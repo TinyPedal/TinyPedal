@@ -202,9 +202,8 @@ class Setting:
         """Set next setting filename to load"""
         self._setting_to_load = filename
 
-    def get_primary_preset_name(self, sim_name: str) -> str:
+    def get_primary_preset_name(self, preset_name: str) -> str:
         """Get primary preset name and verify"""
-        preset_name = self.primary_preset.get(sim_name, "")
         if is_allowed_filename(preset_name):
             full_preset_name = f"{preset_name}{FileExt.JSON}"
             if os.path.exists(f"{self.path.settings}{full_preset_name}"):

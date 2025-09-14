@@ -25,47 +25,58 @@ from types import MappingProxyType
 CLASSINFO_DEFAULT = MappingProxyType({
     "alias": "???",
     "color": "#0044AA",
+    "preset": "",
 })
 
 CLASSES_DEFAULT = {
     "Hyper": {
         "alias": "HY",
         "color": "#FF4400",
+        "preset": "",
     },
     "Hypercar": {
         "alias": "HY",
         "color": "#FF4400",
+        "preset": "",
     },
     "LMP1": {
         "alias": "LMP1",
         "color": "#FF00AA",
+        "preset": "",
     },
     "LMP2": {
         "alias": "LMP2",
         "color": "#0088FF",
+        "preset": "",
     },
     "LMP3": {
         "alias": "LMP3",
         "color": "#0044AA",
+        "preset": "",
     },
     "GTE": {
         "alias": "GTE",
         "color": "#00CC44",
+        "preset": "",
     },
     "GT3": {
         "alias": "GT3",
         "color": "#229900",
+        "preset": "",
     },
     "DPi": {
         "alias": "DPi",
         "color": "#0044AA",
+        "preset": "",
     },
     "FR3.5_2014": {
         "alias": "FR35",
         "color": "#4488AA",
+        "preset": "",
     },
     "Formula Pro": {
         "alias": "FPro",
         "color": "#FF3300",
+        "preset": "",
     },
 }

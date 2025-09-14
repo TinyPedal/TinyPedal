@@ -36,26 +36,41 @@ Click `Transfer` button to transfer settings from currently loaded preset to ano
 `Right-Click` on a preset name in `Preset` tab opens up a context menu that provides additional preset file management options:
 
 * Lock Preset
+
     Lock selected preset, which prevents any changes that made through TinyPedal from saving to locked preset file. APP `version` tag will be attached to the preset that is locked with.
 
     Note, this feature does not prevent user from modifying or deleting locked preset file by other means. Locked preset file info is stored in `config.lock` file in [Global User Configuration](#global-user-configuration) folder.
 
 * Unlock Preset
+
     Unlock selected preset.
 
-* Set primary for *
-    Add `primary sim` tag to selected preset, which will be auto loaded by `Auto load preset` system. Note, a single preset can have tags from multiple games.
+* Set Primary for Class
 
-* Clear primary tag
-    Clear all tags from selected preset.
+    Add primary `class` tag to selected preset, which will be auto loaded by `Auto load preset` system. Class tags and colors are defined in `classes.json` file, which can be modified in [Vehicle Class Editor](#vehicle-class-editor).
+
+    Note, a single preset can have tags from multiple classes. Auto loading `primary class` preset (if available) always takes priority over `primary sim`.
+
+* Set Primary for * (Sim)
+
+    Add primary `sim` tag to selected preset, which will be auto loaded by `Auto load preset` system.
+
+    Note, a single preset can have tags from multiple games. This option is ignored if `primary class` is found.
+
+* Clear Primary Tag
+
+    Clear all primary tags from selected preset.
 
 * Duplicate
+
     Duplicate selected preset with a new name.
 
 * Rename
+
     Rename selected preset with a new name. This option is not available for locked preset.
 
 * Delete
+
     Delete selected preset with confirmation. This option is not available for locked preset.
 
 [**`Back to Top`**](#)

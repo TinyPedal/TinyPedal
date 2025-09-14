@@ -33,6 +33,7 @@ from PySide2.QtWidgets import (
 )
 
 from ..api_control import api
+from ..const_common import EMPTY_DICT
 from ..const_file import ConfigType
 from ..formatter import random_color_class
 from ..setting import cfg, copy_setting
@@ -200,6 +201,7 @@ class VehicleClassEditor(BaseEditor):
 
     def update_classes_temp(self):
         """Update temporary changes to class temp first"""
+        loaded = self.classes_temp.copy()
         self.classes_temp.clear()
         for index in range(self.table_classes.rowCount()):
             class_name = self.table_classes.item(index, 0).text()
@@ -208,6 +210,7 @@ class VehicleClassEditor(BaseEditor):
             self.classes_temp[class_name] = {
                 "alias": abbr_name,
                 "color": color_string,
+                "preset": loaded.get(class_name, EMPTY_DICT).get("preset", ""),
             }
 
     def save_setting(self):

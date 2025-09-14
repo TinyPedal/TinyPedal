@@ -162,6 +162,13 @@ class PresetList(QWidget):
         menu = QMenu()  # no parent for temp menu
         menu.addAction("Unlock Preset" if is_locked else "Lock Preset")
         menu.addSeparator()
+
+        menu_class = QMenu()
+        menu_class.setTitle("Set Primary for Class")
+        for class_name in cfg.user.classes:
+            menu_class.addAction(class_name)
+        menu.addMenu(menu_class)
+
         menu.addAction("Set Primary for LMU")
         menu.addAction("Set Primary for RF2")
         menu.addAction("Clear Primary Tag")
@@ -176,8 +183,13 @@ class PresetList(QWidget):
             return
         action = selected_action.text()
 
+        # Set primary preset Class
+        if action in cfg.user.classes:
+            cfg.user.classes[action]["preset"] = selected_preset_name
+            cfg.save(cfg_type=ConfigType.CLASSES)
+            self.refresh()
         # Set primary preset LMU
-        if action == "Set Primary for LMU":
+        elif action == "Set Primary for LMU":
             cfg.primary_preset["LMU"] = selected_preset_name
             cfg.save(cfg_type=ConfigType.CONFIG)
             self.refresh()
@@ -188,13 +200,14 @@ class PresetList(QWidget):
             self.refresh()
         # Clear primary preset tag
         elif action == "Clear Primary Tag":
-            tag_found = False
+            for class_name, class_data in cfg.user.classes.items():
+                if selected_preset_name == class_data["preset"]:
+                    class_data["preset"] = ""
+                    cfg.save(cfg_type=ConfigType.CLASSES)
             for sim_name, primary_preset in cfg.primary_preset.items():
                 if selected_preset_name == primary_preset:
                     cfg.primary_preset[sim_name] = ""
-                    tag_found = True
-            if tag_found:
-                cfg.save(cfg_type=ConfigType.CONFIG)
+                    cfg.save(cfg_type=ConfigType.CONFIG)
                 self.refresh()
         # Lock/unlock preset
         elif action == "Lock Preset":
@@ -342,12 +355,21 @@ class PresetTagItem(QWidget):
         layout_item.setSpacing(0)
         layout_item.addStretch(1)
 
+        # Class name tag
+        for class_name, class_data in cfg.user.classes.items():
+            if preset_name == class_data["preset"]:
+                label_class_name = QLabel(class_name)
+                label_class_name.setStyleSheet(f"background: {class_data['color']}")
+                layout_item.addWidget(label_class_name)
+
+        # Sim name tag
         for sim_name, primary_preset in cfg.primary_preset.items():
             if preset_name == primary_preset:
                 label_sim_name = QLabel(sim_name)
                 label_sim_name.setObjectName(sim_name)
                 layout_item.addWidget(label_sim_name)
 
+        # File lock tag
         preset_filename = f"{preset_name}{FileExt.JSON}"
         if preset_filename in cfg.user.filelock:
             label_locked = QLabel(f"{cfg.user.filelock[preset_filename]['version']}")

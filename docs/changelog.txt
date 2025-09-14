@@ -1,7 +1,13 @@
 WIP
 -----------------------------
+* Auto load preset system
+  - [New]Now supports auto loading primary preset for specific vehicle class (requested by user "H4dro" and "Lymark"). Note, auto loading primary class preset (if available) always takes priority over primary sim (such as LMU or RF2).
+  - Added "Set Primary for Class" sub-menu to right-click context menu in Preset tab list, which allows to tag select preset with specific vehicle class name for auto loading.
+  - Show vehicle class tags in Preset tab. Class tags and colors are defined in "classes.json" file, which can be modified in "Vehicle Class Editor".
+  - "Clear Primary Tag" option now removes both "class" and "sim" tags from selected preset.
+
 * Fuel Widget, Virtual energy Widget
-  - Added "show_estimated_pitstop_count", "show_delta_and_end_remaining", "show_fuel_ratio_and_bias" options, which allow to show or hide corresponding column.
+  - [New]Added "show_estimated_pitstop_count", "show_delta_and_end_remaining", "show_fuel_ratio_and_bias" options, which allow to show or hide corresponding column.
 
 * Brake temperature Widget
   - [New]Reworked average brake temperature calculation to more accurately reflect average temperature change under braking. Average brake temperature is now calculated from most recent braking period. The braking period is defined by "average_sampling_duration" and "off_brake_duration" options.
