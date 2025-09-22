@@ -3542,6 +3542,21 @@ Show percentage load ratio between each and total tyre load. Set `false` to show
 ## Tyre pressure
 **This widget displays tyre pressure info.**
 
+    hot_pressure_temperature_threshold
+Set minimum temperature threshold (measured from tyre carcass in Celsius) for hot pressure indication. Default is `65` degrees Celsius. Default color for cold pressure is blue, and orange for hot pressure.
+
+    show_pressure_deviation
+Show average tyre pressure deviation between each tyre and the tyre with highest pressure.
+
+    average_sampling_duration
+Set duration (seconds) for calculating average tyre pressure. Default is `10` seconds. Maximum duration is limited to `600` seconds.
+
+    swap_style
+Swap cold and hot pressure color.
+
+    show_tyre_compound
+Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
+
 [**`Back to Top`**](#)
 
 

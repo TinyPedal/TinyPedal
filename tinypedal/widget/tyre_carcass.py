@@ -240,7 +240,7 @@ class Realtime(Overlay):
         """Rate of change"""
         if target.last != data:
             target.last = data
-            target.setText(f"{self.unit_temp(data):.1f}"[:3].strip("."))
+            target.setText(f"{self.unit_temp(abs(data)):.1f}"[:3].strip("."))
             target.updateStyle(self.bar_style_rtemp[data > 0])
 
     def update_tcmpd(self, target, data):

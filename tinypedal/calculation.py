@@ -23,7 +23,7 @@ Calculation function
 from __future__ import annotations
 
 from math import acos, atan, atan2, ceil, cos, degrees, dist, hypot, radians, sin
-from statistics import fmean, stdev
+from statistics import fmean
 from typing import Sequence, Tuple
 
 from .const_common import FLOAT_INF
@@ -35,7 +35,6 @@ mean = fmean
 vel2speed = hypot  # velocity to speed
 rad2deg = degrees  # radians to degrees
 oriyaw2rad = atan2  # orientation yaw to radians
-std_dev = stdev  # sample standard deviation
 deg2rad = radians  # degrees to radians
 
 

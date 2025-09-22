@@ -6,6 +6,12 @@ WIP
   - Show vehicle class tags in Preset tab. Class tags and colors are defined in "classes.json" file, which can be modified in "Vehicle Class Editor".
   - "Clear Primary Tag" option now removes both "class" and "sim" tags from selected preset.
 
+* Tyre pressure Widget
+  - [New]Redesigned tyre pressure widget to show cold and hot pressure indication and average pressure deviation (requested by user "ebeninca"). Default color for cold pressure is blue, and orange for hot pressure.
+  - Added "hot_pressure_temperature_threshold" option, which sets minimum temperature threshold (measured from tyre carcass in Celsius) for hot pressure indication. Default is `65` degrees Celsius.
+  - Added "show_pressure_deviation" option, which shows average tyre pressure deviation between each tyre and the tyre with highest pressure.
+  - Added "show_tyre_compound" option for displaying tyre compound symbols.
+
 * Fuel Widget, Virtual energy Widget
   - [New]Added "show_estimated_pitstop_count", "show_delta_and_end_remaining", "show_fuel_ratio_and_bias" options, which allow to show or hide corresponding column.
 
