@@ -20,6 +20,8 @@
 Rake angle Widget
 """
 
+from functools import partial
+
 from .. import calculation as calc
 from ..api_control import api
 from ._base import Overlay
@@ -67,15 +69,22 @@ class Realtime(Overlay):
         )
         layout.addWidget(self.bar_rake, 0, 0)
 
+        # Last data
+        self.ema_rake = 0
+        self.calc_ema_rake = partial(
+            calc.exp_mov_avg,
+            calc.ema_factor(min(max(self.wcfg["rake_angle_smoothing_samples"], 1), 500))
+        )
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Rake angle
-        rake = round(calc.rake(*api.read.wheel.ride_height()), 2)
-        self.update_rakeangle(self.bar_rake, rake)
+        self.ema_rake = self.calc_ema_rake(self.ema_rake, calc.rake(*api.read.wheel.ride_height()))
+        self.update_rake(self.bar_rake, round(self.ema_rake, 2))
 
     # GUI update methods
-    def update_rakeangle(self, target, data):
-        """Rake angle data"""
+    def update_rake(self, target, data):
+        """Rake data"""
         if target.last != data:
             target.last = data
             target.setText(self.format_rake(data))

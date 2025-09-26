@@ -50,7 +50,7 @@ def generator_init(func):
 
 
 # Value validate
-def infnan_to_zero(value: Any) -> float | int:
+def infnan_to_zero(value: Any) -> float:
     """Convert invalid value (inf or nan) to zero"""
     if isfinite(value):  # isinstance(value, TYPE_NUMBER)
         return value

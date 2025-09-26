@@ -834,12 +834,14 @@ class Vehicle(DataAdapter):
         dmg = self.info.rf2TeleVeh(index).mDentSeverity
         return dmg[1], dmg[0], dmg[7], dmg[2], dmg[6], dmg[3], dmg[4], dmg[5]  # RF2 order
 
-    def bodywork_integrity(self, index: int | None = None) -> float:
-        """Bodywork integrity"""
+    def integrity(self, index: int | None = None) -> float:
+        """Vehicle integrity"""
+        data = self.info.rf2TeleVeh(index)
         total = (
             1
-            - sum(self.info.rf2TeleVeh(index).mDentSeverity) / 16
-            - any(data.mDetached for data in self.info.rf2TeleVeh(index).mWheels) / 2
+            - sum(data.mDentSeverity) / 16
+            - any(wheel_data.mDetached for wheel_data in data.mWheels) / 2
+            - data.mDetached / 2
         )
         if total < 0:
             return 0

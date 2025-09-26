@@ -1,30 +1,33 @@
 WIP
 -----------------------------
 * Auto load preset system
-  - [New]Now supports auto loading primary preset for specific vehicle class (requested by user "H4dro" and "Lymark"). Note, auto loading primary class preset (if available) always takes priority over primary sim (such as LMU or RF2).
+  - Now supports auto loading primary preset for specific vehicle class (requested by user "H4dro" and "Lymark"). Note, auto loading primary class preset (if available) always takes priority over primary sim (such as LMU or RF2).
   - Added "Set Primary for Class" sub-menu to right-click context menu in Preset tab list, which allows to tag select preset with specific vehicle class name for auto loading.
   - Show vehicle class tags in Preset tab. Class tags and colors are defined in "classes.json" file, which can be modified in "Vehicle Class Editor".
   - "Clear Primary Tag" option now removes both "class" and "sim" tags from selected preset.
 
 * Tyre pressure Widget
-  - [New]Redesigned tyre pressure widget to show cold and hot pressure indication and average pressure deviation (requested by user "ebeninca"). Default color for cold pressure is blue, and orange for hot pressure.
+  - Redesigned tyre pressure widget to show cold and hot pressure indication and average pressure deviation (requested by user "ebeninca"). Default color for cold pressure is blue, and orange for hot pressure.
   - Added "hot_pressure_temperature_threshold" option, which sets minimum temperature threshold (measured from tyre carcass in Celsius) for hot pressure indication. Default is `65` degrees Celsius.
   - Added "show_pressure_deviation" option, which shows average tyre pressure deviation between each tyre and the tyre with highest pressure.
   - Added "show_tyre_compound" option for displaying tyre compound symbols.
 
 * Fuel Widget, Virtual energy Widget
-  - [New]Added "show_estimated_pitstop_count", "show_delta_and_end_remaining", "show_fuel_ratio_and_bias" options, which allow to show or hide corresponding column.
+  - Added "show_estimated_pitstop_count", "show_delta_and_end_remaining", "show_fuel_ratio_and_bias" options, which allow to show or hide corresponding column.
 
 * Brake temperature Widget
-  - [New]Reworked average brake temperature calculation to more accurately reflect average temperature change under braking. Average brake temperature is now calculated from most recent braking period. The braking period is defined by "average_sampling_duration" and "off_brake_duration" options.
+  - Reworked average brake temperature calculation to more accurately reflect average temperature change under braking. Average brake temperature is now calculated from most recent braking period. The braking period is defined by "average_sampling_duration" and "off_brake_duration" options.
   - Added "average_sampling_duration" option, which sets duration (seconds) for calculating average brake temperature from most recent braking period. Default is "10" seconds. Maximum duration is limited to "600" seconds.
   - Added "off_brake_duration" option, which sets duration (seconds) for continuously updating average brake temperature for a short period after fully released brakes. Default is "1" seconds.
   - Removed old "highlight_duration", "font_color_highlighted", "bkg_color_highlighted" options.
 
 * Laps and position Widget
-  - [New]Now shows estimated total laps for time-based session (requested by user "Sandriekus"). A "~" sign will be displayed before estimated total laps reading, and up to two decimal places will be kept.
+  - Now shows estimated total laps for time-based session (requested by user "Sandriekus"). A "~" sign will be displayed before estimated total laps reading, and up to two decimal places will be kept.
     Note, estimated total laps reading is calculated based on local player's lap time pace data from Delta Module, which can be different from in-game HUD reading. This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it.
   - Increased "lap_number" bar width by 3 characters to fit with additional digits and decimals from estimated total laps reading.
+
+* Rake angle Widget
+  - Added "rake_angle_smoothing_samples" option for reducing data fluctuation and improved readability.
 
 * Spectate mode
   - Fixed an issue where lower-case names were sorted and placed at the bottom of player list.

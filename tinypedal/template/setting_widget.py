@@ -1369,6 +1369,7 @@ WIDGET_DEFAULT = {
         "font_weight": "bold",
         "bar_padding": 0.2,
         "wheelbase": 2800,
+        "rake_angle_smoothing_samples": 20,
         "font_color_rake_angle": "#FFFFFF",
         "bkg_color_rake_angle": "#222222",
         "warning_color_negative_rake": "#00AAFF",

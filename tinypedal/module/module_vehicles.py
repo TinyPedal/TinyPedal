@@ -236,7 +236,7 @@ def calc_time_gap_behind(
     behind_index: int,
     track_length: float,
     lap_progress_total: float,
-) -> float | int:
+) -> float:
     """Calculate interval behind next in class"""
     if ahead_index < 0:
         return 0.0
@@ -254,7 +254,7 @@ def calc_time_gap_behind(
     return abs(time_gap)
 
 
-def calc_gap_behind_next(index: int) -> float | int:
+def calc_gap_behind_next(index: int) -> float:
     """Calculate interval behind next"""
     laps_behind_next = api.read.lap.behind_next(index)
     if laps_behind_next > 0:
@@ -262,7 +262,7 @@ def calc_gap_behind_next(index: int) -> float | int:
     return api.read.timing.behind_next(index)
 
 
-def calc_gap_behind_leader(index: int) -> float | int:
+def calc_gap_behind_leader(index: int) -> float:
     """Calculate interval behind leader"""
     laps_behind_leader = api.read.lap.behind_leader(index)
     if laps_behind_leader > 0:

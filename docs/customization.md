@@ -1116,7 +1116,7 @@ Enable delta module.
 Set minimum recording distance (in meters) between each lap time sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
 
     delta_smoothing_samples
-Set number of samples for delta data smoothing calculation using exponential moving average (EMA) method. Value range in `1` to `100`. Higher value results more smoothness, but may lose accuracy. Default is `30` samples. Set to `1` to disable smoothing.
+Set number of samples for reducing data fluctuation. Value range in `1` to `100`. Higher value results more smoothness, but may lose accuracy. Default is `30` samples. Set to `1` to disable smoothing.
 
     laptime_pace_samples
 Set number of samples for average laptime pace calculation (EMA). Value range in `1` to `20`. Default is `6` samples. Set `1` to disable averaging. Note, initial laptime pace is always based on player's all time personal best laptime if available. If a new laptime is faster than current laptime pace, it will replace current laptime pace without calculating average. Invalid lap, pit-in/out laps are always excluded from laptime pace calculation.
@@ -2657,6 +2657,9 @@ The three values define an invisible rectangle area(unit meter) that hides any v
     wheelbase
 Set wheelbase in millimeters, for used in rake angle calculation.
 
+    rake_angle_smoothing_samples
+Set number of samples for reducing data fluctuation. Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+
     show_degree_sign
 Set `true` to show degree sign for rake angle value.
 
@@ -3491,7 +3494,7 @@ Show carcass temeperature rate of change for a specific time interval.
 Set time interval in seconds for rate of change calculation. Default interval is `5` seconds. Minimum interval is limited to `1` second, maximum interval is limited to `60` seconds.
 
     rate_of_change_smoothing_samples
-Set number of samples for rate of change data smoothing calculation (EMA). Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+Set number of samples for reducing data fluctuation. Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
