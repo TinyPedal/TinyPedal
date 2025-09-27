@@ -135,6 +135,17 @@ def force_ratio(value1: float, value2: float, min_limit: float = 1) -> float:
     return 0
 
 
+def part_to_whole_ratio(part: float, whole: float, median: float = 0) -> float:
+    """Part to whole ratio"""
+    abs_part = abs(part)
+    abs_whole = abs(whole)
+    if abs_whole > 0:
+        if abs_part < abs_whole:
+            return 100 * part / whole
+        return 100
+    return median
+
+
 def braking_rate(lgt_gforce: float, is_braking: bool, not_impacted: bool = True) -> float:
     """Braking rate (longitudinal G force)"""
     if is_braking and not_impacted:

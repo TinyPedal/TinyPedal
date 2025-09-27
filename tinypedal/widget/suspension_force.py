@@ -102,7 +102,7 @@ class Realtime(Overlay):
         force_set = api.read.wheel.suspension_force()
         sum_force = sum(force_set)
         for force, bar_force in zip(force_set, self.bars_force):
-            ratio = calc.force_ratio(force, sum_force)
+            ratio = calc.part_to_whole_ratio(force, sum_force)
             if self.wcfg["show_force_ratio"]:
                 force = ratio
             self.update_force(bar_force, round(force), ratio)

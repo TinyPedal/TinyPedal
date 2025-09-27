@@ -6,6 +6,12 @@ WIP
   - Show vehicle class tags in Preset tab. Class tags and colors are defined in "classes.json" file, which can be modified in "Vehicle Class Editor".
   - "Clear Primary Tag" option now removes both "class" and "sim" tags from selected preset.
 
+* [New]Roll angle Widget
+  - Show vehicle front and rear roll angles in degrees.
+  - Show roll angle difference between front and rear roll angles.
+  - Show roll angle ratio between front and rear. 50% indicates equal roll angle; less than 50% indicates rear rolls more than front.
+  - See User Guide "Roll angle" section for details.
+
 * Tyre pressure Widget
   - Redesigned tyre pressure widget to show cold and hot pressure indication and average pressure deviation (requested by user "ebeninca"). Default color for cold pressure is blue, and orange for hot pressure.
   - Added "hot_pressure_temperature_threshold" option, which sets minimum temperature threshold (measured from tyre carcass in Celsius) for hot pressure indication. Default is `65` degrees Celsius.
@@ -28,6 +34,7 @@ WIP
 
 * Rake angle Widget
   - Added "rake_angle_smoothing_samples" option for reducing data fluctuation and improved readability.
+  - Added "decimal_places" option.
 
 * Spectate mode
   - Fixed an issue where lower-case names were sorted and placed at the bottom of player list.

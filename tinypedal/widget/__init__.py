@@ -61,6 +61,7 @@ __all__ = [
     "relative_finish_order",
     "ride_height",
     "rivals",
+    "roll_angle",
     "sectors",
     "session",
     "slip_ratio",

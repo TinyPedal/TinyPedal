@@ -44,6 +44,7 @@ class Realtime(Overlay):
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.prefix_text = self.wcfg["prefix_rake_angle"]
         self.sign_text = "°" if self.wcfg["show_degree_sign"] else ""
+        self.decimals = max(int(self.wcfg["decimal_places"]), 1)
 
         # Base style
         self.set_base_style(self.set_qss(
@@ -80,7 +81,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         # Rake angle
         self.ema_rake = self.calc_ema_rake(self.ema_rake, calc.rake(*api.read.wheel.ride_height()))
-        self.update_rake(self.bar_rake, round(self.ema_rake, 2))
+        self.update_rake(self.bar_rake, self.ema_rake)
 
     # GUI update methods
     def update_rake(self, target, data):
@@ -92,7 +93,7 @@ class Realtime(Overlay):
 
     def format_rake(self, rake):
         """Format rake"""
-        rake_angle = f"{calc.slope_angle(rake, self.wcfg['wheelbase']):+.2f}"[:5]
+        rake_angle = f"{calc.slope_angle(rake, self.wcfg['wheelbase']):+.{self.decimals}f}"[:self.decimals + 3]
         if self.wcfg["show_ride_height_difference"]:
             ride_diff = f"({abs(rake):02.0f})"[:4]
         else:

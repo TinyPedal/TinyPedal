@@ -102,7 +102,7 @@ class Realtime(Overlay):
         tload_set = api.read.tyre.load()
         sum_load = sum(tload_set)
         for tload, bar_tload in zip(tload_set, self.bars_tload):
-            tratio = calc.force_ratio(tload, sum_load)
+            tratio = calc.part_to_whole_ratio(tload, sum_load)
             if self.wcfg["show_tyre_load_ratio"]:
                 tload = tratio
             self.update_tload(bar_tload, round(tload), tratio)

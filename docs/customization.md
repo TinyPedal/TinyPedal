@@ -1916,7 +1916,7 @@ Show finish or disqualify state.
 Show longitudinal and lateral g force with direction indicator.
 
     show_downforce_ratio
-Show front vs rear downforce ratio. 50% means equal downforce; higher than 50% means front has more downforce.
+Show downforce ratio between front and rear. 50% indicates equal downforce; higher than 50% indicates front has more downforce.
 
     show_front_downforce, show_rear_downforce
 Show front and rear downforce reading in Newtons.
@@ -2652,7 +2652,7 @@ The three values define an invisible rectangle area(unit meter) that hides any v
 
 
 ## Rake angle
-**This widget displays vehicle rake info.**
+**This widget displays vehicle rake angle info.**
 
     wheelbase
 Set wheelbase in millimeters, for used in rake angle calculation.
@@ -2960,6 +2960,27 @@ Align time interval in the center when enabled. Default is right alignment when 
 
     *_color_time_interval_ahead, *_color_time_interval_behind
 Set custom time interval color of opponent ahead and behind.
+
+[**`Back to Top`**](#)
+
+
+## Roll angle
+**This widget displays vehicle front and rear roll angles info.**
+
+    show_degree_and_percentage_sign
+Set `true` to show degree and percentage sign.
+
+    wheel_track_front, wheel_track_rear
+Set front and rear wheel track in millimeters, for used in roll angle calculation. Default is `2000` millimeters.
+
+    roll_angle_smoothing_samples, roll_angle_ratio_smoothing_samples
+Set number of samples for reducing data fluctuation. Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+
+    show_roll_angle_difference
+Show roll angle difference between front and rear roll angles.
+
+    show_roll_angle_ratio
+Show roll angle ratio between front and rear. 50% indicates equal roll angle; less than 50% indicates rear rolls more than front.
 
 [**`Back to Top`**](#)
 
