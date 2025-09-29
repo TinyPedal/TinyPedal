@@ -662,7 +662,7 @@ class Realtime(Overlay):
             elif ve <= -100:
                 text = "---"
             else:
-                text = f"{data[0]:03.0%}"[:3]
+                text = f"{ve:03.0%}"[:3]
             target.setText(text)
             target.updateStyle(self.bar_style_nrg[color_index])
 

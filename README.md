@@ -27,6 +27,8 @@ The plugin file `rFactor2SharedMemoryMapPlugin64.dll` should be placed in:
 
 2. For `Le Mans Ultimate`, it is `Le Mans Ultimate\Plugins` folder.
 
+Note, if `Plugins` folder is missing from game folder, you will have to manually create this `Plugins` folder.
+
 This plugin also comes with some of the popular rF2/LMU Apps, check corresponding game's plugins folder first to see if it was installed already.
 
 In-game setup:
