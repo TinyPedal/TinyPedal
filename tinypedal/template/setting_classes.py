@@ -49,9 +49,14 @@ CLASSES_DEFAULT = {
         "color": "#0088FF",
         "preset": "",
     },
+    "LMP2_ELMS": {
+        "alias": "LMP2_ELMS",
+        "color": "#0044AA",
+        "preset": "",
+    },
     "LMP3": {
         "alias": "LMP3",
-        "color": "#0044AA",
+        "color": "#880088",
         "preset": "",
     },
     "GTE": {
