@@ -451,6 +451,33 @@ class Realtime(Overlay):
                 column_index=self.wcfg["column_index_energy_remaining"],
                 hide_start=1,
             )
+        # Vehicle integrity
+        if self.wcfg["show_vehicle_integrity"]:
+            self.bar_style_dmg = (
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_vehicle_integrity_full"],
+                    bg_color=self.wcfg["bkg_color_vehicle_integrity"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_vehicle_integrity_high"],
+                    bg_color=self.wcfg["bkg_color_vehicle_integrity"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_vehicle_integrity_low"],
+                    bg_color=self.wcfg["bkg_color_vehicle_integrity"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_player_vehicle_integrity"],
+                    bg_color=self.wcfg["bkg_color_player_vehicle_integrity"])
+            )
+            self.bars_dmg = self.set_qlabel(
+                style=self.bar_style_dmg[0],
+                width=1 * font_m.width + bar_padx,
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_dmg,
+                column_index=self.wcfg["column_index_vehicle_integrity"],
+                hide_start=1,
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -559,6 +586,9 @@ class Realtime(Overlay):
             # Remaining energy
             if self.wcfg["show_energy_remaining"]:
                 self.update_nrg(self.bars_nrg[idx], veh_info.energyRemaining, hi_player, state)
+            # Vehicle integrity
+            if self.wcfg["show_vehicle_integrity"]:
+                self.update_dmg(self.bars_dmg[idx], veh_info.vehicleIntegrity, hi_player, state)
 
     # GUI update methods
     def update_pos(self, target, *data):
@@ -768,6 +798,27 @@ class Realtime(Overlay):
                 text = f"{ve:03.0%}"[:3]
             target.setText(text)
             target.updateStyle(self.bar_style_nrg[color_index])
+            self.toggle_visibility(target, data[-1])
+
+    def update_dmg(self, target, *data):
+        """Vehicle integrity"""
+        if target.last != data:
+            target.last = data
+            hp = int(data[0] * 10)
+            if data[1]:  # highlighted player
+                color_index = 3
+            elif hp >= 10:  # full integrity
+                color_index = 0
+            elif hp <= 5:  # low
+                color_index = 2
+            else:  # high
+                color_index = 1
+            if hp >= 10:
+                text = TEXT_PLACEHOLDER
+            else:
+                text = f"{hp:d}"
+            target.setText(text)
+            target.updateStyle(self.bar_style_dmg[color_index])
             self.toggle_visibility(target, data[-1])
 
     # Additional methods

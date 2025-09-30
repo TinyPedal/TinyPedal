@@ -14,9 +14,16 @@ WIP
 
 * Tyre pressure Widget
   - Redesigned tyre pressure widget to show cold and hot pressure indication and average pressure deviation (requested by user "ebeninca"). Default color for cold pressure is blue, and orange for hot pressure.
-  - Added "hot_pressure_temperature_threshold" option, which sets minimum temperature threshold (measured from tyre carcass in Celsius) for hot pressure indication. Default is `65` degrees Celsius.
+  - Added "hot_pressure_temperature_threshold" option, which sets minimum temperature threshold (measured from tyre carcass in Celsius) for hot pressure indication. Default is "65" degrees Celsius.
   - Added "show_pressure_deviation" option, which shows average tyre pressure deviation between each tyre and the tyre with highest pressure.
   - Added "show_tyre_compound" option for displaying tyre compound symbols.
+
+* Relative, Rivals, Standings Widget
+  - Added "show_vehicle_integrity" option (requested by user "francescodg"), which shows opponent vehicle integrity reading.
+    The integrity reading is calculated from hull damage, detachable wheels and parts, and displayed as:
+    - Full integrity (no damage), as "-" (default color grey).
+    - High integrity (lightly damaged hull), from "9" to "5" (default color blue).
+    - Low integrity (severely damaged hull, and most likely has detached wheels or parts), from "5" to "0" (default color red).
 
 * Fuel Widget, Virtual energy Widget
   - Added "show_estimated_pitstop_count", "show_delta_and_end_remaining", "show_fuel_ratio_and_bias" options, which allow to show or hide corresponding column.

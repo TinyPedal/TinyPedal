@@ -182,6 +182,7 @@ class VehicleDataSet:
         "worldPositionY",
         "relativeRotatedPositionX",
         "relativeRotatedPositionY",
+        "vehicleIntegrity",
         "energyRemaining",
         "pitTimer",
         "lapTimeHistory",
@@ -219,6 +220,7 @@ class VehicleDataSet:
         self.worldPositionY: float = 0.0
         self.relativeRotatedPositionX: float = 0.0
         self.relativeRotatedPositionY: float = 0.0
+        self.vehicleIntegrity: float = 0.0
         self.energyRemaining: float = 0.0
         self.pitTimer: VehiclePitTimer = VehiclePitTimer()
         self.lapTimeHistory: DeltaLapTime = DeltaLapTime("d", [0.0] * 6)

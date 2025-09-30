@@ -2338,7 +2338,7 @@ Show empty lap time history. Default is `false`, which hides empty rows.
 **This widget displays lap number, driver overall position, position in class info.**
 
     show_lap_number
-Show your current lap number (lap progression) and total race laps. If total race laps is not available, such as in time-based session, estimated total laps will be displayed instead, and a "~" sign will be displayed before estimated total laps reading, and up to two decimal places will be kept.
+Show your current lap number (lap progression) and total race laps. If total race laps is not available, such as in time-based session, estimated total laps will be displayed instead, and a `~` sign will be displayed before estimated total laps reading, and up to two decimal places will be kept.
 
 Note, estimated total laps reading is calculated based on local player's lap time pace data from Delta Module, which can be different from in-game HUD reading. This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it.
 
@@ -3147,6 +3147,14 @@ Some cases where interpolation may not be applied:
 - During pit stop, refilled energy reading may not be updated until driver finishes his pit out lap (as mentioned earlier), which means old energy reading persists during pit out lap and would result wrong estimates with interpolation. For this reason, interpolation is disabled during pit out lap.
 
 In either case, just wait another lap and energy readings will be synchronized.
+
+    show_vehicle_integrity
+Show opponent vehicle integrity reading.
+
+The integrity reading is calculated from hull damage, detachable wheels and parts, and displayed as:
+- Full integrity (no damage), as `-` (default color grey).
+- High integrity (lightly damaged hull), from `9` to `5` (default color blue).
+- Low integrity (severely damaged hull, and most likely has detached wheels or parts), from `5` to `0` (default color red).
 
 [**`Back to Top`**](#)
 

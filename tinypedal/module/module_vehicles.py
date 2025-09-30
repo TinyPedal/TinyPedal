@@ -194,6 +194,7 @@ def update_vehicle_data(
             data.gapBehindNextInClass = calc_time_gap_behind(opt_index_ahead, index, track_length, data.totalLapProgress)
             data.gapBehindLeaderInClass = calc_time_gap_behind(opt_index_leader, index, track_length, data.totalLapProgress)
 
+            data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.energyRemaining = calc_stint_energy(data.driverName, data.vehicleClass, data.totalLapProgress, data.pitTimer.pitting and not data.inPit)
 
             data.lapTimeHistory.update(api.read.timing.start(index), elapsed_time, data.lastLapTime)
