@@ -3154,7 +3154,7 @@ Show opponent vehicle integrity reading.
 The integrity reading is calculated from hull damage, detachable wheels and parts, and displayed as:
 - Full integrity (no damage), as `-` (default color grey).
 - High integrity (lightly damaged hull), from `9` to `5` (default color blue).
-- Low integrity (severely damaged hull, and most likely has detached wheels or parts), from `5` to `0` (default color red).
+- Low integrity (severely damaged hull, and most likely has detached wheels or parts), from `4` to `0` (default color red).
 
 [**`Back to Top`**](#)
 
@@ -3728,6 +3728,30 @@ Set number of forecasts to display. Value range in `1` to `4`. Default is `4` fo
 
     show_unavailable_data
 Show columns with unavailable weather data. Set `False` to auto hide columns with unavailable data. Note, auto hide only works for time-based race.
+
+[**`Back to Top`**](#)
+
+
+## Weight distribution
+**This widget displays weight distribution info.**
+
+Note, to get accurate static weight distribution readings, test setup on level ground.
+
+Weight distribution is calculated from tyre load data, which may not be available from certain vehicles in game API (such as LMGT3).
+
+To workaround this limitation, suspension load data, while not entirely the same, will be used for calculation instead.
+
+    show_front_to_rear_distribution
+Show front to rear weight distribution in percentage.
+
+    show_left_to_right_distribution
+Show left to right weight distribution in percentage.
+
+    show_cross_weight
+Show cross weight (known as `wedge`) in percentage.
+
+    smoothing_samples
+Set number of samples for reducing data fluctuation. Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
 [**`Back to Top`**](#)
 

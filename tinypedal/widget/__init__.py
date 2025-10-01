@@ -86,6 +86,7 @@ __all__ = [
     "virtual_energy",
     "weather",
     "weather_forecast",
+    "weight_distribution",
     "wheel_alignment",
 ]
 

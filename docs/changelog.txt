@@ -1,5 +1,10 @@
-WIP
+2.34.0 (2025-10-01)
 -----------------------------
+* Repository change notice
+  - In order to better organize things, as well as serve future development, the repository address (previous under my personal repo) is now moved to "github.com/TinyPedal".
+    All previous links to the old repository will be auto-redirected to the new address and continue to work, with only one exception to "Check for updates".
+  - Updated "Check for updates" function to point to the new repository address (any version before v2.34.0 may not be able to detect this or newer updates, as expected due to changes above).
+
 * Auto load preset system
   - Now supports auto loading primary preset for specific vehicle class (requested by user "H4dro" and "Lymark"). Note, auto loading primary class preset (if available) always takes priority over primary sim (such as LMU or RF2).
   - Added "Set Primary for Class" sub-menu to right-click context menu in Preset tab list, which allows to tag select preset with specific vehicle class name for auto loading.
@@ -12,6 +17,14 @@ WIP
   - Show roll angle ratio between front and rear. 50% indicates equal roll angle; less than 50% indicates rear rolls more than front.
   - See User Guide "Roll angle" section for details.
 
+* [New]Weight distribution Widget
+  - Show front to rear weight distribution in percentage.
+  - Show left to right weight distribution in percentage.
+  - Show cross weight (known as "wedge") in percentage.
+  - Note, to get accurate static weight distribution readings, test setup on level ground.
+    Weight distribution is calculated from tyre load data, which may not be available from certain vehicles in game API (such as LMGT3).
+    To workaround this limitation, suspension load data, while not entirely the same, will be used for calculation instead.
+
 * Tyre pressure Widget
   - Redesigned tyre pressure widget to show cold and hot pressure indication and average pressure deviation (requested by user "ebeninca"). Default color for cold pressure is blue, and orange for hot pressure.
   - Added "hot_pressure_temperature_threshold" option, which sets minimum temperature threshold (measured from tyre carcass in Celsius) for hot pressure indication. Default is "65" degrees Celsius.
@@ -23,7 +36,7 @@ WIP
     The integrity reading is calculated from hull damage, detachable wheels and parts, and displayed as:
     - Full integrity (no damage), as "-" (default color grey).
     - High integrity (lightly damaged hull), from "9" to "5" (default color blue).
-    - Low integrity (severely damaged hull, and most likely has detached wheels or parts), from "5" to "0" (default color red).
+    - Low integrity (severely damaged hull, and most likely has detached wheels or parts), from "4" to "0" (default color red).
 
 * Fuel Widget, Virtual energy Widget
   - Added "show_estimated_pitstop_count", "show_delta_and_end_remaining", "show_fuel_ratio_and_bias" options, which allow to show or hide corresponding column.
@@ -48,6 +61,8 @@ WIP
 
 * Misc
   - Added new contributor "sepi" to contributors.md in "Community support" section.
+
+Thanks to everyone supporting the development, have fun.
 
 2.33.2 (2025-09-03)
 -----------------------------
