@@ -95,11 +95,17 @@ class Realtime(DataModule):
 
 def update_consumption_history():
     """Update consumption history"""
-    if (minfo.history.consumptionDataSet[0].lapTimeLast != minfo.delta.lapTimeLast
-        > minfo.delta.lapTimeCurrent > 2):  # record 2s after pass finish line
+    if not (10 > minfo.delta.lapTimeCurrent > 2) or minfo.delta.lapTimeLast < 1:
+        return
+
+    lap_number = api.read.lap.completed_laps() - 1
+    if (
+        minfo.history.consumptionDataSet[0].lapTimeLast != minfo.delta.lapTimeLast
+        or minfo.history.consumptionDataSet[0].lapNumber != lap_number
+    ):
         minfo.history.consumptionDataSet.appendleft(
             ConsumptionDataSet(
-                lapNumber=api.read.lap.completed_laps() - 1,
+                lapNumber=lap_number,
                 isValidLap=int(minfo.delta.isValidLap),
                 lapTimeLast=minfo.delta.lapTimeLast,
                 lastLapUsedFuel=minfo.fuel.lastLapConsumption,
