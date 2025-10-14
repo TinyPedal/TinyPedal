@@ -120,13 +120,13 @@ class Realtime(Overlay):
 
         # Last data
         self.last_sector_idx = -1  # previous recorded sector index value
+        self.last_target_time = MAX_SECONDS
         self.freeze_timer_start = 0  # sector timer start
-        self.time_target_text = ""  # target time text
 
     def post_update(self):
         self.last_sector_idx = -1
+        self.last_target_time = MAX_SECONDS
         self.freeze_timer_start = 0
-        self.time_target_text = ""
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -134,61 +134,60 @@ class Realtime(Overlay):
         lap_stime = api.read.timing.start()
         lap_etime = api.read.timing.elapsed()
         laptime_curr = max(lap_etime - lap_stime, 0)
+        data = minfo.sectors
 
         # Triggered when sector changed
-        if self.last_sector_idx != minfo.sectors.sectorIndex:
+        if self.last_sector_idx != data.sectorIndex:
+
+            # Activate freeze timer, reset sector index
+            self.freeze_timer_start = lap_etime
+            self.last_sector_idx = data.sectorIndex
+
+            # Previous sector index
+            prev_s_idx = PREV_SECTOR_INDEX[data.sectorIndex]
 
             # Update (time target) best sector text
-            self.time_target_text = self.set_target_time(
-                minfo.sectors.sectorBestTB,
-                minfo.sectors.sectorBestPB,
-                minfo.sectors.sectorIndex)
-
-            # Activate freeze & sector timer
-            self.freeze_timer_start = lap_etime
-
-            # Freeze current sector time
-            self.update_time_curr(
-                minfo.sectors.sectorIndex,
-                minfo.sectors.sectorPrev,
-                laptime_curr, True)
-
-            # Update previous & best sector time
-            prev_s_idx = PREV_SECTOR_INDEX[minfo.sectors.sectorIndex]
-
-            self.update_time_target_gap(
-                minfo.sectors.deltaSectorBestPB, minfo.sectors.deltaSectorBestTB, prev_s_idx
-            )
-
-            if not minfo.sectors.noDeltaSector:
-                if self.wcfg["target_laptime"] == "Theoretical":
+            if self.wcfg["target_laptime"] == "Theoretical":
+                self.last_target_time = calc.accumulated_sum(data.sectorBestTB, data.sectorIndex)
+                self.update_time_target_gap(data.deltaSectorBestTB, prev_s_idx)
+                if not data.noDeltaSector:
                     self.update_sector_gap(
                         self.bars_time_gap[prev_s_idx],
-                        minfo.sectors.deltaSectorBestTB[prev_s_idx])
-                else:
+                        data.deltaSectorBestTB[prev_s_idx],
+                    )
+            else:
+                self.last_target_time = calc.accumulated_sum(data.sectorBestPB, data.sectorIndex)
+                self.update_time_target_gap(data.deltaSectorBestPB, prev_s_idx)
+                if not data.noDeltaSector:
                     self.update_sector_gap(
                         self.bars_time_gap[prev_s_idx],
-                        minfo.sectors.deltaSectorBestPB[prev_s_idx])
+                        data.deltaSectorBestPB[prev_s_idx],
+                    )
 
-            self.last_sector_idx = minfo.sectors.sectorIndex  # reset
+            # Freeze previous sector time
+            if valid_sectors(data.sectorPrev[prev_s_idx]):  # valid previous sector time
+                sum_sectortime = calc.accumulated_sum(data.sectorPrev, prev_s_idx)
+                if sum_sectortime < MAX_SECONDS:  # bypass invalid value
+                    laptime_curr = sum_sectortime
+            self.update_time_curr(self.bar_time_curr, laptime_curr, prev_s_idx)
 
         # Update freeze timer
         if self.freeze_timer_start:
             # Stop freeze timer after duration
-            if lap_etime - self.freeze_timer_start >= self.freeze_duration(
-                minfo.sectors.sectorPrev[minfo.sectors.sectorIndex]):
+            freeze_time = self.freeze_duration(data.sectorPrev[data.sectorIndex])
+            if lap_etime - self.freeze_timer_start >= freeze_time:
                 self.freeze_timer_start = 0  # stop timer
-                # Update best sector time
-                self.update_time_target(self.time_target_text)
+                # Update target time
+                self.update_time_target(self.last_target_time)
                 # Restore best sector time when cross finish line
-                if minfo.sectors.sectorIndex == 0:
-                    self.restore_best_sector()
+                if data.sectorIndex == 0:
+                    if self.wcfg["target_laptime"] == "Theoretical":
+                        self.restore_best_sector(data.sectorBestTB)
+                    else:
+                        self.restore_best_sector(data.sectorBestPB)
         else:
             # Update current sector time
-            self.update_time_curr(
-                minfo.sectors.sectorIndex,
-                minfo.sectors.sectorPrev,
-                laptime_curr)
+            self.update_time_curr(self.bar_time_curr, laptime_curr, data.sectorIndex)
 
     # GUI update methods
     def update_sector_gap(self, target, data):
@@ -198,63 +197,38 @@ class Realtime(Overlay):
             target.setText(f"{data:+.3f}"[:7])
             target.updateStyle(self.bar_style_gap[data < 0])
 
-    def update_time_curr(self, sector_idx, prev_s, laptime_curr, freeze=False):
+    def update_time_curr(self, target, data, prev_s_idx):
         """Current sector time text"""
-        curr_sectortime = laptime_curr
-        # Freeze current sector time
-        if freeze:
-            prev_sector_idx = PREV_SECTOR_INDEX[sector_idx]
-            if valid_sectors(prev_s[prev_sector_idx]):  # valid previous sector time
-                sum_sectortime = calc.accumulated_sum(prev_s, prev_sector_idx)
-                if sum_sectortime < MAX_SECONDS:  # bypass invalid value
-                    curr_sectortime = sum_sectortime
-        else:
-            prev_sector_idx = sector_idx
-        self.bar_time_curr.setText(
-            f"{SECTOR_ABBR_ID[prev_sector_idx]}{calc.sec2laptime(curr_sectortime)[:8]: >9}")
+        if target.last != data:
+            target.last = data
+            target.setText(f"{SECTOR_ABBR_ID[prev_s_idx]}{calc.sec2laptime(data)[:8]: >9}")
 
-    def update_time_target(self, text_laptime):
+    def update_time_target(self, seconds):
         """Target sector time text"""
+        if seconds < MAX_SECONDS:  # bypass invalid value
+            text_laptime = f"{self.prefix_best}{calc.sec2laptime(seconds)[:8]: >9}"
+        else:
+            text_laptime = f"{self.prefix_best}   --.---"
         self.bar_time_target.setText(text_laptime)
         self.bar_time_target.updateStyle(self.bar_style_time_target[2])
 
-    def update_time_target_gap(self, delta_pb, delta_tb, sec_index):
+    def update_time_target_gap(self, delta_sec, sec_index):
         """Target sector time gap"""
-        if self.wcfg["target_laptime"] == "Theoretical":
-            sector_gap = calc.accumulated_sum(delta_tb, sec_index)
-        else:
-            sector_gap = calc.accumulated_sum(delta_pb, sec_index)
+        sector_gap = calc.accumulated_sum(delta_sec, sec_index)
         self.bar_time_target.setText(f"{self.prefix_best}{sector_gap: >+9.3f}"[:11])
         self.bar_time_target.updateStyle(self.bar_style_time_target[sector_gap < 0])
 
-    def restore_best_sector(self):
+    def restore_best_sector(self, sector_time):
         """Restore best sector time"""
-        if self.wcfg["target_laptime"] == "Theoretical":
-            sector_time = minfo.sectors.sectorBestTB
-        else:
-            sector_time = minfo.sectors.sectorBestPB
         for idx, bar_time_gap in enumerate(self.bars_time_gap):
-            text_s = SECTOR_ABBR_ID[idx]
             if valid_sectors(sector_time[idx]):
                 text_s = f"{sector_time[idx]:.3f}"[:7]
+            else:
+                text_s = SECTOR_ABBR_ID[idx]
             bar_time_gap.setText(text_s)
             bar_time_gap.updateStyle(self.bar_style_gap[2])
 
     # Sector data update methods
-    def set_target_time(self, sec_tb, sec_pb, sec_index):
-        """Set target sector time text"""
-        # Mode 0 - show theoretical best sector, only update if all sector time is valid
-        if self.wcfg["target_laptime"] == "Theoretical":
-            sector_time = calc.accumulated_sum(sec_tb, sec_index)
-            if sector_time < MAX_SECONDS:  # bypass invalid value
-                return f"TB{calc.sec2laptime(sector_time)[:8]: >9}"
-            return "TB   --.---"
-        # Mode 1 - show personal best lap sector
-        sector_time = calc.accumulated_sum(sec_pb, sec_index)
-        if sector_time < MAX_SECONDS:  # bypass invalid value
-            return f"PB{calc.sec2laptime(sector_time)[:8]: >9}"
-        return "PB   --.---"
-
     def freeze_duration(self, seconds):
         """Set freeze duration"""
         if valid_sectors(seconds):
