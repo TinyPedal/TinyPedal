@@ -1,3 +1,18 @@
+WIP
+-----------------------------
+* Delta Module
+  - Now calculates estimated lap time based on stint deltabest for increased accuracy (requested by user "Obly88").
+    Note, if stint deltabest is not yet available, session deltabest (or all time deltabest) will be used instead.
+
+* Wheels Module
+  - Added brake failure thickness logging to console if brake fails (LMU only).
+
+* Brake wear Widget
+  - Fixed an issue where brake "warning_threshold_wear" was not correctly applied while "show_thickness" enabled.
+
+* Misc
+  - Fixed an issue where consumption history was not recorded if two consecutive laps ended with exact same lap time.
+
 2.34.0 (2025-10-01)
 -----------------------------
 * Repository change notice

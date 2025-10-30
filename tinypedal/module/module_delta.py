@@ -251,6 +251,15 @@ class Realtime(DataModule):
                         ),
                     )
 
+                # Estimated laptime
+                laptime_est = laptime_stint_best + delta_ema_stint  # from stint
+                if not 0 < laptime_est < MAX_SECONDS:
+                    laptime_est = laptime_session_best + delta_ema_session  # fallback to session
+                    if not 0 < laptime_est < MAX_SECONDS:
+                        laptime_est = laptime_best + delta_ema_best  # fallback to best
+                        if not 0 < laptime_est < MAX_SECONDS:
+                            laptime_est = 0
+
                 # Output delta time data
                 output.deltaBest = delta_ema_best
                 output.deltaLast = delta_ema_last
@@ -260,7 +269,7 @@ class Realtime(DataModule):
                 output.lapTimeCurrent = laptime_curr
                 output.lapTimeLast = laptime_last
                 output.lapTimeBest = laptime_best
-                output.lapTimeEstimated = laptime_best + delta_ema_best
+                output.lapTimeEstimated = laptime_est
                 output.lapTimeSession = laptime_session_best
                 output.lapTimeStint = laptime_stint_best
                 output.lapTimePace = laptime_pace
