@@ -20,6 +20,7 @@
 Wheels module
 """
 
+import logging
 from collections import deque
 
 from .. import calculation as calc
@@ -29,6 +30,8 @@ from ..module_info import WheelsInfo, minfo
 from ..userfile.heatmap import brake_failure_thickness
 from ..validator import generator_init
 from ._base import DataModule
+
+logger = logging.getLogger(__name__)
 
 
 class Realtime(DataModule):
@@ -272,6 +275,8 @@ def calc_brake_wear(output: WheelsInfo):
     brake_wear_last = list(WHEELS_ZERO)  # last lap brake wear
     brake_max_thickness = list(WHEELS_ZERO)  # brake max thickness at start of stint
     failure_thickness = WHEELS_ZERO
+    failure_record = list(WHEELS_ZERO)  # recorded failure thickness
+
     while True:
         updating = yield None
 
@@ -297,8 +302,19 @@ def calc_brake_wear(output: WheelsInfo):
             last_lap_stime = lap_stime  # reset time stamp counter
 
         for idx, brake_curr in enumerate(brake_curr_set):
-            # Calculate effective thickness
             brake_curr *= 1000  # meter to millimeter
+
+            # Log brake failure
+            if brake_curr > 1:
+                failure_record[idx] = brake_curr
+            elif output.currentBrakeThickness[idx] > 1:
+                logger.info(
+                    "%s brake failed at %s(mm)",
+                    ("Front left", "Front right", "Rear left", "Rear right")[idx],
+                    failure_record[idx],
+                )
+
+            # Calculate effective thickness
             brake_curr -= failure_thickness[idx]
 
             # Calibrate max thickness
@@ -308,7 +324,7 @@ def calc_brake_wear(output: WheelsInfo):
 
             if not brake_max_thickness[idx]:  # bypass invalid value
                 brake_curr = 0.0
-            else:  # convert to percent
+            else:  # fraction to percent
                 brake_curr *= 100 / brake_max_thickness[idx]
 
             # Update wear differences & accumulated wear
