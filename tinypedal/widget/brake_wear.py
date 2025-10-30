@@ -192,10 +192,12 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         laptime_pace = minfo.delta.lapTimePace
+
         for idx in range(4):
             brake_curr = minfo.wheels.currentBrakeThickness[idx]
             max_thickness = minfo.wheels.maxBrakeThickness[idx]
             est_wear = minfo.wheels.estimatedBrakeWear[idx]
+            est_wear_percent = est_wear
 
             if self.wcfg["show_thickness"]:
                 brake_curr *= max_thickness / 100
@@ -211,7 +213,7 @@ class Realtime(Overlay):
 
             # Wear differences
             if self.wcfg["show_wear_difference"]:
-                self.update_diff(self.bars_diff[idx], est_wear)
+                self.update_diff(self.bars_diff[idx], est_wear, est_wear_percent)
 
             # Estimated lifespan in laps
             if self.wcfg["show_lifespan_laps"]:
@@ -233,13 +235,13 @@ class Realtime(Overlay):
                 self.bar_style_remain[data <= threshold_remaining]
             )
 
-    def update_diff(self, target, data):
+    def update_diff(self, target, data, percent):
         """Wear differences"""
         if target.last != data:
             target.last = data
             target.setText(self.format_num(data))
             target.updateStyle(
-                self.bar_style_diff[data > self.wcfg["warning_threshold_wear"]]
+                self.bar_style_diff[percent > self.wcfg["warning_threshold_wear"]]
             )
 
     def update_laps(self, target, data):
