@@ -22,6 +22,7 @@ Overlay base common class.
 
 from __future__ import annotations
 
+from time import monotonic
 from typing import NamedTuple
 
 from PySide2.QtCore import QPoint
@@ -225,8 +226,10 @@ class WarningFlash:
         self._flash_count = 0
         self._flash_max = max(max_count, 3)
 
-    def state(self, elapsed: float, condition: bool) -> bool:
+    def state(self, condition: bool) -> bool:
         """Update warning flash state"""
+        elapsed = monotonic()
+
         if self._last_condition != condition:
             self._last_condition = condition
             if condition:

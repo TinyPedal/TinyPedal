@@ -7,6 +7,10 @@ WIP
 * Wheels Module
   - Added brake failure thickness logging to console if brake fails (LMU only).
 
+* Battery Widget
+  - Added "show_battery_charge_warning_flash" option (requested by user "Ces-cos"), which shows battery charge warning flash effect when battery charge decreased below "low_battery_threshold" or increased above "high_battery_threshold".
+  - Added "number_of_warning_flashes", "warning_flash_highlight_duration", "warning_flash_interval" options.
+
 * Brake wear Widget
   - Fixed an issue where brake "warning_threshold_wear" was not correctly applied while "show_thickness" enabled.
 

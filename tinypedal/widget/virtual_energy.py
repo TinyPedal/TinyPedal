@@ -21,7 +21,6 @@ Virtual energy Widget
 """
 
 from .. import calculation as calc
-from ..api_control import api
 from ..module_info import minfo
 from ._base import Overlay
 from ._common import WarningFlash
@@ -372,7 +371,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         is_low_energy = minfo.energy.estimatedLaps <= self.wcfg["low_energy_lap_threshold"]
         if self.wcfg["show_low_energy_warning_flash"] and minfo.energy.estimatedValidConsumption:
-            is_low_energy = self.warn_flash.state(api.read.timing.elapsed(), is_low_energy)
+            is_low_energy = self.warn_flash.state(is_low_energy)
             if is_low_energy:
                 padding = 0.00000001  # add padding for switching state
             else:

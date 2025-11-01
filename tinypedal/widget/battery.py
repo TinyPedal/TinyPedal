@@ -22,6 +22,7 @@ Battery Widget
 
 from ..module_info import minfo
 from ._base import Overlay
+from ._common import WarningFlash
 
 
 class Realtime(Overlay):
@@ -136,12 +137,37 @@ class Realtime(Overlay):
                 column=self.wcfg["column_index_activation_timer"],
             )
 
+        # Last data
+        self.warn_flash = WarningFlash(
+            self.wcfg["warning_flash_highlight_duration"],
+            self.wcfg["warning_flash_interval"],
+            self.wcfg["number_of_warning_flashes"],
+        )
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Battery charge & usage
         if self.wcfg["show_battery_charge"]:
             battery_charge = minfo.hybrid.batteryCharge
-            self.update_charge(self.bar_charge, battery_charge)
+
+            if battery_charge >= self.wcfg["high_battery_threshold"]:
+                batt_warning = 2
+            elif battery_charge <= self.wcfg["low_battery_threshold"]:
+                batt_warning = 1
+            else:
+                batt_warning = 0
+
+            if self.wcfg["show_battery_charge_warning_flash"]:
+                batt_highlight = self.warn_flash.state(batt_warning)
+                if batt_highlight:
+                    padding = 0.00000001  # add padding for switching state
+                else:
+                    batt_warning = 0
+                    padding = 0
+            else:
+                padding = 0
+
+            self.update_charge(self.bar_charge, battery_charge + padding, self.bar_style_charge[batt_warning])
 
         if 0 <= minfo.delta.lapTimeCurrent < self.freeze_duration:
             battery_drain = minfo.hybrid.batteryDrainLast
@@ -166,18 +192,12 @@ class Realtime(Overlay):
             self.update_timer(self.bar_timer, active_timer)
 
     # GUI update methods
-    def update_charge(self, target, data):
+    def update_charge(self, target, data, color):
         """Battery charge"""
         if target.last != data:
             target.last = data
-            if data >= self.wcfg["high_battery_threshold"]:
-                color_index = 2
-            elif data <= self.wcfg["low_battery_threshold"]:
-                color_index = 1
-            else:
-                color_index = 0
             target.setText(f"B{data: >7.2f}"[:8])
-            target.updateStyle(self.bar_style_charge[color_index])
+            target.updateStyle(color)
 
     def update_drain(self, target, data):
         """Battery drain"""

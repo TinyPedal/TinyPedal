@@ -1363,6 +1363,18 @@ Show electric boost motor activation timer.
     high_battery_threshold, low_battery_threshold
 Set percentage threshold for displaying low or high battery charge warning indicator. Default high threshold is `95` percent (default color purple), low threshold is `10` percent (default color red).
 
+    show_battery_charge_warning_flash
+Show battery charge warning flash effect when battery charge decreased below `low_battery_threshold` or increased above `high_battery_threshold`.
+
+    number_of_warning_flashes
+Set number of warning flashes that will be played for a limited number of times. Default is `10` flashes. Minimum value is limited to `3`.
+
+    warning_flash_highlight_duration
+Set color highlight duration for each warning flash. Default is `0.4` seconds. Minimum value is limited to `0.2`.
+
+    warning_flash_interval
+Set minimum time interval between each warning flash. Default is `0.4` seconds. Minimum value is limited to `0.2`.
+
     freeze_duration
 Set freeze duration (seconds) for displaying previous lap total drained/regenerated battery charge after crossing finish line. Value range in `0` to `30` seconds. Default is `10` seconds.
 
