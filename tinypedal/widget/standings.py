@@ -478,6 +478,27 @@ class Realtime(Overlay):
                 column_index=self.wcfg["column_index_vehicle_integrity"],
                 hide_start=1,
             )
+        # Stint laps
+        if self.wcfg["show_stint_laps"]:
+            self.bar_style_stl = (
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_stint_laps"],
+                    bg_color=self.wcfg["bkg_color_stint_laps"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_player_stint_laps"],
+                    bg_color=self.wcfg["bkg_color_player_stint_laps"])
+            )
+            self.bars_stl = self.set_qlabel(
+                style=self.bar_style_stl[0],
+                width=5 * font_m.width + bar_padx,
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_stl,
+                column_index=self.wcfg["column_index_stint_laps"],
+                hide_start=1,
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -589,6 +610,9 @@ class Realtime(Overlay):
             # Vehicle integrity
             if self.wcfg["show_vehicle_integrity"]:
                 self.update_dmg(self.bars_dmg[idx], veh_info.vehicleIntegrity, hi_player, state)
+            # Stint laps
+            if self.wcfg["show_stint_laps"]:
+                self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, hi_player, state)
 
     # GUI update methods
     def update_pos(self, target, *data):
@@ -784,7 +808,7 @@ class Realtime(Overlay):
             ve = data[0]
             if data[1]:  # highlighted player
                 color_index = 4
-            elif ve <= -100:  # unavailable
+            elif ve <= -1:  # unavailable
                 color_index = 0
             elif ve <= 0.1:  # 10% remaining
                 color_index = 3
@@ -792,7 +816,7 @@ class Realtime(Overlay):
                 color_index = 2
             else:
                 color_index = 1
-            if ve <= -100:
+            if ve <= -1:
                 text = "---"
             else:
                 text = f"{ve:03.0%}"[:3]
@@ -819,6 +843,24 @@ class Realtime(Overlay):
                 text = f"{hp:d}"
             target.setText(text)
             target.updateStyle(self.bar_style_dmg[color_index])
+            self.toggle_visibility(target, data[-1])
+
+    def update_stl(self, target, *data):
+        """Stint laps"""
+        if target.last != data:
+            target.last = data
+            stint_laps_done = data[0]
+            stint_laps_est = data[1]
+            if stint_laps_done <= 0:
+                text_done = "--"
+            else:
+                text_done = f"{stint_laps_done:02.0f}"
+            if stint_laps_est <= 0:
+                text_est = "--"
+            else:
+                text_est = f"{stint_laps_est // 1:02.0f}"
+            target.setText(f"{text_done}/{text_est}")
+            target.updateStyle(self.bar_style_stl[data[2]])
             self.toggle_visibility(target, data[-1])
 
     # Additional methods

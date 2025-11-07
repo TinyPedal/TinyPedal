@@ -141,7 +141,7 @@ LMU_PITSTOPTIME = (
     ResRawOutput(minfo.restapi, "penaltyTime", 0.0, ("penalties",)),
 )
 LMU_STINTUSAGE = (
-    ResParOutput(minfo.restapi, "stintVirtualEnergy", EMPTY_DICT, stint_ve_usage, EMPTY_KEYS),
+    ResParOutput(minfo.restapi, "stintUsage", EMPTY_DICT, stint_ve_usage, EMPTY_KEYS),
 )
 #LMU_GAMESTATE = (
 #    ResRawOutput(minfo.restapi, "trackClockTime", -1.0, ("timeOfDay",)),

@@ -654,7 +654,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             ve = data[0]
-            if ve <= -100:  # unavailable
+            if ve <= -1:  # unavailable
                 color_index = 0
             elif ve <= 0.1:  # 10% remaining
                 color_index = 3
@@ -662,7 +662,7 @@ class Realtime(Overlay):
                 color_index = 2
             else:
                 color_index = 1
-            if ve <= -100:
+            if ve <= -1:
                 text = "---"
             else:
                 text = f"{ve:03.0%}"[:3]
