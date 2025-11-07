@@ -187,7 +187,7 @@ def dict_value_type(data: dict, default_data: dict) -> dict:
 def is_hex_color(color_str: str | Any) -> bool:
     """Validate HEX color string"""
     if isinstance(color_str, str):
-        return rex_hex_color(color_str) is not None
+        return rex_hex_color.search(color_str) is not None
     return False
 
 

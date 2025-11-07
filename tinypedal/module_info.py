@@ -56,7 +56,7 @@ class ConsumptionDataSet(NamedTuple):
 class WeatherNode(NamedTuple):
     """Weather forecast node info"""
 
-    start_seconds: float = MAX_SECONDS
+    start_percent: float = MAX_SECONDS
     sky_type: int = -1
     temperature: float = ABS_ZERO_CELSIUS
     rain_chance: float = -1.0
@@ -497,9 +497,9 @@ class RestAPIInfo:
         self.maxVirtualEnergy: float = 0.0
         self.aeroDamage: float = -1.0
         self.penaltyTime: float = 0.0
-        self.forecastPractice: list[WeatherNode] | None = None
-        self.forecastQualify: list[WeatherNode] | None = None
-        self.forecastRace: list[WeatherNode] | None = None
+        self.forecastPractice: tuple[WeatherNode, ...] | None = None
+        self.forecastQualify: tuple[WeatherNode, ...] | None = None
+        self.forecastRace: tuple[WeatherNode, ...] | None = None
         self.brakeWear: list[float] = []
         self.suspensionDamage: list[float] = []
         self.stintUsage: Mapping[str, tuple[float, float, float, float, int]] = EMPTY_DICT

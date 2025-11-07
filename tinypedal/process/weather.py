@@ -24,31 +24,30 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from ..const_common import ABS_ZERO_CELSIUS, MAX_FORECAST_MINUTES
 from ..module_info import WeatherNode, minfo
 
-FORECAST_DEFAULT = [WeatherNode(MAX_FORECAST_MINUTES, -1, ABS_ZERO_CELSIUS, -1)]
+FORECAST_DEFAULT = (WeatherNode(),)
 FORECAST_NODES_RF2 = ("START", "NODE_25", "NODE_50", "NODE_75", "FINISH")
 
 
-def forecast_rf2(data: dict) -> list[WeatherNode]:
+def forecast_rf2(data: dict) -> tuple[WeatherNode, ...]:
     """Get value from weather forecast dictionary, output 5 api data"""
     try:
-        output = [
+        output = tuple(
             WeatherNode(
-                round(index * 0.2, 1),
-                data[node]["WNV_SKY"]["currentValue"],
-                round(data[node]["WNV_TEMPERATURE"]["currentValue"]),
-                round(data[node]["WNV_RAIN_CHANCE"]["currentValue"]),
+                start_percent=round(index * 0.2, 1),
+                sky_type=data[node]["WNV_SKY"]["currentValue"],
+                temperature=round(data[node]["WNV_TEMPERATURE"]["currentValue"]),
+                rain_chance=round(data[node]["WNV_RAIN_CHANCE"]["currentValue"]),
             )
             for index, node in enumerate(FORECAST_NODES_RF2)
-        ]
+        )
     except (KeyError, TypeError):
         output = FORECAST_DEFAULT
     return output
 
 
-def get_forecast_info(session_type: int) -> list[WeatherNode]:
+def get_forecast_info(session_type: int) -> tuple[WeatherNode, ...]:
     """Get forecast nodes list"""
     if session_type <= 1:  # practice session
         info = minfo.restapi.forecastPractice

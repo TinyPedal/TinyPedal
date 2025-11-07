@@ -258,7 +258,7 @@ class Realtime(Overlay):
                     self.bars_rain[slot_index].setHidden(unavailable)
 
     # Additional methods
-    def set_forecast_time(self, forecast_info: list[WeatherNode]) -> int:
+    def set_forecast_time(self, forecast_info: tuple[WeatherNode, ...]) -> int:
         """Set forecast estimated time"""
         index_offset = 0
         session_length = api.read.session.end()
@@ -266,9 +266,9 @@ class Realtime(Overlay):
         for index, forecast in enumerate(forecast_info):
             if index == 0:
                 continue
-            # Seconds away = next node start seconds * session length - elapsed time
+            # Seconds away = next node start percent * session length - elapsed time
             _time = self.estimated_time[index] = round(
-                (forecast.start_seconds * session_length - elapsed_time) / 60)
+                (forecast.start_percent * session_length - elapsed_time) / 60)
             if _time <= 0:
                 index_offset += 1
         return index_offset

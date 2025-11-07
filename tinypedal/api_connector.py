@@ -107,12 +107,12 @@ class SimRF2(Connector):
     def dataset(self) -> APIDataSet:
         return set_dataset_rf2(self.info)
 
-    def setup(self, *config):
-        self.info.setMode(config[0])
-        self.info.setPID(config[1])
-        self.info.setPlayerOverride(config[2])
-        self.info.setPlayerIndex(config[3])
-        rf2_data.tostr = partial(bytes_to_str, char_encoding=config[4])
+    def setup(self, config: dict):
+        self.info.setMode(config["access_mode"])
+        self.info.setPID(config["process_id"])
+        self.info.setPlayerOverride(config["enable_player_index_override"])
+        self.info.setPlayerIndex(config["player_index"])
+        rf2_data.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
 
 
 class SimLMU(Connector):
@@ -133,12 +133,12 @@ class SimLMU(Connector):
     def dataset(self) -> APIDataSet:
         return set_dataset_rf2(self.info)
 
-    def setup(self, *config):
-        self.info.setMode(config[0])
-        self.info.setPID(config[1])
-        self.info.setPlayerOverride(config[2])
-        self.info.setPlayerIndex(config[3])
-        rf2_data.tostr = partial(bytes_to_str, char_encoding=config[4])
+    def setup(self, config: dict):
+        self.info.setMode(config["access_mode"])
+        self.info.setPID(config["process_id"])
+        self.info.setPlayerOverride(config["enable_player_index_override"])
+        self.info.setPlayerIndex(config["player_index"])
+        rf2_data.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
 
 
 # Add new API to API_PACK

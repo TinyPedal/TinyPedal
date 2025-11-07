@@ -114,7 +114,7 @@ def shorten_driver_name(name: str) -> str:
 
 def strip_invalid_char(name: str) -> str:
     """Strip invalid characters"""
-    return rex_invalid_char("", name)
+    return rex_invalid_char.sub("", name)
 
 
 def laptime_string_to_seconds(laptime: str) -> float:

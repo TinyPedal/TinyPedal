@@ -77,7 +77,7 @@ def zero_one(value: float) -> float:
 
 def min_nonzero(data: tuple[float, ...]) -> float:
     """Minimum non-zero positive value"""
-    return min(filter(lambda x: x > 0, data))
+    return min(value for value in data if value > 0)
 
 
 def decimal_strip(raw_range: float, max_decimals: int) -> float:

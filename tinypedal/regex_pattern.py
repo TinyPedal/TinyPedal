@@ -23,8 +23,8 @@ Regular expression, pattern, string constants
 import re
 
 # Compiled regex function
-rex_hex_color = re.compile(r"^#[0-9A-F]{3}$|^#[0-9A-F]{6}$|^#[0-9A-F]{8}$", flags=re.IGNORECASE).search
-rex_invalid_char = re.compile(r'[\\/:*?"<>|]').sub
+rex_hex_color = re.compile(r"^#[0-9A-F]{3}$|^#[0-9A-F]{6}$|^#[0-9A-F]{8}$", flags=re.IGNORECASE)
+rex_invalid_char = re.compile(r'[\\/:*?"<>|]')
 rex_number_extract = re.compile(r"\d*\.?\d+")
 
 # Bool
