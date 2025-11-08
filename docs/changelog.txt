@@ -1,5 +1,11 @@
 WIP
 -----------------------------
+* Major Changes
+  - Added new "Telemetry API" setting, which unifies "Shared memory API" and "Rest API" data accessing.
+  - Previous settings from "Shared memory API" and "RestAPI Module" will be auto transferred to "Telemetry API". All old settings are preserved for backward compatibility in case user wish to use older versions.
+  - Rest API accessing can now be enabled or disabled by toggling "enable_restapi_access" option in "Telemetry API" dialog.
+  - Removed "RestAPI Module" from Module Tab.
+
 * Delta Module
   - Now calculates estimated lap time based on stint deltabest for increased accuracy (requested by user "Obly88").
     Note, if stint deltabest is not yet available, session deltabest (or all time deltabest) will be used instead.
@@ -3798,8 +3804,8 @@ Thanks to @DanRZ for suggestions and testing feedback.
   - Show "last stint" data bar that displays last full stint.
   - Note:
     * All current stint data resets when player makes a full-serviced pit stop (either refueled or tire changed).
-    * Current stint data will only be transfered and displayed in "last stint data" bar, if player makes a full-serviced pit stop.
-    * ESC & restarting in a session or race will not have stint data transfered to "last stint data".
+    * Current stint data will only be transferred and displayed in "last stint data" bar, if player makes a full-serviced pit stop.
+    * ESC & restarting in a session or race will not have stint data transferred to "last stint data".
       This is to prevent incomplete or useless data from overriding normal last stint data.
     * Currently, stint data is not saved to external file.
 

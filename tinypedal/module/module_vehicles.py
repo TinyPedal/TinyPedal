@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import MAX_METERS, MAX_SECONDS, STINT_USAGE_DEFAULT
+from ..const_common import MAX_METERS, MAX_SECONDS
 from ..module_info import VehicleDataSet, VehiclesInfo, minfo
 from ..validator import state_timer
 from ._base import DataModule
@@ -42,7 +42,7 @@ class Realtime(DataModule):
         """Update module data"""
         _event_wait = self._event.wait
         reset = False
-        update_interval = self.active_interval
+        update_interval = self.idle_interval
 
         output = minfo.vehicles
         max_lap_diff_ahead = self.mcfg["lap_difference_ahead_threshold"]
@@ -274,7 +274,7 @@ def calc_gap_behind_leader(index: int) -> float:
 def update_stint_usage(data: VehicleDataSet) -> None:
     """Update stint usage data"""
     (ve_remaining, ve_used, total_laps_done, stint_laps_est, stint_laps_done
-     ) = minfo.restapi.stintUsage.get(data.driverName, STINT_USAGE_DEFAULT)
+     ) = api.read.vehicle.stint_usage(data.driverName)
 
     # Estimated stint laps
     data.estimatedStintLaps = stint_laps_est

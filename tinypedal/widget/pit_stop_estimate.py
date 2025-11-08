@@ -212,13 +212,13 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         pitlane_length = minfo.mapping.pitLaneLength
         speed_limit = minfo.mapping.pitSpeedLimit
-        min_pitstop_time, max_pitstop_time, refill_fuel, refill_energy, state_stopgo = minfo.restapi.pitStopEstimate
+        min_pitstop_time, max_pitstop_time, refill_fuel, refill_energy, state_stopgo = api.read.vehicle.pit_estimate()
         pass_time = pitlane_length / speed_limit if speed_limit else 0
         delay_time = max_pitstop_time - min_pitstop_time
         pit_timer = minfo.vehicles.dataSet[minfo.vehicles.playerIndex].pitTimer.elapsed
 
         if state_stopgo:
-            stopgo_time = minfo.restapi.penaltyTime
+            stopgo_time = api.read.vehicle.penalty_duration()
             if stopgo_time <= 0:  # fallback if not available from API
                 stopgo_time = self.wcfg["stop_go_penalty_time"]
 
@@ -229,7 +229,7 @@ class Realtime(Overlay):
                 min_pitstop_time += stopgo_time
                 max_pitstop_time += stopgo_time
 
-        if minfo.restapi.maxVirtualEnergy:
+        if api.read.vehicle.max_virtual_energy():
             actual_refill = refill_energy
             total_refill = calc.sym_max(minfo.energy.neededRelative, 9999)
         else:

@@ -46,6 +46,7 @@ POS_XY_ZERO = (0.0, 0.0)  # world origin position
 POS_XYZ_ZERO = (0.0, 0.0, 0.0)  # world origin position
 POS_XYZ_INF = (FLOAT_INF, FLOAT_INF, FLOAT_INF)  # infinite position
 WHEELS_ZERO = (0.0, 0.0, 0.0, 0.0)  # FL, FR, RL, RR
+WHEELS_NA = (-1.0, -1.0, -1.0, -1.0)  # FL, FR, RL, RR
 WHEELS_DELTA_DEFAULT = (0.0, *WHEELS_ZERO)  # pos, target set
 STINT_USAGE_DEFAULT = (-1.0, -1.0, -1.0, 0.0, 0)
 REL_TIME_DEFAULT = (0.0, -1)  # relative time gap, player index

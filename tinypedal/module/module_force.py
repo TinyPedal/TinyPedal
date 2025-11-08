@@ -40,7 +40,7 @@ class Realtime(DataModule):
         """Update module data"""
         _event_wait = self._event.wait
         reset = False
-        update_interval = self.active_interval
+        update_interval = self.idle_interval
 
         output = minfo.force
         g_accel = max(self.mcfg["gravitational_acceleration"], 0.01)

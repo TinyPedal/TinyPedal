@@ -112,7 +112,7 @@ class StatusButtonBar(QStatusBar):
 
         self.button_api = QPushButton("")
         self.button_api.clicked.connect(self.refresh)
-        self.button_api.setToolTip("Config Simulation API")
+        self.button_api.setToolTip("Config Telemetry API")
 
         self.button_style = QPushButton("Light")
         self.button_style.clicked.connect(self.toggle_color_theme)
@@ -130,7 +130,7 @@ class StatusButtonBar(QStatusBar):
 
     def refresh(self):
         """Refresh status bar"""
-        if cfg.shared_memory_api["enable_active_state_override"]:
+        if cfg.telemetry_api["enable_active_state_override"]:
             text_api_status = "overriding"
         else:
             text_api_status = api.version
@@ -226,7 +226,7 @@ class AppWindow(QMainWindow):
         # Config menu
         menu_config = ConfigMenu("Config", self)
         menu.addMenu(menu_config)
-        self.statusBar().button_api.clicked.connect(menu_config.open_config_sharedmemory)
+        self.statusBar().button_api.clicked.connect(menu_config.open_config_api)
         # Tools menu
         menu_tools = ToolsMenu("Tools", self)
         menu.addMenu(menu_tools)
@@ -361,7 +361,7 @@ class AppWindow(QMainWindow):
             self.quit_app()
 
     def restart_api(self):
-        """Restart shared memory api"""
+        """Restart telemetry API"""
         api.restart()
         self.statusBar().refresh()
         self.tab_view.refresh_tab(3)

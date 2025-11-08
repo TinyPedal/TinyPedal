@@ -46,7 +46,7 @@ class Realtime(DataModule):
         """Update module data"""
         _event_wait = self._event.wait
         reset = False
-        update_interval = self.active_interval
+        update_interval = self.idle_interval
 
         gen_wheel_rotation = calc_wheel_rotation(
             output=minfo.wheels,
@@ -289,8 +289,8 @@ def calc_brake_wear(output: WheelsInfo):
             failure_thickness = brake_failure_thickness(api.read.vehicle.class_name())
             last_lap_stime = 0.0
 
-        brake_curr_set = minfo.restapi.brakeWear
-        if len(brake_curr_set) != 4:  # skip if data invalid
+        brake_curr_set = api.read.brake.wear()
+        if -1.0 in brake_curr_set:
             continue
 
         lap_stime = api.read.timing.start()

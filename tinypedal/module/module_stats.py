@@ -42,7 +42,7 @@ class Realtime(DataModule):
         """Update module data"""
         _event_wait = self._event.wait
         reset = False
-        update_interval = self.active_interval
+        update_interval = self.idle_interval
 
         output = minfo.stats
         max_moved_distance = 1500 * update_interval
@@ -52,8 +52,8 @@ class Realtime(DataModule):
         while not _event_wait(update_interval):
 
             # Ignore stats while in override mode
-            if (self.cfg.shared_memory_api["enable_player_index_override"]
-                or self.cfg.shared_memory_api["enable_active_state_override"]):
+            if (self.cfg.telemetry_api["enable_player_index_override"]
+                or self.cfg.telemetry_api["enable_active_state_override"]):
                 reset = False  # make sure stats not saved
                 update_interval = self.idle_interval
                 continue

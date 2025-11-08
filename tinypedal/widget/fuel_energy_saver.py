@@ -150,7 +150,7 @@ class Realtime(Overlay):
         in_pits = api.read.vehicle.in_pits()
         tyre_life = sum(api.read.tyre.wear())
         lap_num = api.read.lap.number()
-        energy_type = minfo.restapi.maxVirtualEnergy
+        energy_type = api.read.vehicle.max_virtual_energy()
 
         if energy_type:
             fuel_curr = minfo.energy.amountCurrent

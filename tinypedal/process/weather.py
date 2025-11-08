@@ -23,8 +23,19 @@ Weather forecast function
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import NamedTuple
 
-from ..module_info import WeatherNode, minfo
+from ..const_common import ABS_ZERO_CELSIUS, MAX_SECONDS
+
+
+class WeatherNode(NamedTuple):
+    """Weather forecast node info"""
+
+    start_percent: float = MAX_SECONDS
+    sky_type: int = -1
+    temperature: float = ABS_ZERO_CELSIUS
+    rain_chance: float = -1.0
+
 
 FORECAST_DEFAULT = (WeatherNode(),)
 FORECAST_NODES_RF2 = ("START", "NODE_25", "NODE_50", "NODE_75", "FINISH")
@@ -45,19 +56,6 @@ def forecast_rf2(data: dict) -> tuple[WeatherNode, ...]:
     except (KeyError, TypeError):
         output = FORECAST_DEFAULT
     return output
-
-
-def get_forecast_info(session_type: int) -> tuple[WeatherNode, ...]:
-    """Get forecast nodes list"""
-    if session_type <= 1:  # practice session
-        info = minfo.restapi.forecastPractice
-    elif session_type == 2:  # qualify session
-        info = minfo.restapi.forecastQualify
-    else:
-        info = minfo.restapi.forecastRace  # race session
-    if info:
-        return info
-    return FORECAST_DEFAULT  # get default if no valid data
 
 
 @lru_cache(maxsize=2)

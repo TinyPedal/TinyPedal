@@ -25,7 +25,6 @@ from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap
 
 from ..api_control import api
 from ..const_file import ImageFile
-from ..module_info import minfo
 from ..validator import image_exists
 from ._base import Overlay
 
@@ -103,8 +102,6 @@ class Realtime(Overlay):
             temp_rot_range = self.wcfg["manual_steering_range"]
         else:
             temp_rot_range = api.read.inputs.steering_range_physical()
-            if minfo.restapi.steeringWheelRange > 0 >= temp_rot_range:
-                temp_rot_range = minfo.restapi.steeringWheelRange
 
         # Steering
         temp_steering_angle = api.read.inputs.steering_raw() * temp_rot_range * 0.5

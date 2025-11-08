@@ -388,7 +388,7 @@ class Realtime(Overlay):
             return
         # Hide in private qualifying
         if (self.wcfg["auto_hide_in_private_qualifying"] and
-            minfo.restapi.privateQualifying == 1 and
+            api.read.session.private_qualifying() == 1 and
             api.read.session.session_type() == 2):
             self.show_radar = False
             return

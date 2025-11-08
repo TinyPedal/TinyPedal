@@ -559,8 +559,8 @@ Note, you will still need a third party program (such as `OpenKneeboard`) to pro
 [**`Back to Top`**](#)
 
 
-## Shared memory API
-**Shared Memory API options can be accessed from `Config` menu in main window. Some options may only be relevant to certain API.**
+## Telemetry API
+**Telemetry API options can be accessed from `Config` menu in main window. Some options may only be relevant to certain API.**
 
     api_name
 Set API name for accessing data from supported API.
@@ -590,6 +590,41 @@ Set `player index` override for displaying data from specific player. Valid play
 
     character_encoding
 Set character encoding for displaying text in correct encoding. Available encoding: `UTF-8`, `ISO-8859-1`. Default encoding is `UTF-8`, which works best in `LMU` game. Note, `UTF-8` may not work well for some Latin characters in `RF2`, try use `ISO-8859-1` instead.
+
+    enable_restapi_access
+Enable Rest API accessing (RF2 & LMU), which connects to game's Rest API for accessing additional data that is not available through sharedmemory API.
+
+    url_host*
+Set `RF2` or `LMU` Rest API host address. Default is `localhost`.
+
+    url_port*
+Set port for Rest API host address. Port value must match `WebUI port` value that sets in `LMU` (UserData\player\Settings.JSON) or `RF2` (UserData\player\player.JSON) setting file in order to successfully connect to Rest API and receive data. The default port value for `RF2` is `5397`, and `6397` for `LMU`.
+
+Note, `WebUI port` value from game setting file may change in some situations, and would require manual correction to match `WebUI port` value.
+
+    connection_timeout
+Set connection timeout duration in seconds for Rest API. Value range in `0.5` to `10`. Default is `1` second.
+
+    connection_retry
+Set number of attempts to retry connection for Rest API. Value range in `0` to `10`. Default is `3` retries.
+
+    connection_retry_delay
+Set time delay in seconds to retry connection for Rest API. Value range in `0` to `60`. Default is `1` second.
+
+    enable_energy_remaining
+Enable access to `remaining energy` data from Rest API (LMU only). This is required for showing remaining energy data in widgets such as Relative, Rivals, Standings.
+
+    enable_garage_setup_info
+Enable access to `garage setup` data from Rest API (RF2 & LMU). This is required for accessing various vehicle setup data.
+
+    enable_session_info
+Enable access to `session` data from Rest API (RF2 & LMU). This is required for accessing various session data, such as time-scale.
+
+    enable_vehicle_info
+Enable access to `vehicle` data from Rest API (LMU only). This is essential for accessing `virtual energy`, `brake wear`, `vehicle damage`, `pit stop timing` data.
+
+    enable_weather_info
+Enable access to `weather` data from Rest API (RF2 & LMU). This is required for showing weather forecast.
 
 [**`Back to Top`**](#)
 
@@ -642,7 +677,7 @@ Set font weight to replace `font_weight` setting of all widgets. Default selecti
 ## Spectate mode
 **Spectate mode can be accessed from `Spectate` tab in main window.**
 
-Click `Enabled` or `Disabled` button to toggle spectate mode on and off. Note, spectate mode can also be enabled by setting `enable_player_index_override` option to `true` in [Shared Memory API](#shared-memory-api) config.
+Click `Enabled` or `Disabled` button to toggle spectate mode on and off. Note, spectate mode can also be enabled by setting `enable_player_index_override` option to `true` in [Telemetry API](#telemetry-api) config.
 
 While Spectate mode is enabled, `double-click` on a player name in the list to access telemetry data and overlay readings from selected player; alternatively, select a player name and click `Spectate` button. Current spectating player name is displayed on top of player name list. Player names are listed in alphabetical order.
 
@@ -846,7 +881,7 @@ Note, there are currently two sources for importing from `LMU Rest API`:
 
 Game must be running in order to import from `Rest API`. Newly imported data will be appended on top of existing data, existing data will not be changed.
 
-If importing fails while game is running, check if `URL Port` option in `RestAPI` module that matches `WebUI port` value that sets in `LMU` (UserData\player\Settings.JSON) or `RF2` (UserData\player\player.JSON) setting file. See [RestAPI Module](#restapi-module) section for details.
+If importing fails while game is running, check if `URL Port` option in `RestAPI` module that matches `WebUI port` value that sets in `LMU` (UserData\player\Settings.JSON) or `RF2` (UserData\player\player.JSON) setting file. See [Telemetry API](#telemetry-api) section for details.
 
 Alternatively, to import vehicle brand data from vehicle `JSON` file, click `Import from` menu, and select `JSON file`.
 
@@ -1217,47 +1252,6 @@ Enable relative module.
 [**`Back to Top`**](#)
 
 
-## RestAPI module
-**This module connects to game's Rest API for accessing additional data that is not available through Sharedmemory API.**
-
-    module_restapi
-Enable RestAPI module.
-
-    url_host*
-Set `RF2` or `LMU` Rest API host address. Default is `localhost`.
-
-    url_port*
-Set port for host address. Port value must match `WebUI port` value that sets in `LMU` (UserData\player\Settings.JSON) or `RF2` (UserData\player\player.JSON) setting file in order to successfully connect to Rest API and receive data. The default port value for `RF2` is `5397`, and `6397` for `LMU`.
-
-Note, `WebUI port` value from game setting file may change in some situations, and would require manual correction to match `WebUI port` value.
-
-    connection_timeout
-Set connection timeout duration in seconds. Value range in `0.5` to `10`. Default is `1` second.
-
-    connection_retry
-Set number of attempts to retry connection. Value range in `0` to `10`. Default is `3` retries.
-
-    connection_retry_delay
-Set time delay in seconds to retry connection. Value range in `0` to `60`. Default is `1` second.
-
-    enable_energy_remaining
-Enable access to `remaining energy` data (LMU only). This is required for showing remaining energy data in widgets such as Relative, Rivals, Standings.
-
-    enable_garage_setup_info
-Enable access to `garage setup` data (RF2 & LMU). This is required for accessing various vehicle setup data.
-
-    enable_session_info
-Enable access to `session` data (RF2 & LMU). This is required for accessing various session data, such as time-scale.
-
-    enable_vehicle_info
-Enable access to `vehicle` data (LMU only). This is essential for accessing `virtual energy`, `brake wear`, `vehicle damage`, `pit stop timing` data.
-
-    enable_weather_info
-Enable access to `weather` data (RF2 & LMU). This is required for showing weather forecast.
-
-[**`Back to Top`**](#)
-
-
 ## Sectors module
 **This module provides sectors timing data.**
 
@@ -1273,7 +1267,7 @@ Calculate sectors timing based on all time best sectors and affects [Sectors](#s
 ## Stats module
 **This module records driver stats data.**
 
-Note, while `enable_player_index_override` or `enable_active_state_override` option is enabled in [Shared Memory API](#shared-memory-api), driver stats will not be recorded. Stats are only saved when driver returned to garage.
+Note, while `enable_player_index_override` or `enable_active_state_override` option is enabled in [Telemetry API](#telemetry-api), driver stats will not be recorded. Stats are only saved when driver returned to garage.
 
     module_stats
 Enable stats module.
@@ -1538,7 +1532,7 @@ Set warning threshold for estimated brake lifespan in minutes. Default is `5` la
 Show current in-game clock time of the circuit.
 
     enable_track_clock_synchronization
-Enable auto track clock and time scale synchronization. RestAPI module must be enabled to synchronize track clock from Rest API.
+Enable auto track clock and time scale synchronization. `enable_restapi_access` must be enabled to synchronize track clock from Rest API.
 
 Note, for `RF2`, synchronization only works in singleplayer; for `LMU`, synchronization works in both singleplayer and multiplayer.
 
@@ -2651,7 +2645,7 @@ Set distance circle line width in pixels.
 Auto hides radar display when no nearby vehicles.
 
     auto_hide_in_private_qualifying
-Auto hides radar in private qualifying session, requires both `auto_hide` and [RestAPI Module](#restapi-module) enabled.
+Auto hides radar in private qualifying session, requires both `auto_hide` and `enable_restapi_access` enabled.
 
     auto_hide_time_threshold
 Set amount time(unit second) before triggering auto hide. Default is `1` second. Note, this option has no effect while `enable_radar_fade` is enabled.
@@ -3146,7 +3140,7 @@ Set number of delta lap time records to display. Minimum number is limited to `2
     show_stint_laps
 Show number of completed laps from current stint and estimated total stint laps.
 
-Note, this option is only available for LMU, and `RestAPI Module` must be enabled for accessing stint data.
+Note, this option is only available for LMU, and `enable_restapi_access` must be enabled for accessing stint data.
 
     show_energy_remaining
 Show remaining virtual energy reading in percentage from each driver, with 4 different states:

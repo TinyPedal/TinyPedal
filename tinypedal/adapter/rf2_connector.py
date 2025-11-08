@@ -306,6 +306,8 @@ class RF2Info:
         "_sync",
         "_access_mode",
         "_rf2_pid",
+        "_state_override",
+        "_active_state",
         "_scor",
         "_tele",
         "_ext",
@@ -316,6 +318,8 @@ class RF2Info:
         self._sync = SyncData()
         self._access_mode = 0
         self._rf2_pid = ""
+        self._state_override = False
+        self._active_state = False
         # Assign mmap instance
         self._scor = self._sync.dataset.scor
         self._tele = self._sync.dataset.tele
@@ -323,7 +327,7 @@ class RF2Info:
         self._ffb = self._sync.dataset.ffb
 
     def __del__(self):
-        logger.info("sharedmemory: GC: RF2SM")
+        logger.info("sharedmemory: GC: RF2Info")
 
     def start(self) -> None:
         """Start data updating thread"""
@@ -344,6 +348,14 @@ class RF2Info:
             mode: 0 = copy access, 1 = direct access
         """
         self._access_mode = mode
+
+    def setStateOverride(self, state: bool = False) -> None:
+        """Enable state override"""
+        self._state_override = state
+
+    def setActiveState(self, state: bool = False) -> None:
+        """Set state override"""
+        self._active_state = state
 
     def setPlayerOverride(self, state: bool = False) -> None:
         """Enable player index override state"""
@@ -407,6 +419,26 @@ class RF2Info:
     def isPaused(self) -> bool:
         """Check whether data stopped updating"""
         return self._sync.paused or self._sync.player_scor_index < 0
+
+    @property
+    def state(self) -> bool:
+        """Check whether in active (driving or overriding) state"""
+        if self._state_override:
+            return self._active_state
+        return not self._sync.paused and self._sync.player_scor_index >= 0 and (
+            self.rf2ScorInfo.mInRealtime
+            or self.rf2TeleVeh().mIgnitionStarter > 0
+        )
+
+    @property
+    def identifier(self) -> str:
+        """Identify sim name"""
+        name = self.rf2ScorInfo.mPlrFileName
+        if b"Settings" in name:
+            return "LMU"
+        if name:
+            return "RF2"
+        return ""
 
 
 def test_api():

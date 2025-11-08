@@ -33,8 +33,7 @@ from ..const_common import (
     TEXT_NA,
 )
 from ..const_file import ImageFile
-from ..module_info import WeatherNode
-from ..process.weather import forecast_sky_type, get_forecast_info
+from ..process.weather import WeatherNode, forecast_sky_type
 from ..units import set_unit_temperature
 from ._base import Overlay
 from ._painter import split_pixmap_icon
@@ -156,7 +155,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         # Read weather data
         is_lap_type = api.read.session.lap_type()
-        forecast_info = get_forecast_info(api.read.session.session_type())
+        forecast_info = api.read.session.weather_forecast()
         forecast_count = min(len(forecast_info), MAX_FORECASTS)
 
         if forecast_count < 1:

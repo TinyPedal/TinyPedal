@@ -332,7 +332,7 @@ def turning_direction(yaw_rad: float, x1: float, y1: float, x2: float, y2: float
 
 
 # Timing
-def clock_time(seconds: float, start: int = 0, scale: int = 1) -> float:
+def clock_time(seconds: float, start: float = 0, scale: float = 1) -> float:
     """Clock time (seconds) looped in full 24 hours, 0 to 86400"""
     time_curr = start + seconds * scale
     return time_curr - time_curr // 86400 * 86400

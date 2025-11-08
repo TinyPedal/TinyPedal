@@ -33,7 +33,6 @@ __all__ = [
     "module_mapping",
     "module_notes",
     "module_relative",
-    "module_restapi",
     "module_sectors",
     "module_stats",
     "module_vehicles",

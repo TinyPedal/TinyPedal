@@ -25,7 +25,7 @@ from functools import partial
 from typing import NamedTuple
 
 # Import APIs
-from .adapter import rf2_connector, rf2_data
+from .adapter import restapi_connector, rf2_connector, rf2_data
 from .regex_pattern import API_NAME_LMU, API_NAME_RF2
 from .validator import bytes_to_str
 
@@ -47,21 +47,21 @@ class APIDataSet(NamedTuple):
     wheel: rf2_data.Wheel
 
 
-def set_dataset_rf2(info: rf2_connector.RF2Info) -> APIDataSet:
+def set_dataset_rf2(shmm: rf2_connector.RF2Info, rest: restapi_connector.RestAPIInfo) -> APIDataSet:
     """Set API data set - RF2"""
     return APIDataSet(
-        rf2_data.Check(info),
-        rf2_data.Brake(info),
-        rf2_data.ElectricMotor(info),
-        rf2_data.Engine(info),
-        rf2_data.Inputs(info),
-        rf2_data.Lap(info),
-        rf2_data.Session(info),
-        rf2_data.Switch(info),
-        rf2_data.Timing(info),
-        rf2_data.Tyre(info),
-        rf2_data.Vehicle(info),
-        rf2_data.Wheel(info),
+        rf2_data.Check(shmm, rest),
+        rf2_data.Brake(shmm, rest),
+        rf2_data.ElectricMotor(shmm, rest),
+        rf2_data.Engine(shmm, rest),
+        rf2_data.Inputs(shmm, rest),
+        rf2_data.Lap(shmm, rest),
+        rf2_data.Session(shmm, rest),
+        rf2_data.Switch(shmm, rest),
+        rf2_data.Timing(shmm, rest),
+        rf2_data.Tyre(shmm, rest),
+        rf2_data.Vehicle(shmm, rest),
+        rf2_data.Wheel(shmm, rest),
     )
 
 
@@ -69,7 +69,8 @@ class Connector(ABC):
     """API Connector"""
 
     __slots__ = (
-        "info",
+        "shmmapi",  # shared memory API
+        "restapi",  # Rest API
     )
 
     @abstractmethod
@@ -85,7 +86,7 @@ class Connector(ABC):
         """Dateset"""
 
     @abstractmethod
-    def setup(self, *config):
+    def setup(self, config: dict):
         """Setup API parameters"""
 
 
@@ -96,22 +97,28 @@ class SimRF2(Connector):
     NAME = API_NAME_RF2
 
     def __init__(self):
-        self.info = rf2_connector.RF2Info()
+        self.shmmapi = rf2_connector.RF2Info()  # primary
+        self.restapi = restapi_connector.RestAPIInfo(self.shmmapi)  # secondary
 
     def start(self):
-        self.info.start()
+        self.shmmapi.start()  # 1 load first
+        self.restapi.start()  # 2
 
     def stop(self):
-        self.info.stop()
+        self.restapi.stop()  # 1 unload first
+        self.shmmapi.stop()  # 2
 
     def dataset(self) -> APIDataSet:
-        return set_dataset_rf2(self.info)
+        return set_dataset_rf2(self.shmmapi, self.restapi)
 
     def setup(self, config: dict):
-        self.info.setMode(config["access_mode"])
-        self.info.setPID(config["process_id"])
-        self.info.setPlayerOverride(config["enable_player_index_override"])
-        self.info.setPlayerIndex(config["player_index"])
+        self.shmmapi.setMode(config["access_mode"])
+        self.shmmapi.setPID(config["process_id"])
+        self.shmmapi.setStateOverride(config["enable_active_state_override"])
+        self.shmmapi.setActiveState(config["active_state"])
+        self.shmmapi.setPlayerOverride(config["enable_player_index_override"])
+        self.shmmapi.setPlayerIndex(config["player_index"])
+        self.restapi.setConnection(config.copy())
         rf2_data.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
 
 
@@ -122,22 +129,28 @@ class SimLMU(Connector):
     NAME = API_NAME_LMU
 
     def __init__(self):
-        self.info = rf2_connector.RF2Info()
+        self.shmmapi = rf2_connector.RF2Info()  # primary
+        self.restapi = restapi_connector.RestAPIInfo(self.shmmapi)  # secondary
 
     def start(self):
-        self.info.start()
+        self.shmmapi.start()  # 1 load first
+        self.restapi.start()  # 2
 
     def stop(self):
-        self.info.stop()
+        self.restapi.stop()  # 1 unload first
+        self.shmmapi.stop()  # 2
 
     def dataset(self) -> APIDataSet:
-        return set_dataset_rf2(self.info)
+        return set_dataset_rf2(self.shmmapi, self.restapi)
 
     def setup(self, config: dict):
-        self.info.setMode(config["access_mode"])
-        self.info.setPID(config["process_id"])
-        self.info.setPlayerOverride(config["enable_player_index_override"])
-        self.info.setPlayerIndex(config["player_index"])
+        self.shmmapi.setMode(config["access_mode"])
+        self.shmmapi.setPID(config["process_id"])
+        self.shmmapi.setStateOverride(config["enable_active_state_override"])
+        self.shmmapi.setActiveState(config["active_state"])
+        self.shmmapi.setPlayerOverride(config["enable_player_index_override"])
+        self.shmmapi.setPlayerIndex(config["player_index"])
+        self.restapi.setConnection(config.copy())
         rf2_data.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
 
 

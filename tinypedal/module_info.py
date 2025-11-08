@@ -27,13 +27,11 @@ from collections import deque
 from typing import Mapping, NamedTuple
 
 from .const_common import (
-    ABS_ZERO_CELSIUS,
     DELTA_DEFAULT,
     EMPTY_DICT,
     MAX_METERS,
     MAX_SECONDS,
     MAX_VEHICLES,
-    PITEST_DEFAULT,
     REL_TIME_DEFAULT,
     WHEELS_ZERO,
 )
@@ -51,15 +49,6 @@ class ConsumptionDataSet(NamedTuple):
     batteryRegenLast: float = 0.0
     tyreAvgWearLast: float = 0.0
     capacityFuel: float = 0.0
-
-
-class WeatherNode(NamedTuple):
-    """Weather forecast node info"""
-
-    start_percent: float = MAX_SECONDS
-    sky_type: int = -1
-    temperature: float = ABS_ZERO_CELSIUS
-    rain_chance: float = -1.0
 
 
 class DeltaLapTime(array):
@@ -318,7 +307,6 @@ class FuelInfo:
         "estimatedMinutes",
         "estimatedNumPitStopsEnd",
         "estimatedNumPitStopsEarly",
-        "expectedConsumption",
         "deltaConsumption",
         "oneLessPitConsumption",
     )
@@ -342,7 +330,6 @@ class FuelInfo:
         self.estimatedMinutes: float = 0.0
         self.estimatedNumPitStopsEnd: float = 0.0
         self.estimatedNumPitStopsEarly: float = 0.0
-        self.expectedConsumption: float = 0.0
         self.deltaConsumption: float = 0.0
         self.oneLessPitConsumption: float = 0.0
 
@@ -467,45 +454,6 @@ class RelativeInfo:
         self.drawOrder: list = [0]
 
 
-class RestAPIInfo:
-    """Rest API module output data"""
-
-    __slots__ = (
-        "timeScale",
-        "trackClockTime",
-        "privateQualifying",
-        "steeringWheelRange",
-        "currentVirtualEnergy",
-        "maxVirtualEnergy",
-        "aeroDamage",
-        "penaltyTime",
-        "forecastPractice",
-        "forecastQualify",
-        "forecastRace",
-        "brakeWear",
-        "suspensionDamage",
-        "stintUsage",
-        "pitStopEstimate",
-    )
-
-    def __init__(self):
-        self.timeScale: int = 1
-        self.trackClockTime: float = -1.0
-        self.privateQualifying: int = 0
-        self.steeringWheelRange: float = 0.0
-        self.currentVirtualEnergy: float = 0.0
-        self.maxVirtualEnergy: float = 0.0
-        self.aeroDamage: float = -1.0
-        self.penaltyTime: float = 0.0
-        self.forecastPractice: tuple[WeatherNode, ...] | None = None
-        self.forecastQualify: tuple[WeatherNode, ...] | None = None
-        self.forecastRace: tuple[WeatherNode, ...] | None = None
-        self.brakeWear: list[float] = []
-        self.suspensionDamage: list[float] = []
-        self.stintUsage: Mapping[str, tuple[float, float, float, float, int]] = EMPTY_DICT
-        self.pitStopEstimate: tuple[float, float, float, float, int] = PITEST_DEFAULT
-
-
 class SectorsInfo:
     """Sectors module output data"""
 
@@ -615,7 +563,6 @@ class ModuleInfo:
         "mapping",
         "pacenotes",
         "relative",
-        "restapi",
         "sectors",
         "stats",
         "tracknotes",
@@ -633,7 +580,6 @@ class ModuleInfo:
         self.mapping = MappingInfo()
         self.pacenotes = NotesInfo()
         self.relative = RelativeInfo()
-        self.restapi = RestAPIInfo()
         self.sectors = SectorsInfo()
         self.stats = StatsInfo()
         self.tracknotes = NotesInfo()

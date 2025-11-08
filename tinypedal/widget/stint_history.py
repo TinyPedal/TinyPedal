@@ -199,7 +199,7 @@ class Realtime(Overlay):
         wear_avg = 100 - sum(api.read.tyre.wear()) * 25
 
         # Check if virtual energy available
-        if self.wcfg["show_virtual_energy_if_available"] and minfo.restapi.maxVirtualEnergy:
+        if self.wcfg["show_virtual_energy_if_available"] and api.read.vehicle.max_virtual_energy():
             fuel_curr = minfo.energy.amountCurrent
         else:
             fuel_curr = self.unit_fuel(minfo.fuel.amountCurrent)

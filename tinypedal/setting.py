@@ -169,7 +169,7 @@ class Setting:
         "compatibility",
         "primary_preset",
         "overlay",
-        "shared_memory_api",
+        "telemetry_api",
         "units",
     )
 
@@ -191,7 +191,7 @@ class Setting:
         self.compatibility = None
         self.primary_preset = None
         self.overlay = None
-        self.shared_memory_api = None
+        self.telemetry_api = None
         self.units = None
 
     def is_loaded(self, filename: str) -> bool:
@@ -299,7 +299,7 @@ class Setting:
         )
         # Assign base setting
         self.overlay = self.user.setting["overlay"]
-        self.shared_memory_api = self.user.setting["shared_memory_api"]
+        self.telemetry_api = self.user.setting["telemetry_api"]
         self.units = self.user.setting["units"]
 
     @property

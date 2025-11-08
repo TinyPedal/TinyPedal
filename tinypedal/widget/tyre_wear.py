@@ -21,6 +21,7 @@ Tyre Wear Widget
 """
 
 from .. import calculation as calc
+from ..api_control import api
 from ..const_common import TEXT_NA
 from ..module_info import minfo
 from ._base import Overlay
@@ -224,7 +225,7 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         laptime_pace = minfo.delta.lapTimePace
-        if minfo.restapi.maxVirtualEnergy:
+        if api.read.vehicle.max_virtual_energy():
             est_runlaps = min(minfo.fuel.estimatedLaps, minfo.energy.estimatedLaps)
         else:
             est_runlaps = minfo.fuel.estimatedLaps

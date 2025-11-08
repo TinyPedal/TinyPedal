@@ -25,7 +25,6 @@ from PySide2.QtGui import QPainter, QPen, QPixmap
 
 from .. import calculation as calc
 from ..api_control import api
-from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -87,8 +86,6 @@ class Realtime(Overlay):
             temp_rot_range = self.wcfg["manual_steering_range"]
         else:
             temp_rot_range = api.read.inputs.steering_range_physical()
-            if minfo.restapi.steeringWheelRange > 0 >= temp_rot_range:
-                temp_rot_range = minfo.restapi.steeringWheelRange
 
         # Recalculate scale mark
         if self.wcfg["show_scale_mark"] and self.rot_range != temp_rot_range:

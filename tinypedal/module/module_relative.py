@@ -51,7 +51,7 @@ class Realtime(DataModule):
         """Update module data"""
         _event_wait = self._event.wait
         reset = False
-        update_interval = self.active_interval
+        update_interval = self.idle_interval
 
         output = minfo.relative
         setting_relative = self.cfg.user.setting["relative"]

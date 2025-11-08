@@ -34,16 +34,12 @@ class APIControl:
     __slots__ = (
         "_api",
         "_same_api_loaded",
-        "_state_override",
-        "_active_state",
         "read",
     )
 
     def __init__(self):
         self._api = None
         self._same_api_loaded = False
-        self._state_override = False
-        self._active_state = False
         self.read = None
 
     def connect(self, name: str = ""):
@@ -53,7 +49,7 @@ class APIControl:
             name: match API name in API_NAME_LIST
         """
         if not name:
-            name = cfg.shared_memory_api["api_name"]
+            name = cfg.telemetry_api["api_name"]
 
         # Do not create new instance if same API already loaded
         self._same_api_loaded = bool(self._api is not None and self._api.NAME == name)
@@ -71,7 +67,7 @@ class APIControl:
 
     def start(self):
         """Start API"""
-        logger.info("ENCODING: %s", cfg.shared_memory_api["character_encoding"])
+        logger.info("ENCODING: %s", cfg.telemetry_api["character_encoding"])
         logger.info("CONNECTING: %s API", self._api.NAME)
         self.setup()
         self._api.start()
@@ -98,9 +94,7 @@ class APIControl:
 
     def setup(self):
         """Setup & apply API changes"""
-        self._api.setup(cfg.shared_memory_api)
-        self._state_override = cfg.shared_memory_api["enable_active_state_override"]
-        self._active_state = cfg.shared_memory_api["active_state"]
+        self._api.setup(cfg.telemetry_api)
 
     @property
     def name(self) -> str:
@@ -110,8 +104,6 @@ class APIControl:
     @property
     def state(self) -> bool:
         """API state output"""
-        if self._state_override:
-            return self._active_state
         return self.read.check.api_state()
 
     @property

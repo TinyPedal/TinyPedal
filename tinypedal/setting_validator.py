@@ -203,7 +203,6 @@ class PresetValidator:
     def fix_outdated_key(dict_user: dict) -> None:
         """Fix outdated key name from user dictionary"""
         key_list_user = tuple(dict_user)  # create user key list
-
         # Rename key, remove outdated key
         for key in key_list_user:
             # Typo (<=2.33.0)
@@ -233,18 +232,36 @@ class PresetValidator:
             dict_user[d_key] = temp_value  # append user key at the end
 
     @classmethod
-    def validate_key_pair(cls, dict_user: dict, dict_def: dict, sub_level: bool) -> None:
+    def validate_key_pair(cls, dict_user: dict, dict_def: dict, fix_key: bool) -> None:
         """Create key-only check list, then validate key"""
         key_list_def = tuple(dict_def)
-        if sub_level:
+        if fix_key:
             cls.fix_outdated_key(dict_user)
         cls.remove_invalid_key(key_list_def, dict_user)
         cls.add_missing_key(key_list_def, dict_user, dict_def)
         cls.sort_key_order(key_list_def, dict_user)
 
+    @staticmethod
+    def update_api_setting(dict_user: dict) -> None:
+        """Update old API setting"""
+        # (<=2.34.0)
+        if "telemetry_api" not in dict_user:
+            api_config = dict_user.get("shared_memory_api")
+            if isinstance(api_config, dict):
+                # Copy "shared_memory_api" to "telemetry_api"
+                dict_user["telemetry_api"] = api_config.copy()
+                api_config = dict_user["telemetry_api"]
+                # Copy "module_restapi" setting to "telemetry_api"
+                if "module_restapi" in dict_user:
+                    restapi_old = dict_user["module_restapi"]
+                    api_config["enable_restapi_access"] = restapi_old.get("enable", True)
+                    api_config["restapi_update_interval"] = restapi_old.get("update_interval", 200)
+                    api_config.update(restapi_old)
+
     @classmethod
     def validate(cls, dict_user: dict, dict_def: dict) -> dict:
         """Validate setting"""
+        cls.update_api_setting(dict_user)
         # Check top-level key
         cls.validate_key_pair(dict_user, dict_def, False)
         # Check sub-level key

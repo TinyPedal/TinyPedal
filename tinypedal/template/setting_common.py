@@ -22,13 +22,35 @@ Default common setting template
 
 from ..regex_pattern import API_NAME_RF2
 
-
 COMMON_DEFAULT = {
     "overlay": {
         "fixed_position": False,
         "auto_hide": True,
         "enable_grid_move": False,
         "vr_compatibility": False,
+    },
+    "telemetry_api": {
+        "api_name": API_NAME_RF2,
+        "access_mode": 0,
+        "process_id": "",
+        "enable_active_state_override": False,
+        "active_state": True,
+        "enable_player_index_override": False,
+        "player_index": -1,
+        "character_encoding": "UTF-8",
+        "enable_restapi_access": True,
+        "restapi_update_interval": 200,
+        "url_host": "localhost",
+        "url_port_rf2": 5397,
+        "url_port_lmu": 6397,
+        "connection_timeout": 1,
+        "connection_retry": 3,
+        "connection_retry_delay": 1,
+        "enable_energy_remaining": True,
+        "enable_garage_setup_info": True,
+        "enable_session_info": True,
+        "enable_vehicle_info": True,
+        "enable_weather_info": True,
     },
     "shared_memory_api": {
         "api_name": API_NAME_RF2,

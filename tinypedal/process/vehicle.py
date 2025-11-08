@@ -25,8 +25,16 @@ from __future__ import annotations
 from itertools import islice
 from typing import Mapping
 
-from ..const_common import EMPTY_DICT
+from ..const_common import EMPTY_DICT, WHEELS_NA
 from ..regex_pattern import rex_number_extract
+
+
+def export_wheels(data: list) -> tuple[float, float, float, float]:
+    """Export wheel data"""
+    try:
+        return data[0], data[1], data[2], data[3]
+    except (IndexError, TypeError, ValueError):
+        return WHEELS_NA
 
 
 def expected_usage(value: str) -> float:

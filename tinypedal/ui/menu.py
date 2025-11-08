@@ -287,8 +287,8 @@ class ConfigMenu(QMenu):
         config_font = self.addAction("Global Font Override")
         config_font.triggered.connect(self.open_config_font)
 
-        config_sharedmemory = self.addAction("Shared Memory API")
-        config_sharedmemory.triggered.connect(self.open_config_sharedmemory)
+        config_api = self.addAction("Telemetry API")
+        config_api.triggered.connect(self.open_config_api)
 
     def open_config_application(self):
         """Config global application"""
@@ -348,11 +348,11 @@ class ConfigMenu(QMenu):
         )
         _dialog.open()
 
-    def open_config_sharedmemory(self):
-        """Config sharedmemory"""
+    def open_config_api(self):
+        """Config telemetry API"""
         _dialog = UserConfig(
             parent=self._parent,
-            key_name="shared_memory_api",
+            key_name="telemetry_api",
             cfg_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,

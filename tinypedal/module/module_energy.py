@@ -42,7 +42,7 @@ class Realtime(DataModule):
         """Update module data"""
         _event_wait = self._event.wait
         reset = False
-        update_interval = self.active_interval
+        update_interval = self.idle_interval
 
         userpath_energy_delta = self.cfg.path.energy_delta
 
@@ -66,7 +66,7 @@ class Realtime(DataModule):
                     minfo.energy.reset()
 
                 # Run calculation if virtual energy available
-                if minfo.restapi.maxVirtualEnergy:
+                if api.read.vehicle.max_virtual_energy():
                     gen_calc_energy.send(True)
 
                     # Update hybrid info
@@ -88,7 +88,7 @@ class Realtime(DataModule):
 
 def telemetry_energy() -> tuple[float, float]:
     """Telemetry energy, output in percentage"""
-    max_energy = minfo.restapi.maxVirtualEnergy
+    max_energy = api.read.vehicle.max_virtual_energy()
     if max_energy:
-        return 100.0, minfo.restapi.currentVirtualEnergy / max_energy * 100
+        return 100.0, api.read.vehicle.virtual_energy() / max_energy * 100
     return 100.0, 0.0
