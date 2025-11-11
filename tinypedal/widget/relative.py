@@ -48,7 +48,7 @@ class Realtime(Overlay):
         self.veh_width = max(int(self.wcfg["vehicle_name_width"]), 1)
         self.brd_width = max(int(self.wcfg["brand_logo_width"]), 1)
         self.brd_height = max(self.wcfg["font_size"], 1)
-        self.cls_width = max(int(self.wcfg["class_width"]), 1)
+        self.cls_width = max(int(self.wcfg["class_width"]), 0)
         self.gap_width = max(int(self.wcfg["time_gap_width"]), 1)
         self.gap_decimals = max(int(self.wcfg["time_gap_decimal_places"]), 0)
 

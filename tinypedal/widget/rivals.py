@@ -50,7 +50,7 @@ class Realtime(Overlay):
         self.veh_width = max(int(self.wcfg["vehicle_name_width"]), 1)
         self.brd_width = max(int(self.wcfg["brand_logo_width"]), 1)
         self.brd_height = max(self.wcfg["font_size"], 1)
-        self.cls_width = max(int(self.wcfg["class_width"]), 1)
+        self.cls_width = max(int(self.wcfg["class_width"]), 0)
         self.int_width = max(int(self.wcfg["time_interval_width"]), 1)
         self.int_decimals = max(int(self.wcfg["time_interval_decimal_places"]), 0)
         self.max_delta = calc.asym_max(int(self.wcfg["number_of_delta_laptime"]), 2, 5)

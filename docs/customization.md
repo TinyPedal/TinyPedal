@@ -2768,7 +2768,7 @@ Show vehicle class categories. Class name and color are fully customizable, see 
 Show random color for unknown class name that is not defined in `classes.json` preset.
 
     class_width
-Set class name display width, value is in chars, 4 = 4 chars wide.
+Set class name display width, value is in chars, `4` = 4 chars wide. Set to `0` to hide class name while showing only class color.
 
     show_pit_status
 Show indicator whether driver is currently in pit or garage, or causes yellow flag.
