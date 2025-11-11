@@ -23,6 +23,7 @@ WIP
 * Relative, Rivals, Standings Widget
   - Added "show_stint_laps" option (requested by user "Shu Gu"), which shows number of completed laps from current stint and estimated total stint laps.
     Note, this option is only available for LMU, and "RestAPI Module" must be enabled for accessing stint data.
+  - Added "yellow_flag_status_text" option (requested by user "bshpanchuk"), which shows yellow flag indicator when driver causes (or likely to) yellow flag. Note, unlike in-game yellow flag, the indicator is always displayed when driver's speed is below 28kph (outside of pit lane), regardless whether driver has caused yellow flag on track.
 
 * Misc
   - Fixed an issue where consumption history was not recorded if two consecutive laps ended with exact same lap time.

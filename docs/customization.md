@@ -2771,13 +2771,16 @@ Show random color for unknown class name that is not defined in `classes.json` p
 Set class name display width, value is in chars, 4 = 4 chars wide.
 
     show_pit_status
-Show indicator whether driver is currently in pit or garage.
+Show indicator whether driver is currently in pit or garage, or causes yellow flag.
 
     pit_status_text
 Set custom pit status text which shows when driver is in pit.
 
     garage_status_text
 Set custom garage status text which shows when driver is in garage.
+
+    yellow_flag_status_text
+Set custom yellow flag status text which shows when driver causes (or likely to) yellow flag. Note, unlike in-game yellow flag, the indicator is always displayed when driver's speed is below 28kph (outside of pit lane), regardless whether driver has caused yellow flag on track.
 
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.

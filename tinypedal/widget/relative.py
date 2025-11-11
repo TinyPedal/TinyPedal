@@ -260,7 +260,8 @@ class Realtime(Overlay):
             self.pit_status_text = (
                 "",
                 self.wcfg["pit_status_text"],
-                self.wcfg["garage_status_text"]
+                self.wcfg["garage_status_text"],
+                self.wcfg["yellow_flag_status_text"],
             )
             self.bar_style_pit = (
                 "",
@@ -269,7 +270,10 @@ class Realtime(Overlay):
                     bg_color=self.wcfg["bkg_color_pit"]),
                 self.set_qss(
                     fg_color=self.wcfg["font_color_garage"],
-                    bg_color=self.wcfg["bkg_color_garage"])
+                    bg_color=self.wcfg["bkg_color_garage"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_yellow_flag"],
+                    bg_color=self.wcfg["bkg_color_yellow_flag"])
             )
             self.bars_pit = self.set_qlabel(
                 style=self.bar_style_pit[0],
@@ -471,7 +475,7 @@ class Realtime(Overlay):
                 self.update_cls(self.bars_cls[idx], veh_info.vehicleClass, state)
             # Vehicle in pit
             if self.wcfg["show_pit_status"]:
-                self.update_pit(self.bars_pit[idx], veh_info.inPit, state)
+                self.update_pit(self.bars_pit[idx], veh_info.inPit, veh_info.isYellow, state)
             # Tyre compound index
             if self.wcfg["show_tyre_compound"]:
                 self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundFront, veh_info.tireCompoundRear, hi_player, state)
@@ -655,12 +659,11 @@ class Realtime(Overlay):
         """Vehicle in pit"""
         if target.last != data:
             target.last = data
-            if data[-1]:
-                text = self.pit_status_text[data[0]]
-            else:
-                text = ""
-            target.setText(text)
-            target.updateStyle(self.bar_style_pit[data[0]])
+            index = data[0]
+            if data[1] and index == 0:  # show yellow flag outside pits
+                index = 3
+            target.setText(self.pit_status_text[index])
+            target.updateStyle(self.bar_style_pit[index])
 
     def update_tcp(self, target, *data):
         """Tyre compound index"""
