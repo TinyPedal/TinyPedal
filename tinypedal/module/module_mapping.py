@@ -23,7 +23,7 @@ Mapping module
 from .. import calculation as calc
 from ..api_control import api
 from ..const_file import FileExt
-from ..module_info import minfo
+from ..module_info import MappingInfo, minfo
 from ..userfile.track_info import load_track_info, save_track_info
 from ..userfile.track_map import load_track_map_file, save_track_map_file
 from ..validator import file_last_modified, generator_init
@@ -86,7 +86,7 @@ class Realtime(DataModule):
 
 
 @generator_init
-def update_track_info(output, track_name: str):
+def update_track_info(output: MappingInfo, track_name: str):
     """Update track info"""
     # Load track info
     pit_entry = load_track_info(track_name).get("pit_entry", 0.0)
@@ -143,6 +143,7 @@ def update_track_info(output, track_name: str):
         output.pitEntryPosition = pit_entry
         output.pitExitPosition = pit_exit
         output.pitLaneLength = pitlane_length
+        output.pitPassTime = pitlane_length / pit_speed if pit_speed else 0.0
 
 
 class MapCoords:

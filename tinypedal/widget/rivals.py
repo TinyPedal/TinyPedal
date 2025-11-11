@@ -22,7 +22,7 @@ Rivals Widget
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import TEXT_PLACEHOLDER
+from ..const_common import TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ..userfile.brand_logo import load_brand_logo_file
@@ -391,6 +391,23 @@ class Realtime(Overlay):
                 column_index=self.wcfg["column_index_vehicle_integrity"],
                 hide_start=1,
             )
+        # Stint laps
+        if self.wcfg["show_stint_laps"]:
+            bar_style_stl = self.set_qss(
+                fg_color=self.wcfg["font_color_stint_laps"],
+                bg_color=self.wcfg["bkg_color_stint_laps"]
+            )
+            self.bars_stl = self.set_qlabel(
+                style=bar_style_stl,
+                width=5 * font_m.width + bar_padx,
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_stl,
+                column_index=self.wcfg["column_index_stint_laps"],
+                hide_start=1,
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -485,6 +502,9 @@ class Realtime(Overlay):
             # Vehicle integrity
             if self.wcfg["show_vehicle_integrity"]:
                 self.update_dmg(self.bars_dmg[idx], veh_info.vehicleIntegrity, state)
+            # Stint laps
+            if self.wcfg["show_stint_laps"]:
+                self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, state)
 
     # GUI update methods
     def update_pos(self, target, *data):
@@ -689,6 +709,23 @@ class Realtime(Overlay):
             target.updateStyle(self.bar_style_dmg[color_index])
             self.toggle_visibility(target, data[-1])
 
+    def update_stl(self, target, *data):
+        """Stint laps"""
+        if target.last != data:
+            target.last = data
+            stint_laps_done = data[0]
+            stint_laps_est = data[1]
+            if stint_laps_done <= 0:
+                text_done = "--"
+            else:
+                text_done = f"{stint_laps_done:02.0f}"
+            if stint_laps_est <= 0:
+                text_est = "--"
+            else:
+                text_est = f"{stint_laps_est // 1:02.0f}"
+            target.setText(f"{text_done}/{text_est}")
+            self.toggle_visibility(target, data[-1])
+
     # Additional methods
     @staticmethod
     def toggle_visibility(target, state):
@@ -719,21 +756,21 @@ class Realtime(Overlay):
     def set_laptime(laptime):
         """Set lap time"""
         if laptime <= 0:
-            return "-:--.---"
+            return TEXT_NOLAPTIME
         return calc.sec2laptime_full(laptime)[:8]
 
     @staticmethod
     def set_pittime(inpit, pit_time):
         """Set lap time"""
-        if inpit:
-            return f"PIT{pit_time: >5.1f}"[:8] if pit_time > 0 else "-:--.---"
-        return f"OUT{pit_time: >5.1f}"[:8] if pit_time > 0 else "-:--.---"
+        if pit_time <= 0:
+            return TEXT_NOLAPTIME
+        return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
 
     @staticmethod
     def set_best_laptime(laptime_best):
         """Set best lap time"""
         if laptime_best <= 0:
-            return "-:--.---"
+            return TEXT_NOLAPTIME
         return calc.sec2laptime_full(laptime_best)[:8]
 
     def int_to_next(self, gap_behind_class, is_ahead):

@@ -22,6 +22,7 @@ Lap time history Widget
 
 from .. import calculation as calc
 from ..api_control import api
+from ..const_common import TEXT_NOLAPTIME
 from ..module_info import minfo
 from ..units import set_unit_fuel
 from ._base import Overlay
@@ -91,7 +92,7 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["bkg_color_last_time"])
         )
         self.bars_time = self.set_qlabel(
-            text="-:--.---",
+            text=TEXT_NOLAPTIME,
             style=self.bar_style_time[1],
             width=font_m.width * 8 + bar_padx,
             count=self.history_slot + 1,

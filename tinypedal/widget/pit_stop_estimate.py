@@ -210,10 +210,8 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        pitlane_length = minfo.mapping.pitLaneLength
-        speed_limit = minfo.mapping.pitSpeedLimit
         min_pitstop_time, max_pitstop_time, refill_fuel, refill_energy, state_stopgo = api.read.vehicle.pit_estimate()
-        pass_time = pitlane_length / speed_limit if speed_limit else 0
+        pass_time = minfo.mapping.pitPassTime
         delay_time = max_pitstop_time - min_pitstop_time
         pit_timer = minfo.vehicles.dataSet[minfo.vehicles.playerIndex].pitTimer.elapsed
 

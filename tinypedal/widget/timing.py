@@ -22,7 +22,7 @@ Timing Widget
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import MAX_SECONDS
+from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -41,7 +41,6 @@ class Realtime(Overlay):
             self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
 
         # Config variable
-        text_def = "-:--.---"
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
 
         if self.wcfg["layout"] == 0:
@@ -76,7 +75,7 @@ class Realtime(Overlay):
 
         # Session best laptime
         if self.wcfg["show_session_best"]:
-            text_sbst = f"{self.prefix_sbst}{text_def}"
+            text_sbst = f"{self.prefix_sbst}{TEXT_NOLAPTIME}"
             bar_style_sbst = self.set_qss(
                 fg_color=self.wcfg["font_color_session_best"],
                 bg_color=self.wcfg["bkg_color_session_best"]
@@ -93,7 +92,7 @@ class Realtime(Overlay):
 
         # Personal best laptime
         if self.wcfg["show_best"]:
-            text_best = f"{self.prefix_best}{text_def}"
+            text_best = f"{self.prefix_best}{TEXT_NOLAPTIME}"
             bar_style_best = self.set_qss(
                 fg_color=self.wcfg["font_color_best"],
                 bg_color=self.wcfg["bkg_color_best"]
@@ -110,7 +109,7 @@ class Realtime(Overlay):
 
         # Last laptime
         if self.wcfg["show_last"]:
-            text_last = f"{self.prefix_last}{text_def}"
+            text_last = f"{self.prefix_last}{TEXT_NOLAPTIME}"
             self.bar_style_last = (
                 self.set_qss(
                     fg_color=self.wcfg["font_color_invalid_laptime"],
@@ -131,7 +130,7 @@ class Realtime(Overlay):
 
         # Current laptime
         if self.wcfg["show_current"]:
-            text_curr = f"{self.prefix_curr}{text_def}"
+            text_curr = f"{self.prefix_curr}{TEXT_NOLAPTIME}"
             bar_style_curr = self.set_qss(
                 fg_color=self.wcfg["font_color_current"],
                 bg_color=self.wcfg["bkg_color_current"]
@@ -148,7 +147,7 @@ class Realtime(Overlay):
 
         # Estimated laptime
         if self.wcfg["show_estimated"]:
-            text_esti = f"{self.prefix_esti}{text_def}"
+            text_esti = f"{self.prefix_esti}{TEXT_NOLAPTIME}"
             bar_style_esti = self.set_qss(
                 fg_color=self.wcfg["font_color_estimated"],
                 bg_color=self.wcfg["bkg_color_estimated"]
@@ -165,7 +164,7 @@ class Realtime(Overlay):
 
         # Session personal best laptime
         if self.wcfg["show_session_personal_best"]:
-            text_spbt = f"{self.prefix_spbt}{text_def}"
+            text_spbt = f"{self.prefix_spbt}{TEXT_NOLAPTIME}"
             bar_style_spbt = self.set_qss(
                 fg_color=self.wcfg["font_color_session_personal_best"],
                 bg_color=self.wcfg["bkg_color_session_personal_best"]
@@ -182,7 +181,7 @@ class Realtime(Overlay):
 
         # Stint personal best laptime
         if self.wcfg["show_stint_best"]:
-            text_stbt = f"{self.prefix_stbt}{text_def}"
+            text_stbt = f"{self.prefix_stbt}{TEXT_NOLAPTIME}"
             bar_style_stbt = self.set_qss(
                 fg_color=self.wcfg["font_color_stint_best"],
                 bg_color=self.wcfg["bkg_color_stint_best"]
@@ -199,7 +198,7 @@ class Realtime(Overlay):
 
         # Average pace laptime
         if self.wcfg["show_average_pace"]:
-            text_avpc = f"{self.prefix_avpc}{text_def}"
+            text_avpc = f"{self.prefix_avpc}{TEXT_NOLAPTIME}"
             bar_style_avpc = self.set_qss(
                 fg_color=self.wcfg["font_color_average_pace"],
                 bg_color=self.wcfg["bkg_color_average_pace"]
@@ -287,5 +286,5 @@ class Realtime(Overlay):
             if 0 < data < MAX_SECONDS:
                 text = f"{prefix}{calc.sec2laptime(data)[:8]: >8}"
             else:
-                text = f"{prefix}-:--.---"
+                text = f"{prefix}{TEXT_NOLAPTIME}"
             target.setText(text)

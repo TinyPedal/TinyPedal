@@ -95,7 +95,7 @@ class ResRawOutput(NamedTuple):
     default: Any
     keys: tuple[str, ...]
 
-    def reset(self, output):
+    def reset(self, output: RestAPIData):
         """Reset data"""
         setattr(output, self.name, self.default)
 

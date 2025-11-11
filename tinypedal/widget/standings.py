@@ -22,7 +22,7 @@ Standings Widget
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import TEXT_PLACEHOLDER
+from ..const_common import TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ..userfile.brand_logo import load_brand_logo_file
@@ -911,21 +911,21 @@ class Realtime(Overlay):
     def set_laptime(laptime):
         """Set lap time"""
         if laptime <= 0:
-            return "-:--.---"
+            return TEXT_NOLAPTIME
         return calc.sec2laptime_full(laptime)[:8]
 
     @staticmethod
     def set_pittime(inpit, pit_time):
         """Set lap time"""
-        if inpit:
-            return f"PIT{pit_time: >5.1f}"[:8] if pit_time > 0 else "-:--.---"
-        return f"OUT{pit_time: >5.1f}"[:8] if pit_time > 0 else "-:--.---"
+        if pit_time <= 0:
+            return TEXT_NOLAPTIME
+        return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
 
     @staticmethod
     def set_best_laptime(laptime_best):
         """Set best lap time"""
         if laptime_best <= 0:
-            return "-:--.---"
+            return TEXT_NOLAPTIME
         return calc.sec2laptime_full(laptime_best)[:8]
 
     def gap_to_leader_best(self, player_best, leader_best):

@@ -21,7 +21,7 @@ Relative Widget
 """
 
 from .. import calculation as calc
-from ..const_common import TEXT_PLACEHOLDER
+from ..const_common import TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ..userfile.brand_logo import load_brand_logo_file
@@ -382,6 +382,26 @@ class Realtime(Overlay):
                 targets=self.bars_dmg,
                 column_index=self.wcfg["column_index_vehicle_integrity"],
             )
+        # Stint laps
+        if self.wcfg["show_stint_laps"]:
+            self.bar_style_stl = (
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_stint_laps"],
+                    bg_color=self.wcfg["bkg_color_stint_laps"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_player_stint_laps"],
+                    bg_color=self.wcfg["bkg_color_player_stint_laps"])
+            )
+            self.bars_stl = self.set_qlabel(
+                style=self.bar_style_stl[0],
+                width=5 * font_m.width + bar_padx,
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_stl,
+                column_index=self.wcfg["column_index_stint_laps"],
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -464,6 +484,9 @@ class Realtime(Overlay):
             # Vehicle integrity
             if self.wcfg["show_vehicle_integrity"]:
                 self.update_dmg(self.bars_dmg[idx], veh_info.vehicleIntegrity, hi_player, state)
+            # Stint laps
+            if self.wcfg["show_stint_laps"]:
+                self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, hi_player, state)
 
     # GUI update methods
     def update_pos(self, target, *data):
@@ -717,6 +740,23 @@ class Realtime(Overlay):
             target.setText(text)
             target.updateStyle(self.bar_style_dmg[color_index])
 
+    def update_stl(self, target, *data):
+        """Stint laps"""
+        if target.last != data:
+            target.last = data
+            stint_laps_done = data[0]
+            stint_laps_est = data[1]
+            if stint_laps_done <= 0:
+                text_done = "--"
+            else:
+                text_done = f"{stint_laps_done:02.0f}"
+            if stint_laps_est <= 0:
+                text_est = "--"
+            else:
+                text_est = f"{stint_laps_est // 1:02.0f}"
+            target.setText(f"{text_done}/{text_est}")
+            target.updateStyle(self.bar_style_stl[data[2]])
+
     # Additional methods
     def set_qss_lap_difference(self, fg_color, bg_color, plr_fg_color, plr_bg_color):
         """Set style with player & lap difference:
@@ -764,15 +804,15 @@ class Realtime(Overlay):
     def set_laptime(laptime):
         """Set lap time"""
         if laptime <= 0:
-            return "-:--.---"
+            return TEXT_NOLAPTIME
         return calc.sec2laptime_full(laptime)[:8]
 
     @staticmethod
     def set_pittime(inpit, pit_time):
         """Set lap time"""
-        if inpit:
-            return f"PIT{pit_time: >5.1f}"[:8] if pit_time > 0 else "-:--.---"
-        return f"OUT{pit_time: >5.1f}"[:8] if pit_time > 0 else "-:--.---"
+        if pit_time <= 0:
+            return TEXT_NOLAPTIME
+        return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
 
 
 def lap_difference_index(is_lapped, offset=2):

@@ -68,10 +68,7 @@ def set_dataset_rf2(shmm: rf2_connector.RF2Info, rest: restapi_connector.RestAPI
 class Connector(ABC):
     """API Connector"""
 
-    __slots__ = (
-        "shmmapi",  # shared memory API
-        "restapi",  # Rest API
-    )
+    __slots__ = ()
 
     @abstractmethod
     def start(self):
@@ -93,7 +90,10 @@ class Connector(ABC):
 class SimRF2(Connector):
     """rFactor 2"""
 
-    __slots__ = ()
+    __slots__ = (
+        "shmmapi",  # shared memory API
+        "restapi",  # Rest API
+    )
     NAME = API_NAME_RF2
 
     def __init__(self):
@@ -125,7 +125,10 @@ class SimRF2(Connector):
 class SimLMU(Connector):
     """Le Mans Ultimate"""
 
-    __slots__ = ()
+    __slots__ = (
+        "shmmapi",  # shared memory API
+        "restapi",  # Rest API
+    )
     NAME = API_NAME_LMU
 
     def __init__(self):

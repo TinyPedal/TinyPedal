@@ -20,7 +20,7 @@ WIP
 * Brake wear Widget
   - Fixed an issue where brake "warning_threshold_wear" was not correctly applied while "show_thickness" enabled.
 
-* Standings Widget
+* Relative, Rivals, Standings Widget
   - Added "show_stint_laps" option (requested by user "Shu Gu"), which shows number of completed laps from current stint and estimated total stint laps.
     Note, this option is only available for LMU, and "RestAPI Module" must be enabled for accessing stint data.
 

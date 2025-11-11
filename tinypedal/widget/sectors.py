@@ -22,7 +22,12 @@ Sectors Widget
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import MAX_SECONDS, PREV_SECTOR_INDEX, SECTOR_ABBR_ID
+from ..const_common import (
+    MAX_SECONDS,
+    PREV_SECTOR_INDEX,
+    SECTOR_ABBR_ID,
+    TEXT_NOLAPTIME,
+)
 from ..module_info import minfo
 from ..validator import valid_sectors
 from ._base import Overlay
@@ -70,7 +75,7 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["bkg_color_target_time"])
         )
         self.bar_time_target = self.set_qlabel(
-            text="  --:--.---",
+            text=f"{self.prefix_best}{TEXT_NOLAPTIME: >9}",
             style=self.bar_style_time_target[2],
             width=font_m.width * 11 + bar_padx,
         )
@@ -82,7 +87,7 @@ class Realtime(Overlay):
             bg_color=self.wcfg["bkg_color_current_time"]
         )
         self.bar_time_curr = self.set_qlabel(
-            text="  --:--.---",
+            text=f"{TEXT_NOLAPTIME: >11}",
             style=bar_style_time_curr,
             width=font_m.width * 11 + bar_padx,
         )
@@ -208,7 +213,7 @@ class Realtime(Overlay):
         if seconds < MAX_SECONDS:  # bypass invalid value
             text_laptime = f"{self.prefix_best}{calc.sec2laptime(seconds)[:8]: >9}"
         else:
-            text_laptime = f"{self.prefix_best}   --.---"
+            text_laptime = f"{self.prefix_best}{TEXT_NOLAPTIME: >9}"
         self.bar_time_target.setText(text_laptime)
         self.bar_time_target.updateStyle(self.bar_style_time_target[2])
 

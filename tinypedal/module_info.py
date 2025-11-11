@@ -87,7 +87,7 @@ class VehiclePitTimer:
         "elapsed",
         "pitting",
         "_slot_id",
-        "_start_time",
+        "_pitin_time",
         "_last_state",
         "_last_pit_lap",
     )
@@ -96,7 +96,7 @@ class VehiclePitTimer:
         self.elapsed: float = 0.0
         self.pitting: bool = False
         self._slot_id: int = -1
-        self._start_time: float = 0.0
+        self._pitin_time: float = 0.0
         self._last_state: int = 0
         self._last_pit_lap: int = -999
 
@@ -110,7 +110,7 @@ class VehiclePitTimer:
             self._slot_id = slot_id
             self.elapsed = 0.0
             self.pitting = False
-            self._start_time = -1.0
+            self._pitin_time = -1.0
             self._last_state = 0
             self._last_pit_lap = -999
         # Reset if session changed
@@ -119,15 +119,15 @@ class VehiclePitTimer:
         # Pit status check
         if self._last_state != in_pit:
             self._last_state = in_pit
-            self._start_time = elapsed_time
+            self._pitin_time = elapsed_time
         if in_pit:
             # Ignore pit timer in garage
             if in_pit == 2:
-                self._start_time = -1.0
+                self._pitin_time = -1.0
                 self.elapsed = 0.0
             # Calculating pit time while in pit
-            elif 0 <= self._start_time:
-                self.elapsed = elapsed_time - self._start_time
+            elif 0 <= self._pitin_time:
+                self.elapsed = elapsed_time - self._pitin_time
             # Save last in pit lap number
             # Pit state can desync, wait minimum 2 seconds before update
             if 2 < self.elapsed:
@@ -399,6 +399,7 @@ class MappingInfo:
         "pitExitPosition",
         "pitLaneLength",
         "pitSpeedLimit",
+        "pitPassTime",
     )
 
     def __init__(self):
@@ -414,6 +415,7 @@ class MappingInfo:
         self.pitExitPosition: float = 0.0
         self.pitLaneLength: float = 0.0
         self.pitSpeedLimit: float = 0.0
+        self.pitPassTime: float = 0.0
 
 
 class NotesInfo:

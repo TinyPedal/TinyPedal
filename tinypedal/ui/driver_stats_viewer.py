@@ -37,7 +37,7 @@ from PySide2.QtWidgets import (
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import MAX_SECONDS
+from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME
 from ..formatter import strip_invalid_char
 from ..setting import cfg
 from ..units import liter_to_gallon, meter_to_kilometer, meter_to_mile
@@ -60,7 +60,7 @@ def parse_display_value(key: str, value: int | float) -> str | int | float:
     """Parse stats display value"""
     if key == "pb":
         if value >= MAX_SECONDS:
-            return "-:--.---"
+            return TEXT_NOLAPTIME
         return calc.sec2laptime_full(value)
     if key == "meters":
         if cfg.units["odometer_unit"] == "Kilometer":
