@@ -1,8 +1,8 @@
-WIP
+2.35.0 (2025-11-12)
 -----------------------------
-* Major Changes
-  - Added new "Telemetry API" setting, which unifies "Shared memory API" and "Rest API" data accessing.
-  - Previous settings from "Shared memory API" and "RestAPI Module" will be auto transferred to "Telemetry API". All old settings are preserved for backward compatibility in case user wish to use older versions.
+* API Changes
+  - Added new "Telemetry API" setting that handles both "Shared memory API" and "Rest API" accessing.
+  - Previous settings from "Shared memory API" and "RestAPI Module" will be auto transferred to "Telemetry API". All old settings are preserved for backward compatibility with older versions.
   - Rest API accessing can now be enabled or disabled by toggling "enable_restapi_access" option in "Telemetry API" dialog.
   - Removed "RestAPI Module" from Module Tab.
 
