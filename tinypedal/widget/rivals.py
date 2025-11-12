@@ -470,7 +470,9 @@ class Realtime(Overlay):
                 self.update_int(self.bars_int[idx], time_int, is_ahead, state)
             # Vehicle laptime
             if self.wcfg["show_laptime"]:
-                if in_race or self.wcfg["show_best_laptime"]:
+                if self.wcfg["show_pitstop_duration_while_requested_pitstop"] and plr_veh_info.pitRequested:
+                    laptime = self.set_pittime(veh_info.inPit, veh_info.pitTimer.elapsed)
+                elif in_race or self.wcfg["show_best_laptime"]:
                     if veh_info.pitTimer.pitting:
                         laptime = self.set_pittime(veh_info.inPit, veh_info.pitTimer.elapsed)
                     else:
@@ -495,7 +497,7 @@ class Realtime(Overlay):
                 self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundFront, veh_info.tireCompoundRear, state)
             # Pitstop count
             if self.wcfg["show_pitstop_count"]:
-                self.update_psc(self.bars_psc[idx], veh_info.numPitStops, veh_info.pitState, state)
+                self.update_psc(self.bars_psc[idx], veh_info.numPitStops, veh_info.pitRequested, state)
             # Delta laptime
             if self.wcfg["show_delta_laptime"]:
                 delta_laptime = tuple(veh_info.lapTimeHistory.delta(plr_veh_info.lapTimeHistory, self.max_delta))

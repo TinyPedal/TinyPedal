@@ -162,7 +162,7 @@ class VehicleDataSet:
         "inPit",
         "isClassFastestLastLap",
         "numPitStops",
-        "pitState",
+        "pitRequested",
         "tireCompoundFront",
         "tireCompoundRear",
         "relativeOrientationRadians",
@@ -202,7 +202,7 @@ class VehicleDataSet:
         self.inPit: int = 0
         self.isClassFastestLastLap: bool = False
         self.numPitStops: int = 0
-        self.pitState: bool = False
+        self.pitRequested: bool = False
         self.tireCompoundFront: str = ""
         self.tireCompoundRear: str = ""
         self.relativeOrientationRadians: float = 0.0

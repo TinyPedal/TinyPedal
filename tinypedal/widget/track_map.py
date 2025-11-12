@@ -330,7 +330,7 @@ class Realtime(Overlay):
         if not plr_veh_info.inPit:
             if not self.show_while_requested:  # if not in pit
                 return
-            if not plr_veh_info.pitState:  # not requested pit
+            if not plr_veh_info.pitRequested:  # not requested pit
                 return
 
         # Verify data set
@@ -352,7 +352,7 @@ class Realtime(Overlay):
         dist_end_index = min(len(dist_data), len(map_data)) - 1
 
         # Calculate pit timer & target time
-        if plr_veh_info.pitState and not plr_veh_info.inPit:  # out pit lane
+        if plr_veh_info.pitRequested and not plr_veh_info.inPit:  # out pit lane
             pitin_time = target_node_time(minfo.mapping.pitEntryPosition, deltabest_data, deltabest_max_index, laptime_scale)
             pos_curr_time = target_node_time(api.read.lap.distance(), deltabest_data, deltabest_max_index, laptime_scale)
             pit_timer = pos_curr_time - pitin_time

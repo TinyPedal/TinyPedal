@@ -25,6 +25,7 @@ WIP
     Note, this option is only available for LMU, and "RestAPI Module" must be enabled for accessing stint data.
   - Added "yellow_flag_status_text" option (requested by user "bshpanchuk"), which shows yellow flag indicator when driver causes (or likely to) yellow flag. Note, unlike in-game yellow flag, the indicator is always displayed when driver's speed is below 28kph (outside of pit lane), regardless whether driver has caused yellow flag on track.
   - "class_width" can now be set to "0" to hide class name while showing only class color. (requested by user "Levis1234").
+  - Added "show_pitstop_duration_while_requested_pitstop" option, which shows driver's last recorded pit stop duration (in lap time column) while you have requested pit stop.
 
 * Misc
   - Fixed an issue where consumption history was not recorded if two consecutive laps ended with exact same lap time.

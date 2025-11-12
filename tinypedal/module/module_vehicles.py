@@ -182,7 +182,7 @@ def update_vehicle_data(
             data.lastLapTime = api.read.timing.last_laptime(index)
             data.bestLapTime = api.read.timing.best_laptime(index)
             data.numPitStops = api.read.vehicle.number_pitstops(index, api.read.vehicle.number_penalties(index))
-            data.pitState = api.read.vehicle.pit_request(index)
+            data.pitRequested = api.read.vehicle.pit_request(index)
             data.driverName = api.read.vehicle.driver_name(index)
             data.vehicleName = api.read.vehicle.vehicle_name(index)
             data.vehicleClass = api.read.vehicle.class_name(index)

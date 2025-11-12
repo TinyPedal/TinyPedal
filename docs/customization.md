@@ -2753,7 +2753,10 @@ Show highlighted color on opponents within nearest time gap threshold.
 Set nearest time gap threshold (in seconds) for opponent who is in front of or behind player. Default is `1` second for front, and `2` seconds for behind.
 
     show_laptime
-Show driver's last lap time and pit timer if available.
+Show driver's last lap time or pit stop duration if available.
+
+    show_pitstop_duration_while_requested_pitstop
+Show driver's last recorded pit stop duration (in lap time column) while you have requested pit stop.
 
     show_highlighted_fastest_last_laptime
 Highlight the fastest last lap time within the same class if available.
@@ -3384,7 +3387,7 @@ Note, pit out position prediction is based on `delta best` data which scaled wit
 For accurate prediction, the location of `pit out line` must be found first. And since each track has different pit out line location, it is required to `pit out` at least `once per session` to mark the correct pit out line location. This can be easily done by driving out of pit lane.
 
     show_pitout_prediction_while_requested_pitstop
-Show estimated pit out on-track position indication while player has requested pitstop and not in pit lane.
+Show estimated pit out on-track position indication while player has requested pit stop and not in pit lane.
 
     number_of_prediction
 Set number of pit out prediction to display. Value range is limited in `1` to `20`.

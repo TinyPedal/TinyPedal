@@ -411,6 +411,8 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         relative_list = minfo.relative.relative
         total_rel_idx = len(relative_list)
+        player_idx = minfo.vehicles.playerIndex
+        plr_veh_info = minfo.vehicles.dataSet[player_idx]
 
         # Relative update
         for idx in range(self.veh_range):
@@ -460,7 +462,10 @@ class Realtime(Overlay):
                 self.update_gap(self.bars_gap[idx], rel_time_gap, hi_player, state)
             # Vehicle laptime
             if self.wcfg["show_laptime"]:
-                if veh_info.pitTimer.pitting:
+                if self.wcfg["show_pitstop_duration_while_requested_pitstop"] and plr_veh_info.pitRequested:
+                    laptime = self.set_pittime(veh_info.inPit, veh_info.pitTimer.elapsed)
+                    is_class_best = False
+                elif veh_info.pitTimer.pitting:
                     laptime = self.set_pittime(veh_info.inPit, veh_info.pitTimer.elapsed)
                     is_class_best = False
                 else:
@@ -481,7 +486,7 @@ class Realtime(Overlay):
                 self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundFront, veh_info.tireCompoundRear, hi_player, state)
             # Pitstop count
             if self.wcfg["show_pitstop_count"]:
-                self.update_psc(self.bars_psc[idx], veh_info.numPitStops, veh_info.pitState, hi_player, state)
+                self.update_psc(self.bars_psc[idx], veh_info.numPitStops, veh_info.pitRequested, hi_player, state)
             # Remaining energy
             if self.wcfg["show_energy_remaining"]:
                 self.update_nrg(self.bars_nrg[idx], veh_info.energyRemaining, hi_player, state)
@@ -747,17 +752,21 @@ class Realtime(Overlay):
         """Stint laps"""
         if target.last != data:
             target.last = data
-            stint_laps_done = data[0]
-            stint_laps_est = data[1]
-            if stint_laps_done <= 0:
-                text_done = "--"
+            if data[-1]:
+                stint_laps_done = data[0]
+                stint_laps_est = data[1]
+                if stint_laps_done <= 0:
+                    text_done = "--"
+                else:
+                    text_done = f"{stint_laps_done:02.0f}"
+                if stint_laps_est <= 0:
+                    text_est = "--"
+                else:
+                    text_est = f"{stint_laps_est // 1:02.0f}"
+                text = f"{text_done}/{text_est}"
             else:
-                text_done = f"{stint_laps_done:02.0f}"
-            if stint_laps_est <= 0:
-                text_est = "--"
-            else:
-                text_est = f"{stint_laps_est // 1:02.0f}"
-            target.setText(f"{text_done}/{text_est}")
+                text = ""
+            target.setText(text)
             target.updateStyle(self.bar_style_stl[data[2]])
 
     # Additional methods
