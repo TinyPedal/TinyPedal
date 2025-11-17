@@ -86,8 +86,11 @@ class VehiclePitTimer:
     __slots__ = (
         "elapsed",
         "pitting",
+        "stopping",
+        "lap_stopped",
         "_slot_id",
         "_pitin_time",
+        "_pitstop_time",
         "_last_state",
         "_last_pit_lap",
     )
@@ -95,12 +98,15 @@ class VehiclePitTimer:
     def __init__(self):
         self.elapsed: float = 0.0
         self.pitting: bool = False
+        self.stopping: bool = False
+        self.lap_stopped: int = 0
         self._slot_id: int = -1
         self._pitin_time: float = 0.0
+        self._pitstop_time: float = 0.0
         self._last_state: int = 0
-        self._last_pit_lap: int = -999
+        self._last_pit_lap: int = 99999
 
-    def update(self, slot_id: int, in_pit: int, elapsed_time: float, laps_done: int):
+    def update(self, slot_id: int, in_pit: int, elapsed_time: float, laps_done: int, speed: float):
         """Calculate pit time
 
         Pit state: 0 = not in pit, 1 = in pit, 2 = in garage.
@@ -109,31 +115,46 @@ class VehiclePitTimer:
         if self._slot_id != slot_id:
             self._slot_id = slot_id
             self.elapsed = 0.0
+            self.stopping = 0.0
             self.pitting = False
-            self._pitin_time = -1.0
+            self._pitin_time = elapsed_time
+            self._pitstop_time = elapsed_time
             self._last_state = 0
-            self._last_pit_lap = -999
+            self._last_pit_lap = laps_done
         # Reset if session changed
         if self._last_pit_lap > laps_done:
-            self._last_pit_lap = -999
+            self._last_pit_lap = laps_done
         # Pit status check
         if self._last_state != in_pit:
             self._last_state = in_pit
             self._pitin_time = elapsed_time
+            self._pitstop_time = elapsed_time
+            if in_pit:  # reset after enter pit
+                self.elapsed = 0.0
+                self.stopping = 0.0
         if in_pit:
             # Ignore pit timer in garage
             if in_pit == 2:
-                self._pitin_time = -1.0
                 self.elapsed = 0.0
+                self.stopping = 0.0
+                self._last_pit_lap = laps_done
             # Calculating pit time while in pit
-            elif 0 <= self._pitin_time:
-                self.elapsed = elapsed_time - self._pitin_time
+            else:
+                # Total pitting time
+                self.elapsed += elapsed_time - self._pitin_time
+                # Total stopping time
+                if speed < 0.1:
+                    self.stopping += elapsed_time - self._pitstop_time
+            # Reset delta
+            self._pitin_time = elapsed_time
+            self._pitstop_time = elapsed_time
             # Save last in pit lap number
             # Pit state can desync, wait minimum 2 seconds before update
-            if 2 < self.elapsed:
+            if self.elapsed > 2 and self.stopping > 1:  # stop for more than 1 seconds
                 self._last_pit_lap = laps_done
         # Check whether is pitting lap
         self.pitting = (in_pit > 0 or laps_done == self._last_pit_lap)
+        self.lap_stopped = self._last_pit_lap
 
 
 class VehicleDataSet:

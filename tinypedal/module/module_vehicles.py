@@ -109,14 +109,15 @@ def update_vehicle_data(
         # Temp var only
         laps_completed = api.read.lap.completed_laps(index)
         lap_distance = api.read.lap.distance(index)
+        speed = api.read.vehicle.speed(index)
 
         # Update high priority info
         data.isPlayer = api.read.vehicle.is_player(index)
         data.currentLapProgress = calc.lap_progress_distance(lap_distance, track_length)
         data.totalLapProgress = laps_completed + data.currentLapProgress
-        data.isYellow = api.read.vehicle.speed(index) < 8
+        data.isYellow = speed < 8
         data.inPit = api.read.vehicle.in_paddock(index)
-        data.pitTimer.update(api.read.vehicle.slot_id(index), data.inPit, elapsed_time, laps_completed)
+        data.pitTimer.update(api.read.vehicle.slot_id(index), data.inPit, elapsed_time, laps_completed, speed)
         data.worldPositionX = api.read.vehicle.position_longitudinal(index)
         data.worldPositionY = api.read.vehicle.position_lateral(index)
 
@@ -197,7 +198,7 @@ def update_vehicle_data(
             data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.lapTimeHistory.update(api.read.timing.start(index), elapsed_time, data.lastLapTime)
 
-            update_stint_usage(data)
+            update_stint_usage(data, laps_completed)
 
             # Save leader info
             if data.positionOverall == 1:
@@ -271,14 +272,17 @@ def calc_gap_behind_leader(index: int) -> float:
     return api.read.timing.behind_leader(index)
 
 
-def update_stint_usage(data: VehicleDataSet) -> None:
+def update_stint_usage(data: VehicleDataSet, laps_completed: int) -> None:
     """Update stint usage data"""
     (ve_remaining, ve_used, total_laps_done, stint_laps_est, stint_laps_done
      ) = api.read.vehicle.stint_usage(data.driverName)
 
     # Estimated stint laps
     data.estimatedStintLaps = stint_laps_est
-    data.currentStintLaps = stint_laps_done
+    if stint_laps_done > 0:
+        data.currentStintLaps = stint_laps_done
+    else:
+        data.currentStintLaps = laps_completed - data.pitTimer.lap_stopped
 
     # Stint energy usage
     if ve_remaining <= -1.0 or ve_used <= 0 or (data.pitTimer.pitting and not data.inPit):
