@@ -70,6 +70,10 @@ class Check(DataAdapter):
         """API state"""
         return self.shmm.state
 
+    def api_paused(self) -> bool:
+        """API paused"""
+        return self.shmm.isPaused
+
     def api_version(self) -> str:
         """Identify API version"""
         return tostr(self.shmm.rf2Ext.mVersion)

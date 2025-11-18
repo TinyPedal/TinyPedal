@@ -59,7 +59,7 @@ class Realtime(DataModule):
         last_version_update = None
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if self.state.active or not api.read.check.api_paused():
 
                 if not reset:
                     reset = True

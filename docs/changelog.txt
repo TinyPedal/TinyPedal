@@ -1,7 +1,11 @@
-WIP
+2.35.1 (2025-11-18)
 -----------------------------
+* Relative, Vehicles Module
+  - Added alternative stint laps recording for vehicle without virtual energy (requested by user "bshpanchuk").
+  - Now continues to update relative and vehicles data while not driving in active session (such as in garage or spectating).
+
 * Relative, Rivals, Standings Widget
-  - Current stint laps reading now shows on vehicle without virtual energy (such as LMP2). Note, estimated total stint laps still does not show on vehicle without virtual energy due to missing game API data.
+  - Current stint laps reading now shows on vehicle without virtual energy (such as LMP2). Note, estimated total stint laps cannot be shown on vehicle without virtual energy due to missing game API data.
 
 * Misc
   - Fixed an issue where TinyPedal could not be closed if "enable_restapi_access" option is disabled in Telemetry API setting (reported by user "Deckard9999").
