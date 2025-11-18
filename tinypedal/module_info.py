@@ -85,8 +85,8 @@ class VehiclePitTimer:
 
     __slots__ = (
         "elapsed",
+        "stopped",
         "pitting",
-        "stopping",
         "lap_stopped",
         "_slot_id",
         "_pitin_time",
@@ -97,8 +97,8 @@ class VehiclePitTimer:
 
     def __init__(self):
         self.elapsed: float = 0.0
+        self.stopped: float = 0.0
         self.pitting: bool = False
-        self.stopping: bool = False
         self.lap_stopped: int = 0
         self._slot_id: int = -1
         self._pitin_time: float = 0.0
@@ -115,7 +115,7 @@ class VehiclePitTimer:
         if self._slot_id != slot_id:
             self._slot_id = slot_id
             self.elapsed = 0.0
-            self.stopping = 0.0
+            self.stopped = 0.0
             self.pitting = False
             self._pitin_time = elapsed_time
             self._pitstop_time = elapsed_time
@@ -131,26 +131,26 @@ class VehiclePitTimer:
             self._pitstop_time = elapsed_time
             if in_pit:  # reset after enter pit
                 self.elapsed = 0.0
-                self.stopping = 0.0
+                self.stopped = 0.0
         if in_pit:
             # Ignore pit timer in garage
             if in_pit == 2:
                 self.elapsed = 0.0
-                self.stopping = 0.0
+                self.stopped = 0.0
                 self._last_pit_lap = laps_done
-            # Calculating pit time while in pit
+            # Calculating time while in pit
             else:
-                # Total pitting time
+                # Total elapsed time in pit
                 self.elapsed += elapsed_time - self._pitin_time
-                # Total stopping time
+                # Total stopped time in pit
                 if speed < 0.1:
-                    self.stopping += elapsed_time - self._pitstop_time
+                    self.stopped += elapsed_time - self._pitstop_time
             # Reset delta
             self._pitin_time = elapsed_time
             self._pitstop_time = elapsed_time
             # Save last in pit lap number
             # Pit state can desync, wait minimum 2 seconds before update
-            if self.elapsed > 2 and self.stopping > 1:  # stop for more than 1 seconds
+            if self.elapsed > 2 and self.stopped > 1:  # stop for more than 1 seconds
                 self._last_pit_lap = laps_done
         # Check whether is pitting lap
         self.pitting = (in_pit > 0 or laps_done == self._last_pit_lap)

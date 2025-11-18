@@ -87,11 +87,12 @@ class RestAPIInfo:
 
     def stop(self):
         """Stop update thread"""
-        self._event.set()
-        self._update_thread.join()
-        # Wait update_data exit
-        self._updating = False
-        logger.info("RestAPI: UPDATING: thread stopped")
+        if self._updating:
+            self._event.set()
+            if self._update_thread is not None:
+                self._update_thread.join()
+            self._updating = False
+            logger.info("RestAPI: UPDATING: thread stopped")
 
     def __update(self):
         """Update Rest API data"""

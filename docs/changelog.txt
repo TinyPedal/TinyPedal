@@ -1,3 +1,11 @@
+WIP
+-----------------------------
+* Relative, Rivals, Standings Widget
+  - Current stint laps reading now shows on vehicle without virtual energy (such as LMP2). Note, estimated total stint laps still does not show on vehicle without virtual energy due to missing game API data.
+
+* Misc
+  - Fixed an issue where TinyPedal could not be closed if "enable_restapi_access" option is disabled in Telemetry API setting (reported by user "Deckard9999").
+
 2.35.0 (2025-11-12)
 -----------------------------
 * API Changes
