@@ -556,7 +556,9 @@ class WheelsInfo:
         "estimatedValidTreadWear",
         "maxBrakeThickness",
         "currentBrakeThickness",
+        "lastLapBrakeWear",
         "estimatedBrakeWear",
+        "estimatedValidBrakeWear",
     )
 
     def __init__(self):
@@ -570,7 +572,9 @@ class WheelsInfo:
         self.estimatedValidTreadWear: list[float] = list(WHEELS_ZERO)
         self.maxBrakeThickness: list[float] = list(WHEELS_ZERO)
         self.currentBrakeThickness: list[float] = list(WHEELS_ZERO)
+        self.lastLapBrakeWear: list[float] = list(WHEELS_ZERO)
         self.estimatedBrakeWear: list[float] = list(WHEELS_ZERO)
+        self.estimatedValidBrakeWear: list[float] = list(WHEELS_ZERO)
 
 
 class ModuleInfo:

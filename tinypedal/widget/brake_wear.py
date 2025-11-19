@@ -197,11 +197,13 @@ class Realtime(Overlay):
             brake_curr = minfo.wheels.currentBrakeThickness[idx]
             max_thickness = minfo.wheels.maxBrakeThickness[idx]
             est_wear = minfo.wheels.estimatedBrakeWear[idx]
+            est_valid_wear = minfo.wheels.estimatedValidBrakeWear[idx]
             est_wear_percent = est_wear
 
             if self.wcfg["show_thickness"]:
                 brake_curr *= max_thickness / 100
                 est_wear *= max_thickness / 100
+                est_valid_wear *= max_thickness / 100
 
             # Remaining brake thickness
             if self.wcfg["show_remaining"]:
@@ -217,12 +219,12 @@ class Realtime(Overlay):
 
             # Estimated lifespan in laps
             if self.wcfg["show_lifespan_laps"]:
-                wear_laps = calc.wear_lifespan_in_laps(brake_curr, est_wear)
+                wear_laps = calc.wear_lifespan_in_laps(brake_curr, est_valid_wear)
                 self.update_laps(self.bars_laps[idx], wear_laps)
 
             # Estimated lifespan in minutes
             if self.wcfg["show_lifespan_minutes"]:
-                wear_mins = calc.wear_lifespan_in_mins(brake_curr, est_wear, laptime_pace)
+                wear_mins = calc.wear_lifespan_in_mins(brake_curr, est_valid_wear, laptime_pace)
                 self.update_mins(self.bars_mins[idx], wear_mins)
 
     # GUI update methods

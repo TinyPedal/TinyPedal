@@ -1,3 +1,9 @@
+WIP
+-----------------------------
+* Wheels Module
+  - Avoid resetting wheel radius, tyre wear, brake wear data while game is paused.
+  - Added delta wear calculation for estimating brake wear difference per lap.
+
 2.35.1 (2025-11-18)
 -----------------------------
 * Relative, Vehicles Module
