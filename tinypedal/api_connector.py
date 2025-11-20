@@ -33,7 +33,7 @@ from .validator import bytes_to_str
 class APIDataSet(NamedTuple):
     """API data set"""
 
-    check: rf2_data.Check
+    state: rf2_data.State
     brake: rf2_data.Brake
     emotor: rf2_data.ElectricMotor
     engine: rf2_data.Engine
@@ -50,7 +50,7 @@ class APIDataSet(NamedTuple):
 def set_dataset_rf2(shmm: rf2_connector.RF2Info, rest: restapi_connector.RestAPIInfo) -> APIDataSet:
     """Set API data set - RF2"""
     return APIDataSet(
-        rf2_data.Check(shmm, rest),
+        rf2_data.State(shmm, rest),
         rf2_data.Brake(shmm, rest),
         rf2_data.ElectricMotor(shmm, rest),
         rf2_data.Engine(shmm, rest),

@@ -91,11 +91,11 @@ def valid_sectors(sector_time: list | Any, max_time: float = MAX_SECONDS) -> boo
 
 
 def is_same_session(
-    combo_id: str, session_id: tuple[int, int, int],
+    combo_name: str, session_id: tuple[int, int, int],
     last_session_id: tuple[str, int, int, int]) -> bool:
     """Check if same session, car, track combo"""
     return (
-        combo_id == last_session_id[0] and
+        combo_name == last_session_id[0] and
         last_session_id[1] == session_id[0] and  # session time stamp
         last_session_id[2] <= session_id[1] and  # session elapsed time
         last_session_id[3] <= session_id[2]  # total completed laps

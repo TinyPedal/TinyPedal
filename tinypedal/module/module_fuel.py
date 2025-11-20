@@ -65,18 +65,18 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
-                    combo_id = api.read.check.combo_id()
+                    combo_name = api.read.session.combo_name()
                     gen_calc_fuel = calc_consumption(
                         output=minfo.fuel,
                         telemetry_func=detect_consumption_type(),
                         filepath=userpath_fuel_delta,
-                        filename=combo_id,
+                        filename=combo_name,
                         extension=FileExt.FUEL,
                         min_delta_distance=self.mcfg["minimum_delta_distance"],
                     )
                     # Reset module output
                     minfo.fuel.reset()
-                    load_consumption_history(userpath_fuel_delta, combo_id)
+                    load_consumption_history(userpath_fuel_delta, combo_name)
 
                 # Run calculation
                 gen_calc_fuel.send(True)
@@ -90,7 +90,7 @@ class Realtime(DataModule):
                     update_interval = self.idle_interval
                     # Trigger save check
                     gen_calc_fuel.send(False)
-                    save_consumption_history(userpath_fuel_delta, combo_id)
+                    save_consumption_history(userpath_fuel_delta, combo_name)
 
 
 def update_consumption_history():
@@ -119,36 +119,36 @@ def update_consumption_history():
         minfo.history.consumptionDataVersion += 1
 
 
-def load_consumption_history(filepath: str, combo_id: str):
+def load_consumption_history(filepath: str, combo_name: str):
     """Load consumption history"""
-    if minfo.history.consumptionDataName != combo_id:
+    if minfo.history.consumptionDataName != combo_name:
         dataset = load_consumption_history_file(
             filepath=filepath,
-            filename=combo_id,
+            filename=combo_name,
         )
         minfo.history.consumptionDataSet.clear()
         minfo.history.consumptionDataSet.extend(dataset)
         # Update combo info
-        minfo.history.consumptionDataName = combo_id
-        minfo.history.consumptionDataVersion = hash(combo_id)  # unique start id
+        minfo.history.consumptionDataName = combo_name
+        minfo.history.consumptionDataVersion = hash(combo_name)  # unique start id
 
 
-def save_consumption_history(filepath: str, combo_id: str):
+def save_consumption_history(filepath: str, combo_name: str):
     """Save consumption history"""
-    if minfo.history.consumptionDataVersion != hash(combo_id):
+    if minfo.history.consumptionDataVersion != hash(combo_name):
         save_consumption_history_file(
             dataset=minfo.history.consumptionDataSet,
             filepath=filepath,
-            filename=combo_id,
+            filename=combo_name,
         )
-        minfo.history.consumptionDataVersion = hash(combo_id)  # reset
+        minfo.history.consumptionDataVersion = hash(combo_name)  # reset
 
 
 def detect_consumption_type() -> Callable:
     """Detect consumption type, return telemetry function"""
     # Pure electric based vehicle
     if (
-        api.read.check.sim_name() == "RF2"
+        api.read.state.identifier() == "RF2"
         and api.read.vehicle.tank_capacity() == 1
         and api.read.emotor.battery_charge() > 0
     ):

@@ -103,7 +103,7 @@ class RestAPIInfo:
         active_task_sim = {}
 
         while not _event_wait(update_interval):
-            if self._parent_api.state:
+            if self._parent_api.isActive:
 
                 # Also check task cancel state in case delay
                 if not reset or self._task_cancel:
@@ -170,7 +170,7 @@ class RestAPIInfo:
     async def task_control(self, task_group: tuple[asyncio.Task, ...]):
         """Control task running state"""
         _event_is_set = self._event.is_set
-        while not _event_is_set() and self._parent_api.state:
+        while not _event_is_set() and self._parent_api.isActive:
             await asyncio.sleep(0.1)  # check every 100ms
         # Set cancel state to exit loop in case failed to cancel
         self._task_cancel = True

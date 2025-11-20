@@ -593,7 +593,7 @@ class TrackNotesEditor(BaseEditor):
 
     def get_track_name(self) -> str:
         """Get track name"""
-        track_name = api.read.check.track_id()
+        track_name = api.read.session.track_name()
         if not track_name:
             return self.trackmap.map_filename
         return track_name

@@ -78,7 +78,7 @@ class OverlayState(QObject):
         """Update global state"""
         _event_wait = self._event.wait
         while not _event_wait(0.2):
-            self.active = api.state
+            self.active = api.read.state.active()
             # Auto hide state check
             hide_state = cfg.overlay["auto_hide"] and not self.active
             if self._last_hide_state != hide_state:
@@ -113,7 +113,7 @@ class OverlayState(QObject):
     def __check_preset_sim(self) -> bool:
         """Check primary preset from sim"""
         # Get sim_name, returns "" if no game running
-        sim_name = api.read.check.sim_name()
+        sim_name = api.read.state.identifier()
         # Abort if game not found
         if not sim_name:
             self._last_detected_sim = None

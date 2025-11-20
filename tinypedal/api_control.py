@@ -78,11 +78,11 @@ class APIControl:
             self.read = init_read
             self._same_api_loaded = True
 
-        logger.info("CONNECTED: %s API (%s)", self._api.NAME, self.version)
+        logger.info("CONNECTED: %s API (%s)", self._api.NAME, self.read.state.version())
 
     def stop(self):
         """Stop API"""
-        logger.info("DISCONNECTING: %s API (%s)", self._api.NAME, self.version)
+        logger.info("DISCONNECTING: %s API (%s)", self._api.NAME, self.read.state.version())
         self._api.stop()
         logger.info("DISCONNECTED: %s API", self._api.NAME)
 
@@ -100,17 +100,6 @@ class APIControl:
     def name(self) -> str:
         """API name output"""
         return self._api.NAME
-
-    @property
-    def state(self) -> bool:
-        """API state output"""
-        return self.read.check.api_state()
-
-    @property
-    def version(self) -> str:
-        """API version output"""
-        version = self.read.check.api_version()
-        return version if version else "unknown"
 
 
 api = APIControl()

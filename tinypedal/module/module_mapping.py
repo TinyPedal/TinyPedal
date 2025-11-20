@@ -56,7 +56,7 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
-                    recorder.load_map(api.read.check.track_id())
+                    recorder.load_map(api.read.session.track_name())
                     if recorder.map_exist:
                         output.coordinates = recorder.output.coords
                         output.elevations = recorder.output.dists

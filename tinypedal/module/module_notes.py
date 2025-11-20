@@ -67,7 +67,7 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
-                    track_name = api.read.check.track_id()
+                    track_name = api.read.session.track_name()
 
                     # Load pace notes
                     pace_notes = load_pace_notes_file(

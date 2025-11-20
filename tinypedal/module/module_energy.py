@@ -53,12 +53,12 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
-                    combo_id = api.read.check.combo_id()
+                    combo_name = api.read.session.combo_name()
                     gen_calc_energy = calc_consumption(
                         output=minfo.energy,
                         telemetry_func=telemetry_energy,
                         filepath=userpath_energy_delta,
-                        filename=combo_id,
+                        filename=combo_name,
                         extension=FileExt.ENERGY,
                         min_delta_distance=self.mcfg["minimum_delta_distance"],
                     )

@@ -173,7 +173,7 @@ class ResetDataMenu(QMenu):
             data_type="delta best",
             extension="csv",
             filepath=cfg.path.delta_best,
-            filename=api.read.check.combo_id(),
+            filename=api.read.session.combo_name(),
         )
 
     def reset_energydelta(self):
@@ -182,7 +182,7 @@ class ResetDataMenu(QMenu):
             data_type="energy delta",
             extension="energy",
             filepath=cfg.path.energy_delta,
-            filename=api.read.check.combo_id(),
+            filename=api.read.session.combo_name(),
         )
 
     def reset_fueldelta(self):
@@ -191,7 +191,7 @@ class ResetDataMenu(QMenu):
             data_type="fuel delta",
             extension="fuel",
             filepath=cfg.path.fuel_delta,
-            filename=api.read.check.combo_id(),
+            filename=api.read.session.combo_name(),
         )
 
     def reset_consumption(self):
@@ -200,7 +200,7 @@ class ResetDataMenu(QMenu):
             data_type="consumption history",
             extension="consumption",
             filepath=cfg.path.fuel_delta,
-            filename=api.read.check.combo_id(),
+            filename=api.read.session.combo_name(),
         ):
             minfo.history.reset_consumption()
 
@@ -210,7 +210,7 @@ class ResetDataMenu(QMenu):
             data_type="sector best",
             extension="sector",
             filepath=cfg.path.sector_best,
-            filename=api.read.check.combo_id(),
+            filename=api.read.session.combo_name(),
         )
 
     def reset_trackmap(self):
@@ -219,13 +219,13 @@ class ResetDataMenu(QMenu):
             data_type="track map",
             extension="svg",
             filepath=cfg.path.track_map,
-            filename=api.read.check.track_id(),
+            filename=api.read.session.track_name(),
         )
 
     def __confirmation(self, data_type: str, extension: str, filepath: str, filename: str) -> bool:
         """Message confirmation, returns true if file deleted"""
         # Check if on track
-        if api.state:
+        if api.read.state.active():
             QMessageBox.warning(
                 self._parent,
                 "Error",

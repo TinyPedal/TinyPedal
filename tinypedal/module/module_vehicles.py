@@ -51,7 +51,7 @@ class Realtime(DataModule):
         gen_low_priority_timer = state_timer(0.2)
 
         while not _event_wait(update_interval):
-            if self.state.active or not api.read.check.api_paused():
+            if self.state.active or not api.read.state.paused():
 
                 if not reset:
                     reset = True

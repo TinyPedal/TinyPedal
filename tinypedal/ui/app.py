@@ -133,7 +133,7 @@ class StatusButtonBar(QStatusBar):
         if cfg.telemetry_api["enable_active_state_override"]:
             text_api_status = "overriding"
         else:
-            text_api_status = api.version
+            text_api_status = api.read.state.version()
         self.button_api.setText(f"API: {API_NAME_ALIAS[api.name]} ({text_api_status})")
 
         self.button_style.setText(f"UI: {cfg.application['window_color_theme']}")

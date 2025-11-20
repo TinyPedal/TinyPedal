@@ -84,18 +84,18 @@ class Realtime(DataModule):
                     is_pit_lap = 0  # whether pit in or pit out lap
 
                     gen_position_sync.send(None)
-                    combo_id = api.read.check.combo_id()
-                    session_id = api.read.check.session_id()
+                    combo_name = api.read.session.combo_name()
+                    session_id = api.read.session.identifier()
 
                     # Reset delta session best if not same session
-                    if not is_same_session(combo_id, session_id, last_session_id):
+                    if not is_same_session(combo_name, session_id, last_session_id):
                         delta_array_session = DELTA_DEFAULT
                         laptime_session_best = MAX_SECONDS
-                        last_session_id = (combo_id, *session_id)
+                        last_session_id = (combo_name, *session_id)
 
                     delta_array_best, laptime_best = load_delta_best_file(
                         filepath=userpath_delta_best,
-                        filename=combo_id,
+                        filename=combo_name,
                         defaults=(DELTA_DEFAULT, MAX_SECONDS)
                     )
                     output.deltaBestData = delta_array_best
@@ -184,7 +184,7 @@ class Realtime(DataModule):
                             output.deltaBestData = delta_array_best = delta_array_last
                             save_delta_best_file(
                                 filepath=userpath_delta_best,
-                                filename=combo_id,
+                                filename=combo_name,
                                 dataset=delta_array_best,
                             )
                         # Update delta session best list
@@ -279,7 +279,7 @@ class Realtime(DataModule):
                 if reset:
                     reset = False
                     update_interval = self.idle_interval
-                    last_session_id = (combo_id, *session_id)
+                    last_session_id = (combo_name, *session_id)
 
 
 def init_laptime_pace(laptime_best: float):

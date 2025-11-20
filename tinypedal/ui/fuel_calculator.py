@@ -263,7 +263,7 @@ class FuelCalculator(BaseDialog):
         """Load history data from live session"""
         self.refresh_table(minfo.history.consumptionDataSet)
         self.fill_in_data(minfo.history.consumptionDataSet)
-        self.status_bar.showMessage(f"Live Source: {api.read.check.combo_id()}")
+        self.status_bar.showMessage(f"Live Source: {api.read.session.combo_name()}")
 
     def fill_in_data(self, dataset: deque[ConsumptionDataSet]):
         """Fill in history data to edit"""

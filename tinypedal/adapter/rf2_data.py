@@ -61,45 +61,27 @@ class DataAdapter:
         self.rest = rest
 
 
-class Check(DataAdapter):
-    """Check"""
+class State(DataAdapter):
+    """State"""
 
     __slots__ = ()
 
-    def api_state(self) -> bool:
-        """API state"""
-        return self.shmm.state
+    def active(self) -> bool:
+        """Is active (driving or overriding)"""
+        return self.shmm.isActive
 
-    def api_paused(self) -> bool:
-        """API paused"""
+    def paused(self) -> bool:
+        """Is paused"""
         return self.shmm.isPaused
 
-    def api_version(self) -> str:
+    def version(self) -> str:
         """Identify API version"""
-        return tostr(self.shmm.rf2Ext.mVersion)
+        version = tostr(self.shmm.rf2Ext.mVersion)
+        return version if version else "unknown"
 
-    def sim_name(self) -> str:
-        """Identify sim name"""
+    def identifier(self) -> str:
+        """Identify API"""
         return self.shmm.identifier
-
-    def combo_id(self) -> str:
-        """Identify track & vehicle combo"""
-        track_name = tostr(self.shmm.rf2ScorInfo.mTrackName)
-        class_name = tostr(self.shmm.rf2ScorVeh().mVehicleClass)
-        return strip_invalid_char(f"{track_name} - {class_name}")
-
-    def track_id(self) -> str:
-        """Identify track name"""
-        return strip_invalid_char(tostr(self.shmm.rf2ScorInfo.mTrackName))
-
-    def session_id(self) -> tuple[int, int, int]:
-        """Identify session"""
-        session_length = rmnan(self.shmm.rf2ScorInfo.mEndET)
-        session_type = self.shmm.rf2ScorInfo.mSession
-        session_stamp = int(session_length * 100 + session_type)
-        session_etime = int(rmnan(self.shmm.rf2ScorInfo.mCurrentET))
-        session_tlaps = self.shmm.rf2ScorVeh().mTotalLaps
-        return session_stamp, session_etime, session_tlaps
 
 
 class Brake(DataAdapter):
@@ -325,6 +307,25 @@ class Session(DataAdapter):
 
     __slots__ = ()
 
+    def combo_name(self) -> str:
+        """Track & vehicle combo name, strip off invalid char"""
+        track_name = tostr(self.shmm.rf2ScorInfo.mTrackName)
+        class_name = tostr(self.shmm.rf2ScorVeh().mVehicleClass)
+        return strip_invalid_char(f"{track_name} - {class_name}")
+
+    def track_name(self) -> str:
+        """Track name, strip off invalid char"""
+        return strip_invalid_char(tostr(self.shmm.rf2ScorInfo.mTrackName))
+
+    def identifier(self) -> tuple[int, int, int]:
+        """Identify session"""
+        session_length = rmnan(self.shmm.rf2ScorInfo.mEndET)
+        session_type = self.shmm.rf2ScorInfo.mSession
+        session_stamp = int(session_length * 100 + session_type)
+        session_etime = int(rmnan(self.shmm.rf2ScorInfo.mCurrentET))
+        session_tlaps = self.shmm.rf2ScorVeh().mTotalLaps
+        return session_stamp, session_etime, session_tlaps
+
     def elapsed(self) -> float:
         """Session elapsed time (seconds)"""
         return rmnan(self.shmm.rf2ScorInfo.mCurrentET)
@@ -401,10 +402,6 @@ class Session(DataAdapter):
         """Start lights countdown sequence"""
         scor = self.shmm.rf2ScorInfo
         return scor.mNumRedLights - scor.mStartLight + 1
-
-    def track_name(self) -> str:
-        """Track name"""
-        return tostr(self.shmm.rf2ScorInfo.mTrackName)
 
     def track_temperature(self) -> float:
         """Track temperature (Celsius)"""

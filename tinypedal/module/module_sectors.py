@@ -53,12 +53,12 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
-                    combo_id = api.read.check.combo_id()  # current car & track combo
-                    session_id = api.read.check.session_id()  # session identity
+                    combo_name = api.read.session.combo_name()
+                    session_id = api.read.session.identifier()
                     (best_s_tb, best_s_pb, all_best_s_tb, all_best_s_pb
                      ) = load_sector_best_file(
                         filepath=userpath_sector_best,
-                        filename=combo_id,
+                        filename=combo_name,
                         session_id=session_id,
                         defaults=[MAX_SECONDS, MAX_SECONDS, MAX_SECONDS],
                     )
@@ -85,7 +85,7 @@ class Realtime(DataModule):
                     if new_best_all or new_best_session:
                         save_sector_best_file(
                             filepath=userpath_sector_best,
-                            filename=combo_id,
+                            filename=combo_name,
                             dataset=(
                                 session_id,
                                 list(map(round6, best_s_tb)),

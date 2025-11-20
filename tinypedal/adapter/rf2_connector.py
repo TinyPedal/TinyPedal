@@ -421,7 +421,7 @@ class RF2Info:
         return self._sync.paused or self._sync.player_scor_index < 0
 
     @property
-    def state(self) -> bool:
+    def isActive(self) -> bool:
         """Check whether in active (driving or overriding) state"""
         if self._state_override:
             return self._active_state
