@@ -45,7 +45,6 @@ class Realtime(Overlay):
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.bar_width = max(self.wcfg["bar_width"], 3)
         style_width = font_m.width * self.bar_width + bar_padx
-        self.extra_time = max(self.wcfg["additional_pitstop_time"], 0)
 
         # Config units
         self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
@@ -63,43 +62,15 @@ class Realtime(Overlay):
         layout.addLayout(layout_upper, self.wcfg["column_index_upper"], 0)
         layout.addLayout(layout_lower, self.wcfg["column_index_lower"], 0)
 
-        # Caption
+        # Caption style
         if self.wcfg["show_caption"]:
             bar_style_desc = self.set_qss(
                 fg_color=self.wcfg["font_color_caption"],
                 bg_color=self.wcfg["bkg_color_caption"],
                 font_size=int(self.wcfg['font_size'] * 0.8)
             )
-            caption_upper = (
-                self.wcfg["caption_text_pass_duration"],
-                self.wcfg["caption_text_stop_duration"],
-                self.wcfg["caption_text_maximum_delay"],
-                self.wcfg["caption_text_actual_relative_refill"],
-            )
-            caption_lower = (
-                self.wcfg["caption_text_pit_timer"],
-                self.wcfg["caption_text_minimum_total_duration"],
-                self.wcfg["caption_text_maximum_total_duration"],
-                self.wcfg["caption_text_total_relative_refill"],
-            )
-
             row_idx_upper = 2 * self.wcfg["swap_upper_caption"]
-            for index, text_caption in enumerate(caption_upper):
-                cap_temp = self.set_qlabel(
-                    text=text_caption,
-                    style=bar_style_desc,
-                    fixed_width=style_width,
-                )
-                layout_upper.addWidget(cap_temp, row_idx_upper, index)
-
             row_idx_lower = 2 - 2 * self.wcfg["swap_lower_caption"]
-            for index, text_caption in enumerate(caption_lower):
-                cap_temp = self.set_qlabel(
-                    text=text_caption,
-                    style=bar_style_desc,
-                    fixed_width=style_width,
-                )
-                layout_lower.addWidget(cap_temp, row_idx_lower, index)
 
         # Estimated pit pass through time
         bar_style_pass = self.set_qss(
@@ -112,42 +83,15 @@ class Realtime(Overlay):
             fixed_width=style_width,
         )
         self.bar_pass.decimals = max(self.wcfg["decimal_places_pass_duration"], 0)
+        layout_upper.addWidget(self.bar_pass, 1, 0)
 
-        # Estimated pit stop time
-        bar_style_stop = self.set_qss(
-            fg_color=self.wcfg["font_color_stop_duration"],
-            bg_color=self.wcfg["bkg_color_stop_duration"]
-        )
-        self.bar_stop = self.set_qlabel(
-            text=text_def,
-            style=bar_style_stop,
-            fixed_width=style_width,
-        )
-        self.bar_stop.decimals = max(self.wcfg["decimal_places_stop_duration"], 0)
-
-        # Maximum pit stop delay time
-        bar_style_delay = self.set_qss(
-            fg_color=self.wcfg["font_color_maximum_delay"],
-            bg_color=self.wcfg["bkg_color_maximum_delay"]
-        )
-        self.bar_delay = self.set_qlabel(
-            text=text_def,
-            style=bar_style_delay,
-            fixed_width=style_width,
-        )
-        self.bar_delay.decimals = max(self.wcfg["decimal_places_maximum_delay"], 0)
-
-        # Relative refilling
-        bar_style_refill = self.set_qss(
-            fg_color=self.wcfg["font_color_actual_relative_refill"],
-            bg_color=self.wcfg["bkg_color_actual_relative_refill"]
-        )
-        self.bar_refill = self.set_qlabel(
-            text=text_def,
-            style=bar_style_refill,
-            fixed_width=style_width,
-        )
-        self.bar_refill.decimals = max(self.wcfg["decimal_places_actual_relative_refill"], 0)
+        if self.wcfg["show_caption"]:
+            cap_temp = self.set_qlabel(
+                text=self.wcfg["caption_text_pass_duration"],
+                style=bar_style_desc,
+                fixed_width=style_width,
+            )
+            layout_upper.addWidget(cap_temp, row_idx_upper, 0)
 
         # Pit timer
         bar_style_timer = self.set_qss(
@@ -160,6 +104,40 @@ class Realtime(Overlay):
             fixed_width=style_width,
         )
         self.bar_timer.decimals = max(self.wcfg["decimal_places_pit_timer"], 0)
+        layout_lower.addWidget(self.bar_timer, 1, 0)
+
+        if self.wcfg["show_caption"]:
+            cap_temp = self.set_qlabel(
+                text=self.wcfg["caption_text_pit_timer"],
+                style=bar_style_desc,
+                fixed_width=style_width,
+            )
+            layout_lower.addWidget(cap_temp, row_idx_lower, 0)
+
+        # Estimated pit stop time
+        self.bar_style_stop = (
+            self.set_qss(
+                fg_color=self.wcfg["font_color_stop_duration"],
+                bg_color=self.wcfg["bkg_color_stop_duration"]),
+            self.set_qss(
+                fg_color=self.wcfg["font_color_stop_duration"],
+                bg_color=self.wcfg["warning_color_lengthy_stop"])
+        )
+        self.bar_stop = self.set_qlabel(
+            text=text_def,
+            style=self.bar_style_stop[0],
+            fixed_width=style_width,
+        )
+        self.bar_stop.decimals = max(self.wcfg["decimal_places_stop_duration"], 0)
+        layout_upper.addWidget(self.bar_stop, 1, 1)
+
+        if self.wcfg["show_caption"]:
+            cap_temp = self.set_qlabel(
+                text=self.wcfg["caption_text_stop_duration"],
+                style=bar_style_desc,
+                fixed_width=style_width,
+            )
+            layout_upper.addWidget(cap_temp, row_idx_upper, 1)
 
         # Estimated min total pit time
         bar_style_minpit = self.set_qss(
@@ -173,40 +151,106 @@ class Realtime(Overlay):
             last=-1,
         )
         self.bar_minpit.decimals = max(self.wcfg["decimal_places_minimum_total_duration"], 0)
-
-        # Estimated max total pit time
-        bar_style_maxpit = self.set_qss(
-            fg_color=self.wcfg["font_color_maximum_total_duration"],
-            bg_color=self.wcfg["bkg_color_maximum_total_duration"]
-        )
-        self.bar_maxpit = self.set_qlabel(
-            text=text_def,
-            style=bar_style_maxpit,
-            fixed_width=style_width,
-        )
-        self.bar_maxpit.decimals = max(self.wcfg["decimal_places_maximum_total_duration"], 0)
-
-        # Estimated total needed refill
-        bar_style_needed = self.set_qss(
-            fg_color=self.wcfg["font_color_total_relative_refill"],
-            bg_color=self.wcfg["bkg_color_total_relative_refill"]
-        )
-        self.bar_needed = self.set_qlabel(
-            text=text_def,
-            style=bar_style_needed,
-            fixed_width=style_width,
-        )
-        self.bar_needed.decimals = max(self.wcfg["decimal_places_total_relative_refill"], 0)
-
-        # Set layout
-        layout_upper.addWidget(self.bar_pass, 1, 0)
-        layout_upper.addWidget(self.bar_stop, 1, 1)
-        layout_upper.addWidget(self.bar_delay, 1, 2)
-        layout_upper.addWidget(self.bar_refill, 1, 3)
-        layout_lower.addWidget(self.bar_timer, 1, 0)
         layout_lower.addWidget(self.bar_minpit, 1, 1)
-        layout_lower.addWidget(self.bar_maxpit, 1, 2)
-        layout_lower.addWidget(self.bar_needed, 1, 3)
+
+        if self.wcfg["show_caption"]:
+            cap_temp = self.set_qlabel(
+                text=self.wcfg["caption_text_minimum_total_duration"],
+                style=bar_style_desc,
+                fixed_width=style_width,
+            )
+            layout_lower.addWidget(cap_temp, row_idx_lower, 1)
+
+        if self.wcfg["show_maximum_delay"]:
+            # Maximum pit stop delay time
+            self.bar_style_delay = (
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_maximum_delay"],
+                    bg_color=self.wcfg["bkg_color_maximum_delay"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_maximum_delay"],
+                    bg_color=self.wcfg["warning_color_lengthy_stop"])
+            )
+            self.bar_delay = self.set_qlabel(
+                text=text_def,
+                style=self.bar_style_delay[0],
+                fixed_width=style_width,
+            )
+            self.bar_delay.decimals = max(self.wcfg["decimal_places_maximum_delay"], 0)
+            layout_upper.addWidget(self.bar_delay, 1, 2)
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_qlabel(
+                    text=self.wcfg["caption_text_maximum_delay"],
+                    style=bar_style_desc,
+                    fixed_width=style_width,
+                )
+                layout_upper.addWidget(cap_temp, row_idx_upper, 2)
+
+            # Estimated max total pit time
+            bar_style_maxpit = self.set_qss(
+                fg_color=self.wcfg["font_color_maximum_total_duration"],
+                bg_color=self.wcfg["bkg_color_maximum_total_duration"]
+            )
+            self.bar_maxpit = self.set_qlabel(
+                text=text_def,
+                style=bar_style_maxpit,
+                fixed_width=style_width,
+                last=-1,
+            )
+            self.bar_maxpit.decimals = max(self.wcfg["decimal_places_maximum_total_duration"], 0)
+            layout_lower.addWidget(self.bar_maxpit, 1, 2)
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_qlabel(
+                    text=self.wcfg["caption_text_maximum_total_duration"],
+                    style=bar_style_desc,
+                    fixed_width=style_width,
+                )
+                layout_lower.addWidget(cap_temp, row_idx_lower, 2)
+
+        if self.wcfg["show_relative_refilling"]:
+            # Relative refilling
+            bar_style_refill = self.set_qss(
+                fg_color=self.wcfg["font_color_actual_relative_refill"],
+                bg_color=self.wcfg["bkg_color_actual_relative_refill"]
+            )
+            self.bar_refill = self.set_qlabel(
+                text=text_def,
+                style=bar_style_refill,
+                fixed_width=style_width,
+            )
+            self.bar_refill.decimals = max(self.wcfg["decimal_places_actual_relative_refill"], 0)
+            layout_upper.addWidget(self.bar_refill, 1, 3)
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_qlabel(
+                    text=self.wcfg["caption_text_actual_relative_refill"],
+                    style=bar_style_desc,
+                    fixed_width=style_width,
+                )
+                layout_upper.addWidget(cap_temp, row_idx_upper, 3)
+
+            # Estimated total needed refill
+            bar_style_needed = self.set_qss(
+                fg_color=self.wcfg["font_color_total_relative_refill"],
+                bg_color=self.wcfg["bkg_color_total_relative_refill"]
+            )
+            self.bar_needed = self.set_qlabel(
+                text=text_def,
+                style=bar_style_needed,
+                fixed_width=style_width,
+            )
+            self.bar_needed.decimals = max(self.wcfg["decimal_places_total_relative_refill"], 0)
+            layout_lower.addWidget(self.bar_needed, 1, 3)
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_qlabel(
+                    text=self.wcfg["caption_text_total_relative_refill"],
+                    style=bar_style_desc,
+                    fixed_width=style_width,
+                )
+                layout_lower.addWidget(cap_temp, row_idx_lower, 3)
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -234,38 +278,52 @@ class Realtime(Overlay):
             actual_refill = self.unit_fuel(refill_fuel)
             total_refill = calc.sym_max(self.unit_fuel(minfo.fuel.neededRelative), 9999)
 
+        is_lengthy_stop = min_pitstop_time >= self.wcfg["lengthy_stop_duration_threshold"]
+        padding = 0.00000001 * is_lengthy_stop
+
+        # Min, max total pit time, update while not in pit
+        if not api.read.vehicle.in_pits() or self.bar_minpit.last < pass_time:
+            if min_pitstop_time:
+                min_total = min_pitstop_time + pass_time + self.wcfg["additional_pitstop_time"]
+                max_total = max_pitstop_time + pass_time + self.wcfg["additional_pitstop_time"]
+            else:
+                min_total = max_total = 0
+        else:
+            min_total = self.bar_minpit.last
+            max_total = self.bar_maxpit.last
+
         # Estimated pit pass through time
         self.update_estimate(self.bar_pass, pass_time)
-
-        # Estimated pit stop time
-        self.update_estimate(self.bar_stop, min_pitstop_time)
-
-        # Maximum pit stop delay time
-        self.update_estimate(self.bar_delay, delay_time, "+")
 
         # Pit timer
         self.update_estimate(self.bar_timer, pit_timer)
 
-        # Relative refilling
-        self.update_estimate(self.bar_refill, max(actual_refill, 0), "+")
+        # Estimated pit stop time
+        self.update_estimate(self.bar_stop, min_pitstop_time + padding, self.bar_style_stop[is_lengthy_stop], "")
 
-        # Estimated total needed refill
-        self.update_estimate(self.bar_needed, total_refill, "+")
+        # Estimated min total pit time
+        self.update_estimate(self.bar_minpit, min_total)
 
-        # Estimated min, max total pit time, update while not in pit
-        if not api.read.vehicle.in_pits() or self.bar_minpit.last < pass_time:
-            if min_pitstop_time:
-                min_total = min_pitstop_time + pass_time + self.extra_time
-                max_total = max_pitstop_time + pass_time + self.extra_time
-            else:
-                min_total = max_total = 0
-            self.update_estimate(self.bar_minpit, min_total)
+        if self.wcfg["show_maximum_delay"]:
+            # Maximum pit stop delay time
+            self.update_estimate(self.bar_delay, delay_time + padding, self.bar_style_delay[is_lengthy_stop], "+")
+
+            # Estimated max total pit time
             self.update_estimate(self.bar_maxpit, max_total)
 
+        if self.wcfg["show_relative_refilling"]:
+            # Relative refilling
+            self.update_estimate(self.bar_refill, max(actual_refill, 0), None, "+")
+
+            # Estimated total needed refill
+            self.update_estimate(self.bar_needed, total_refill, None, "+")
+
     # GUI update methods
-    def update_estimate(self, target, data, sign=""):
+    def update_estimate(self, target, data, color=None, sign=""):
         """Update estimate pit data"""
         if target.last != data:
             target.last = data
             text = f"{data:{sign}.{target.decimals}f}"[:self.bar_width].strip(".")
             target.setText(text)
+            if color:  # lengthy stop warning
+                target.updateStyle(color)

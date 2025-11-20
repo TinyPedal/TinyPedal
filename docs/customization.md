@@ -2520,16 +2520,22 @@ Show filtered pedal input if available. Note, some vehicles may not provide filt
 
 Note, this widget is designed for `LMU`. Most readings are not available for `RF2` due to lack of API data.
 
+    lengthy_stop_duration_threshold
+Set warning threshold for lengthy pit stop duration in seconds. Default is `60` seconds. This option can be useful to check for unusually long pit stop duration, such as repairing.
+
     pass_duration
 Show estimated pit-lane pass through (drive-through) time, calculated from pit-entry to pit-exit line. Average accuracy is within `0.5` seconds. Note, for any new tracks, at least one pit-lane pass through is required to record data for pass through time calculation.
+
+    pit_timer
+Show pit timer, useful for comparing against other pit time readings.
 
     stop_duration
 Show estimated pit stop time while making a service stop or serving a penalty, calculated according to each setting from MFD `Pitstop` page and underlying service timing and concurrency differences. Average accuracy is within `1` seconds.
 
 Note, for unscheduled pit stop (without requesting pit), game sometimes will add random amount extra delay (as part of pit crew preparation time) on top of pit stop time. To avoid this, always requests pit before entering pit.
 
-    maximum_delay
-Show maximum total random delay which game may add on top of pit stop time. For example, if estimated pit stop time is `12.0`s, and maximum delay is `+3.0`s, then final pit stop time will be between `12.0`s and `15.0`s.
+    minimum_total_duration
+Show estimated minimum total pit time, which is the sum of `pass_duration`, `stop_duration`, and `additional_pitstop_time`. Note, this reading is recalculated only while not in pit lane.
 
     stop_go_penalty_time
 Set stop go penalty time in seconds. Default value is `10` seconds. Note, this value is only used if penalty time data is not available from game API.
@@ -2537,14 +2543,17 @@ Set stop go penalty time in seconds. Default value is `10` seconds. Note, this v
     additional_pitstop_time
 Set additional pit stop time that is not part of `pass_duration` or `stop_duration`. Default value is `2` seconds, which is the average time it takes to decelerate and accelerate towards and away from pit spot.
 
-    minimum_total_duration
-Show estimated minimum total pit time, which is the sum of `pass_duration`, `stop_duration`, and `additional_pitstop_time`. Note, this reading is recalculated only while not in pit lane.
+    show_maximum_delay
+Show `maximum_delay` and `maximum_total_duration` column.
+
+    maximum_delay
+Show maximum total random delay which game may add on top of pit stop time. For example, if estimated pit stop time is `12.0`s, and maximum delay is `+3.0`s, then final pit stop time will be between `12.0`s and `15.0`s.
 
     maximum_total_duration
 Show estimated maximum total pit time, which is the sum of `minimum_total_duration` and `maximum_delay`. Note, this reading is recalculated only while not in pit lane.
 
-    pit_timer
-Show pit timer, useful for comparing against other pit time readings.
+    show_relative_refilling
+Show `actual_relative_refill` and `total_relative_refill` column.
 
     actual_relative_refill
 Show actual relative refilling, as the total additional fuel or virtual energy that will be added in next pit stop according to remaining fuel or virtual energy and user refill setting from MFD `Pitstop` page.
