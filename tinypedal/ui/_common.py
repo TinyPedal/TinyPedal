@@ -54,10 +54,10 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from .. import set_relative_path
 from ..const_app import APP_NAME
 from ..const_file import FileFilter
 from ..module_control import mctrl, wctrl
+from ..userfile import set_relative_path
 from ..validator import image_exists, is_hex_color, is_string_number
 
 # Validator

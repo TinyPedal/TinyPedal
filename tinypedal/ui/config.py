@@ -46,10 +46,10 @@ from PySide2.QtWidgets import (
 )
 
 from .. import regex_pattern as rxp
-from .. import set_relative_path, set_user_data_path
 from ..const_file import ConfigType
 from ..formatter import format_option_name
 from ..setting import cfg
+from ..userfile import set_relative_path, set_user_data_path
 from ..validator import is_clock_format, is_hex_color, is_string_number
 from ._common import (
     QVAL_COLOR,

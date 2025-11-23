@@ -22,7 +22,8 @@ Constants
 
 import platform
 
-from . import set_global_user_path, version_check
+from . import version_check
+from .userfile import set_global_user_path
 
 # System info
 PLATFORM = platform.system()

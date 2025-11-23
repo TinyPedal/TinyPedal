@@ -29,7 +29,6 @@ from collections import ChainMap
 from time import sleep
 from types import MappingProxyType
 
-from . import set_user_data_path
 from .const_app import PATH_GLOBAL
 from .const_common import EMPTY_DICT
 from .const_file import ConfigType, FileExt
@@ -44,6 +43,7 @@ from .template.setting_heatmap import HEATMAP_DEFAULT
 from .template.setting_module import MODULE_DEFAULT
 from .template.setting_tracks import TRACKS_DEFAULT
 from .template.setting_widget import WIDGET_DEFAULT
+from .userfile import set_user_data_path
 from .userfile.json_setting import (
     copy_setting,
     load_setting_json_file,

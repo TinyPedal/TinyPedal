@@ -44,12 +44,12 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import set_relative_path
 from ..const_file import FileFilter
 from ..module_control import mctrl
 from ..module_info import minfo
 from ..overlay_control import octrl
 from ..setting import cfg
+from ..userfile import set_relative_path
 from ..userfile.track_notes import COLUMN_PACENOTE
 from ._common import CompactButton, UIScaler
 
