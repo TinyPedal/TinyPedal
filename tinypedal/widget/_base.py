@@ -28,10 +28,10 @@ from PySide2.QtCore import QBasicTimer, Qt, Slot
 from PySide2.QtGui import QFont, QFontMetrics, QPalette, QPixmap
 from PySide2.QtWidgets import QGridLayout, QLabel, QLayout, QMenu, QWidget
 
+from .. import overlay_signal, realtime_state
 from .. import regex_pattern as rxp
 from ..const_app import APP_NAME
 from ..formatter import format_module_name
-from ..overlay_control import octrl
 from ..setting import Setting
 from ._common import ExLabel, FontMetrics, MousePosition
 
@@ -45,7 +45,6 @@ class Overlay(QWidget):
         super().__init__()
         self.widget_name = widget_name
         self.closed = False
-        self.state = octrl.state
 
         # Base config
         self.cfg = config
@@ -70,7 +69,7 @@ class Overlay(QWidget):
         self.__connect_signal()
         self.__set_window_attributes()  # 1
         self.__set_window_flags()  # 2
-        self.__toggle_timer(not self.state.active)
+        self.__toggle_timer(not realtime_state.active)
 
     def stop(self):
         """Stop and close widget"""
@@ -79,7 +78,6 @@ class Overlay(QWidget):
         self.unload_resource()
         self.wcfg = None
         self.cfg = None
-        self.state = None
         self.closed = self.close()
 
     def post_update(self):
@@ -185,14 +183,14 @@ class Overlay(QWidget):
         """Toggle widget lock state"""
         self.setWindowFlag(Qt.WindowTransparentForInput, locked)
         # Need re-check after lock/unlock
-        self.setHidden(self.cfg.overlay["auto_hide"] and not self.state.active)
+        self.setHidden(self.cfg.overlay["auto_hide"] and not realtime_state.active)
 
     @Slot(bool)  # type: ignore[operator]
     def __toggle_vr_compat(self, enabled: bool):
         """Toggle widget VR compatibility"""
         self.setWindowFlag(Qt.Tool, not enabled)
         # Need re-check
-        self.setHidden(self.cfg.overlay["auto_hide"] and not self.state.active)
+        self.setHidden(self.cfg.overlay["auto_hide"] and not realtime_state.active)
 
     @Slot(bool)  # type: ignore[operator]
     def __toggle_timer(self, paused: bool):
@@ -205,21 +203,21 @@ class Overlay(QWidget):
 
     def __connect_signal(self):
         """Connect overlay lock and hide signal"""
-        self.state.locked.connect(self.__toggle_lock)
-        self.state.hidden.connect(self.setHidden)
-        self.state.paused.connect(self.__toggle_timer)
-        self.state.vr_compat.connect(self.__toggle_vr_compat)
+        overlay_signal.locked.connect(self.__toggle_lock)
+        overlay_signal.hidden.connect(self.setHidden)
+        overlay_signal.paused.connect(self.__toggle_timer)
+        overlay_signal.iconify.connect(self.__toggle_vr_compat)
 
     def __break_signal(self):
         """Disconnect overlay lock and hide signal"""
-        self.state.locked.disconnect(self.__toggle_lock)
-        self.state.hidden.disconnect(self.setHidden)
-        self.state.paused.disconnect(self.__toggle_timer)
-        self.state.vr_compat.disconnect(self.__toggle_vr_compat)
+        overlay_signal.locked.disconnect(self.__toggle_lock)
+        overlay_signal.hidden.disconnect(self.setHidden)
+        overlay_signal.paused.disconnect(self.__toggle_timer)
+        overlay_signal.iconify.disconnect(self.__toggle_vr_compat)
 
     def closeEvent(self, event):
         """Ignore attempts to close via window Close button when VR compatibility enabled"""
-        if self.state is not None:
+        if self.cfg is not None:
             event.ignore()
 
     # Common GUI methods

@@ -36,12 +36,11 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import loader
+from .. import loader, overlay_signal
 from ..api_control import api
 from ..const_app import APP_NAME, VERSION
 from ..const_file import ConfigType
 from ..module_control import mctrl, wctrl
-from ..overlay_control import octrl
 from ..regex_pattern import API_NAME_ALIAS
 from ..setting import cfg
 from . import set_style_palette, set_style_window
@@ -173,8 +172,6 @@ class StatusButtonBar(QStatusBar):
         # Wait saving finish
         while cfg.is_saving:
             time.sleep(0.01)
-        # self.refresh()
-        # self._parent.quit_app()
         loader.restart()
 
     def toggle_color_theme(self):
@@ -385,10 +382,10 @@ class AppWindow(QMainWindow):
 
     def __connect_signal(self):
         """Connect signal"""
-        octrl.state.reload.connect(self.reload_preset)
+        overlay_signal.reload.connect(self.reload_preset)
         logger.info("GUI: connect signals")
 
     def __break_signal(self):
         """Disconnect signal"""
-        octrl.state.reload.disconnect(self.reload_preset)
+        overlay_signal.reload.disconnect(self.reload_preset)
         logger.info("GUI: disconnect signals")

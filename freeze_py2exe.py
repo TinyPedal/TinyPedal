@@ -187,15 +187,17 @@ def build_start() -> None:
     print("INFO:Qt:", version_check.qt())
     print("INFO:PySide:", version_check.pyside())
     print("INFO:psutil:", version_check.psutil())
-    if PLATFORM == "Windows":
-        cli_args = get_cli_argument()
-        if check_old_build(cli_args.clean, check_dist()):
-            build_exe()
-            print("INFO:Building finished")
-        else:
-            print("INFO:Building canceled")
-    else:
+
+    if PLATFORM != "Windows":
         print("ERROR:Build script does not support none Windows platform")
+        print("INFO:Building canceled")
+        return
+
+    cli_args = get_cli_argument()
+    if check_old_build(cli_args.clean, check_dist()):
+        build_exe()
+        print("INFO:Building finished")
+    else:
         print("INFO:Building canceled")
 
 

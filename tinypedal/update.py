@@ -26,9 +26,7 @@ import asyncio
 import logging
 import threading
 
-from PySide2.QtCore import QObject, Signal
-
-from . import version
+from . import overlay_signal, version
 from .async_request import get_response, set_header_get
 from .const_app import APP_NAME, REPO_NAME
 
@@ -84,13 +82,18 @@ def parse_date(data: bytes) -> tuple[int, int, int]:
     return DATE_NA
 
 
-class UpdateChecker(QObject):
+class UpdateChecker:
     """Check for updates"""
 
-    checking = Signal(bool)
+    __slots__ = (
+        "_is_checking",
+        "_update_available",
+        "_manual_checking",
+        "_last_checked_version",
+        "_last_checked_date",
+    )
 
     def __init__(self):
-        super().__init__()
         self._is_checking = False
         self._update_available = False
         self._manual_checking = False
@@ -110,7 +113,7 @@ class UpdateChecker(QObject):
         self._manual_checking = manual
         if not self._is_checking:
             self._is_checking = True
-            self.checking.emit(True)
+            overlay_signal.updates.emit(True)
             threading.Thread(target=self.__checking, daemon=True).start()
 
     def __checking(self):
@@ -139,7 +142,7 @@ class UpdateChecker(QObject):
         self._last_checked_version = checked_version
         self._last_checked_date = checked_date
         # Send update signal
-        self.checking.emit(False)
+        overlay_signal.updates.emit(False)
         self._is_checking = False
 
     def message(self) -> str:

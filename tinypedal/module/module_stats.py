@@ -23,6 +23,7 @@ Stats module
 from __future__ import annotations
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_common import FLOAT_INF, POS_XYZ_INF
 from ..module_info import minfo
@@ -58,7 +59,7 @@ class Realtime(DataModule):
                 update_interval = self.idle_interval
                 continue
 
-            if self.state.active:
+            if realtime_state.active:
                 if not reset:
 
                     reset = True

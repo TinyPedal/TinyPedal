@@ -26,6 +26,7 @@ from math import ceil
 from typing import Callable
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, POS_XYZ_ZERO
 from ..const_file import FileExt
@@ -59,7 +60,7 @@ class Realtime(DataModule):
         userpath_fuel_delta = self.cfg.path.fuel_delta
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True

@@ -22,6 +22,7 @@ Sectors module
 
 from __future__ import annotations
 
+from .. import realtime_state
 from ..api_control import api
 from ..const_common import MAX_SECONDS
 from ..module_info import SectorsInfo, minfo
@@ -47,7 +48,7 @@ class Realtime(DataModule):
         userpath_sector_best = self.cfg.path.sector_best
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True

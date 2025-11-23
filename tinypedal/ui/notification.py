@@ -31,6 +31,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import overlay_signal
 from ..const_app import URL_RELEASE
 from ..update import update_checker
 
@@ -58,7 +59,7 @@ class NotifyBar(QWidget):
         self.updates = UpdatesNotifyButton("")
         self.updates.setObjectName("notifyUpdates")
         self.updates.setVisible(False)
-        update_checker.checking.connect(self.updates.checking)
+        overlay_signal.updates.connect(self.updates.checking)
 
         layout = QVBoxLayout()
         layout.addWidget(self.spectate)

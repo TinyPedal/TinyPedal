@@ -124,22 +124,22 @@ class OverlayMenu(QMenu):
     @staticmethod
     def is_locked():
         """Check lock state"""
-        octrl.toggle_lock()
+        octrl.toggle.lock()
 
     @staticmethod
     def is_hidden():
         """Check hide state"""
-        octrl.toggle_hide()
+        octrl.toggle.hide()
 
     @staticmethod
     def has_grid():
         """Check grid move state"""
-        octrl.toggle_grid()
+        octrl.toggle.grid()
 
     @staticmethod
     def vr_compatibility():
         """Check VR compatibility state"""
-        octrl.toggle_vr()
+        octrl.toggle.vr()
 
 
 class ResetDataMenu(QMenu):

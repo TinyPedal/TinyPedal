@@ -23,6 +23,7 @@ Vehicles module
 from __future__ import annotations
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_common import MAX_METERS, MAX_SECONDS
 from ..module_info import VehicleDataSet, VehiclesInfo, minfo
@@ -51,7 +52,7 @@ class Realtime(DataModule):
         gen_low_priority_timer = state_timer(0.2)
 
         while not _event_wait(update_interval):
-            if self.state.active or not api.read.state.paused():
+            if not realtime_state.paused:
 
                 if not reset:
                     reset = True

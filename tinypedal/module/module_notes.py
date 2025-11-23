@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import Callable, Mapping
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_file import FileExt
 from ..module_info import NotesInfo, minfo
@@ -61,7 +62,7 @@ class Realtime(DataModule):
         setting_playback = self.cfg.user.setting["pace_notes_playback"]
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True

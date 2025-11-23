@@ -24,7 +24,6 @@ import logging
 import threading
 from functools import partial
 
-from ..overlay_control import octrl
 from ..setting import Setting
 
 logger = logging.getLogger(__name__)
@@ -39,7 +38,6 @@ class DataModule:
     __slots__ = (
         "module_name",
         "closed",
-        "state",
         "cfg",
         "mcfg",
         "active_interval",
@@ -50,7 +48,6 @@ class DataModule:
     def __init__(self, config: Setting, module_name: str):
         self.module_name = module_name
         self.closed = True
-        self.state = octrl.state
 
         # Base config
         self.cfg = config

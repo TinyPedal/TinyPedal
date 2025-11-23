@@ -24,35 +24,57 @@ import logging
 import threading
 from time import sleep
 
-from PySide2.QtCore import QObject, Signal
-
+from . import overlay_signal, realtime_state
 from .api_control import api
 from .setting import cfg
 
 logger = logging.getLogger(__name__)
 
 
-class OverlayState(QObject):
-    """Set and update overlay global state
+class OverlayToggle:
+    """Overlay state toggle"""
 
-    Attributes:
-        active: check whether api state (on track) is active.
-        hidden: signal for toggling auto hide state.
-        locked: signal for toggling lock state.
-        reload: signal for reloading preset, should only be emitted after app fully loaded.
-        paused: whether to pause/resume overlay timer.
-        vr_compat: signal for toggling VR compatibility state.
-    """
+    __slots__ = ()
 
-    hidden = Signal(bool)
-    locked = Signal(bool)
-    reload = Signal(bool)
-    paused = Signal(bool)
-    vr_compat = Signal(bool)
+    def vr(self):
+        """Toggle VR state"""
+        self.__toggle_option("vr_compatibility")
+        overlay_signal.iconify.emit(cfg.overlay["vr_compatibility"])
+
+    def lock(self):
+        """Toggle lock state"""
+        self.__toggle_option("fixed_position")
+        overlay_signal.locked.emit(cfg.overlay["fixed_position"])
+
+    def hide(self):
+        """Toggle hide state"""
+        self.__toggle_option("auto_hide")
+
+    def grid(self):
+        """Toggle grid move state"""
+        self.__toggle_option("enable_grid_move")
+
+    @staticmethod
+    def __toggle_option(option_name: str):
+        """Toggle option"""
+        cfg.overlay[option_name] = not cfg.overlay[option_name]
+        cfg.save()
+
+
+class OverlayControl:
+    """Overlay control"""
+
+    __slots__ = (
+        "toggle",
+        "_stopped",
+        "_event",
+        "_last_detected_sim",
+        "_last_active_state",
+        "_last_hide_state",
+    )
 
     def __init__(self):
-        super().__init__()
-        self.active = False
+        self.toggle = OverlayToggle()
         self._stopped = True
         self._event = threading.Event()
 
@@ -60,16 +82,16 @@ class OverlayState(QObject):
         self._last_active_state = None
         self._last_hide_state = None
 
-    def start(self):
-        """Start state update thread"""
+    def enable(self):
+        """Enable overlay control"""
         if self._stopped:
             self._stopped = False
             self._event.clear()
             threading.Thread(target=self.__updating, daemon=True).start()
             logger.info("ENABLED: overlay control")
 
-    def stop(self):
-        """Stop thread"""
+    def disable(self):
+        """Disable overlay control"""
         self._event.set()
         while not self._stopped:
             sleep(0.01)
@@ -78,21 +100,26 @@ class OverlayState(QObject):
         """Update global state"""
         _event_wait = self._event.wait
         while not _event_wait(0.2):
-            self.active = api.read.state.active()
+            # Read state
+            active = api.read.state.active()
+            paused = api.read.state.paused()
+            # Update state
+            realtime_state.active = active
+            realtime_state.paused = paused
             # Auto hide state check
-            hide_state = cfg.overlay["auto_hide"] and not self.active
+            hide_state = cfg.overlay["auto_hide"] and not active
             if self._last_hide_state != hide_state:
                 self._last_hide_state = hide_state
-                self.hidden.emit(hide_state)
+                overlay_signal.hidden.emit(hide_state)
             # Active state check
-            if self._last_active_state != self.active:
-                self._last_active_state = self.active
+            if self._last_active_state != active:
+                self._last_active_state = active
                 # Update auto load state only once when player enters track
-                if self.active and cfg.application["enable_auto_load_preset"]:
+                if active and cfg.application["enable_auto_load_preset"]:
                     if not self.__check_preset_class():
                         self.__check_preset_sim()
                 # Set overlay timer state
-                self.paused.emit(not self.active)
+                overlay_signal.paused.emit(not active)
 
         self._stopped = True
         logger.info("DISABLED: overlay control")
@@ -140,49 +167,7 @@ class OverlayState(QObject):
             return
         # Update preset name & signal reload
         cfg.set_next_to_load(preset_name)
-        self.reload.emit(True)
+        overlay_signal.reload.emit(True)
 
-
-class OverlayControl:
-    """Overlay control"""
-
-    __slots__ = (
-        "state",
-    )
-
-    def __init__(self):
-        self.state = OverlayState()
-
-    def enable(self):
-        """Enable overlay control"""
-        self.state.start()
-
-    def disable(self):
-        """Disable overlay control"""
-        self.state.stop()
-
-    def toggle_vr(self):
-        """Toggle VR state"""
-        self.__toggle_option("vr_compatibility")
-        self.state.vr_compat.emit(cfg.overlay["vr_compatibility"])
-
-    def toggle_lock(self):
-        """Toggle lock state"""
-        self.__toggle_option("fixed_position")
-        self.state.locked.emit(cfg.overlay["fixed_position"])
-
-    def toggle_hide(self):
-        """Toggle hide state"""
-        self.__toggle_option("auto_hide")
-
-    def toggle_grid(self):
-        """Toggle grid move state"""
-        self.__toggle_option("enable_grid_move")
-
-    @staticmethod
-    def __toggle_option(option_name: str):
-        """Toggle option"""
-        cfg.overlay[option_name] = not cfg.overlay[option_name]
-        cfg.save()
 
 octrl = OverlayControl()

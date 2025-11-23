@@ -25,6 +25,7 @@ from __future__ import annotations
 from itertools import chain
 from operator import itemgetter
 
+from .. import realtime_state
 from ..api_control import api
 from ..calculation import asym_max, zero_max
 from ..const_common import MAX_SECONDS, MAX_VEHICLES, REL_TIME_DEFAULT
@@ -59,7 +60,7 @@ class Realtime(DataModule):
         last_version_update = None
 
         while not _event_wait(update_interval):
-            if self.state.active or not api.read.state.paused():
+            if not realtime_state.paused:
 
                 if not reset:
                     reset = True

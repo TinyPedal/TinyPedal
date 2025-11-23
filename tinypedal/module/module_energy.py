@@ -23,6 +23,7 @@ Energy module
 from __future__ import annotations
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_file import FileExt
 from ..module_info import minfo
@@ -47,7 +48,7 @@ class Realtime(DataModule):
         userpath_energy_delta = self.cfg.path.energy_delta
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True

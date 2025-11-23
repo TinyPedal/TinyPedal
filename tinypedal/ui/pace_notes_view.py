@@ -44,10 +44,10 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import realtime_state
 from ..const_file import FileFilter
 from ..module_control import mctrl
 from ..module_info import minfo
-from ..overlay_control import octrl
 from ..setting import cfg
 from ..userfile import set_relative_path
 from ..userfile.track_notes import COLUMN_PACENOTE
@@ -65,7 +65,6 @@ class PaceNotesPlayer(QMediaPlayer):
     def __init__(self, parent, config: dict):
         super().__init__(parent)
         self.mcfg = config
-        self._active_state = octrl.state
 
         # Set update timer
         self._update_timer = QBasicTimer()
@@ -115,7 +114,7 @@ class PaceNotesPlayer(QMediaPlayer):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        if self._active_state.active:
+        if realtime_state.active:
 
             # Reset switch
             if not self._checked:

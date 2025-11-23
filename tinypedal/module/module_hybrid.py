@@ -21,6 +21,7 @@ Hybrid module
 """
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, MAX_SECONDS
 from ..module_info import minfo
@@ -44,7 +45,7 @@ class Realtime(DataModule):
         output = minfo.hybrid
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True

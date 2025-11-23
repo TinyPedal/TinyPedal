@@ -23,6 +23,7 @@ Delta module
 from functools import partial
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_common import (
     DELTA_DEFAULT,
@@ -73,7 +74,7 @@ class Realtime(DataModule):
         gen_position_sync = vehicle_position_sync()
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True

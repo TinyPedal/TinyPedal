@@ -23,6 +23,7 @@ Force module
 from functools import partial
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..module_info import minfo
 from ._base import DataModule
@@ -57,7 +58,7 @@ class Realtime(DataModule):
         calc_max_braking_rate = TransientMax(self.mcfg["max_braking_rate_reset_delay"], True)
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True

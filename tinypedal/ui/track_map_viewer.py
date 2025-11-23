@@ -94,6 +94,7 @@ class TrackMapViewer(BaseDialog):
 
 class MapView(QWidget):
     """Map view"""
+
     reloaded = Signal(bool)
 
     def __init__(self, parent):

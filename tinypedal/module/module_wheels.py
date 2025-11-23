@@ -24,6 +24,7 @@ import logging
 from collections import deque
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_common import POS_XY_ZERO, WHEELS_DELTA_DEFAULT, WHEELS_ZERO
 from ..module_info import WheelsInfo, minfo
@@ -68,7 +69,7 @@ class Realtime(DataModule):
         )
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True

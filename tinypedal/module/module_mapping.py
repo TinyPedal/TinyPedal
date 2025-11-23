@@ -21,6 +21,7 @@ Mapping module
 """
 
 from .. import calculation as calc
+from .. import realtime_state
 from ..api_control import api
 from ..const_file import FileExt
 from ..module_info import MappingInfo, minfo
@@ -50,7 +51,7 @@ class Realtime(DataModule):
         recorder = MapRecorder(userpath_track_map)
 
         while not _event_wait(update_interval):
-            if self.state.active:
+            if realtime_state.active:
 
                 if not reset:
                     reset = True
