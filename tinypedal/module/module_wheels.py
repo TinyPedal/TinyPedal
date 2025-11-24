@@ -366,14 +366,14 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
                     ("Front left", "Front right", "Rear left", "Rear right")[idx],
                     failure_record[idx],
                 )
-                output.currentBrakeThickness[idx] = round(failure_record[idx], 2)
+                output.failureBrakeThickness[idx] = round(failure_record[idx], 2)
                 save_brake_failure_thickness(
                     brake_name=set_predefined_brake_name(
                         api.read.vehicle.class_name(),
                         api.read.vehicle.vehicle_name(),
                         idx < 2,
                     ),
-                    failure=output.currentBrakeThickness[idx],
+                    failure=output.failureBrakeThickness[idx],
                 )
                 failure_record[idx] = 0
 
