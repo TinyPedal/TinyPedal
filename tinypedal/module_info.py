@@ -555,6 +555,7 @@ class WheelsInfo:
         "estimatedTreadWear",
         "estimatedValidTreadWear",
         "maxBrakeThickness",
+        "failureBrakeThickness",
         "currentBrakeThickness",
         "lastLapBrakeWear",
         "estimatedBrakeWear",
@@ -571,6 +572,7 @@ class WheelsInfo:
         self.estimatedTreadWear: list[float] = list(WHEELS_ZERO)
         self.estimatedValidTreadWear: list[float] = list(WHEELS_ZERO)
         self.maxBrakeThickness: list[float] = list(WHEELS_ZERO)
+        self.failureBrakeThickness: list[float] = list(WHEELS_ZERO)
         self.currentBrakeThickness: list[float] = list(WHEELS_ZERO)
         self.lastLapBrakeWear: list[float] = list(WHEELS_ZERO)
         self.estimatedBrakeWear: list[float] = list(WHEELS_ZERO)

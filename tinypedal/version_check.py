@@ -26,11 +26,8 @@ import sys
 def tinypedal() -> str:
     from . import version
 
-    ver = version.__version__
-    tag = version.DEVELOPMENT
-    if tag != "":
-        return f"{ver}-{tag}"
-    return ver
+    ver_number = (version.__version__, version.DEVELOPMENT)
+    return "-".join(ver for ver in ver_number if ver != "")
 
 
 def python() -> str:

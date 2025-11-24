@@ -42,11 +42,29 @@ def add_missing_brake(brake_name: str) -> dict:
     return new_data
 
 
-def set_predefined_brake_name(class_name: str, is_front: bool) -> str:
+def save_brake_failure_thickness(brake_name: str, failure: float) -> None:
+    """Save brake failure thickness (mm) to brakes preset when brake fails"""
+    if invalid_save_name(brake_name):
+        return
+    brake = cfg.user.brakes.get(brake_name)
+    if brake is None:
+        new_data = BRAKEINFO_DEFAULT.copy()
+        new_data["failure_thickness"] = failure
+        cfg.user.brakes[brake_name] = new_data
+    else:
+        brake["failure_thickness"] = failure
+    cfg.save(cfg_type=ConfigType.BRAKES)
+
+
+def set_predefined_brake_name(class_name: str, vehicle_name: str, is_front: bool) -> str:
     """Set common brake name"""
-    if is_front:
-        return f"{class_name} - Front Brake"
-    return f"{class_name} - Rear Brake"
+    if class_name == "":
+        return ""
+    suffix_name = "Front Brake" if is_front else "Rear Brake"
+    brand_name = cfg.user.brands.get(vehicle_name, "")
+    if brand_name != "":
+        return f"{class_name} - {brand_name} {suffix_name}"
+    return f"{class_name} - {suffix_name}"
 
 
 def select_brake_failure_thickness(brake_name: str) -> float:
@@ -69,13 +87,13 @@ def select_brake_heatmap_name(brake_name: str) -> str:
     return brake.get("heatmap", HEATMAP_DEFAULT_BRAKE)
 
 
-def brake_failure_thickness(class_name: str) -> tuple[float, float, float, float]:
+def brake_failure_thickness(class_name: str, vehicle_name: str) -> tuple[float, float, float, float]:
     """Get failure thickness"""
     failure_thickness_f = select_brake_failure_thickness(
-        set_predefined_brake_name(class_name, True)
+        set_predefined_brake_name(class_name, vehicle_name, True)
     )
     failure_thickness_r = select_brake_failure_thickness(
-        set_predefined_brake_name(class_name, False)
+        set_predefined_brake_name(class_name, vehicle_name, False)
     )
     return (
         failure_thickness_f,

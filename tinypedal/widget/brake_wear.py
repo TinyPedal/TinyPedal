@@ -191,19 +191,26 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        laptime_pace = minfo.delta.lapTimePace
-
         for idx in range(4):
             brake_curr = minfo.wheels.currentBrakeThickness[idx]
-            max_thickness = minfo.wheels.maxBrakeThickness[idx]
+            is_failed = brake_curr <= 0
+
+            # Calculate effective thickness in millimeters
+            failure_thickness = minfo.wheels.failureBrakeThickness[idx]
+            max_thickness = minfo.wheels.maxBrakeThickness[idx] - failure_thickness
+            brake_curr -= failure_thickness
             est_wear = minfo.wheels.estimatedBrakeWear[idx]
             est_valid_wear = minfo.wheels.estimatedValidBrakeWear[idx]
-            est_wear_percent = est_wear
 
-            if self.wcfg["show_thickness"]:
-                brake_curr *= max_thickness / 100
-                est_wear *= max_thickness / 100
-                est_valid_wear *= max_thickness / 100
+            if max_thickness <= 0:  # bypass invalid value
+                max_thickness = 99999999
+
+            # Convert to percent
+            est_wear_percent = est_wear * 100 / max_thickness
+            if not self.wcfg["show_thickness"]:
+                brake_curr *= 100 / max_thickness
+                est_wear *= 100 / max_thickness
+                est_valid_wear *= 100 / max_thickness
 
             # Remaining brake thickness
             if self.wcfg["show_remaining"]:
@@ -211,7 +218,7 @@ class Realtime(Overlay):
                     threshold_remaining = self.threshold_remaining * max_thickness
                 else:
                     threshold_remaining = self.threshold_remaining * 100
-                self.update_remain(self.bars_remain[idx], brake_curr, threshold_remaining)
+                self.update_remain(self.bars_remain[idx], brake_curr, threshold_remaining, is_failed)
 
             # Wear differences
             if self.wcfg["show_wear_difference"]:
@@ -224,15 +231,19 @@ class Realtime(Overlay):
 
             # Estimated lifespan in minutes
             if self.wcfg["show_lifespan_minutes"]:
-                wear_mins = calc.wear_lifespan_in_mins(brake_curr, est_valid_wear, laptime_pace)
+                wear_mins = calc.wear_lifespan_in_mins(brake_curr, est_valid_wear, minfo.delta.lapTimePace)
                 self.update_mins(self.bars_mins[idx], wear_mins)
 
     # GUI update methods
-    def update_remain(self, target, data, threshold_remaining):
+    def update_remain(self, target, data, threshold_remaining, is_failed):
         """Remaining brake thickness"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_num(data))
+            if is_failed:
+                text = "FAIL"
+            else:
+                text = self.format_num(data)
+            target.setText(text)
             target.updateStyle(
                 self.bar_style_remain[data <= threshold_remaining]
             )

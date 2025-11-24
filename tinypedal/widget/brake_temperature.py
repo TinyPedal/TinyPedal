@@ -124,19 +124,25 @@ class Realtime(Overlay):
             )
 
         # Last data
-        self.last_class_name = None
+        self.last_in_pits = -1
+        self.last_vehicle_name = None
         self.last_lap_etime = 0
         self.off_brake_timer = 0
         self.calc_ema_btemp = partial(calc.exp_mov_avg, calc.ema_factor(average_samples))
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        # Update heatmap style
-        if self.wcfg["enable_heatmap_auto_matching"]:
-            class_name = api.read.vehicle.class_name()
-            if self.last_class_name != class_name:
-                self.last_class_name = class_name
-                self.update_heatmap(class_name)
+        # Update while in pit (or switched pit state)
+        in_pits = api.read.vehicle.in_pits()
+        if in_pits or self.last_in_pits != in_pits:
+            self.last_in_pits = in_pits
+
+            # Heatmap style
+            if self.wcfg["enable_heatmap_auto_matching"]:
+                vehicle_name = api.read.vehicle.vehicle_name()
+                if self.last_vehicle_name != vehicle_name:
+                    self.last_vehicle_name = vehicle_name
+                    self.update_heatmap(api.read.vehicle.class_name(), vehicle_name)
 
         # Brake temperature
         btemp = api.read.brake.temperature()
@@ -182,13 +188,13 @@ class Realtime(Overlay):
                 target.setText(f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}")
 
     # Additional methods
-    def update_heatmap(self, class_name: str):
+    def update_heatmap(self, class_name: str, vehicle_name: str):
         """Update heatmap"""
         heatmap_f = select_brake_heatmap_name(
-            set_predefined_brake_name(class_name, True)
+            set_predefined_brake_name(class_name, vehicle_name, True)
         )
         heatmap_r = select_brake_heatmap_name(
-            set_predefined_brake_name(class_name, False)
+            set_predefined_brake_name(class_name, vehicle_name, False)
         )
         heatmap_style_f = load_heatmap_style(
             heatmap_name=heatmap_f,

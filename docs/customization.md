@@ -938,7 +938,7 @@ To reset all classes setting to default, click `Reset` button; or manually delet
 
 Brake editor is used for editing [Brakes Preset](#brakes-preset). Note, any changes will only be saved and take effect after clicking `Apply` or `Save` Button.
 
-`Brake name` column is full vehicle class name plus brake name that must match in-game vehicle.
+`Brake name` column is full vehicle class name plus brake name that must match in-game vehicle. Brand name may also be added if vehicle brand data is available.
 
 `Failure (mm)` column is millimeter thickness threshold at brake failure and affects brake wear calculation. See [Brake Wear](#brake-wear) widget for details.
 
@@ -1488,18 +1488,20 @@ Note, brake maximum thickness (for percentage wear calculation) is retrieved at 
 
 Brake failure thickness is millimeter thickness threshold at brake failure, which affects brake wear calculation accuracy, and can be customized for specific vehicle class in [Brake Editor](#brake-editor).
 
-For example, if `brake thickness` is `40`mm, and `failure thickness` is `25`mm, then `effective thickness` is `40 - 25 = 15mm`.
+For example, if `brake thickness` is `40`mm, and `failure thickness` is `25`mm, then `effective thickness` is `40 - 25 = 15mm`. And brake fails upon reaching `25`mm thickness. Note, each installed brake may have a random failure thickness variation of `±0.1`mm.
 
-Since brake failure thickness threshold data is not available from game API, it may require testing to find out, and may vary from vehicle to vehicle. Front brake failure thickness threshold can be different from rear brake. Thickness threshold value should not exceed brake maximum thickness, otherwise brake wear readings will not be displayed correctly.
+Since brake failure thickness threshold data is not available from game API, it requires testing to find out, and may vary from vehicle to vehicle. Front brake failure thickness threshold can be different from rear brake. Thickness threshold value should not exceed brake maximum thickness, otherwise brake wear readings will not be displayed correctly.
 
-Note, failure thickness values from most recent brake failure are logged and can be found in `Show Log` dialog from Help menu.
+Note, failure thickness values are automatically saved to `brakes.json` preset when brakes failed, and most recent brake failures are logged and can be found in `Show Log` dialog from Help menu.
 
-Some reference brake failure thickness threshold (may not be accurate):
-`Hypercar` and `P2` classes in `LMU` usually have `25`mm brake failure threshold.
-`GTE` and `LMGT3` class in `LMU` usually has `30`mm brake failure threshold.
+**Tips for testing failure thickness:**
+
+Before start, make sure vehicle brand data is imported via [Vehicle Brand Editor](#vehicle-brand-editor). This is necessary to save brake failure thickness settings per vehicle brand.
+
+First, set all `brake duct` settings to `closed` in car setup, then keeps brakes on while driving at around 100kph speed until brakes failed (use brake bias to control front and rear wear rate), and failure thickness value will be automatically saved for this vehicle. Be aware that testing may take a very long time for some vehicles.
 
     show_remaining
-Show total remaining brake in percentage that changes color according to wear.
+Show total remaining brake in percentage that changes color according to wear. A `FAIL` text will be shown on failed brakes.
 
     show_wear_difference
 Show estimated brake wear difference per lap (at least one valid lap is required).

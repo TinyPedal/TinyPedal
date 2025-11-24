@@ -28,7 +28,11 @@ from .. import realtime_state
 from ..api_control import api
 from ..const_common import POS_XY_ZERO, WHEELS_DELTA_DEFAULT, WHEELS_ZERO
 from ..module_info import WheelsInfo, minfo
-from ..userfile.heatmap import brake_failure_thickness
+from ..userfile.heatmap import (
+    brake_failure_thickness,
+    save_brake_failure_thickness,
+    set_predefined_brake_name,
+)
 from ..validator import generator_init
 from ._base import DataModule
 
@@ -92,7 +96,7 @@ class Realtime(DataModule):
 @generator_init
 def calc_wheel_rotation(output: WheelsInfo, max_rot_bias_f: float, max_rot_bias_r: float, min_rot_axle: float):
     """Calculate wheel rotation, radius, locking percent, slip ratio"""
-    last_reset = False  # reset check
+    last_reset = None  # reset check
 
     vehicle_name = ""
     radius_front_ema = 0.0
@@ -107,14 +111,13 @@ def calc_wheel_rotation(output: WheelsInfo, max_rot_bias_f: float, max_rot_bias_
         # Reset
         if last_reset != reset:
             last_reset = reset
-            if reset:
-                last_accel_max = 0.0
-                locking_f = 1.0
-                locking_r = 1.0
-                if vehicle_name != api.read.vehicle.vehicle_name():
-                    vehicle_name = api.read.vehicle.vehicle_name()
-                    radius_front_ema = 0.0
-                    radius_rear_ema = 0.0
+            last_accel_max = 0.0
+            locking_f = 1.0
+            locking_r = 1.0
+            if vehicle_name != api.read.vehicle.vehicle_name():
+                vehicle_name = api.read.vehicle.vehicle_name()
+                radius_front_ema = 0.0
+                radius_rear_ema = 0.0
 
         wheel_rot = api.read.wheel.rotation()
         speed = api.read.vehicle.speed()
@@ -157,7 +160,7 @@ def calc_wheel_rotation(output: WheelsInfo, max_rot_bias_f: float, max_rot_bias_
 @generator_init
 def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
     """Calculate tyre wear & delta wear"""
-    last_reset = False  # reset check
+    last_reset = None  # reset check
 
     last_lap_stime = 0.0  # last lap start time
     tread_last = list(WHEELS_ZERO)  # last moment remaining tread
@@ -177,15 +180,14 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
         # Reset
         if last_reset != reset:
             last_reset = reset
-            if reset:
-                tread_last[:] = WHEELS_ZERO
-                tread_wear_curr[:] = WHEELS_ZERO
-                tread_wear_valid[:] = WHEELS_ZERO
-                delta_array_raw[:] = (WHEELS_DELTA_DEFAULT,)
-                delta_array_last = (WHEELS_DELTA_DEFAULT,)
-                is_valid_delta = False
-                last_lap_stime = 0.0
-                output.lastLapTreadWear[:] = WHEELS_ZERO
+            tread_last[:] = WHEELS_ZERO
+            tread_wear_curr[:] = WHEELS_ZERO
+            tread_wear_valid[:] = WHEELS_ZERO
+            delta_array_raw[:] = (WHEELS_DELTA_DEFAULT,)
+            delta_array_last = (WHEELS_DELTA_DEFAULT,)
+            is_valid_delta = False
+            last_lap_stime = 0.0
+            output.lastLapTreadWear[:] = WHEELS_ZERO
 
         tread_curr_set = api.read.tyre.wear()
         lap_stime = api.read.timing.start()
@@ -274,14 +276,13 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
 @generator_init
 def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
     """Calculate brake wear"""
-    last_reset = False  # reset check
+    last_reset = None  # reset check
 
     last_lap_stime = 0.0  # last lap start time
     brake_last = list(WHEELS_ZERO)  # last moment remaining brake
     brake_wear_curr = list(WHEELS_ZERO)  # current lap brake wear
     brake_wear_valid = list(WHEELS_ZERO)  # valid last lap brake wear
     brake_max_thickness = list(WHEELS_ZERO)  # brake max thickness at start of stint
-    failure_thickness = WHEELS_ZERO
     failure_record = list(WHEELS_ZERO)  # recorded failure thickness
 
     is_pit_lap = 0  # whether pit in or pit out lap
@@ -297,17 +298,16 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
         # Reset
         if last_reset != reset:
             last_reset = reset
-            if reset:
-                brake_last[:] = WHEELS_ZERO
-                brake_wear_curr[:] = WHEELS_ZERO
-                brake_wear_valid[:] = WHEELS_ZERO
-                brake_max_thickness[:] = WHEELS_ZERO
-                delta_array_raw[:] = (WHEELS_DELTA_DEFAULT,)
-                delta_array_last = (WHEELS_DELTA_DEFAULT,)
-                failure_thickness = brake_failure_thickness(api.read.vehicle.class_name())
-                is_valid_delta = False
-                last_lap_stime = 0.0
-                output.lastLapBrakeWear[:] = WHEELS_ZERO
+            brake_last[:] = WHEELS_ZERO
+            brake_wear_curr[:] = WHEELS_ZERO
+            brake_wear_valid[:] = WHEELS_ZERO
+            brake_max_thickness[:] = WHEELS_ZERO
+            delta_array_raw[:] = (WHEELS_DELTA_DEFAULT,)
+            delta_array_last = (WHEELS_DELTA_DEFAULT,)
+            is_valid_delta = False
+            last_lap_stime = 0.0
+            output.lastLapBrakeWear[:] = WHEELS_ZERO
+            output.failureBrakeThickness[:] = brake_failure_thickness(api.read.vehicle.class_name(), api.read.vehicle.vehicle_name())
 
         brake_curr_set = api.read.brake.wear()
         if -1.0 in brake_curr_set:
@@ -366,20 +366,21 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
                     ("Front left", "Front right", "Rear left", "Rear right")[idx],
                     failure_record[idx],
                 )
+                output.currentBrakeThickness[idx] = round(failure_record[idx], 2)
+                save_brake_failure_thickness(
+                    brake_name=set_predefined_brake_name(
+                        api.read.vehicle.class_name(),
+                        api.read.vehicle.vehicle_name(),
+                        idx < 2,
+                    ),
+                    failure=output.currentBrakeThickness[idx],
+                )
                 failure_record[idx] = 0
-
-            # Calculate effective thickness
-            brake_curr -= failure_thickness[idx]
 
             # Calibrate max thickness
             if brake_max_thickness[idx] < brake_curr:
                 brake_max_thickness[idx] = brake_curr
                 output.maxBrakeThickness[idx] = brake_curr
-
-            if not brake_max_thickness[idx]:  # bypass invalid value
-                brake_curr = 0.0
-            else:  # fraction to percent
-                brake_curr *= 100 / brake_max_thickness[idx]
 
             # Ignore wear difference while in pit
             if in_pits:

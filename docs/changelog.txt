@@ -1,8 +1,16 @@
-WIP
+2.35.2 (2025-11-25)
 -----------------------------
 * Wheels Module
   - Avoid resetting wheel radius, tyre wear, brake wear data while game is paused.
   - Added delta wear calculation for estimating brake wear difference per lap.
+  - Now automatically saves brake failure thickness values to "brakes.json" preset when brakes failed.
+
+* Brakes Preset
+  - Now saves and loads brake style and failure thickness settings per vehicle brand for the same class, as different brands utilize different settings.
+    Note, user must import vehicle brand data via "Vehicle Brand Editor" in order to save settings under vehicle brand name.
+
+* Brake wear Widget
+  - Now shows "FAIL" text on failed brakes.
 
 * Pit stop estimate Widget
   - Added "lengthy_stop_duration_threshold" option, which sets warning threshold for lengthy pit stop duration in seconds. Default is "60" seconds.
