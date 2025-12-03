@@ -1,3 +1,8 @@
+WIP
+-----------------------------
+* Pace Notes Playback
+  - Fixed volume slider not correctly applied volume while using PySide6.
+
 2.35.3 (2025-11-25)
 -----------------------------
 * Wheels Module

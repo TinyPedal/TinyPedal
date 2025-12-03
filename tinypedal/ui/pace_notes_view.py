@@ -58,13 +58,12 @@ logger = logging.getLogger(__name__)
 
 class PaceNotesPlayer(QMediaPlayer):
     """Pace notes player"""
-    set_source: Callable
-    set_volume: Callable
-    is_playing: Callable
 
     def __init__(self, parent, config: dict):
         super().__init__(parent)
         self.mcfg = config
+        self.is_pyside6 = os.getenv("PYSIDE_OVERRIDE") == "6"
+        self.audio_device = self.set_audio_device()
 
         # Set update timer
         self._update_timer = QBasicTimer()
@@ -74,21 +73,15 @@ class PaceNotesPlayer(QMediaPlayer):
         self._last_notes_index = None
         self._play_queue: list[str] = []
 
-        # Set compatibility
-        if os.getenv("PYSIDE_OVERRIDE") == "6":
+    def set_audio_device(self):
+        """Set audio device"""
+        if self.is_pyside6:
             from PySide6.QtMultimedia import QAudioOutput
 
-            audio_output = QAudioOutput()
-            self.setAudioOutput(audio_output)
-            # Assign methods for qt6
-            self.set_source = self.setSource
-            self.set_volume = audio_output.setVolume
-            self.is_playing = self.__is_playing_qt6
-        else:
-            # Assign methods for qt5
-            self.set_source = self.setMedia
-            self.set_volume = self.setVolume
-            self.is_playing = self.__is_playing_qt5
+            audio_device = QAudioOutput()
+            self.setAudioOutput(audio_device)  # qt6 only
+            return audio_device
+        return None  # qt5
 
     def set_playback(self, enabled: bool):
         """Set playback state"""
@@ -133,20 +126,29 @@ class PaceNotesPlayer(QMediaPlayer):
             if self._checked:
                 self.reset_playback()
 
-    def __is_playing_qt5(self) -> bool:
-        """Check playing state (qt5 only)"""
-        return self.state() == QMediaPlayer.State.PlayingState
-
-    def __is_playing_qt6(self) -> bool:
-        """Check playing state (qt6 only)"""
-        return self.playbackState() == QMediaPlayer.PlayingState
-
-    def source_url(self) -> QUrl:
-        """Get sound source url"""
+    def set_source(self) -> None:
+        """Set source (compatibility)"""
+        # Get sound source url
         pace_note = self._play_queue[0]
         sound_path = self.mcfg["pace_notes_sound_path"]
         sound_format = self.mcfg["pace_notes_sound_format"].strip(".")
-        return QUrl(f"{sound_path}{pace_note}.{sound_format}")
+        source_url = QUrl(f"{sound_path}{pace_note}.{sound_format}")
+
+        if self.is_pyside6:
+            return self.setSource(source_url)  # qt6
+        return self.setMedia(source_url)  # qt5
+
+    def set_volume(self, value: int) -> None:
+        """Set volume (compatibility)"""
+        if self.is_pyside6 and self.audio_device:
+            return self.audio_device.setVolume(value / 100)  # qt6 (0.0 - 1.0)
+        return self.setVolume(value)  # qt5 (0 - 100)
+
+    def is_playing(self) -> bool:
+        """Is playing state (compatibility)"""
+        if self.is_pyside6:
+            return self.playbackState() == QMediaPlayer.PlayingState  # qt6
+        return self.state() == QMediaPlayer.State.PlayingState  # qt5
 
     def __update_queue(self, pace_note: str | None):
         """Update playback queue"""
@@ -161,7 +163,7 @@ class PaceNotesPlayer(QMediaPlayer):
             self.position() < self.mcfg["pace_notes_sound_max_duration"] * 1000):
             return
         # Play next sound in queue
-        self.set_source(self.source_url())
+        self.set_source()
         self.play()
         self._play_queue.pop(0)  # remove playing notes from queue
 
