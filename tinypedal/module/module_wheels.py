@@ -307,7 +307,10 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             is_valid_delta = False
             last_lap_stime = 0.0
             output.lastLapBrakeWear[:] = WHEELS_ZERO
-            output.failureBrakeThickness[:] = brake_failure_thickness(api.read.vehicle.class_name(), api.read.vehicle.vehicle_name())
+            output.failureBrakeThickness[:] = brake_failure_thickness(
+                api.read.vehicle.class_name(),
+                api.read.vehicle.vehicle_name(),
+            )
 
         brake_curr_set = api.read.brake.wear()
         if -1.0 in brake_curr_set:
@@ -366,14 +369,17 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
                     ("Front left", "Front right", "Rear left", "Rear right")[idx],
                     failure_record[idx],
                 )
-                output.failureBrakeThickness[idx] = round(failure_record[idx], 2)
                 save_brake_failure_thickness(
                     brake_name=set_predefined_brake_name(
                         api.read.vehicle.class_name(),
                         api.read.vehicle.vehicle_name(),
                         idx < 2,
                     ),
-                    failure=output.failureBrakeThickness[idx],
+                    failure=round(failure_record[idx], 2),
+                )
+                output.failureBrakeThickness[:] = brake_failure_thickness(
+                    api.read.vehicle.class_name(),
+                    api.read.vehicle.vehicle_name(),
                 )
                 failure_record[idx] = 0
 

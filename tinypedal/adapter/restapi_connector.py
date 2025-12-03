@@ -27,14 +27,24 @@ import json
 import logging
 import threading
 from itertools import chain
-from typing import Any
+from typing import Any, NamedTuple
 
 from ..async_request import http_get, set_header_get
 from ..const_common import TYPE_JSON
-from .rf2_restapi import HttpSetup, ResRawOutput, RestAPIData, select_taskset
+from .rf2_restapi import ResRawOutput, RestAPIData, select_taskset
 
 logger = logging.getLogger(__name__)
 json_decoder = json.JSONDecoder()
+
+
+class HttpSetup(NamedTuple):
+    """Http connection setup"""
+
+    host: str
+    port: int
+    timeout: float
+    retry: int
+    retry_delay: float
 
 
 class RestAPIInfo:

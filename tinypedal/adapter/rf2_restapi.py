@@ -78,16 +78,6 @@ class RestAPIData:
         self.pitStopEstimate: tuple[float, float, float, float, int] = PITEST_DEFAULT
 
 
-class HttpSetup(NamedTuple):
-    """Http connection setup"""
-
-    host: str
-    port: int
-    timeout: float
-    retry: int
-    retry_delay: float
-
-
 class ResRawOutput(NamedTuple):
     """URI resource raw output"""
 
