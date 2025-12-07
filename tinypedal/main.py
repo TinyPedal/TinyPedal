@@ -167,6 +167,8 @@ def set_environment():
     # Windows only
     if PLATFORM == "Windows":
         if os.getenv("PYSIDE_OVERRIDE") == "6":
+            # Use "freetype" to avoid high memory usage in pyside6
+            os.environ["QT_QPA_PLATFORM"] = "windows:fontengine=freetype"
             os.environ["QT_MEDIA_BACKEND"] = "windows"
         else:
             if cfg.compatibility["multimedia_plugin_on_windows"] == "WMF":
