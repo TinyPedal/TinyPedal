@@ -53,8 +53,8 @@ class Realtime(DataModule):
         while not _event_wait(update_interval):
 
             # Ignore stats while in override mode
-            if (self.cfg.telemetry_api["enable_player_index_override"]
-                or self.cfg.telemetry_api["enable_active_state_override"]):
+            if (self.cfg.api["enable_player_index_override"]
+                or self.cfg.api["enable_active_state_override"]):
                 reset = False  # make sure stats not saved
                 update_interval = self.idle_interval
                 continue

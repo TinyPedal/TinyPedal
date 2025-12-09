@@ -11,6 +11,7 @@ TinyPedal stores global user configuration in `config.json` file, which is used 
 Available settings:
 
 * `Application`, can be accessed from `Config` menu in main window, see [Application](#application) section for details.
+* `Telemetry API`, can be accessed from `API` menu in main window, see [Telemetry API](#telemetry-api) section for details.
 * `Compatibility`, can be accessed from `Config` menu in main window, see [Compatibility](#compatibility) section for details.
 * `User path`, can be accessed from `Config` menu in main window, see [User Path](#user-path) section for details.
 * `Auto load preset`, can be accessed from `Preset` tab in main window, see [Preset Management](#preset-management) section for details.
@@ -18,7 +19,7 @@ Available settings:
 Reload or Restart:
 
 * To reload all presets, select `Reload` from `Overlay` menu in main window.
-* To restart game API, select `Restart API` from `Overlay` menu in main window.
+* To restart game API, select `Restart API` from `API` menu in main window.
 * To restart TinyPedal, select `Restart TinyPedal` from `Window` menu in main window.
 
 [**`Back to Top`**](#)
@@ -50,12 +51,6 @@ Click `Transfer` button to transfer settings from currently loaded preset to ano
     Add primary `class` tag to selected preset, which will be auto loaded by `Auto load preset` system. Class tags and colors are defined in `classes.json` file, which can be modified in [Vehicle Class Editor](#vehicle-class-editor).
 
     Note, a single preset can have tags from multiple classes. Auto loading `primary class` preset (if available) always takes priority over `primary sim`.
-
-* Set Primary for * (Sim)
-
-    Add primary `sim` tag to selected preset, which will be auto loaded by `Auto load preset` system.
-
-    Note, a single preset can have tags from multiple games. This option is ignored if `primary class` is found.
 
 * Clear Primary Tag
 
@@ -332,6 +327,135 @@ Set PySide (Qt for Python) module version. Set `2` for PySide2 (default). Set `6
 [**`Back to Top`**](#)
 
 
+# Telemetry API
+**Telemetry API options can be accessed from `API` menu in main window.**
+
+    api_name
+Set API name for accessing data from supported API.
+
+| API name | Requirement | Options |
+|:-:|---|---|
+| Le Mans Ultimate | Requires `rF2 Shared Memory Map Plugin` to work. | [LMU API](#lmu-api) |
+| rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to work. | [RF2 API](#rf2-api) |
+
+[**`Back to Top`**](#)
+
+
+## LMU API
+**LMU API options can be accessed from `Options` while `Le Mans Ultimate` API is enabled in `API` menu in main window.**
+
+    access_mode
+Set access mode for API. Mode value `0` uses copy access and additional data check to avoid data desynchronized or interruption issues. Mode value `1` uses direct access, which may result data desynchronized or interruption issues. Default mode is copy access.
+
+    enable_active_state_override
+Set `true` to enable `active state` manual override. While enabled, `overriding` notification will be shown on API status bar from main window.
+
+    active_state
+This option overrides local player on-track status check, and updates or stops overlay and data processing accordingly. Set `true` to activate state. Set `false` to deactivate state. This option works only when `enable_active_state_override` enabled.
+
+    enable_player_index_override
+Set `true` to enable `player index` manual override.
+
+    player_index
+Set `player index` override for displaying data from specific player. Valid player index range starts from `0` to max number players minus one, and must not exceed `127`. Set value to `-1` for unspecified player, which can be useful for display general standings and trackmap data (ex. broadcasting). This option works only when `enable_player_index_override` enabled.
+
+    character_encoding
+Set character encoding for displaying text in correct encoding. Available encoding: `UTF-8`, `ISO-8859-1`. Default encoding is `UTF-8`.
+
+    enable_restapi_access
+Enable Rest API accessing, which connects to game's Rest API for accessing additional data that is not available through sharedmemory API.
+
+    url_host
+Set Rest API host address. Default is `localhost`.
+
+    url_port
+Set port for Rest API host address. Port value must match `WebUI port` value that sets in `LMU` (UserData\player\Settings.JSON) setting file in order to successfully connect to Rest API and receive data. The default port value for `LMU` is `6397`.
+
+Note, `WebUI port` value from game setting file may change in some situations, and would require manual correction to match `WebUI port` value.
+
+    connection_timeout
+Set connection timeout duration in seconds for Rest API. Value range in `0.5` to `10`. Default is `1` second.
+
+    connection_retry
+Set number of attempts to retry connection for Rest API. Value range in `0` to `10`. Default is `3` retries.
+
+    connection_retry_delay
+Set time delay in seconds to retry connection for Rest API. Value range in `0` to `60`. Default is `1` second.
+
+    enable_energy_remaining
+Enable access to `remaining energy` data from Rest API. This is required for showing remaining energy data in widgets such as Relative, Rivals, Standings.
+
+    enable_garage_setup_info
+Enable access to `garage setup` data from Rest API. This is required for accessing various vehicle setup data.
+
+    enable_session_info
+Enable access to `session` data from Rest API. This is required for accessing various session data, such as time-scale.
+
+    enable_vehicle_info
+Enable access to `vehicle` data from Rest API. This is essential for accessing `virtual energy`, `brake wear`, `vehicle damage`, `pit stop timing` data.
+
+    enable_weather_info
+Enable access to `weather` data from Rest API. This is required for showing weather forecast.
+
+[**`Back to Top`**](#)
+
+
+## RF2 API
+**RF2 API options can be accessed from `Options` while `rFactor 2` API is enabled in `API` menu in main window.**
+
+    access_mode
+Set access mode for API. Mode value `0` uses copy access and additional data check to avoid data desynchronized or interruption issues. Mode value `1` uses direct access, which may result data desynchronized or interruption issues. Default mode is copy access.
+
+    process_id
+Set process ID string for accessing API from server. This option is for server use only.
+
+    enable_active_state_override
+Set `true` to enable `active state` manual override. While enabled, `overriding` notification will be shown on API status bar from main window.
+
+    active_state
+This option overrides local player on-track status check, and updates or stops overlay and data processing accordingly. Set `true` to activate state. Set `false` to deactivate state. This option works only when `enable_active_state_override` enabled.
+
+    enable_player_index_override
+Set `true` to enable `player index` manual override.
+
+    player_index
+Set `player index` override for displaying data from specific player. Valid player index range starts from `0` to max number players minus one, and must not exceed `127`. Set value to `-1` for unspecified player, which can be useful for display general standings and trackmap data (ex. broadcasting). This option works only when `enable_player_index_override` enabled.
+
+    character_encoding
+Set character encoding for displaying text in correct encoding. Available encoding: `UTF-8`, `ISO-8859-1`. Default encoding is `UTF-8`. Note, `UTF-8` may not work well for some Latin characters in `RF2`, try use `ISO-8859-1` instead.
+
+    enable_restapi_access
+Enable Rest API accessing, which connects to game's Rest API for accessing additional data that is not available through sharedmemory API.
+
+    url_host
+Set Rest API host address. Default is `localhost`.
+
+    url_port
+Set port for Rest API host address. Port value must match `WebUI port` value that sets in `RF2` (UserData\player\player.JSON) setting file in order to successfully connect to Rest API and receive data. The default port value for `RF2` is `5397`.
+
+Note, `WebUI port` value from game setting file may change in some situations, and would require manual correction to match `WebUI port` value.
+
+    connection_timeout
+Set connection timeout duration in seconds for Rest API. Value range in `0.5` to `10`. Default is `1` second.
+
+    connection_retry
+Set number of attempts to retry connection for Rest API. Value range in `0` to `10`. Default is `3` retries.
+
+    connection_retry_delay
+Set time delay in seconds to retry connection for Rest API. Value range in `0` to `60`. Default is `1` second.
+
+    enable_garage_setup_info
+Enable access to `garage setup` data from Rest API. This is required for accessing various vehicle setup data.
+
+    enable_session_info
+Enable access to `session` data from Rest API. This is required for accessing various session data, such as time-scale.
+
+    enable_weather_info
+Enable access to `weather` data from Rest API. This is required for showing weather forecast.
+
+[**`Back to Top`**](#)
+
+
 # General options
 **General options can be accessed from main window menu.**
 
@@ -555,76 +679,6 @@ Enable grid-snap effect while moving widget for easy alignment and repositioning
 Enable widget visibility as windows on taskbar in order to be used in VR via APPs such as `OpenKneeboard`. Non-VR user should not enable this option.
 
 Note, you will still need a third party program (such as `OpenKneeboard`) to project overlay windows (widgets) into VR.
-
-[**`Back to Top`**](#)
-
-
-## Telemetry API
-**Telemetry API options can be accessed from `Config` menu in main window. Some options may only be relevant to certain API.**
-
-    api_name
-Set API name for accessing data from supported API.
-
-| API name | Requirement |
-|:-:|---|
-| rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to work. |
-| Le Mans Ultimate | Currently a placehoder, the underlying code uses the same RF2 API which requires `rF2 Shared Memory Map Plugin` to work. |
-
-    access_mode
-Set access mode for API. Mode value `0` uses copy access and additional data check to avoid data desynchronized or interruption issues. Mode value `1` uses direct access, which may result data desynchronized or interruption issues. Default mode is copy access.
-
-    process_id
-Set process ID string for accessing API from server. Currently this option is only relevant to `RF2`.
-
-    enable_active_state_override
-Set `true` to enable `active state` manual override. While enabled, `overriding` notification will be shown on API status bar from main window.
-
-    active_state
-This option overrides local player on-track status check, and updates or stops overlay and data processing accordingly. Set `true` to activate state. Set `false` to deactivate state. This option works only when `enable_active_state_override` enabled.
-
-    enable_player_index_override
-Set `true` to enable `player index` manual override.
-
-    player_index
-Set `player index` override for displaying data from specific player. Valid player index range starts from `0` to max number players minus one, and must not exceed `127`. Set value to `-1` for unspecified player, which can be useful for display general standings and trackmap data (ex. broadcasting). This option works only when `enable_player_index_override` enabled.
-
-    character_encoding
-Set character encoding for displaying text in correct encoding. Available encoding: `UTF-8`, `ISO-8859-1`. Default encoding is `UTF-8`, which works best in `LMU` game. Note, `UTF-8` may not work well for some Latin characters in `RF2`, try use `ISO-8859-1` instead.
-
-    enable_restapi_access
-Enable Rest API accessing (RF2 & LMU), which connects to game's Rest API for accessing additional data that is not available through sharedmemory API.
-
-    url_host*
-Set `RF2` or `LMU` Rest API host address. Default is `localhost`.
-
-    url_port*
-Set port for Rest API host address. Port value must match `WebUI port` value that sets in `LMU` (UserData\player\Settings.JSON) or `RF2` (UserData\player\player.JSON) setting file in order to successfully connect to Rest API and receive data. The default port value for `RF2` is `5397`, and `6397` for `LMU`.
-
-Note, `WebUI port` value from game setting file may change in some situations, and would require manual correction to match `WebUI port` value.
-
-    connection_timeout
-Set connection timeout duration in seconds for Rest API. Value range in `0.5` to `10`. Default is `1` second.
-
-    connection_retry
-Set number of attempts to retry connection for Rest API. Value range in `0` to `10`. Default is `3` retries.
-
-    connection_retry_delay
-Set time delay in seconds to retry connection for Rest API. Value range in `0` to `60`. Default is `1` second.
-
-    enable_energy_remaining
-Enable access to `remaining energy` data from Rest API (LMU only). This is required for showing remaining energy data in widgets such as Relative, Rivals, Standings.
-
-    enable_garage_setup_info
-Enable access to `garage setup` data from Rest API (RF2 & LMU). This is required for accessing various vehicle setup data.
-
-    enable_session_info
-Enable access to `session` data from Rest API (RF2 & LMU). This is required for accessing various session data, such as time-scale.
-
-    enable_vehicle_info
-Enable access to `vehicle` data from Rest API (LMU only). This is essential for accessing `virtual energy`, `brake wear`, `vehicle damage`, `pit stop timing` data.
-
-    enable_weather_info
-Enable access to `weather` data from Rest API (RF2 & LMU). This is required for showing weather forecast.
 
 [**`Back to Top`**](#)
 

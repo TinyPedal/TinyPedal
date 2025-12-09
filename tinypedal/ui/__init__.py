@@ -148,6 +148,10 @@ def set_style_window(base_font_pt: int) -> str:
             color: {color_active_highlighted_text};
             background: {color_active_highlight};
         }}
+        AppWindow QStatusBar > QPushButton::menu-indicator {{
+            image: none;
+            width: 0;
+        }}
 
         /* Notify bar */
         NotifyBar QPushButton {{
@@ -169,7 +173,8 @@ def set_style_window(base_font_pt: int) -> str:
             background: #A4A;
         }}
         NotifyBar #notifyUpdates::menu-indicator {{
-            image: None;
+            image: none;
+            width: 0;
         }}
 
         /* Module list (tab) */
@@ -237,15 +242,6 @@ def set_style_window(base_font_pt: int) -> str:
             margin: 0.25em 0.25em 0.25em 0;
             border-radius: {border_radius_button}em;
         }}
-        PresetTagItem QLabel#LMU {{
-            background: #F40;
-        }}
-        PresetTagItem QLabel#RF2 {{
-            background: #0AF;
-        }}
-        PresetTagItem QLabel#LOCKED {{
-            background: #777;
-        }}
 
         /* Preset transfer (dialog) */
         PresetTransfer QListView {{
@@ -274,7 +270,7 @@ def set_style_window(base_font_pt: int) -> str:
             padding: 0 0.1em;
         }}
         PresetTransfer ListHeader CompactButton {{
-            border: None;
+            border: none;
             font-size: {font_pt_item_button}pt;
             padding: 0.2em;
         }}

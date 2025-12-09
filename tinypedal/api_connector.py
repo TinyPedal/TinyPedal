@@ -98,7 +98,7 @@ class SimRF2(Connector):
 
     def __init__(self):
         self.shmmapi = rf2_connector.RF2Info()  # primary
-        self.restapi = restapi_connector.RestAPIInfo(self.shmmapi)  # secondary
+        self.restapi = restapi_connector.RestAPIInfo(API_NAME_RF2)  # secondary
 
     def start(self):
         self.shmmapi.start()  # 1 load first
@@ -133,7 +133,7 @@ class SimLMU(Connector):
 
     def __init__(self):
         self.shmmapi = rf2_connector.RF2Info()  # primary
-        self.restapi = restapi_connector.RestAPIInfo(self.shmmapi)  # secondary
+        self.restapi = restapi_connector.RestAPIInfo(API_NAME_LMU)  # secondary
 
     def start(self):
         self.shmmapi.start()  # 1 load first
@@ -148,7 +148,6 @@ class SimLMU(Connector):
 
     def setup(self, config: dict):
         self.shmmapi.setMode(config["access_mode"])
-        self.shmmapi.setPID(config["process_id"])
         self.shmmapi.setStateOverride(config["enable_active_state_override"])
         self.shmmapi.setActiveState(config["active_state"])
         self.shmmapi.setPlayerOverride(config["enable_player_index_override"])

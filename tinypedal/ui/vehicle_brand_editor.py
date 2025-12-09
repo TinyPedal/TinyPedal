@@ -156,7 +156,8 @@ class VehicleBrandEditor(BaseEditor):
         """Import brand from RF2"""
         self.import_from_restapi(
             "RF2",
-            cfg.telemetry_api["url_port_rf2"],
+            cfg.user.setting["api_rf2"]["url_host"],
+            cfg.user.setting["api_rf2"]["url_port"],
             "/rest/race/car",
         )
 
@@ -164,7 +165,8 @@ class VehicleBrandEditor(BaseEditor):
         """Import brand from LMU (primary source)"""
         self.import_from_restapi(
             "LMU",
-            cfg.telemetry_api["url_port_lmu"],
+            cfg.user.setting["api_lmu"]["url_host"],
+            cfg.user.setting["api_lmu"]["url_port"],
             "/rest/race/car",
         )
 
@@ -172,13 +174,13 @@ class VehicleBrandEditor(BaseEditor):
         """Import brand from LMU (alternative source)"""
         self.import_from_restapi(
             "LMU",
-            cfg.telemetry_api["url_port_lmu"],
+            cfg.user.setting["api_lmu"]["url_host"],
+            cfg.user.setting["api_lmu"]["url_port"],
             "/rest/sessions/getAllVehicles",
         )
 
-    def import_from_restapi(self, sim_name: str, url_port: int, resource_name: str):
+    def import_from_restapi(self, sim_name: str, url_host: str, url_port: int, resource_name: str):
         """Import brand from Rest API"""
-        url_host = cfg.telemetry_api["url_host"]
         request_header = set_header_get(resource_name, url_host)
         time_out = 3
 

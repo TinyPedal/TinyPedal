@@ -49,7 +49,7 @@ class APIControl:
             name: match API name in API_NAME_LIST
         """
         if not name:
-            name = cfg.telemetry_api["api_name"]
+            name = cfg.user.config["telemetry_api"]["api_name"]
 
         # Do not create new instance if same API already loaded
         self._same_api_loaded = bool(self._api is not None and self._api.NAME == name)
@@ -67,7 +67,7 @@ class APIControl:
 
     def start(self):
         """Start API"""
-        logger.info("ENCODING: %s", cfg.telemetry_api["character_encoding"])
+        logger.info("ENCODING: %s", cfg.api["character_encoding"])
         logger.info("CONNECTING: %s API", self._api.NAME)
         self.setup()
         self._api.start()
@@ -94,7 +94,7 @@ class APIControl:
 
     def setup(self):
         """Setup & apply API changes"""
-        self._api.setup(cfg.telemetry_api)
+        self._api.setup(cfg.api)
 
     @property
     def name(self) -> str:

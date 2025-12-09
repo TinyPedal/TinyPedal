@@ -64,7 +64,7 @@ class SpectateList(QWidget):
 
         self.button_toggle = QPushButton("")
         self.button_toggle.setCheckable(True)
-        self.button_toggle.setChecked(cfg.telemetry_api["enable_player_index_override"])
+        self.button_toggle.setChecked(cfg.api["enable_player_index_override"])
         self.button_toggle.toggled.connect(self.toggle_spectate)
         self.refresh()
 
@@ -99,17 +99,17 @@ class SpectateList(QWidget):
 
     def toggle_spectate(self, checked: bool):
         """Toggle spectate mode"""
-        cfg.telemetry_api["enable_player_index_override"] = checked
+        cfg.api["enable_player_index_override"] = checked
         cfg.save()
         api.setup()
         self.refresh()
 
     def refresh(self):
         """Refresh spectate list"""
-        enabled = cfg.telemetry_api["enable_player_index_override"]
+        enabled = cfg.api["enable_player_index_override"]
 
         if enabled:
-            self.update_drivers("Anonymous", cfg.telemetry_api["player_index"], False)
+            self.update_drivers("Anonymous", cfg.api["player_index"], False)
         else:
             self.listbox_spectate.clear()
             self.label_spectating.setText("Spectating: <b>Disabled</b>")
@@ -166,7 +166,7 @@ class SpectateList(QWidget):
     @staticmethod
     def save_selected_index(index: int):
         """Save selected driver index"""
-        if cfg.telemetry_api["player_index"] != index:
-            cfg.telemetry_api["player_index"] = index
+        if cfg.api["player_index"] != index:
+            cfg.api["player_index"] = index
             api.setup()
             cfg.save()

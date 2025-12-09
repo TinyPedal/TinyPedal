@@ -26,13 +26,15 @@ import logging
 import os
 import threading
 from collections import ChainMap
-from time import sleep
+from time import sleep, time
 from types import MappingProxyType
 
 from .const_app import PATH_GLOBAL
 from .const_common import EMPTY_DICT
 from .const_file import ConfigType, FileExt
+from .regex_pattern import API_NAME_ALIAS
 from .setting_validator import StyleValidator
+from .template.setting_api import API_DEFAULT
 from .template.setting_brakes import BRAKES_DEFAULT
 from .template.setting_classes import CLASSES_DEFAULT
 from .template.setting_common import COMMON_DEFAULT
@@ -142,7 +144,7 @@ class Preset:
     def set_default(self):
         """Set default setting"""
         self.config = MappingProxyType(GLOBAL_DEFAULT)
-        self.setting = MappingProxyType(ChainMap(WIDGET_DEFAULT, MODULE_DEFAULT, COMMON_DEFAULT))
+        self.setting = MappingProxyType(ChainMap(WIDGET_DEFAULT, MODULE_DEFAULT, API_DEFAULT, COMMON_DEFAULT))
         self.brakes = MappingProxyType(BRAKES_DEFAULT)
         self.brands = EMPTY_DICT
         self.classes = MappingProxyType(CLASSES_DEFAULT)
@@ -153,7 +155,7 @@ class Preset:
 
 
 class Setting:
-    """Overlay setting"""
+    """APP setting"""
 
     __slots__ = (
         "_save_delay",
@@ -167,10 +169,9 @@ class Setting:
         "path",
         "application",
         "compatibility",
-        "primary_preset",
         "overlay",
-        "telemetry_api",
         "units",
+        "api",
     )
 
     def __init__(self):
@@ -189,10 +190,9 @@ class Setting:
         # Quick references
         self.application = None
         self.compatibility = None
-        self.primary_preset = None
         self.overlay = None
-        self.telemetry_api = None
         self.units = None
+        self.api = None
 
     def is_loaded(self, filename: str) -> bool:
         """Check if selected setting file is already loaded"""
@@ -233,7 +233,6 @@ class Setting:
         # Assign global setting
         self.application = self.user.config["application"]
         self.compatibility = self.user.config["compatibility"]
-        self.primary_preset = self.user.config["primary_preset"]
 
     def update_path(self):
         """Update global path, call this if "user_path" changed"""
@@ -247,8 +246,8 @@ class Setting:
         if new_settings_path != old_settings_path:
             self.set_next_to_load(f"{self.preset_list[0]}{FileExt.JSON}")
 
-    def load(self):
-        """Load all setting files"""
+    def load_user(self):
+        """Load user settings, should be called after loaded global setting"""
         # Load preset JSON file
         if self._setting_to_load != "":
             filename_setting_temp = self._setting_to_load
@@ -299,8 +298,16 @@ class Setting:
         )
         # Assign base setting
         self.overlay = self.user.setting["overlay"]
-        self.telemetry_api = self.user.setting["telemetry_api"]
         self.units = self.user.setting["units"]
+
+    def load_api(self) -> None:
+        """Load API setting, should be called after loaded user settings, but before starting API"""
+        self.api = self.user.setting[self.api_config_name()]
+
+    def api_config_name(self) -> str:
+        """Get api config name"""
+        api_name = self.user.config["telemetry_api"]["api_name"]
+        return f"api_{API_NAME_ALIAS[api_name].lower()}"
 
     @property
     def preset_list(self) -> list[str]:
@@ -400,6 +407,12 @@ class Setting:
         # Run next save task in save queue if any
         if self._save_queue:
             self.save(0, next_task=True)
+
+    def update_access_time(self) -> None:
+        """Update last access & modified time, without re-saving"""
+        preset_file = f"{self.path.settings}{self.filename.setting}"
+        last_atime = time()
+        os.utime(preset_file, (last_atime, last_atime))
 
     @property
     def max_saving_attempts(self) -> int:

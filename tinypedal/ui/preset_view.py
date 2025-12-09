@@ -169,8 +169,6 @@ class PresetList(QWidget):
             menu_class.addAction(class_name)
         menu.addMenu(menu_class)
 
-        menu.addAction("Set Primary for LMU")
-        menu.addAction("Set Primary for RF2")
         menu.addAction("Clear Primary Tag")
         menu.addSeparator()
         menu.addAction("Duplicate")
@@ -188,26 +186,12 @@ class PresetList(QWidget):
             cfg.user.classes[action]["preset"] = selected_preset_name
             cfg.save(cfg_type=ConfigType.CLASSES)
             self.refresh()
-        # Set primary preset LMU
-        elif action == "Set Primary for LMU":
-            cfg.primary_preset["LMU"] = selected_preset_name
-            cfg.save(cfg_type=ConfigType.CONFIG)
-            self.refresh()
-        # Set primary preset RF2
-        elif action == "Set Primary for RF2":
-            cfg.primary_preset["RF2"] = selected_preset_name
-            cfg.save(cfg_type=ConfigType.CONFIG)
-            self.refresh()
         # Clear primary preset tag
         elif action == "Clear Primary Tag":
             for class_name, class_data in cfg.user.classes.items():
                 if selected_preset_name == class_data["preset"]:
                     class_data["preset"] = ""
                     cfg.save(cfg_type=ConfigType.CLASSES)
-            for sim_name, primary_preset in cfg.primary_preset.items():
-                if selected_preset_name == primary_preset:
-                    cfg.primary_preset[sim_name] = ""
-                    cfg.save(cfg_type=ConfigType.CONFIG)
                 self.refresh()
         # Lock/unlock preset
         elif action == "Lock Preset":
@@ -359,21 +343,14 @@ class PresetTagItem(QWidget):
         for class_name, class_data in cfg.user.classes.items():
             if preset_name == class_data["preset"]:
                 label_class_name = QLabel(class_name)
-                label_class_name.setStyleSheet(f"background: {class_data['color']}")
+                label_class_name.setStyleSheet(f"background: {class_data['color']};")
                 layout_item.addWidget(label_class_name)
-
-        # Sim name tag
-        for sim_name, primary_preset in cfg.primary_preset.items():
-            if preset_name == primary_preset:
-                label_sim_name = QLabel(sim_name)
-                label_sim_name.setObjectName(sim_name)
-                layout_item.addWidget(label_sim_name)
 
         # File lock tag
         preset_filename = f"{preset_name}{FileExt.JSON}"
         if preset_filename in cfg.user.filelock:
             label_locked = QLabel(f"{cfg.user.filelock[preset_filename]['version']}")
-            label_locked.setObjectName("LOCKED")
+            label_locked.setStyleSheet("background: #777;")
             layout_item.addWidget(label_locked)
 
         self.setLayout(layout_item)

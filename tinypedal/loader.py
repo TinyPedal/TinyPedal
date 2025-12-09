@@ -24,6 +24,7 @@ import logging
 import os
 import signal
 import sys
+import time
 
 from .api_control import api
 from .const_file import FileExt
@@ -45,18 +46,20 @@ def start():
     """Start api, modules, widgets, etc. Call once per launch."""
     logger.info("STARTING............")
     signal.signal(signal.SIGINT, int_signal_handler)
-    # 1 load preset
+    # 1 load user setting
     cfg.set_next_to_load(f"{cfg.preset_list[0]}{FileExt.JSON}")
-    cfg.load()
+    cfg.load_user()
     cfg.save()
-    # 2 start api
+    # 2 load api setting
+    cfg.load_api()
+    # 3 start api
     api.connect()
     api.start()
-    # 3 start modules
+    # 4 start modules
     mctrl.start()
-    # 4 start widgets
+    # 5 start widgets
     wctrl.start()
-    # 5 start main window
+    # 6 start main window
     from .ui.app import AppWindow
     AppWindow()
     # Finalize loading after main GUI fully loaded
@@ -99,15 +102,22 @@ def reload(reload_preset: bool = False):
             or auto-loading preset.
     """
     logger.info("RELOADING............")
+    # 0 wait unfinished saving
+    if cfg.is_saving:
+        cfg.save(0)  # trigger immediate saving
+        while cfg.is_saving:
+            time.sleep(0.01)
     # 1 unload modules
     unload_modules()
-    # 2 reload preset file
+    # 2 reload user setting
     if reload_preset:
-        cfg.load()
-        cfg.save(0)
-    # 3 restart api
+        cfg.load_user()
+        cfg.update_access_time()
+    # 3 reload api setting
+    cfg.load_api()
+    # 4 restart api
     api.restart()
-    # 4 load modules
+    # 5 load modules
     load_modules()
 
 

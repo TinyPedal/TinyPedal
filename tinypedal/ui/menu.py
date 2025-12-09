@@ -31,6 +31,7 @@ from ..const_app import URL_FAQ, URL_USER_GUIDE
 from ..const_file import ConfigType
 from ..module_info import minfo
 from ..overlay_control import octrl
+from ..regex_pattern import API_NAME_LMU, API_NAME_RF2
 from ..setting import cfg
 from ..update import update_checker
 from .about import About
@@ -82,11 +83,6 @@ class OverlayMenu(QMenu):
         # Reload preset
         reload_preset = self.addAction("Reload")
         reload_preset.triggered.connect(parent.reload_preset)
-        self.addSeparator()
-
-        # Restart API
-        restart_api = self.addAction("Restart API")
-        restart_api.triggered.connect(parent.restart_api)
         self.addSeparator()
 
         # Reset submenu
@@ -287,9 +283,6 @@ class ConfigMenu(QMenu):
         config_font = self.addAction("Global Font Override")
         config_font.triggered.connect(self.open_config_font)
 
-        config_api = self.addAction("Telemetry API")
-        config_api.triggered.connect(self.open_config_api)
-
     def open_config_application(self):
         """Config global application"""
         _dialog = UserConfig(
@@ -348,11 +341,68 @@ class ConfigMenu(QMenu):
         )
         _dialog.open()
 
+
+class APIMenu(QMenu):
+    """API menu"""
+
+    def __init__(self, title, parent):
+        super().__init__(title, parent)
+        self._parent = parent
+
+        self.api_lmu = self.addAction(API_NAME_LMU)
+        self.api_lmu.setCheckable(True)
+        self.api_lmu.triggered.connect(self.enable_lmu)
+
+        self.api_rf2 = self.addAction(API_NAME_RF2)
+        self.api_rf2.setCheckable(True)
+        self.api_rf2.triggered.connect(self.enable_rf2)
+        self.addSeparator()
+
+        # Auto switch currently not enabled dur to performance concern
+        #self.auto_switch = self.addAction("Auto Switch API")
+        #self.auto_switch.setCheckable(True)
+        #self.auto_switch.triggered.connect(self.toggle_auto_switch)
+        #self.addSeparator()
+
+        config_api = self.addAction("Options")
+        config_api.triggered.connect(self.open_config_api)
+        self.addSeparator()
+
+        restart_api = self.addAction("Restart API")
+        restart_api.triggered.connect(parent.restart_api)
+
+        # Refresh menu
+        self.aboutToShow.connect(self.refresh_menu)
+
+    #def toggle_auto_switch(self):
+    #    """Toggle auto switch API"""
+    #    cfg.application["enable_auto_switch_api"] = not cfg.application["enable_auto_switch_api"]
+    #    cfg.save(cfg_type=ConfigType.CONFIG)
+
+    def enable_lmu(self):
+        """Enable LMU API"""
+        cfg.user.config["telemetry_api"]["api_name"] = API_NAME_LMU
+        cfg.save(cfg_type=ConfigType.CONFIG)
+        self._parent.reload_only()
+
+    def enable_rf2(self):
+        """Enable RF2 API"""
+        cfg.user.config["telemetry_api"]["api_name"] = API_NAME_RF2
+        cfg.save(cfg_type=ConfigType.CONFIG)
+        self._parent.reload_only()
+
+    def refresh_menu(self):
+        """Refresh menu"""
+        api_name = cfg.user.config["telemetry_api"]["api_name"]
+        #self.auto_switch.setChecked(cfg.application["enable_auto_switch_api"])
+        self.api_lmu.setChecked(api_name == API_NAME_LMU)
+        self.api_rf2.setChecked(api_name == API_NAME_RF2)
+
     def open_config_api(self):
-        """Config telemetry API"""
+        """Config API"""
         _dialog = UserConfig(
             parent=self._parent,
-            key_name="telemetry_api",
+            key_name=cfg.api_config_name(),
             cfg_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,

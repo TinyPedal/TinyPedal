@@ -1,5 +1,11 @@
 WIP
 -----------------------------
+* API Changes
+  - Separated Telemetry API settings under specific game name, which allows different set of API options for each game. Default game API is "LMU".
+  - General API setting, such as selected API name, is now saved in global config file, while API setting for specific game is saved in user preset file, same as before.
+  - Removed "auto load primary preset for sim" option. User should now select and switch game API via "API" menu.
+  - Added "API" menu to main window, which allows to switch API, configure options, and restart API. "API" menu can also be accessed by clicking "API" button on right-bottom of status bar.
+
 * Pace Notes Playback
   - Fixed volume slider not correctly applied volume while using PySide6.
 

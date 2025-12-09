@@ -21,6 +21,7 @@ Default global (config) setting template
 """
 
 from ..const_app import APP_NAME, PLATFORM
+from ..regex_pattern import API_NAME_LMU
 
 GLOBAL_DEFAULT = {
     "application": {
@@ -51,6 +52,9 @@ GLOBAL_DEFAULT = {
         "global_bkg_color": "#000000",
         "multimedia_plugin_on_windows": "WMF",
     },
+    "telemetry_api": {
+        "api_name": API_NAME_LMU,
+    },
     "user_path": {
         "settings_path": "settings/",
         "brand_logo_path": "brandlogo/",
@@ -61,10 +65,6 @@ GLOBAL_DEFAULT = {
         "track_map_path": "trackmap/",
         "pace_notes_path": "pacenotes/",
         "track_notes_path": "tracknotes/",
-    },
-    "primary_preset": {
-        "LMU": "",
-        "RF2": "",
     },
     "track_map_viewer": {
         "inner_margin": 6,

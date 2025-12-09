@@ -68,7 +68,6 @@ class OverlayControl:
         "toggle",
         "_stopped",
         "_event",
-        "_last_detected_sim",
         "_last_active_state",
         "_last_hide_state",
     )
@@ -78,7 +77,6 @@ class OverlayControl:
         self._stopped = True
         self._event = threading.Event()
 
-        self._last_detected_sim = None
         self._last_active_state = None
         self._last_hide_state = None
 
@@ -116,8 +114,7 @@ class OverlayControl:
                 self._last_active_state = active
                 # Update auto load state only once when player enters track
                 if active and cfg.application["enable_auto_load_preset"]:
-                    if not self.__check_preset_class():
-                        self.__check_preset_sim()
+                    self.__check_preset_class()
                 # Set overlay timer state
                 overlay_signal.paused.emit(not active)
 
@@ -135,23 +132,6 @@ class OverlayControl:
             return False
         preset_name = cfg.get_primary_preset_name(class_preset_name)
         self.__auto_load_preset(class_name, preset_name)
-        return True
-
-    def __check_preset_sim(self) -> bool:
-        """Check primary preset from sim"""
-        # Get sim_name, returns "" if no game running
-        sim_name = api.read.state.identifier()
-        # Abort if game not found
-        if not sim_name:
-            self._last_detected_sim = None
-            return False
-        # Abort if same as last found game
-        if sim_name == self._last_detected_sim:
-            return True
-        # Assign sim name to last detected, set preset name
-        self._last_detected_sim = sim_name
-        preset_name = cfg.get_primary_preset_name(cfg.primary_preset.get(sim_name, ""))
-        self.__auto_load_preset(sim_name, preset_name)
         return True
 
     def __auto_load_preset(self, target_name, preset_name):

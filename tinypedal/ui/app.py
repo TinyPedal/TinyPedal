@@ -45,7 +45,7 @@ from ..regex_pattern import API_NAME_ALIAS
 from ..setting import cfg
 from . import set_style_palette, set_style_window
 from ._common import UIScaler
-from .menu import ConfigMenu, HelpMenu, OverlayMenu, ToolsMenu, WindowMenu
+from .menu import APIMenu, ConfigMenu, HelpMenu, OverlayMenu, ToolsMenu, WindowMenu
 from .module_view import ModuleList
 from .notification import NotifyBar
 from .pace_notes_view import PaceNotesControl
@@ -129,7 +129,7 @@ class StatusButtonBar(QStatusBar):
 
     def refresh(self):
         """Refresh status bar"""
-        if cfg.telemetry_api["enable_active_state_override"]:
+        if cfg.api["enable_active_state_override"]:
             text_api_status = "overriding"
         else:
             text_api_status = api.read.state.version()
@@ -220,10 +220,13 @@ class AppWindow(QMainWindow):
         # Overlay menu
         menu_overlay = OverlayMenu("Overlay", self)
         menu.addMenu(menu_overlay)
+        # API menu
+        menu_api = APIMenu("API", self)
+        menu.addMenu(menu_api)
+        self.statusBar().button_api.setMenu(menu_api)
         # Config menu
         menu_config = ConfigMenu("Config", self)
         menu.addMenu(menu_config)
-        self.statusBar().button_api.clicked.connect(menu_config.open_config_api)
         # Tools menu
         menu_tools = ToolsMenu("Tools", self)
         menu.addMenu(menu_tools)

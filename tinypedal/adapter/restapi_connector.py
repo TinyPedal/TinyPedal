@@ -29,6 +29,7 @@ import threading
 from itertools import chain
 from typing import Any, NamedTuple
 
+from .. import realtime_state
 from ..async_request import http_get, set_header_get
 from ..const_common import TYPE_JSON
 from .rf2_restapi import ResRawOutput, RestAPIData, select_taskset
@@ -51,7 +52,7 @@ class RestAPIInfo:
     """Rest API data output"""
 
     __slots__ = (
-        "_parent_api",
+        "_api_name",
         "_cfg",
         "_task_cancel",
         "_updating",
@@ -61,8 +62,8 @@ class RestAPIInfo:
         "_dataset",
     )
 
-    def __init__(self, parent_api):
-        self._parent_api = parent_api
+    def __init__(self, api_name: str):
+        self._api_name = api_name
         self._cfg: dict = None
 
         self._task_cancel = False
@@ -113,14 +114,14 @@ class RestAPIInfo:
         active_task_sim = {}
 
         while not _event_wait(update_interval):
-            if self._parent_api.isActive:
+            if realtime_state.active:
 
                 # Also check task cancel state in case delay
                 if not reset or self._task_cancel:
                     reset = True
                     update_interval = self._active_interval
                     self._task_cancel = False
-                    self.run_tasks(self._parent_api.identifier, active_task_sim)
+                    self.run_tasks(self._api_name, active_task_sim)
 
             else:
                 if reset:
@@ -130,16 +131,13 @@ class RestAPIInfo:
         # Reset to default on close
         reset_to_default(self._dataset, active_task_sim)
 
-    def run_tasks(self, sim_name: str, active_task_sim: dict):
+    def run_tasks(self, api_name: str, active_task_sim: dict):
         """Run tasks"""
-        if not sim_name:
-            logger.info("RestAPI: game session not found")
-            return
-        logger.info("RestAPI: session found (%s)", sim_name)
+        logger.info("RestAPI: CONNECTING: %s", api_name)
         # Load http connection setting
         sim_http = HttpSetup(
             host=self._cfg["url_host"],
-            port=self._cfg.get(f"url_port_{sim_name.lower()}", 0),
+            port=self._cfg["url_port"],
             timeout=min(max(self._cfg["connection_timeout"], 0.5), 10),
             retry=min(max(int(self._cfg["connection_retry"]), 0), 10),
             retry_delay=min(max(self._cfg["connection_retry_delay"], 0), 60),
@@ -148,7 +146,7 @@ class RestAPIInfo:
         logger.info("RestAPI: all tasks started")
         asyncio.run(
             self.task_init(
-                self.sort_taskset(sim_http, active_task_sim, select_taskset(sim_name)),
+                self.sort_taskset(sim_http, active_task_sim, select_taskset(api_name)),
             )
         )
         logger.info("RestAPI: all tasks stopped")
@@ -180,7 +178,7 @@ class RestAPIInfo:
     async def task_control(self, task_group: tuple[asyncio.Task, ...]):
         """Control task running state"""
         _event_is_set = self._event.is_set
-        while not _event_is_set() and self._parent_api.isActive:
+        while not _event_is_set() and realtime_state.active:
             await asyncio.sleep(0.1)  # check every 100ms
         # Set cancel state to exit loop in case failed to cancel
         self._task_cancel = True
