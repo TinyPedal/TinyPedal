@@ -8,13 +8,17 @@ TinyPedal relies on following third-party software:
   website: https://www.qt.io/qt-for-python
   license: https://www.qt.io/licensing/
 
-- rF2 Shared Memory Map Plugin by The Iron Wolf, the GNU General Public License version 3.0.
+- rF2 Shared Memory Map Plugin, the GNU General Public License version 3.0.
   website: https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin
   license: https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin/blob/master/LICENSE
 
-- pyRfactor2SharedMemory by Tony Whitley, the MIT license.
+- pyRfactor2SharedMemory, the MIT license.
   website: https://github.com/TonyWhitley/pyRfactor2SharedMemory
   license: https://github.com/TonyWhitley/pyRfactor2SharedMemory/blob/master/License.txt
+
+- pyLMUSharedMemory, the MIT license.
+  website: https://github.com/s-victor/pyLMUSharedMemory
+  license: https://github.com/s-victor/pyLMUSharedMemory/blob/master/License.txt
 
 - psutil, the BSD 3-Clause License.
   website: https://github.com/giampaolo/psutil
