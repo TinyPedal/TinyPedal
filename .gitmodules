@@ -1,3 +1,6 @@
 [submodule "pyRfactor2SharedMemory"]
 	path = pyRfactor2SharedMemory
 	url = https://github.com/s-victor/pyRfactor2SharedMemory.git
+[submodule "pyLMUSharedMemory"]
+	path = pyLMUSharedMemory
+	url = https://github.com/s-victor/pyLMUSharedMemory.git
