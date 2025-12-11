@@ -50,16 +50,14 @@ def start():
     cfg.set_next_to_load(f"{cfg.preset_list[0]}{FileExt.JSON}")
     cfg.load_user()
     cfg.save()
-    # 2 load api setting
-    cfg.load_api()
-    # 3 start api
+    # 2 start api
     api.connect()
     api.start()
-    # 4 start modules
+    # 3 start modules
     mctrl.start()
-    # 5 start widgets
+    # 4 start widgets
     wctrl.start()
-    # 6 start main window
+    # 5 start main window
     from .ui.app import AppWindow
     AppWindow()
     # Finalize loading after main GUI fully loaded
@@ -113,11 +111,9 @@ def reload(reload_preset: bool = False):
     if reload_preset:
         cfg.load_user()
         cfg.update_access_time()
-    # 3 reload api setting
-    cfg.load_api()
-    # 4 restart api
+    # 3 restart api
     api.restart()
-    # 5 load modules
+    # 4 load modules
     load_modules()
 
 

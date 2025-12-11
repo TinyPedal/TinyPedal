@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-rF2 API connector
+LMU API connector
 """
 
 from __future__ import annotations
@@ -33,15 +33,15 @@ if __name__ == "__main__":  # local import check
     sys.path.append(".")
 
 if TYPE_CHECKING:  # for type checker only
-    from pyRfactor2SharedMemory import rF2Type as rF2data
+    from pyLMUSharedMemory import lmu_type as lmu_data
 else:  # run time only
-    from pyRfactor2SharedMemory import rF2data
+    from pyLMUSharedMemory import lmu_data
 
-from pyRfactor2SharedMemory.rF2MMap import (
+from pyLMUSharedMemory.lmu_mmap import (
     INVALID_INDEX,
     MAX_VEHICLES,
+    LMUConstants,
     MMapControl,
-    rFactor2Constants,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,11 +57,11 @@ def copy_struct(struct_data):
     )
 
 
-def local_scoring_index(scor_veh: Sequence[rF2data.rF2VehicleScoring]) -> int:
+def local_scoring_index(scor_veh: Sequence[lmu_data.LMUVehicleScoring]) -> int:
     """Find local player scoring index
 
     Args:
-        scor_veh: scoring mVehicles array.
+        scor_veh: scoring array.
     """
     for scor_idx, veh_info in enumerate(scor_veh):
         if veh_info.mIsPlayer:
@@ -73,44 +73,30 @@ class MMapDataSet:
     """Create mmap data set"""
 
     __slots__ = (
-        "scor",
-        "tele",
-        "ext",
-        "ffb",
+        "shmm",
     )
 
     def __init__(self) -> None:
-        self.scor = MMapControl(rFactor2Constants.MM_SCORING_FILE_NAME, rF2data.rF2Scoring)
-        self.tele = MMapControl(rFactor2Constants.MM_TELEMETRY_FILE_NAME, rF2data.rF2Telemetry)
-        self.ext = MMapControl(rFactor2Constants.MM_EXTENDED_FILE_NAME, rF2data.rF2Extended)
-        self.ffb = MMapControl(rFactor2Constants.MM_FORCE_FEEDBACK_FILE_NAME, rF2data.rF2ForceFeedback)
+        self.shmm = MMapControl(LMUConstants.LMU_SHARED_MEMORY_FILE, lmu_data.LMUObjectOut)
 
     def __del__(self):
         logger.info("sharedmemory: GC: MMapDataSet")
 
-    def create_mmap(self, access_mode: int, rf2_pid: str) -> None:
+    def create_mmap(self, access_mode: int) -> None:
         """Create mmap instance
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
-            rf2_pid: rF2 Process ID for accessing server data.
         """
-        self.scor.create(access_mode, rf2_pid)
-        self.tele.create(access_mode, rf2_pid)
-        self.ext.create(1, rf2_pid)
-        self.ffb.create(1, rf2_pid)
+        self.shmm.create(access_mode)
 
     def close_mmap(self) -> None:
         """Close mmap instance"""
-        self.scor.close()
-        self.tele.close()
-        self.ext.close()
-        self.ffb.close()
+        self.shmm.close()
 
     def update_mmap(self) -> None:
         """Update mmap data"""
-        self.scor.update()
-        self.tele.update()
+        self.shmm.update()
 
 
 class SyncData:
@@ -156,11 +142,11 @@ class SyncData:
 
     def __sync_player_scor(self, scor_index: int = INVALID_INDEX) -> None:
         """Sync local player vehicle scoring data"""
-        self.player_scor = self.dataset.scor.data.mVehicles[scor_index]
+        self.player_scor = self.dataset.shmm.data.scoring.vehScoringInfo[scor_index]
 
     def __sync_player_tele(self, tele_index: int = INVALID_INDEX) -> None:
         """Sync local player vehicle telemetry data"""
-        self.player_tele = self.dataset.tele.data.mVehicles[tele_index]
+        self.player_tele = self.dataset.shmm.data.telemetry.telemInfo[tele_index]
 
     def __sync_player_data(self) -> bool:
         """Sync local player data
@@ -171,7 +157,7 @@ class SyncData:
         """
         if not self.override_player_index:
             # Update scoring index
-            scor_idx = local_scoring_index(self.dataset.scor.data.mVehicles)
+            scor_idx = local_scoring_index(self.dataset.shmm.data.scoring.vehScoringInfo)
             if scor_idx == INVALID_INDEX:
                 return False  # index not found, not synced
             self.player_scor_index = scor_idx
@@ -181,7 +167,7 @@ class SyncData:
         return True  # found index, synced
 
     @staticmethod
-    def __update_tele_indexes(tele_data: rF2data.rF2Telemetry, tele_indexes: dict) -> None:
+    def __update_tele_indexes(veh_total: int, tele_data: lmu_data.LMUTelemetryData, tele_indexes: dict) -> None:
         """Update telemetry player index dictionary for quick reference
 
         Telemetry index can be different from scoring index.
@@ -191,7 +177,7 @@ class SyncData:
             tele_data: Telemetry data.
             tele_indexes: Telemetry mID:index reference dictionary.
         """
-        for tele_idx, veh_info in zip(range(tele_data.mNumVehicles), tele_data.mVehicles):
+        for tele_idx, veh_info in zip(range(veh_total), tele_data.telemInfo):
             tele_indexes[veh_info.mID] = tele_idx
 
     def sync_tele_index(self, scor_idx: int) -> int:
@@ -208,22 +194,25 @@ class SyncData:
             Player telemetry index.
         """
         return self._tele_indexes.get(
-            self.dataset.scor.data.mVehicles[scor_idx].mID, INVALID_INDEX)
+            self.dataset.shmm.data.scoring.vehScoringInfo[scor_idx].mID, INVALID_INDEX)
 
-    def start(self, access_mode: int, rf2_pid: str) -> None:
+    def start(self, access_mode: int) -> None:
         """Update & sync mmap data copy in separate thread
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
-            rf2_pid: rF2 Process ID for accessing server data.
         """
         if self._updating:
             logger.warning("sharedmemory: UPDATING: already started")
         else:
             self._updating = True
             # Initialize mmap data
-            self.dataset.create_mmap(access_mode, rf2_pid)
-            self.__update_tele_indexes(self.dataset.tele.data, self._tele_indexes)
+            self.dataset.create_mmap(access_mode)
+            self.__update_tele_indexes(
+                self.dataset.shmm.data.scoring.scoringInfo.mNumVehicles,
+                self.dataset.shmm.data.telemetry,
+                self._tele_indexes,
+            )
             if not self.__sync_player_data():
                 self.__sync_player_scor()
                 self.__sync_player_tele()
@@ -233,7 +222,6 @@ class SyncData:
             self._update_thread.start()
             logger.info("sharedmemory: UPDATING: thread started")
             logger.info("sharedmemory: player index override: %s", self.override_player_index)
-            logger.info("sharedmemory: server process ID: %s", rf2_pid if rf2_pid else "DISABLED")
 
     def stop(self) -> None:
         """Join and stop updating thread, close mmap"""
@@ -261,7 +249,11 @@ class SyncData:
 
         while not _event_wait(update_delay):
             self.dataset.update_mmap()
-            self.__update_tele_indexes(self.dataset.tele.data, self._tele_indexes)
+            self.__update_tele_indexes(
+                self.dataset.shmm.data.scoring.scoringInfo.mNumVehicles,
+                self.dataset.shmm.data.telemetry,
+                self._tele_indexes,
+            )
             # Update player data & index
             if not data_freezed:
                 # Get player data
@@ -279,7 +271,7 @@ class SyncData:
                         self.paused = True
                         logger.info("sharedmemory: UPDATING: player data paused")
 
-            version_update = self.dataset.scor.data.mVersionUpdateEnd
+            version_update = self.dataset.shmm.data.scoring.scoringInfo.mCurrentET
             if last_version_update != version_update:
                 last_version_update = version_update
                 last_update_time = monotonic()
@@ -307,16 +299,15 @@ class SyncData:
         logger.info("sharedmemory: UPDATING: thread stopped")
 
 
-class RF2Info:
-    """RF2 shared memory data output"""
+class LMUInfo:
+    """LMU shared memory data output"""
 
     __slots__ = (
         "_sync",
         "_access_mode",
-        "_rf2_pid",
         "_state_override",
         "_active_state",
-        "_scor",
+        "_shmm",
         "_tele",
         "_ext",
         "_ffb",
@@ -325,32 +316,24 @@ class RF2Info:
     def __init__(self) -> None:
         self._sync = SyncData()
         self._access_mode = 0
-        self._rf2_pid = ""
         self._state_override = False
         self._active_state = False
         # Assign mmap instance
-        self._scor = self._sync.dataset.scor
-        self._tele = self._sync.dataset.tele
-        self._ext = self._sync.dataset.ext
-        self._ffb = self._sync.dataset.ffb
+        self._shmm = self._sync.dataset.shmm
 
     def __del__(self):
-        logger.info("sharedmemory: GC: RF2Info")
+        logger.info("sharedmemory: GC: LMUInfo")
 
     def start(self) -> None:
         """Start data updating thread"""
-        self._sync.start(self._access_mode, self._rf2_pid)
+        self._sync.start(self._access_mode)
 
     def stop(self) -> None:
         """Stop data updating thread"""
         self._sync.stop()
 
-    def setPID(self, pid: str = "") -> None:
-        """Set rF2 process ID for connecting to server data"""
-        self._rf2_pid = str(pid)
-
     def setMode(self, mode: int = 0) -> None:
-        """Set rF2 mmap access mode
+        """Set LMU mmap access mode
 
         Args:
             mode: 0 = copy access, 1 = direct access
@@ -374,12 +357,12 @@ class RF2Info:
         self._sync.player_scor_index = min(max(index, INVALID_INDEX), MAX_VEHICLES - 1)
 
     @property
-    def rf2ScorInfo(self) -> rF2data.rF2ScoringInfo:
-        """rF2 scoring info data"""
-        return self._scor.data.mScoringInfo
+    def lmuScorInfo(self) -> lmu_data.LMUScoringInfo:
+        """LMU scoring info data"""
+        return self._shmm.data.scoring.scoringInfo
 
-    def rf2ScorVeh(self, index: int | None = None) -> rF2data.rF2VehicleScoring:
-        """rF2 scoring vehicle data
+    def lmuScorVeh(self, index: int | None = None) -> lmu_data.LMUVehicleScoring:
+        """LMU scoring vehicle data
 
         Specify index for specific player.
 
@@ -388,10 +371,10 @@ class RF2Info:
         """
         if index is None:
             return self._sync.player_scor
-        return self._scor.data.mVehicles[index]
+        return self._shmm.data.scoring.vehScoringInfo[index]
 
-    def rf2TeleVeh(self, index: int | None = None) -> rF2data.rF2VehicleTelemetry:
-        """rF2 telemetry vehicle data
+    def lmuTeleVeh(self, index: int | None = None) -> lmu_data.LMUVehicleTelemetry:
+        """LMU telemetry vehicle data
 
         Specify index for specific player.
 
@@ -400,17 +383,12 @@ class RF2Info:
         """
         if index is None:
             return self._sync.player_tele
-        return self._tele.data.mVehicles[self._sync.sync_tele_index(index)]
+        return self._shmm.data.telemetry.telemInfo[self._sync.sync_tele_index(index)]
 
     @property
-    def rf2Ext(self) -> rF2data.rF2Extended:
-        """rF2 extended data"""
-        return self._ext.data
-
-    @property
-    def rf2Ffb(self) -> rF2data.rF2ForceFeedback:
-        """rF2 force feedback data"""
-        return self._ffb.data
+    def lmuGeneric(self) -> lmu_data.LMUGeneric:
+        """LMU generic data"""
+        return self._shmm.data.generic
 
     @property
     def playerIndex(self) -> int:
@@ -421,7 +399,7 @@ class RF2Info:
         """Check whether index is player"""
         if self._sync.override_player_index:
             return self._sync.player_scor_index == index
-        return self._scor.data.mVehicles[index].mIsPlayer
+        return self._shmm.data.scoring.vehScoringInfo[index].mIsPlayer
 
     @property
     def isPaused(self) -> bool:
@@ -434,19 +412,14 @@ class RF2Info:
         if self._state_override:
             return self._active_state
         return not self._sync.paused and self._sync.player_scor_index >= 0 and (
-            self.rf2ScorInfo.mInRealtime
-            or self.rf2TeleVeh().mIgnitionStarter > 0
+            self.lmuScorInfo.mInRealtime
+            or self.lmuTeleVeh().mIgnitionStarter > 0
         )
 
     @property
     def identifier(self) -> str:
         """Identify sim name"""
-        name = self.rf2ScorInfo.mPlrFileName
-        if b"Settings" in name:
-            return "LMU"
-        if name:
-            return "RF2"
-        return ""
+        return "LMU"
 
 
 def test_api():
@@ -459,9 +432,8 @@ def test_api():
     # Test run
     SEPARATOR = "=" * 50
     print("Test API - Start")
-    info = RF2Info()
+    info = LMUInfo()
     info.setMode(1)  # set direct access
-    info.setPID("")
     info.setPlayerOverride(True)  # enable player override
     info.setPlayerIndex(0)  # set player index to 0
     info.start()
@@ -476,9 +448,9 @@ def test_api():
 
     print(SEPARATOR)
     print("Test API - Read")
-    version = info.rf2Ext.mVersion.decode()
-    driver = info.rf2ScorVeh(0).mDriverName.decode()
-    track = info.rf2ScorInfo.mTrackName.decode()
+    version = info.lmuGeneric.gameVersion
+    driver = info.lmuScorVeh(0).mDriverName.decode()
+    track = info.lmuScorInfo.mTrackName.decode()
     print(f"version: {version if version else 'not running'}")
     print(f"driver name   : {driver if version else 'not running'}")
     print(f"track name    : {track if version else 'not running'}")

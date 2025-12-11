@@ -64,9 +64,11 @@ class APIControl:
 
         logger.warning("CONNECTING: Invalid API name, fall back to default")
         self._api = API_PACK[0]()
+        cfg.user.config["telemetry_api"]["api_name"] = self._api.NAME
 
     def start(self):
         """Start API"""
+        cfg.load_api()
         logger.info("ENCODING: %s", cfg.api["character_encoding"])
         logger.info("CONNECTING: %s API", self._api.NAME)
         self.setup()

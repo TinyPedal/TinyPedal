@@ -158,9 +158,11 @@ CFG_INVALID_FILENAME = (
 # API name
 API_NAME_RF2 = "rFactor 2"
 API_NAME_LMU = "Le Mans Ultimate"
+API_NAME_LMULEGACY = "Le Mans Ultimate (legacy)"
 API_NAME_ALIAS = {
-    API_NAME_RF2: "RF2",
     API_NAME_LMU: "LMU",
+    API_NAME_LMULEGACY: "LMU",
+    API_NAME_RF2: "RF2",
 }
 
 # Abbreviation
@@ -180,7 +182,7 @@ ABBR_PATTERN = (
 
 # Choice dictionary
 CHOICE_COMMON = {
-    CFG_API_NAME: [API_NAME_RF2, API_NAME_LMU],
+    CFG_API_NAME: [API_NAME_LMU, API_NAME_LMULEGACY, API_NAME_RF2],
     CFG_CHARACTER_ENCODING: ["UTF-8", "ISO-8859-1"],
     CFG_DELTABEST_SOURCE: ["Best", "Session", "Stint", "Last"],
     CFG_FONT_WEIGHT: ["normal", "bold"],

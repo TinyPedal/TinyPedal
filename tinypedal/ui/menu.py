@@ -26,12 +26,11 @@ from PySide2.QtGui import QDesktopServices
 from PySide2.QtWidgets import QMenu, QMessageBox
 
 from .. import loader
-from ..api_control import api
+from ..api_control import API_PACK, api
 from ..const_app import URL_FAQ, URL_USER_GUIDE
 from ..const_file import ConfigType
 from ..module_info import minfo
 from ..overlay_control import octrl
-from ..regex_pattern import API_NAME_LMU, API_NAME_RF2
 from ..setting import cfg
 from ..update import update_checker
 from .about import About
@@ -349,20 +348,9 @@ class APIMenu(QMenu):
         super().__init__(title, parent)
         self._parent = parent
 
-        self.api_lmu = self.addAction(API_NAME_LMU)
-        self.api_lmu.setCheckable(True)
-        self.api_lmu.triggered.connect(self.enable_lmu)
-
-        self.api_rf2 = self.addAction(API_NAME_RF2)
-        self.api_rf2.setCheckable(True)
-        self.api_rf2.triggered.connect(self.enable_rf2)
+        # API selector
+        self.__api_selector()
         self.addSeparator()
-
-        # Auto switch currently not enabled dur to performance concern
-        #self.auto_switch = self.addAction("Auto Switch API")
-        #self.auto_switch.setCheckable(True)
-        #self.auto_switch.triggered.connect(self.toggle_auto_switch)
-        #self.addSeparator()
 
         config_api = self.addAction("Options")
         config_api.triggered.connect(self.open_config_api)
@@ -370,33 +358,6 @@ class APIMenu(QMenu):
 
         restart_api = self.addAction("Restart API")
         restart_api.triggered.connect(parent.restart_api)
-
-        # Refresh menu
-        self.aboutToShow.connect(self.refresh_menu)
-
-    #def toggle_auto_switch(self):
-    #    """Toggle auto switch API"""
-    #    cfg.application["enable_auto_switch_api"] = not cfg.application["enable_auto_switch_api"]
-    #    cfg.save(cfg_type=ConfigType.CONFIG)
-
-    def enable_lmu(self):
-        """Enable LMU API"""
-        cfg.user.config["telemetry_api"]["api_name"] = API_NAME_LMU
-        cfg.save(cfg_type=ConfigType.CONFIG)
-        self._parent.reload_only()
-
-    def enable_rf2(self):
-        """Enable RF2 API"""
-        cfg.user.config["telemetry_api"]["api_name"] = API_NAME_RF2
-        cfg.save(cfg_type=ConfigType.CONFIG)
-        self._parent.reload_only()
-
-    def refresh_menu(self):
-        """Refresh menu"""
-        api_name = cfg.user.config["telemetry_api"]["api_name"]
-        #self.auto_switch.setChecked(cfg.application["enable_auto_switch_api"])
-        self.api_lmu.setChecked(api_name == API_NAME_LMU)
-        self.api_rf2.setChecked(api_name == API_NAME_RF2)
 
     def open_config_api(self):
         """Config API"""
@@ -409,6 +370,32 @@ class APIMenu(QMenu):
             reload_func=self._parent.restart_api,
         )
         _dialog.open()
+
+    def __api_selector(self):
+        """Generate API selector"""
+        if os.getenv("PYSIDE_OVERRIDE") == "6":
+            from PySide6.QtGui import QActionGroup
+        else:
+            from PySide2.QtWidgets import QActionGroup
+
+        actions_api = QActionGroup(self)
+        selected_api_name = cfg.user.config["telemetry_api"]["api_name"]
+
+        for _api in API_PACK:
+            api_name = _api.NAME
+            option = self.addAction(api_name)
+            option.setCheckable(True)
+            option.triggered.connect(lambda checked=True, name=api_name: self.__toggle_option(checked, name))
+            option.setChecked(selected_api_name == api_name)
+            actions_api.addAction(option)
+
+    def __toggle_option(self, checked: bool, api_name: str):
+        """Toggle option"""
+        if cfg.user.config["telemetry_api"]["api_name"] == api_name:
+            return
+        cfg.user.config["telemetry_api"]["api_name"] = api_name
+        cfg.save(cfg_type=ConfigType.CONFIG)
+        self._parent.reload_only()
 
 
 class ToolsMenu(QMenu):

@@ -128,24 +128,25 @@ def update_vehicle_data(
                 nearest_yellow_ahead = 0.0
                 nearest_yellow_behind = 0.0
         else:
-            # Relative position & orientation
-            plr_pos_x = api.read.vehicle.position_longitudinal()
-            plr_pos_y = api.read.vehicle.position_lateral()
-            plr_ori_yaw = api.read.vehicle.orientation_yaw_radians()
-            opt_ori_yaw = api.read.vehicle.orientation_yaw_radians(index)
+            if not api.read.state.desynced(index):
+                # Relative position & orientation
+                plr_pos_x = api.read.vehicle.position_longitudinal()
+                plr_pos_y = api.read.vehicle.position_lateral()
+                plr_ori_yaw = api.read.vehicle.orientation_yaw_radians()
+                opt_ori_yaw = api.read.vehicle.orientation_yaw_radians(index)
 
-            data.relativeOrientationRadians = opt_ori_yaw - plr_ori_yaw
-            data.relativeRotatedPositionX, data.relativeRotatedPositionY = calc.rotate_coordinate(
-                plr_ori_yaw - 3.14159265,  # plr_ori_rad, rotate view
-                data.worldPositionX - plr_pos_x,     # x position related to player
-                data.worldPositionY - plr_pos_y,     # y position related to player
-            )
+                data.relativeOrientationRadians = opt_ori_yaw - plr_ori_yaw
+                data.relativeRotatedPositionX, data.relativeRotatedPositionY = calc.rotate_coordinate(
+                    plr_ori_yaw - 3.14159265,  # plr_ori_rad, rotate view
+                    data.worldPositionX - plr_pos_x,  # x position related to player
+                    data.worldPositionY - plr_pos_y,  # y position related to player
+                )
+                # Relative distance & time gap
+                data.relativeStraightDistance = calc.distance(
+                    (plr_pos_x, plr_pos_y),
+                    (data.worldPositionX, data.worldPositionY)
+                )
 
-            # Relative distance & time gap
-            data.relativeStraightDistance = calc.distance(
-                (plr_pos_x, plr_pos_y),
-                (data.worldPositionX, data.worldPositionY)
-            )
             data.isLapped = calc.lap_difference(
                 data.totalLapProgress, plr_lap_progress_total,
                 max_lap_diff_ahead, max_lap_diff_behind

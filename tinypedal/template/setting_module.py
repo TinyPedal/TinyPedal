@@ -90,7 +90,7 @@ MODULE_DEFAULT = {
     },
     "module_vehicles": {
         "enable": True,
-        "update_interval": 20,
+        "update_interval": 10,
         "idle_update_interval": 400,
         "lap_difference_ahead_threshold": 0.9,
         "lap_difference_behind_threshold": 0.9,
