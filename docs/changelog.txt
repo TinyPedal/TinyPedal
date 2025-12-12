@@ -12,6 +12,10 @@ WIP
 * Brake wear, Tyre wear Widget
   - Added "show_live_wear_difference" option (requested by user "kfran42" & "laabbassi"), which shows current lap wear difference. This option is disabled by default.
 
+* Track notes Widget
+  - Added "show_pit_notes_while_in_pit" option (requested by user "DanRZ"), which shows alternative pit notes while in pit lane.
+  - Added "pit_notes_text" & "pit_comments_text" options.
+
 2.35.3 (2025-11-25)
 -----------------------------
 * Wheels Module

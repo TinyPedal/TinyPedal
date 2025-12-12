@@ -137,16 +137,27 @@ class Realtime(Overlay):
         elif self.wcfg["auto_hide_if_not_available"]:
             self.update_auto_hide(True)
 
+        pit_override = self.wcfg["show_pit_notes_while_in_pit"] and api.read.vehicle.in_pits()
+
         if self.wcfg["show_track_notes"]:
-            notes = minfo.tracknotes.currentNote.get(COLUMN_TRACKNOTE, TEXT_NOTAVAILABLE)
+            if pit_override:
+                notes = self.wcfg["pit_notes_text"]
+            else:
+                notes = minfo.tracknotes.currentNote.get(COLUMN_TRACKNOTE, TEXT_NOTAVAILABLE)
             self.update_notes(self.bar_notes, notes)
 
         if self.wcfg["show_comments"]:
-            comments = minfo.tracknotes.currentNote.get(COLUMN_COMMENT, TEXT_NOTAVAILABLE)
+            if pit_override:
+                comments = self.wcfg["pit_comments_text"]
+            else:
+                comments = minfo.tracknotes.currentNote.get(COLUMN_COMMENT, TEXT_NOTAVAILABLE)
             self.update_comments(self.bar_comments, comments)
 
         if self.wcfg["show_debugging"]:
-            debugging = minfo.tracknotes.currentNote.get(COLUMN_DISTANCE, TEXT_NOTAVAILABLE)
+            if pit_override:
+                debugging = TEXT_NOTAVAILABLE
+            else:
+                debugging = minfo.tracknotes.currentNote.get(COLUMN_DISTANCE, TEXT_NOTAVAILABLE)
             self.update_debugging(self.bar_debugging, debugging)
 
     # GUI update methods
