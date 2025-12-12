@@ -551,12 +551,14 @@ class WheelsInfo:
         "corneringRadius",
         "slipRatio",
         "currentTreadDepth",
+        "currentLapTreadWear",
         "lastLapTreadWear",
         "estimatedTreadWear",
         "estimatedValidTreadWear",
         "maxBrakeThickness",
         "failureBrakeThickness",
         "currentBrakeThickness",
+        "currentlapBrakeWear",
         "lastLapBrakeWear",
         "estimatedBrakeWear",
         "estimatedValidBrakeWear",
@@ -568,12 +570,14 @@ class WheelsInfo:
         self.corneringRadius: float = 0.0
         self.slipRatio: list[float] = list(WHEELS_ZERO)
         self.currentTreadDepth: list[float] = list(WHEELS_ZERO)
+        self.currentLapTreadWear: list[float] = list(WHEELS_ZERO)
         self.lastLapTreadWear: list[float] = list(WHEELS_ZERO)
         self.estimatedTreadWear: list[float] = list(WHEELS_ZERO)
         self.estimatedValidTreadWear: list[float] = list(WHEELS_ZERO)
         self.maxBrakeThickness: list[float] = list(WHEELS_ZERO)
         self.failureBrakeThickness: list[float] = list(WHEELS_ZERO)
         self.currentBrakeThickness: list[float] = list(WHEELS_ZERO)
+        self.currentlapBrakeWear: list[float] = list(WHEELS_ZERO)
         self.lastLapBrakeWear: list[float] = list(WHEELS_ZERO)
         self.estimatedBrakeWear: list[float] = list(WHEELS_ZERO)
         self.estimatedValidBrakeWear: list[float] = list(WHEELS_ZERO)

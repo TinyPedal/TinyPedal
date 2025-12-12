@@ -123,6 +123,39 @@ class Realtime(Overlay):
                 )
                 layout_diff.addWidget(cap_diff, 0, 0, 1, 0)
 
+        # Live wear difference
+        if self.wcfg["show_live_wear_difference"]:
+            layout_live = self.set_grid_layout()
+            self.bar_style_live = (
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_live_wear_difference"],
+                    bg_color=self.wcfg["bkg_color_live_wear_difference"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_warning"],
+                    bg_color=self.wcfg["bkg_color_live_wear_difference"])
+            )
+            self.bars_live = self.set_qlabel(
+                text=TEXT_NA,
+                style=self.bar_style_live[0],
+                width=bar_width,
+                count=4,
+            )
+            self.set_grid_layout_quad(
+                layout=layout_live,
+                targets=self.bars_live,
+            )
+            self.set_primary_orient(
+                target=layout_live,
+                column=self.wcfg["column_index_live_wear_difference"],
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_live = self.set_qlabel(
+                    text="live wear",
+                    style=bar_style_desc,
+                )
+                layout_live.addWidget(cap_live, 0, 0, 1, 0)
+
         # Estimated lifespan in laps
         if self.wcfg["show_lifespan_laps"]:
             layout_laps = self.set_grid_layout()
@@ -199,6 +232,7 @@ class Realtime(Overlay):
             failure_thickness = minfo.wheels.failureBrakeThickness[idx]
             max_thickness = minfo.wheels.maxBrakeThickness[idx] - failure_thickness
             brake_curr -= failure_thickness
+            live_wear = minfo.wheels.currentlapBrakeWear[idx]
             est_wear = minfo.wheels.estimatedBrakeWear[idx]
             est_valid_wear = minfo.wheels.estimatedValidBrakeWear[idx]
 
@@ -206,9 +240,11 @@ class Realtime(Overlay):
                 max_thickness = 99999999
 
             # Convert to percent
+            live_wear_percent = live_wear * 100 / max_thickness
             est_wear_percent = est_wear * 100 / max_thickness
             if not self.wcfg["show_thickness"]:
                 brake_curr *= 100 / max_thickness
+                live_wear *= 100 / max_thickness
                 est_wear *= 100 / max_thickness
                 est_valid_wear *= 100 / max_thickness
 
@@ -223,6 +259,10 @@ class Realtime(Overlay):
             # Wear differences
             if self.wcfg["show_wear_difference"]:
                 self.update_diff(self.bars_diff[idx], est_wear, est_wear_percent)
+
+            # Live wear difference
+            if self.wcfg["show_live_wear_difference"]:
+                self.update_live(self.bars_live[idx], live_wear, live_wear_percent)
 
             # Estimated lifespan in laps
             if self.wcfg["show_lifespan_laps"]:
@@ -255,6 +295,15 @@ class Realtime(Overlay):
             target.setText(self.format_num(data))
             target.updateStyle(
                 self.bar_style_diff[percent > self.wcfg["warning_threshold_wear"]]
+            )
+
+    def update_live(self, target, data, percent):
+        """Live wear differences"""
+        if target.last != data:
+            target.last = data
+            target.setText(self.format_num(data))
+            target.updateStyle(
+                self.bar_style_live[percent > self.wcfg["warning_threshold_wear"]]
             )
 
     def update_laps(self, target, data):

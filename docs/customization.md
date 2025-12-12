@@ -1560,6 +1560,9 @@ Show total remaining brake in percentage that changes color according to wear. A
     show_wear_difference
 Show estimated brake wear difference per lap (at least one valid lap is required).
 
+    show_live_wear_difference
+Show current lap brake wear difference.
+
     show_lifespan_laps
 Show estimated brake lifespan in laps.
 
@@ -3718,6 +3721,9 @@ Show total remaining tyre tread in percentage that changes color according to we
 
     show_wear_difference
 Show estimated tyre wear difference per lap (at least one valid lap is required).
+
+    show_live_wear_difference
+Show current lap tyre wear difference.
 
     show_lifespan_laps
 Show estimated tyre lifespan in laps.

@@ -269,6 +269,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
 
             # Output
             output.currentTreadDepth[idx] = tread_curr
+            output.currentLapTreadWear[idx] = tread_wear_curr[idx]
             output.estimatedTreadWear[idx] = est_wear
             output.estimatedValidTreadWear[idx] = est_valid_wear
 
@@ -419,6 +420,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
 
             # Output
             output.currentBrakeThickness[idx] = brake_curr
+            output.currentlapBrakeWear[idx] = brake_wear_curr[idx]
             output.estimatedBrakeWear[idx] = est_wear
             output.estimatedValidBrakeWear[idx] = est_valid_wear
 
