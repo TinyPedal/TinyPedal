@@ -77,8 +77,8 @@ class State(DataAdapter):
     def desynced(self, index: int | None = None) -> bool:
         """Is player data desynced from others"""
         return (
-            self.shmm.lmuTeleVeh().mElapsedTime
-            - self.shmm.lmuTeleVeh(index).mElapsedTime
+            abs(self.shmm.lmuTeleVeh().mElapsedTime
+            - self.shmm.lmuTeleVeh(index).mElapsedTime)
             >= 0.01
         )
 

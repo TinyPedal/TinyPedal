@@ -71,6 +71,7 @@ class Realtime(DataModule):
             output=minfo.wheels,
             sampling_interval=self.mcfg["cornering_radius_sampling_interval"],
         )
+        last_session_elapsed = -1
 
         while not _event_wait(update_interval):
             if realtime_state.active:
@@ -79,9 +80,15 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
-                # Run calculate
-                is_reset = api.read.vehicle.in_garage()
+                # Reset condition
+                session_elapsed = api.read.session.elapsed()
+                is_reset = (
+                    api.read.vehicle.in_garage()  # whether returned to garage
+                    or last_session_elapsed > session_elapsed  # whether changed session
+                )
+                last_session_elapsed = session_elapsed
 
+                # Run calculate
                 gen_wheel_rotation.send(is_reset)
                 gen_tyre_wear.send(is_reset)
                 gen_brake_wear.send(is_reset)
