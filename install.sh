@@ -31,7 +31,7 @@ replace() {
     done
 }
 
-if [ ! -f "pyRfactor2SharedMemory/__init__.py" ];
+if [ ! -f "pyLMUSharedMemory/__init__.py" ] || [ ! -f "pyRfactor2SharedMemory/__init__.py" ];
 then
     echo "Error: Missing files. Please, use a Linux source release file or 'git clone --recurse-submodules'."
     exit 1
