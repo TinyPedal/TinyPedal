@@ -46,7 +46,7 @@ def start():
     """Start api, modules, widgets, etc. Call once per launch."""
     logger.info("STARTING............")
     signal.signal(signal.SIGINT, int_signal_handler)
-    # 1 load user setting
+    # 1 load user preset
     cfg.set_next_to_load(f"{cfg.preset_list[0]}{FileExt.JSON}")
     cfg.load_user()
     cfg.save()
@@ -107,10 +107,10 @@ def reload(reload_preset: bool = False):
             time.sleep(0.01)
     # 1 unload modules
     unload_modules()
-    # 2 reload user setting
+    # 2 reload user preset from file
     if reload_preset:
         cfg.load_user()
-        cfg.update_access_time()
+        cfg.save(0)  # save new changes in case preset was edited externally
     # 3 restart api
     api.restart()
     # 4 load modules

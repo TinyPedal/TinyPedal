@@ -26,7 +26,7 @@ import logging
 import os
 import threading
 from collections import ChainMap
-from time import sleep, time
+from time import sleep
 from types import MappingProxyType
 
 from .const_app import PATH_GLOBAL
@@ -408,12 +408,6 @@ class Setting:
         # Run next save task in save queue if any
         if self._save_queue:
             self.save(0, next_task=True)
-
-    def update_access_time(self) -> None:
-        """Update last access & modified time, without re-saving"""
-        preset_file = f"{self.path.settings}{self.filename.setting}"
-        last_atime = time()
-        os.utime(preset_file, (last_atime, last_atime))
 
     @property
     def max_saving_attempts(self) -> int:
