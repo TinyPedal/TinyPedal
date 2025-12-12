@@ -32,6 +32,7 @@ from .template.setting_compounds import COMPOUNDINFO_DEFAULT
 from .template.setting_filelock import FILELOCKINFO_DEFAULT
 from .template.setting_tracks import TRACKINFO_DEFAULT
 from .validator import is_clock_format, is_hex_color
+from .version_check import parse_version_string
 
 COMMON_STRINGS = "|".join((
     rxp.CFG_FONT_NAME,
@@ -240,20 +241,49 @@ class PresetValidator:
     #            continue
 
     @staticmethod
-    def update_api_setting(dict_user: dict) -> None:
-        """Update old API setting"""
+    def preupdate_global_preset(dict_user: dict):
+        """Pre update global preset, run before validation"""
+
+    @staticmethod
+    def preupdate_user_preset(dict_user: dict, dict_def: dict):
+        """Pre update user preset, run before validation"""
+        # Copy old telemetry_api setting
         if "telemetry_api" in dict_user:
             api_config = dict_user.get("telemetry_api")
             if isinstance(api_config, dict):
-                # Copy "telemetry_api" to "api_lmu"
                 dict_user["api_lmu"] = api_config.copy()
-                # Copy "telemetry_api" to "api_rf2"
                 dict_user["api_rf2"] = api_config.copy()
 
+        # Check preset version
+        preset_info = dict_user.get("preset")
+        if not isinstance(preset_info, dict):
+            dict_user["preset"] = {}
+            preset_info = dict_user["preset"]
+        preset_version = parse_version_string(preset_info.get("version", "0.0.0"))
+
+        # Update old setting for specific version
+        if preset_version < (2, 36, 0):
+            module_vehicles = dict_user.get("module_vehicles")
+            if isinstance(module_vehicles, dict):
+                module_vehicles["update_interval"] = 10
+
+        # Update preset version
+        dict_user["preset"]["version"] = dict_def["preset"]["version"]
+
     @classmethod
-    def validate(cls, dict_user: dict, dict_def: dict) -> dict:
+    def global_preset(cls, dict_user: dict, dict_def: dict) -> dict:
+        """Validate global preset"""
+        return cls._validate(dict_user, dict_def)
+
+    @classmethod
+    def user_preset(cls, dict_user: dict, dict_def: dict) -> dict:
+        """Validate user preset"""
+        cls.preupdate_user_preset(dict_user, dict_def)
+        return cls._validate(dict_user, dict_def)
+
+    @classmethod
+    def _validate(cls, dict_user: dict, dict_def: dict) -> dict:
         """Validate setting"""
-        cls.update_api_setting(dict_user)
         # Check top-level key
         cls.validate_key_pair(dict_user, dict_def)
         # Check sub-level key

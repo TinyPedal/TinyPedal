@@ -54,7 +54,8 @@ def copy_setting(dict_user: dict) -> dict:
 
 
 def load_setting_json_file(
-    filename: str, filepath: str, dict_def: dict, file_info: str = "user preset"
+    filename: str, filepath: str, dict_def: dict, file_info: str = "user preset",
+    validator: Callable = PresetValidator.user_preset,
 ) -> dict:
     """Load setting json file & verify"""
     filename_source = f"{filepath}{filename}"
@@ -62,7 +63,7 @@ def load_setting_json_file(
         with open(filename_source, "r", encoding="utf-8") as jsonfile:
             setting_user = json.load(jsonfile)
         # Verify & assign setting
-        setting_user = PresetValidator.validate(setting_user, dict_def)
+        setting_user = validator(setting_user, dict_def)
     except FileNotFoundError:
         logger.info("USERDATA: %s not found, fall back to default", filename)
         setting_user = copy_setting(dict_def)
@@ -78,7 +79,7 @@ def load_setting_json_file(
 def load_style_json_file(
     filename: str, filepath: str, dict_def: dict,
     check_missing: bool = False, file_info: str = "style preset",
-    validator: Callable | None = None
+    validator: Callable | None = None,
 ) -> dict:
     """Load style json file & verify (optional)"""
     filename_source = f"{filepath}{filename}"

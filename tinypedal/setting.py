@@ -33,7 +33,7 @@ from .const_app import PATH_GLOBAL
 from .const_common import EMPTY_DICT
 from .const_file import ConfigType, FileExt
 from .regex_pattern import API_NAME_ALIAS
-from .setting_validator import StyleValidator
+from .setting_validator import PresetValidator, StyleValidator
 from .template.setting_api import API_DEFAULT
 from .template.setting_brakes import BRAKES_DEFAULT
 from .template.setting_classes import CLASSES_DEFAULT
@@ -217,13 +217,14 @@ class Setting:
             filepath=self.path.config,
             dict_def=self.default.config,
             file_info="global preset",
+            validator=PresetValidator.global_preset,
         )
         self.user.filelock = load_style_json_file(
             filename=self.filename.filelock,
             filepath=self.path.config,
             dict_def=self.default.filelock,
-            validator=StyleValidator.filelock,
             file_info="file lock",
+            validator=StyleValidator.filelock,
         )
         # Assign global path
         self.path.update(

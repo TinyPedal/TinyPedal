@@ -20,7 +20,12 @@
 Default common setting template
 """
 
+from ..version import __version__
+
 COMMON_DEFAULT = {
+    "preset": {
+        "version": __version__,
+    },
     "overlay": {
         "fixed_position": False,
         "auto_hide": True,

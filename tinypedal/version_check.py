@@ -23,6 +23,15 @@ Version check function
 import sys
 
 
+def parse_version_string(ver: str) -> tuple[int, int, int]:
+    """Parse version string to tuple (major, minor, patch)"""
+    try:
+        version = ver.split(".")
+        return int(version[0]), int(version[1]), int(version[2])
+    except (AttributeError, ValueError, TypeError, IndexError):
+        return 0, 0, 0
+
+
 def tinypedal() -> str:
     from . import version
 

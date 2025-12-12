@@ -74,16 +74,15 @@ CFG_USER_IMAGE = "_image_file"
 CFG_STRING = (
     # Exact match
     "^process_id$|"
-    "^url_host$|"
-    "^LMU$|"
-    "^RF2$|"
+    "^version$|"
     # Partial match
     "file_name|"
     "prefix|"
     "sound_format|"
     "suffix|"
     "text|"
-    "unit"
+    "unit|"
+    "url_host"
 )
 
 # Integer

@@ -29,6 +29,7 @@ import threading
 from . import overlay_signal, version
 from .async_request import get_response, set_header_get
 from .const_app import APP_NAME, REPO_NAME
+from .version_check import parse_version_string
 
 VERSION_NA = (0, 0, 0)  # major, minor, patch
 DATE_NA = VERSION_NA  # year, month, day
@@ -121,7 +122,7 @@ class UpdateChecker:
         raw_bytes = asyncio.run(request_latest_release())
         checked_version = parse_version(raw_bytes)
         checked_date = parse_date(raw_bytes)
-        current_version = tuple(map(int, version.__version__.split(".")))
+        current_version = parse_version_string(version.__version__)
         # Output log
         if checked_version == VERSION_NA:
             self._update_available = False
