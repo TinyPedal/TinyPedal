@@ -18,7 +18,19 @@ Currently supports `rFactor 2` and `Le Mans Ultimate`, and runs on `Windows` and
 
 ## Requirements
 
-TinyPedal requires The Iron Wolf’s `rF2 Shared Memory Map Plugin` from `Download` section of following page:  
+| Supported API | Requirement | Windows | Linux |
+|:-:|---|:-:|:-:|
+| Le Mans Ultimate | Game's built-in API, no plugin required. | Yes | No |
+| Le Mans Ultimate (legacy) | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
+| rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
+
+### Display Mode
+
+Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fullscreen` mode is not supported.
+
+### rF2 Shared Memory Map Plugin
+
+TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `RF2` or `LMU (legacy)` API. It can be found from `Download` section of following page:  
 https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin
 
 The plugin file `rFactor2SharedMemoryMapPlugin64.dll` should be placed in:
@@ -29,25 +41,21 @@ The plugin file `rFactor2SharedMemoryMapPlugin64.dll` should be placed in:
 
 Note, if `Plugins` folder is missing from game folder, you will have to manually create this `Plugins` folder.
 
-This plugin also comes with some of the popular rF2/LMU Apps, check corresponding game's plugins folder first to see if it was installed already.
+Some popular rF2/LMU Apps may also have this plugin pre-installed, check corresponding game's plugins folder first to see if it was installed already.
 
-In-game setup:
+Enable plugin in game:
 
-1. Set game display mode to `Borderless` or `Windowed` mode. `Fullscreen` mode is not supported.
+- For `rFactor 2`, in game `Settings` -> `Gameplay` page, find `Plugins` section and toggle on `rFactor2SharedMemoryMapPlugin64.dll`.
 
-2. Enable shared memory map plugin:
+- For `Le Mans Ultimate`, user may have to manually enable plugin by editing `CustomPluginVariables.JSON` file (set `" Enabled"` value to `1` ) under `Le Mans Ultimate\UserData\player` folder.
 
-    For `rFactor 2`, in game `Settings` -> `Gameplay` page, find `Plugins` section and toggle on `rFactor2SharedMemoryMapPlugin64.dll`.
+After plugin enabled, must `restart game` to take effect.
 
-    For `Le Mans Ultimate`, user may have to manually enable plugin by editing `CustomPluginVariables.JSON` file (set `" Enabled"` value to `1` ) under `Le Mans Ultimate\UserData\player` folder.
-
-    After plugin enabled, must `restart game` to take effect.
-
-    Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `CustomPluginVariables.JSON` file, make sure `VC12 (Visual C++ 2013) runtime` is installed, which can be found in game's `Support\Runtimes` folder.
+Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `CustomPluginVariables.JSON` file, make sure `VC12 (Visual C++ 2013) runtime` is installed, which can be found in game's `Support\Runtimes` folder.
 
 ## Quick Start
 
-**Important:** make sure required plugins are installed as mentioned in [Requirements](#requirements) section.
+**Important:** make sure required plugins for specific game are installed as mentioned in [Requirements](#requirements) section.
 
 1. Download latest TinyPedal version from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page, extract it into a clean folder, and run `tinypedal.exe`.  
 Note, DO NOT extract TinyPedal into `system` or `game` folder, such as `Program Files` or `rFactor 2` folder, otherwise it may fail to run.  
@@ -73,30 +81,38 @@ See [User Guide](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide) for usa
 ### Dependencies:
 * [Python](https://www.python.org/) 3.8, 3.9, or 3.10
 * PySide2
+* pyLMUSharedMemory
 * pyRfactor2SharedMemory
 * psutil
 
 Note, PySide2 may not be available for Python version higher than 3.10; or requires PySide6 instead for running with newer Python version. PySide6 is currently supported only via command line argument, see `Command line arguments` section in `User Guide` for details.
 
-### Steps:
+### Download source code
 
-1. Download source code from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page; or click `Code` button at the top of repository and select `Download ZIP`; or use `Git` tool to clone this repository.
+Method 1:
 
-2. Download submodule `pyRfactor2SharedMemory` source code from:  
-https://github.com/s-victor/pyRfactor2SharedMemory  
-(This forked version includes a few required changes for TinyPedal)
+1. Download TinyPedal source code from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page; or click `Code` button at the top of repository and select `Download ZIP`.
 
-3. Extract TinyPedal source code ZIP file. Then extract pyRfactor2SharedMemory ZIP file and put `pyRfactor2SharedMemory` folder in the root folder of TinyPedal.
+2. Download submodule source code from following links:
+    - pyLMUSharedMemory: https://github.com/s-victor/pyLMUSharedMemory
+    - pyRfactor2SharedMemory: https://github.com/s-victor/pyRfactor2SharedMemory
 
-4. Install additional dependencies by using command:  
-`pip3 install PySide2 psutil`  
+3. Extract TinyPedal source code ZIP file. Then extract submodule ZIP files and put them in corresponding folder in the root folder of TinyPedal.
 
-5. To start TinyPedal, type command from root folder:  
-`python run.py`  
-(TinyPedal is currently tested on Python 3.8+)
+Method 2:
 
-Note: if using `Git` tool to clone this repository, run command with `--recursive` to also clone submodule, such as:  
-`git clone --recursive https://github.com/TinyPedal/TinyPedal.git`
+1. Use [Git](https://git-scm.com/) tool and run following command to clone TinyPedal source code alongside required submodules:  
+    `git clone --recursive https://github.com/TinyPedal/TinyPedal.git`
+2. To update submodules, run command:  
+    `git submodule update --init`
+
+### Install dependencies
+
+Install additional dependencies by using command:  
+`pip3 install PySide2 psutil`
+
+To start TinyPedal, type command from root folder:  
+`python run.py`
 
 ## Build executable for Windows
 

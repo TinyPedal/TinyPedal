@@ -1,20 +1,26 @@
-WIP
+2.36.0 (2025-12-13)
 -----------------------------
-* API Changes
-  - Separated Telemetry API settings under specific game name, which allows different set of API options for each game. Default game API is "LMU".
-  - General API setting, such as selected API name, is now saved in global config file, while API setting for specific game is saved in user preset file, same as before.
-  - Removed "auto load primary preset for sim" option. User should now select and switch game API via "API" menu.
-  - Added "API" menu to main window, which allows to switch API, configure options, and restart API. "API" menu can also be accessed by clicking "API" button on right-bottom of status bar.
+* Major API Changes
+  - Now supports LMU's new built-in API, no plugin is required to access this API. Note, currently this new API is not accessible on Linux system.
+  - Added "legacy" tag to the old plugin-based LMU API (rF2SharedMemoryMapPlugin), and can still be used as fallback.
+  - Added "API" menu to main window, which allows to switch game API, configure options, and restart API. "API" menu can also be accessed by clicking "API" button on right-bottom of status bar.
+  - API settings are now saved separately in user preset file for each different game API.
+  - Auto-switching API is not supported currently. Removed "auto load primary preset for sim" option.
 
 * Pace Notes Playback
-  - Fixed volume slider not correctly applied volume while using PySide6.
+  - Fixed volume slider could not apply volume change while using PySide6.
 
 * Brake wear, Tyre wear Widget
   - Added "show_live_wear_difference" option (requested by user "kfran42" & "laabbassi"), which shows current lap wear difference. This option is disabled by default.
+  - Fixed wear data sometimes did not reset after changed session.
 
 * Track notes Widget
   - Added "show_pit_notes_while_in_pit" option (requested by user "DanRZ"), which shows alternative pit notes while in pit lane.
   - Added "pit_notes_text" & "pit_comments_text" options.
+
+* Misc
+  - Now saves current version info in user preset, which is used to auto check and update outdated settings.
+  - Updated "README.md" and "User Guide" with new API info and options.
 
 2.35.3 (2025-11-25)
 -----------------------------

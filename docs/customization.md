@@ -330,19 +330,20 @@ Set PySide (Qt for Python) module version. Set `2` for PySide2 (default). Set `6
 # Telemetry API
 **Telemetry API options can be accessed from `API` menu in main window.**
 
+| Supported API | Requirement | Windows | Linux |
+|:-:|---|:-:|:-:|
+| Le Mans Ultimate | Game's built-in API, no requirements. | Yes | No |
+| Le Mans Ultimate (legacy) | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
+| rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
+
     api_name
 Set API name for accessing data from supported API.
-
-| API name | Requirement | Options |
-|:-:|---|---|
-| Le Mans Ultimate | Requires `rF2 Shared Memory Map Plugin` to work. | [LMU API](#lmu-api) |
-| rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to work. | [RF2 API](#rf2-api) |
 
 [**`Back to Top`**](#)
 
 
-## LMU API
-**LMU API options can be accessed from `Options` while `Le Mans Ultimate` API is enabled in `API` menu in main window.**
+## Le Mans Ultimate API
+**Le Mans Ultimate API options can be accessed from `Options` while this API is enabled in `API` menu in main window.**
 
     access_mode
 Set access mode for API. Mode value `0` uses copy access and additional data check to avoid data desynchronized or interruption issues. Mode value `1` uses direct access, which may result data desynchronized or interruption issues. Default mode is copy access.
@@ -400,8 +401,8 @@ Enable access to `weather` data from Rest API. This is required for showing weat
 [**`Back to Top`**](#)
 
 
-## RF2 API
-**RF2 API options can be accessed from `Options` while `rFactor 2` API is enabled in `API` menu in main window.**
+## rFactor 2 API
+**rFactor 2 API options can be accessed from `Options` while this API is enabled in `API` menu in main window.**
 
     access_mode
 Set access mode for API. Mode value `0` uses copy access and additional data check to avoid data desynchronized or interruption issues. Mode value `1` uses direct access, which may result data desynchronized or interruption issues. Default mode is copy access.
@@ -3484,6 +3485,12 @@ Show pit stop duration reading on top of each prediction circle.
 
     show_background
 Show background color. Turn off to show text only.
+
+    show_pit_notes_while_in_pit
+Show custom notes while in pit lane.
+
+    pit_notes_text, pit_comments_text
+Set custom notes and comments to be displayed while in pit lane.
 
     show_track_notes
 Show nearest track notes info behind current vehicle position.

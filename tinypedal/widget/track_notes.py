@@ -119,7 +119,9 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        if api.read.vehicle.in_garage():
+        pit_override = self.wcfg["show_pit_notes_while_in_pit"] and api.read.vehicle.in_pits()
+
+        if pit_override or api.read.vehicle.in_garage():
             self.update_auto_hide(False)
         elif minfo.tracknotes.currentNote:
             if self.wcfg["maximum_display_duration"] <= 0:
@@ -136,8 +138,6 @@ class Realtime(Overlay):
                     etime - self.last_etime > self.wcfg["maximum_display_duration"])
         elif self.wcfg["auto_hide_if_not_available"]:
             self.update_auto_hide(True)
-
-        pit_override = self.wcfg["show_pit_notes_while_in_pit"] and api.read.vehicle.in_pits()
 
         if self.wcfg["show_track_notes"]:
             if pit_override:
