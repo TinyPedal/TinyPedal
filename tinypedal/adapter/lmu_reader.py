@@ -715,7 +715,7 @@ class Vehicle(DataAdapter):
 
     def is_player(self, index: int=0) -> bool:
         """Is local player"""
-        return self.shmm.isPlayer(index)
+        return self.shmm.playerIndex == index
 
     def is_driving(self) -> bool:
         """Is local player driving or in monitor"""

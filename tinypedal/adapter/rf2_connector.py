@@ -417,12 +417,6 @@ class RF2Info:
         """Local player's scoring index"""
         return self._sync.player_scor_index
 
-    def isPlayer(self, index: int) -> bool:
-        """Check whether index is player"""
-        if self._sync.override_player_index:
-            return self._sync.player_scor_index == index
-        return self._scor.data.mVehicles[index].mIsPlayer
-
     @property
     def isPaused(self) -> bool:
         """Check whether data stopped updating"""

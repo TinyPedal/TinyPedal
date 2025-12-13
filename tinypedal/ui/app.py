@@ -257,7 +257,7 @@ class AppWindow(QMainWindow):
 
     def set_window_state(self):
         """Set initial window state"""
-        self.setMinimumSize(UIScaler.size(22), UIScaler.size(36))
+        self.setMinimumSize(UIScaler.size(23), UIScaler.size(36))
         self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)  # disable maximize
 
         if cfg.application["remember_size"]:
