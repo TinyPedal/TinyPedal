@@ -1,3 +1,12 @@
+WIP
+-----------------------------
+* Pace Notes Playback
+  - Added "Enable Playback While in Pit Lane" check box, which allows to enable or disable pace notes playback while in pit lane. This option takes immediate effect when changed.
+
+* Pace notes Widget
+  - Added "show_pit_notes_while_in_pit" option (requested by user "DanRZ"), which shows alternative pit notes while in pit lane. Note, this option does not affect pace notes playback.
+  - Added "pit_notes_text" & "pit_comments_text" options.
+
 2.36.0 (2025-12-13)
 -----------------------------
 * Major API Changes

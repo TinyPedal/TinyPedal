@@ -750,6 +750,8 @@ Note, [Notes Module](#notes-module) must be enabled to allow pace notes playback
 
 Click `Playback Enabled` or `Playback Disabled` button to quickly enable or disable pace notes playback. Disabling this option does not affect `Notes Module` or `Pace notes Widget`.
 
+Click `Enable Playback While in Pit Lane` check box to enable or disable pace notes playback while in pit lane. This option takes immediate effect when changed.
+
 Enable `Manually Select Pace Notes File` check box to disable auto-file-name matching, and manually select a pace notes file that can be played on any track. By default, pace notes file is automatically loaded from `pace_notes_path` if a file that matches current track name is found. This option takes immediate effect when changed.
 
 `Sound file path` sets path for loading pace notes sound files that matches name value (exclude file extension) from `pace note` column found in pace notes file. If no sound file found, sound won't be played. This option takes immediate effect when changed.
@@ -2508,6 +2510,12 @@ Set maximum P2P activation time per lap, unit in seconds.
 
     show_background
 Show background color. Turn off to show text only.
+
+    show_pit_notes_while_in_pit
+Show custom notes while in pit lane.
+
+    pit_notes_text, pit_comments_text
+Set custom notes and comments to be displayed while in pit lane.
 
     show_pace_notes
 Show nearest pace notes info behind current vehicle position.

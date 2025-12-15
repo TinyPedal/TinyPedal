@@ -45,6 +45,7 @@ from PySide2.QtWidgets import (
 )
 
 from .. import realtime_state
+from ..api_control import api
 from ..const_file import FileFilter
 from ..module_control import mctrl
 from ..module_info import minfo
@@ -117,7 +118,8 @@ class PaceNotesPlayer(QMediaPlayer):
             notes_index = minfo.pacenotes.currentIndex
             if self._last_notes_index != notes_index:
                 self._last_notes_index = notes_index
-                self.__update_queue(minfo.pacenotes.currentNote.get(COLUMN_PACENOTE))
+                if self.mcfg["enable_playback_while_in_pit"] or not api.read.vehicle.in_pits():
+                    self.__update_queue(minfo.pacenotes.currentNote.get(COLUMN_PACENOTE))
 
             if self._play_queue:
                 self.__play_next_in_queue()
@@ -228,6 +230,10 @@ class PaceNotesControl(QWidget):
         self.slider_volume.setRange(0, 100)
         self.slider_volume.valueChanged.connect(self.set_sound_volume)
 
+        # Playback option
+        self.checkbox_playinpit = QCheckBox("Enable Playback While in Pit Lane")
+        self.checkbox_playinpit.toggled.connect(self.toggle_playinpit_state)
+
         # Frame layout
         layout_file = QGridLayout()
         layout_file.setAlignment(Qt.AlignTop)
@@ -260,6 +266,7 @@ class PaceNotesControl(QWidget):
         layout_setting.addStretch(1)
         layout_setting.addWidget(self.label_volume)
         layout_setting.addWidget(self.slider_volume)
+        layout_setting.addWidget(self.checkbox_playinpit)
 
         self.frame_control = QFrame(self)
         self.frame_control.setFrameShape(QFrame.StyledPanel)
@@ -291,6 +298,7 @@ class PaceNotesControl(QWidget):
         """Refresh state"""
         self.mcfg = cfg.user.setting["pace_notes_playback"]
         self.pace_notes_player.mcfg = self.mcfg
+        self.toggle_playinpit_state(self.mcfg["enable_playback_while_in_pit"])
         self.toggle_selector_state(self.mcfg["enable_manual_file_selector"])
         self.file_selector.setText(self.mcfg["pace_notes_file_name"])
         self.path_selector.setText(self.mcfg["pace_notes_sound_path"])
@@ -351,6 +359,11 @@ class PaceNotesControl(QWidget):
 
         if self.update_config("enable_manual_file_selector", checked):
             mctrl.reload("module_notes")  # reload file in module notes
+
+    def toggle_playinpit_state(self, checked: bool):
+        """Toggle playback in pit state"""
+        self.checkbox_playinpit.setChecked(checked)
+        self.update_config("enable_playback_while_in_pit", checked)
 
     def toggle_button_state(self, checked: bool):
         """Toggle button state"""

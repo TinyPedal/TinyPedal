@@ -119,7 +119,9 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        if api.read.vehicle.in_garage():
+        pit_override = self.wcfg["show_pit_notes_while_in_pit"] and api.read.vehicle.in_pits()
+
+        if pit_override or api.read.vehicle.in_garage():
             self.update_auto_hide(False)
         elif minfo.pacenotes.currentNote:
             if self.wcfg["maximum_display_duration"] <= 0:
@@ -138,15 +140,24 @@ class Realtime(Overlay):
             self.update_auto_hide(True)
 
         if self.wcfg["show_pace_notes"]:
-            notes = minfo.pacenotes.currentNote.get(COLUMN_PACENOTE, TEXT_NOTAVAILABLE)
+            if pit_override:
+                notes = self.wcfg["pit_notes_text"]
+            else:
+                notes = minfo.pacenotes.currentNote.get(COLUMN_PACENOTE, TEXT_NOTAVAILABLE)
             self.update_notes(self.bar_notes, notes)
 
         if self.wcfg["show_comments"]:
-            comments = minfo.pacenotes.currentNote.get(COLUMN_COMMENT, TEXT_NOTAVAILABLE)
+            if pit_override:
+                comments = self.wcfg["pit_comments_text"]
+            else:
+                comments = minfo.pacenotes.currentNote.get(COLUMN_COMMENT, TEXT_NOTAVAILABLE)
             self.update_comments(self.bar_comments, comments)
 
         if self.wcfg["show_debugging"]:
-            debugging = minfo.pacenotes.currentNote.get(COLUMN_DISTANCE, TEXT_NOTAVAILABLE)
+            if pit_override:
+                debugging = TEXT_NOTAVAILABLE
+            else:
+                debugging = minfo.pacenotes.currentNote.get(COLUMN_DISTANCE, TEXT_NOTAVAILABLE)
             self.update_debugging(self.bar_debugging, debugging)
 
     # GUI update methods
