@@ -7,6 +7,9 @@ WIP
   - Added "show_pit_notes_while_in_pit" option (requested by user "DanRZ"), which shows alternative pit notes while in pit lane. Note, this option does not affect pace notes playback.
   - Added "pit_notes_text" & "pit_comments_text" options.
 
+* Misc
+  - More accurate vehicle coordinates synchronization between local player and opponents.
+
 2.36.0 (2025-12-13)
 -----------------------------
 * Major API Changes

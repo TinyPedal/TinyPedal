@@ -162,6 +162,7 @@ class VehicleDataSet:
 
     __slots__ = (
         "isPlayer",
+        "elapsedTime",
         "positionOverall",
         "positionInClass",
         "qualifyOverall",
@@ -202,6 +203,7 @@ class VehicleDataSet:
 
     def __init__(self):
         self.isPlayer: bool = False
+        self.elapsedTime: float = 0.0
         self.positionOverall: int = 0
         self.positionInClass: int = 0
         self.qualifyOverall: int = 0

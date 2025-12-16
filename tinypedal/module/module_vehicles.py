@@ -89,21 +89,24 @@ def update_vehicle_data(
     update_low_priority: bool,
 ) -> None:
     """Update vehicle data"""
-    # General data
-    track_length = api.read.lap.track_length()
-    in_race = api.read.session.in_race()
-    elapsed_time = api.read.timing.elapsed()
-
     nearest_line = MAX_METERS
     nearest_time_behind = -MAX_SECONDS
     nearest_yellow_ahead = MAX_METERS
     nearest_yellow_behind = -MAX_METERS
 
+    # General data
+    track_length = api.read.lap.track_length()
+    in_race = api.read.session.in_race()
+
     # Local player data
+    elapsed_time = api.read.timing.elapsed()
     plr_lap_distance = api.read.lap.distance()
     plr_lap_progress_total = api.read.lap.completed_laps() + calc.lap_progress_distance(plr_lap_distance, track_length)
     plr_laptime_est = api.read.timing.estimated_laptime()
     plr_timeinto_est = api.read.timing.estimated_time_into()
+    plr_pos_x = api.read.vehicle.position_longitudinal()
+    plr_pos_y = api.read.vehicle.position_lateral()
+    plr_ori_yaw = api.read.vehicle.orientation_yaw_radians()
 
     # Update dataset from all vehicles in current session
     for index, data, class_pos in zip(range(output.totalVehicles), output.dataSet, class_pos_list):
@@ -119,38 +122,53 @@ def update_vehicle_data(
         data.isYellow = speed < 8
         data.inPit = api.read.vehicle.in_paddock(index)
         data.pitTimer.update(api.read.vehicle.slot_id(index), data.inPit, elapsed_time, laps_completed, speed)
-        data.worldPositionX = api.read.vehicle.position_longitudinal(index)
-        data.worldPositionY = api.read.vehicle.position_lateral(index)
 
         if data.isPlayer:
+            data.elapsedTime = elapsed_time
+            data.worldPositionX = plr_pos_x
+            data.worldPositionY = plr_pos_y
             output.playerIndex = index
             if data.isYellow:
                 nearest_yellow_ahead = 0.0
                 nearest_yellow_behind = 0.0
         else:
-            if not api.read.state.desynced(index):
-                # Relative position & orientation
-                plr_pos_x = api.read.vehicle.position_longitudinal()
-                plr_pos_y = api.read.vehicle.position_lateral()
-                plr_ori_yaw = api.read.vehicle.orientation_yaw_radians()
+            # Relative position & orientation
+            opt_etime = api.read.timing.elapsed(index)
+            if data.elapsedTime != opt_etime:
+                opt_pos_x = api.read.vehicle.position_longitudinal(index)
+                opt_pos_y = api.read.vehicle.position_lateral(index)
                 opt_ori_yaw = api.read.vehicle.orientation_yaw_radians(index)
+                # Player data update rate may be (twice) higher than opponents
+                # Interpolate coordinates to avoid desync
+                est_pos_x, est_pos_y = interp_coordinate(
+                    opt_pos_x,
+                    data.worldPositionX,
+                    opt_pos_y,
+                    data.worldPositionY,
+                    opt_etime,
+                    data.elapsedTime,
+                    elapsed_time,
+                )
+                data.worldPositionX = opt_pos_x
+                data.worldPositionY = opt_pos_y
+                data.elapsedTime = opt_etime
 
                 data.relativeOrientationRadians = opt_ori_yaw - plr_ori_yaw
                 data.relativeRotatedPositionX, data.relativeRotatedPositionY = calc.rotate_coordinate(
                     plr_ori_yaw - 3.14159265,  # plr_ori_rad, rotate view
-                    data.worldPositionX - plr_pos_x,  # x position related to player
-                    data.worldPositionY - plr_pos_y,  # y position related to player
+                    est_pos_x - plr_pos_x,  # x position related to player
+                    est_pos_y - plr_pos_y,  # y position related to player
                 )
                 # Relative distance & time gap
                 data.relativeStraightDistance = calc.distance(
                     (plr_pos_x, plr_pos_y),
-                    (data.worldPositionX, data.worldPositionY)
+                    (est_pos_x, est_pos_y)
                 )
 
-            data.isLapped = calc.lap_difference(
-                data.totalLapProgress, plr_lap_progress_total,
-                max_lap_diff_ahead, max_lap_diff_behind
-            ) if in_race else 0
+                data.isLapped = calc.lap_difference(
+                    data.totalLapProgress, plr_lap_progress_total,
+                    max_lap_diff_ahead, max_lap_diff_behind
+                ) if in_race else 0
 
             # Nearest straight line distance (non local players)
             if nearest_line > data.relativeStraightDistance:
@@ -213,6 +231,26 @@ def update_vehicle_data(
     output.nearestYellowAhead = nearest_yellow_ahead
     output.nearestYellowBehind = nearest_yellow_behind
     output.dataSetVersion += 1
+
+
+def interp_coordinate(
+    pos_curr_x: float,
+    pos_last_x: float,
+    pos_curr_y: float,
+    pos_last_y: float,
+    etime_curr: float,
+    etime_last: float,
+    etime_player: float,
+) -> tuple[float, float]:
+    """Interpolate coordinates based on time & coordinate delta"""
+    etime_diff = etime_player - etime_curr
+    if etime_diff <= 0:
+        return pos_curr_x, pos_curr_y
+    etime_frac = etime_diff / (etime_curr - etime_last)
+    return (
+        (pos_curr_x - pos_last_x) * etime_frac + pos_curr_x,
+        (pos_curr_y - pos_last_y) * etime_frac + pos_curr_y,
+    )
 
 
 def update_qualify_position(output: VehiclesInfo) -> None:
