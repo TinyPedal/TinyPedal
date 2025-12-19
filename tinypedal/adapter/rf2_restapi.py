@@ -84,7 +84,7 @@ class ResRawOutput(NamedTuple):
 
     name: str
     default: Any
-    keys: tuple[str, ...]
+    keys: tuple[str, ...] = ()
 
     def reset(self, output: RestAPIData):
         """Reset data"""
@@ -114,7 +114,7 @@ class ResParOutput(NamedTuple):
     name: str
     default: Any
     parser: Callable
-    keys: tuple[str, ...]
+    keys: tuple[str, ...] = ()
 
     def reset(self, output: RestAPIData):
         """Reset data"""
@@ -135,8 +135,6 @@ class ResParOutput(NamedTuple):
         setattr(output, self.name, self.parser(data))
         return True
 
-
-EMPTY_KEYS: tuple[str, ...] = tuple()
 
 # Common
 COMMON_WEATHERFORECAST = (
@@ -162,7 +160,7 @@ LMU_CURRENTSTINT = (
     ResParOutput("brakeWear", WHEELS_NA, export_wheels, ("wearables", "brakes")),
     ResParOutput("suspensionDamage", WHEELS_NA, export_wheels, ("wearables", "suspension")),
     ResRawOutput("trackClockTime", -1.0, ("sessionTime", "timeOfDay")),
-    ResParOutput("pitStopEstimate", PITEST_DEFAULT, EstimatePitTime(), EMPTY_KEYS),
+    ResParOutput("pitStopEstimate", PITEST_DEFAULT, EstimatePitTime()),
 )
 LMU_GARAGESETUP = (
     ResParOutput("steeringWheelRange", 0.0, steerlock_to_number, ("VM_STEER_LOCK", "stringValue")),
@@ -177,7 +175,7 @@ LMU_PITSTOPTIME = (
     ResRawOutput("penaltyTime", 0.0, ("penalties",)),
 )
 LMU_STINTUSAGE = (
-    ResParOutput("stintUsage", EMPTY_DICT, stint_ve_usage, EMPTY_KEYS),
+    ResParOutput("stintUsage", EMPTY_DICT, stint_ve_usage),
 )
 
 # Define task set

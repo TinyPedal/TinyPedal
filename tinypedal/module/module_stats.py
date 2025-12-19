@@ -85,14 +85,24 @@ class Realtime(DataModule):
                 lap_stime = api.read.timing.start()
                 lap_etime = api.read.timing.elapsed()
                 is_pit_lap |= api.read.vehicle.in_pits()
+                session_type = api.read.session.session_type()
 
                 # Best lap time
                 last_valid_laptime = api.read.timing.last_laptime()
                 if (last_best_laptime > last_valid_laptime > 1 and
                     abs(last_valid_laptime - last_raw_laptime) < 0.001):  # validate lap time
                     last_best_laptime = last_valid_laptime
+                    # Personal best (any session)
                     if driver_stats.pb > last_valid_laptime:
                         driver_stats.pb = last_valid_laptime
+                    # Qualifying best
+                    if session_type == 2:
+                        if driver_stats.qb > last_valid_laptime:
+                            driver_stats.qb = last_valid_laptime
+                    # Race best
+                    elif session_type == 4:
+                        if driver_stats.rb > last_valid_laptime:
+                            driver_stats.rb = last_valid_laptime
 
                 # Driven distance
                 gps_curr = api.read.vehicle.position_xyz()
@@ -131,7 +141,7 @@ class Realtime(DataModule):
                     fuel_last = fuel_curr
 
                 # Race session stats
-                if api.read.session.in_race():
+                if session_type == 4:
                     # Penalties
                     num_penalties = api.read.vehicle.number_penalties()
                     if last_num_penalties > num_penalties:

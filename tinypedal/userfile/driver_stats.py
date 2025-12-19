@@ -43,14 +43,31 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class DriverStats:
-    """Driver stats data"""
+    """Driver stats data
 
-    pb: float = MAX_SECONDS  # personal best lap time
-    meters: float = 0.0  # meters driven
-    seconds: float = 0.0  # seconds spent
-    liters: float = 0.0  # fuel consumed
-    valid: int = 0  # valid laps
-    invalid: int = 0  # invalid laps
+    Attributes:
+        pb: personal best lap time.
+        qb: qualifying best lap time.
+        rb: race best lap time.
+        meters: meters driven.
+        seconds: seconds spent driving.
+        liters: liters of fuel consumed.
+        valid: valid laps.
+        invalid: invalid laps.
+        penalties: penalties recieved in race.
+        races: number of races completed.
+        wins: number of wins.
+        podiums: number of podiums.
+    """
+
+    pb: float = MAX_SECONDS
+    qb: float = MAX_SECONDS
+    rb: float = MAX_SECONDS
+    meters: float = 0.0
+    seconds: float = 0.0
+    liters: float = 0.0
+    valid: int = 0
+    invalid: int = 0
     penalties: int = 0
     races: int = 0
     wins: int = 0
@@ -60,6 +77,11 @@ class DriverStats:
     def keys(cls) -> KeysView[str]:
         """Get key name list"""
         return cls.__annotations__.keys()
+
+    @staticmethod
+    def is_lap_time(key: str) -> bool:
+        """Is lap time"""
+        return key in ("pb", "qb", "rb")
 
 
 def validate_stats_file(stats_user: dict) -> dict:
@@ -150,8 +172,10 @@ def save_driver_stats(
         if not isinstance(loaded_dict[key], default_type[key]):
             loaded_dict[key] = convert_value_type(loaded_dict[key], default_dict[key], default_type[key])
         # Update laptime value faster than old value
-        if key == "pb":
-            if loaded_dict[key] > value:
+        if DriverStats.is_lap_time(key):
+            if loaded_dict[key] <= 0:  # reset invalid time
+                loaded_dict[key] = MAX_SECONDS
+            if loaded_dict[key] > value > 0:
                 loaded_dict[key] = value
             continue
         # Update value (increment)

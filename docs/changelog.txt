@@ -1,5 +1,8 @@
 WIP
 -----------------------------
+* Driver Stats
+  - Now records personal best lap time also for qualifying and race session separately, and can be viewed under "Qual" and "Race" columns in Driver stats viewer.
+
 * Pace Notes Playback
   - Added "Enable Playback While in Pit Lane" check box, which allows to enable or disable pace notes playback while in pit lane. This option takes immediate effect when changed.
 
@@ -8,7 +11,7 @@ WIP
   - Added "pit_notes_text" & "pit_comments_text" options.
 
 * Misc
-  - More accurate vehicle coordinates synchronization between local player and opponents.
+  - More accurate vehicle coordinates synchronization between local player and opponents (smoother vehicle position update on Radar & Navigation Widget).
 
 2.36.0 (2025-12-13)
 -----------------------------

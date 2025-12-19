@@ -894,6 +894,10 @@ To reset personal best lap time to default, right-click on personal best lap tim
 
 `PB` column is personal best lap time. This value can be reset via right-click menu.
 
+`Qual` column is personal best lap time from qualifying session only. This value can be reset via right-click menu.
+
+`Race` column is personal best lap time from race session only. This value can be reset via right-click menu.
+
 `Km` column is total driven distance in kilometers. Note, `odometer_unit` setting from [Units](#units) affects how this column is displayed.
 
 `Hours` column is total time spent in driving (only counts when vehicle speed higher than 1 m/s).
@@ -906,7 +910,7 @@ To reset personal best lap time to default, right-click on personal best lap tim
 
 `Penalties` column is total penalties received in race. Non-race penalties are not recorded.
 
-`Races` column is total races completed.
+`Finishes` column is total races completed.
 
 `Wins` column is total races won.
 

@@ -58,10 +58,10 @@ from .track_map_viewer import TrackMapViewer
 
 def parse_display_value(key: str, value: int | float) -> str | int | float:
     """Parse stats display value"""
-    if key == "pb":
-        if value >= MAX_SECONDS:
-            return TEXT_NOLAPTIME
-        return calc.sec2laptime_full(value)
+    if DriverStats.is_lap_time(key):
+        if 0 < value < MAX_SECONDS:
+            return calc.sec2laptime_full(value)
+        return TEXT_NOLAPTIME
     if key == "meters":
         if cfg.units["odometer_unit"] == "Kilometer":
             return round(meter_to_kilometer(value), 1)
@@ -81,6 +81,10 @@ def format_header_key(key: str):
     """Format header key"""
     if key == "pb":
         return "PB"
+    if key == "qb":
+        return "Qual"
+    if key == "rb":
+        return "Race"
     if key == "meters":
         if cfg.units["odometer_unit"] == "Kilometer":
             return "Km"
@@ -93,6 +97,8 @@ def format_header_key(key: str):
         if cfg.units["fuel_unit"] == "Gallon":
             return "Gallons"
         return "Liters"
+    if key == "races":
+        return "Finishes"
     return key.title()
 
 
@@ -102,7 +108,8 @@ class DriverStatsViewer(BaseEditor):
     def __init__(self, parent):
         super().__init__(parent)
         self.set_utility_title("Driver Stats Viewer")
-        self.setMinimumSize(UIScaler.size(66), UIScaler.size(30))
+        self.setMinimumSize(UIScaler.size(80), UIScaler.size(30))
+        self.resize(UIScaler.size(80), UIScaler.size(50))
 
         self.stats_temp = {}
         self.selected_stats_key = ""  # get active session key
@@ -121,12 +128,9 @@ class DriverStatsViewer(BaseEditor):
         self.table_stats.verticalHeader().setVisible(False)
         self.table_stats.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table_stats.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        for idx in range(1, 5):
+        for idx in range(1, len(self.table_header_key)):
             self.table_stats.horizontalHeader().setSectionResizeMode(idx, QHeaderView.Fixed)
-            self.table_stats.setColumnWidth(idx, UIScaler.size(6))
-        for idx in range(5, len(self.table_header_key)):
-            self.table_stats.horizontalHeader().setSectionResizeMode(idx, QHeaderView.Fixed)
-            self.table_stats.setColumnWidth(idx, UIScaler.size(5))
+            self.table_stats.setColumnWidth(idx, UIScaler.size(5 + (idx <= 6)))
 
         self.table_stats.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table_stats.customContextMenuRequested.connect(self.open_context_menu)
@@ -213,6 +217,8 @@ class DriverStatsViewer(BaseEditor):
                 continue
             # Vehicle stats
             value_raw = veh_data.get(header_key, 0)
+            if DriverStats.is_lap_time(header_key) and value_raw <= 0:
+                value_raw = MAX_SECONDS  # correct invalid lap time
             item = NumericTableItem(value_raw, str(parse_display_value(header_key, value_raw)))
             item.setFlags(flag_selectable)
             item.setTextAlignment(Qt.AlignCenter)
@@ -302,7 +308,7 @@ class DriverStatsViewer(BaseEditor):
         menu = QMenu()  # no parent for temp menu
         if item_column == 0:
             menu.addAction("Remove Vehicle")
-        elif item_column == 1:
+        elif DriverStats.is_lap_time(self.table_header_key[item_column]):
             menu.addAction("Reset Lap Time")
         else:
             return
