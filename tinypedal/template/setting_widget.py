@@ -1302,6 +1302,7 @@ WIDGET_DEFAULT = {
         "opacity": 0.9,
         "global_scale": 6,
         "radar_radius": 30,
+        "show_vehicle_orientation": True,
         "vehicle_length": 4.6,
         "vehicle_width": 2.2,
         "vehicle_border_radius": 2,

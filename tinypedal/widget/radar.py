@@ -322,16 +322,12 @@ class Realtime(Overlay):
                     if indicator.min_range_x < raw_pos_x < nearest_right:
                         nearest_right = raw_pos_x
 
-                # Rotated position relative to player
-                pos_x = self.scale_veh_pos(raw_pos_x)
-                pos_y = self.scale_veh_pos(raw_pos_y)
-                angle_deg = calc.rad2deg(-veh_info.relativeOrientationRadians)
-
                 # Draw vehicle
                 self.brush_veh.setColor(self.color_lap_diff(veh_info))
                 painter.setBrush(self.brush_veh)
-                painter.translate(pos_x, pos_y)
-                painter.rotate(angle_deg)
+                painter.translate(self.scale_veh_pos(raw_pos_x), self.scale_veh_pos(raw_pos_y))
+                if self.wcfg["show_vehicle_orientation"]:
+                    painter.rotate(calc.rad2deg(-veh_info.relativeOrientationRadians))
                 painter.drawRoundedRect(
                     self.veh_shape,
                     self.wcfg["vehicle_border_radius"],

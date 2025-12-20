@@ -2647,6 +2647,9 @@ Sets global scale of radar display. Default is `6`, which is 6 times of original
     radar_radius
 Set the radar display area by radius(unit meter). Default is `30` meters. Minimum value is limited to `5`.
 
+    show_vehicle_orientation
+Show opponent vehicle orientation (heading) relative to player. Disable this option to show player and opponent vehicle headings in parallel.
+
     vehicle_length, vehicle_width
 Set vehicle overall size (length and width), value in meters.
 

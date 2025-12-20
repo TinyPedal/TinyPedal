@@ -10,6 +10,9 @@ WIP
   - Added "show_pit_notes_while_in_pit" option (requested by user "DanRZ"), which shows alternative pit notes while in pit lane. Note, this option does not affect pace notes playback.
   - Added "pit_notes_text" & "pit_comments_text" options.
 
+* Radar Widget
+  - Added "show_vehicle_orientation" option, which shows opponent vehicle orientation (heading) relative to player. Disable this option to show player and opponent vehicle headings in parallel.
+
 * Relative, Rivals, Standings Widget
   - Added "show_class_style_for_position_in_class" option (requested by user "Wigg1es"), which shows class style background color for position in class. This option is disabled by default.
   - Removed "show_random_color_for_unknown_class" option. Random color is now always displayed for unknown class.
