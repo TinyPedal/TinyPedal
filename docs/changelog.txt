@@ -14,6 +14,9 @@ WIP
   - Added "show_class_style_for_position_in_class" option (requested by user "Wigg1es"), which shows class style background color for position in class. This option is disabled by default.
   - Removed "show_random_color_for_unknown_class" option. Random color is now always displayed for unknown class.
 
+* Track map Widget
+  - Added "vehicle_scale" & "vehicle_scale_player" options, which set vehicle scale that multiplies base vehicle size. Note, base vehicle size is determined by "font size" and "bar padding". Minimum scale is limited to "1.0".
+
 * Misc
   - More accurate vehicle coordinates synchronization between local player and opponents (smoother vehicle position update on Radar & Navigation Widget).
 

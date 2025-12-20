@@ -2338,6 +2338,8 @@ WIDGET_DEFAULT = {
         "enable_auto_font_offset": True,
         "font_offset_vertical": 0,
         "bar_padding": 0.5,
+        "vehicle_scale": 1,
+        "vehicle_scale_player": 1,
         "display_orientation": 0,
         "display_detail_level": 1,
         "area_size": 400,

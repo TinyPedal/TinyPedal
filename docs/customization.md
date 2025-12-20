@@ -3417,6 +3417,9 @@ Show personal current average lap time pace, this reading is also used in real-t
 ## Track map
 **This widget displays track map and standings. Note: at least one complete and valid lap is required to generate track map.**
 
+    vehicle_scale, vehicle_scale_player
+Set vehicle scale that multiplies base vehicle size. Note, base vehicle size is determined by `font size` and `bar padding`. Minimum scale is limited to `1.0`.
+
     display_orientation
 Set track map display orientation in degrees. For example, a `270` value will rotate map by `270` degrees clockwise. Default value is `0`, which always displays track map `North Up` in game's coordinate system.
 

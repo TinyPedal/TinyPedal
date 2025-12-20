@@ -50,9 +50,14 @@ class Realtime(Overlay):
         # Config variable
         self.show_position_in_class = self.wcfg["enable_multi_class_styling"] and self.wcfg["show_position_in_class"]
         self.display_detail_level = max(self.wcfg["display_detail_level"], 0)
-        veh_size = self.wcfg["font_size"] + round(font_m.width * self.wcfg["bar_padding"])
-        self.veh_shape = QRectF(-veh_size * 0.5, -veh_size * 0.5, veh_size, veh_size)
-        self.veh_text_shape = self.veh_shape.adjusted(0, font_offset, 0, 0)
+
+        veh_size_base = self.wcfg["font_size"] + round(font_m.width * self.wcfg["bar_padding"])
+        veh_size_opt = veh_size_base * max(self.wcfg["vehicle_scale"], 1.0)
+        veh_size_plr = veh_size_base * max(self.wcfg["vehicle_scale_player"], 1.0)
+
+        self.veh_shape = QRectF(-veh_size_opt * 0.5, -veh_size_opt * 0.5, veh_size_opt, veh_size_opt)
+        self.veh_shape_player = QRectF(-veh_size_plr * 0.5, -veh_size_plr * 0.5, veh_size_plr, veh_size_plr)
+        self.veh_text_shape = QRectF(-veh_size_base * 0.5, -veh_size_base * 0.5 + font_offset, veh_size_base, veh_size_base)
 
         # Config canvas
         self.area_size = max(self.wcfg["area_size"], 100)
@@ -84,7 +89,7 @@ class Realtime(Overlay):
                 self.set_veh_pen_style(self.wcfg["prediction_outline_color"], self.wcfg["prediction_outline_width"]),
                 QPen(self.wcfg["font_color_pitstop_duration"]),
             )
-            self.pit_text_shape = self.veh_shape.adjusted(-2, font_offset - veh_size - 3, 2, -veh_size - 3)
+            self.pit_text_shape = QRectF(-veh_size_base * 0.5 - 2, font_offset - veh_size_opt * 0.5 - veh_size_base - 3, veh_size_base + 4, veh_size_base)
 
         # Last data
         self.last_modified = 0
@@ -280,7 +285,11 @@ class Realtime(Overlay):
 
             painter.setPen(self.outline_vehicle(data))
             painter.setBrush(self.color_vehicle(data))
-            painter.drawEllipse(self.veh_shape)
+
+            if data.isPlayer:
+                painter.drawEllipse(self.veh_shape_player)
+            else:
+                painter.drawEllipse(self.veh_shape)
 
             # Draw text standings
             if self.wcfg["show_vehicle_standings"]:
@@ -312,7 +321,11 @@ class Realtime(Overlay):
 
             painter.setPen(self.outline_vehicle(data))
             painter.setBrush(self.color_vehicle(data))
-            painter.drawEllipse(self.veh_shape)
+
+            if data.isPlayer:
+                painter.drawEllipse(self.veh_shape_player)
+            else:
+                painter.drawEllipse(self.veh_shape)
 
             # Draw text standings
             if self.wcfg["show_vehicle_standings"]:
