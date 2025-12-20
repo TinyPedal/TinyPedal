@@ -445,9 +445,11 @@ class Realtime(Overlay):
         """Set vehicle color"""
         if veh_info.isYellow and not veh_info.inPit:
             return self.brush_overall["yellow"]
-        if veh_info.inPit:
+        if veh_info.inPit and not veh_info.isPlayer:
             return self.brush_overall["in_pit"]
         if self.wcfg["enable_multi_class_styling"]:
+            if self.wcfg["show_custom_player_color_in_multi_class"] and veh_info.isPlayer:
+                return self.brush_overall["player"]
             return self.classes_style(veh_info.vehicleClass)
         if veh_info.isPlayer:
             return self.brush_overall["player"]

@@ -3462,6 +3462,9 @@ Show vehicles in multi-class color styles on map instead. Multi-class color can 
 Note, while multi-class styling is enabled, following color styles will not be displayed:
 `vehicle_color_player`, `vehicle_color_leader`, `vehicle_color_same_lap`, `vehicle_color_laps_ahead`, `vehicle_color_laps_behind`.
 
+    show_custom_player_color_in_multi_class
+Show custom player vehicle color (defined in `vehicle_color_player` option) while `enable_multi_class_styling` option is enabled.
+
     show_position_in_class
 Show position in class while `enable_multi_class_styling` option is also enabled, otherwise this option has no effect.
 
