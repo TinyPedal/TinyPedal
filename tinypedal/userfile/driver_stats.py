@@ -122,9 +122,10 @@ def load_driver_stats(
     # Get data from matching key
     loaded_dict = stats_user
     for key in key_list:
-        loaded_dict = loaded_dict.get(key)
-        if not isinstance(loaded_dict, dict):  # not exist, set to default
+        temp_dict = loaded_dict.get(key)
+        if not isinstance(temp_dict, dict):  # not exist, set to default
             return DriverStats()
+        loaded_dict = temp_dict
     # Add data to DriverStats
     try:
         return DriverStats(**purge_data_key(loaded_dict, DriverStats.keys()))

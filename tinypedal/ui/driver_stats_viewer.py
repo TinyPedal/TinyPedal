@@ -82,7 +82,7 @@ def format_header_key(key: str):
     if key == "pb":
         return "PB"
     if key == "qb":
-        return "Qual"
+        return "Qualifying"
     if key == "rb":
         return "Race"
     if key == "meters":

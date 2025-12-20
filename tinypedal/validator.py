@@ -29,7 +29,7 @@ import time
 from functools import wraps
 from math import isfinite
 from time import monotonic
-from typing import Any, Sequence
+from typing import Any, Iterable
 
 from .const_common import MAX_SECONDS
 from .const_file import FileExt
@@ -102,7 +102,7 @@ def is_same_session(
     )
 
 
-def purge_data_key(loaded_dict: dict, ref_keys: Sequence[str]) -> dict:
+def purge_data_key(loaded_dict: dict, ref_keys: Iterable[str]) -> dict:
     """Purge unwanted key from dict"""
     for key in tuple(loaded_dict):
         if key not in ref_keys:

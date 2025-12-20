@@ -594,7 +594,7 @@ class Realtime(Overlay):
                 self.update_blp(self.bars_blp[idx], veh_info.bestLapTime, hi_player, state)
             # Position in class
             if self.wcfg["show_position_in_class"]:
-                self.update_pic(self.bars_pic[idx], veh_info.positionInClass, hi_player, state)
+                self.update_pic(self.bars_pic[idx], veh_info.positionInClass, veh_info.vehicleClass, hi_player, state)
             # Vehicle class
             if self.wcfg["show_class"]:
                 self.update_cls(self.bars_cls[idx], veh_info.vehicleClass, state)
@@ -759,8 +759,14 @@ class Realtime(Overlay):
         """Position in class"""
         if target.last != data:
             target.last = data
+            if data[2]:  # player
+                style = self.bar_style_pic[1]
+            elif self.wcfg["show_class_style_for_position_in_class"]:
+                style = f"color:{self.wcfg['font_color_position_in_class']};background:{self.set_class_style(data[1])[1]};"
+            else:
+                style = self.bar_style_pic[0]
             target.setText(f"{data[0]:02d}")
-            target.updateStyle(self.bar_style_pic[data[1]])
+            target.updateStyle(style)
             self.toggle_visibility(target, data[-1])
 
     def update_cls(self, target, *data):
@@ -913,7 +919,7 @@ class Realtime(Overlay):
         style = self.cfg.user.classes.get(class_name)
         if style is not None:
             return style["alias"], style["color"]
-        if class_name and self.wcfg["show_random_color_for_unknown_class"]:
+        if class_name:
             return class_name, random_color_class(class_name)
         return class_name, self.wcfg["bkg_color_class"]
 

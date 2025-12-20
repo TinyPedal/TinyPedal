@@ -1,7 +1,7 @@
 WIP
 -----------------------------
 * Driver Stats
-  - Now records personal best lap time also for qualifying and race session separately, and can be viewed under "Qual" and "Race" columns in Driver stats viewer.
+  - Now records personal best lap time also for qualifying and race session separately, and can be viewed under "Qualifying" and "Race" columns in Driver stats viewer.
 
 * Pace Notes Playback
   - Added "Enable Playback While in Pit Lane" check box, which allows to enable or disable pace notes playback while in pit lane. This option takes immediate effect when changed.
@@ -9,6 +9,10 @@ WIP
 * Pace notes Widget
   - Added "show_pit_notes_while_in_pit" option (requested by user "DanRZ"), which shows alternative pit notes while in pit lane. Note, this option does not affect pace notes playback.
   - Added "pit_notes_text" & "pit_comments_text" options.
+
+* Relative, Rivals, Standings Widget
+  - Added "show_class_style_for_position_in_class" option (requested by user "Wigg1es"), which shows class style background color for position in class. This option is disabled by default.
+  - Removed "show_random_color_for_unknown_class" option. Random color is now always displayed for unknown class.
 
 * Misc
   - More accurate vehicle coordinates synchronization between local player and opponents (smoother vehicle position update on Radar & Navigation Widget).

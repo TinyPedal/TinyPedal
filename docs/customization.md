@@ -894,7 +894,7 @@ To reset personal best lap time to default, right-click on personal best lap tim
 
 `PB` column is personal best lap time. This value can be reset via right-click menu.
 
-`Qual` column is personal best lap time from qualifying session only. This value can be reset via right-click menu.
+`Qualifying` column is personal best lap time from qualifying session only. This value can be reset via right-click menu.
 
 `Race` column is personal best lap time from race session only. This value can be reset via right-click menu.
 
@@ -2845,11 +2845,13 @@ Highlight the fastest last lap time within the same class if available.
     show_position_in_class
 Show driver's position standing in class.
 
-    show_class
-Show vehicle class categories. Class name and color are fully customizable, see [Vehicle Class Editor](#vehicle-class-editor) section for details.
+    show_class_style_for_position_in_class
+Show class style background color for position in class.
 
-    show_random_color_for_unknown_class
-Show random color for unknown class name that is not defined in `classes.json` preset.
+    show_class
+Show vehicle class categories. Class alias name and color are fully customizable in `classes.json` preset, see [Vehicle Class Editor](#vehicle-class-editor) section for details.
+
+Note, random color will be displayed for unknown class name that is not defined in `classes.json` preset.
 
     class_width
 Set class name display width, value is in chars, `4` = 4 chars wide. Set to `0` to hide class name while showing only class color.
