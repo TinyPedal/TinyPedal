@@ -89,8 +89,8 @@ class Realtime(Overlay):
         self.pixmap_trace.fill(Qt.transparent)
         if self.wcfg["show_trace_fade_out"]:
             trace_alpha = int(255 * min(max(self.wcfg["trace_fade_out_step"], 0.1), 0.9) / 2)
-            self.pixmap_fademask = QPixmap(self.area_size, self.area_size)
-            self.pixmap_fademask.fill(QColor(0, 0, 0, trace_alpha))
+            self.fademask_color = QColor(0, 0, 0, trace_alpha)
+            self.rect_fademask = QRectF(0, 0, self.area_size, self.area_size)
 
         self.pen_mark = QPen()
         self.pen_trace = QPen()
@@ -240,7 +240,7 @@ class Realtime(Overlay):
         painter.setRenderHint(QPainter.Antialiasing, True)
         if self.wcfg["show_trace_fade_out"]:
             painter.setCompositionMode(QPainter.CompositionMode_DestinationOut)
-            painter.drawPixmap(0, 0, self.pixmap_fademask)
+            painter.fillRect(self.rect_fademask, self.fademask_color)
             painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         else:
             self.pixmap_trace.fill(Qt.transparent)
