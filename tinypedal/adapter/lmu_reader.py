@@ -884,8 +884,10 @@ class Vehicle(DataAdapter):
 
     def damage_severity(self, index: int | None = None) -> tuple[int, int, int, int, int, int, int, int]:
         """Damage severity, sort row by row from left to right, top to bottom"""
-        dmg = self.shmm.lmuTeleVeh(index).mDentSeverity
-        return dmg[1], dmg[0], dmg[7], dmg[2], dmg[6], dmg[3], dmg[4], dmg[5]  # LMU order
+        data = self.shmm.lmuTeleVeh(index)
+        dmg = data.mDentSeverity
+        dmg_rear = 3 if data.mDetached else dmg[4]  # the only body parts can detach in LMU is rear wing
+        return dmg[1], dmg[0], dmg[7], dmg[2], dmg[6], dmg[3], dmg_rear, dmg[5]  # LMU order
 
     def aero_damage(self, index: int | None = None) -> float:
         """Aerodynamic damage (fraction), 0.0 no damage, 1.0 totaled"""

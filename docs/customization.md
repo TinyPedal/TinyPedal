@@ -1658,6 +1658,9 @@ Set body parts inner gap in pixels.
     part_width
 Set body parts width in pixels. Minimum value is limited to `1`.
 
+    parts_width_ratio
+Set width ratio between side and center body parts. Value range in `0.1` to `1.0`.
+
     parts_max_width, parts_max_height
 Set maximum body parts width, height in pixels. Minimum value is limited to `4`.
 
@@ -1669,6 +1672,15 @@ Show widget background.
 
     suspension_damage_*_threshold
 Set suspension damage level percentage threshold for suspension damage color indication, which better reflects severity of suspension damage that would affect handling.
+
+    show_detached_warning_flash
+Show warning flash for detached parts, such as wings and wheels.
+
+    warning_flash_highlight_duration
+Set color highlight duration for each warning flash. Default is `0.5` seconds. Minimum value is limited to `0.2`.
+
+    warning_flash_interval
+Set minimum time interval between each warning flash. Default is `0.5` seconds. Minimum value is limited to `0.2`.
 
     show_last_impact_cone
 Show cone indicator towards last known impact (collision) position.

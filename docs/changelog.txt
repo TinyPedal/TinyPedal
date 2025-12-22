@@ -10,6 +10,11 @@ WIP
 * Pace Notes Playback
   - Added "Enable Playback While in Pit Lane" check box, which allows to enable or disable pace notes playback while in pit lane. This option takes immediate effect when changed.
 
+* Damage Widget
+  - Now shows detached wings (for LMU built-in API only).
+  - Added "show_detached_warning_flash" option, which shows warning flash for detached parts, such as wings and wheels.
+  - Added "parts_width_ratio" option, which sets width ratio between side and center body parts. Value range in "0.1" to "1.0".
+
 * Pace notes Widget
   - Added "show_pit_notes_while_in_pit" option (requested by user "DanRZ"), which shows alternative pit notes while in pit lane. Note, this option does not affect pace notes playback.
   - Added "pit_notes_text" & "pit_comments_text" options.

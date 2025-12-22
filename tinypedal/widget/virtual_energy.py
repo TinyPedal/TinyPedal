@@ -360,12 +360,12 @@ class Realtime(Overlay):
             )
             layout.addWidget(self.bar_level, self.wcfg["column_index_middle"], 0)
 
-        # Last data
-        self.warn_flash = WarningFlash(
-            self.wcfg["warning_flash_highlight_duration"],
-            self.wcfg["warning_flash_interval"],
-            self.wcfg["number_of_warning_flashes"],
-        )
+        if self.wcfg["show_low_energy_warning_flash"]:
+            self.warn_flash = WarningFlash(
+                self.wcfg["warning_flash_highlight_duration"],
+                self.wcfg["warning_flash_interval"],
+                self.wcfg["number_of_warning_flashes"],
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""

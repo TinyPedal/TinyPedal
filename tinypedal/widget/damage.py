@@ -25,7 +25,9 @@ from PySide2.QtGui import QBrush, QPainter, QPen
 
 from .. import calculation as calc
 from ..api_control import api
+from ..const_common import FLOAT_INF
 from ._base import Overlay
+from ._common import WarningFlash
 
 
 class Realtime(Overlay):
@@ -72,6 +74,7 @@ class Realtime(Overlay):
             self.wcfg["suspension_color_damage_heavy"],
             self.wcfg["suspension_color_damage_totaled"],
             self.wcfg["wheel_color_detached"],
+            self.wcfg["warning_color_detached"],
         )
 
         # Rect parts
@@ -83,7 +86,7 @@ class Realtime(Overlay):
             display_margin, parts_width, inner_gap, parts_full_width, parts_full_height
         )
         self.rects_parts = self.create_parts_rect(
-            display_margin, inner_gap, parts_max_width, parts_max_height
+            display_margin, inner_gap, parts_width, parts_max_width, parts_max_height
         )
 
         # Rect
@@ -103,6 +106,13 @@ class Realtime(Overlay):
         self.pen_text.setColor(self.wcfg["font_color_integrity"])
         self.brush_cone = QBrush(Qt.SolidPattern)
         self.brush_cone.setColor(self.wcfg["last_impact_cone_color"])
+
+        if self.wcfg["show_detached_warning_flash"]:
+            self.warn_flash = WarningFlash(
+                self.wcfg["warning_flash_highlight_duration"],
+                self.wcfg["warning_flash_interval"],
+                FLOAT_INF,
+            )
 
         # Last data
         self.damage_aero = -1.0
@@ -206,6 +216,10 @@ class Realtime(Overlay):
             return self.wcfg["body_color_damage_light"]
         if value == 2:
             return self.wcfg["body_color_damage_heavy"]
+        if value >= 3:
+            if self.wcfg["show_detached_warning_flash"] and self.warn_flash.state(True):
+                return self.wcfg["warning_color_detached"]
+            return self.wcfg["body_color_detached"]
         return self.wcfg["body_color"]
 
     def set_damage_level_wheel(self, wheel_detached: bool, susp_wear: float) -> int:
@@ -220,6 +234,8 @@ class Realtime(Overlay):
             5 wheel detached.
         """
         if wheel_detached:
+            if self.wcfg["show_detached_warning_flash"] and self.warn_flash.state(True):
+                return 6
             return 5
         if susp_wear < self.wcfg["suspension_damage_light_threshold"]:
             return 0
@@ -247,18 +263,29 @@ class Realtime(Overlay):
         )
         return tuple(QRect(*pos, wheel_width, wheel_height) for pos in wheels_pos)
 
-    def create_parts_rect(self, display_margin, inner_gap, parts_max_width, parts_max_height):
+    def create_parts_rect(self, display_margin, inner_gap, parts_width, parts_max_width, parts_max_height):
         """Body parts rect, row by row from left to right, top to bottom"""
-        offset_x = inner_gap + parts_max_width
         offset_y = inner_gap + parts_max_height
+        width_ratio = min(max(self.wcfg["parts_width_ratio"], 0.1), 1.0)
+        side_scale = width_ratio * 2 / (1 + width_ratio)
+        part_side_width = max(round(parts_max_width * side_scale), parts_width)
+        part_center_width = parts_max_width * 3 - part_side_width * 2
         parts_pos = (
-            (display_margin, display_margin),  # front left
-            (display_margin + offset_x, display_margin),  # front center
-            (display_margin + offset_x * 2, display_margin,),  # front right
-            (display_margin, display_margin + offset_y,),  # center left
-            (display_margin + offset_x * 2, display_margin + offset_y,),  # center right
-            (display_margin, display_margin + offset_y * 2,),  # rear left
-            (display_margin + offset_x, display_margin + offset_y * 2,),  # rear center
-            (display_margin + offset_x * 2, display_margin + offset_y * 2,),  # rear right
+            # front left
+            QRect(display_margin, display_margin, part_side_width, parts_max_height),
+            # front center
+            QRect(display_margin + inner_gap + part_side_width, display_margin, part_center_width, parts_max_height),
+            # front right
+            QRect(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin, part_side_width, parts_max_height),
+            # center left
+            QRect(display_margin, display_margin + offset_y, part_side_width, parts_max_height),
+            # center right
+            QRect(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin + offset_y, part_side_width, parts_max_height),
+            # rear left
+            QRect(display_margin, display_margin + offset_y * 2, part_side_width, parts_max_height),
+            # rear center
+            QRect(display_margin + inner_gap + part_side_width, display_margin + offset_y * 2, part_center_width, parts_max_height),
+            # rear right
+            QRect(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin + offset_y * 2, part_side_width, parts_max_height),
         )
-        return tuple(QRect(*pos, parts_max_width, parts_max_height) for pos in parts_pos)
+        return parts_pos

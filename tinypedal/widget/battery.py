@@ -137,12 +137,12 @@ class Realtime(Overlay):
                 column=self.wcfg["column_index_activation_timer"],
             )
 
-        # Last data
-        self.warn_flash = WarningFlash(
-            self.wcfg["warning_flash_highlight_duration"],
-            self.wcfg["warning_flash_interval"],
-            self.wcfg["number_of_warning_flashes"],
-        )
+        if self.wcfg["show_battery_charge_warning_flash"]:
+            self.warn_flash = WarningFlash(
+                self.wcfg["warning_flash_highlight_duration"],
+                self.wcfg["warning_flash_interval"],
+                self.wcfg["number_of_warning_flashes"],
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
