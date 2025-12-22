@@ -49,7 +49,7 @@ class APIControl:
             name: match API name in API_NAME_LIST
         """
         if not name:
-            name = cfg.user.config["telemetry_api"]["api_name"]
+            name = cfg.api_name
 
         # Do not create new instance if same API already loaded
         self._same_api_loaded = bool(self._api is not None and self._api.NAME == name)
@@ -64,7 +64,7 @@ class APIControl:
 
         logger.warning("CONNECTING: Invalid API name, fall back to default")
         self._api = API_PACK[0]()
-        cfg.user.config["telemetry_api"]["api_name"] = self._api.NAME
+        cfg.api_name = self._api.NAME
 
     def start(self):
         """Start API"""

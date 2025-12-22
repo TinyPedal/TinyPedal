@@ -339,6 +339,9 @@ Set PySide (Qt for Python) module version. Set `2` for PySide2 (default). Set `6
     api_name
 Set API name for accessing data from supported API.
 
+    enable_global_api_selector
+Set API selector mode. While this option is enabled, API is selected globally for all presets. While disabled, API is selected individually for each preset.
+
 [**`Back to Top`**](#)
 
 

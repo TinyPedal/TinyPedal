@@ -245,7 +245,7 @@ class Setting:
         new_settings_path = os.path.abspath(self.path.settings)
         # Update preset name if settings path changed
         if new_settings_path != old_settings_path:
-            self.set_next_to_load(f"{self.preset_list[0]}{FileExt.JSON}")
+            self.set_next_to_load(f"{self.preset_files()[0]}{FileExt.JSON}")
 
     def load_user(self):
         """Load user settings, should be called after loaded global setting"""
@@ -303,16 +303,32 @@ class Setting:
 
     def load_api(self) -> None:
         """Load API setting, should be called after loaded user settings, but before starting API"""
-        self.api = self.user.setting[self.api_config_name()]
-
-    def api_config_name(self) -> str:
-        """Get api config name"""
-        api_name = self.user.config["telemetry_api"]["api_name"]
-        return f"api_{API_NAME_ALIAS[api_name].lower()}"
+        self.api = self.user.setting[self.api_key]
 
     @property
-    def preset_list(self) -> list[str]:
-        """Load user preset JSON filename list, sort by modified date in descending order
+    def api_name(self) -> str:
+        """Get selected api name"""
+        global_api_setting = self.user.config["telemetry_api"]
+        if global_api_setting["enable_global_api_selector"]:
+            return global_api_setting["api_name"]
+        return self.user.setting["preset"]["api_name"]
+
+    @api_name.setter
+    def api_name(self, name: str) -> None:
+        """Set selected api name"""
+        global_api_setting = self.user.config["telemetry_api"]
+        if global_api_setting["enable_global_api_selector"]:
+            global_api_setting["api_name"] = name
+        else:
+            self.user.setting["preset"]["api_name"] = name
+
+    @property
+    def api_key(self) -> str:
+        """Get selected api config key name"""
+        return f"api_{API_NAME_ALIAS[self.api_name].lower()}"
+
+    def preset_files(self) -> list[str]:
+        """Get user preset JSON filename list, sort by modified date in descending order
 
         Returns:
             JSON filename (without file extension) list.

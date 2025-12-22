@@ -133,7 +133,8 @@ class StatusButtonBar(QStatusBar):
             text_api_status = "overriding"
         else:
             text_api_status = api.read.state.version()
-        self.button_api.setText(f"API: {API_NAME_ALIAS[api.name]} ({text_api_status})")
+        legacy_tag = "*" if "legacy" in api.name else ""
+        self.button_api.setText(f"API: {API_NAME_ALIAS[api.name]}{legacy_tag} ({text_api_status})")
 
         self.button_style.setText(f"UI: {cfg.application['window_color_theme']}")
 

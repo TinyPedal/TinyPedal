@@ -247,13 +247,6 @@ class PresetValidator:
     @staticmethod
     def preupdate_user_preset(dict_user: dict, dict_def: dict):
         """Pre update user preset, run before validation"""
-        # Copy old telemetry_api setting
-        if "telemetry_api" in dict_user:
-            api_config = dict_user.get("telemetry_api")
-            if isinstance(api_config, dict):
-                dict_user["api_lmu"] = api_config.copy()
-                dict_user["api_rf2"] = api_config.copy()
-
         # Check preset version
         preset_info = dict_user.get("preset")
         if not isinstance(preset_info, dict):
@@ -261,14 +254,12 @@ class PresetValidator:
             preset_info = dict_user["preset"]
         preset_version = parse_version_string(preset_info.get("version", "0.0.0"))
 
-        # Update old setting for specific version
-        if preset_version < (2, 36, 0):
-            module_vehicles = dict_user.get("module_vehicles")
-            if isinstance(module_vehicles, dict):
-                module_vehicles["update_interval"] = 10
-
         # Update preset version
         dict_user["preset"]["version"] = dict_def["preset"]["version"]
+
+        # Update old setting for specific version
+        if preset_version < (2, 36, 0):
+            _prior_2_36_0(dict_user)
 
     @classmethod
     def global_preset(cls, dict_user: dict, dict_def: dict) -> dict:
@@ -290,3 +281,18 @@ class PresetValidator:
         for item in dict_user.keys():  # list each key lists
             cls.validate_key_pair(dict_user[item], dict_def[item])
         return dict_user
+
+
+def _prior_2_36_0(dict_user: dict):
+    """Update old setting prior to 2.36.0"""
+    # Copy old telemetry_api setting
+    if "telemetry_api" in dict_user:
+        api_config = dict_user.get("telemetry_api")
+        if isinstance(api_config, dict):
+            dict_user["api_lmu"] = api_config.copy()
+            dict_user["api_rf2"] = api_config.copy()
+    # Correct default update interval in module_vehicles
+    module_vehicles = dict_user.get("module_vehicles")
+    if isinstance(module_vehicles, dict):
+        if module_vehicles["update_interval"] == 20:
+            module_vehicles["update_interval"] = 10

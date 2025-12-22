@@ -349,8 +349,12 @@ class APIMenu(QMenu):
         self._parent = parent
 
         # API selector
-        self.__api_selector()
+        self.actions_api = self.__api_selector()
         self.addSeparator()
+
+        self.global_api = self.addAction("Global API Selector")
+        self.global_api.setCheckable(True)
+        self.global_api.triggered.connect(self.toggle_global_api)
 
         config_api = self.addAction("Options")
         config_api.triggered.connect(self.open_config_api)
@@ -359,11 +363,45 @@ class APIMenu(QMenu):
         restart_api = self.addAction("Restart API")
         restart_api.triggered.connect(parent.restart_api)
 
+        self.aboutToShow.connect(self.refresh_menu)
+
+    def refresh_menu(self):
+        """Refresh menu"""
+        selected_api_name = cfg.api_name
+        for action in self.actions_api.actions():
+            action.setChecked(selected_api_name == action.text())
+        self.global_api.setChecked(cfg.user.config["telemetry_api"]["enable_global_api_selector"])
+
+    def toggle_global_api(self):
+        """Toggle global API selector mode"""
+        enabled = cfg.user.config["telemetry_api"]["enable_global_api_selector"]
+        if enabled:
+            state = "Disable"
+            desc = "While disabled, API is selected individually for each preset."
+        else:
+            state = "Enable"
+            desc = "While enabled, API is selected globally for all presets."
+        msg_text = (
+            f"{state} <b>Global API Selector</b>?<br><br>"
+            f"{desc}"
+        )
+        api_msg = QMessageBox.question(
+            self._parent, "API Selector Mode", msg_text,
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
+        if api_msg != QMessageBox.Yes:
+            return
+
+        cfg.user.config["telemetry_api"]["enable_global_api_selector"] = not enabled
+        cfg.save(cfg_type=ConfigType.CONFIG)
+        self._parent.reload_only()
+
     def open_config_api(self):
         """Config API"""
         _dialog = UserConfig(
             parent=self._parent,
-            key_name=cfg.api_config_name(),
+            key_name=cfg.api_key,
             cfg_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,
@@ -379,21 +417,20 @@ class APIMenu(QMenu):
             from PySide2.QtWidgets import QActionGroup
 
         actions_api = QActionGroup(self)
-        selected_api_name = cfg.user.config["telemetry_api"]["api_name"]
 
         for _api in API_PACK:
             api_name = _api.NAME
             option = self.addAction(api_name)
             option.setCheckable(True)
             option.triggered.connect(lambda checked=True, name=api_name: self.__toggle_option(checked, name))
-            option.setChecked(selected_api_name == api_name)
             actions_api.addAction(option)
+        return actions_api
 
     def __toggle_option(self, checked: bool, api_name: str):
         """Toggle option"""
-        if cfg.user.config["telemetry_api"]["api_name"] == api_name:
+        if cfg.api_name == api_name:
             return
-        cfg.user.config["telemetry_api"]["api_name"] = api_name
+        cfg.api_name = api_name
         cfg.save(cfg_type=ConfigType.CONFIG)
         self._parent.reload_only()
 

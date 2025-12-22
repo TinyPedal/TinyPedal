@@ -120,7 +120,7 @@ class PresetTransfer(BaseEditor):
 
     def set_selector_list(self) -> list:
         """Set preset selector list"""
-        preset_list = cfg.preset_list
+        preset_list = cfg.preset_files()
         # Remove loaded preset
         if self.loaded_preset in preset_list:
             preset_list.remove(self.loaded_preset)

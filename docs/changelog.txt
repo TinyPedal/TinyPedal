@@ -1,5 +1,9 @@
 WIP
 -----------------------------
+* API
+  - Added "Global API Selector" option to "API" menu, which allows to toggle "API Selector Mode". While this option is enabled, API is selected globally for all presets. While disabled, API is selected individually for each preset. This option is disabled by default.
+  - Added asterisk (*) symbol to legacy API name in status bar.
+
 * Driver Stats
   - Now records personal best lap time also for qualifying and race session separately, and can be viewed under "Qualifying" and "Race" columns in Driver stats viewer.
 
