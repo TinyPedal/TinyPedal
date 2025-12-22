@@ -67,21 +67,20 @@ class Realtime(Overlay):
             text=text_rake,
             style=self.bar_style_rake[0],
             width=font_m.width * len(text_rake) + bar_padx,
+            last=0,
         )
         layout.addWidget(self.bar_rake, 0, 0)
 
-        # Last data
-        self.ema_rake = 0
         self.calc_ema_rake = partial(
             calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.wcfg["rake_angle_smoothing_samples"], 1), 500))
+            calc.ema_factor(self.wcfg["rake_angle_smoothing_samples"])
         )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Rake angle
-        self.ema_rake = self.calc_ema_rake(self.ema_rake, calc.rake(*api.read.wheel.ride_height()))
-        self.update_rake(self.bar_rake, self.ema_rake)
+        ema_rake = self.calc_ema_rake(self.bar_rake.last, calc.rake(*api.read.wheel.ride_height()))
+        self.update_rake(self.bar_rake, ema_rake)
 
     # GUI update methods
     def update_rake(self, target, data):

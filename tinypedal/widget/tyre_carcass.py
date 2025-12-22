@@ -154,6 +154,10 @@ class Realtime(Overlay):
                 target=layout_rtemp,
                 column=self.wcfg["column_index_rate_of_change"],
             )
+            self.calc_ema_rdiff = partial(
+                calc.exp_mov_avg,
+                calc.ema_factor(self.wcfg["rate_of_change_smoothing_samples"])
+            )
 
             if self.wcfg["show_tyre_compound"]:
                 bars_blank = self.set_qlabel(
@@ -173,10 +177,6 @@ class Realtime(Overlay):
         self.last_tcmpd_r = ""
         self.last_rtemp = list(WHEELS_ZERO)
         self.last_lap_etime = 0
-        self.calc_ema_rdiff = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.wcfg["rate_of_change_smoothing_samples"], 1), 500))
-        )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""

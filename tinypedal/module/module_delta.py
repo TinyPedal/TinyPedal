@@ -64,11 +64,11 @@ class Realtime(DataModule):
 
         calc_ema_delta = partial(
             calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.mcfg["delta_smoothing_samples"], 1), 100))
+            calc.ema_factor(self.mcfg["delta_smoothing_samples"])
         )
         calc_ema_laptime = partial(
             calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.mcfg["laptime_pace_samples"], 1), 20))
+            calc.ema_factor(self.mcfg["laptime_pace_samples"])
         )
         laptime_pace_margin = max(self.mcfg["laptime_pace_margin"], 0.1)
         gen_position_sync = vehicle_position_sync()

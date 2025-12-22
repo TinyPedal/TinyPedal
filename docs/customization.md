@@ -1215,10 +1215,10 @@ Enable delta module.
 Set minimum recording distance (in meters) between each lap time sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
 
     delta_smoothing_samples
-Set number of samples for reducing data fluctuation. Value range in `1` to `100`. Higher value results more smoothness, but may lose accuracy. Default is `30` samples. Set to `1` to disable smoothing.
+Set number of samples for reducing data fluctuation. Higher value results more smoothness, but may lose accuracy. Default is `30` samples. Set to `1` to disable smoothing.
 
     laptime_pace_samples
-Set number of samples for average laptime pace calculation (EMA). Value range in `1` to `20`. Default is `6` samples. Set `1` to disable averaging. Note, initial laptime pace is always based on player's all time personal best laptime if available. If a new laptime is faster than current laptime pace, it will replace current laptime pace without calculating average. Invalid lap, pit-in/out laps are always excluded from laptime pace calculation.
+Set number of samples for average laptime pace calculation. Default is `6` samples. Set `1` to disable averaging. Note, initial laptime pace is always based on player's all time personal best laptime if available. If a new laptime is faster than current laptime pace, it will replace current laptime pace without calculating average. Invalid lap, pit-in/out laps are always excluded from laptime pace calculation.
 
     laptime_pace_margin
 Set additional margin for laptime pace that cannot exceed the sum of previous `laptime pace` and `margin`. This option is used to minimize the impact of unusually slow laptime. Default value is `5` seconds. Minimum value is limited to `0.1`.
@@ -2753,7 +2753,7 @@ The three values define an invisible rectangle area(unit meter) that hides any v
 Set wheelbase in millimeters, for used in rake angle calculation.
 
     rake_angle_smoothing_samples
-Set number of samples for reducing data fluctuation. Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
     show_degree_sign
 Set `true` to show degree sign for rake angle value.
@@ -3014,7 +3014,7 @@ Set detection range (in seconds) near (after) start/finish line to show color in
 Set detection range (in seconds) near (before) start/finish line to show color indicator when vehicle is within the range (or less). Default is `20` seconds. Default color is orange.
 
     leader_laptime_pace_samples
-Set number of samples for average laptime pace calculation (EMA). Value range in `1` to `20`. Default is `6` samples. Set `1` to disable averaging.
+Set number of samples for average laptime pace calculation. Default is `6` samples. Set `1` to disable averaging.
 
 Note, initial laptime pace is always based on leader's session personal best laptime if available. If a new laptime is faster than current laptime pace, it will replace current laptime pace without calculating average. Invalid lap, pit-in/out laps are always excluded from laptime pace calculation.
 
@@ -3077,7 +3077,7 @@ Set `true` to show degree and percentage sign.
 Set front and rear wheel track in millimeters, for used in roll angle calculation. Default is `2000` millimeters.
 
     roll_angle_smoothing_samples, roll_angle_ratio_smoothing_samples
-Set number of samples for reducing data fluctuation. Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
     show_roll_angle_difference
 Show roll angle difference between front and rear roll angles.
@@ -3379,7 +3379,7 @@ Show system's overall CPU utilization (percent) and memory usage (GB). Note, sam
 Show TinyPedal's CPU utilization (percent) and memory usage (MB).
 
     average_samples
-Set number of samples for average CPU utilization calculation (EMA). Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable averaging.
+Set number of samples for average CPU utilization calculation. Lower value may result more fluctuated reading. Set `1` to disable averaging.
 
 [**`Back to Top`**](#)
 
@@ -3643,7 +3643,7 @@ Show carcass temeperature rate of change for a specific time interval.
 Set time interval in seconds for rate of change calculation. Default interval is `5` seconds. Minimum interval is limited to `1` second, maximum interval is limited to `60` seconds.
 
     rate_of_change_smoothing_samples
-Set number of samples for reducing data fluctuation. Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
@@ -3874,7 +3874,7 @@ Show left to right weight distribution in percentage.
 Show cross weight (known as `wedge`) in percentage.
 
     smoothing_samples
-Set number of samples for reducing data fluctuation. Value range in `1` to `500`. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
 [**`Back to Top`**](#)
 
@@ -3887,5 +3887,8 @@ Show camber in degree.
 
     show_toe_in
 Show toe-in in degree.
+
+    camber_smoothing_samples, toe_in_smoothing_samples
+Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
 [**`Back to Top`**](#)

@@ -78,6 +78,7 @@ class Realtime(Overlay):
             text=text_rollf,
             style=bar_style_rollf,
             width=font_m.width * len(text_rollf) + bar_padx,
+            last=0,
         )
         self.set_primary_orient(
             target=self.bar_rollf,
@@ -94,10 +95,16 @@ class Realtime(Overlay):
             text=text_rollr,
             style=bar_style_rollr,
             width=font_m.width * len(text_rollr) + bar_padx,
+            last=0,
         )
         self.set_primary_orient(
             target=self.bar_rollr,
             column=self.wcfg["column_index_roll_angle_rear"],
+        )
+
+        self.calc_ema_roll = partial(
+            calc.exp_mov_avg,
+            calc.ema_factor(self.wcfg["roll_angle_smoothing_samples"])
         )
 
         # Roll angle difference
@@ -128,24 +135,16 @@ class Realtime(Overlay):
                 text=text_ratio,
                 style=bar_style_ratio,
                 width=font_m.width * len(text_ratio) + bar_padx,
+                last=0,
             )
             self.set_primary_orient(
                 target=self.bar_ratio,
                 column=self.wcfg["column_index_roll_angle_ratio"],
             )
-
-        # Last data
-        self.ema_rollf_deg = 0
-        self.ema_rollr_deg = 0
-        self.ema_ratio = 0
-        self.calc_ema_roll = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.wcfg["roll_angle_smoothing_samples"], 1), 500))
-        )
-        self.calc_ema_ratio = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.wcfg["roll_angle_ratio_smoothing_samples"], 1), 500))
-        )
+            self.calc_ema_ratio = partial(
+                calc.exp_mov_avg,
+                calc.ema_factor(self.wcfg["roll_angle_ratio_smoothing_samples"])
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -155,15 +154,15 @@ class Realtime(Overlay):
         rollf_deg = calc.slope_angle(height_fr - height_fl, self.wcfg["wheel_track_front"])
         rollr_deg = calc.slope_angle(height_rr - height_rl, self.wcfg["wheel_track_rear"])
 
-        self.ema_rollf_deg = self.calc_ema_roll(self.ema_rollf_deg, rollf_deg)
-        self.ema_rollr_deg = self.calc_ema_roll(self.ema_rollr_deg, rollr_deg)
+        ema_rollf_deg = self.calc_ema_roll(self.bar_rollf.last, rollf_deg)
+        ema_rollr_deg = self.calc_ema_roll(self.bar_rollr.last, rollr_deg)
 
-        self.update_roll(self.bar_rollf, self.ema_rollf_deg, self.prefix_rollf)
-        self.update_roll(self.bar_rollr, self.ema_rollr_deg, self.prefix_rollr)
+        self.update_roll(self.bar_rollf, ema_rollf_deg, self.prefix_rollf)
+        self.update_roll(self.bar_rollr, ema_rollr_deg, self.prefix_rollr)
 
         # Roll angle difference
         if self.wcfg["show_roll_angle_difference"]:
-            self.update_roll(self.bar_rolld, self.ema_rollr_deg - self.ema_rollf_deg, self.prefix_rolld)
+            self.update_roll(self.bar_rolld, ema_rollr_deg - ema_rollf_deg, self.prefix_rolld)
 
         # Roll angle ratio
         if self.wcfg["show_roll_angle_ratio"]:
@@ -173,8 +172,8 @@ class Realtime(Overlay):
                 ratio = calc.part_to_whole_ratio(abs(rollf_deg), abs(rollf_deg + rollr_deg), 50)
             else:
                 ratio = 50
-            self.ema_ratio = self.calc_ema_ratio(self.ema_ratio, ratio)
-            self.update_ratio(self.bar_ratio, self.ema_ratio, self.prefix_ratio)
+            ema_ratio = self.calc_ema_ratio(self.bar_ratio.last, ratio)
+            self.update_ratio(self.bar_ratio, ema_ratio, self.prefix_ratio)
 
     # GUI update methods
     def update_roll(self, target, data, prefix):

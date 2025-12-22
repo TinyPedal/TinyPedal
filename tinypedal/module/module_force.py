@@ -48,7 +48,7 @@ class Realtime(DataModule):
         max_g_diff = self.mcfg["max_average_g_force_difference"]
         calc_ema_gforce = partial(
             calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.mcfg["max_average_g_force_samples"], 3), 1000))
+            calc.ema_factor(self.mcfg["max_average_g_force_samples"], 3)
         )
 
         calc_max_lgt = TransientMax(self.mcfg["max_g_force_reset_delay"])

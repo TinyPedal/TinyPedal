@@ -403,9 +403,9 @@ def exp_mov_avg(factor: float, ema_last: float, source: float) -> float:
     return ema_last + factor * (source - ema_last)
 
 
-def ema_factor(samples: int) -> float:
+def ema_factor(samples: int, min_samples: int = 1) -> float:
     """Calculate smoothing factor for exponential moving average"""
-    return 2 / (samples + 1)
+    return 2 / (max(samples, min_samples) + 1)
 
 
 def accumulated_sum(data: list, end_index: int) -> float:

@@ -26,6 +26,9 @@ WIP
   - Added "show_custom_player_color_in_multi_class" option (requested by user "mzluzifer"), which shows custom player vehicle color while "enable_multi_class_styling" option is enabled. This option is disabled by default.
   - Now always highlight player vehicle color while in pit.
 
+* Wheel alignment Widget
+  - Added "camber_smoothing_samples" & "toe_in_smoothing_samples" options for reducing data fluctuation and improved readability.
+
 * Misc
   - More accurate vehicle coordinates synchronization between local player and opponents (smoother vehicle position update on Radar & Navigation Widget).
 

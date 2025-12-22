@@ -74,6 +74,7 @@ class Realtime(Overlay):
                 text=text_system,
                 style=bar_style_system,
                 width=font_m.width * len(text_system) + bar_padx,
+                last=0,
             )
             self.set_primary_orient(
                 target=self.bar_system,
@@ -91,32 +92,31 @@ class Realtime(Overlay):
                 text=text_app,
                 style=bar_style_app,
                 width=font_m.width * len(text_app) + bar_padx,
+                last=0,
             )
             self.set_primary_orient(
                 target=self.bar_app,
                 column=self.wcfg["column_index_tinypedal"],
             )
 
+        self.calc_ema = partial(
+            calc.exp_mov_avg,
+            calc.ema_factor(self.wcfg["average_samples"])
+        )
+
         # Last data
         self.app_info = psutil.Process(os.getpid())
         self.cpu_count = os.cpu_count()
-        self.calc_ema_cpu = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.wcfg["average_samples"], 1), 500))
-        )
-        self.sys_cpu_ema = 0
-        self.app_cpu_ema = 0
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
         if self.wcfg["show_system_performance"]:
-            self.sys_cpu_ema = self.calc_ema_cpu(self.sys_cpu_ema, psutil.cpu_percent())
-            self.update_system(self.bar_system, self.sys_cpu_ema, self.prefix_sys)
+            sys_cpu_ema = self.calc_ema(self.bar_system.last, psutil.cpu_percent())
+            self.update_system(self.bar_system, sys_cpu_ema, self.prefix_sys)
 
         if self.wcfg["show_tinypedal_performance"]:
-            self.app_cpu_ema = self.calc_ema_cpu(
-                self.app_cpu_ema, self.app_info.cpu_percent() / self.cpu_count)
-            self.update_app(self.bar_app, self.app_cpu_ema, self.prefix_app)
+            app_cpu_ema = self.calc_ema(self.bar_app.last, self.app_info.cpu_percent() / self.cpu_count)
+            self.update_app(self.bar_app, app_cpu_ema, self.prefix_app)
 
     # GUI update methods
     def update_system(self, target, data, prefix):

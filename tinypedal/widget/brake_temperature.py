@@ -54,7 +54,6 @@ class Realtime(Overlay):
         self.leading_zero = min(max(self.wcfg["leading_zero"], 1), 3) + 0.0  # no decimal
         self.sign_text = "°" if self.wcfg["show_degree_sign"] else ""
         text_width = 3 + len(self.sign_text) + (self.cfg.units["temperature_unit"] == "Fahrenheit")
-        average_samples = max(int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (self._update_interval * 0.001)), 1)
         self.off_brake_duration = max(self.wcfg["off_brake_duration"], 0)
 
         # Config units
@@ -122,13 +121,14 @@ class Realtime(Overlay):
                 target=layout_btavg,
                 column=self.wcfg["column_index_average"],
             )
+            average_samples = int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (self._update_interval * 0.001))
+            self.calc_ema_btemp = partial(calc.exp_mov_avg, calc.ema_factor(average_samples))
 
         # Last data
         self.last_in_pits = -1
         self.last_vehicle_name = None
         self.last_lap_etime = 0
         self.off_brake_timer = 0
-        self.calc_ema_btemp = partial(calc.exp_mov_avg, calc.ema_factor(average_samples))
 
     def timerEvent(self, event):
         """Update when vehicle on track"""

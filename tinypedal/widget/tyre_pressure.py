@@ -131,7 +131,7 @@ class Realtime(Overlay):
             )
 
             self.tpavg = list(WHEELS_ZERO)
-            average_samples = max(int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (self._update_interval * 0.001)), 1)
+            average_samples = int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (self._update_interval * 0.001))
             self.calc_ema_tpres = partial(
                 calc.exp_mov_avg,
                 calc.ema_factor(average_samples)

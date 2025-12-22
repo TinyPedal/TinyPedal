@@ -76,6 +76,7 @@ class Realtime(Overlay):
                 text=text_distf,
                 style=bar_style_distf,
                 width=font_m.width * len(text_distf) + bar_padx,
+                last=0,
             )
             self.set_primary_orient(
                 target=self.bar_distf,
@@ -93,6 +94,7 @@ class Realtime(Overlay):
                 text=text_distl,
                 style=bar_style_distl,
                 width=font_m.width * len(text_distl) + bar_padx,
+                last=0,
             )
             self.set_primary_orient(
                 target=self.bar_distl,
@@ -110,19 +112,16 @@ class Realtime(Overlay):
                 text=text_cross,
                 style=bar_style_cross,
                 width=font_m.width * len(text_cross) + bar_padx,
+                last=0,
             )
             self.set_primary_orient(
                 target=self.bar_cross,
                 column=self.wcfg["column_index_cross_weight"],
             )
 
-        # Last data
-        self.ema_distf = 0
-        self.ema_distl = 0
-        self.ema_cross = 0
         self.calc_ema_ratio = partial(
             calc.exp_mov_avg,
-            calc.ema_factor(min(max(self.wcfg["smoothing_samples"], 1), 500))
+            calc.ema_factor(self.wcfg["smoothing_samples"])
         )
 
     def timerEvent(self, event):
@@ -137,18 +136,18 @@ class Realtime(Overlay):
 
         # Front to rear distribution
         if self.wcfg["show_front_to_rear_distribution"]:
-            self.ema_distf = self.calc_ema_ratio(self.ema_distf, calc.part_to_whole_ratio((load_fl + load_fr), total_load))
-            self.update_dist(self.bar_distf, self.ema_distf, self.prefix_distf)
+            ema_distf = self.calc_ema_ratio(self.bar_distf.last, calc.part_to_whole_ratio((load_fl + load_fr), total_load))
+            self.update_dist(self.bar_distf, ema_distf, self.prefix_distf)
 
         # Left to right distribution
         if self.wcfg["show_left_to_right_distribution"]:
-            self.ema_distl = self.calc_ema_ratio(self.ema_distl, calc.part_to_whole_ratio((load_fl + load_rl), total_load))
-            self.update_dist(self.bar_distl, self.ema_distl, self.prefix_distl)
+            ema_distl = self.calc_ema_ratio(self.bar_distl.last, calc.part_to_whole_ratio((load_fl + load_rl), total_load))
+            self.update_dist(self.bar_distl, ema_distl, self.prefix_distl)
 
         # Cross weight
         if self.wcfg["show_cross_weight"]:
-            self.ema_cross = self.calc_ema_ratio(self.ema_cross, calc.part_to_whole_ratio((load_fr + load_rl), total_load))
-            self.update_dist(self.bar_cross, self.ema_cross, self.prefix_cross)
+            ema_cross = self.calc_ema_ratio(self.bar_cross.last, calc.part_to_whole_ratio((load_fr + load_rl), total_load))
+            self.update_dist(self.bar_cross, ema_cross, self.prefix_cross)
 
     # GUI update methods
     def update_dist(self, target, data, prefix):

@@ -369,7 +369,9 @@ class APIMenu(QMenu):
         """Refresh menu"""
         selected_api_name = cfg.api_name
         for action in self.actions_api.actions():
-            action.setChecked(selected_api_name == action.text())
+            if selected_api_name == action.text():
+                action.setChecked(True)
+                break
         self.global_api.setChecked(cfg.user.config["telemetry_api"]["enable_global_api_selector"])
 
     def toggle_global_api(self):

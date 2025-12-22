@@ -68,7 +68,7 @@ class Realtime(Overlay):
         self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
 
         self.gen_leader_pace = calc_laptime_pace(
-            min(max(self.wcfg["leader_laptime_pace_samples"], 1), 20),
+            self.wcfg["leader_laptime_pace_samples"],
             max(self.wcfg["leader_laptime_pace_margin"], 0.1))
 
         # Base style

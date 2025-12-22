@@ -20,6 +20,8 @@
 Wheel alignment Widget
 """
 
+from functools import partial
+
 from .. import calculation as calc
 from ..api_control import api
 from ..const_common import TEXT_NA
@@ -67,7 +69,7 @@ class Realtime(Overlay):
                 style=bar_style_camber,
                 width=bar_width,
                 count=4,
-                last=-1,
+                last=0,
             )
             self.set_grid_layout_quad(
                 layout=layout_camber,
@@ -76,6 +78,10 @@ class Realtime(Overlay):
             self.set_primary_orient(
                 target=layout_camber,
                 column=self.wcfg["column_index_camber"],
+            )
+            self.calc_ema_camber = partial(
+                calc.exp_mov_avg,
+                calc.ema_factor(self.wcfg["camber_smoothing_samples"])
             )
 
             if self.wcfg["show_caption"]:
@@ -97,7 +103,7 @@ class Realtime(Overlay):
                 style=bar_style_toein,
                 width=bar_width,
                 count=4,
-                last=-1,
+                last=0,
             )
             self.set_grid_layout_quad(
                 layout=layout_toein,
@@ -106,6 +112,10 @@ class Realtime(Overlay):
             self.set_primary_orient(
                 target=layout_toein,
                 column=self.wcfg["column_index_toe_in"],
+            )
+            self.calc_ema_toein = partial(
+                calc.exp_mov_avg,
+                calc.ema_factor(self.wcfg["toe_in_smoothing_samples"])
             )
 
             if self.wcfg["show_caption"]:
@@ -121,17 +131,17 @@ class Realtime(Overlay):
         if self.wcfg["show_camber"]:
             camber_set = api.read.wheel.camber()
             for camber, bar_camber in zip(camber_set, self.bars_camber):
-                self.update_wheel(bar_camber, round(calc.rad2deg(camber), 2))
+                self.update_wheel(bar_camber, self.calc_ema_camber(bar_camber.last, camber))
 
         # Toe in
         if self.wcfg["show_toe_in"]:
             toein_set = api.read.wheel.toe_symmetric()
             for toein, bar_toein in zip(toein_set, self.bars_toein):
-                self.update_wheel(bar_toein, round(calc.rad2deg(toein), 2))
+                self.update_wheel(bar_toein, self.calc_ema_toein(bar_toein.last, toein))
 
     # GUI update methods
     def update_wheel(self, target, data):
         """Wheel data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:+.2f}"[:5])
+            target.setText(f"{calc.rad2deg(data):+.2f}"[:5])
