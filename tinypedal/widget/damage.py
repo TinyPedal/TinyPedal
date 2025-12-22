@@ -25,7 +25,7 @@ from PySide2.QtGui import QBrush, QPainter, QPen
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import FLOAT_INF
+from ..const_common import FLOAT_INF, WHEELS_ZERO
 from ._base import Overlay
 from ._common import WarningFlash
 
@@ -66,17 +66,6 @@ class Realtime(Overlay):
         impact_cone_size = max(display_width, display_height)
         self.impact_cone_angle = max(min(self.wcfg["last_impact_cone_angle"], 90), 2)
 
-        # Base style
-        self.color_damage_wheel = (
-            self.wcfg["suspension_color"],
-            self.wcfg["suspension_color_damage_light"],
-            self.wcfg["suspension_color_damage_medium"],
-            self.wcfg["suspension_color_damage_heavy"],
-            self.wcfg["suspension_color_damage_totaled"],
-            self.wcfg["wheel_color_detached"],
-            self.wcfg["warning_color_detached"],
-        )
-
         # Rect parts
         self.rect_mask = QRect(
             display_margin + parts_width, display_margin + parts_width,
@@ -115,14 +104,18 @@ class Realtime(Overlay):
             )
 
         # Last data
+        self.detached_parts = False
         self.damage_aero = -1.0
-        self.damage_body = [0] * 8
-        self.damage_wheel = [0] * 4
+        self.damage_body = WHEELS_ZERO * 2
+        self.damage_wheel = WHEELS_ZERO
+        self.damage_susp = WHEELS_ZERO
         self.last_impact_time = None
         self.last_impact_expired = True
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
+        update_later = False
+
         # Last impact time & position
         if self.wcfg["show_last_impact_cone"]:
             impact_time = api.read.vehicle.impact_time()
@@ -130,31 +123,44 @@ class Realtime(Overlay):
             if self.last_impact_time != impact_time:
                 self.last_impact_time = impact_time
                 self.last_impact_expired = api.read.vehicle.impact_magnitude() < 1
-                self.update()
+                update_later = True
 
             if (not self.last_impact_expired and
                 api.read.timing.elapsed() - self.last_impact_time
                 > self.wcfg["last_impact_cone_duration"]):
                 self.last_impact_expired = True
-                self.update()
+                update_later = True
 
         # Damage body
         temp_damage_body = api.read.vehicle.damage_severity()
         if self.damage_body != temp_damage_body:
             self.damage_body = temp_damage_body
-            self.update()
+            update_later = True
 
         # Damage aero
         temp_damage_aero = api.read.vehicle.aero_damage()
         if self.damage_aero != temp_damage_aero:
             self.damage_aero = temp_damage_aero
-            self.update()
+            update_later = True
 
         # Damage wheel
-        temp_damage_wheel = tuple(map(self.set_damage_level_wheel,
-            api.read.wheel.is_detached(), api.read.wheel.suspension_damage()))
+        temp_damage_wheel = api.read.wheel.is_detached()
         if self.damage_wheel != temp_damage_wheel:
             self.damage_wheel = temp_damage_wheel
+            update_later = True
+
+        # Damage suspension
+        temp_damage_susp = api.read.wheel.suspension_damage()
+        if self.damage_susp != temp_damage_susp:
+            self.damage_susp = temp_damage_susp
+            update_later = True
+
+        # Update if any detached parts
+        if self.detached_parts:
+            self.detached_parts = False
+            update_later = True
+
+        if update_later:
             self.update()
 
     # GUI update methods
@@ -180,13 +186,13 @@ class Realtime(Overlay):
 
     def draw_damage_body(self, painter):
         """Draw damage body"""
-        for part, damage in zip(self.rects_parts, self.damage_body):
-            painter.fillRect(part, self.color_damage_body(damage))
+        for rect_part, damage_body in zip(self.rects_parts, self.damage_body):
+            painter.fillRect(rect_part, self.color_damage_body(damage_body))
 
     def draw_damage_wheel(self, painter):
         """Draw damage wheel"""
-        for wheel, damage in zip(self.rects_wheels, self.damage_wheel):
-            painter.fillRect(wheel, self.color_damage_wheel[damage])
+        for rect_wheel, damage_wheel, damage_susp in zip(self.rects_wheels, self.damage_wheel, self.damage_susp):
+            painter.fillRect(rect_wheel, self.color_damage_wheel(damage_wheel, damage_susp))
 
     def draw_impact_cone(self, painter):
         """Draw impact cone"""
@@ -211,41 +217,44 @@ class Realtime(Overlay):
 
     # Additional methods
     def color_damage_body(self, value: int) -> str:
-        """Damage body color"""
+        """Body damage color"""
+        # light body damage
         if value == 1:
             return self.wcfg["body_color_damage_light"]
+        # heavy body damage
         if value == 2:
             return self.wcfg["body_color_damage_heavy"]
+        # body parts detached
         if value >= 3:
+            self.detached_parts = True
             if self.wcfg["show_detached_warning_flash"] and self.warn_flash.state(True):
                 return self.wcfg["warning_color_detached"]
             return self.wcfg["body_color_detached"]
+        # no damage
         return self.wcfg["body_color"]
 
-    def set_damage_level_wheel(self, wheel_detached: bool, susp_wear: float) -> int:
-        """Set damage level for wheel and suspension
-
-        Damage level:
-            0 no damage.
-            1 light suspension damage.
-            2 medium suspension damage.
-            3 heavy suspension damage.
-            4 suspension totaled.
-            5 wheel detached.
-        """
+    def color_damage_wheel(self, wheel_detached: bool, susp_damage: float) -> int:
+        """Wheel and suspension damage color"""
+        # wheel detached
         if wheel_detached:
+            self.detached_parts = True
             if self.wcfg["show_detached_warning_flash"] and self.warn_flash.state(True):
-                return 6
-            return 5
-        if susp_wear < self.wcfg["suspension_damage_light_threshold"]:
-            return 0
-        if susp_wear < self.wcfg["suspension_damage_medium_threshold"]:
-            return 1
-        if susp_wear < self.wcfg["suspension_damage_heavy_threshold"]:
-            return 2
-        if susp_wear < self.wcfg["suspension_damage_totaled_threshold"]:
-            return 3
-        return 4
+                return self.wcfg["warning_color_detached"]
+            return self.wcfg["wheel_color_detached"]
+        # no damage
+        if susp_damage < self.wcfg["suspension_damage_light_threshold"]:
+            return self.wcfg["suspension_color"]
+        # light suspension damage
+        if susp_damage < self.wcfg["suspension_damage_medium_threshold"]:
+            return self.wcfg["suspension_color_damage_light"]
+        # medium suspension damage
+        if susp_damage < self.wcfg["suspension_damage_heavy_threshold"]:
+            return self.wcfg["suspension_color_damage_medium"]
+        # heavy suspension damage
+        if susp_damage < self.wcfg["suspension_damage_totaled_threshold"]:
+            return self.wcfg["suspension_color_damage_heavy"]
+        # suspension totaled
+        return self.wcfg["suspension_color_damage_totaled"]
 
     def create_wheels_rect(
         self, display_margin, parts_width, inner_gap, parts_full_width, parts_full_height):
@@ -255,13 +264,17 @@ class Realtime(Overlay):
         offset_w = parts_width + inner_gap
         offset_x = parts_full_width - wheel_width - offset_w
         offset_y = parts_full_height - wheel_height - offset_w
-        wheels_pos = (
-            (display_margin + offset_w, display_margin + offset_w),  # front left
-            (display_margin + offset_x, display_margin + offset_w),  # front right
-            (display_margin + offset_w, display_margin + offset_y),  # rear left
-            (display_margin + offset_x, display_margin + offset_y),  # rear right
+        wheels_rect = (
+            # front left
+            QRect(display_margin + offset_w, display_margin + offset_w, wheel_width, wheel_height),
+            # front right
+            QRect(display_margin + offset_x, display_margin + offset_w, wheel_width, wheel_height),
+            # rear left
+            QRect(display_margin + offset_w, display_margin + offset_y, wheel_width, wheel_height),
+            # rear right
+            QRect(display_margin + offset_x, display_margin + offset_y, wheel_width, wheel_height),
         )
-        return tuple(QRect(*pos, wheel_width, wheel_height) for pos in wheels_pos)
+        return wheels_rect
 
     def create_parts_rect(self, display_margin, inner_gap, parts_width, parts_max_width, parts_max_height):
         """Body parts rect, row by row from left to right, top to bottom"""
@@ -270,7 +283,7 @@ class Realtime(Overlay):
         side_scale = width_ratio * 2 / (1 + width_ratio)
         part_side_width = max(round(parts_max_width * side_scale), parts_width)
         part_center_width = parts_max_width * 3 - part_side_width * 2
-        parts_pos = (
+        parts_rect = (
             # front left
             QRect(display_margin, display_margin, part_side_width, parts_max_height),
             # front center
@@ -288,4 +301,4 @@ class Realtime(Overlay):
             # rear right
             QRect(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin + offset_y * 2, part_side_width, parts_max_height),
         )
-        return parts_pos
+        return parts_rect
