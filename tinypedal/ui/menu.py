@@ -352,9 +352,9 @@ class APIMenu(QMenu):
         self.actions_api = self.__api_selector()
         self.addSeparator()
 
-        self.global_api = self.addAction("Global API Selector")
-        self.global_api.setCheckable(True)
-        self.global_api.triggered.connect(self.toggle_global_api)
+        self.api_selection = self.addAction("Remember API Selection from Preset")
+        self.api_selection.setCheckable(True)
+        self.api_selection.triggered.connect(self.toggle_api_selection)
 
         config_api = self.addAction("Options")
         config_api.triggered.connect(self.open_config_api)
@@ -372,30 +372,12 @@ class APIMenu(QMenu):
             if selected_api_name == action.text():
                 action.setChecked(True)
                 break
-        self.global_api.setChecked(cfg.user.config["telemetry_api"]["enable_global_api_selector"])
+        self.api_selection.setChecked(cfg.user.config["telemetry_api"]["enable_api_selection_from_preset"])
 
-    def toggle_global_api(self):
-        """Toggle global API selector mode"""
-        enabled = cfg.user.config["telemetry_api"]["enable_global_api_selector"]
-        if enabled:
-            state = "Disable"
-            desc = "While disabled, API is selected individually for each preset."
-        else:
-            state = "Enable"
-            desc = "While enabled, API is selected globally for all presets."
-        msg_text = (
-            f"{state} <b>Global API Selector</b>?<br><br>"
-            f"{desc}"
-        )
-        api_msg = QMessageBox.question(
-            self._parent, "API Selector Mode", msg_text,
-            buttons=QMessageBox.Yes | QMessageBox.No,
-            defaultButton=QMessageBox.No,
-        )
-        if api_msg != QMessageBox.Yes:
-            return
-
-        cfg.user.config["telemetry_api"]["enable_global_api_selector"] = not enabled
+    def toggle_api_selection(self):
+        """Toggle API selection mode"""
+        enabled = cfg.user.config["telemetry_api"]["enable_api_selection_from_preset"]
+        cfg.user.config["telemetry_api"]["enable_api_selection_from_preset"] = not enabled
         cfg.save(cfg_type=ConfigType.CONFIG)
         self._parent.reload_only()
 

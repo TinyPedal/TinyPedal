@@ -1,7 +1,7 @@
 WIP
 -----------------------------
 * API
-  - Added "Global API Selector" option to "API" menu, which allows to toggle "API Selector Mode". While this option is enabled, API is selected globally for all presets. While disabled, API is selected individually for each preset. This option is disabled by default.
+  - Added "Remember API Selection from Preset" check box to "API" menu, which allows to remember and load API selection from preset. Turn off this option to select API globally for all presets. This option is enabled by default.
   - Added asterisk (*) symbol to legacy API name in status bar.
 
 * Driver Stats

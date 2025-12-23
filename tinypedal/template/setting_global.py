@@ -54,7 +54,7 @@ GLOBAL_DEFAULT = {
     },
     "telemetry_api": {
         "api_name": API_NAME_LMU,
-        "enable_global_api_selector": False,
+        "enable_api_selection_from_preset": True,
     },
     "user_path": {
         "settings_path": "settings/",

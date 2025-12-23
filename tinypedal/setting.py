@@ -309,18 +309,18 @@ class Setting:
     def api_name(self) -> str:
         """Get selected api name"""
         global_api_setting = self.user.config["telemetry_api"]
-        if global_api_setting["enable_global_api_selector"]:
-            return global_api_setting["api_name"]
-        return self.user.setting["preset"]["api_name"]
+        if global_api_setting["enable_api_selection_from_preset"]:
+            return self.user.setting["preset"]["api_name"]
+        return global_api_setting["api_name"]
 
     @api_name.setter
     def api_name(self, name: str) -> None:
         """Set selected api name"""
         global_api_setting = self.user.config["telemetry_api"]
-        if global_api_setting["enable_global_api_selector"]:
-            global_api_setting["api_name"] = name
-        else:
+        if global_api_setting["enable_api_selection_from_preset"]:
             self.user.setting["preset"]["api_name"] = name
+        else:
+            global_api_setting["api_name"] = name
 
     @property
     def api_key(self) -> str:
