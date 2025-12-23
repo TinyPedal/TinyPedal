@@ -3468,6 +3468,12 @@ Show start line mark.
     show_sector_line
 Show sector line mark.
 
+    show_proximity_circle
+Show proximity circle around player's position, which helps to quickly spot player and nearby opponents on map.
+
+    proximity_circle_radius
+Set proximity circle radius in meters. Default radius is `150` meters.
+
     show_vehicle_standings
 Show vehicle standings info on track map. Note, if `enable_multi_class_styling` is enabled, position in class will be displayed for each vehicle class instead.
 

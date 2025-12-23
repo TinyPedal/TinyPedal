@@ -27,6 +27,7 @@ WIP
   - Removed "show_random_color_for_unknown_class" option. Random color is now always displayed for unknown class.
 
 * Track map Widget
+  - Added "show_proximity_circle" option, which draws a proximity circle around player's position. The proximity circle helps to quickly spot player and nearby opponents on map. Default circle radius is "150" meters.
   - Added "vehicle_scale" & "vehicle_scale_player" options, which set vehicle scale that multiplies base vehicle size. Note, base vehicle size is determined by "font size" and "bar padding". Minimum scale is limited to "1.0".
   - Added "show_custom_player_color_in_multi_class" option (requested by user "mzluzifer"), which shows custom player vehicle color while "enable_multi_class_styling" option is enabled. This option is disabled by default.
   - Now always highlight player vehicle color while in pit.

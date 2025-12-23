@@ -91,15 +91,22 @@ class Realtime(Overlay):
             )
             self.pit_text_shape = QRectF(-veh_size_base * 0.5 - 2, font_offset - veh_size_opt * 0.5 - veh_size_base - 3, veh_size_base + 4, veh_size_base)
 
+        if self.wcfg["show_proximity_circle"]:
+            self.pen_proximity = self.set_veh_pen_style(
+                self.wcfg["proximity_circle_color"],
+                self.wcfg["proximity_circle_width"],
+            )
+            self.rect_proximity = QRectF()
+
         # Last data
         self.last_modified = 0
         self.last_veh_data_version = None
         self.circular_map = True
         self.map_scaled = None
         self.map_range = (0, 10, 0, 10)
-        self.map_scale = 1
+        self.map_scale = 1.0
         self.map_offset = (0, 0)
-        self.map_orient = 0  # radians
+        self.map_orient = 0.0  # radians
 
         self.update_map(-1)
 
@@ -123,6 +130,8 @@ class Realtime(Overlay):
             raw_data = minfo.mapping.coordinates if data != -1 else None
             map_path = self.create_map_path(raw_data)
             self.draw_map_image(map_path, self.circular_map)
+            if self.wcfg["show_proximity_circle"]:
+                self.update_proximity_rect()
 
     def paintEvent(self, event):
         """Draw"""
@@ -324,6 +333,10 @@ class Realtime(Overlay):
 
             if data.isPlayer:
                 painter.drawEllipse(self.veh_shape_player)
+                if self.wcfg["show_proximity_circle"]:
+                    painter.setPen(self.pen_proximity)
+                    painter.setBrush(Qt.NoBrush)
+                    painter.drawEllipse(self.rect_proximity)
             else:
                 painter.drawEllipse(self.veh_shape)
 
@@ -427,6 +440,13 @@ class Realtime(Overlay):
         # Add to brush cache
         self.brush_classes[class_name] = brush
         return brush
+
+    def update_proximity_rect(self):
+        """Update proximity circle rect"""
+        proxi_radius = max(self.wcfg["proximity_circle_radius"], 1)
+        proxi_x = -proxi_radius * self.map_scale
+        proxi_y = proxi_radius * 2 * self.map_scale
+        self.rect_proximity.setRect(proxi_x, proxi_x, proxi_y, proxi_y)
 
     # Additional methods
     def outline_vehicle(self, veh_info):
