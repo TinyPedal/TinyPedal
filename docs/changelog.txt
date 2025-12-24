@@ -1,4 +1,4 @@
-WIP
+2.37.0 (2025-12-24)
 -----------------------------
 * API
   - Added "Remember API Selection from Preset" check box to "API" menu, which allows to remember and load API selection from preset. Turn off this option to select API globally for all presets. This option is enabled by default.
@@ -32,8 +32,20 @@ WIP
   - Added "show_custom_player_color_in_multi_class" option (requested by user "mzluzifer"), which shows custom player vehicle color while "enable_multi_class_styling" option is enabled. This option is disabled by default.
   - Now always highlight player vehicle color while in pit.
 
-* Wheel alignment Widget
-  - Added "camber_smoothing_samples" & "toe_in_smoothing_samples" options for reducing data fluctuation and improved readability.
+* [Removed]Wheel alignment Widget
+  - Removed Wheel alignment Widget, split into the new "Wheel camber" & "Wheel toe" widgets. Relevant settings are automatically transferred to the new corresponding widget.
+
+* [New]Wheel camber Widget
+  - Show camber angle in degrees.
+  - Show camber difference between left and right wheel on the same axle, useful for quickly checking misalignment while driving.
+  - Added "smoothing_samples" option for reducing data fluctuation.
+  - Added "horizontal_gap", "vertical_gap", "caption_text" options.
+
+* [New]Wheel toe Widget
+  - Show toe angle in degrees.
+  - Show total toe angle between left and right wheel on the same axle, useful for quickly checking amount total toe angle while driving.
+  - Added "smoothing_samples" option for reducing data fluctuation.
+  - Added "horizontal_gap", "vertical_gap", "caption_text" options.
 
 * Misc
   - More accurate vehicle coordinates synchronization between local player and opponents (smoother vehicle position update on Radar & Navigation Widget).

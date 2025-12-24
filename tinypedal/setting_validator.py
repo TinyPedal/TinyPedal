@@ -259,7 +259,9 @@ class PresetValidator:
 
         # Update old setting for specific version
         if preset_version < (2, 36, 0):
-            _prior_2_36_0(dict_user)
+            _user_prior_2_36_0(dict_user)
+        if preset_version < (2, 37, 0):
+            _user_prior_2_37_0(dict_user)
 
     @classmethod
     def global_preset(cls, dict_user: dict, dict_def: dict) -> dict:
@@ -283,14 +285,24 @@ class PresetValidator:
         return dict_user
 
 
-def _prior_2_36_0(dict_user: dict):
-    """Update old setting prior to 2.36.0"""
+def _user_prior_2_37_0(dict_user: dict):
+    """Update user setting prior to 2.37.0"""
+    # Transfer wheel_alignment setting to new widgets
+    wheel_alignment = dict_user.get("wheel_alignment")
+    if isinstance(wheel_alignment, dict):
+        wheel_alignment["bar_gap"] = 0
+        dict_user["wheel_camber"] = wheel_alignment.copy()
+        dict_user["wheel_toe"] = wheel_alignment.copy()
+        dict_user["wheel_toe"]["position_y"] += 60
+
+
+def _user_prior_2_36_0(dict_user: dict):
+    """Update user setting prior to 2.36.0"""
     # Copy old telemetry_api setting
-    if "telemetry_api" in dict_user:
-        api_config = dict_user.get("telemetry_api")
-        if isinstance(api_config, dict):
-            dict_user["api_lmu"] = api_config.copy()
-            dict_user["api_rf2"] = api_config.copy()
+    telemetry_api = dict_user.get("telemetry_api")
+    if isinstance(telemetry_api, dict):
+        dict_user["api_lmu"] = telemetry_api.copy()
+        dict_user["api_rf2"] = telemetry_api.copy()
     # Correct default update interval in module_vehicles
     module_vehicles = dict_user.get("module_vehicles")
     if isinstance(module_vehicles, dict):

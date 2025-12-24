@@ -3897,16 +3897,29 @@ Set number of samples for reducing data fluctuation. Lower value may result more
 [**`Back to Top`**](#)
 
 
-## Wheel alignment
-**This widget displays camber and toe-in info.**
+## Wheel camber
+**This widget displays wheel camber info.**
 
-    show_camber
-Show camber in degree.
+Note, all camber readings are in degrees.
 
-    show_toe_in
-Show toe-in in degree.
+    show_camber_difference
+Show camber difference between left and right wheel on the same axle, useful for quickly checking misalignment while driving.
 
-    camber_smoothing_samples, toe_in_smoothing_samples
+    camber_smoothing_samples, camber_difference_smoothing_samples
+Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+
+[**`Back to Top`**](#)
+
+
+## Wheel toe
+**This widget displays wheel toe info.**
+
+Note, all toe readings are in degrees. Positive reading indicates toe-in; negative indicates toe-out.
+
+    show_total_toe_angle
+Show total toe angle between left and right wheel on the same axle, useful for quickly checking amount total toe angle while driving.
+
+    toe_in_smoothing_samples, total_toe_angle_smoothing_samples
 Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
 [**`Back to Top`**](#)

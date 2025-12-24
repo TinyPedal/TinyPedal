@@ -150,6 +150,7 @@ def init_gui() -> QApplication:
     root.setFont(font)
     # Disable global pixmap cache
     QPixmapCache.setCacheLimit(0)
+    logger.info("Screen pixel ratio: %s", root.devicePixelRatio())
     logger.info("Platform plugin: %s", root.platformName())
     return root
 

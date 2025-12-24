@@ -87,7 +87,8 @@ __all__ = [
     "weather",
     "weather_forecast",
     "weight_distribution",
-    "wheel_alignment",
+    "wheel_camber",
+    "wheel_toe",
 ]
 
 from . import *
