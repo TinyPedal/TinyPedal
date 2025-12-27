@@ -44,11 +44,13 @@ class Realtime(Overlay):
             self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
 
         # Config variable
+        self.pit_bias = self.wcfg["enable_pit_entry_bias"]
+        self.pitstop_threshold = self.wcfg["remaining_pitstop_threshold"]
         layout_reversed = self.wcfg["layout"] != 0
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.char_width = max(self.wcfg["bar_width"], 4)
         bar_width = font_m.width * self.char_width + bar_padx
-        self.center_slot = min(max(self.wcfg["number_of_less_laps"], 0), 5) + 1  # +1 column offset
+        self.center_slot = min(max(self.wcfg["number_of_less_laps"], 0), 5) + 1 + self.pit_bias  # column offset
         self.total_slot = min(max(self.wcfg["number_of_more_laps"], 1), 10) + 1 + self.center_slot
         self.decimals_consumption = max(self.wcfg["decimal_places_consumption"], 0)
         self.decimals_delta = max(self.wcfg["decimal_places_delta"], 0)
@@ -82,7 +84,11 @@ class Realtime(Overlay):
             count=self.total_slot,
             last=-MAX_SECONDS,
         )
-        self.bars_target_lap[0].setText("LAST")
+        if self.pit_bias:
+            self.bars_target_lap[0].setText("BIAS")
+            self.bars_target_lap[1].setText("LAST")
+        else:
+            self.bars_target_lap[0].setText("LAST")
         self.bars_target_lap[self.center_slot].updateStyle(bar_style_lap[1])
         self.set_grid_layout_table_row(
             layout=layout,
@@ -151,17 +157,26 @@ class Realtime(Overlay):
         tyre_life = sum(api.read.tyre.wear())
         lap_num = api.read.lap.number()
         energy_type = api.read.vehicle.max_virtual_energy()
+        pit_bias = 0.0
 
         if energy_type:
             fuel_curr = minfo.energy.amountCurrent
             fuel_est = minfo.energy.estimatedConsumption
             fuel_used_curr = minfo.energy.amountUsedCurrent
             fuel_used_last_raw = minfo.energy.lastLapConsumption
+            est_pits = minfo.energy.estimatedNumPitStopsEnd
         else:
             fuel_curr = minfo.fuel.amountCurrent
             fuel_est = minfo.fuel.estimatedConsumption
             fuel_used_curr = minfo.fuel.amountUsedCurrent
             fuel_used_last_raw = minfo.fuel.lastLapConsumption
+            est_pits = minfo.fuel.estimatedNumPitStopsEnd
+
+        if self.pit_bias:
+            pit_pos = minfo.mapping.pitEntryPosition
+            track_length = api.read.lap.track_length()
+            if 0 < pit_pos < track_length and est_pits > self.pitstop_threshold:
+                pit_bias = 1 - pit_pos / track_length
 
         # Check stint status
         if not in_pits:
@@ -178,19 +193,26 @@ class Realtime(Overlay):
 
         laps_done = max(lap_num - self.start_laps, 0)
         # Total fuel remaining count from start of current lap
-        total_fuel_remaining = max(fuel_curr + fuel_used_curr - self.min_reserve, 0)
+        total_fuel_remaining = max(fuel_curr + fuel_used_curr - self.min_reserve + pit_bias * fuel_est, 0)
         # Estimate laps current fuel can last, minus center slot offset
         # Round to 1 decimal to reduce sensitivity
         est_runlaps = floor(round(calc.end_stint_laps(
             total_fuel_remaining, fuel_est), 1)) - self.center_slot
 
+        # Pit entry bias
+        if self.pit_bias:
+            # Bias percent
+            self.update_pit_bias(self.bars_delta[0], pit_bias)
+            # Bias amount
+            self.update_target_use(self.bars_target_use[0], pit_bias * fuel_est, energy_type)
+
         # Fuel or energy
-        self.update_energy_type(self.bars_delta[0], energy_type)
+        self.update_energy_type(self.bars_delta[self.pit_bias], energy_type)
         # Last lap consumption
-        self.update_target_use(self.bars_target_use[0], fuel_used_last_raw, energy_type)
+        self.update_target_use(self.bars_target_use[self.pit_bias], fuel_used_last_raw, energy_type)
 
         # Update slots
-        for index in range(1, self.total_slot):
+        for index in range(1 + self.pit_bias, self.total_slot):
             # Progressive fuel saving
             total_laps_target = est_runlaps + index
 
@@ -255,3 +277,9 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.setText(ENERGY_TYPE_ID[data > 0])
+
+    def update_pit_bias(self, target, data):
+        """Pit entry bias"""
+        if target.last != data:
+            target.last = data
+            target.setText(f"{data:.1%}"[:self.char_width])

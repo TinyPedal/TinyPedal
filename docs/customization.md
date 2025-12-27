@@ -2241,6 +2241,20 @@ Set number of target slots for more completable laps. Default is `3`. Range in `
     number_of_less_laps
 Set number of target slots for less completable laps. Default is `0`. Range in `0` to `5`.
 
+    enable_pit_entry_bias
+Auto calibrate target fuel (or energy) saving bias towards either pit entry position or finish line, depending on number of estimated remaining pit stops.
+
+This feature is made specially for tracks that have pit entry position located far away from finish line, which it is necessary to take pit entry position into fuel saving calculation for increased accuracy.
+
+While enabled, a new `BIAS` column will be added, which shows amount added fuel (or energy) bias towards pit entry position, as well as percentage pit entry bias from finish line, When bias is `0`, it means there is no pit entry bias added.
+
+**Important notes:** Do not enable this feature if you are not sure what it does. You must enter pit at least once to record pit entry position of the track for this feature to work.
+
+    remaining_pitstop_threshold
+Set number of remaining pit stops threshold for auto calibrating target fuel (or energy) saving bias. Default value is `0.1`.
+
+Fuel (or energy) saving calculation is biased towards pit entry position when number of estimated remaining pit stops is greater than the threshold, otherwise biased towards finish line.
+
 [**`Back to Top`**](#)
 
 
