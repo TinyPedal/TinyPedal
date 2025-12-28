@@ -387,19 +387,19 @@ Set number of attempts to retry connection for Rest API. Value range in `0` to `
 Set time delay in seconds to retry connection for Rest API. Value range in `0` to `60`. Default is `1` second.
 
     enable_energy_remaining
-Enable access to `remaining energy` data from Rest API. This is required for showing remaining energy data in widgets such as Relative, Rivals, Standings.
+Enable access to `remaining energy` data from Rest API. This is required for showing remaining energy data in widgets such as Relative, Rivals, Standings. Minimum request interval is hard-limited to `1.0` second (1 request per second) for this data.
 
     enable_garage_setup_info
-Enable access to `garage setup` data from Rest API. This is required for accessing various vehicle setup data.
+Enable access to `garage setup` data from Rest API. This is required for accessing various vehicle setup data. This data is requested `only once` when player exited garage each time.
 
     enable_session_info
-Enable access to `session` data from Rest API. This is required for accessing various session data, such as time-scale.
+Enable access to `session` data from Rest API. This is required for accessing various session data, such as time-scale. This data is requested `only once` when player exited garage each time.
 
     enable_vehicle_info
-Enable access to `vehicle` data from Rest API. This is essential for accessing `virtual energy`, `brake wear`, `vehicle damage`, `pit stop timing` data.
+Enable access to `vehicle` data from Rest API. This is essential for accessing `virtual energy`, `brake wear`, `vehicle damage`, `pit stop timing` data. Minimum request interval is hard-limited to `0.2` second (5 requests per second) for this data.
 
     enable_weather_info
-Enable access to `weather` data from Rest API. This is required for showing weather forecast.
+Enable access to `weather` data from Rest API. This is required for showing weather forecast. This data is requested `only once` when player exited garage each time.
 
 [**`Back to Top`**](#)
 
@@ -449,13 +449,13 @@ Set number of attempts to retry connection for Rest API. Value range in `0` to `
 Set time delay in seconds to retry connection for Rest API. Value range in `0` to `60`. Default is `1` second.
 
     enable_garage_setup_info
-Enable access to `garage setup` data from Rest API. This is required for accessing various vehicle setup data.
+Enable access to `garage setup` data from Rest API. This is required for accessing various vehicle setup data. This data is requested `only once` when player exited garage each time.
 
     enable_session_info
-Enable access to `session` data from Rest API. This is required for accessing various session data, such as time-scale.
+Enable access to `session` data from Rest API. This is required for accessing various session data, such as time-scale. This data is requested `only once` when player exited garage each time.
 
     enable_weather_info
-Enable access to `weather` data from Rest API. This is required for showing weather forecast.
+Enable access to `weather` data from Rest API. This is required for showing weather forecast. This data is requested `only once` when player exited garage each time.
 
 [**`Back to Top`**](#)
 
