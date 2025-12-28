@@ -726,7 +726,7 @@ class Realtime(Overlay):
         """Vehicle best laptime"""
         if target.last != data:
             target.last = data
-            target.setText(self.set_best_laptime(data[0]))
+            target.setText(self.set_laptime(data[0]))
             target.updateStyle(self.bar_style_blp[data[1]])
             self.toggle_visibility(target, data[-1])
 
@@ -936,13 +936,6 @@ class Realtime(Overlay):
         if pit_time <= 0:
             return TEXT_NOLAPTIME
         return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
-
-    @staticmethod
-    def set_best_laptime(laptime_best):
-        """Set best lap time"""
-        if laptime_best <= 0:
-            return TEXT_NOLAPTIME
-        return calc.sec2laptime_full(laptime_best)[:8]
 
     def gap_to_leader_best(self, player_best, leader_best):
         """Gap to leader's best laptime"""

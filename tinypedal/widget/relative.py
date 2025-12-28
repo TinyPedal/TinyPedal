@@ -219,6 +219,26 @@ class Realtime(Overlay):
                 targets=self.bars_lpt,
                 column_index=self.wcfg["column_index_laptime"],
             )
+        # Vehicle best laptime
+        if self.wcfg["show_best_laptime"]:
+            self.bar_style_blp = (
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_best_laptime"],
+                    bg_color=self.wcfg["bkg_color_best_laptime"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_player_best_laptime"],
+                    bg_color=self.wcfg["bkg_color_player_best_laptime"])
+            )
+            self.bars_blp = self.set_qlabel(
+                style=self.bar_style_blp[0],
+                width=8 * font_m.width + bar_padx,
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_blp,
+                column_index=self.wcfg["column_index_best_laptime"],
+            )
         # Position in class
         if self.wcfg["show_position_in_class"]:
             self.bar_style_pic = (
@@ -472,6 +492,9 @@ class Realtime(Overlay):
                     laptime = self.set_laptime(veh_info.lastLapTime)
                     is_class_best = veh_info.isClassFastestLastLap
                 self.update_lpt(self.bars_lpt[idx], laptime, is_class_best, hi_player, state)
+            # Vehicle best laptime
+            if self.wcfg["show_best_laptime"]:
+                self.update_blp(self.bars_blp[idx], veh_info.bestLapTime, hi_player, state)
             # Position in class
             if self.wcfg["show_position_in_class"]:
                 self.update_pic(self.bars_pic[idx], veh_info.positionInClass, veh_info.vehicleClass, hi_player, state)
@@ -640,6 +663,17 @@ class Realtime(Overlay):
                 text = ""
             target.setText(text)
             target.updateStyle(self.bar_style_lpt[color_index])
+
+    def update_blp(self, target, *data):
+        """Vehicle best laptime"""
+        if target.last != data:
+            target.last = data
+            if data[-1]:
+                text = self.set_laptime(data[0])
+            else:
+                text = ""
+            target.setText(text)
+            target.updateStyle(self.bar_style_blp[data[1]])
 
     def update_pic(self, target, *data):
         """Position in class"""

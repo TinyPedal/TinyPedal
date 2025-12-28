@@ -10,6 +10,9 @@ WIP
   - Added "remaining_pitstop_threshold" option, which sets number of remaining pit stops threshold for auto calibrating target fuel (or energy) saving bias. Default value is "0.1".
     Fuel (or energy) saving calculation is biased towards pit entry position when number of estimated remaining pit stops is greater than the threshold, otherwise biased towards finish line.
 
+* Relative Widget
+  - Added "show_best_laptime" option (requested by user "MzzyL"), which shows best lap time for each driver.
+
 2.37.0 (2025-12-24)
 -----------------------------
 * API

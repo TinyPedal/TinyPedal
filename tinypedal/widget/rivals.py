@@ -602,7 +602,7 @@ class Realtime(Overlay):
         """Vehicle best laptime"""
         if target.last != data:
             target.last = data
-            target.setText(self.set_best_laptime(data[0]))
+            target.setText(self.set_laptime(data[0]))
             self.toggle_visibility(target, data[-1])
 
     def update_dlt(self, target, *data):
@@ -779,13 +779,6 @@ class Realtime(Overlay):
         if pit_time <= 0:
             return TEXT_NOLAPTIME
         return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
-
-    @staticmethod
-    def set_best_laptime(laptime_best):
-        """Set best lap time"""
-        if laptime_best <= 0:
-            return TEXT_NOLAPTIME
-        return calc.sec2laptime_full(laptime_best)[:8]
 
     def int_to_next(self, gap_behind_class, is_ahead):
         """Interval to next"""
