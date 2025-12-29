@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from array import array
 from collections import deque
+from itertools import islice
 from typing import Mapping, NamedTuple
 
 from .const_common import (
@@ -52,7 +53,12 @@ class ConsumptionDataSet(NamedTuple):
 
 
 class DeltaLapTime(array):
-    """Delta lap time history data"""
+    """Delta lap time history data
+
+    Recent lap time index range: 0 - 4.
+    Recent best lap time index: 5 (-2).
+    Last lap start time index: 6 (-1).
+    """
 
     __slots__ = ()
 
@@ -60,22 +66,35 @@ class DeltaLapTime(array):
         """Update delta lap time history"""
         # Check 2 sec after start new lap (for validating last lap time)
         # Store lap start time in index 5
-        if self[5] != lap_start and lap_elapsed - lap_start > 2:
-            if self[5] < lap_start:
+        if self[-1] != lap_start and lap_elapsed - lap_start > 2:
+            if self[-1] < lap_start:
                 self[0], self[1], self[2], self[3] = self[1], self[2], self[3], self[4]
                 if laptime_last > 0:  # valid last lap time
                     self[4] = laptime_last
                 else:
                     self[4] = 0.0
-            else:  # reset all laptime
+            else:  # reset all laptime on session change
                 self[0] = self[1] = self[2] = self[3] = self[4] = 0.0
-            self[5] = lap_start
+            self[-1] = lap_start
+            self[-2] = min(self._filter_laptime())
 
     def delta(self, target: DeltaLapTime, max_output: int):
         """Generate delta from target player's lap time data set"""
         for index in range(5 - max_output, 5):  # max 5 records
             if target[index] > 0 < self[index]:  # check invalid lap time
                 yield target[index] - self[index]
+            else:
+                yield MAX_SECONDS
+
+    def best(self) -> float:
+        """Best lap time from recent laps"""
+        return self[-2]
+
+    def _filter_laptime(self):
+        """Filter invalid lap time"""
+        for laptime in islice(self, 5):
+            if laptime > 0:
+                yield laptime
             else:
                 yield MAX_SECONDS
 
@@ -239,7 +258,7 @@ class VehicleDataSet:
         self.estimatedStintLaps: float = 0.0
         self.currentStintLaps: int = 0
         self.pitTimer: VehiclePitTimer = VehiclePitTimer()
-        self.lapTimeHistory: DeltaLapTime = DeltaLapTime("d", [0.0] * 6)
+        self.lapTimeHistory: DeltaLapTime = DeltaLapTime("d", [0.0] * 7)
 
 
 class DeltaInfo:

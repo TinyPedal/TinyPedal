@@ -21,7 +21,8 @@ Relative Widget
 """
 
 from .. import calculation as calc
-from ..const_common import TEXT_NOLAPTIME, TEXT_PLACEHOLDER
+from ..api_control import api
+from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ..userfile.brand_logo import load_brand_logo_file
@@ -433,6 +434,7 @@ class Realtime(Overlay):
         total_rel_idx = len(relative_list)
         player_idx = minfo.vehicles.playerIndex
         plr_veh_info = minfo.vehicles.dataSet[player_idx]
+        in_race = api.read.session.in_race()
 
         # Relative update
         for idx in range(self.veh_range):
@@ -494,7 +496,11 @@ class Realtime(Overlay):
                 self.update_lpt(self.bars_lpt[idx], laptime, is_class_best, hi_player, state)
             # Vehicle best laptime
             if self.wcfg["show_best_laptime"]:
-                self.update_blp(self.bars_blp[idx], veh_info.bestLapTime, hi_player, state)
+                if in_race and self.wcfg["show_best_laptime_from_recent_laps_in_race"]:
+                    laptime = veh_info.lapTimeHistory.best()
+                else:
+                    laptime = veh_info.bestLapTime
+                self.update_blp(self.bars_blp[idx], laptime, hi_player, state)
             # Position in class
             if self.wcfg["show_position_in_class"]:
                 self.update_pic(self.bars_pic[idx], veh_info.positionInClass, veh_info.vehicleClass, hi_player, state)
@@ -855,16 +861,16 @@ class Realtime(Overlay):
     @staticmethod
     def set_laptime(laptime):
         """Set lap time"""
-        if laptime <= 0:
-            return TEXT_NOLAPTIME
-        return calc.sec2laptime_full(laptime)[:8]
+        if 0 < laptime < MAX_SECONDS:
+            return calc.sec2laptime_full(laptime)[:8]
+        return TEXT_NOLAPTIME
 
     @staticmethod
     def set_pittime(inpit, pit_time):
         """Set lap time"""
-        if pit_time <= 0:
-            return TEXT_NOLAPTIME
-        return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
+        if 0 < pit_time < MAX_SECONDS:
+            return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
+        return TEXT_NOLAPTIME
 
 
 def lap_difference_index(is_lapped, offset=2):

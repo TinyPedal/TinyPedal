@@ -369,6 +369,11 @@ Set character encoding for displaying text in correct encoding. Available encodi
     enable_restapi_access
 Enable Rest API accessing, which connects to game's Rest API for accessing additional data that is not available through sharedmemory API.
 
+    restapi_update_interval
+Set update interval (in milliseconds) for requesting data from Rest API.
+
+Note, minimum update interval is hard-limited to `200` milliseconds or higher, and some data are accessed `only once` per garage-exit. Update interval is auto-delayed up to `5` seconds if has not received new data recently. See individual data description for details.
+
     url_host
 Set Rest API host address. Default is `localhost`.
 
@@ -430,6 +435,11 @@ Set character encoding for displaying text in correct encoding. Available encodi
 
     enable_restapi_access
 Enable Rest API accessing, which connects to game's Rest API for accessing additional data that is not available through sharedmemory API.
+
+    restapi_update_interval
+Set update interval (in milliseconds) for requesting data from Rest API.
+
+Note, minimum update interval is hard-limited to `200` milliseconds or higher, and some data are accessed `only once` per garage-exit. Update interval is auto-delayed up to `5` seconds if has not received new data recently. See individual data description for details.
 
     url_host
 Set Rest API host address. Default is `localhost`.
@@ -3246,6 +3256,9 @@ Show driver's last lap time or pit timer if available. If `show_best_laptime` is
 
     show_best_laptime
 Show driver's session best lap time.
+
+    show_best_laptime_from_recent_laps_in_race
+Show driver's best lap time from (five) most recent laps in race session. This option provides a better view of driver's recent performance during longer race.
 
     show_delta_laptime
 Show lap time difference (delta) between player and opponents from most recent laps (up to 5 recent lap time records). The default layout order shows delta lap time records from right side column (most recent lap) to left.
