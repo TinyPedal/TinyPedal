@@ -2320,7 +2320,7 @@ Show RPM reading text on RPM bar.
 This value multiplies max RPM value, which sets relative safe RPM range for RPM color indicator (changes gear widget background color upon reaching this RPM value).
 
     rpm_multiplier_redline
-This value multiplies max RPM value, which sets relative near-max RPM range for RPM color indicator.
+This value multiplies max RPM value, which sets relative redline RPM range for RPM color indicator.
 
     rpm_multiplier_critical
 This value multiplies max RPM value, which sets critical RPM range for RPM color indicator.
@@ -3120,6 +3120,45 @@ Show roll angle difference between front and rear roll angles.
 
     show_roll_angle_ratio
 Show roll angle ratio between front and rear. 50% indicates equal roll angle; less than 50% indicates rear rolls more than front.
+
+[**`Back to Top`**](#)
+
+
+## RPM LED
+**This widget displays RPM LED info.**
+
+    number_of_led
+Set number of LED to display. Minimum LED is limited to `3`.
+
+    enable_double_side_led
+Enable `Outside to Center` LED layout (as opposite to `Left to Right` layout). While this option is enabled, total number of LED is doubled.
+
+    led_width, led_height, led_radius
+Set LED width, height, radius in pixels. To achieve circle LED, set a higher radius value.
+
+    rpm_multiplier_low
+This value multiplies max RPM value, which sets starting range of RPM LED.
+
+    rpm_multiplier_safe
+This value multiplies max RPM value, which sets safe range of RPM LED.
+
+    rpm_multiplier_redline
+This value multiplies max RPM value, which sets redline range of RPM LED.
+
+    rpm_multiplier_critical
+This value multiplies max RPM value, which sets critical range of RPM LED.
+
+    rpm_multiplier_over_rev
+This value multiplies max RPM value, which sets over rev range of RPM LED.
+
+    show_rpm_flickering_above_critical
+Show flickering effects when RPM is above critical range and gear is lower than max gear.
+
+    show_speed_limiter_flash
+Show RPM LED flash effect when speed limiter is activated.
+
+    speed_limiter_flash_interval
+Set minimum time interval between each LED flash. Default is `0.25` seconds. Minimum value is limited to `0.2`.
 
 [**`Back to Top`**](#)
 

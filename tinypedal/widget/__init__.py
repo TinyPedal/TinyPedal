@@ -62,6 +62,7 @@ __all__ = [
     "ride_height",
     "rivals",
     "roll_angle",
+    "rpm_led",
     "sectors",
     "session",
     "slip_ratio",

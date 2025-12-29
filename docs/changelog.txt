@@ -1,5 +1,11 @@
 WIP
 -----------------------------
+* [New]RPM LED Widget
+  - Show customizable RPM LED (requested by user "BorzhonovAI").
+  - Support two primary LED layouts: "Left to Right" and "Outside to Center" (via "enable_double_side_led").
+  - Customizable number of LEDs, size, radius, color range, and more.
+  - Show speed limiter state.
+
 * Fuel energy saver Widget
   - Added "enable_pit_entry_bias" option (requested by user "Alit54"), which auto calibrates target fuel (or energy) saving bias towards either pit entry position or finish line, depending on number of estimated remaining pit stops.
     This feature is made specially for tracks that have pit entry position located far away from finish line, which it is necessary to take pit entry position into fuel saving calculation for increased accuracy.

@@ -168,6 +168,7 @@ API_NAME_ALIAS = {
 ABBR_PATTERN = (
     "^id | id$| id |"
     "^ui | ui$| ui |"
+    "^led | led$| led |"
     "api|"
     "dpi|"
     "drs|"
