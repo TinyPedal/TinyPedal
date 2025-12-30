@@ -536,6 +536,7 @@ class VehiclesInfo:
     """Vehicles module output data"""
 
     __slots__ = (
+        "completedSessionLaps",
         "totalVehicles",
         "leaderIndex",
         "playerIndex",
@@ -549,6 +550,7 @@ class VehiclesInfo:
     )
 
     def __init__(self):
+        self.completedSessionLaps: int = 0
         self.totalVehicles: int = 0
         self.leaderIndex: int = 0
         self.playerIndex: int = -1

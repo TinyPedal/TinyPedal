@@ -97,6 +97,7 @@ def update_vehicle_data(
     # General data
     track_length = api.read.lap.track_length()
     in_race = api.read.session.in_race()
+    laps_session = 0
 
     # Local player data
     elapsed_time = api.read.timing.elapsed()
@@ -114,6 +115,7 @@ def update_vehicle_data(
         laps_completed = api.read.lap.completed_laps(index)
         lap_distance = api.read.lap.distance(index)
         speed = api.read.vehicle.speed(index)
+        laps_session += laps_completed
 
         # Update high priority info
         data.isPlayer = api.read.vehicle.is_player(index)
@@ -226,6 +228,7 @@ def update_vehicle_data(
                 output.leaderBestLapTime = data.bestLapTime
 
     # Output extra info
+    output.completedSessionLaps = laps_session
     output.nearestLine = nearest_line
     output.nearestTraffic = -nearest_time_behind
     output.nearestYellowAhead = nearest_yellow_ahead

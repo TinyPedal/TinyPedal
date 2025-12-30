@@ -3904,6 +3904,25 @@ Show rain precipitation in percentage.
     show_wetness
 Show average surface wetness in percentage.
 
+    show_rubber_coverage_while_dry
+Show rubber coverage (percent) while road surface is dry.
+
+Note, rubber coverage reading may not be accurate during `practice session` in multiplayer, as some API data will be lost or reset while people joining or leaving server. This does not affect `qualifying` and `race` session.
+
+| Rubber Coverage | Equivalent Grip |
+|:-:|:-:|
+| 0.0 | Green |
+| 0.25 | Light |
+| 0.5 | Medium |
+| 0.75 | Heavy |
+| 1.0 | Saturated |
+
+    rubber_time_scale
+Set time scale multiplier for calculating rubber coverage. This value should match `Realroad Time Scale` session setting from game. For `static` rubber, set time scale to `0`.
+
+    starting_rubber_practice, starting_rubber_qualifying, starting_rubber_race
+Set starting rubber coverage (percent) for corresponding sessions. Since session starting rubber coverage data is not available from game API, it is required to manually set the value.
+
     temperature_trend_interval, raininess_trend_interval, wetness_trend_interval
 Set weather change trend interval in seconds for temperature, raininess, surface wetness readings. Default interval is `60` seconds.
 

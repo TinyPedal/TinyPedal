@@ -20,6 +20,19 @@ WIP
   - Added "show_best_laptime" option for Relative Widget (requested by user "MzzyL"), which shows best lap time for each driver.
   - Added "show_best_laptime_from_recent_laps_in_race" option, which shows driver's best lap time from (five) most recent laps in race session. This option provides a better view of driver's recent performance during longer race. This option is disabled by default.
 
+* Weather
+  - Added "show_rubber_coverage_while_dry" option (request by user "kby702"), which shows rubber coverage (percent) while road surface is dry.
+    Note, rubber coverage reading may not be accurate during "practice session" in multiplayer, as some API data will be lost or reset while people joining or leaving server. This does not affect "qualifying" and "race" session.
+    Reference rubber coverage values:
+    - "0.0" is equivalent to "Green" grip.
+    - "0.25" is equivalent to "Light" grip.
+    - "0.5" is equivalent to "Medium" grip.
+    - "0.75" is equivalent to "Heavy" grip.
+    - "1.0" is equivalent to "Saturated" grip.
+  - Added "rubber_time_scale" option, which sets time scale multiplier for calculating rubber coverage. This value should match "Realroad Time Scale" session setting from game. For "static" rubber, set time scale to "0".
+  - Added "starting_rubber_practice", "starting_rubber_qualifying", "starting_rubber_race" options, which sets starting rubber coverage (percent) for corresponding sessions.
+    Since session starting rubber coverage data is not available from game API, it is required to manually set the value.
+
 2.37.0 (2025-12-24)
 -----------------------------
 * API
