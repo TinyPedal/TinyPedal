@@ -21,17 +21,20 @@ WIP
   - Added "show_best_laptime_from_recent_laps_in_race" option, which shows driver's best lap time from (five) most recent laps in race session. This option provides a better view of driver's recent performance during longer race. This option is disabled by default.
 
 * Weather
-  - Added "show_rubber_coverage_while_dry" option (request by user "kby702"), which shows rubber coverage (percent) while road surface is dry.
+  - Added "show_rubber_coverage_while_dry" option (request by user "kby702"), which shows rough estimate of rubber coverage (percent) based on total number of laps done by all drivers while road surface is dry.
     Note, rubber coverage reading may not be accurate during "practice session" in multiplayer, as some API data will be lost or reset while people joining or leaving server. This does not affect "qualifying" and "race" session.
     Reference rubber coverage values:
-    - "0.0" is equivalent to "Green" grip.
-    - "0.25" is equivalent to "Light" grip.
-    - "0.5" is equivalent to "Medium" grip.
-    - "0.75" is equivalent to "Heavy" grip.
-    - "1.0" is equivalent to "Saturated" grip.
-  - Added "rubber_time_scale" option, which sets time scale multiplier for calculating rubber coverage. This value should match "Realroad Time Scale" session setting from game. For "static" rubber, set time scale to "0".
-  - Added "starting_rubber_practice", "starting_rubber_qualifying", "starting_rubber_race" options, which sets starting rubber coverage (percent) for corresponding sessions.
-    Since session starting rubber coverage data is not available from game API, it is required to manually set the value.
+    - 0% (0.0) is roughly equivalent to "Green" grip.
+    - 25% (0.25) is roughly equivalent to "Light" grip.
+    - 50% (0.5) is roughly equivalent to "Medium" grip.
+    - 75% (0.75) is roughly equivalent to "Heavy (High)" grip.
+    - 100% (1.0) is roughly equivalent to "Saturated" grip.
+  - Added "rubber_median_laps" option, which sets median laps at the point when grip becomes "Heavy (High)" for calculating accurate rubber coverage. Default median laps is "2000". This value may vary from different games. See user guide for details.
+  - Added "rubber_time_scale" options, which set time scale multiplier for calculating rubber coverage in corresponding sessions (practice, qualifying, race). This value should match "Realroad Time Scale" session setting from game. For "static" rubber, set time scale to "0".
+    Note, since Realroad Time Scale data is not available from game API, it is required to manually set the value.
+    Most online servers use default "1.0" Realroad Time Scale setting during "qualifying" and "race" session, while some servers may use "static" setting during "practice" session only.
+  - Added "starting_rubber" options, which set starting rubber coverage (percent) in corresponding sessions (practice, qualifying, race).
+    Note, since session starting rubber coverage data is not available from game API, it is required to manually set the value.
 
 2.37.0 (2025-12-24)
 -----------------------------

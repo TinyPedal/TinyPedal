@@ -3905,23 +3905,37 @@ Show rain precipitation in percentage.
 Show average surface wetness in percentage.
 
     show_rubber_coverage_while_dry
-Show rubber coverage (percent) while road surface is dry.
+Show rough estimate of rubber coverage (percent) based on total number of laps done by all drivers while road surface is dry.
 
 Note, rubber coverage reading may not be accurate during `practice session` in multiplayer, as some API data will be lost or reset while people joining or leaving server. This does not affect `qualifying` and `race` session.
 
-| Rubber Coverage | Equivalent Grip |
+| Rubber Coverage | Rough Equivalent Grip |
 |:-:|:-:|
-| 0.0 | Green |
-| 0.25 | Light |
-| 0.5 | Medium |
-| 0.75 | Heavy |
-| 1.0 | Saturated |
+| 0.0 (0%) | Green |
+| 0.25 (25%) | Light |
+| 0.5 (50%) | Medium |
+| 0.75 (75%) | Heavy (High) |
+| 1.0 (100%) | Saturated |
 
-    rubber_time_scale
-Set time scale multiplier for calculating rubber coverage. This value should match `Realroad Time Scale` session setting from game. For `static` rubber, set time scale to `0`.
+    rubber_median_laps
+Set median laps at the point when grip becomes `Heavy (High)` for calculating accurate rubber coverage. Default median laps is `2000`. This value may vary from different games, see table below for reference.
 
-    starting_rubber_practice, starting_rubber_qualifying, starting_rubber_race
-Set starting rubber coverage (percent) for corresponding sessions. Since session starting rubber coverage data is not available from game API, it is required to manually set the value.
+| Game | Median Laps | Rough Equivalent Grip |
+|:-:|:-:|:-:|
+| Le Mans Ultimate | 2000 | Heavy (High) |
+| rFactor 2 | 1000 | Heavy (High) |
+
+    rubber_time_scale_*
+Set time scale multiplier for calculating rubber coverage in corresponding sessions (practice, qualifying, race). This value should match `Realroad Time Scale` session setting from game. For `static` rubber, set time scale to `0`.
+
+Note, since Realroad Time Scale data is not available from game API, it is required to manually set the value.
+
+Most online servers use default `1.0` Realroad Time Scale setting during `qualifying` and `race` session, while some servers may use `static` setting during `practice` session only.
+
+    starting_rubber_*
+Set starting rubber coverage (percent) in corresponding sessions (practice, qualifying, race).
+
+Note, since session starting rubber coverage data is not available from game API, it is required to manually set the value.
 
     temperature_trend_interval, raininess_trend_interval, wetness_trend_interval
 Set weather change trend interval in seconds for temperature, raininess, surface wetness readings. Default interval is `60` seconds.

@@ -51,13 +51,20 @@ class Realtime(Overlay):
         self.temp_cut = 2 + (self.cfg.units["temperature_unit"] == "Fahrenheit") + (decimals != 0) + decimals
         self.temp_digits = f"0{self.temp_cut + round(0.1 + decimals * 0.1, decimals)}f"
 
-        self.rubber_time_scale = max(self.wcfg["rubber_time_scale"], 0)
-        self.laps_rubber = (
-            rubber_to_laps(self.wcfg["starting_rubber_practice"]),  # testday
-            rubber_to_laps(self.wcfg["starting_rubber_practice"]),  # practice
-            rubber_to_laps(self.wcfg["starting_rubber_qualifying"]),  # qualifying
-            rubber_to_laps(self.wcfg["starting_rubber_race"]),  # warmup
-            rubber_to_laps(self.wcfg["starting_rubber_race"]),  # race
+        self.rubber_median_laps = max(int(self.wcfg["rubber_median_laps"]), 100)
+        self.rubber_time_scale = (
+            self.wcfg["rubber_time_scale_practice"],  # testday
+            self.wcfg["rubber_time_scale_practice"],  # practice
+            self.wcfg["rubber_time_scale_qualifying"],  # qualifying
+            self.wcfg["rubber_time_scale_race"],  # warmup
+            self.wcfg["rubber_time_scale_race"],  # race
+        )
+        self.rubber_starting = (
+            self.wcfg["starting_rubber_practice"],  # testday
+            self.wcfg["starting_rubber_practice"],  # practice
+            self.wcfg["starting_rubber_qualifying"],  # qualifying
+            self.wcfg["starting_rubber_race"],  # warmup
+            self.wcfg["starting_rubber_race"],  # race
         )
 
         # Config units
@@ -233,9 +240,11 @@ class Realtime(Overlay):
                 self.update_wetness(self.bar_wetness, wet_avg)
             # Rubber coverage percentage
             else:
-                laps_session = self.laps_rubber[api.read.session.session_type()]
-                if self.rubber_time_scale > 0:  # time-scaled coverage
-                    laps_session += (minfo.vehicles.completedSessionLaps * self.rubber_time_scale)
+                session_type = api.read.session.session_type()
+                rubber_scale = self.rubber_time_scale[session_type]
+                laps_session = rubber_to_laps(self.rubber_starting[session_type], self.rubber_median_laps)
+                if rubber_scale > 0:  # time-scaled coverage
+                    laps_session += (minfo.vehicles.completedSessionLaps * rubber_scale)
                 self.update_rubber(self.bar_wetness, laps_session)
             # Wet trend
             wetness = wet_min + wet_max + wet_avg
@@ -283,7 +292,7 @@ class Realtime(Overlay):
         """Surface rubber coverage percentage"""
         if target.last != data:
             target.last = data
-            percent_rubber = f"{laps_to_rubber(data): >3.0%}"[:3]
+            percent_rubber = f"{laps_to_rubber(data, self.rubber_median_laps): >3.0%}"[:3]
             target.setText(f"{self.prefix_dry} {percent_rubber}")
 
     def update_wetness_trend(self, target, data):
@@ -294,25 +303,27 @@ class Realtime(Overlay):
             target.updateStyle(self.bar_style_wetness_trend[data])
 
 
-def laps_to_rubber(value: float) -> float:
+def laps_to_rubber(value: float, median_laps: int = 2000) -> float:
     """Convert laps to rubber coverage (percent)"""
-    if value > 2000:
+    max_laps = median_laps * 2
+    if value > max_laps:
         return 1.0
-    if value > 1000:
-        return 0.75 + value * 0.25 / 2000
+    if value > median_laps:
+        return 0.75 + (value - median_laps) / median_laps / 4
     if value > 0:
-        return value * 0.75 / 1000
+        return value * 0.75 / median_laps
     return 0.0
 
 
-def rubber_to_laps(value: float) -> float:
+def rubber_to_laps(value: float, median_laps: int = 2000) -> float:
     """Convert rubber coverage (percent) to laps"""
+    max_laps = median_laps * 2
     if value >= 1:
-        return 2000
+        return max_laps
     if value > 0.75:
-        return (value - 0.75) * 1000 / 0.25
+        return median_laps + (value - 0.75) * median_laps * 4
     if value > 0:
-        return value * 1000 / 0.75
+        return value * median_laps / 0.75
     return 0
 
 
