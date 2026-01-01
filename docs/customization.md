@@ -3909,21 +3909,18 @@ Show rough estimate of rubber coverage (percent) based on total number of laps d
 
 Note, rubber coverage reading may not be accurate during `practice session` in multiplayer, as some API data will be lost or reset while people joining or leaving server. This does not affect `qualifying` and `race` session.
 
-| Rubber Coverage | Rough Equivalent Grip |
-|:-:|:-:|
-| 0.0 (0%) | Green |
-| 0.25 (25%) | Light |
-| 0.5 (50%) | Medium |
-| 0.75 (75%) | Heavy (High) |
-| 1.0 (100%) | Saturated |
+| Rubber Coverage | Equivalent Grip | Equivalent Laps (LMU) | Equivalent Laps (RF2) |
+|:-:|:-:|:-:|:-:|
+| 0.0 (0%) | Green | 0+ | 0+ |
+| 0.25 (25%) | Light | 600+ | 300+ |
+| 0.5 (50%) | Medium |  1200+ | 600+ |
+| 0.75 (75%) | Heavy (High) | 2000+ (Median) | 1000+ (Median) |
+| 1.0 (100%) | Saturated | 4000+ | 2000+ |
+
+**Note, all data from above table are rough estimate based on testing.*
 
     rubber_median_laps
-Set median laps at the point when grip becomes `Heavy (High)` for calculating accurate rubber coverage. Default median laps is `2000`. This value may vary from different games, see table below for reference.
-
-| Game | Median Laps | Rough Equivalent Grip |
-|:-:|:-:|:-:|
-| Le Mans Ultimate | 2000 | Heavy (High) |
-| rFactor 2 | 1000 | Heavy (High) |
+Set median laps at the point when grip becomes `Heavy (High)` for calculating accurate rubber coverage. Default median laps is `2000`. This value may vary from different games, see above table for reference.
 
     rubber_time_scale_*
 Set time scale multiplier for calculating rubber coverage in corresponding sessions (practice, qualifying, race). This value should match `Realroad Time Scale` session setting from game. For `static` rubber, set time scale to `0`.
