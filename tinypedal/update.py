@@ -29,10 +29,9 @@ import threading
 from . import overlay_signal, version
 from .async_request import get_response, set_header_get
 from .const_app import APP_NAME, REPO_NAME
-from .version_check import parse_version_string
+from .const_common import DATE_NA, VERSION_NA
+from .version_check import is_new_version, parse_version_string
 
-VERSION_NA = (0, 0, 0)  # major, minor, patch
-DATE_NA = VERSION_NA  # year, month, day
 logger = logging.getLogger(__name__)
 
 
@@ -123,28 +122,15 @@ class UpdateChecker:
         checked_version = parse_version(raw_bytes)
         checked_date = parse_date(raw_bytes)
         current_version = parse_version_string(version.__version__)
-        # Output log
-        if checked_version == VERSION_NA:
-            self._update_available = False
-            logger.info("UPDATES: Unable To Find Updates")
-        elif checked_version > current_version or (
-            checked_version == current_version and version.DEVELOPMENT  # pre-release version check
-        ):
-            self._update_available = True
-            logger.info(
-                "UPDATES: New Updates: v%s.%s.%s (%s-%s-%s)",
-                *checked_version,
-                *checked_date,
-            )
-        else:
-            self._update_available = False
-            logger.info("UPDATES: No Updates Available")
+        self._update_available = is_new_version(checked_version, current_version, version.DEVELOPMENT)
         # Save info
         self._last_checked_version = checked_version
         self._last_checked_date = checked_date
         # Send update signal
         overlay_signal.updates.emit(False)
         self._is_checking = False
+        # Output log
+        logger.info("UPDATES: %s", self.message())
 
     def message(self) -> str:
         """Get message"""

@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import sys
 
+from .const_common import VERSION_NA
+
 
 def parse_version_string(ver: str) -> tuple[int, int, int]:
     """Parse version string to tuple (major, minor, patch)"""
@@ -32,6 +34,25 @@ def parse_version_string(ver: str) -> tuple[int, int, int]:
         return int(version[0]), int(version[1]), int(version[2])
     except (AttributeError, ValueError, TypeError, IndexError):
         return 0, 0, 0
+
+
+def is_new_version(
+    checked_version: tuple[int, int, int],
+    current_version: tuple[int, int, int],
+    version_tag: str,
+) -> bool:
+    """Is new version"""
+    # Invalid version
+    if checked_version == VERSION_NA:
+        return False
+    # New version
+    if checked_version > current_version:
+        return True
+    # Pre-release version
+    if checked_version == current_version and version_tag:
+        return True
+    # Same version
+    return False
 
 
 def tinypedal() -> str:

@@ -60,6 +60,10 @@ PITEST_DEFAULT = (
     0,  # stop go penalty state
 )
 
+# Version & date
+VERSION_NA = (0, 0, 0)  # major, minor, patch
+DATE_NA = (0, 0, 0)  # year, month, day
+
 # Type set
 TYPE_NUMBER = (float, int)
 TYPE_JSON = (dict, list)

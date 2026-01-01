@@ -229,17 +229,6 @@ class PresetValidator:
         cls.add_missing_key(key_list_def, dict_user, dict_def)
         cls.sort_key_order(key_list_def, dict_user)
 
-    #@staticmethod
-    #def fix_outdated_key(dict_user: dict) -> None:
-    #    """Fix outdated key name from user dictionary"""
-    #    key_list_user = tuple(dict_user)  # create user key list
-    #    # Rename key, remove outdated key
-    #    for key in key_list_user:
-    #        # Typo (<=2.33.0)
-    #        if "predication" in key:
-    #            dict_user[key.replace("predication", "prediction")] = dict_user.pop(key)
-    #            continue
-
     @staticmethod
     def preupdate_global_preset(dict_user: dict):
         """Pre update global preset, run before validation"""
@@ -258,6 +247,8 @@ class PresetValidator:
         dict_user["preset"]["version"] = dict_def["preset"]["version"]
 
         # Update old setting for specific version
+        if preset_version < (2, 33, 1):
+            _user_prior_2_33_1(dict_user)
         if preset_version < (2, 36, 0):
             _user_prior_2_36_0(dict_user)
         if preset_version < (2, 37, 0):
@@ -308,3 +299,23 @@ def _user_prior_2_36_0(dict_user: dict):
     if isinstance(module_vehicles, dict):
         if module_vehicles["update_interval"] == 20:
             module_vehicles["update_interval"] = 10
+
+
+def _user_prior_2_33_1(dict_user: dict):
+    """Update user setting prior to 2.33.1"""
+    # Fix option name typo "predication"
+    relative_finish_order = dict_user.get("relative_finish_order")
+    if isinstance(relative_finish_order, dict):
+        _rename_key(relative_finish_order, "predication", "prediction")
+
+    track_map = dict_user.get("track_map")
+    if isinstance(track_map, dict):
+        _rename_key(track_map, "predication", "prediction")
+
+
+def _rename_key(data: dict, old: str, new: str):
+    """Rename key name"""
+    for key in tuple(data):
+        if old in key:
+            data[key.replace(old, new)] = data.pop(key)
+            continue

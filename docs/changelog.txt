@@ -21,7 +21,7 @@ WIP
   - Added "show_best_laptime_from_recent_laps_in_race" option, which shows driver's best lap time from (five) most recent laps in race session. This option provides a better view of driver's recent performance during longer race. This option is disabled by default.
 
 * Weather
-  - Added "show_rubber_coverage_while_dry" option (request by user "kby702"), which shows rough estimate of rubber coverage (percent) based on total number of laps done by all drivers while road surface is dry.
+  - Added "show_rubber_coverage_while_dry" option (requested by user "kby702"), which shows rough estimate of rubber coverage (percent) based on total number of laps done by all drivers while road surface is dry.
     Note, rubber coverage reading may not be accurate during "practice session" in multiplayer, as some API data will be lost or reset while people joining or leaving server. This does not affect "qualifying" and "race" session.
     Reference rubber coverage values:
     - 0% (0.0) is roughly equivalent to "Green" grip.
