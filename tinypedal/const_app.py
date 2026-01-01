@@ -1,5 +1,5 @@
 #  TinyPedal is an open-source overlay application for racing simulation.
-#  Copyright (C) 2022-2025 TinyPedal developers, see contributors.md file
+#  Copyright (C) 2022-2026 TinyPedal developers, see contributors.md file
 #
 #  This file is part of TinyPedal.
 #
@@ -34,7 +34,7 @@ VERSION = version_check.tinypedal()
 # App info
 APP_NAME = "TinyPedal"
 REPO_NAME = "TinyPedal/TinyPedal"
-COPYRIGHT = "Copyright (C) 2022-2025 TinyPedal developers"
+COPYRIGHT = "Copyright (C) 2022-2026 TinyPedal developers"
 DESCRIPTION = "Free and Open Source telemetry overlay application for racing simulation."
 LICENSE = "Licensed under the GNU General Public License v3.0 or later."
 

@@ -181,7 +181,7 @@ You can run the script as (it doesn't support any arguments or options):
 
 ## License
 
-Copyright (C) 2022-2025 TinyPedal developers
+Copyright (C) 2022-2026 TinyPedal developers
 
 TinyPedal is free software and licensed under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. TinyPedal is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. See [LICENSE.txt](./LICENSE.txt) for more info.
 

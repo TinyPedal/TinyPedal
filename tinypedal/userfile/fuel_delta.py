@@ -1,5 +1,5 @@
 #  TinyPedal is an open-source overlay application for racing simulation.
-#  Copyright (C) 2022-2025 TinyPedal developers, see contributors.md file
+#  Copyright (C) 2022-2026 TinyPedal developers, see contributors.md file
 #
 #  This file is part of TinyPedal.
 #
