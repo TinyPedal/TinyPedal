@@ -32,21 +32,27 @@ class RealtimeState:
     """Realtime state
 
     Check realtime data update state without calling methods.
-    Change state via OverlayControl.
+    State control: APIControl, OverlayControl.
 
     Attributes:
         active: whether is active (driving or overriding) state.
         paused: whether data stopped updating.
+        overriding: whether is state override mode enabled.
+        spectating: whether is spectate mode enabled.
     """
 
     __slots__ = (
         "active",
         "paused",
+        "overriding",
+        "spectating",
     )
 
     def __init__(self):
         self.active: bool = False
         self.paused: bool = True
+        self.overriding: bool = False
+        self.spectating: bool = False
 
 
 class OverlaySignal(QObject):

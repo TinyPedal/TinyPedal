@@ -22,10 +22,14 @@ Setting validator function
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import Any, Mapping
 
 from . import regex_pattern as rxp
+from . import version
+from .const_api import API_LMU_CONFIG, API_RF2_CONFIG
+from .const_common import VERSION_NA
 from .template.setting_brakes import BRAKEINFO_DEFAULT
 from .template.setting_classes import CLASSINFO_DEFAULT
 from .template.setting_compounds import COMPOUNDINFO_DEFAULT
@@ -41,6 +45,15 @@ COMMON_STRINGS = "|".join((
     rxp.CFG_USER_IMAGE,
     rxp.CFG_STRING,
 ))
+
+logger = logging.getLogger(__name__)
+
+
+def _rename_key(data: dict, old: str, new: str):
+    """Rename key name"""
+    for key in tuple(data):
+        if old in key:
+            data[key.replace(old, new)] = data.pop(key)
 
 
 def validate_style(dict_user: dict[str, dict], dict_def: Mapping[str, Any]) -> bool:
@@ -170,16 +183,11 @@ class ValueValidator:
 class PresetValidator:
     """Preset validator"""
 
-    # Set validator methods in ordered list
-    _value_validators = (
-        ValueValidator.boolean,
-        ValueValidator.choice_units,
-        ValueValidator.choice_common,
-        ValueValidator.color,
-        ValueValidator.clock_format,
-        ValueValidator.string,
-        ValueValidator.integer,
-        ValueValidator.numeric,
+    # Set validator methods in order
+    _value_validators = tuple(
+        getattr(ValueValidator, attr)
+        for attr in ValueValidator.__dict__
+        if attr[0] != "_"
     )
 
     @classmethod
@@ -232,6 +240,9 @@ class PresetValidator:
     @staticmethod
     def preupdate_global_preset(dict_user: dict):
         """Pre update global preset, run before validation"""
+        telemetry_api = dict_user.get("telemetry_api")
+        if isinstance(telemetry_api, dict):
+            dict_user["telemetry"] = telemetry_api.copy()
 
     @staticmethod
     def preupdate_user_preset(dict_user: dict, dict_def: dict):
@@ -246,6 +257,12 @@ class PresetValidator:
         # Update preset version
         dict_user["preset"]["version"] = dict_def["preset"]["version"]
 
+        # Skip check if already newest version
+        build_version = parse_version_string(version.__version__)
+        if preset_version > VERSION_NA and preset_version >= build_version:
+            logger.info("PRECHECK: preset version already up to date")
+            return
+
         # Update old setting for specific version
         if preset_version < (2, 33, 1):
             _user_prior_2_33_1(dict_user)
@@ -254,9 +271,12 @@ class PresetValidator:
         if preset_version < (2, 37, 0):
             _user_prior_2_37_0(dict_user)
 
+        logger.info("PRECHECK: preset version updated")
+
     @classmethod
     def global_preset(cls, dict_user: dict, dict_def: dict) -> dict:
         """Validate global preset"""
+        cls.preupdate_global_preset(dict_user)
         return cls._validate(dict_user, dict_def)
 
     @classmethod
@@ -292,8 +312,8 @@ def _user_prior_2_36_0(dict_user: dict):
     # Copy old telemetry_api setting
     telemetry_api = dict_user.get("telemetry_api")
     if isinstance(telemetry_api, dict):
-        dict_user["api_lmu"] = telemetry_api.copy()
-        dict_user["api_rf2"] = telemetry_api.copy()
+        dict_user[API_LMU_CONFIG] = telemetry_api.copy()
+        dict_user[API_RF2_CONFIG] = telemetry_api.copy()
     # Correct default update interval in module_vehicles
     module_vehicles = dict_user.get("module_vehicles")
     if isinstance(module_vehicles, dict):
@@ -311,11 +331,3 @@ def _user_prior_2_33_1(dict_user: dict):
     track_map = dict_user.get("track_map")
     if isinstance(track_map, dict):
         _rename_key(track_map, "predication", "prediction")
-
-
-def _rename_key(data: dict, old: str, new: str):
-    """Rename key name"""
-    for key in tuple(data):
-        if old in key:
-            data[key.replace(old, new)] = data.pop(key)
-            continue

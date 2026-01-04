@@ -22,6 +22,7 @@ API control
 
 import logging
 
+from . import realtime_state
 from .api_connector import API_PACK
 from .setting import cfg
 
@@ -46,7 +47,7 @@ class APIControl:
         """Connect to API
 
         Args:
-            name: match API name in API_NAME_LIST
+            name: API full name
         """
         if not name:
             name = cfg.api_name
@@ -68,8 +69,6 @@ class APIControl:
 
     def start(self):
         """Start API"""
-        cfg.load_api()
-        logger.info("ENCODING: %s", cfg.api["character_encoding"])
         logger.info("CONNECTING: %s API", self._api.NAME)
         self.setup()
         self._api.start()
@@ -80,6 +79,7 @@ class APIControl:
             self.read = init_read
             self._same_api_loaded = True
 
+        logger.info("ENCODING: %s", cfg.api["character_encoding"])
         logger.info("CONNECTED: %s API (%s)", self._api.NAME, self.read.state.version())
 
     def stop(self):
@@ -96,11 +96,14 @@ class APIControl:
 
     def setup(self):
         """Setup & apply API changes"""
-        self._api.setup(cfg.api)
+        setting_api = cfg.api
+        realtime_state.overriding = setting_api["enable_active_state_override"]
+        realtime_state.spectating = setting_api["enable_player_index_override"]
+        self._api.setup(setting_api)
 
     @property
     def name(self) -> str:
-        """API name output"""
+        """API full name output"""
         return self._api.NAME
 
 

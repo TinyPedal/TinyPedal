@@ -410,11 +410,6 @@ class LMUInfo:
             or self.lmuTeleVeh().mIgnitionStarter > 0
         )
 
-    @property
-    def identifier(self) -> str:
-        """Identify sim name"""
-        return "LMU"
-
 
 def test_api():
     """API test run"""

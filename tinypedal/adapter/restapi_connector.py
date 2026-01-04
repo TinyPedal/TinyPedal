@@ -32,7 +32,7 @@ from typing import Any, NamedTuple
 from .. import realtime_state
 from ..async_request import http_get, set_header_get
 from ..const_common import TYPE_JSON
-from .rf2_restapi import ResRawOutput, RestAPIData, select_taskset
+from .rf2_restapi import ResRawOutput, RestAPIData
 
 logger = logging.getLogger(__name__)
 json_decoder = json.JSONDecoder()
@@ -52,27 +52,26 @@ class RestAPIInfo:
     """Rest API data output"""
 
     __slots__ = (
-        "_api_name",
+        "_taskset",
+        "_dataset",
         "_cfg",
         "_task_cancel",
         "_updating",
         "_update_thread",
         "_active_interval",
         "_event",
-        "_dataset",
     )
 
-    def __init__(self, api_name: str):
-        self._api_name = api_name
-        self._cfg: dict = None
+    def __init__(self, taskset: tuple, dataset: RestAPIData):
+        self._taskset = taskset
+        self._dataset = dataset
 
+        self._cfg: dict = None
         self._task_cancel = False
         self._updating = False
         self._update_thread = None
         self._active_interval = 0.2
         self._event = threading.Event()
-
-        self._dataset = RestAPIData()
 
     @property
     def telemetry(self) -> RestAPIData:
@@ -121,7 +120,7 @@ class RestAPIInfo:
                     reset = True
                     update_interval = self._active_interval
                     self._task_cancel = False
-                    self.run_tasks(self._api_name, active_task_sim)
+                    self.run_tasks(active_task_sim)
 
             else:
                 if reset:
@@ -131,9 +130,9 @@ class RestAPIInfo:
         # Reset to default on close
         reset_to_default(self._dataset, active_task_sim)
 
-    def run_tasks(self, api_name: str, active_task_sim: dict):
+    def run_tasks(self, active_task_sim: dict):
         """Run tasks"""
-        logger.info("RestAPI: CONNECTING: %s", api_name)
+        logger.info("RestAPI: CONNECTING")
         # Load http connection setting
         sim_http = HttpSetup(
             host=self._cfg["url_host"],
@@ -144,11 +143,7 @@ class RestAPIInfo:
         )
         # Run all tasks while on track, this blocks until tasks cancelled
         logger.info("RestAPI: all tasks started")
-        asyncio.run(
-            self.task_init(
-                self.sort_taskset(sim_http, active_task_sim, select_taskset(api_name)),
-            )
-        )
+        asyncio.run(self.task_init(self.sort_taskset(sim_http, active_task_sim, self._taskset)))
         logger.info("RestAPI: all tasks stopped")
         # Reset when finished
         reset_to_default(self._dataset, active_task_sim)

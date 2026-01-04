@@ -20,8 +20,8 @@
 Default global (config) setting template
 """
 
+from ..const_api import API_LMU_NAME
 from ..const_app import APP_NAME, PLATFORM
-from ..regex_pattern import API_NAME_LMU
 
 GLOBAL_DEFAULT = {
     "application": {
@@ -52,8 +52,8 @@ GLOBAL_DEFAULT = {
         "global_bkg_color": "#000000",
         "multimedia_plugin_on_windows": "WMF",
     },
-    "telemetry_api": {
-        "api_name": API_NAME_LMU,
+    "telemetry": {
+        "api_name": API_LMU_NAME,
         "enable_api_selection_from_preset": True,
     },
     "user_path": {

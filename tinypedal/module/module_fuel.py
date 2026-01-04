@@ -28,6 +28,7 @@ from typing import Callable
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
+from ..const_api import API_RF2_NAME
 from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, POS_XYZ_ZERO
 from ..const_file import FileExt
 from ..module_info import ConsumptionDataSet, FuelInfo, minfo
@@ -149,7 +150,7 @@ def detect_consumption_type() -> Callable:
     """Detect consumption type, return telemetry function"""
     # Pure electric based vehicle
     if (
-        api.read.state.identifier() == "RF2"
+        api.name == API_RF2_NAME
         and api.read.vehicle.tank_capacity() == 1
         and api.read.emotor.battery_charge() > 0
     ):

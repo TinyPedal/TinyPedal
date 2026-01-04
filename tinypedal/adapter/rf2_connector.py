@@ -432,16 +432,6 @@ class RF2Info:
             or self.rf2TeleVeh().mIgnitionStarter > 0
         )
 
-    @property
-    def identifier(self) -> str:
-        """Identify sim name"""
-        name = self.rf2ScorInfo.mPlrFileName
-        if b"Settings" in name:
-            return "LMU"
-        if name:
-            return "RF2"
-        return ""
-
 
 def test_api():
     """API test run"""

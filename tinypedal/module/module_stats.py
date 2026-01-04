@@ -52,11 +52,11 @@ class Realtime(DataModule):
 
         while not _event_wait(update_interval):
 
-            # Ignore stats while in override mode
-            if (self.cfg.api["enable_player_index_override"]
-                or self.cfg.api["enable_active_state_override"]):
-                reset = False  # make sure stats not saved
-                update_interval = self.idle_interval
+            # Ignore stats while in spectate or override mode
+            if realtime_state.spectating or realtime_state.overriding:
+                if reset:
+                    reset = False  # make sure stats not saved
+                    update_interval = self.idle_interval
                 continue
 
             if realtime_state.active:

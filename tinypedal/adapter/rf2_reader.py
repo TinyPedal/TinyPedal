@@ -87,10 +87,6 @@ class State(DataAdapter):
         version = tostr(self.shmm.rf2Ext.mVersion)
         return version if version else "unknown"
 
-    def identifier(self) -> str:
-        """Identify API"""
-        return self.shmm.identifier
-
 
 class Brake(DataAdapter):
     """Brake"""
@@ -444,7 +440,7 @@ class Session(DataAdapter):
 
     def weather_forecast(self) -> tuple[WeatherNode, ...]:
         """Weather forecast nodes"""
-        session_type = self.shmm.rf2ScorInfo.mSession
+        session_type = self.session_type()
         if session_type <= 1:  # practice session
             return self.rest.telemetry.forecastPractice
         if session_type == 2:  # qualify session

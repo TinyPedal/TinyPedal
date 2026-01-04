@@ -41,6 +41,7 @@ from PySide2.QtWidgets import (
 
 from ..api_control import api
 from ..async_request import get_response, set_header_get
+from ..const_api import API_LMU_ALIAS, API_LMU_CONFIG, API_RF2_ALIAS, API_RF2_CONFIG
 from ..const_file import ConfigType, FileFilter
 from ..setting import cfg, copy_setting
 from ._common import (
@@ -154,28 +155,31 @@ class VehicleBrandEditor(BaseEditor):
 
     def import_from_rf2(self):
         """Import brand from RF2"""
+        setting_api = cfg.user.setting[API_RF2_CONFIG]
         self.import_from_restapi(
-            "RF2",
-            cfg.user.setting["api_rf2"]["url_host"],
-            cfg.user.setting["api_rf2"]["url_port"],
+            API_RF2_ALIAS,
+            setting_api["url_host"],
+            setting_api["url_port"],
             "/rest/race/car",
         )
 
     def import_from_lmu(self):
         """Import brand from LMU (primary source)"""
+        setting_api = cfg.user.setting[API_LMU_CONFIG]
         self.import_from_restapi(
-            "LMU",
-            cfg.user.setting["api_lmu"]["url_host"],
-            cfg.user.setting["api_lmu"]["url_port"],
+            API_LMU_ALIAS,
+            setting_api["url_host"],
+            setting_api["url_port"],
             "/rest/race/car",
         )
 
     def import_from_lmu_alt(self):
         """Import brand from LMU (alternative source)"""
+        setting_api = cfg.user.setting[API_LMU_CONFIG]
         self.import_from_restapi(
-            "LMU",
-            cfg.user.setting["api_lmu"]["url_host"],
-            cfg.user.setting["api_lmu"]["url_port"],
+            API_LMU_ALIAS,
+            setting_api["url_host"],
+            setting_api["url_port"],
             "/rest/sessions/getAllVehicles",
         )
 

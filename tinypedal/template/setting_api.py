@@ -20,8 +20,10 @@
 Default API setting template
 """
 
+from ..const_api import API_LMU_CONFIG, API_RF2_CONFIG
+
 API_DEFAULT = {
-    "api_lmu": {
+    API_LMU_CONFIG: {
         "access_mode": 0,
         "enable_active_state_override": False,
         "active_state": True,
@@ -41,7 +43,7 @@ API_DEFAULT = {
         "enable_vehicle_info": True,
         "enable_weather_info": True,
     },
-    "api_rf2": {
+    API_RF2_CONFIG: {
         "access_mode": 0,
         "process_id": "",
         "enable_active_state_override": False,

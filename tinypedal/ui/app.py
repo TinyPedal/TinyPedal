@@ -38,10 +38,10 @@ from PySide2.QtWidgets import (
 
 from .. import loader, overlay_signal
 from ..api_control import api
+from ..const_api import API_MAP_ALIAS
 from ..const_app import APP_NAME, VERSION
 from ..const_file import ConfigType
 from ..module_control import mctrl, wctrl
-from ..regex_pattern import API_NAME_ALIAS
 from ..setting import cfg
 from . import set_style_palette, set_style_window
 from ._common import UIScaler
@@ -133,8 +133,7 @@ class StatusButtonBar(QStatusBar):
             text_api_status = "overriding"
         else:
             text_api_status = api.read.state.version()
-        legacy_tag = "*" if "legacy" in api.name else ""
-        self.button_api.setText(f"API: {API_NAME_ALIAS[api.name]}{legacy_tag} ({text_api_status})")
+        self.button_api.setText(f"API: {API_MAP_ALIAS[api.name]} ({text_api_status})")
 
         self.button_style.setText(f"UI: {cfg.application['window_color_theme']}")
 

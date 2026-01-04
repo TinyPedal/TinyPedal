@@ -33,7 +33,6 @@ from ..process.vehicle import (
     stint_ve_usage,
 )
 from ..process.weather import FORECAST_DEFAULT, WeatherNode, forecast_rf2
-from ..regex_pattern import API_NAME_LMU, API_NAME_LMULEGACY, API_NAME_RF2
 
 
 class RestAPIData:
@@ -194,14 +193,3 @@ TASKSET_LMU = (
     ("/rest/strategy/pitstop-estimate", LMU_PITSTOPTIME, "enable_vehicle_info", True, 1.0),
     ("/rest/strategy/usage", LMU_STINTUSAGE, "enable_energy_remaining", True, 1.0),
 )
-
-
-def select_taskset(api_name: str) -> tuple:
-    """Select taskset"""
-    if api_name == API_NAME_RF2:
-        return TASKSET_RF2
-    if api_name == API_NAME_LMU:
-        return TASKSET_LMU
-    if api_name == API_NAME_LMULEGACY:
-        return TASKSET_LMU
-    return ()

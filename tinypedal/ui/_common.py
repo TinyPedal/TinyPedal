@@ -326,7 +326,7 @@ class TableBatchReplace(BaseDialog):
         self.search_selector.setCompleter(QCompleter())  # disable auto-complete
 
         self.column_selector = QComboBox()
-        self.column_selector.addItems(list(self.table_selector))
+        self.column_selector.addItems(self.table_selector.keys())
         self.column_selector.currentIndexChanged.connect(self.update_selector)
         self.update_selector(self.table_selector[self.column_selector.currentText()])
 
@@ -412,7 +412,7 @@ class DoubleClickEdit(QLineEdit):
         """Set dialog mode and initial value
 
         Args:
-            mode: "color", "path".
+            mode: "color", "path", "image".
             init: initial value.
         """
         super().__init__(parent)

@@ -372,12 +372,12 @@ class APIMenu(QMenu):
             if selected_api_name == action.text():
                 action.setChecked(True)
                 break
-        self.api_selection.setChecked(cfg.user.config["telemetry_api"]["enable_api_selection_from_preset"])
+        self.api_selection.setChecked(cfg.telemetry["enable_api_selection_from_preset"])
 
     def toggle_api_selection(self):
         """Toggle API selection mode"""
-        enabled = cfg.user.config["telemetry_api"]["enable_api_selection_from_preset"]
-        cfg.user.config["telemetry_api"]["enable_api_selection_from_preset"] = not enabled
+        enabled = cfg.telemetry["enable_api_selection_from_preset"]
+        cfg.telemetry["enable_api_selection_from_preset"] = not enabled
         cfg.save(cfg_type=ConfigType.CONFIG)
         self._parent.reload_only()
 

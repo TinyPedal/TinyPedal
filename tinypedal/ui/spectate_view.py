@@ -64,7 +64,6 @@ class SpectateList(QWidget):
 
         self.button_toggle = QPushButton("")
         self.button_toggle.setCheckable(True)
-        self.button_toggle.setChecked(cfg.api["enable_player_index_override"])
         self.button_toggle.toggled.connect(self.toggle_spectate)
         self.refresh()
 
@@ -139,8 +138,8 @@ class SpectateList(QWidget):
                     selected_driver_name = driver_name
 
         driver_list.sort(key=str.lower)
-        driver_list.insert(0, "Anonymous")
         listbox.clear()
+        listbox.addItem("Anonymous")
         listbox.addItems(driver_list)
 
         self.focus_on_selected(selected_driver_name)

@@ -21,6 +21,9 @@ Regular expression, pattern, string constants
 """
 
 import re
+from types import MappingProxyType
+
+from .const_api import API_MAP_ALIAS
 
 # Compiled regex function
 rex_hex_color = re.compile(r"^#[0-9A-F]{3}$|^#[0-9A-F]{6}$|^#[0-9A-F]{8}$", flags=re.IGNORECASE)
@@ -154,16 +157,6 @@ CFG_INVALID_FILENAME = (
     "backup"
 )
 
-# API name
-API_NAME_RF2 = "rFactor 2"
-API_NAME_LMU = "Le Mans Ultimate"
-API_NAME_LMULEGACY = "Le Mans Ultimate (legacy)"
-API_NAME_ALIAS = {
-    API_NAME_LMU: "LMU",
-    API_NAME_LMULEGACY: "LMU",
-    API_NAME_RF2: "RF2",
-}
-
 # Abbreviation
 ABBR_PATTERN = (
     "^id | id$| id |"
@@ -181,27 +174,27 @@ ABBR_PATTERN = (
 )
 
 # Choice dictionary
-CHOICE_COMMON = {
-    CFG_API_NAME: [API_NAME_LMU, API_NAME_LMULEGACY, API_NAME_RF2],
-    CFG_CHARACTER_ENCODING: ["UTF-8", "ISO-8859-1"],
-    CFG_DELTABEST_SOURCE: ["Best", "Session", "Stint", "Last"],
-    CFG_FONT_WEIGHT: ["normal", "bold"],
-    CFG_TARGET_LAPTIME: ["Theoretical", "Personal"],
-    CFG_TEXT_ALIGNMENT: ["Left", "Center", "Right"],
-    CFG_MULTIMEDIA_PLUGIN: ["WMF", "DirectShow"],
-    CFG_STATS_CLASSIFICATION: ["Class - Brand", "Class", "Vehicle"],
-    CFG_WINDOW_COLOR_THEME: ["Light", "Dark"],
-}
-CHOICE_UNITS = {
-    "distance_unit": ["Meter", "Feet"],
-    "fuel_unit": ["Liter", "Gallon"],
-    "odometer_unit": ["Kilometer", "Mile", "Meter"],
-    "power_unit": ["Kilowatt", "Horsepower", "Metric Horsepower"],
-    "speed_unit": ["KPH", "MPH", "m/s"],
-    "temperature_unit": ["Celsius", "Fahrenheit"],
-    "turbo_pressure_unit": ["bar", "psi", "kPa"],
-    "tyre_pressure_unit": ["kPa", "psi", "bar"],
-}
+CHOICE_COMMON = MappingProxyType({
+    CFG_API_NAME: tuple(API_MAP_ALIAS),
+    CFG_CHARACTER_ENCODING: ("UTF-8", "ISO-8859-1"),
+    CFG_DELTABEST_SOURCE: ("Best", "Session", "Stint", "Last"),
+    CFG_FONT_WEIGHT: ("normal", "bold"),
+    CFG_TARGET_LAPTIME: ("Theoretical", "Personal"),
+    CFG_TEXT_ALIGNMENT: ("Left", "Center", "Right"),
+    CFG_MULTIMEDIA_PLUGIN: ("WMF", "DirectShow"),
+    CFG_STATS_CLASSIFICATION: ("Class - Brand", "Class", "Vehicle"),
+    CFG_WINDOW_COLOR_THEME: ("Light", "Dark"),
+})
+CHOICE_UNITS = MappingProxyType({
+    "distance_unit": ("Meter", "Feet"),
+    "fuel_unit": ("Liter", "Gallon"),
+    "odometer_unit": ("Kilometer", "Mile", "Meter"),
+    "power_unit": ("Kilowatt", "Horsepower", "Metric Horsepower"),
+    "speed_unit": ("KPH", "MPH", "m/s"),
+    "temperature_unit": ("Celsius", "Fahrenheit"),
+    "turbo_pressure_unit": ("bar", "psi", "kPa"),
+    "tyre_pressure_unit": ("kPa", "psi", "bar"),
+})
 
 # Misc
 COMMON_TYRE_COMPOUNDS = (

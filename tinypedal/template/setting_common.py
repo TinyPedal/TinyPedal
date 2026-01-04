@@ -20,12 +20,12 @@
 Default common setting template
 """
 
-from ..regex_pattern import API_NAME_LMU
+from ..const_api import API_LMU_NAME
 from ..version import __version__
 
 COMMON_DEFAULT = {
     "preset": {
-        "api_name": API_NAME_LMU,
+        "api_name": API_LMU_NAME,
         "version": __version__,
     },
     "overlay": {

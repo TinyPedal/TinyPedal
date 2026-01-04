@@ -83,7 +83,8 @@ class FontConfig(BaseDialog):
 
         # Combobox
         self.edit_fontname = QComboBox(self)
-        self.edit_fontname.addItems(["no change"] + get_font_list())
+        self.edit_fontname.addItem("no change")
+        self.edit_fontname.addItems(get_font_list())
         self.edit_fontname.setFixedWidth(UIScaler.size(9))
 
         self.edit_fontsize = QSpinBox(self)
@@ -91,7 +92,8 @@ class FontConfig(BaseDialog):
         self.edit_fontsize.setFixedWidth(UIScaler.size(9))
 
         self.edit_fontweight = QComboBox(self)
-        self.edit_fontweight.addItems(["no change"] + rxp.CHOICE_COMMON[rxp.CFG_FONT_WEIGHT])
+        self.edit_fontweight.addItem("no change")
+        self.edit_fontweight.addItems(rxp.CHOICE_COMMON[rxp.CFG_FONT_WEIGHT])
         self.edit_fontweight.setFixedWidth(UIScaler.size(9))
 
         layout_option = QGridLayout()

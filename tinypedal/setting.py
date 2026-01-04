@@ -28,11 +28,12 @@ import threading
 from collections import ChainMap
 from time import sleep
 from types import MappingProxyType
+from typing import Any
 
+from .const_api import API_MAP_CONFIG
 from .const_app import PATH_GLOBAL
 from .const_common import EMPTY_DICT
 from .const_file import ConfigType, FileExt
-from .regex_pattern import API_NAME_ALIAS
 from .setting_validator import PresetValidator, StyleValidator
 from .template.setting_api import API_DEFAULT
 from .template.setting_brakes import BRAKES_DEFAULT
@@ -167,11 +168,6 @@ class Setting:
         "default",
         "user",
         "path",
-        "application",
-        "compatibility",
-        "overlay",
-        "units",
-        "api",
     )
 
     def __init__(self):
@@ -187,12 +183,36 @@ class Setting:
         self.default.set_default()
         self.user = Preset()
         self.path = FilePath()
-        # Quick references
-        self.application = None
-        self.compatibility = None
-        self.overlay = None
-        self.units = None
-        self.api = None
+
+    @property
+    def api(self) -> dict[str, Any]:
+        """API setting (quick reference)"""
+        return self.user.setting[self.api_key]
+
+    @property
+    def application(self) -> dict[str, Any]:
+        """Application (global) setting (quick reference)"""
+        return self.user.config["application"]
+
+    @property
+    def compatibility(self) -> dict[str, Any]:
+        """Compatibility (global) setting (quick reference)"""
+        return self.user.config["compatibility"]
+
+    @property
+    def overlay(self) -> dict[str, Any]:
+        """Overlay setting (quick reference)"""
+        return self.user.setting["overlay"]
+
+    @property
+    def telemetry(self) -> dict[str, Any]:
+        """Telemetry (global) setting (quick reference)"""
+        return self.user.config["telemetry"]
+
+    @property
+    def units(self) -> dict[str, Any]:
+        """Units setting (quick reference)"""
+        return self.user.setting["units"]
 
     def is_loaded(self, filename: str) -> bool:
         """Check if selected setting file is already loaded"""
@@ -231,9 +251,6 @@ class Setting:
             user_path=self.user.config["user_path"],
             default_path=self.default.config["user_path"],
         )
-        # Assign global setting
-        self.application = self.user.config["application"]
-        self.compatibility = self.user.config["compatibility"]
 
     def update_path(self):
         """Update global path, call this if "user_path" changed"""
@@ -297,35 +314,26 @@ class Setting:
             dict_def=self.default.tracks,
             validator=StyleValidator.tracks,
         )
-        # Assign base setting
-        self.overlay = self.user.setting["overlay"]
-        self.units = self.user.setting["units"]
-
-    def load_api(self) -> None:
-        """Load API setting, should be called after loaded user settings, but before starting API"""
-        self.api = self.user.setting[self.api_key]
 
     @property
     def api_name(self) -> str:
         """Get selected api name"""
-        global_api_setting = self.user.config["telemetry_api"]
-        if global_api_setting["enable_api_selection_from_preset"]:
+        if self.telemetry["enable_api_selection_from_preset"]:
             return self.user.setting["preset"]["api_name"]
-        return global_api_setting["api_name"]
+        return self.telemetry["api_name"]
 
     @api_name.setter
     def api_name(self, name: str) -> None:
         """Set selected api name"""
-        global_api_setting = self.user.config["telemetry_api"]
-        if global_api_setting["enable_api_selection_from_preset"]:
+        if self.telemetry["enable_api_selection_from_preset"]:
             self.user.setting["preset"]["api_name"] = name
         else:
-            global_api_setting["api_name"] = name
+            self.telemetry["api_name"] = name
 
     @property
     def api_key(self) -> str:
         """Get selected api config key name"""
-        return f"api_{API_NAME_ALIAS[self.api_name].lower()}"
+        return API_MAP_CONFIG[self.api_name]
 
     def preset_files(self) -> list[str]:
         """Get user preset JSON filename list, sort by modified date in descending order

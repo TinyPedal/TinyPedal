@@ -31,9 +31,10 @@ from .adapter import (
     restapi_connector,
     rf2_connector,
     rf2_reader,
+    rf2_restapi,
 )
+from .const_api import API_LMU_NAME, API_LMULEGACY_NAME, API_RF2_NAME
 from .const_app import PLATFORM
-from .regex_pattern import API_NAME_LMU, API_NAME_LMULEGACY, API_NAME_RF2
 from .validator import bytes_to_str
 
 
@@ -121,11 +122,11 @@ class SimRF2(Connector):
         # Secondary API
         "restapi",
     )
-    NAME = API_NAME_RF2
+    NAME = API_RF2_NAME
 
     def __init__(self):
         self.shmmapi = rf2_connector.RF2Info()
-        self.restapi = restapi_connector.RestAPIInfo(API_NAME_RF2)
+        self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_RF2, rf2_restapi.RestAPIData())
 
     def start(self):
         self.shmmapi.start()  # 1 load first
@@ -158,11 +159,11 @@ class SimLMU(Connector):
         # Secondary API
         "restapi",
     )
-    NAME = API_NAME_LMU
+    NAME = API_LMU_NAME
 
     def __init__(self):
         self.shmmapi = lmu_connector.LMUInfo()
-        self.restapi = restapi_connector.RestAPIInfo(API_NAME_LMU)
+        self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_LMU, rf2_restapi.RestAPIData())
 
     def start(self):
         self.shmmapi.start()  # 1 load first
@@ -197,11 +198,11 @@ class SimLMULegacy(Connector):
         # Secondary API
         "restapi",
     )
-    NAME = API_NAME_LMULEGACY
+    NAME = API_LMULEGACY_NAME
 
     def __init__(self):
         self.shmmapi = rf2_connector.RF2Info()
-        self.restapi = restapi_connector.RestAPIInfo(API_NAME_LMULEGACY)
+        self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_LMU, rf2_restapi.RestAPIData())
 
     def start(self):
         self.shmmapi.start()  # 1 load first
@@ -236,7 +237,7 @@ def _set_available_api():
     if PLATFORM == "Windows":
         platform_all += platform_win
     # Sort API by name
-    return tuple(sorted((_api for _api in platform_all), key=lambda x:x.NAME))
+    return tuple(sorted((_api for _api in platform_all), key=lambda cls:cls.NAME))
 
 
 API_PACK = _set_available_api()

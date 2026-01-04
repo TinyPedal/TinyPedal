@@ -89,10 +89,6 @@ class State(DataAdapter):
             return "unknown"
         return f"{version[0]}.{version[1:]}"
 
-    def identifier(self) -> str:
-        """Identify API"""
-        return self.shmm.identifier
-
 
 class Brake(DataAdapter):
     """Brake"""
@@ -446,7 +442,7 @@ class Session(DataAdapter):
 
     def weather_forecast(self) -> tuple[WeatherNode, ...]:
         """Weather forecast nodes"""
-        session_type = self.shmm.lmuScorInfo.mSession
+        session_type = self.session_type()
         if session_type <= 1:  # practice session
             return self.rest.telemetry.forecastPractice
         if session_type == 2:  # qualify session
