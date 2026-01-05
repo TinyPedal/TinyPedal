@@ -22,10 +22,10 @@ API connector
 
 from abc import ABC, abstractmethod
 from functools import partial
-from typing import NamedTuple
 
 # Import APIs
 from .adapter import (
+    APIDataReader,
     lmu_connector,
     lmu_reader,
     restapi_connector,
@@ -36,59 +36,6 @@ from .adapter import (
 from .const_api import API_LMU_NAME, API_LMULEGACY_NAME, API_RF2_NAME
 from .const_app import PLATFORM
 from .validator import bytes_to_str
-
-
-class APIDataSet(NamedTuple):
-    """API data set"""
-
-    state: rf2_reader.State
-    brake: rf2_reader.Brake
-    emotor: rf2_reader.ElectricMotor
-    engine: rf2_reader.Engine
-    inputs: rf2_reader.Inputs
-    lap: rf2_reader.Lap
-    session: rf2_reader.Session
-    switch: rf2_reader.Switch
-    timing: rf2_reader.Timing
-    tyre: rf2_reader.Tyre
-    vehicle: rf2_reader.Vehicle
-    wheel: rf2_reader.Wheel
-
-
-def set_dataset_rf2(shmm: rf2_connector.RF2Info, rest: restapi_connector.RestAPIInfo) -> APIDataSet:
-    """Set API data set - RF2"""
-    return APIDataSet(
-        rf2_reader.State(shmm, rest),
-        rf2_reader.Brake(shmm, rest),
-        rf2_reader.ElectricMotor(shmm, rest),
-        rf2_reader.Engine(shmm, rest),
-        rf2_reader.Inputs(shmm, rest),
-        rf2_reader.Lap(shmm, rest),
-        rf2_reader.Session(shmm, rest),
-        rf2_reader.Switch(shmm, rest),
-        rf2_reader.Timing(shmm, rest),
-        rf2_reader.Tyre(shmm, rest),
-        rf2_reader.Vehicle(shmm, rest),
-        rf2_reader.Wheel(shmm, rest),
-    )
-
-
-def set_dataset_lmu(shmm: lmu_connector.LMUInfo, rest: restapi_connector.RestAPIInfo) -> APIDataSet:
-    """Set API data set - LMU"""
-    return APIDataSet(
-        lmu_reader.State(shmm, rest),
-        lmu_reader.Brake(shmm, rest),
-        lmu_reader.ElectricMotor(shmm, rest),
-        lmu_reader.Engine(shmm, rest),
-        lmu_reader.Inputs(shmm, rest),
-        lmu_reader.Lap(shmm, rest),
-        lmu_reader.Session(shmm, rest),
-        lmu_reader.Switch(shmm, rest),
-        lmu_reader.Timing(shmm, rest),
-        lmu_reader.Tyre(shmm, rest),
-        lmu_reader.Vehicle(shmm, rest),
-        lmu_reader.Wheel(shmm, rest),
-    )
 
 
 class Connector(ABC):
@@ -105,53 +52,16 @@ class Connector(ABC):
         """Stop API"""
 
     @abstractmethod
-    def dataset(self) -> APIDataSet:
-        """Dateset"""
+    def reader(self) -> APIDataReader:
+        """Data reader"""
 
     @abstractmethod
     def setup(self, config: dict):
         """Setup API parameters"""
 
 
-class SimRF2(Connector):
-    """rFactor 2"""
-
-    __slots__ = (
-        # Primary API
-        "shmmapi",
-        # Secondary API
-        "restapi",
-    )
-    NAME = API_RF2_NAME
-
-    def __init__(self):
-        self.shmmapi = rf2_connector.RF2Info()
-        self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_RF2, rf2_restapi.RestAPIData())
-
-    def start(self):
-        self.shmmapi.start()  # 1 load first
-        self.restapi.start()  # 2
-
-    def stop(self):
-        self.restapi.stop()  # 1 unload first
-        self.shmmapi.stop()  # 2
-
-    def dataset(self) -> APIDataSet:
-        return set_dataset_rf2(self.shmmapi, self.restapi)
-
-    def setup(self, config: dict):
-        self.shmmapi.setMode(config["access_mode"])
-        self.shmmapi.setPID(config["process_id"])
-        self.shmmapi.setStateOverride(config["enable_active_state_override"])
-        self.shmmapi.setActiveState(config["active_state"])
-        self.shmmapi.setPlayerOverride(config["enable_player_index_override"])
-        self.shmmapi.setPlayerIndex(config["player_index"])
-        self.restapi.setConnection(config.copy())
-        rf2_reader.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
-
-
 class SimLMU(Connector):
-    """Le Mans Ultimate"""
+    """Le Mans Ultimate - LMU Native Sharedmemory API"""
 
     __slots__ = (
         # Primary API
@@ -173,8 +83,23 @@ class SimLMU(Connector):
         self.restapi.stop()  # 1 unload first
         self.shmmapi.stop()  # 2
 
-    def dataset(self) -> APIDataSet:
-        return set_dataset_lmu(self.shmmapi, self.restapi)
+    def reader(self) -> APIDataReader:
+        shmm = self.shmmapi
+        rest = self.restapi
+        return APIDataReader(
+            lmu_reader.State(shmm, rest),
+            lmu_reader.Brake(shmm, rest),
+            lmu_reader.ElectricMotor(shmm, rest),
+            lmu_reader.Engine(shmm, rest),
+            lmu_reader.Inputs(shmm, rest),
+            lmu_reader.Lap(shmm, rest),
+            lmu_reader.Session(shmm, rest),
+            lmu_reader.Switch(shmm, rest),
+            lmu_reader.Timing(shmm, rest),
+            lmu_reader.Tyre(shmm, rest),
+            lmu_reader.Vehicle(shmm, rest),
+            lmu_reader.Wheel(shmm, rest),
+        )
 
     def setup(self, config: dict):
         self.shmmapi.setMode(config["access_mode"])
@@ -186,11 +111,60 @@ class SimLMU(Connector):
         lmu_reader.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
 
 
-class SimLMULegacy(Connector):
-    """Le Mans Ultimate (legacy)
+class SimRF2(Connector):
+    """rFactor 2 - RF2 Sharedmemory Map Plugin API"""
 
-    Use RF2 Sharedmemory Plugin if LMU native Sharedmemory API not accessible
-    """
+    __slots__ = (
+        # Primary API
+        "shmmapi",
+        # Secondary API
+        "restapi",
+    )
+    NAME = API_RF2_NAME
+
+    def __init__(self):
+        self.shmmapi = rf2_connector.RF2Info()
+        self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_RF2, rf2_restapi.RestAPIData())
+
+    def start(self):
+        self.shmmapi.start()  # 1 load first
+        self.restapi.start()  # 2
+
+    def stop(self):
+        self.restapi.stop()  # 1 unload first
+        self.shmmapi.stop()  # 2
+
+    def reader(self) -> APIDataReader:
+        shmm = self.shmmapi
+        rest = self.restapi
+        return APIDataReader(
+            rf2_reader.State(shmm, rest),
+            rf2_reader.Brake(shmm, rest),
+            rf2_reader.ElectricMotor(shmm, rest),
+            rf2_reader.Engine(shmm, rest),
+            rf2_reader.Inputs(shmm, rest),
+            rf2_reader.Lap(shmm, rest),
+            rf2_reader.Session(shmm, rest),
+            rf2_reader.Switch(shmm, rest),
+            rf2_reader.Timing(shmm, rest),
+            rf2_reader.Tyre(shmm, rest),
+            rf2_reader.Vehicle(shmm, rest),
+            rf2_reader.Wheel(shmm, rest),
+        )
+
+    def setup(self, config: dict):
+        self.shmmapi.setMode(config["access_mode"])
+        self.shmmapi.setPID(config.get("process_id", ""))
+        self.shmmapi.setStateOverride(config["enable_active_state_override"])
+        self.shmmapi.setActiveState(config["active_state"])
+        self.shmmapi.setPlayerOverride(config["enable_player_index_override"])
+        self.shmmapi.setPlayerIndex(config["player_index"])
+        self.restapi.setConnection(config.copy())
+        rf2_reader.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
+
+
+class SimLMULegacy(SimRF2):
+    """Le Mans Ultimate (legacy) - RF2 Sharedmemory Map Plugin API"""
 
     __slots__ = (
         # Primary API
@@ -203,26 +177,6 @@ class SimLMULegacy(Connector):
     def __init__(self):
         self.shmmapi = rf2_connector.RF2Info()
         self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_LMU, rf2_restapi.RestAPIData())
-
-    def start(self):
-        self.shmmapi.start()  # 1 load first
-        self.restapi.start()  # 2
-
-    def stop(self):
-        self.restapi.stop()  # 1 unload first
-        self.shmmapi.stop()  # 2
-
-    def dataset(self) -> APIDataSet:
-        return set_dataset_rf2(self.shmmapi, self.restapi)
-
-    def setup(self, config: dict):
-        self.shmmapi.setMode(config["access_mode"])
-        self.shmmapi.setStateOverride(config["enable_active_state_override"])
-        self.shmmapi.setActiveState(config["active_state"])
-        self.shmmapi.setPlayerOverride(config["enable_player_index_override"])
-        self.shmmapi.setPlayerIndex(config["player_index"])
-        self.restapi.setConnection(config.copy())
-        rf2_reader.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
 
 
 def _set_available_api():

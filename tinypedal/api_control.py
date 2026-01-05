@@ -75,7 +75,7 @@ class APIControl:
 
         # Reload dataset if API changed
         if self.read is None or not self._same_api_loaded:
-            init_read = self._api.dataset()
+            init_read = self._api.reader()
             self.read = init_read
             self._same_api_loaded = True
 

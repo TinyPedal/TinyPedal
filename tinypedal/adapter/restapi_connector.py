@@ -73,7 +73,6 @@ class RestAPIInfo:
         self._active_interval = 0.2
         self._event = threading.Event()
 
-    @property
     def telemetry(self) -> RestAPIData:
         """Rest API telemetry data"""
         return self._dataset

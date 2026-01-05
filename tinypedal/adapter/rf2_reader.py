@@ -39,7 +39,7 @@ from ..formatter import strip_invalid_char
 from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
-from . import restapi_connector, rf2_connector
+from . import _reader, restapi_connector, rf2_connector
 
 
 class DataAdapter:
@@ -61,7 +61,7 @@ class DataAdapter:
         self.rest = rest
 
 
-class State(DataAdapter):
+class State(_reader.State, DataAdapter):
     """State"""
 
     __slots__ = ()
@@ -88,7 +88,7 @@ class State(DataAdapter):
         return version if version else "unknown"
 
 
-class Brake(DataAdapter):
+class Brake(_reader.Brake, DataAdapter):
     """Brake"""
 
     __slots__ = ()
@@ -119,10 +119,10 @@ class Brake(DataAdapter):
 
     def wear(self, index: int | None = None) -> tuple[float, ...]:
         """Brake remaining thickness (meters)"""
-        return self.rest.telemetry.brakeWear
+        return self.rest.telemetry().brakeWear
 
 
-class ElectricMotor(DataAdapter):
+class ElectricMotor(_reader.ElectricMotor, DataAdapter):
     """Electric motor"""
 
     __slots__ = ()
@@ -161,7 +161,7 @@ class ElectricMotor(DataAdapter):
         return rmnan(self.shmm.rf2TeleVeh(index).mElectricBoostWaterTemperature)
 
 
-class Engine(DataAdapter):
+class Engine(_reader.Engine, DataAdapter):
     """Engine"""
 
     __slots__ = ()
@@ -199,7 +199,7 @@ class Engine(DataAdapter):
         return rmnan(self.shmm.rf2TeleVeh(index).mEngineWaterTemp)
 
 
-class Inputs(DataAdapter):
+class Inputs(_reader.Inputs, DataAdapter):
     """Inputs"""
 
     __slots__ = ()
@@ -244,7 +244,7 @@ class Inputs(DataAdapter):
         """Steering physical rotation range (degrees)"""
         rot_range = rmnan(self.shmm.rf2TeleVeh(index).mPhysicalSteeringWheelRange)
         if rot_range <= 0:
-            rot_range = self.rest.telemetry.steeringWheelRange
+            rot_range = self.rest.telemetry().steeringWheelRange
         return rot_range
 
     def steering_range_visual(self, index: int | None = None) -> float:
@@ -256,7 +256,7 @@ class Inputs(DataAdapter):
         return rmnan(self.shmm.rf2Ffb.mForceValue)
 
 
-class Lap(DataAdapter):
+class Lap(_reader.Lap, DataAdapter):
     """Lap"""
 
     __slots__ = ()
@@ -306,7 +306,7 @@ class Lap(DataAdapter):
         return self.shmm.rf2ScorVeh(index).mLapsBehindNext
 
 
-class Session(DataAdapter):
+class Session(_reader.Session, DataAdapter):
     """Session"""
 
     __slots__ = ()
@@ -370,7 +370,7 @@ class Session(DataAdapter):
 
     def private_qualifying(self) -> bool:
         """Is private qualifying"""
-        return self.rest.telemetry.privateQualifying == 1
+        return self.rest.telemetry().privateQualifying == 1
 
     def in_countdown(self) -> bool:
         """Is in countdown phase before race"""
@@ -442,22 +442,22 @@ class Session(DataAdapter):
         """Weather forecast nodes"""
         session_type = self.session_type()
         if session_type <= 1:  # practice session
-            return self.rest.telemetry.forecastPractice
+            return self.rest.telemetry().forecastPractice
         if session_type == 2:  # qualify session
-            return self.rest.telemetry.forecastQualify
-        return self.rest.telemetry.forecastRace  # race session
+            return self.rest.telemetry().forecastQualify
+        return self.rest.telemetry().forecastRace  # race session
 
     def time_scale(self) -> int:
         """Time scale"""
-        track_time = self.rest.telemetry.trackClockTime
+        track_time = self.rest.telemetry().trackClockTime
         if track_time == -1:  # trackClockTime unavailable
-            time_scale = max(self.rest.telemetry.timeScale, 0)
+            time_scale = max(self.rest.telemetry().timeScale, 0)
         else:  # sync time scale
             time_scale = clock_time_scale_sync(track_time, self.elapsed(), self.start())
         return time_scale
 
 
-class Switch(DataAdapter):
+class Switch(_reader.Switch, DataAdapter):
     """Switch"""
 
     __slots__ = ()
@@ -491,7 +491,7 @@ class Switch(DataAdapter):
         return bool(self.shmm.rf2Ext.mPhysics.mAutoClutch)
 
 
-class Timing(DataAdapter):
+class Timing(_reader.Timing, DataAdapter):
     """Timing"""
 
     __slots__ = ()
@@ -574,7 +574,7 @@ class Timing(DataAdapter):
         return rmnan(self.shmm.rf2ScorVeh(index).mTimeBehindNext)
 
 
-class Tyre(DataAdapter):
+class Tyre(_reader.Tyre, DataAdapter):
     """Tyre"""
 
     __slots__ = ()
@@ -702,7 +702,7 @@ class Tyre(DataAdapter):
         )
 
 
-class Vehicle(DataAdapter):
+class Vehicle(_reader.Vehicle, DataAdapter):
     """Vehicle"""
 
     __slots__ = ()
@@ -774,7 +774,7 @@ class Vehicle(DataAdapter):
 
     def penalty_duration(self, index: int | None = None) -> float:
         """Penalty duration (seconds)"""
-        return self.rest.telemetry.penaltyTime
+        return self.rest.telemetry().penaltyTime
 
     def pit_request(self, index: int | None = None) -> bool:
         """Is requested pit, 0 = none, 1 = request, 2 = entering, 3 = stopped, 4 = exiting"""
@@ -782,11 +782,11 @@ class Vehicle(DataAdapter):
 
     def pit_estimate(self, index: int | None = None) -> tuple[float, float, float, float, int]:
         """Pit stop estimate data, 0 min_pitstop_time, 1 max_pitstop_time, 2 refill_fuel, 3 refill_energy, 4 state_stopgo"""
-        return self.rest.telemetry.pitStopEstimate
+        return self.rest.telemetry().pitStopEstimate
 
     def stint_usage(self, driver_name: str) -> tuple[float, float, float, float, int]:
         """Stint usage data"""
-        return self.rest.telemetry.stintUsage.get(driver_name, STINT_USAGE_DEFAULT)
+        return self.rest.telemetry().stintUsage.get(driver_name, STINT_USAGE_DEFAULT)
 
     def finish_state(self, index: int | None = None) -> int:
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""
@@ -811,11 +811,11 @@ class Vehicle(DataAdapter):
 
     def virtual_energy(self, index: int | None = None) -> float:
         """Remaining virtual energy (joule)"""
-        return self.rest.telemetry.currentVirtualEnergy
+        return self.rest.telemetry().currentVirtualEnergy
 
     def max_virtual_energy(self, index: int | None = None) -> float:
         """Max virtual energy (joule)"""
-        return self.rest.telemetry.maxVirtualEnergy
+        return self.rest.telemetry().maxVirtualEnergy
 
     def orientation_yaw_radians(self, index: int | None = None) -> float:
         """Orientation yaw (radians)"""
@@ -883,7 +883,7 @@ class Vehicle(DataAdapter):
 
     def aero_damage(self, index: int | None = None) -> float:
         """Aerodynamic damage (fraction), 0.0 no damage, 1.0 totaled"""
-        return self.rest.telemetry.aeroDamage
+        return self.rest.telemetry().aeroDamage
 
     def integrity(self, index: int | None = None) -> float:
         """Vehicle integrity"""
@@ -916,7 +916,7 @@ class Vehicle(DataAdapter):
         return -rmnan(pos.x), rmnan(pos.z)
 
 
-class Wheel(DataAdapter):
+class Wheel(_reader.Wheel, DataAdapter):
     """Wheel & suspension"""
 
     __slots__ = ()
@@ -1048,7 +1048,7 @@ class Wheel(DataAdapter):
 
     def suspension_damage(self, index: int | None = None) -> tuple[float, ...]:
         """Suspension damage (fraction), 0.0 no damage, 1.0 totaled"""
-        return self.rest.telemetry.suspensionDamage
+        return self.rest.telemetry().suspensionDamage
 
     def position_vertical(self, index: int | None = None) -> tuple[float, ...]:
         """Vertical wheel position (convert meters to millmeters) related to vehicle"""
@@ -1064,10 +1064,10 @@ class Wheel(DataAdapter):
         """Whether wheel is detached"""
         wheel_data = self.shmm.rf2TeleVeh(index).mWheels
         return (
-            bool(wheel_data[0].mDetached),
-            bool(wheel_data[1].mDetached),
-            bool(wheel_data[2].mDetached),
-            bool(wheel_data[3].mDetached),
+            wheel_data[0].mDetached,
+            wheel_data[1].mDetached,
+            wheel_data[2].mDetached,
+            wheel_data[3].mDetached,
         )
 
     def is_offroad(self, index: int | None = None) -> bool:

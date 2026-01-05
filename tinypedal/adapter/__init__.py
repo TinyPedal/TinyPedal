@@ -19,3 +19,23 @@
 """
 API data adapter
 """
+from typing import NamedTuple
+
+from . import _reader
+
+
+class APIDataReader(NamedTuple):
+    """API data reader"""
+
+    state: _reader.State
+    brake: _reader.Brake
+    emotor: _reader.ElectricMotor
+    engine: _reader.Engine
+    inputs: _reader.Inputs
+    lap: _reader.Lap
+    session: _reader.Session
+    switch: _reader.Switch
+    timing: _reader.Timing
+    tyre: _reader.Tyre
+    vehicle: _reader.Vehicle
+    wheel: _reader.Wheel
