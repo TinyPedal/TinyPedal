@@ -782,9 +782,13 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Is requested pit, 0 = none, 1 = request, 2 = entering, 3 = stopped, 4 = exiting"""
         return self.shmm.lmuScorVeh(index).mPitState == 1
 
-    def pit_estimate(self, index: int | None = None) -> tuple[float, float, float, float, int]:
-        """Pit stop estimate data, 0 min_pitstop_time, 1 max_pitstop_time, 2 refill_fuel, 3 refill_energy, 4 state_stopgo"""
-        return self.rest.telemetry().pitStopEstimate
+    def pit_stop_time(self) -> float:
+        """Estimated pit stop time (seconds)"""
+        return self.rest.telemetry().pitStopTime
+
+    def absolute_refill(self) -> float:
+        """Absolute refill fuel (liter) or virtual energy (percent)"""
+        return self.rest.telemetry().absoluteRefill
 
     def stint_usage(self, driver_name: str) -> tuple[float, float, float, float, int]:
         """Stint usage data"""

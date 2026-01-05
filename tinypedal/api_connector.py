@@ -153,8 +153,9 @@ class SimRF2(Connector):
         )
 
     def setup(self, config: dict):
+        if self.NAME == API_RF2_NAME:
+            self.shmmapi.setPID(config["process_id"])
         self.shmmapi.setMode(config["access_mode"])
-        self.shmmapi.setPID(config.get("process_id", ""))
         self.shmmapi.setStateOverride(config["enable_active_state_override"])
         self.shmmapi.setActiveState(config["active_state"])
         self.shmmapi.setPlayerOverride(config["enable_player_index_override"])

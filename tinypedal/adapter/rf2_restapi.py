@@ -24,9 +24,9 @@ from __future__ import annotations
 
 from typing import Any, Callable, Mapping, NamedTuple
 
-from ..const_common import EMPTY_DICT, PITEST_DEFAULT, WHEELS_NA
-from ..process.pitstop import EstimatePitTime
+from ..const_common import EMPTY_DICT, WHEELS_NA
 from ..process.vehicle import (
+    absolute_refilling,
     expected_usage,
     export_wheels,
     steerlock_to_number,
@@ -49,13 +49,14 @@ class RestAPIData:
         "expectedVirtualEnergyConsumption",
         "aeroDamage",
         "penaltyTime",
+        "pitStopTime",
+        "absoluteRefill",
         "forecastPractice",
         "forecastQualify",
         "forecastRace",
         "brakeWear",
         "suspensionDamage",
         "stintUsage",
-        "pitStopEstimate",
     )
 
     def __init__(self):
@@ -69,13 +70,14 @@ class RestAPIData:
         self.expectedVirtualEnergyConsumption: float = 0.0
         self.aeroDamage: float = -1.0
         self.penaltyTime: float = 0.0
+        self.pitStopTime: float = 0.0
+        self.absoluteRefill: float = 0.0
         self.forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
         self.forecastQualify: tuple[WeatherNode, ...] = FORECAST_DEFAULT
         self.forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
         self.brakeWear: tuple[float, float, float, float] = WHEELS_NA
         self.suspensionDamage: tuple[float, float, float, float] = WHEELS_NA
         self.stintUsage: Mapping[str, tuple[float, float, float, float, int]] = EMPTY_DICT
-        self.pitStopEstimate: tuple[float, float, float, float, int] = PITEST_DEFAULT
 
 
 class ResRawOutput(NamedTuple):
@@ -159,7 +161,7 @@ LMU_CURRENTSTINT = (
     ResParOutput("brakeWear", WHEELS_NA, export_wheels, ("wearables", "brakes")),
     ResParOutput("suspensionDamage", WHEELS_NA, export_wheels, ("wearables", "suspension")),
     ResRawOutput("trackClockTime", -1.0, ("sessionTime", "timeOfDay")),
-    ResParOutput("pitStopEstimate", PITEST_DEFAULT, EstimatePitTime()),
+    ResParOutput("absoluteRefill", 0.0, absolute_refilling, ("pitMenu", "pitMenu")),
 )
 LMU_GARAGESETUP = (
     ResParOutput("steeringWheelRange", 0.0, steerlock_to_number, ("VM_STEER_LOCK", "stringValue")),
@@ -172,6 +174,7 @@ LMU_SESSIONSINFO = (
 )
 LMU_PITSTOPTIME = (
     ResRawOutput("penaltyTime", 0.0, ("penalties",)),
+    ResRawOutput("pitStopTime", 0.0, ("total",)),
 )
 LMU_STINTUSAGE = (
     ResParOutput("stintUsage", EMPTY_DICT, stint_ve_usage),

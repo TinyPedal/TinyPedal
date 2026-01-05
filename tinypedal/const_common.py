@@ -52,13 +52,6 @@ WHEELS_NA = (-1.0, -1.0, -1.0, -1.0)  # FL, FR, RL, RR
 WHEELS_DELTA_DEFAULT = (0.0, *WHEELS_ZERO)  # pos, target set
 STINT_USAGE_DEFAULT = (-1.0, -1.0, -1.0, 0.0, 0)
 REL_TIME_DEFAULT = (0.0, -1)  # relative time gap, player index
-PITEST_DEFAULT = (
-    0.0,  # min pit duration
-    0.0,  # max pit duration
-    0.0,  # relative refill (fuel)
-    0.0,  # relative refill (virtual energy)
-    0,  # stop go penalty state
-)
 
 # Version & date
 VERSION_NA = (0, 0, 0)  # major, minor, patch

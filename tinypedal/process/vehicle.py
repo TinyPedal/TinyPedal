@@ -57,6 +57,27 @@ def steerlock_to_number(value: str) -> float:
         return 0.0
 
 
+def absolute_refilling(dataset: list[dict]) -> float:
+    """Get absolute refilling of fuel or virtual energy from next pit"""
+    abs_refill = 0.0
+    try:
+        for data in dataset:
+            # Get absolute refilling energy (percent) from raw value
+            if data.get("name") == "VIRTUAL ENERGY:":
+                abs_refill = float(data["currentSetting"])
+                break
+            # Get absolute refilling fuel (liter) from raw string
+            if data.get("name") == "FUEL:":
+                raw_value = data["settings"][data["currentSetting"]]["text"]
+                abs_refill = float(rex_number_extract.search(raw_value).group())
+                if "gal" in raw_value.lower():  # convert to liter
+                    abs_refill *= 3.7854118
+                break
+    except (AttributeError, TypeError, IndexError, ValueError):
+        pass
+    return abs_refill
+
+
 def stint_ve_usage(dataset: dict) -> Mapping[str, tuple[float, float, float, float, int]]:
     """Stint virtual energy usage"""
     if not isinstance(dataset, dict) or not dataset:

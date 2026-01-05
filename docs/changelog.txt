@@ -1,3 +1,9 @@
+WIP
+-----------------------------
+* Pit stop estimate Widget
+  - Now reads pit stop timing data from more reliable source.
+  - Removed "show_maximum_delay" and related options, as those options no longer work due to changed source.
+
 2.38.0 (2026-01-01)
 -----------------------------
 * [New]RPM LED Widget

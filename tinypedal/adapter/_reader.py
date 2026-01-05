@@ -589,8 +589,12 @@ class Vehicle(ABC):
         """Is requested pit, 0 = none, 1 = request, 2 = entering, 3 = stopped, 4 = exiting"""
 
     @abstractmethod
-    def pit_estimate(self, index: int | None = None) -> tuple[float, float, float, float, int]:
-        """Pit stop estimate data, 0 min_pitstop_time, 1 max_pitstop_time, 2 refill_fuel, 3 refill_energy, 4 state_stopgo"""
+    def pit_stop_time(self) -> float:
+        """Estimated pit stop time (seconds)"""
+
+    @abstractmethod
+    def absolute_refill(self) -> float:
+        """Absolute refill fuel (liter) or virtual energy (percent)"""
 
     @abstractmethod
     def stint_usage(self, driver_name: str) -> tuple[float, float, float, float, int]:

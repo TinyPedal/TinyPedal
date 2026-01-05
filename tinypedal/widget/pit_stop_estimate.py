@@ -161,54 +161,6 @@ class Realtime(Overlay):
             )
             layout_lower.addWidget(cap_temp, row_idx_lower, 1)
 
-        if self.wcfg["show_maximum_delay"]:
-            # Maximum pit stop delay time
-            self.bar_style_delay = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_maximum_delay"],
-                    bg_color=self.wcfg["bkg_color_maximum_delay"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_maximum_delay"],
-                    bg_color=self.wcfg["warning_color_lengthy_stop"])
-            )
-            self.bar_delay = self.set_qlabel(
-                text=text_def,
-                style=self.bar_style_delay[0],
-                fixed_width=style_width,
-            )
-            self.bar_delay.decimals = max(self.wcfg["decimal_places_maximum_delay"], 0)
-            layout_upper.addWidget(self.bar_delay, 1, 2)
-
-            if self.wcfg["show_caption"]:
-                cap_temp = self.set_qlabel(
-                    text=self.wcfg["caption_text_maximum_delay"],
-                    style=bar_style_desc,
-                    fixed_width=style_width,
-                )
-                layout_upper.addWidget(cap_temp, row_idx_upper, 2)
-
-            # Estimated max total pit time
-            bar_style_maxpit = self.set_qss(
-                fg_color=self.wcfg["font_color_maximum_total_duration"],
-                bg_color=self.wcfg["bkg_color_maximum_total_duration"]
-            )
-            self.bar_maxpit = self.set_qlabel(
-                text=text_def,
-                style=bar_style_maxpit,
-                fixed_width=style_width,
-                last=-1,
-            )
-            self.bar_maxpit.decimals = max(self.wcfg["decimal_places_maximum_total_duration"], 0)
-            layout_lower.addWidget(self.bar_maxpit, 1, 2)
-
-            if self.wcfg["show_caption"]:
-                cap_temp = self.set_qlabel(
-                    text=self.wcfg["caption_text_maximum_total_duration"],
-                    style=bar_style_desc,
-                    fixed_width=style_width,
-                )
-                layout_lower.addWidget(cap_temp, row_idx_lower, 2)
-
         if self.wcfg["show_relative_refilling"]:
             # Relative refilling
             bar_style_refill = self.set_qss(
@@ -254,43 +206,21 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        min_pitstop_time, max_pitstop_time, refill_fuel, refill_energy, state_stopgo = api.read.vehicle.pit_estimate()
+        min_pitstop_time = api.read.vehicle.pit_stop_time()
+        abs_refill = api.read.vehicle.absolute_refill()
         pass_time = minfo.mapping.pitPassTime
-        delay_time = max_pitstop_time - min_pitstop_time
         pit_timer = minfo.vehicles.dataSet[minfo.vehicles.playerIndex].pitTimer.elapsed
-
-        if state_stopgo:
-            stopgo_time = api.read.vehicle.penalty_duration()
-            if stopgo_time <= 0:  # fallback if not available from API
-                stopgo_time = self.wcfg["stop_go_penalty_time"]
-
-            if state_stopgo == 1:  # stopgo only
-                min_pitstop_time = max_pitstop_time = stopgo_time
-                refill_fuel = refill_energy = 0
-            else:  # add stopgo time to service time (simultaneous)
-                min_pitstop_time += stopgo_time
-                max_pitstop_time += stopgo_time
-
-        if api.read.vehicle.max_virtual_energy():
-            actual_refill = refill_energy
-            total_refill = calc.sym_max(minfo.energy.neededRelative, 9999)
-        else:
-            actual_refill = self.unit_fuel(refill_fuel)
-            total_refill = calc.sym_max(self.unit_fuel(minfo.fuel.neededRelative), 9999)
-
         is_lengthy_stop = min_pitstop_time >= self.wcfg["lengthy_stop_duration_threshold"]
         padding = 0.00000001 * is_lengthy_stop
 
-        # Min, max total pit time, update while not in pit
+        # Min total pit time, update while not in pit
         if not api.read.vehicle.in_pits() or self.bar_minpit.last < pass_time:
             if min_pitstop_time:
                 min_total = min_pitstop_time + pass_time + self.wcfg["additional_pitstop_time"]
-                max_total = max_pitstop_time + pass_time + self.wcfg["additional_pitstop_time"]
             else:
-                min_total = max_total = 0
+                min_total = 0
         else:
             min_total = self.bar_minpit.last
-            max_total = self.bar_maxpit.last
 
         # Estimated pit pass through time
         self.update_estimate(self.bar_pass, pass_time)
@@ -304,14 +234,15 @@ class Realtime(Overlay):
         # Estimated min total pit time
         self.update_estimate(self.bar_minpit, min_total)
 
-        if self.wcfg["show_maximum_delay"]:
-            # Maximum pit stop delay time
-            self.update_estimate(self.bar_delay, delay_time + padding, self.bar_style_delay[is_lengthy_stop], "+")
-
-            # Estimated max total pit time
-            self.update_estimate(self.bar_maxpit, max_total)
-
         if self.wcfg["show_relative_refilling"]:
+            # Calculate relative refilling
+            if api.read.vehicle.max_virtual_energy():
+                actual_refill = abs_refill - minfo.energy.amountCurrent
+                total_refill = calc.sym_max(minfo.energy.neededRelative, 9999)
+            else:
+                actual_refill = self.unit_fuel(abs_refill - minfo.fuel.amountCurrent)
+                total_refill = calc.sym_max(self.unit_fuel(minfo.fuel.neededRelative), 9999)
+
             # Relative refilling
             self.update_estimate(self.bar_refill, max(actual_refill, 0), None, "+")
 

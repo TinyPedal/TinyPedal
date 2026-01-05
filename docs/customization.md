@@ -2654,15 +2654,6 @@ Set stop go penalty time in seconds. Default value is `10` seconds. Note, this v
     additional_pitstop_time
 Set additional pit stop time that is not part of `pass_duration` or `stop_duration`. Default value is `2` seconds, which is the average time it takes to decelerate and accelerate towards and away from pit spot.
 
-    show_maximum_delay
-Show `maximum_delay` and `maximum_total_duration` column.
-
-    maximum_delay
-Show maximum total random delay which game may add on top of pit stop time. For example, if estimated pit stop time is `12.0`s, and maximum delay is `+3.0`s, then final pit stop time will be between `12.0`s and `15.0`s.
-
-    maximum_total_duration
-Show estimated maximum total pit time, which is the sum of `minimum_total_duration` and `maximum_delay`. Note, this reading is recalculated only while not in pit lane.
-
     show_relative_refilling
 Show `actual_relative_refill` and `total_relative_refill` column.
 
