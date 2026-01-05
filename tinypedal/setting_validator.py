@@ -185,9 +185,9 @@ class PresetValidator:
 
     # Set validator methods in order
     _value_validators = tuple(
-        getattr(ValueValidator, attr)
-        for attr in ValueValidator.__dict__
-        if attr[0] != "_"
+        getattr(ValueValidator, key)
+        for key, value in ValueValidator.__dict__.items()
+        if isinstance(value, staticmethod)
     )
 
     @classmethod
