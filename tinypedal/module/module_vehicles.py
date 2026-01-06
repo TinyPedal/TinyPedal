@@ -94,10 +94,16 @@ def update_vehicle_data(
     nearest_yellow_ahead = MAX_METERS
     nearest_yellow_behind = -MAX_METERS
 
+    # Counter
+    total_completed_laps = 0
+    total_out_pits = 0
+    total_in_pits = 0
+    total_stopped_pits = 0
+    total_pit_requests = 0
+
     # General data
     track_length = api.read.lap.track_length()
     in_race = api.read.session.in_race()
-    laps_session = 0
 
     # Local player data
     elapsed_time = api.read.timing.elapsed()
@@ -115,7 +121,6 @@ def update_vehicle_data(
         laps_completed = api.read.lap.completed_laps(index)
         lap_distance = api.read.lap.distance(index)
         speed = api.read.vehicle.speed(index)
-        laps_session += laps_completed
 
         # Update high priority info
         data.isPlayer = api.read.vehicle.is_player(index)
@@ -222,18 +227,34 @@ def update_vehicle_data(
 
             update_stint_usage(data, laps_completed)
 
+            # Update counter
+            total_completed_laps += laps_completed
+
+            if data.inPit == 1:  # in pit (exclude garage)
+                total_in_pits += 1
+                total_stopped_pits += (speed < 0.1)
+            elif data.inPit == 0:  # out pit
+                total_out_pits += 1
+                total_pit_requests += data.pitRequested
+
             # Save leader info
             if data.positionOverall == 1:
                 output.leaderIndex = index
                 output.leaderBestLapTime = data.bestLapTime
 
     # Output extra info
-    output.completedSessionLaps = laps_session
     output.nearestLine = nearest_line
     output.nearestTraffic = -nearest_time_behind
     output.nearestYellowAhead = nearest_yellow_ahead
     output.nearestYellowBehind = nearest_yellow_behind
     output.dataSetVersion += 1
+
+    if update_low_priority:
+        output.totalOutPits = total_out_pits
+        output.totalInPits = total_in_pits
+        output.totalStoppedPits = total_stopped_pits
+        output.totalPitRequests = total_pit_requests
+        output.totalCompletedLaps = total_completed_laps
 
 
 def interp_coordinate(

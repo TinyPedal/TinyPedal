@@ -48,7 +48,6 @@ class RestAPIData:
         "expectedFuelConsumption",
         "expectedVirtualEnergyConsumption",
         "aeroDamage",
-        "penaltyTime",
         "pitStopTime",
         "absoluteRefill",
         "forecastPractice",
@@ -69,7 +68,6 @@ class RestAPIData:
         self.expectedFuelConsumption: float = 0.0
         self.expectedVirtualEnergyConsumption: float = 0.0
         self.aeroDamage: float = -1.0
-        self.penaltyTime: float = 0.0
         self.pitStopTime: float = 0.0
         self.absoluteRefill: float = 0.0
         self.forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
@@ -173,7 +171,6 @@ LMU_SESSIONSINFO = (
     ResRawOutput("privateQualifying", 0, ("SESSSET_private_qual", "currentValue")),
 )
 LMU_PITSTOPTIME = (
-    ResRawOutput("penaltyTime", 0.0, ("penalties",)),
     ResRawOutput("pitStopTime", 0.0, ("total",)),
 )
 LMU_STINTUSAGE = (

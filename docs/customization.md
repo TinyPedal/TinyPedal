@@ -2655,7 +2655,7 @@ Set stop go penalty time in seconds. Default value is `10` seconds. Note, this v
 Set additional pit stop time that is not part of `pass_duration` or `stop_duration`. Default value is `2` seconds, which is the average time it takes to decelerate and accelerate towards and away from pit spot.
 
     show_relative_refilling
-Show `actual_relative_refill` and `total_relative_refill` column.
+Show `actual_relative_refill` and `total_relative_refill` columns.
 
     actual_relative_refill
 Show actual relative refilling, as the total additional fuel or virtual energy that will be added in next pit stop according to remaining fuel or virtual energy and user refill setting from MFD `Pitstop` page.
@@ -2664,6 +2664,15 @@ Show actual relative refilling, as the total additional fuel or virtual energy t
 Show total relative refilling, as the total additional fuel or virtual energy that is required to finish the race. This is the same value as seen from `refill` column of Fuel Widget or Virtual energy Widget.
 
 With both `actual` and `total` relative refilling readings, users can determine precisely how much fuel or virtual energy that will be added in next pit stop, and whether the refilling will be enough or more pit stops are required.
+
+    show_pit_occupancy
+Show `pit_occupancy` and `pit_requests` columns.
+
+    pit_occupancy
+Show number of vehicles has stopped in pit lane, and number of vehicles currently in pit lane (whether passing or stopped). This does not include vehicles that are parked in garage.
+
+    pit_requests
+Show number of vehicles has requested for pit stop, and number of vehicles currently outside of pit lane.
 
 [**`Back to Top`**](#)
 

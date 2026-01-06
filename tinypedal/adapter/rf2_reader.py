@@ -772,10 +772,6 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Number of penalties"""
         return self.shmm.rf2ScorVeh(index).mNumPenalties
 
-    def penalty_duration(self, index: int | None = None) -> float:
-        """Penalty duration (seconds)"""
-        return self.rest.telemetry().penaltyTime
-
     def pit_request(self, index: int | None = None) -> bool:
         """Is requested pit, 0 = none, 1 = request, 2 = entering, 3 = stopped, 4 = exiting"""
         return self.shmm.rf2ScorVeh(index).mPitState == 1

@@ -581,10 +581,6 @@ class Vehicle(ABC):
         """Number of penalties"""
 
     @abstractmethod
-    def penalty_duration(self, index: int | None = None) -> float:
-        """Penalty duration (seconds)"""
-
-    @abstractmethod
     def pit_request(self, index: int | None = None) -> bool:
         """Is requested pit, 0 = none, 1 = request, 2 = entering, 3 = stopped, 4 = exiting"""
 

@@ -244,7 +244,7 @@ class Realtime(Overlay):
                 rubber_scale = self.rubber_time_scale[session_type]
                 laps_session = rubber_to_laps(self.rubber_starting[session_type], self.rubber_median_laps)
                 if rubber_scale > 0:  # time-scaled coverage
-                    laps_session += (minfo.vehicles.completedSessionLaps * rubber_scale)
+                    laps_session += (minfo.vehicles.totalCompletedLaps * rubber_scale)
                 self.update_rubber(self.bar_wetness, laps_session)
             # Wet trend
             wetness = wet_min + wet_max + wet_avg

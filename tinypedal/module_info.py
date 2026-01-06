@@ -536,7 +536,11 @@ class VehiclesInfo:
     """Vehicles module output data"""
 
     __slots__ = (
-        "completedSessionLaps",
+        "totalOutPits",
+        "totalInPits",
+        "totalStoppedPits",
+        "totalPitRequests",
+        "totalCompletedLaps",
         "totalVehicles",
         "leaderIndex",
         "playerIndex",
@@ -550,7 +554,11 @@ class VehiclesInfo:
     )
 
     def __init__(self):
-        self.completedSessionLaps: int = 0
+        self.totalOutPits: int = 0
+        self.totalInPits: int = 0
+        self.totalStoppedPits: int = 0
+        self.totalPitRequests: int = 0
+        self.totalCompletedLaps: int = 0
         self.totalVehicles: int = 0
         self.leaderIndex: int = 0
         self.playerIndex: int = -1

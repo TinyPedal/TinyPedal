@@ -173,7 +173,7 @@ class Realtime(Overlay):
                 fixed_width=style_width,
             )
             self.bar_refill.decimals = max(self.wcfg["decimal_places_actual_relative_refill"], 0)
-            layout_upper.addWidget(self.bar_refill, 1, 3)
+            layout_upper.addWidget(self.bar_refill, 1, 2)
 
             if self.wcfg["show_caption"]:
                 cap_temp = self.set_qlabel(
@@ -181,7 +181,7 @@ class Realtime(Overlay):
                     style=bar_style_desc,
                     fixed_width=style_width,
                 )
-                layout_upper.addWidget(cap_temp, row_idx_upper, 3)
+                layout_upper.addWidget(cap_temp, row_idx_upper, 2)
 
             # Estimated total needed refill
             bar_style_needed = self.set_qss(
@@ -194,11 +194,53 @@ class Realtime(Overlay):
                 fixed_width=style_width,
             )
             self.bar_needed.decimals = max(self.wcfg["decimal_places_total_relative_refill"], 0)
-            layout_lower.addWidget(self.bar_needed, 1, 3)
+            layout_lower.addWidget(self.bar_needed, 1, 2)
 
             if self.wcfg["show_caption"]:
                 cap_temp = self.set_qlabel(
                     text=self.wcfg["caption_text_total_relative_refill"],
+                    style=bar_style_desc,
+                    fixed_width=style_width,
+                )
+                layout_lower.addWidget(cap_temp, row_idx_lower, 2)
+
+        if self.wcfg["show_pit_occupancy"]:
+            # Pit occupancy
+            bar_style_inpit = self.set_qss(
+                fg_color=self.wcfg["font_color_pit_occupancy"],
+                bg_color=self.wcfg["bkg_color_pit_occupancy"]
+            )
+            self.bar_inpit = self.set_qlabel(
+                text="-/-",
+                style=bar_style_inpit,
+                fixed_width=style_width,
+            )
+            layout_upper.addWidget(self.bar_inpit, 1, 3)
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_qlabel(
+                    text=self.wcfg["caption_text_pit_occupancy"],
+                    style=bar_style_desc,
+                    fixed_width=style_width,
+                )
+                layout_upper.addWidget(cap_temp, row_idx_upper, 3)
+
+            # Number of pit requests
+            bar_style_request = self.set_qss(
+                fg_color=self.wcfg["font_color_pit_requests"],
+                bg_color=self.wcfg["bkg_color_pit_requests"]
+            )
+            self.bar_request = self.set_qlabel(
+                text="-/-",
+                style=bar_style_request,
+                fixed_width=style_width,
+                last=-1,
+            )
+            layout_lower.addWidget(self.bar_request, 1, 3)
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_qlabel(
+                    text=self.wcfg["caption_text_pit_requests"],
                     style=bar_style_desc,
                     fixed_width=style_width,
                 )
@@ -244,10 +286,17 @@ class Realtime(Overlay):
                 total_refill = calc.sym_max(self.unit_fuel(minfo.fuel.neededRelative), 9999)
 
             # Relative refilling
-            self.update_estimate(self.bar_refill, max(actual_refill, 0), None, "+")
+            self.update_refill(self.bar_refill, max(actual_refill, 0))
 
             # Estimated total needed refill
-            self.update_estimate(self.bar_needed, total_refill, None, "+")
+            self.update_refill(self.bar_needed, total_refill)
+
+        if self.wcfg["show_pit_occupancy"]:
+            # Pit occupancy
+            self.update_occupancy(self.bar_inpit, minfo.vehicles.totalStoppedPits, minfo.vehicles.totalInPits)
+
+            # Number of pit requests
+            self.update_occupancy(self.bar_request, minfo.vehicles.totalPitRequests, minfo.vehicles.totalOutPits)
 
     # GUI update methods
     def update_estimate(self, target, data, color=None, sign=""):
@@ -258,3 +307,16 @@ class Realtime(Overlay):
             target.setText(text)
             if color:  # lengthy stop warning
                 target.updateStyle(color)
+
+    def update_refill(self, target, data):
+        """Update refilling"""
+        if target.last != data:
+            target.last = data
+            text = f"{data:+.{target.decimals}f}"[:self.bar_width].strip(".")
+            target.setText(text)
+
+    def update_occupancy(self, target, *data):
+        """Update pit occupancy"""
+        if target.last != data:
+            target.last = data
+            target.setText(f"{data[0]}/{data[1]}")
