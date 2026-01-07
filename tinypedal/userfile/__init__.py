@@ -41,7 +41,7 @@ def set_user_data_path(filepath: str) -> str:
 def set_global_user_path(filepath: str, platform: str) -> str:
     """Set global user data path, create if not exist"""
     if platform == "Windows":
-        path = set_user_data_path(f"{os.getenv('APPDATA')}/{filepath}/")
+        path = set_user_data_path(f"{os.getenv('APPDATA', '.')}\\{filepath}\\")
     else:
         from xdg import BaseDirectory as BD
 

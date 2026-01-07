@@ -74,15 +74,18 @@ class FileName:
     )
 
     def __init__(self):
+        # Global preset
         self.config = f"config{FileExt.JSON}"
+        self.filelock = f"config{FileExt.LOCK}"
+        # User preset
         self.setting = f"default{FileExt.JSON}"
+        # Style preset
         self.brakes = f"brakes{FileExt.JSON}"
         self.brands = f"brands{FileExt.JSON}"
         self.classes = f"classes{FileExt.JSON}"
         self.compounds = f"compounds{FileExt.JSON}"
         self.heatmap = f"heatmap{FileExt.JSON}"
         self.tracks = f"tracks{FileExt.JSON}"
-        self.filelock = f"config{FileExt.LOCK}"
 
 
 class FilePath:
@@ -132,6 +135,7 @@ class Preset:
 
     __slots__ = (
         "config",
+        "filelock",
         "setting",
         "brakes",
         "brands",
@@ -139,20 +143,23 @@ class Preset:
         "compounds",
         "heatmap",
         "tracks",
-        "filelock",
     )
 
-    def set_default(self):
-        """Set default setting"""
+    def __init__(self, default: bool = False):
+        if not default:
+            return
+        # Global preset
         self.config = MappingProxyType(GLOBAL_DEFAULT)
+        self.filelock = MappingProxyType(FILELOCK_DEFAULT)
+        # User preset
         self.setting = MappingProxyType(ChainMap(WIDGET_DEFAULT, MODULE_DEFAULT, API_DEFAULT, COMMON_DEFAULT))
+        # Style preset
         self.brakes = MappingProxyType(BRAKES_DEFAULT)
         self.brands = EMPTY_DICT
         self.classes = MappingProxyType(CLASSES_DEFAULT)
         self.compounds = MappingProxyType(COMPOUNDS_DEFAULT)
         self.heatmap = MappingProxyType(HEATMAP_DEFAULT)
         self.tracks = MappingProxyType(TRACKS_DEFAULT)
-        self.filelock = MappingProxyType(FILELOCK_DEFAULT)
 
 
 class Setting:
@@ -179,8 +186,7 @@ class Setting:
         self.version_update = 0
         # Settings
         self.filename = FileName()
-        self.default = Preset()
-        self.default.set_default()
+        self.default = Preset(default=True)
         self.user = Preset()
         self.path = FilePath()
 

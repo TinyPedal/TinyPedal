@@ -271,7 +271,7 @@ class Realtime(Overlay):
         self.update_estimate(self.bar_timer, pit_timer)
 
         # Estimated pit stop time
-        self.update_estimate(self.bar_stop, min_pitstop_time + padding, self.bar_style_stop[is_lengthy_stop], "")
+        self.update_estimate(self.bar_stop, min_pitstop_time + padding, self.bar_style_stop[is_lengthy_stop])
 
         # Estimated min total pit time
         self.update_estimate(self.bar_minpit, min_total)
@@ -299,11 +299,11 @@ class Realtime(Overlay):
             self.update_occupancy(self.bar_request, minfo.vehicles.totalPitRequests, minfo.vehicles.totalOutPits)
 
     # GUI update methods
-    def update_estimate(self, target, data, color=None, sign=""):
+    def update_estimate(self, target, data, color=None):
         """Update estimate pit data"""
         if target.last != data:
             target.last = data
-            text = f"{data:{sign}.{target.decimals}f}"[:self.bar_width].strip(".")
+            text = f"{data:.{target.decimals}f}"[:self.bar_width].strip(".")
             target.setText(text)
             if color:  # lengthy stop warning
                 target.updateStyle(color)

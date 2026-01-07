@@ -2669,10 +2669,10 @@ With both `actual` and `total` relative refilling readings, users can determine 
 Show `pit_occupancy` and `pit_requests` columns.
 
     pit_occupancy
-Show number of vehicles has stopped in pit lane, and number of vehicles currently in pit lane (whether passing or stopped). This does not include vehicles that are parked in garage.
+Show number of vehicles that stopped in pit lane, and number of vehicles currently in pit lane (whether passing or stopped). This does not include vehicles that are parked in garage.
 
     pit_requests
-Show number of vehicles has requested for pit stop, and number of vehicles currently outside of pit lane.
+Show number of vehicles that requested for pit stop, and number of vehicles currently outside pit lane.
 
 [**`Back to Top`**](#)
 
@@ -2908,7 +2908,7 @@ Set custom pit status text which shows when driver is in pit.
 Set custom garage status text which shows when driver is in garage.
 
     yellow_flag_status_text
-Set custom yellow flag status text which shows when driver causes (or likely to) yellow flag. Note, unlike in-game yellow flag, the indicator is always displayed when driver's speed is below 28kph (outside of pit lane), regardless whether driver has caused yellow flag on track.
+Set custom yellow flag status text which shows when driver causes (or likely to) yellow flag. Note, unlike in-game yellow flag, the indicator is always displayed when driver's speed is below 28kph (outside pit lane), regardless whether driver has caused yellow flag on track.
 
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.

@@ -2,8 +2,8 @@ WIP
 -----------------------------
 * Pit stop estimate Widget
   - Added "show_pit_occupancy" option, which shows "pit occupancy" and "pit requests" columns.
-  - Added "pit occupancy" column, which shows number of vehicles has stopped in pit lane, and number of vehicles currently in pit lane (whether passing or stopped). This does not include vehicles that are parked in garage.
-  - Added "pit requests" column, which shows number of vehicles has requested for pit stop, and number of vehicles currently outside of pit lane.
+  - Added "pit occupancy" column, which shows number of vehicles that stopped in pit lane, and number of vehicles currently in pit lane (whether passing or stopped). This does not include vehicles that are parked in garage.
+  - Added "pit requests" column, which shows number of vehicles that requested for pit stop, and number of vehicles currently outside pit lane.
   - Now reads pit stop timing data from more reliable source. Due to this change, "show_maximum_delay" and related options no longer worked and removed.
 
 2.38.0 (2026-01-01)
