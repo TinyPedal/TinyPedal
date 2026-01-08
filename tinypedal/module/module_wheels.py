@@ -26,7 +26,7 @@ from collections import deque
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import POS_XY_ZERO, WHEELS_DELTA_DEFAULT, WHEELS_ZERO
+from ..const_common import FLOAT_INF, POS_XY_ZERO, WHEELS_DELTA_DEFAULT, WHEELS_ZERO
 from ..module_info import WheelsInfo, minfo
 from ..userfile.heatmap import (
     brake_failure_thickness,
@@ -67,6 +67,11 @@ class Realtime(DataModule):
             output=minfo.wheels,
             min_delta_distance=self.mcfg["minimum_delta_distance"],
         )
+        gen_susp_travel = calc_suspension_travel(
+            output=minfo.wheels,
+            average_samples=self.mcfg["average_suspension_position_samples"],
+            average_margin=max(self.mcfg["average_suspension_position_margin"], 0.1),
+        )
         gen_cornering_radius = calc_cornering_radius(
             output=minfo.wheels,
             sampling_interval=self.mcfg["cornering_radius_sampling_interval"],
@@ -82,16 +87,17 @@ class Realtime(DataModule):
 
                 # Reset condition
                 session_elapsed = api.read.session.elapsed()
-                is_reset = (
-                    api.read.vehicle.in_garage()  # whether returned to garage
-                    or last_session_elapsed > session_elapsed  # whether changed session
-                )
+                is_new_session = (last_session_elapsed > session_elapsed)
                 last_session_elapsed = session_elapsed
 
+                in_garage = api.read.vehicle.in_garage() or is_new_session
+                in_pits = api.read.vehicle.in_pits() or is_new_session
+
                 # Run calculate
-                gen_wheel_rotation.send(is_reset)
-                gen_tyre_wear.send(is_reset)
-                gen_brake_wear.send(is_reset)
+                gen_wheel_rotation.send(in_garage)
+                gen_tyre_wear.send(in_garage)
+                gen_brake_wear.send(in_garage)
+                gen_susp_travel.send(in_pits)
                 gen_cornering_radius.send(True)
 
             else:
@@ -430,6 +436,66 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             output.currentlapBrakeWear[idx] = brake_wear_curr[idx]
             output.estimatedBrakeWear[idx] = est_wear
             output.estimatedValidBrakeWear[idx] = est_valid_wear
+
+
+@generator_init
+def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_margin: float):
+    """Calculate suspension travel"""
+    last_reset = None  # reset check
+
+    min_pos = [FLOAT_INF] * 4
+    max_pos = [-FLOAT_INF] * 4
+    min_avg_pos_ema = list(WHEELS_ZERO)
+    max_avg_pos_ema = list(WHEELS_ZERO)
+    d_factor = calc.ema_factor(average_samples, 3)
+
+    while True:
+        reset = yield None
+
+        # Reset
+        if last_reset != reset:
+            last_reset = reset
+            min_avg_pos_ema[:] = WHEELS_ZERO
+            max_avg_pos_ema[:] = WHEELS_ZERO
+            min_pos[:] = (FLOAT_INF, FLOAT_INF, FLOAT_INF, FLOAT_INF)
+            max_pos[:] = (-FLOAT_INF, -FLOAT_INF, -FLOAT_INF, -FLOAT_INF)
+
+        susp_pos_set = api.read.wheel.suspension_deflection()
+
+        if last_reset:
+            output.currentSuspensionPosition[:] = susp_pos_set
+            continue
+
+        # Calculate only while not in pit
+        for idx, susp_pos in enumerate(susp_pos_set):
+            # Min position (under extension)
+            if min_avg_pos_ema[idx] == 0:
+                min_avg_pos_ema[idx] = susp_pos
+
+            min_avg_pos_ema[idx] = max(
+                calc.exp_mov_avg(d_factor, min_avg_pos_ema[idx], susp_pos),
+                min_avg_pos_ema[idx] - average_margin,
+            )
+            if min_pos[idx] > min_avg_pos_ema[idx]:
+                min_pos[idx] = min_avg_pos_ema[idx]
+
+            # Max position (under compression)
+            if max_avg_pos_ema[idx] == 0:
+                max_avg_pos_ema[idx] = susp_pos
+
+            max_avg_pos_ema[idx] = min(
+                calc.exp_mov_avg(d_factor, max_avg_pos_ema[idx], susp_pos),
+                max_avg_pos_ema[idx] + average_margin,
+            )
+
+            if max_pos[idx] < max_avg_pos_ema[idx]:
+                max_pos[idx] = max_avg_pos_ema[idx]
+
+            # Output wheels data
+            output.currentSuspensionPosition[idx] = susp_pos
+            output.minSuspensionPosition[idx] = min_pos[idx]
+            output.maxSuspensionPosition[idx] = max_pos[idx]
+            output.utilizedSuspensionTravel[idx] = max_pos[idx] - min_pos[idx]
 
 
 @generator_init

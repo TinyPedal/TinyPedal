@@ -1,10 +1,24 @@
 WIP
 -----------------------------
+* Wheels Module
+  - Added suspension travel travel calculation, which is required by "Suspension position" and "Suspension travel" Widgets.
+  - Added "average_suspension_position_samples", "average_suspension_position_margin" options. See User Guide for details.
+
 * Pit stop estimate Widget
   - Added "show_pit_occupancy" option, which shows "pit occupancy" and "pit requests" columns.
   - Added "pit occupancy" column, which shows number of vehicles that stopped in pit lane, and number of vehicles currently in pit lane (whether passing or stopped). This does not include vehicles that are parked in garage.
   - Added "pit requests" column, which shows number of vehicles that requested for pit stop, and number of vehicles currently outside pit lane.
   - Now reads pit stop timing data from more reliable source. Due to this change, "show_maximum_delay" and related options no longer worked and removed.
+
+* Suspension position Widget
+  - Added "show_maximum_position_range" option (requested by user "yhnp78"), which shows a visualized line indicating maximum suspension position range under compression, which can be useful to check suspension travel limits. While this option enabled, the suspension position line will also change its color to match "maximum_position_range_color" when reaching maximum position.
+  - Note, maximum suspension position data calculation is handled by Wheels Module, and is not updated while in pit lane, and resets when exiting pit lane. A minimum of two laps are required to get sensible readings.
+
+* [New]Suspension travel Widget
+  - Show total utilized suspension travel (millimeter).
+  - Show minimum recorded suspension position under extension (millimeter).
+  - Show maximum recorded suspension position under compression (millimeter).
+  - Show current suspension position (millimeter).
 
 2.38.0 (2026-01-01)
 -----------------------------

@@ -21,6 +21,8 @@ Suspension position Widget
 """
 
 from ..api_control import api
+from ..const_common import WHEELS_NA
+from ..module_info import minfo
 from ._base import Overlay
 from ._painter import WheelGaugeBar
 
@@ -53,9 +55,14 @@ class Realtime(Overlay):
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
         max_range = max(int(self.wcfg["position_max_range"]), 10)
-        mark_color = (
+        susp_mark_color = (
             self.wcfg["third_spring_position_mark_color"]
             if self.wcfg["show_third_spring_position_mark"]
+            else ""
+        )
+        susp_max_color = (
+            self.wcfg["maximum_position_range_color"]
+            if self.wcfg["show_maximum_position_range"]
             else ""
         )
 
@@ -91,13 +98,16 @@ class Realtime(Overlay):
                 bar_width=bar_width,
                 bar_height=bar_height,
                 font_offset=font_offset,
-                max_range=max_range,
+                display_range=max_range,
                 input_color=self.wcfg["positive_position_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["bkg_color"],
                 mark_width=max(self.wcfg["third_spring_position_mark_width"], 1),
-                mark_color=mark_color,
+                mark_color=susp_mark_color,
+                maxrange_height=max(self.wcfg["maximum_position_range_height"], 0),
+                maxrange_color=susp_max_color,
                 right_side=idx % 2,
+                top_side=idx < 2,
             ) for idx in range(4)
         )
         self.set_grid_layout_quad(
@@ -111,27 +121,31 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        susp_set = api.read.wheel.suspension_deflection()
+        susp_pos = minfo.wheels.currentSuspensionPosition
 
         if self.wcfg["show_third_spring_position_mark"]:
-            third_set = api.read.wheel.third_spring_deflection()
-            for susp, third, bar_susp in zip(susp_set, third_set, self.bars_susp):
-                self.update_susp_third(bar_susp, round(susp), third)
+            third_pos = api.read.wheel.third_spring_deflection()
         else:
-            for susp, bar_susp in zip(susp_set, self.bars_susp):
-                self.update_susp(bar_susp, round(susp))
+            third_pos = WHEELS_NA
+
+        if self.wcfg["show_maximum_position_range"]:
+            max_pos = minfo.wheels.maxSuspensionPosition
+        else:
+            max_pos = WHEELS_NA
+
+        for idx, bar_susp in enumerate(self.bars_susp):
+            self.update_susp(bar_susp, susp_pos[idx], third_pos[idx], max_pos[idx])
 
     # GUI update methods
-    def update_susp(self, target, data):
+    def update_susp(self, target, data, third, susp_max):
         """Suspension position"""
         if target.last != data:
             target.last = data
             target.input_color = self.susp_color[data < 0]
+            if third != -1:
+                target.update_mark(abs(third))
+            if susp_max > 0:
+                target.update_maxrange(susp_max)
+                if data >= susp_max:  # highlight when exceeded max range
+                    target.input_color = target.maxrange_color
             target.update_input(abs(data))
-
-    def update_susp_third(self, target, data, third):
-        """Suspension position with third spring"""
-        if target.last != data:
-            target.last = data
-            target.input_color = self.susp_color[data < 0]
-            target.update_input_mark(abs(data), abs(third))

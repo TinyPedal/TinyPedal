@@ -1391,6 +1391,12 @@ Set position sampling interval for cornering radius calculation. Value range in 
     minimum_delta_distance
 Set minimum recording distance (in meters) between each tyre wear sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
 
+    average_suspension_position_samples
+Set amount samples for calculating average suspension position, which helps to filter out unusual data. Default is `20`. Minimum value is limited to `3`.
+
+    average_suspension_position_margin
+Set additional margin that cannot exceed the sum of previous `average suspension position` and `margin`. This option is used to minimize the impact of unusual data. Default value is `1` millimeter. Minimum value is limited to `0.1`.
+
 [**`Back to Top`**](#)
 
 
@@ -3439,10 +3445,35 @@ Show percentage force ratio between each and total suspension force. Set `false`
 **This widget displays visualized suspension position info.**
 
     position_max_range
-Set visualized maximum suspension position display range (millimeter).
+Set visualized maximum display range of suspension position (millimeter).
 
     show_third_spring_position_mark
 Show front and rear third spring position mark relative to each suspension position.
+
+    show_maximum_position_range
+Show a visualized line indicating maximum suspension position range under compression, which can be useful to check suspension travel limits. While this option enabled, the suspension position line will also change its color to match `maximum_position_range_color` when reaching maximum position.
+
+Note, maximum suspension position calculation is handled by [Wheels Module](#wheels-module), and is not updated while in pit lane, and resets when exiting pit lane. A minimum of two laps are required to get sensible readings.
+
+[**`Back to Top`**](#)
+
+
+## Suspension travel
+**This widget displays suspension travel info.**
+
+Note, suspension travel data calculation is handled by [Wheels Module](#wheels-module), and is not updated while in pit lane, and resets when exiting pit lane. A minimum of two laps are required to get sensible readings.
+
+    show_utilized_travel
+Show total utilized suspension travel (millimeter), which is calculated from minimum and maximum recorded suspension position.
+
+    show_minimum_position
+Show minimum recorded suspension position under extension (millimeter).
+
+    show_maximum_position
+Show maximum recorded suspension position under compression (millimeter).
+
+    show_live_position
+Show current suspension position (millimeter).
 
 [**`Back to Top`**](#)
 

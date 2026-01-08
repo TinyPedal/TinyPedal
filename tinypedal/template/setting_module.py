@@ -102,7 +102,9 @@ MODULE_DEFAULT = {
         "minimum_axle_rotation": 4,
         "maximum_rotation_difference_front": 0.002,
         "maximum_rotation_difference_rear": 0.002,
-        "cornering_radius_sampling_interval": 10,
         "minimum_delta_distance": 5,
+        "average_suspension_position_samples": 20,
+        "average_suspension_position_margin": 1,
+        "cornering_radius_sampling_interval": 10,
     },
 }

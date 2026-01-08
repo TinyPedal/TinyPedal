@@ -49,21 +49,25 @@ class WheelGaugeBar(QWidget):
         bar_width: int,
         bar_height: int,
         font_offset: int = 0,
-        max_range: int = 100,
+        display_range: int = 100,
         input_color: str = "",
         fg_color: str = "",
         bg_color: str = "",
         mark_width: int = 0,
         mark_color: str = "",
+        maxrange_height: int = 0,
+        maxrange_color: str = "",
         right_side: bool = False,
+        top_side: bool = True,
     ):
         super().__init__(parent)
         self.last = -1
-        self.max_range = max_range
-        self.width_scale = bar_width / self.max_range
+        self.display_range = display_range
+        self.width_scale = bar_width / self.display_range
         self.input_color = input_color
         self.bg_color = bg_color
         self.mark_color = mark_color
+        self.maxrange_color = maxrange_color
         self.rect_bg = QRectF(0, 0, bar_width, bar_height)
         self.rect_input = self.rect_bg.adjusted(0, 0, 0, 0)
         self.rect_text = self.rect_bg.adjusted(padding_x, font_offset, -padding_x, 0)
@@ -73,6 +77,18 @@ class WheelGaugeBar(QWidget):
             self.rect_mark = QRectF(0, 0, mark_width, bar_height)
         else:
             self.rect_mark = self.rect_bg
+
+        if self.maxrange_color:
+            if top_side:
+                self.rect_max = QRectF(0, 0, bar_width, maxrange_height)
+            else:
+                self.rect_max = QRectF(0, bar_height - maxrange_height, bar_width, maxrange_height)
+            if right_side:
+                self.rect_max.setWidth(0)
+            else:
+                self.rect_max.setX(bar_width)
+        else:
+            self.rect_max = self.rect_bg
 
         if right_side:
             self.align = Qt.AlignRight | Qt.AlignVCenter
@@ -88,18 +104,22 @@ class WheelGaugeBar(QWidget):
         if self.right_side:
             self.rect_input.setWidth(input_value * self.width_scale)
         else:
-            self.rect_input.setX((self.max_range - input_value) * self.width_scale)
+            self.rect_input.setX((self.display_range - input_value) * self.width_scale)
         self.update()
 
-    def update_input_mark(self, input_value: float, mark_value: float):
-        """Update input value & mark"""
+    def update_mark(self, mark_value: float):
+        """Update mark"""
         if self.right_side:
-            self.rect_input.setWidth(input_value * self.width_scale)
             self.rect_mark.moveRight(mark_value * self.width_scale)
         else:
-            self.rect_input.setX((self.max_range - input_value) * self.width_scale)
-            self.rect_mark.moveLeft((self.max_range - mark_value) * self.width_scale)
-        self.update()
+            self.rect_mark.moveLeft((self.display_range - mark_value) * self.width_scale)
+
+    def update_maxrange(self, input_value: float):
+        """Update max range"""
+        if self.right_side:
+            self.rect_max.setWidth(input_value * self.width_scale)
+        else:
+            self.rect_max.setX((self.display_range - input_value) * self.width_scale)
 
     def paintEvent(self, event):
         """Draw normal without warning or negative highlighting"""
@@ -108,6 +128,8 @@ class WheelGaugeBar(QWidget):
         painter.fillRect(self.rect_input, self.input_color)
         if self.mark_color:
             painter.fillRect(self.rect_mark, self.mark_color)
+        if self.maxrange_color:
+            painter.fillRect(self.rect_max, self.maxrange_color)
         painter.setPen(self.pen)
         painter.drawText(self.rect_text, self.align, f"{self.last:.0f}")
 

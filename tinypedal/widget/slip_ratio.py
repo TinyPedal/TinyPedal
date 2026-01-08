@@ -87,7 +87,7 @@ class Realtime(Overlay):
                 bar_width=bar_width,
                 bar_height=bar_height,
                 font_offset=font_offset,
-                max_range=max_range,
+                display_range=max_range,
                 input_color=self.wcfg["optimal_slip_ratio_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["bkg_color"],

@@ -73,6 +73,7 @@ __all__ = [
     "stint_history",
     "suspension_force",
     "suspension_position",
+    "suspension_travel",
     "system_performance",
     "timing",
     "track_map",
