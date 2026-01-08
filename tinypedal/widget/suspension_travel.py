@@ -78,7 +78,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_travel = self.set_qlabel(
-                    text="susp util",
+                    text=self.wcfg["caption_text_utilized_travel"],
                     style=bar_style_desc,
                 )
                 layout_travel.addWidget(cap_travel, 0, 0, 1, 0)
@@ -107,7 +107,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_minpos = self.set_qlabel(
-                    text="min pos",
+                    text=self.wcfg["caption_text_minimum_position"],
                     style=bar_style_desc,
                 )
                 layout_minpos.addWidget(cap_minpos, 0, 0, 1, 0)
@@ -136,7 +136,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_maxpos = self.set_qlabel(
-                    text="max pos",
+                    text=self.wcfg["caption_text_maximum_position"],
                     style=bar_style_desc,
                 )
                 layout_maxpos.addWidget(cap_maxpos, 0, 0, 1, 0)
@@ -165,7 +165,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_live = self.set_qlabel(
-                    text="live pos",
+                    text=self.wcfg["caption_text_live_position"],
                     style=bar_style_desc,
                 )
                 layout_live.addWidget(cap_live, 0, 0, 1, 0)

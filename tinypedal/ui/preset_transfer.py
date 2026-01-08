@@ -81,6 +81,8 @@ class PresetTransfer(BaseEditor):
             "layout",
             "color",
             "font",
+            "prefix_and_suffix",
+            "caption_text",
             "column_index",
             "decimal_places",
             "other_options",
@@ -233,6 +235,14 @@ class PresetTransfer(BaseEditor):
                     continue
                 if re.search("font_name|font_weight|font_size", option_name):
                     if "font" in options_selection:
+                        dest_setting_dict[option_name] = option_value
+                    continue
+                if re.search("prefix|suffix", option_name):
+                    if "prefix_and_suffix" in options_selection:
+                        dest_setting_dict[option_name] = option_value
+                    continue
+                if re.search("caption_text", option_name):
+                    if "caption_text" in options_selection:
                         dest_setting_dict[option_name] = option_value
                     continue
                 if re.search("column_index", option_name):

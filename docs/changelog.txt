@@ -11,14 +11,19 @@ WIP
   - Now reads pit stop timing data from more reliable source. Due to this change, "show_maximum_delay" and related options no longer worked and removed.
 
 * Suspension position Widget
-  - Added "show_maximum_position_range" option (requested by user "yhnp78"), which shows a visualized line indicating maximum suspension position range under compression, which can be useful to check suspension travel limits. While this option enabled, the suspension position line will also change its color to match "maximum_position_range_color" when reaching maximum position.
-  - Note, maximum suspension position data calculation is handled by Wheels Module, and is not updated while in pit lane, and resets when exiting pit lane. A minimum of two laps are required to get sensible readings.
+  - Added "show_maximum_position_range" option (requested by user "yhnp78"), which shows a visualized line indicating maximum suspension position range under compression, which can be useful to check suspension travel limits. While this option enabled, the suspension position line will also change its color to match "maximum_position_range_color" when reaching maximum position. The visualized line will not be displayed if maximum position range is negative (such as with too much packers).
+    Note, maximum suspension position data calculation is handled by Wheels Module, and is not updated while in pit lane, and resets when exiting pit lane. A minimum of two laps are required to get sensible readings.
+  - Added "maximum_position_range_height", "maximum_position_range_color" options.
 
 * [New]Suspension travel Widget
   - Show total utilized suspension travel (millimeter).
   - Show minimum recorded suspension position under extension (millimeter).
   - Show maximum recorded suspension position under compression (millimeter).
   - Show current suspension position (millimeter).
+
+* Misc
+  - Added "caption_text" options for "Brake wear", "Suspension travel", "Tyre wear" Widgets.
+  - Added "prefix and suffix" and "caption text" options in "Preset Transfer" dialog.
 
 2.38.0 (2026-01-01)
 -----------------------------

@@ -85,7 +85,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_remain = self.set_qlabel(
-                    text="tyre wear",
+                    text=self.wcfg["caption_text_remaining"],
                     style=bar_style_desc,
                 )
                 layout_remain.addWidget(cap_remain, 0, 0, 1, 0)
@@ -118,7 +118,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_diff = self.set_qlabel(
-                    text="wear diff",
+                    text=self.wcfg["caption_text_wear_difference"],
                     style=bar_style_desc,
                 )
                 layout_diff.addWidget(cap_diff, 0, 0, 1, 0)
@@ -151,7 +151,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_live = self.set_qlabel(
-                    text="live wear",
+                    text=self.wcfg["caption_text_live_wear_difference"],
                     style=bar_style_desc,
                 )
                 layout_live.addWidget(cap_live, 0, 0, 1, 0)
@@ -184,7 +184,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_laps = self.set_qlabel(
-                    text="est. laps",
+                    text=self.wcfg["caption_text_lifespan_laps"],
                     style=bar_style_desc,
                 )
                 layout_laps.addWidget(cap_laps, 0, 0, 1, 0)
@@ -217,7 +217,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_mins = self.set_qlabel(
-                    text="est. mins",
+                    text=self.wcfg["caption_text_lifespan_minutes"],
                     style=bar_style_desc,
                 )
                 layout_mins.addWidget(cap_mins, 0, 0, 1, 0)
@@ -250,7 +250,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_caption"]:
                 cap_end = self.set_qlabel(
-                    text="end tread",
+                    text=self.wcfg["caption_text_end_stint_remaining"],
                     style=bar_style_desc,
                 )
                 layout_end.addWidget(cap_end, 0, 0, 1, 0)

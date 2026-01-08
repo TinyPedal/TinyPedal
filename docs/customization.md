@@ -3451,7 +3451,7 @@ Set visualized maximum display range of suspension position (millimeter).
 Show front and rear third spring position mark relative to each suspension position.
 
     show_maximum_position_range
-Show a visualized line indicating maximum suspension position range under compression, which can be useful to check suspension travel limits. While this option enabled, the suspension position line will also change its color to match `maximum_position_range_color` when reaching maximum position.
+Show a visualized line indicating maximum suspension position range under compression, which can be useful to check suspension travel limits. While this option enabled, the suspension position line will also change its color to match `maximum_position_range_color` when reaching maximum position. The visualized line will not be displayed if maximum position range is negative (such as with too much packers).
 
 Note, maximum suspension position calculation is handled by [Wheels Module](#wheels-module), and is not updated while in pit lane, and resets when exiting pit lane. A minimum of two laps are required to get sensible readings.
 
