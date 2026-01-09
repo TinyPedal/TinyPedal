@@ -104,7 +104,7 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["bkg_color"],
                 mark_width=max(self.wcfg["third_spring_position_mark_width"], 1),
                 mark_color=susp_mark_color,
-                maxrange_height=max(self.wcfg["maximum_position_range_height"], 0),
+                maxrange_height=max(self.wcfg["maximum_position_range_size"], 0),
                 maxrange_color=susp_max_color,
                 right_side=idx % 2,
                 top_side=idx < 2,

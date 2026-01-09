@@ -21,6 +21,7 @@ Brake pressure Widget
 """
 
 from ..api_control import api
+from ..const_common import WHEELS_NA, WHEELS_ZERO
 from ._base import Overlay
 from ._painter import WheelGaugeBar
 
@@ -52,6 +53,11 @@ class Realtime(Overlay):
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
+        brake_input_color = (
+            self.wcfg["brake_input_color"]
+            if self.wcfg["show_brake_input"]
+            else ""
+        )
 
         # Caption
         if self.wcfg["show_caption"]:
@@ -84,7 +90,10 @@ class Realtime(Overlay):
                 input_color=self.wcfg["highlight_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["bkg_color"],
+                maxrange_color=brake_input_color,
+                maxrange_height=max(self.wcfg["brake_input_size"], 0),
                 right_side=idx % 2,
+                top_side=idx < 2,
             ) for idx in range(4)
         )
         self.set_grid_layout_quad(
@@ -98,13 +107,29 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        bpres_set = api.read.brake.pressure(scale=100)
-        for bpres, bar_bpres in zip(bpres_set, self.bars_bpres):
-            self.update_bpres(bar_bpres, round(bpres))
+        brake_pressure = api.read.brake.pressure(scale=100)
+
+        if self.wcfg["show_brake_input"]:
+            raw_brake = api.read.inputs.brake_raw()
+            if raw_brake > 0:
+                raw_brake *= 100
+                bbias = api.read.brake.bias_front()
+                raw_brake_f = raw_brake * bbias
+                raw_brake_r = raw_brake * (1 - bbias)
+                brake_inputs = raw_brake_f, raw_brake_f, raw_brake_r, raw_brake_r
+            else:
+                brake_inputs = WHEELS_ZERO
+        else:
+            brake_inputs = WHEELS_NA
+
+        for idx, bar_bpres in enumerate(self.bars_bpres):
+            self.update_bpres(bar_bpres, brake_pressure[idx], brake_inputs[idx])
 
     # GUI update methods
-    def update_bpres(self, target, data):
+    def update_bpres(self, target, data, inputs):
         """Brake pressure"""
         if target.last != data:
             target.last = data
+            if inputs != -1:
+                target.update_maxrange(inputs)
             target.update_input(data)

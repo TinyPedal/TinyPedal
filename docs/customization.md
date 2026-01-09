@@ -1513,6 +1513,9 @@ Set percentage threshold for counting wheel lock duration under braking. `0.3` m
 ## Brake pressure
 **This widget displays visualized percentage brake pressure info.**
 
+    show_brake_input
+Show raw brake input on each brake. This option can be useful to check amount difference between brake input and applied brake pressure.
+
 [**`Back to Top`**](#)
 
 
