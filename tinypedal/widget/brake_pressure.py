@@ -108,6 +108,7 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         brake_pressure = api.read.brake.pressure(scale=100)
+        brake_inputs = WHEELS_NA
 
         if self.wcfg["show_brake_input"]:
             raw_brake = api.read.inputs.brake_raw()
@@ -119,8 +120,6 @@ class Realtime(Overlay):
                 brake_inputs = raw_brake_f, raw_brake_f, raw_brake_r, raw_brake_r
             else:
                 brake_inputs = WHEELS_ZERO
-        else:
-            brake_inputs = WHEELS_NA
 
         for idx, bar_bpres in enumerate(self.bars_bpres):
             self.update_bpres(bar_bpres, brake_pressure[idx], brake_inputs[idx])

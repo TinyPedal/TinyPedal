@@ -122,16 +122,14 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         susp_pos = minfo.wheels.currentSuspensionPosition
+        third_pos = WHEELS_NA
+        max_pos = WHEELS_NA
 
         if self.wcfg["show_third_spring_position_mark"]:
             third_pos = api.read.wheel.third_spring_deflection()
-        else:
-            third_pos = WHEELS_NA
 
         if self.wcfg["show_maximum_position_range"]:
             max_pos = minfo.wheels.maxSuspensionPosition
-        else:
-            max_pos = WHEELS_NA
 
         for idx, bar_susp in enumerate(self.bars_susp):
             self.update_susp(bar_susp, susp_pos[idx], third_pos[idx], max_pos[idx])
