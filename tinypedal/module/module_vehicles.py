@@ -64,7 +64,6 @@ class Realtime(DataModule):
                 if veh_total > 0:
                     update_vehicle_data(
                         output,
-                        minfo.relative.classes,
                         max_lap_diff_ahead,
                         max_lap_diff_behind,
                         next(gen_low_priority_timer),
@@ -83,7 +82,6 @@ class Realtime(DataModule):
 
 def update_vehicle_data(
     output: VehiclesInfo,
-    class_pos_list: list,
     max_lap_diff_ahead: float,
     max_lap_diff_behind: float,
     update_low_priority: bool,
@@ -104,6 +102,7 @@ def update_vehicle_data(
     # General data
     track_length = api.read.lap.track_length()
     in_race = api.read.session.in_race()
+    speedtrap_distance = minfo.mapping.speedTrapPosition
 
     # Local player data
     elapsed_time = api.read.timing.elapsed()
@@ -116,7 +115,7 @@ def update_vehicle_data(
     plr_ori_yaw = api.read.vehicle.orientation_yaw_radians()
 
     # Update dataset from all vehicles in current session
-    for index, data, class_pos in zip(range(output.totalVehicles), output.dataSet, class_pos_list):
+    for index, data, class_pos in zip(range(output.totalVehicles), output.dataSet, minfo.relative.classes):
         # Temp var only
         laps_completed = api.read.lap.completed_laps(index)
         lap_distance = api.read.lap.distance(index)
@@ -129,6 +128,9 @@ def update_vehicle_data(
         data.isYellow = speed < 8
         data.inPit = api.read.vehicle.in_paddock(index)
         data.pitTimer.update(api.read.vehicle.slot_id(index), data.inPit, elapsed_time, laps_completed, speed)
+
+        if not data.inPit:
+            data.speedTrap.update(speed, lap_distance, speedtrap_distance, track_length)
 
         if data.isPlayer:
             data.elapsedTime = elapsed_time

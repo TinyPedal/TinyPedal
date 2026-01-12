@@ -282,6 +282,9 @@ class DriverStatsViewer(BaseEditor):
         selected_vehicle = self.table_stats.item(row, 0).text()
         selected_column = self.table_header_key[column]
         best_laptime = self.table_stats.item(row, column).text()
+        if best_laptime == TEXT_NOLAPTIME:
+            QMessageBox.warning(self, "Error", "No lap time found.")
+            return
         msg_text = (
             f"Reset <b>{best_laptime}</b> lap time for <b>{selected_vehicle}</b>?<br><br>"
             "This cannot be undone!"
@@ -300,10 +303,8 @@ class DriverStatsViewer(BaseEditor):
         if not self.table_stats.itemAt(position):
             return
 
-        for data in self.table_stats.selectedIndexes():
-            item_row = data.row()
-            item_column = data.column()
-            break
+        item_row = self.table_stats.currentRow()
+        item_column = self.table_stats.currentColumn()
 
         menu = QMenu()  # no parent for temp menu
         if item_column == 0:
@@ -320,9 +321,11 @@ class DriverStatsViewer(BaseEditor):
         selected_action = menu.exec_(self.table_stats.mapToGlobal(position))
         if not selected_action:
             return
-        if selected_action.text() == "Remove Vehicle":
+
+        action = selected_action.text()
+        if action == "Remove Vehicle":
             self.remove_vehicle()
-        elif selected_action.text() == "Reset Lap Time":
+        elif action == "Reset Lap Time":
             self.reset_stat(item_row, item_column)
 
     def open_trackmap(self):

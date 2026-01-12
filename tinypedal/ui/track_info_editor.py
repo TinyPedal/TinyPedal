@@ -23,9 +23,11 @@ Track info editor
 import logging
 import time
 
+from PySide2.QtCore import QPoint, Qt
 from PySide2.QtWidgets import (
     QHBoxLayout,
     QHeaderView,
+    QMenu,
     QMessageBox,
     QTableWidget,
     QTableWidgetItem,
@@ -43,7 +45,13 @@ from ._common import (
     UIScaler,
 )
 
-HEADER_TRACKS = "Track name","Pit entry (m)","Pit exit (m)","Pit speed (m/s)"
+HEADER_TRACKS = (
+    "Track name",
+    "Pit entry (m)",
+    "Pit exit (m)",
+    "Pit speed (m/s)",
+    "Speed trap (m)",
+)
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +62,7 @@ class TrackInfoEditor(BaseEditor):
     def __init__(self, parent):
         super().__init__(parent)
         self.set_utility_title("Track Info Editor")
-        self.setMinimumSize(UIScaler.size(45), UIScaler.size(38))
+        self.setMinimumSize(UIScaler.size(60), UIScaler.size(38))
 
         self.tracks_temp = copy_setting(cfg.user.tracks)
 
@@ -68,6 +76,10 @@ class TrackInfoEditor(BaseEditor):
             self.table_tracks.horizontalHeader().setSectionResizeMode(idx, QHeaderView.Fixed)
             self.table_tracks.setColumnWidth(idx, UIScaler.size(8))
         self.table_tracks.cellChanged.connect(self.verify_input)
+
+        self.table_tracks.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table_tracks.customContextMenuRequested.connect(self.open_context_menu)
+
         self.refresh_table()
         self.set_unmodified()
 
@@ -197,6 +209,62 @@ class TrackInfoEditor(BaseEditor):
         item = self.table_tracks.item(row_index, column_index)
         if column_index >= 1:
             item.validate()
+
+    def open_context_menu(self, position: QPoint):
+        """Open context menu"""
+        if not self.table_tracks.itemAt(position):
+            return
+
+        menu = QMenu()
+        if self.table_tracks.currentColumn() == 4:
+            menu.addAction("Set from Telemetry")
+        else:
+            return
+
+        position += QPoint(  # position correction from header
+            self.table_tracks.verticalHeader().width(),
+            self.table_tracks.horizontalHeader().height(),
+        )
+        selected_action = menu.exec_(self.table_tracks.mapToGlobal(position))
+        if not selected_action:
+            return
+
+        action = selected_action.text()
+        if action == "Set from Telemetry":
+            self.set_position_from_tele()
+
+    def set_position_from_tele(self):
+        """Set position from telemetry to selected cell"""
+        if len(self.table_tracks.selectedIndexes()) != 1:  # limit to one selected cell
+            msg_text = (
+                "Select <b>one value</b> from <b>Speed trap</b> column to set position."
+            )
+            QMessageBox.warning(self, "Error", msg_text)
+            return
+
+        if api.read.vehicle.in_pits():
+            msg_text = "Cannot set speed trap position while in pit lane."
+            QMessageBox.warning(self, "Error", msg_text)
+            return
+
+        row_index = self.table_tracks.currentRow()
+        track_name = self.table_tracks.item(row_index, 0).text()
+        current_name = api.read.session.track_name()
+        if track_name != current_name:
+            msg_text = (
+                f"Unable to set speed trap position for selected track:<br><b>{track_name}</b><br><br>"
+                f"Only support to set speed trap position for current track:<br><b>{current_name}</b>"
+            )
+            QMessageBox.warning(self, "Error", msg_text)
+            return
+
+        position = round(api.read.lap.distance(), 4)
+        if not self.confirm_operation(
+            message=f"Set speed trap at position <b>{position}</b><br>for <b>{track_name}</b>?"):
+            return
+
+        self.table_tracks.item(row_index, 4).setValue(position)
+        self.table_tracks.setCurrentCell(-1, -1)  # deselect to avoid mis-clicking
 
     def update_tracks_temp(self):
         """Update temporary changes to tracks temp first"""

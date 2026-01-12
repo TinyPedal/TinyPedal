@@ -93,6 +93,7 @@ def update_track_info(output: MappingInfo, track_name: str):
     pit_entry = load_track_info(track_name).get("pit_entry", 0.0)
     pit_exit = load_track_info(track_name).get("pit_exit", 0.0)
     pit_speed = load_track_info(track_name).get("pit_speed", 0.0)
+    output.speedTrapPosition = load_track_info(track_name).get("speed_trap", 0.0)
     # Set default
     pos_last = 0.0
     last_speed = 0.0

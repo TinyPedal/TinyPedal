@@ -25,6 +25,7 @@ from ..api_control import api
 from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
+from ..units import set_unit_speed
 from ..userfile.brand_logo import load_brand_logo_file
 from ..userfile.heatmap import select_compound_symbol
 from ._base import Overlay
@@ -412,6 +413,24 @@ class Realtime(Overlay):
                 column_index=self.wcfg["column_index_stint_laps"],
                 hide_start=1,
             )
+        # Speed trap
+        if self.wcfg["show_speed_trap"]:
+            self.unit_speed = set_unit_speed(self.cfg.units["speed_unit"])
+            bar_style_spd = self.set_qss(
+                fg_color=self.wcfg["font_color_speed_trap"],
+                bg_color=self.wcfg["bkg_color_speed_trap"]
+            )
+            self.bars_spd = self.set_qlabel(
+                style=bar_style_spd,
+                width=5 * font_m.width + bar_padx,
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_spd,
+                column_index=self.wcfg["column_index_speed_trap"],
+                hide_start=1,
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -515,6 +534,9 @@ class Realtime(Overlay):
             # Stint laps
             if self.wcfg["show_stint_laps"]:
                 self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, state)
+            # Speed trap
+            if self.wcfg["show_speed_trap"]:
+                self.update_spd(self.bars_spd[idx], veh_info.speedTrap.speed, state)
 
     # GUI update methods
     def update_pos(self, target, *data):
@@ -742,6 +764,13 @@ class Realtime(Overlay):
             else:
                 text_est = f"{stint_laps_est // 1:02.0f}"
             target.setText(f"{text_done}/{text_est}")
+            self.toggle_visibility(target, data[-1])
+
+    def update_spd(self, target, *data):
+        """Speed trap"""
+        if target.last != data:
+            target.last = data
+            target.setText(f"{self.unit_speed(data[0]):.3f}"[:5])
             self.toggle_visibility(target, data[-1])
 
     # Additional methods

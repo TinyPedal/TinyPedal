@@ -1,8 +1,18 @@
 WIP
 -----------------------------
+* Track Info Editor
+  - Added "Speed trap" column for customizing speed trap position. To manually set speed trap position at your current on-track position, "Right-Click" on corresponding track's speed trap column and select "Set from Telemetry".
+
+* Vehicles Module
+  - Added speed trap recording function.
+
 * Wheels Module
   - Added suspension travel travel calculation, which is required by "Suspension position" and "Suspension travel" Widgets.
   - Added "average_suspension_position_samples", "average_suspension_position_margin" options. See User Guide for details.
+
+* Relative, Rivals, Standings Widget
+  - Added "show_speed_trap" option (requested by user "francescodg"), which shows fastest recorded speed of each driver per lap at user-defined speed trap position on track. This option can be useful to keep track of each driver's straight line performance from most recent lap.
+    Note, speed trap position is defined in "tracks.json" preset, which can be customized via Track Info Editor. Default speed trap position is set at start/finish line.
 
 * Brake pressure Widget
   - Added "show_brake_input" option, which shows raw brake input on each brake. This option can be useful to check amount difference between brake input and applied brake pressure.

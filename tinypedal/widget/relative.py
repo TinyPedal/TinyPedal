@@ -25,6 +25,7 @@ from ..api_control import api
 from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
+from ..units import set_unit_speed
 from ..userfile.brand_logo import load_brand_logo_file
 from ..userfile.heatmap import select_compound_symbol
 from ._base import Overlay
@@ -427,6 +428,27 @@ class Realtime(Overlay):
                 targets=self.bars_stl,
                 column_index=self.wcfg["column_index_stint_laps"],
             )
+        # Speed trap
+        if self.wcfg["show_speed_trap"]:
+            self.unit_speed = set_unit_speed(self.cfg.units["speed_unit"])
+            self.bar_style_spd = (
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_speed_trap"],
+                    bg_color=self.wcfg["bkg_color_speed_trap"]),
+                self.set_qss(
+                    fg_color=self.wcfg["font_color_player_speed_trap"],
+                    bg_color=self.wcfg["bkg_color_player_speed_trap"])
+            )
+            self.bars_spd = self.set_qlabel(
+                style=self.bar_style_spd[0],
+                width=5 * font_m.width + bar_padx,
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_spd,
+                column_index=self.wcfg["column_index_speed_trap"],
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -525,6 +547,9 @@ class Realtime(Overlay):
             # Stint laps
             if self.wcfg["show_stint_laps"]:
                 self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, hi_player, state)
+            # Speed trap
+            if self.wcfg["show_speed_trap"]:
+                self.update_spd(self.bars_spd[idx], veh_info.speedTrap.speed, hi_player, state)
 
     # GUI update methods
     def update_pos(self, target, *data):
@@ -814,6 +839,17 @@ class Realtime(Overlay):
                 text = ""
             target.setText(text)
             target.updateStyle(self.bar_style_stl[data[2]])
+
+    def update_spd(self, target, *data):
+        """Speed trap"""
+        if target.last != data:
+            target.last = data
+            if data[-1]:
+                text_speed = f"{self.unit_speed(data[0]):.3f}"[:5]
+            else:
+                text_speed = ""
+            target.setText(text_speed)
+            target.updateStyle(self.bar_style_spd[data[1]])
 
     # Additional methods
     def set_qss_lap_difference(self, fg_color, bg_color, plr_fg_color, plr_bg_color):

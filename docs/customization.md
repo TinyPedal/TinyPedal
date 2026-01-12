@@ -1042,6 +1042,8 @@ Track info editor is used for editing [Tracks Preset](#tracks-preset). Note, any
 
 `Pit speed (m/s)` column is pit lane speed limit (in meters per second). This value is automatically recorded or updated by [Mapping Module](#mapping-module). Note, vehicle pit limiter must be activated while in pit lane to allow recording speed limit.
 
+`Speed trap (m)` column is speed trap position (in meters) relative to track length. To manually set speed trap position at your current on-track position, `Right-Click` on corresponding track's speed trap column and select `Set from Telemetry`.
+
 To add new track, click `Add` button. Note, the editor can auto-detect and fill-in missing track found from current active session, existing data will not be changed.
 
 To sort track name in orders, click `Sort` button.
@@ -3350,6 +3352,11 @@ The integrity reading is calculated from hull damage, detachable wheels and part
 - Full integrity (no damage), as `-` (default color grey).
 - High integrity (lightly damaged hull), from `9` to `5` (default color blue).
 - Low integrity (severely damaged hull, and most likely has detached wheels or parts), from `4` to `0` (default color red).
+
+    show_speed_trap
+Show fastest recorded speed of each driver per lap at user-defined speed trap position on track. This option can be useful to keep track of each driver's straight line performance from most recent lap.
+
+Note, speed trap position is defined in `tracks.json` preset, which can be customized via [Track Info Editor](#track-info-editor). Default speed trap position is set at start/finish line.
 
 [**`Back to Top`**](#)
 

@@ -27,6 +27,7 @@ from collections import deque
 from itertools import islice
 from typing import Mapping, NamedTuple
 
+from .calculation import circular_relative_distance, linear_interp
 from .const_common import (
     DELTA_DEFAULT,
     EMPTY_DICT,
@@ -97,6 +98,54 @@ class DeltaLapTime(array):
                 yield laptime
             else:
                 yield MAX_SECONDS
+
+
+class VehicleSpeedTrap:
+    """Vehicle speed trap"""
+
+    __slots__ = (
+        "_record_next",
+        "_speed_before",
+        "_distance_last",
+        "_distance_before",
+        "speed",
+    )
+
+    def __init__(self):
+        self._record_next = False
+        self._speed_before = 0.0
+        self._distance_last = 0.0
+        self._distance_before = 0.0
+        self.speed = 0.0
+
+    def update(self, speed: float, distance_into: float, speedtrap_distance: float, track_length: float):
+        """Update speed trap data"""
+        if self._distance_last == distance_into:
+            return
+        self._distance_last = distance_into
+
+        # Center distance to speed trap position
+        distance_into = circular_relative_distance(track_length, speedtrap_distance, distance_into)
+
+        if self._record_next:
+            # Distance before speed trap
+            if 0 > distance_into:
+                self._distance_before = distance_into
+                self._speed_before = speed
+            else:
+                # Distance after speed trap
+                if distance_into - self._distance_before < 200:
+                    self.speed = linear_interp(
+                        0,
+                        self._distance_before,
+                        self._speed_before,
+                        distance_into,
+                        speed,
+                    )
+                # Turn off record until distance circles back
+                self._record_next = False
+        elif 0 > distance_into:
+            self._record_next = True
 
 
 class VehiclePitTimer:
@@ -217,6 +266,7 @@ class VehicleDataSet:
         "estimatedStintLaps",
         "currentStintLaps",
         "pitTimer",
+        "speedTrap",
         "lapTimeHistory",
     )
 
@@ -258,6 +308,7 @@ class VehicleDataSet:
         self.estimatedStintLaps: float = 0.0
         self.currentStintLaps: int = 0
         self.pitTimer: VehiclePitTimer = VehiclePitTimer()
+        self.speedTrap: VehicleSpeedTrap = VehicleSpeedTrap()
         self.lapTimeHistory: DeltaLapTime = DeltaLapTime("d", [0.0] * 7)
 
 
@@ -282,7 +333,7 @@ class DeltaInfo:
     )
 
     def __init__(self):
-        self.deltaBestData: tuple = DELTA_DEFAULT
+        self.deltaBestData: tuple[tuple[float, float], ...] = DELTA_DEFAULT
         self.deltaBest: float = 0.0
         self.deltaLast: float = 0.0
         self.deltaSession: float = 0.0
@@ -437,6 +488,7 @@ class MappingInfo:
         "elevations",
         "sectors",
         "lastModified",
+        "speedTrapPosition",
         "pitEntryPosition",
         "pitExitPosition",
         "pitLaneLength",
@@ -453,6 +505,7 @@ class MappingInfo:
         self.elevations: tuple[tuple[float, float], ...] | None = None
         self.sectors: tuple[int, int] | None = None
         self.lastModified: float = 0.0
+        self.speedTrapPosition: float = 0.0
         self.pitEntryPosition: float = 0.0
         self.pitExitPosition: float = 0.0
         self.pitLaneLength: float = 0.0
@@ -536,16 +589,16 @@ class VehiclesInfo:
     """Vehicles module output data"""
 
     __slots__ = (
+        "dataSet",
+        "dataSetVersion",
+        "leaderIndex",
+        "playerIndex",
         "totalOutPits",
         "totalInPits",
         "totalStoppedPits",
         "totalPitRequests",
         "totalCompletedLaps",
         "totalVehicles",
-        "leaderIndex",
-        "playerIndex",
-        "dataSet",
-        "dataSetVersion",
         "nearestLine",
         "nearestTraffic",
         "nearestYellowAhead",
@@ -554,18 +607,18 @@ class VehiclesInfo:
     )
 
     def __init__(self):
+        self.dataSet: tuple[VehicleDataSet, ...] = tuple(
+            VehicleDataSet() for _ in range(MAX_VEHICLES)
+        )
+        self.dataSetVersion: int = -1
+        self.leaderIndex: int = 0
+        self.playerIndex: int = -1
         self.totalOutPits: int = 0
         self.totalInPits: int = 0
         self.totalStoppedPits: int = 0
         self.totalPitRequests: int = 0
         self.totalCompletedLaps: int = 0
         self.totalVehicles: int = 0
-        self.leaderIndex: int = 0
-        self.playerIndex: int = -1
-        self.dataSet: tuple[VehicleDataSet, ...] = tuple(
-            VehicleDataSet() for _ in range(MAX_VEHICLES)
-        )
-        self.dataSetVersion: int = -1
         self.nearestLine: float = MAX_METERS
         self.nearestTraffic: float = MAX_SECONDS
         self.nearestYellowAhead: float = MAX_METERS
