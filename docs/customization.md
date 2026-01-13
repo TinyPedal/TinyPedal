@@ -1402,6 +1402,9 @@ Set amount samples for calculating average suspension position, which helps to f
     average_suspension_position_margin
 Set additional margin that cannot exceed the sum of previous `average suspension position` and `margin`. This option is used to minimize the impact of unusual data. Default value is `1` millimeter. Minimum value is limited to `0.1`.
 
+    wheel_lift_off_threshold
+Set millimeter threshold of tyre vertical deflection for detecting lifted wheels. Suspension travel is not calculated from wheel that is lifted off the ground (as below the threshold). Default threshold is `1` millimeter. Set to `-1` to always calculate suspension travel even if wheel is lifted off.
+
 [**`Back to Top`**](#)
 
 
@@ -3476,18 +3479,18 @@ Note, maximum suspension position calculation is handled by [Wheels Module](#whe
 
 Note, suspension travel data calculation is handled by [Wheels Module](#wheels-module), and is not updated while in pit lane, and resets when exiting pit lane.
 
-Static suspension position is measured only while car is stationary on track or in garage stall (no throttle and no steering). Measurement is disabled in pit lane, as car can be lifted by pit crew which would result incorrect readings.
+Static suspension position is measured only while car is stationary on track or in garage stall (neutral gear and no throttle). Measurement is disabled in pit lane, as car can be lifted by pit crew which would result incorrect readings.
 
 A minimum of two laps are required to get sensible readings.
 
     show_total_travel
-Show total travel (millimeter), as the difference between minimum and maximum recorded suspension position.
+Show total travel (millimeter) between minimum and maximum recorded suspension position.
 
     show_bump_travel
-Show bump travel (millimeter), as the difference between static and maximum recorded suspension position. Note, bump travel may not be available if static suspension position was not recorded.
+Show bump travel (millimeter) between static and maximum recorded suspension position. Note, bump travel may not be available if static suspension position was not recorded.
 
     show_rebound_travel
-Show rebound travel (millimeter), as the difference between static and minimum recorded suspension position. Note, rebound travel may not be available if static suspension position was not recorded.
+Show rebound travel (millimeter) between static and minimum recorded suspension position. Note, rebound travel may not be available if static suspension position was not recorded.
 
     show_travel_ratio
 Show travel ratio (percentage) between bump travel and total travel. For example, a `70%` reading indicates 70% of travel is spent in bump, and 30% of travel in rebound. A `50%` reading indicates equal travel in bump and rebound travel.
@@ -3500,6 +3503,9 @@ Show maximum recorded suspension position under compression (millimeter).
 
     show_live_position
 Show current suspension position (millimeter).
+
+    show_live_position_relative_to_static_position
+Show current suspension position (millimeter) relative to static position instead.
 
 [**`Back to Top`**](#)
 

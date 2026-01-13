@@ -510,6 +510,10 @@ class Tyre(ABC):
     def carcass_temperature(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre carcass temperature (Celsius)"""
 
+    @abstractmethod
+    def vertical_deflection(self, index: int | None = None) -> tuple[float, ...]:
+        """Tyre vertical deflection (millimeters)"""
+
 
 class Vehicle(ABC):
     """Vehicle"""

@@ -71,6 +71,7 @@ class Realtime(DataModule):
             output=minfo.wheels,
             average_samples=self.mcfg["average_suspension_position_samples"],
             average_margin=max(self.mcfg["average_suspension_position_margin"], 0.1),
+            wheel_liftoff=self.mcfg["wheel_lift_off_threshold"],
             enable_offroad=self.mcfg["enable_suspension_measurement_while_offroad"]
         )
         gen_cornering_radius = calc_cornering_radius(
@@ -440,7 +441,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
 
 
 @generator_init
-def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_margin: float, enable_offroad: bool):
+def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_margin: float, wheel_liftoff: float, enable_offroad: bool):
     """Calculate suspension travel"""
     last_reset = None  # reset check
     last_offroad_time = 0.0
@@ -463,6 +464,7 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
             max_susp_pos_ema[:] = WHEELS_ZERO
 
         susp_pos_set = api.read.wheel.suspension_deflection()
+        output.currentSuspensionPosition[:] = susp_pos_set
 
         # Record static position
         if (
@@ -470,13 +472,11 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
             and api.read.vehicle.in_paddock() != 1  # ignore while in pit (b/c car can be lifted), but not in garage
             and (enable_offroad or not api.read.wheel.offroad())  # offroad check
             and api.read.inputs.throttle_raw() < 0.01  # no throttle
-            and abs(api.read.inputs.steering_raw()) < 0.02  # limit steering
             and api.read.vehicle.speed() < 0.01  # stationary
         ):
             output.staticSuspensionPosition[:] = susp_pos_set
 
         if last_reset:
-            output.currentSuspensionPosition[:] = susp_pos_set
             continue
 
         elapsed_time = api.read.timing.elapsed()
@@ -492,8 +492,14 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
             or elapsed_time - api.read.vehicle.impact_time() < 3):
             continue
 
+        tyre_deflection_set = api.read.tyre.vertical_deflection()
+
         # Calculate only while not in pit
         for idx, susp_pos in enumerate(susp_pos_set):
+            # Skip if wheel leaves ground (0 tyre deflection)
+            if tyre_deflection_set[idx] < wheel_liftoff:
+                continue
+
             # Min position (under extension)
             if min_susp_pos_ema[idx] == 0:
                 min_susp_pos_ema[idx] = susp_pos
@@ -517,8 +523,7 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
             if max_susp_pos[idx] < max_susp_pos_ema[idx]:
                 max_susp_pos[idx] = max_susp_pos_ema[idx]
 
-            # Output wheels data
-            output.currentSuspensionPosition[idx] = susp_pos
+            # Output position data
             output.minSuspensionPosition[idx] = min_susp_pos[idx]
             output.maxSuspensionPosition[idx] = max_susp_pos[idx]
 

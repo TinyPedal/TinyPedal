@@ -2354,6 +2354,7 @@ WIDGET_DEFAULT = {
         "font_color_maximum_position": "#FF6600",
         "bkg_color_maximum_position": "#222222",
         "show_live_position": True,
+        "show_live_position_relative_to_static_position": True,
         "font_color_live_position": "#22CC22",
         "bkg_color_live_position": "#222222",
         "show_caption": True,

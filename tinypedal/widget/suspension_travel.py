@@ -307,7 +307,10 @@ class Realtime(Overlay):
 
             # Live position
             if self.wcfg["show_live_position"]:
-                self.update_travel(self.bars_live[idx], minfo.wheels.currentSuspensionPosition[idx])
+                live_pos = minfo.wheels.currentSuspensionPosition[idx]
+                if self.wcfg["show_live_position_relative_to_static_position"]:
+                    live_pos -= static_pos
+                self.update_travel(self.bars_live[idx], live_pos)
 
     # GUI update methods
     def update_travel(self, target, data):

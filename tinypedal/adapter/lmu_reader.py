@@ -703,6 +703,16 @@ class Tyre(_reader.Tyre, DataAdapter):
             rmnan(wheel_data[3].mTireCarcassTemperature) - 273.15,
         )
 
+    def vertical_deflection(self, index: int | None = None) -> tuple[float, ...]:
+        """Tyre vertical deflection (millimeters)"""
+        wheel_data = self.shmm.lmuTeleVeh(index).mWheels
+        return (
+            rmnan(wheel_data[0].mVerticalTireDeflection) * 1000,
+            rmnan(wheel_data[1].mVerticalTireDeflection) * 1000,
+            rmnan(wheel_data[2].mVerticalTireDeflection) * 1000,
+            rmnan(wheel_data[3].mVerticalTireDeflection) * 1000,
+        )
+
 
 class Vehicle(_reader.Vehicle, DataAdapter):
     """Vehicle"""

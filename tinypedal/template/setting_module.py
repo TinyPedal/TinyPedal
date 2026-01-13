@@ -106,6 +106,7 @@ MODULE_DEFAULT = {
         "enable_suspension_measurement_while_offroad": False,
         "average_suspension_position_samples": 20,
         "average_suspension_position_margin": 1,
+        "wheel_lift_off_threshold": 1,
         "cornering_radius_sampling_interval": 10,
     },
 }
