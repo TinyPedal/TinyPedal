@@ -748,15 +748,15 @@ class Wheel(ABC):
 
     @abstractmethod
     def ride_height(self, index: int | None = None) -> tuple[float, ...]:
-        """Ride height (convert meters to millmeters)"""
+        """Ride height (convert meters to millimeters)"""
 
     @abstractmethod
     def third_spring_deflection(self, index: int | None = None) -> tuple[float, ...]:
-        """Third spring deflection front & rear (convert meters to millmeters)"""
+        """Third spring deflection front & rear (convert meters to millimeters)"""
 
     @abstractmethod
     def suspension_deflection(self, index: int | None = None) -> tuple[float, ...]:
-        """Suspension deflection (convert meters to millmeters)"""
+        """Suspension deflection (convert meters to millimeters)"""
 
     @abstractmethod
     def suspension_force(self, index: int | None = None) -> tuple[float, ...]:
@@ -768,7 +768,7 @@ class Wheel(ABC):
 
     @abstractmethod
     def position_vertical(self, index: int | None = None) -> tuple[float, ...]:
-        """Vertical wheel position (convert meters to millmeters) related to vehicle"""
+        """Vertical wheel position (convert meters to millimeters) related to vehicle"""
 
     @abstractmethod
     def is_detached(self, index: int | None = None) -> tuple[bool, ...]:

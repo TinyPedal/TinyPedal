@@ -1010,7 +1010,7 @@ class Wheel(_reader.Wheel, DataAdapter):
             wheel_data.mLongitudinalGroundVel))
 
     def ride_height(self, index: int | None = None) -> tuple[float, ...]:
-        """Ride height (convert meters to millmeters)"""
+        """Ride height (convert meters to millimeters)"""
         wheel_data = self.shmm.rf2TeleVeh(index).mWheels
         return (
             rmnan(wheel_data[0].mRideHeight) * 1000,
@@ -1020,14 +1020,14 @@ class Wheel(_reader.Wheel, DataAdapter):
         )
 
     def third_spring_deflection(self, index: int | None = None) -> tuple[float, ...]:
-        """Third spring deflection front & rear (convert meters to millmeters)"""
+        """Third spring deflection front & rear (convert meters to millimeters)"""
         wheel_data = self.shmm.rf2TeleVeh(index)
         front = rmnan(wheel_data.mFront3rdDeflection) * 1000
         rear = rmnan(wheel_data.mRear3rdDeflection) * 1000
         return (front, front, rear, rear)
 
     def suspension_deflection(self, index: int | None = None) -> tuple[float, ...]:
-        """Suspension deflection (convert meters to millmeters)"""
+        """Suspension deflection (convert meters to millimeters)"""
         wheel_data = self.shmm.rf2TeleVeh(index).mWheels
         return (
             rmnan(wheel_data[0].mSuspensionDeflection) * 1000,
@@ -1051,7 +1051,7 @@ class Wheel(_reader.Wheel, DataAdapter):
         return self.rest.telemetry().suspensionDamage
 
     def position_vertical(self, index: int | None = None) -> tuple[float, ...]:
-        """Vertical wheel position (convert meters to millmeters) related to vehicle"""
+        """Vertical wheel position (convert meters to millimeters) related to vehicle"""
         wheel_data = self.shmm.rf2TeleVeh(index).mWheels
         return (
             rmnan(wheel_data[0].mWheelYLocation) * 1000,

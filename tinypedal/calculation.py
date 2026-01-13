@@ -117,7 +117,7 @@ def engine_power(torque: float, rpm: float) -> float:
 
 
 def rake(height_fl: float, height_fr: float, height_rl: float, height_rr: float) -> float:
-    """Raw rake (front & rear ride height difference in millmeters)"""
+    """Raw rake (front & rear ride height difference in millimeters)"""
     return (height_rr + height_rl - height_fr - height_fl) * 0.5
 
 

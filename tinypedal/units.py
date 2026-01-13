@@ -31,7 +31,7 @@ def pass_value(v: float) -> float:
 
 
 # Unit conversion
-def meter_to_millmeter(meter: float) -> float:
+def meter_to_millimeter(meter: float) -> float:
     """Meter to Millimeter"""
     return meter * 1000
 

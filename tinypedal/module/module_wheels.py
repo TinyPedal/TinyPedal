@@ -184,7 +184,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
     is_pit_lap = 0  # whether pit in or pit out lap
     delta_recording = False
     delta_array_raw = [WHEELS_DELTA_DEFAULT]  # distance, wear diff
-    delta_array_last = (WHEELS_DELTA_DEFAULT,)
+    delta_array_last = tuple(delta_array_raw)
     is_valid_delta = False
     pos_last = 0.0  # last checked vehicle position
 
@@ -303,7 +303,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
     is_pit_lap = 0  # whether pit in or pit out lap
     delta_recording = False
     delta_array_raw = [WHEELS_DELTA_DEFAULT]  # distance, wear diff
-    delta_array_last = (WHEELS_DELTA_DEFAULT,)
+    delta_array_last = tuple(delta_array_raw)
     is_valid_delta = False
     pos_last = 0.0  # last checked vehicle position
 
