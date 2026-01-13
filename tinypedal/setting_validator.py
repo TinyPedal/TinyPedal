@@ -28,8 +28,8 @@ from typing import Any, Mapping
 
 from . import regex_pattern as rxp
 from . import version
-from .const_api import API_LMU_CONFIG, API_RF2_CONFIG
 from .const_common import VERSION_NA
+from .setting_preupdate import preupdate_specific_version_setting
 from .template.setting_brakes import BRAKEINFO_DEFAULT
 from .template.setting_classes import CLASSINFO_DEFAULT
 from .template.setting_compounds import COMPOUNDINFO_DEFAULT
@@ -47,13 +47,6 @@ COMMON_STRINGS = "|".join((
 ))
 
 logger = logging.getLogger(__name__)
-
-
-def _rename_key(data: dict, old: str, new: str):
-    """Rename key name"""
-    for key in tuple(data):
-        if old in key:
-            data[key.replace(old, new)] = data.pop(key)
 
 
 def validate_style(dict_user: dict[str, dict], dict_def: Mapping[str, Any]) -> bool:
@@ -263,14 +256,7 @@ class PresetValidator:
             logger.info("PRECHECK: preset version already up to date")
             return
 
-        # Update old setting for specific version
-        if preset_version < (2, 33, 1):
-            _user_prior_2_33_1(dict_user)
-        if preset_version < (2, 36, 0):
-            _user_prior_2_36_0(dict_user)
-        if preset_version < (2, 37, 0):
-            _user_prior_2_37_0(dict_user)
-
+        preupdate_specific_version_setting(preset_version, dict_user)
         logger.info("PRECHECK: preset version updated")
 
     @classmethod
@@ -294,40 +280,3 @@ class PresetValidator:
         for item in dict_user.keys():  # list each key lists
             cls.validate_key_pair(dict_user[item], dict_def[item])
         return dict_user
-
-
-def _user_prior_2_37_0(dict_user: dict):
-    """Update user setting prior to 2.37.0"""
-    # Transfer wheel_alignment setting to new widgets
-    wheel_alignment = dict_user.get("wheel_alignment")
-    if isinstance(wheel_alignment, dict):
-        wheel_alignment["bar_gap"] = 0
-        dict_user["wheel_camber"] = wheel_alignment.copy()
-        dict_user["wheel_toe"] = wheel_alignment.copy()
-        dict_user["wheel_toe"]["position_y"] += 60
-
-
-def _user_prior_2_36_0(dict_user: dict):
-    """Update user setting prior to 2.36.0"""
-    # Copy old telemetry_api setting
-    telemetry_api = dict_user.get("telemetry_api")
-    if isinstance(telemetry_api, dict):
-        dict_user[API_LMU_CONFIG] = telemetry_api.copy()
-        dict_user[API_RF2_CONFIG] = telemetry_api.copy()
-    # Correct default update interval in module_vehicles
-    module_vehicles = dict_user.get("module_vehicles")
-    if isinstance(module_vehicles, dict):
-        if module_vehicles["update_interval"] == 20:
-            module_vehicles["update_interval"] = 10
-
-
-def _user_prior_2_33_1(dict_user: dict):
-    """Update user setting prior to 2.33.1"""
-    # Fix option name typo "predication"
-    relative_finish_order = dict_user.get("relative_finish_order")
-    if isinstance(relative_finish_order, dict):
-        _rename_key(relative_finish_order, "predication", "prediction")
-
-    track_map = dict_user.get("track_map")
-    if isinstance(track_map, dict):
-        _rename_key(track_map, "predication", "prediction")

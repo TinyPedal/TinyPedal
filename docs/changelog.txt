@@ -1,4 +1,4 @@
-WIP
+2.39.0 (2026-01-13)
 -----------------------------
 * Track Info Editor
   - Added "Speed trap" column for customizing speed trap position. To manually set speed trap position at your current on-track position, "Right-Click" on corresponding track's speed trap column and select "Set from Telemetry".
