@@ -7,8 +7,9 @@ WIP
   - Added speed trap recording function.
 
 * Wheels Module
-  - Added suspension travel travel calculation, which is required by "Suspension position" and "Suspension travel" Widgets.
-  - Added "average_suspension_position_samples", "average_suspension_position_margin" options. See User Guide for details.
+  - Added suspension travel calculation, which is required by "Suspension position" and "Suspension travel" Widgets.
+  - Added "enable_suspension_measurement_while_offroad" option, which enables suspension travel measurement while vehicle is offroad. This option should be disabled for road racing for more accurate suspension measurement. This option is disabled by default.
+  - Added "average_suspension_position_samples", "average_suspension_position_margin" options.
 
 * Relative, Rivals, Standings Widget
   - Added "show_speed_trap" option (requested by user "francescodg"), which shows fastest recorded speed of each driver per lap at user-defined speed trap position on track. This option can be useful to keep track of each driver's straight line performance from most recent lap.
@@ -30,10 +31,15 @@ WIP
   - Added "maximum_position_range_size", "maximum_position_range_color" options.
 
 * [New]Suspension travel Widget
-  - Show total utilized suspension travel (millimeter).
+  - Show total travel (millimeter), as the difference between minimum and maximum recorded suspension position.
+  - Show bump travel (millimeter), as the difference between static and maximum recorded suspension position.
+  - Show rebound travel (millimeter), as the difference between static and minimum recorded suspension position.
+  - Show travel ratio (percentage) between bump travel and total travel.
   - Show minimum recorded suspension position under extension (millimeter).
   - Show maximum recorded suspension position under compression (millimeter).
   - Show current suspension position (millimeter).
+  - Note, static suspension position is measured only while car is stationary on track or in garage stall (no throttle and no steering). Measurement is disabled in pit lane, as car can be lifted by pit crew which would result incorrect readings. 
+    Bump or rebound travel may not be available if static suspension position was not recorded.
 
 * Misc
   - Added "caption_text" options for "Brake wear", "Suspension travel", "Tyre wear" Widgets.

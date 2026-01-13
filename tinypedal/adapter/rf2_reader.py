@@ -1070,7 +1070,7 @@ class Wheel(_reader.Wheel, DataAdapter):
             wheel_data[3].mDetached,
         )
 
-    def is_offroad(self, index: int | None = None) -> bool:
-        """Whether all wheels are complete offroad"""
+    def offroad(self, index: int | None = None) -> int:
+        """Number of wheels currently off the road"""
         wheel_data = self.shmm.rf2TeleVeh(index).mWheels
-        return all(2 <= data.mSurfaceType <= 4 for data in wheel_data)
+        return sum(2 <= data.mSurfaceType <= 4 for data in wheel_data)

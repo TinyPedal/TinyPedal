@@ -103,6 +103,7 @@ MODULE_DEFAULT = {
         "maximum_rotation_difference_front": 0.002,
         "maximum_rotation_difference_rear": 0.002,
         "minimum_delta_distance": 5,
+        "enable_suspension_measurement_while_offroad": False,
         "average_suspension_position_samples": 20,
         "average_suspension_position_margin": 1,
         "cornering_radius_sampling_interval": 10,

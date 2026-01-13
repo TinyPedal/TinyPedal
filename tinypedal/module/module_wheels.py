@@ -71,6 +71,7 @@ class Realtime(DataModule):
             output=minfo.wheels,
             average_samples=self.mcfg["average_suspension_position_samples"],
             average_margin=max(self.mcfg["average_suspension_position_margin"], 0.1),
+            enable_offroad=self.mcfg["enable_suspension_measurement_while_offroad"]
         )
         gen_cornering_radius = calc_cornering_radius(
             output=minfo.wheels,
@@ -439,14 +440,15 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
 
 
 @generator_init
-def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_margin: float):
+def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_margin: float, enable_offroad: bool):
     """Calculate suspension travel"""
     last_reset = None  # reset check
+    last_offroad_time = 0.0
 
-    min_pos = [FLOAT_INF] * 4
-    max_pos = [-FLOAT_INF] * 4
-    min_avg_pos_ema = list(WHEELS_ZERO)
-    max_avg_pos_ema = list(WHEELS_ZERO)
+    min_susp_pos = [FLOAT_INF] * 4
+    max_susp_pos = [-FLOAT_INF] * 4
+    min_susp_pos_ema = list(WHEELS_ZERO)
+    max_susp_pos_ema = list(WHEELS_ZERO)
     d_factor = calc.ema_factor(average_samples, 3)
 
     while True:
@@ -455,47 +457,70 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
         # Reset
         if last_reset != reset:
             last_reset = reset
-            min_avg_pos_ema[:] = WHEELS_ZERO
-            max_avg_pos_ema[:] = WHEELS_ZERO
-            min_pos[:] = (FLOAT_INF, FLOAT_INF, FLOAT_INF, FLOAT_INF)
-            max_pos[:] = (-FLOAT_INF, -FLOAT_INF, -FLOAT_INF, -FLOAT_INF)
+            min_susp_pos[:] = (FLOAT_INF, FLOAT_INF, FLOAT_INF, FLOAT_INF)
+            max_susp_pos[:] = (-FLOAT_INF, -FLOAT_INF, -FLOAT_INF, -FLOAT_INF)
+            min_susp_pos_ema[:] = WHEELS_ZERO
+            max_susp_pos_ema[:] = WHEELS_ZERO
 
         susp_pos_set = api.read.wheel.suspension_deflection()
+
+        # Record static position
+        if (
+            api.read.engine.gear() == 0  # neutral gear
+            and api.read.vehicle.in_paddock() != 1  # ignore while in pit (b/c car can be lifted), but not in garage
+            and (enable_offroad or not api.read.wheel.offroad())  # offroad check
+            and api.read.inputs.throttle_raw() < 0.01  # no throttle
+            and abs(api.read.inputs.steering_raw()) < 0.02  # limit steering
+            and api.read.vehicle.speed() < 0.01  # stationary
+        ):
+            output.staticSuspensionPosition[:] = susp_pos_set
 
         if last_reset:
             output.currentSuspensionPosition[:] = susp_pos_set
             continue
 
+        elapsed_time = api.read.timing.elapsed()
+
+        # Offroad check
+        if not enable_offroad and api.read.wheel.offroad():
+            last_offroad_time = elapsed_time
+        if last_offroad_time > elapsed_time:
+            last_offroad_time = elapsed_time
+
+        # Skip for incident in last 3 seconds
+        if (elapsed_time - last_offroad_time < 3
+            or elapsed_time - api.read.vehicle.impact_time() < 3):
+            continue
+
         # Calculate only while not in pit
         for idx, susp_pos in enumerate(susp_pos_set):
             # Min position (under extension)
-            if min_avg_pos_ema[idx] == 0:
-                min_avg_pos_ema[idx] = susp_pos
+            if min_susp_pos_ema[idx] == 0:
+                min_susp_pos_ema[idx] = susp_pos
 
-            min_avg_pos_ema[idx] = max(
-                calc.exp_mov_avg(d_factor, min_avg_pos_ema[idx], susp_pos),
-                min_avg_pos_ema[idx] - average_margin,
+            min_susp_pos_ema[idx] = max(
+                calc.exp_mov_avg(d_factor, min_susp_pos_ema[idx], susp_pos),
+                min_susp_pos_ema[idx] - average_margin,
             )
-            if min_pos[idx] > min_avg_pos_ema[idx]:
-                min_pos[idx] = min_avg_pos_ema[idx]
+            if min_susp_pos[idx] > min_susp_pos_ema[idx]:
+                min_susp_pos[idx] = min_susp_pos_ema[idx]
 
             # Max position (under compression)
-            if max_avg_pos_ema[idx] == 0:
-                max_avg_pos_ema[idx] = susp_pos
+            if max_susp_pos_ema[idx] == 0:
+                max_susp_pos_ema[idx] = susp_pos
 
-            max_avg_pos_ema[idx] = min(
-                calc.exp_mov_avg(d_factor, max_avg_pos_ema[idx], susp_pos),
-                max_avg_pos_ema[idx] + average_margin,
+            max_susp_pos_ema[idx] = min(
+                calc.exp_mov_avg(d_factor, max_susp_pos_ema[idx], susp_pos),
+                max_susp_pos_ema[idx] + average_margin,
             )
 
-            if max_pos[idx] < max_avg_pos_ema[idx]:
-                max_pos[idx] = max_avg_pos_ema[idx]
+            if max_susp_pos[idx] < max_susp_pos_ema[idx]:
+                max_susp_pos[idx] = max_susp_pos_ema[idx]
 
             # Output wheels data
             output.currentSuspensionPosition[idx] = susp_pos
-            output.minSuspensionPosition[idx] = min_pos[idx]
-            output.maxSuspensionPosition[idx] = max_pos[idx]
-            output.utilizedSuspensionTravel[idx] = max_pos[idx] - min_pos[idx]
+            output.minSuspensionPosition[idx] = min_susp_pos[idx]
+            output.maxSuspensionPosition[idx] = max_susp_pos[idx]
 
 
 @generator_init

@@ -54,34 +54,121 @@ class Realtime(Overlay):
             font_size=int(self.wcfg['font_size'] * 0.8)
         )
 
-        # Utilized travel
-        if self.wcfg["show_utilized_travel"]:
-            layout_travel = self.set_grid_layout()
-            bar_style_travel = self.set_qss(
-                fg_color=self.wcfg["font_color_utilized_travel"],
-                bg_color=self.wcfg["bkg_color_utilized_travel"]
+        # Total travel
+        if self.wcfg["show_total_travel"]:
+            layout_total = self.set_grid_layout()
+            bar_style_total = self.set_qss(
+                fg_color=self.wcfg["font_color_total_travel"],
+                bg_color=self.wcfg["bkg_color_total_travel"]
             )
-            self.bars_travel = self.set_qlabel(
+            self.bars_total = self.set_qlabel(
                 text=TEXT_NA,
-                style=bar_style_travel,
+                style=bar_style_total,
                 width=bar_width,
                 count=4,
             )
             self.set_grid_layout_quad(
-                layout=layout_travel,
-                targets=self.bars_travel,
+                layout=layout_total,
+                targets=self.bars_total,
             )
             self.set_primary_orient(
-                target=layout_travel,
-                column=self.wcfg["column_index_utilized_travel"],
+                target=layout_total,
+                column=self.wcfg["column_index_total_travel"],
             )
 
             if self.wcfg["show_caption"]:
-                cap_travel = self.set_qlabel(
-                    text=self.wcfg["caption_text_utilized_travel"],
+                cap_total = self.set_qlabel(
+                    text=self.wcfg["caption_text_total_travel"],
                     style=bar_style_desc,
                 )
-                layout_travel.addWidget(cap_travel, 0, 0, 1, 0)
+                layout_total.addWidget(cap_total, 0, 0, 1, 0)
+
+        # Bump travel
+        if self.wcfg["show_bump_travel"]:
+            layout_bump = self.set_grid_layout()
+            bar_style_bump = self.set_qss(
+                fg_color=self.wcfg["font_color_bump_travel"],
+                bg_color=self.wcfg["bkg_color_bump_travel"]
+            )
+            self.bars_bump = self.set_qlabel(
+                text=TEXT_NA,
+                style=bar_style_bump,
+                width=bar_width,
+                count=4,
+            )
+            self.set_grid_layout_quad(
+                layout=layout_bump,
+                targets=self.bars_bump,
+            )
+            self.set_primary_orient(
+                target=layout_bump,
+                column=self.wcfg["column_index_bump_travel"],
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_bump = self.set_qlabel(
+                    text=self.wcfg["caption_text_bump_travel"],
+                    style=bar_style_desc,
+                )
+                layout_bump.addWidget(cap_bump, 0, 0, 1, 0)
+
+        # Rebound travel
+        if self.wcfg["show_rebound_travel"]:
+            layout_rebound = self.set_grid_layout()
+            bar_style_rebound = self.set_qss(
+                fg_color=self.wcfg["font_color_rebound_travel"],
+                bg_color=self.wcfg["bkg_color_rebound_travel"]
+            )
+            self.bars_rebound = self.set_qlabel(
+                text=TEXT_NA,
+                style=bar_style_rebound,
+                width=bar_width,
+                count=4,
+            )
+            self.set_grid_layout_quad(
+                layout=layout_rebound,
+                targets=self.bars_rebound,
+            )
+            self.set_primary_orient(
+                target=layout_rebound,
+                column=self.wcfg["column_index_rebound_travel"],
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_rebound = self.set_qlabel(
+                    text=self.wcfg["caption_text_rebound_travel"],
+                    style=bar_style_desc,
+                )
+                layout_rebound.addWidget(cap_rebound, 0, 0, 1, 0)
+
+        # Travel ratio
+        if self.wcfg["show_travel_ratio"]:
+            layout_ratio = self.set_grid_layout()
+            bar_style_ratio = self.set_qss(
+                fg_color=self.wcfg["font_color_travel_ratio"],
+                bg_color=self.wcfg["bkg_color_travel_ratio"]
+            )
+            self.bars_ratio = self.set_qlabel(
+                text=TEXT_NA,
+                style=bar_style_ratio,
+                width=bar_width,
+                count=4,
+            )
+            self.set_grid_layout_quad(
+                layout=layout_ratio,
+                targets=self.bars_ratio,
+            )
+            self.set_primary_orient(
+                target=layout_ratio,
+                column=self.wcfg["column_index_travel_ratio"],
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_ratio = self.set_qlabel(
+                    text=self.wcfg["caption_text_travel_ratio"],
+                    style=bar_style_desc,
+                )
+                layout_ratio.addWidget(cap_ratio, 0, 0, 1, 0)
 
         # Minimum position
         if self.wcfg["show_minimum_position"]:
@@ -173,17 +260,50 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         for idx in range(4):
-            # Utilized travel
-            if self.wcfg["show_utilized_travel"]:
-                self.update_travel(self.bars_travel[idx], minfo.wheels.utilizedSuspensionTravel[idx])
+            min_pos = minfo.wheels.minSuspensionPosition[idx]
+            max_pos = minfo.wheels.maxSuspensionPosition[idx]
+            static_pos = minfo.wheels.staticSuspensionPosition[idx]
+
+            total_travel = max_pos - min_pos
+
+            if static_pos != 0 and static_pos < max_pos:
+                bump_travel = max_pos - static_pos
+            else:
+                bump_travel = 0
+
+            if static_pos != 0 and static_pos > min_pos:
+                rebound_travel = static_pos - min_pos
+            else:
+                rebound_travel = 0
+
+            if total_travel > 0 and total_travel >= bump_travel:
+                travel_ratio = bump_travel / total_travel
+            else:
+                travel_ratio = 0
+
+            # Total travel
+            if self.wcfg["show_total_travel"]:
+                self.update_travel(self.bars_total[idx], total_travel)
+
+            # Bump travel
+            if self.wcfg["show_bump_travel"]:
+                self.update_travel(self.bars_bump[idx], bump_travel)
+
+            # Rebound travel
+            if self.wcfg["show_rebound_travel"]:
+                self.update_travel(self.bars_rebound[idx], rebound_travel)
+
+            # Travel ratio
+            if self.wcfg["show_travel_ratio"]:
+                self.update_ratio(self.bars_ratio[idx], travel_ratio)
 
             # Minimum position
             if self.wcfg["show_minimum_position"]:
-                self.update_travel(self.bars_minpos[idx], minfo.wheels.minSuspensionPosition[idx])
+                self.update_travel(self.bars_minpos[idx], min_pos)
 
             # Maximum position
             if self.wcfg["show_maximum_position"]:
-                self.update_travel(self.bars_maxpos[idx], minfo.wheels.maxSuspensionPosition[idx])
+                self.update_travel(self.bars_maxpos[idx], max_pos)
 
             # Live position
             if self.wcfg["show_live_position"]:
@@ -195,3 +315,9 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.setText(f"{data:.2f}"[:4].strip("."))
+
+    def update_ratio(self, target, data):
+        """Travel ratio"""
+        if target.last != data:
+            target.last = data
+            target.setText(f"{data:.0%}")

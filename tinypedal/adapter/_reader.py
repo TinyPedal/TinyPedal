@@ -775,5 +775,5 @@ class Wheel(ABC):
         """Whether wheel is detached"""
 
     @abstractmethod
-    def is_offroad(self, index: int | None = None) -> bool:
-        """Whether all wheels are complete offroad"""
+    def offroad(self, index: int | None = None) -> int:
+        """Number of wheels currently off the road"""

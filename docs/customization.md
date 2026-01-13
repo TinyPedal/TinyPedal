@@ -1393,6 +1393,9 @@ Set position sampling interval for cornering radius calculation. Value range in 
     minimum_delta_distance
 Set minimum recording distance (in meters) between each tyre wear sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
 
+    enable_suspension_measurement_while_offroad
+Enable suspension travel measurement while vehicle is offroad. This option should be disabled for road racing for more accurate suspension measurement. This option is disabled by default.
+
     average_suspension_position_samples
 Set amount samples for calculating average suspension position, which helps to filter out unusual data. Default is `20`. Minimum value is limited to `3`.
 
@@ -3471,10 +3474,23 @@ Note, maximum suspension position calculation is handled by [Wheels Module](#whe
 ## Suspension travel
 **This widget displays suspension travel info.**
 
-Note, suspension travel data calculation is handled by [Wheels Module](#wheels-module), and is not updated while in pit lane, and resets when exiting pit lane. A minimum of two laps are required to get sensible readings.
+Note, suspension travel data calculation is handled by [Wheels Module](#wheels-module), and is not updated while in pit lane, and resets when exiting pit lane.
 
-    show_utilized_travel
-Show total utilized suspension travel (millimeter), which is calculated from minimum and maximum recorded suspension position.
+Static suspension position is measured only while car is stationary on track or in garage stall (no throttle and no steering). Measurement is disabled in pit lane, as car can be lifted by pit crew which would result incorrect readings.
+
+A minimum of two laps are required to get sensible readings.
+
+    show_total_travel
+Show total travel (millimeter), as the difference between minimum and maximum recorded suspension position.
+
+    show_bump_travel
+Show bump travel (millimeter), as the difference between static and maximum recorded suspension position. Note, bump travel may not be available if static suspension position was not recorded.
+
+    show_rebound_travel
+Show rebound travel (millimeter), as the difference between static and minimum recorded suspension position. Note, rebound travel may not be available if static suspension position was not recorded.
+
+    show_travel_ratio
+Show travel ratio (percentage) between bump travel and total travel. For example, a `70%` reading indicates 70% of travel is spent in bump, and 30% of travel in rebound. A `50%` reading indicates equal travel in bump and rebound travel.
 
     show_minimum_position
 Show minimum recorded suspension position under extension (millimeter).

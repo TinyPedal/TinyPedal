@@ -647,9 +647,9 @@ class WheelsInfo:
         "estimatedBrakeWear",
         "estimatedValidBrakeWear",
         "currentSuspensionPosition",
+        "staticSuspensionPosition",
         "minSuspensionPosition",
         "maxSuspensionPosition",
-        "utilizedSuspensionTravel",
     )
 
     def __init__(self):
@@ -670,9 +670,9 @@ class WheelsInfo:
         self.estimatedBrakeWear: list[float] = list(WHEELS_ZERO)
         self.estimatedValidBrakeWear: list[float] = list(WHEELS_ZERO)
         self.currentSuspensionPosition: list[float] = list(WHEELS_ZERO)
+        self.staticSuspensionPosition: list[float] = list(WHEELS_ZERO)
         self.minSuspensionPosition: list[float] = list(WHEELS_ZERO)
         self.maxSuspensionPosition: list[float] = list(WHEELS_ZERO)
-        self.utilizedSuspensionTravel: list[float] = list(WHEELS_ZERO)
 
 
 class ModuleInfo:
