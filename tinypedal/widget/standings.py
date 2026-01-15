@@ -72,10 +72,13 @@ class Realtime(Overlay):
         self.bar_split_style = f"margin-top:{self.wcfg['split_gap']}px;max-height:0;"
 
         # Max display players
-        if self.wcfg["enable_multi_class_split_mode"]:
-            self.veh_range = min(max(int(self.wcfg["max_vehicles_split_mode"]), 5), 126)
+        if self.wcfg["enable_single_class_exclusive_mode"]:
+            max_display_vehicles = self.wcfg["max_vehicles_exclusive_mode"]
+        elif self.wcfg["enable_multi_class_split_mode"]:
+            max_display_vehicles = self.wcfg["max_vehicles_split_mode"]
         else:
-            self.veh_range = min(max(int(self.wcfg["max_vehicles_combined_mode"]), 5), 126)
+            max_display_vehicles = self.wcfg["max_vehicles_combined_mode"]
+        self.veh_range = min(max(int(max_display_vehicles), 5), 126)
         self.pixmap_brandlogo = {}
         self.row_visible = [False] * self.veh_range
 

@@ -70,6 +70,7 @@ class Realtime(DataModule):
                 if last_version_update != self.cfg.version_update:
                     last_version_update = self.cfg.version_update
                     show_in_garage = setting_relative["show_vehicle_in_garage"]
+                    is_exclusive_mode = setting_standings["enable_single_class_exclusive_mode"]
                     is_split_mode = setting_standings["enable_multi_class_split_mode"]
                     max_veh_front = max_relative_vehicles(
                         setting_relative["additional_players_front"])
@@ -77,7 +78,9 @@ class Realtime(DataModule):
                         setting_relative["additional_players_behind"])
                     min_top_veh = min_top_vehicles_in_class(
                         setting_standings["min_top_vehicles"])
-                    veh_limit_all = max_vehicles_in_class(
+                    veh_limit_exclusive = max_vehicles_in_class(
+                        setting_standings["max_vehicles_exclusive_mode"], min_top_veh, 2)
+                    veh_limit_combined = max_vehicles_in_class(
                         setting_standings["max_vehicles_combined_mode"], min_top_veh, 2)
                     veh_limit_other = max_vehicles_in_class(
                         setting_standings["max_vehicles_per_split_others"], min_top_veh, 0)
@@ -102,14 +105,18 @@ class Realtime(DataModule):
                     classes_list, plr_index)
 
                 # Create standings index list
-                if is_split_mode and is_multi_class:
-                    standings_index_list = list(chain(*list(create_class_standings_index(
+                if is_exclusive_mode:  # single class exclusive list
+                    standings_index_list = standings_index_from_same_class(
+                        min_top_veh, class_pos_list, plr_class_name, plr_class_place,
+                        veh_limit_exclusive)
+                elif is_split_mode and is_multi_class:  # multi-class split list
+                    standings_index_list = list(chain(*list(standings_index_from_all_classes(
                         min_top_veh, class_pos_list, plr_class_name, plr_class_place,
                         veh_limit_other, veh_limit_player))))
-                else:
+                else:  # mixed class list
                     classes_list.sort(key=itemgetter(1))  # sort by overall position
                     standings_index_list = calc_standings_index(
-                        min_top_veh, veh_limit_all, plr_place, classes_list, 2)
+                        min_top_veh, veh_limit_combined, plr_place, classes_list, 2)
 
                 # Sort vehicle class position list (by player index) for output
                 class_pos_list.sort()
@@ -294,10 +301,10 @@ def create_position_in_class(sorted_veh_class: list, plr_index: int):
     return TEMP_CLASSES_POS[:veh_total], plr_class_name, plr_class_place
 
 
-def create_class_standings_index(
+def standings_index_from_all_classes(
     min_top_veh: int, class_pos_list: list, plr_class_name: str, plr_class_place: int,
     veh_limit_other: int, veh_limit_player: int):
-    """Generate class standings index list from class list collection"""
+    """Generate class standings index list from all classes"""
     class_collection = sorted(split_class_list(class_pos_list), key=sort_class_collection)
     for class_list in class_collection:
         if plr_class_name == class_list[0][2]:  # match class name
@@ -307,6 +314,16 @@ def create_class_standings_index(
             veh_limit = veh_limit_other
             plr_place = 0
         yield calc_standings_index(min_top_veh, veh_limit, plr_place, class_list, 0)
+
+
+def standings_index_from_same_class(
+    min_top_veh: int, class_pos_list: list, plr_class_name: str, plr_class_place: int,
+    veh_limit_player: int):
+    """Generate class standings index list from same class only"""
+    class_list = list(class_data for class_data in class_pos_list if plr_class_name == class_data[2])
+    if not class_list:
+        return [-1]
+    return calc_standings_index(min_top_veh, veh_limit_player, plr_class_place, class_list, 0)
 
 
 def calc_standings_index(

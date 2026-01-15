@@ -1,3 +1,9 @@
+WIP
+-----------------------------
+* Standings Widget
+  - Added "enable_single_class_exclusive_mode" option (requested by user "omenek159"), which enables single-class exclusive mode that displays vehicles from player's class only. This mode takes priority over all other display mode.
+  - Added "max_vehicles_exclusive_mode" option, which sets maximum amount vehicles to display when "enable_single_class_exclusive_mode" is enabled.
+
 2.39.0 (2026-01-13)
 -----------------------------
 * Track Info Editor

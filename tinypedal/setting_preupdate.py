@@ -32,10 +32,10 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 39, 0), _user_prior_2_39_0),
-        ((2, 37, 0), _user_prior_2_37_0),
-        ((2, 36, 0), _user_prior_2_36_0),
-        ((2, 33, 1), _user_prior_2_33_1),
+        ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
+        ((2, 37, 0), _user_prior_2_37_0),  # 2025-12-24
+        ((2, 36, 0), _user_prior_2_36_0),  # 2025-12-13
+        ((2, 33, 1), _user_prior_2_33_1),  # 2025-08-22
     )
     for _version, _update in reversed(target_versions):
         if preset_version < _version:

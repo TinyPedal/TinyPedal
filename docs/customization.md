@@ -3268,17 +3268,23 @@ Set cooldown duration (seconds) before resetting minimum or maximum speed value.
 
 Note, most options are inherited from [Relative](#relative) widget, with some additions noted below.
 
-    max_vehicles_combined_mode
-Set maximum amount vehicles to display, which takes effect when `enable_multi_class_split_mode` is not enabled. When total vehicle number is lower than this value, extra rows will auto-hide. When total vehicle number is above this value, the top 3 vehicles will always show, and rest of the vehicles will be selected from the nearest front and behind places related to player.
-
-    max_vehicles_split_mode
-Set maximum amount vehicles to display, which takes effect when in multi-class session and `enable_multi_class_split_mode` is enabled. If total vehicle number is above this value, any extra vehicles will not be shown. Default is `50`, which is sufficient in most case.
-
-    min_top_vehicles
-Set minimum amount top place vehicles to display. This value has higher priority than other `max_vehicles` settings. Default is `3`, which always shows top 3 vehicles if present.
+    enable_single_class_exclusive_mode
+Enable single-class exclusive mode, which displays vehicles from player's class only. This mode takes priority over all other display mode.
 
     enable_multi_class_split_mode
 Enable multi-class split mode, which splits and displays each vehicle class in separated groups. This mode will only take effect when there is more than one vehicle class present in a session, otherwise it will automatically fall back to normal single class mode.
+
+    min_top_vehicles
+Set minimum amount top place vehicles to display. This value has higher priority over other `max_vehicles` settings. Default is `3`, which always shows top 3 vehicles if present.
+
+    max_vehicles_exclusive_mode
+Set maximum amount vehicles to display in exclusive mode, which takes effect when `enable_single_class_exclusive_mode` is enabled.
+
+    max_vehicles_combined_mode
+Set maximum amount vehicles to display in combined mode, which takes effect when `enable_multi_class_split_mode` is not enabled. When total vehicle number is lower than this value, extra rows will auto-hide. When total vehicle number is above this value, the top 3 vehicles will always show, and rest of the vehicles will be selected from the nearest front and behind places related to player.
+
+    max_vehicles_split_mode
+Set maximum amount vehicles to display in split mode, which takes effect when in multi-class session and `enable_multi_class_split_mode` is enabled. If total vehicle number is above this value, any extra vehicles will not be shown. Default is `50`, which is sufficient in most case.
 
     max_vehicles_per_split_player
 Set maximum amount vehicles to display for class where player is in. Default is `7`. Note that, if player is not in first place, then at least one opponent ahead of player will always be displayed, even if this value sets lower.
