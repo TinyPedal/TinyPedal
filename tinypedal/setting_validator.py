@@ -22,14 +22,13 @@ Setting validator function
 
 from __future__ import annotations
 
-import logging
 import re
 from typing import Any, Mapping
 
 from . import regex_pattern as rxp
 from . import version
 from .const_common import VERSION_NA
-from .setting_preupdate import preupdate_specific_version_setting
+from .setting_preupdate import preupdate_specific_version
 from .template.setting_brakes import BRAKEINFO_DEFAULT
 from .template.setting_classes import CLASSINFO_DEFAULT
 from .template.setting_compounds import COMPOUNDINFO_DEFAULT
@@ -45,8 +44,6 @@ COMMON_STRINGS = "|".join((
     rxp.CFG_USER_IMAGE,
     rxp.CFG_STRING,
 ))
-
-logger = logging.getLogger(__name__)
 
 
 def validate_style(dict_user: dict[str, dict], dict_def: Mapping[str, Any]) -> bool:
@@ -252,12 +249,8 @@ class PresetValidator:
 
         # Skip check if already newest version
         build_version = parse_version_string(version.__version__)
-        if preset_version > VERSION_NA and preset_version >= build_version:
-            logger.info("PRECHECK: preset version already up to date")
-            return
-
-        preupdate_specific_version_setting(preset_version, dict_user)
-        logger.info("PRECHECK: preset version updated")
+        if preset_version == VERSION_NA or preset_version < build_version:
+            preupdate_specific_version(preset_version, dict_user)
 
     @classmethod
     def global_preset(cls, dict_user: dict, dict_def: dict) -> dict:

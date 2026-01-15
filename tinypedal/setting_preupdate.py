@@ -22,19 +22,25 @@ Setting pre update function
 
 from __future__ import annotations
 
-from .const_api import API_LMU_CONFIG, API_RF2_CONFIG
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-def preupdate_specific_version_setting(preset_version: tuple[int, int, int], dict_user: dict):
+def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: dict):
     """Pre update old setting from specific version"""
-    if preset_version < (2, 33, 1):
-        _user_prior_2_33_1(dict_user)
-    if preset_version < (2, 36, 0):
-        _user_prior_2_36_0(dict_user)
-    if preset_version < (2, 37, 0):
-        _user_prior_2_37_0(dict_user)
-    if preset_version < (2, 39, 0):
-        _user_prior_2_39_0(dict_user)
+    # Create target version and update function list
+    # Very old version may be removed later
+    target_versions = (
+        ((2, 39, 0), _user_prior_2_39_0),
+        ((2, 37, 0), _user_prior_2_37_0),
+        ((2, 36, 0), _user_prior_2_36_0),
+        ((2, 33, 1), _user_prior_2_33_1),
+    )
+    for _version, _update in reversed(target_versions):
+        if preset_version < _version:
+            _update(dict_user)
+            logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
 def _user_prior_2_39_0(dict_user: dict):
@@ -61,8 +67,8 @@ def _user_prior_2_36_0(dict_user: dict):
     # Copy old telemetry_api setting
     telemetry_api = dict_user.get("telemetry_api")
     if isinstance(telemetry_api, dict):
-        dict_user[API_LMU_CONFIG] = telemetry_api.copy()
-        dict_user[API_RF2_CONFIG] = telemetry_api.copy()
+        dict_user["api_lmu"] = telemetry_api.copy()
+        dict_user["api_rf2"] = telemetry_api.copy()
     # Correct default update interval in module_vehicles
     module_vehicles = dict_user.get("module_vehicles")
     if isinstance(module_vehicles, dict):
