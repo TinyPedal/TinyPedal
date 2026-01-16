@@ -22,6 +22,7 @@ Relative module
 
 from __future__ import annotations
 
+from functools import lru_cache
 from itertools import chain
 from operator import itemgetter
 
@@ -131,6 +132,7 @@ class Realtime(DataModule):
                 if reset:
                     reset = False
                     update_interval = self.idle_interval
+                    create_reference_place.cache_clear()
 
 
 def get_vehicles_info(veh_total: int, plr_index: int, show_in_garage: bool):
@@ -335,6 +337,7 @@ def calc_standings_index(
     return list(standings_index_from_place_reference(ref_place_list, class_index_list, veh_total, column))
 
 
+@lru_cache(maxsize=20)
 def create_reference_place(
     min_top_veh: int, veh_total: int, plr_place: int, veh_limit: int):
     """Create reference place list"""

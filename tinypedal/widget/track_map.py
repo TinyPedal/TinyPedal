@@ -83,8 +83,10 @@ class Realtime(Overlay):
             self.show_while_requested = self.wcfg["show_pitout_prediction_while_requested_pitstop"]
             self.prediction_count = min(max(self.wcfg["number_of_prediction"], 1), 20)
             self.pitout_time_offset = max(self.wcfg["pitout_time_offset"], 0)
-            self.min_pit_time = self.wcfg["pitstop_duration_minimum"] + self.pitout_time_offset
-            self.pit_time_increment = max(self.wcfg["pitstop_duration_increment"], 1)
+            self.min_pit_time = self.wcfg["pitout_duration_minimum"] + self.pitout_time_offset
+            self.pit_time_increment = max(self.wcfg["pitout_duration_increment"], 1)
+            if self.wcfg["enabled_fixed_pitout_prediction"]:
+                self.fixed_pit_times = tuple(sorted(set(self.set_fixed_pit_time())))
             self.pen_pit_styles = (
                 self.set_veh_pen_style(self.wcfg["prediction_outline_color"], self.wcfg["prediction_outline_width"]),
                 QPen(self.wcfg["font_color_pitstop_duration"]),
@@ -392,7 +394,8 @@ class Realtime(Overlay):
         pitout_time_extend = pit_timer + pitout_time
 
         painter.setBrush(Qt.NoBrush)
-        for _ in range(self.prediction_count):
+
+        for target_pit_time in self.get_target_pit_time(target_pit_time, pit_timer):
             # Calc estimated pitout_time_into based on laptime_pace
             offset_time_into = pitout_time_extend - target_pit_time
             pitout_time_into = (offset_time_into - offset_time_into // laptime_pace * laptime_pace) * laptime_scale
@@ -423,8 +426,34 @@ class Realtime(Overlay):
                 text_time = f"{min(target_pit_time - self.pitout_time_offset, 999):.0f}"
                 painter.drawText(self.pit_text_shape, Qt.AlignCenter, text_time)
 
-            target_pit_time += self.pit_time_increment
             painter.resetTransform()
+
+    def get_target_pit_time(self, target_pit_time: float, pit_timer: float):
+        """Generate target pit time"""
+        # Fixed time
+        if self.wcfg["enabled_fixed_pitout_prediction"]:
+            pass_time = minfo.mapping.pitPassTime
+            valid_count = 0
+            for fixed_time in self.fixed_pit_times:
+                if valid_count >= self.prediction_count:
+                    break
+                fixed_time += pass_time
+                if fixed_time > pit_timer:
+                    valid_count += 1
+                    yield fixed_time
+        # Auto incremented time
+        else:
+            for idx in range(self.prediction_count):
+                if idx > 0:
+                    target_pit_time += self.pit_time_increment
+                yield target_pit_time
+
+    def set_fixed_pit_time(self):
+        """Set fixed target pit time"""
+        for idx in range(1, 11):
+            fixed_time = self.wcfg[f"fixed_pitstop_duration_{idx}"]
+            if fixed_time >= 0:
+                yield fixed_time + self.pitout_time_offset
 
     def classes_style(self, class_name: str) -> str:
         """Get vehicle class style from brush cache"""

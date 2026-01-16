@@ -2162,7 +2162,7 @@ Remaining fuel in tank.
     *refuel
 Estimated refueling reading, which is the total amount additional fuel required to finish race.
 
-Note, for `relative refueling` (`show_absolute_refueling` disabled), positive value indicates additional refueling and pit-stop would be required, while negative value indicates total remaining fuel at the end of race, and no extra pit-stop required. For example, a `-1.5` value indicates `1.5` remaining fuel after crossed finish line.
+Note, for `relative refueling` (`show_absolute_refueling` disabled), positive value indicates additional refueling and pit stop would be required, while negative value indicates total remaining fuel at the end of race, and no extra pit stop required. For example, a `-1.5` value indicates `1.5` remaining fuel after crossed finish line.
 
 For `absolute refueling` (`show_absolute_refueling` enabled), total remaining fuel at the end of race can be found by subtracting `refuel` value from `remain` value. For example, `6` (remain column) - `4.5` (refuel column) = `1.5` remaining fuel after crossed finish line.
 
@@ -3347,13 +3347,13 @@ Show remaining virtual energy reading in percentage from each driver, with 4 dif
 
 **Known limitation with remaining virtual energy readings**
 
-Currently, remaining virtual energy data from `LMU's Rest API` is updated only when driver completes a lap, which means the data from API will not change during a lap, but only at the moment a lap is done by a driver. And due to this, the data will not tell how much energy was refilled in pit until the driver finished his pit out lap. This makes the data less useful by itself.
+Currently, remaining virtual energy data from `LMU's Rest API` is updated only when driver completes a lap, which means the data from API will not change during a lap, but only at the moment a lap is done by a driver. And due to this, the data will not tell how much energy was refilled in pit until the driver finished his pit-out lap. This makes the data less useful by itself.
 
 To workaround this API limitation, a special interpolation algorithm is implemented, which enables accurate estimates to remaining energy progressively during a lap for each driver. The average accuracy of estimation is within 1%.
 
 Some cases where interpolation may not be applied:
-- Interpolation may require at least 1 full lap (not counting pit out lap) done before it can take effect.
-- During pit stop, refilled energy reading may not be updated until driver finishes his pit out lap (as mentioned earlier), which means old energy reading persists during pit out lap and would result wrong estimates with interpolation. For this reason, interpolation is disabled during pit out lap.
+- Interpolation may require at least 1 full lap (not counting pit-out lap) done before it can take effect.
+- During pit stop, refilled energy reading may not be updated until driver finishes his pit-out lap (as mentioned earlier), which means old energy reading persists during pit-out lap and would result wrong estimates with interpolation. For this reason, interpolation is disabled during pit-out lap.
 
 In either case, just wait another lap and energy readings will be synchronized.
 
@@ -3628,30 +3628,38 @@ Show position in class while `enable_multi_class_styling` option is also enabled
 Show outline color based on lap difference (ahead or behind) between player and opponents. This option is disabled by default.
 
     show_pitout_prediction
-Show estimated pit out on-track position indication for each pit stop duration. Default indication shows `circle` with `pit stop duration` displayed above.
+Show estimated pit-out on-track position indication for each pit stop duration. Default indication shows `circle` with `pit stop duration` displayed above.
 
-Note, pit out position prediction is based on `delta best` data which scaled with player's latest `lap time pace` for accurate real-time position prediction under various track conditions. Pit out prediction requires both valid `track map` and `delta best` data to display. At least `one valid lap` for any car and track combo is required to display pit out prediction.
+Note, pit-out position prediction is based on `delta best` data which scaled with player's latest `lap time pace` for accurate real-time position prediction under various track conditions. Pit-out prediction requires both valid `track map` and `delta best` data to display. At least `one valid lap` for any car and track combo is required to display pit-out prediction.
 
-For accurate prediction, the location of `pit out line` must be found first. And since each track has different pit out line location, it is required to `pit out` at least `once per session` to mark the correct pit out line location. This can be easily done by driving out of pit lane.
+For accurate prediction, the location of `pit-out line` must be found first. And since each track has different pit-out line location, it is required to `pit-out` at least `once per session` to mark the correct pit-out line location. This can be easily done by driving out of pit lane.
 
     show_pitout_prediction_while_requested_pitstop
-Show estimated pit out on-track position indication while player has requested pit stop and not in pit lane.
+Show estimated pit-out on-track position indication while player has requested pit stop and not in pit lane.
 
     number_of_prediction
-Set number of pit out prediction to display. Value range is limited in `1` to `20`.
+Set number of pit-out prediction to display. Value range is limited in `1` to `20`.
 
-    pitstop_duration_minimum
-Set pit stop duration (in seconds) of first prediction.
+    pitout_time_offset
+Set amount time offset (in seconds) for catching up with vehicle speed after pit-out. Default is `3` seconds.
 
-    pitstop_duration_increment
-Set each pit stop duration (in seconds) increment after previous prediction. Default increment is `10` seconds.
+Note, this value is important for accurate prediction, as initial vehicle speed is much slower after pit-out, so extra time is needed for driver to catch up, and also affected by pit-out line location. For most tracks, this extra time after pit-out is roughly within `1` to `5` seconds.
+
+    pitout_duration_minimum
+Set pit stop duration (in seconds) of first prediction. This option has no effect if `enabled_fixed_pitout_prediction` is enabled.
+
+    pitout_duration_increment
+Set each pit stop duration (in seconds) increment after previous prediction. Default increment is `10` seconds. This option has no effect if `enabled_fixed_pitout_prediction` is enabled.
 
 Note, each time when pit stop duration of the nearest prediction exceeded current pit stop timer, the prediction circle will be removed, and a new prediction circle will be appended with pit stop duration increment after the last prediction.
 
-    pitout_time_offset
-Set amount time offset (in seconds) for catching up with vehicle speed after pit out. Default is `3` seconds.
+    enabled_fixed_pitout_prediction
+Show pit-out prediction based on user-defined fixed pitstop duration instead. This option overrides `pitout_duration_minimum` and `pitout_duration_increment` options.
 
-Note, this value is important for accurate prediction, as initial vehicle speed is much slower after pit out, so extra time is needed for driver to catch up, and also affected by pit out line location. For most tracks, this extra time after pit out is roughly within `1` to `5` seconds.
+While this option is enabled, total pit-out duration is calculated from the sum of `pit-out time offset`, `fixed pit stop duration` and `estimated pit lane pass-through duration`. It's required to enter and exit pit lane at least once to get correct total pit-out duration.
+
+    fixed_pitstop_duration
+Set fixed amount pit stop duration (in seconds). Note, only `stopped` time should be considered for this option. Set to `0` if only passing through pit lane (such as `Drive Through`). Set to `-1` to disable this option.
 
     show_pitstop_duration
 Show pit stop duration reading on top of each prediction circle.

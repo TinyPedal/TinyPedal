@@ -545,7 +545,7 @@ class RelativeInfo:
     )
 
     def __init__(self):
-        self.relative: list[list] = [REL_TIME_DEFAULT]
+        self.relative: list[tuple[float, int]] = [REL_TIME_DEFAULT]
         self.standings: list[int] = [-1]
         self.classes: list[list] = [[0, 1, "", 0.0, -1, -1, -1, False]]
         self.drawOrder: list = [0]

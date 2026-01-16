@@ -4,6 +4,12 @@ WIP
   - Added "enable_single_class_exclusive_mode" option (requested by user "omenek159"), which enables single-class exclusive mode that displays vehicles from player's class only. This mode takes priority over all other display mode.
   - Added "max_vehicles_exclusive_mode" option, which sets maximum amount vehicles to display when "enable_single_class_exclusive_mode" is enabled.
 
+* Track map Widget
+  - Added "enabled_fixed_pitout_prediction" option (requested by user "Ces-cos"), which shows pit-out prediction based on user-defined fixed pit stop duration instead.
+    Total pit-out duration is calculated from the sum of "pit-out time offset", "fixed pit stop duration" and "estimated pit lane pass-through duration". It's required to enter and exit pit lane at least once to get correct total pit-out duration.
+    While this option is enabled, "pitout_duration_minimum" and "pitout_duration_increment" options will have no effect.
+  - Added "fixed_pitstop_duration" option, which sets fixed amount pit stop duration (in seconds). Note, only "stopped" time should be considered for this option. Set to "0" if only passing through pit lane (such as "Drive Through"). Set to "-1" to disable this option.
+
 2.39.0 (2026-01-13)
 -----------------------------
 * Track Info Editor
