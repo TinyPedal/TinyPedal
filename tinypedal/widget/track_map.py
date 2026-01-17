@@ -362,12 +362,12 @@ class Realtime(Overlay):
                 return
 
         # Verify data set
-        if not map_data:
+        if not map_data:  # x, y coords
             return
         dist_data = minfo.mapping.elevations
-        if not dist_data:
+        if not dist_data:  # distance, z coords
             return
-        deltabest_data = minfo.delta.deltaBestData
+        deltabest_data = minfo.delta.deltaBestData  # distance, seconds
         deltabest_max_index = len(deltabest_data) - 1
         if deltabest_max_index < 2:
             return
@@ -430,12 +430,13 @@ class Realtime(Overlay):
 
     def get_target_pit_time(self, target_pit_time: float, pit_timer: float):
         """Generate target pit time"""
+        max_prediction = self.prediction_count
         # Fixed time
         if self.wcfg["enabled_fixed_pitout_prediction"]:
             pass_time = minfo.mapping.pitPassTime
             valid_count = 0
             for fixed_time in self.fixed_pit_times:
-                if valid_count >= self.prediction_count:
+                if valid_count >= max_prediction:
                     break
                 fixed_time += pass_time
                 if fixed_time > pit_timer:
@@ -443,17 +444,9 @@ class Realtime(Overlay):
                     yield fixed_time
         # Auto incremented time
         else:
-            for idx in range(self.prediction_count):
-                if idx > 0:
-                    target_pit_time += self.pit_time_increment
-                yield target_pit_time
-
-    def set_fixed_pit_time(self):
-        """Set fixed target pit time"""
-        for idx in range(1, 11):
-            fixed_time = self.wcfg[f"fixed_pitstop_duration_{idx}"]
-            if fixed_time >= 0:
-                yield fixed_time + self.pitout_time_offset
+            increment = self.pit_time_increment
+            for idx in range(max_prediction):
+                yield target_pit_time + increment * idx
 
     def classes_style(self, class_name: str) -> str:
         """Get vehicle class style from brush cache"""
@@ -526,6 +519,13 @@ class Realtime(Overlay):
             suffix: QBrush(self.wcfg[f"vehicle_color_{suffix}"], Qt.SolidPattern)
             for suffix in suffixes
         }
+
+    def set_fixed_pit_time(self):
+        """Set fixed target pit time"""
+        for idx in range(1, 11):
+            fixed_time = self.wcfg[f"fixed_pitstop_duration_{idx}"]
+            if fixed_time >= 0:
+                yield fixed_time + self.pitout_time_offset
 
 
 def target_pitstop_duration(pit_timer: float, min_pit_time: float, pit_time_increment: float) -> float:
