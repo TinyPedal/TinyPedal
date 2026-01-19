@@ -10,6 +10,9 @@ WIP
     While this option is enabled, "pitout_duration_minimum" and "pitout_duration_increment" options will have no effect.
   - Added "fixed_pitstop_duration" option, which sets fixed amount pit stop duration (in seconds). Note, only "stopped" time should be considered for this option. Set to "0" if only passing through pit lane (such as "Drive Through"). Set to "-1" to disable this option.
 
+* Misc
+  - Fixed an issue where default read-only setting can be modified.
+
 2.39.0 (2026-01-13)
 -----------------------------
 * Track Info Editor

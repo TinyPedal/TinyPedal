@@ -79,12 +79,17 @@ class StyleValidator:
     @staticmethod
     def heatmap(dict_user: dict[str, dict]) -> bool:
         """Heatmap style validator"""
-        key_list_def = tuple(HEATMAP_DEFAULT)
-        save_change = PresetValidator.add_missing_key(key_list_def, dict_user, HEATMAP_DEFAULT)
-        # Sort
+        save_change = PresetValidator.add_missing_key(dict_user, HEATMAP_DEFAULT)
+        # Sort styles
         if save_change:
-            key_list_def += tuple(set(dict_user) - set(key_list_def))
-            PresetValidator.sort_key_order(key_list_def, dict_user)
+            # Place default keys in front
+            key_list_def = list(HEATMAP_DEFAULT)
+            # Append user keys
+            for key in dict_user:
+                if key not in HEATMAP_DEFAULT:
+                    key_list_def.append(key)
+            for d_key in key_list_def:
+                dict_user[d_key] = dict_user.pop(d_key)  # append user key at the end
         return save_change
 
     @staticmethod
@@ -194,13 +199,13 @@ class PresetValidator:
     )
 
     @classmethod
-    def remove_invalid_key(cls, key_list_def: tuple[str, ...], dict_user: dict) -> None:
+    def remove_invalid_key(cls, dict_user: dict, dict_def: dict) -> None:
         """Remove invalid key & value from user dictionary"""
         key_list_user = tuple(dict_user)  # create user key list
 
         for key in key_list_user:  # loop through user key list
             # Remove invalid key
-            if key not in key_list_def:  # check in default list
+            if key not in dict_def:  # check in default list
                 dict_user.pop(key)
                 continue
             # Skip sub_level dict
@@ -212,31 +217,35 @@ class PresetValidator:
                     break
 
     @staticmethod
-    def add_missing_key(key_list_def: tuple[str, ...], dict_user: dict, dict_def: dict) -> bool:
+    def add_missing_key(dict_user: dict, dict_def: dict) -> bool:
         """Add missing default key to user list"""
         is_modified = False
         key_list_user = tuple(dict_user)  # create user key list
 
-        for key in key_list_def:  # loop through default key list
+        for key in dict_def:  # loop through default keys
             if key not in key_list_user:  # check each default key in user list
-                dict_user[key] = dict_def[key]  # add missing item to user
+                data_def = dict_def[key]
+                # Add missing item to user
+                if isinstance(data_def, dict):
+                    dict_user[key] = data_def.copy()  # copy sub-dict
+                else:
+                    dict_user[key] = data_def
                 is_modified = True
 
         return is_modified
 
     @staticmethod
-    def sort_key_order(key_list_def: tuple[str, ...], dict_user: dict) -> None:
+    def sort_key_order(dict_user: dict, dict_def: dict) -> None:
         """Sort user key order according to default key list"""
-        for d_key in key_list_def:  # loop through default key list
+        for d_key in dict_def:  # loop through default keys
             dict_user[d_key] = dict_user.pop(d_key)  # append user key at the end
 
     @classmethod
     def validate_key_pair(cls, dict_user: dict, dict_def: dict) -> None:
         """Create key-only check list, then validate key"""
-        key_list_def = tuple(dict_def)
-        cls.remove_invalid_key(key_list_def, dict_user)
-        cls.add_missing_key(key_list_def, dict_user, dict_def)
-        cls.sort_key_order(key_list_def, dict_user)
+        cls.remove_invalid_key(dict_user, dict_def)
+        cls.add_missing_key(dict_user, dict_def)
+        cls.sort_key_order(dict_user, dict_def)
 
     @staticmethod
     def preupdate_global_preset(dict_user: dict):
@@ -281,6 +290,6 @@ class PresetValidator:
         # Check top-level key
         cls.validate_key_pair(dict_user, dict_def)
         # Check sub-level key
-        for item in dict_user.keys():  # list each key lists
+        for item in dict_user:
             cls.validate_key_pair(dict_user[item], dict_def[item])
         return dict_user
