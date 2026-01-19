@@ -110,7 +110,7 @@ class PresetList(QWidget):
             item.setText(preset_name)
             self.listbox_preset.addItem(item)
             # Add primary preset tag
-            label_item = PresetTagItem(self, preset_name)
+            label_item = PresetTagItem(None, preset_name)
             self.listbox_preset.setItemWidget(item, label_item)
 
         loaded_preset = cfg.filename.setting

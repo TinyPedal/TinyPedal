@@ -37,14 +37,6 @@ from .template.setting_tracks import TRACKINFO_DEFAULT
 from .validator import is_clock_format, is_hex_color
 from .version_check import parse_version_string
 
-COMMON_STRINGS = "|".join((
-    rxp.CFG_FONT_NAME,
-    rxp.CFG_HEATMAP,
-    rxp.CFG_USER_PATH,
-    rxp.CFG_USER_IMAGE,
-    rxp.CFG_STRING,
-))
-
 
 def validate_style(dict_user: dict[str, dict], dict_def: Mapping[str, Any]) -> bool:
     """Validate style dict entries"""
@@ -147,7 +139,16 @@ class ValueValidator:
     @staticmethod
     def string(key: str, dict_user: dict) -> bool:
         """Value - string"""
-        if not re.search(COMMON_STRINGS, key):
+        for strings in (
+            rxp.CFG_FONT_NAME,
+            rxp.CFG_HEATMAP,
+            rxp.CFG_USER_PATH,
+            rxp.CFG_USER_IMAGE,
+            rxp.CFG_STRING,
+        ):
+            if re.search(strings, key):
+                break
+        else:
             return False
         if not isinstance(dict_user[key], str):
             dict_user.pop(key)

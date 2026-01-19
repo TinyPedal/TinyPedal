@@ -63,6 +63,7 @@ class FileName:
 
     __slots__ = (
         "config",
+        "filelock",
         "setting",
         "brakes",
         "brands",
@@ -70,7 +71,6 @@ class FileName:
         "compounds",
         "heatmap",
         "tracks",
-        "filelock",
     )
 
     def __init__(self):

@@ -33,11 +33,11 @@ def qfile_filter(extension: str, description: str) -> str:
 class ConfigType:
     """Configuration types"""
 
-    # Setting preset
+    # Global preset
     CONFIG = "config"
-    SETTING = "setting"
-    # File lock
     FILELOCK = "filelock"
+    # User preset
+    SETTING = "setting"
     # Module ID
     MODULE = "module"
     WIDGET = "widget"
