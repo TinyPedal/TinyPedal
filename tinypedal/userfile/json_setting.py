@@ -55,7 +55,7 @@ def copy_setting(dict_user: dict) -> dict:
 
 def load_setting_json_file(
     filename: str, filepath: str, dict_def: dict, file_info: str = "user preset",
-    validator: Callable = PresetValidator.user_preset,
+    validator: Callable[[dict, dict], dict] = PresetValidator.user_preset,
 ) -> dict:
     """Load setting json file & verify"""
     filename_source = f"{filepath}{filename}"
@@ -77,9 +77,8 @@ def load_setting_json_file(
 
 
 def load_style_json_file(
-    filename: str, filepath: str, dict_def: dict,
-    check_missing: bool = False, file_info: str = "style preset",
-    validator: Callable | None = None,
+    filename: str, filepath: str, dict_def: dict, file_info: str = "style preset",
+    validator: Callable[[dict], bool] | None = None,
 ) -> dict:
     """Load style json file & verify (optional)"""
     filename_source = f"{filepath}{filename}"
@@ -87,10 +86,6 @@ def load_style_json_file(
     try:
         with open(filename_source, "r", encoding="utf-8") as jsonfile:
             style_user = json.load(jsonfile)
-        # Whether to check and add missing style
-        if check_missing:
-            if PresetValidator.add_missing_key(tuple(dict_def), style_user, dict_def):
-                msg_text = "updated"
         # Whether to validate style
         if validator is not None:
             if validator(style_user):

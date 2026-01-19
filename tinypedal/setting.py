@@ -312,7 +312,7 @@ class Setting:
             filename=self.filename.heatmap,
             filepath=self.path.settings,
             dict_def=self.default.heatmap,
-            check_missing=True,
+            validator=StyleValidator.heatmap,
         )
         self.user.tracks = load_style_json_file(
             filename=self.filename.tracks,
@@ -393,9 +393,10 @@ class Setting:
             # Add to save queue
             elif filename not in self._save_queue:
                 # Save to global config path
-                if cfg_type == ConfigType.CONFIG:
-                    filepath = self.path.config
-                elif cfg_type == ConfigType.FILELOCK:
+                if cfg_type in (
+                    ConfigType.CONFIG,
+                    ConfigType.FILELOCK,
+                ):
                     filepath = self.path.config
                 # Save to settings (preset) path
                 else:

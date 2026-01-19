@@ -33,6 +33,7 @@ from .template.setting_brakes import BRAKEINFO_DEFAULT
 from .template.setting_classes import CLASSINFO_DEFAULT
 from .template.setting_compounds import COMPOUNDINFO_DEFAULT
 from .template.setting_filelock import FILELOCKINFO_DEFAULT
+from .template.setting_heatmap import HEATMAP_DEFAULT
 from .template.setting_tracks import TRACKINFO_DEFAULT
 from .validator import is_clock_format, is_hex_color
 from .version_check import parse_version_string
@@ -74,6 +75,17 @@ class StyleValidator:
     def compounds(dict_user: dict[str, dict]) -> bool:
         """Compounds style validator"""
         return validate_style(dict_user, COMPOUNDINFO_DEFAULT)
+
+    @staticmethod
+    def heatmap(dict_user: dict[str, dict]) -> bool:
+        """Heatmap style validator"""
+        key_list_def = tuple(HEATMAP_DEFAULT)
+        save_change = PresetValidator.add_missing_key(key_list_def, dict_user, HEATMAP_DEFAULT)
+        # Sort
+        if save_change:
+            key_list_def += tuple(set(dict_user) - set(key_list_def))
+            PresetValidator.sort_key_order(key_list_def, dict_user)
+        return save_change
 
     @staticmethod
     def tracks(dict_user: dict[str, dict]) -> bool:
@@ -216,9 +228,7 @@ class PresetValidator:
     def sort_key_order(key_list_def: tuple[str, ...], dict_user: dict) -> None:
         """Sort user key order according to default key list"""
         for d_key in key_list_def:  # loop through default key list
-            temp_value = dict_user[d_key]  # store user value
-            dict_user.pop(d_key)  # delete user key
-            dict_user[d_key] = temp_value  # append user key at the end
+            dict_user[d_key] = dict_user.pop(d_key)  # append user key at the end
 
     @classmethod
     def validate_key_pair(cls, dict_user: dict, dict_def: dict) -> None:
