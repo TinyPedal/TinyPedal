@@ -134,23 +134,24 @@ class FontConfig(BaseDialog):
         self.applying()
         self.accept()  # close
 
-    def save_setting(self, dict_user: dict):
+    def save_setting(self, dict_user: dict[str, dict]):
         """Save setting"""
-        for item in dict_user.keys():
-            key_list_user = tuple(dict_user[item])
-            for key in key_list_user:
-                if (re.search(rxp.CFG_FONT_NAME, key) and
-                    self.edit_fontname.currentText() != "no change"):
-                    dict_user[item][key] = self.edit_fontname.currentText()
+        for setting in dict_user.values():
+            for key in setting:
+                if re.search(rxp.CFG_FONT_NAME, key):
+                    font_name = self.edit_fontname.currentText()
+                    if font_name != "no change":
+                        setting[key] = font_name
                     continue
-                if (re.search(rxp.CFG_FONT_WEIGHT, key) and
-                    self.edit_fontweight.currentText() != "no change"):
-                    dict_user[item][key] = self.edit_fontweight.currentText()
+                if re.search(rxp.CFG_FONT_WEIGHT, key):
+                    font_weight = self.edit_fontweight.currentText()
+                    if font_weight != "no change":
+                        setting[key] = font_weight
                     continue
-                if (re.search("font_size", key) and
-                    self.edit_fontsize.value() != 0):
-                    dict_user[item][key] = max(
-                        dict_user[item][key] + self.edit_fontsize.value(), 1)
+                if re.search("font_size", key):
+                    font_size = self.edit_fontsize.value()
+                    if font_size != 0:
+                        setting[key] = max(setting[key] + font_size, 1)
                     continue
         self.edit_fontsize.setValue(0)
         cfg.save(0)
@@ -364,9 +365,7 @@ class UserConfig(BaseDialog):
 
     def create_options(self, layout):
         """Create options"""
-        key_list_user = tuple(self.user_setting[self.key_name])  # create user key list
-
-        for idx, key in enumerate(key_list_user):
+        for idx, key in enumerate(self.user_setting[self.key_name]):
             self.__add_option_label(idx, key, layout)
             # Bool
             if re.search(rxp.CFG_BOOL, key):
@@ -396,7 +395,7 @@ class UserConfig(BaseDialog):
                 continue
             # Heatmap string
             if re.search(rxp.CFG_HEATMAP, key):
-                self.__add_option_combolist(idx, key, layout, tuple(cfg.user.heatmap))
+                self.__add_option_combolist(idx, key, layout, cfg.user.heatmap.keys())
                 continue
             # Clock format string
             if re.search(rxp.CFG_CLOCK_FORMAT, key):

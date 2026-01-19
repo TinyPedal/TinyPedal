@@ -84,12 +84,12 @@ class StyleValidator:
         if save_change:
             # Place default keys in front
             key_list_def = list(HEATMAP_DEFAULT)
-            # Append user keys
+            # Append user keys at end
             for key in dict_user:
                 if key not in HEATMAP_DEFAULT:
                     key_list_def.append(key)
             for d_key in key_list_def:
-                dict_user[d_key] = dict_user.pop(d_key)  # append user key at the end
+                dict_user[d_key] = dict_user.pop(d_key)
         return save_change
 
     @staticmethod

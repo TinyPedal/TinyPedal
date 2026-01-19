@@ -599,7 +599,7 @@ class Overlay(QWidget):
 def validate_column_order(config: dict):
     """Validate column/row index order, correct any overlapping indexes"""
     column_set = []
-    for key in config.keys():
+    for key in config:
         if key.startswith("column_index"):
             while config[key] in column_set:
                 config[key] += 1

@@ -65,7 +65,7 @@ class ModuleControl:
     )
 
     def __init__(self, target: Any, type_id: str):
-        self._imported_modules = create_module_pack(target)
+        self._imported_modules = MappingProxyType(create_module_pack(target))
         self._active_modules: dict = {}
         self.type_id = type_id
         self.active_modules: MappingProxyType = MappingProxyType(self._active_modules)
@@ -101,7 +101,7 @@ class ModuleControl:
 
     def enable_all(self):
         """Enable all modules"""
-        for _name in self._imported_modules.keys():
+        for _name in self._imported_modules:
             cfg.user.setting[_name]["enable"] = True
         self.start()
         cfg.save()
@@ -109,7 +109,7 @@ class ModuleControl:
 
     def disable_all(self):
         """Disable all modules"""
-        for _name in self._imported_modules.keys():
+        for _name in self._imported_modules:
             cfg.user.setting[_name]["enable"] = False
         self.close()
         cfg.save()
@@ -117,7 +117,7 @@ class ModuleControl:
 
     def __start_enabled(self):
         """Start all enabled module"""
-        for _name in self._imported_modules.keys():
+        for _name in self._imported_modules:
             self.__start_selected(_name)
 
     def __start_selected(self, name: str):

@@ -64,7 +64,7 @@ class PresetTransfer(BaseEditor):
 
         # Setting list
         self.listbox_setting = QListWidget(self)
-        self.set_setting_list(self.listbox_setting, tuple(cfg.user.setting.keys()))
+        self.set_setting_list(self.listbox_setting, cfg.user.setting)
 
         # Preset selector
         self.dest_selector = QComboBox()
@@ -133,9 +133,9 @@ class PresetTransfer(BaseEditor):
                 preset_list.remove(name)
         return preset_list
 
-    def set_setting_list(self, listbox: QListWidget, setting_list: tuple[str, ...]):
+    def set_setting_list(self, listbox: QListWidget, settings: tuple | dict):
         """Set setting list"""
-        for setting_name in setting_list:
+        for setting_name in settings:
             item = QListWidgetItem()
             listbox.addItem(item)
             checkbox_item = QCheckBox(self)

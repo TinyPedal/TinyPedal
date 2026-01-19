@@ -187,7 +187,7 @@ class DriverStatsViewer(BaseEditor):
 
         self.stats_list.clear()
         if self.stats_temp:
-            self.stats_list.addItems(sorted(self.stats_temp.keys(), key=sort_stats_key))
+            self.stats_list.addItems(sorted(self.stats_temp, key=sort_stats_key))
         self.stats_list.setCurrentText(last_selected_stats_key)
 
     def refresh_table(self):

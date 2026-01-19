@@ -121,7 +121,7 @@ class FilePath:
 
     def update(self, user_path: dict, default_path: dict):
         """Update path variables from global user path dictionary"""
-        for key in user_path.keys():
+        for key in user_path:
             # Reset path if invalid
             if not set_user_data_path(user_path[key]):
                 user_path[key] = default_path[key]

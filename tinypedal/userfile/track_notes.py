@@ -123,7 +123,6 @@ def parse_csv_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
 def parse_gpl_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
     """Parse GPL pace notes"""
     meta_info = create_notes_metadata()
-    meta_info_keys = meta_info.keys()
     column_key = table_header[0]
     metadata_checked = False
     notes_temp = []
@@ -132,7 +131,7 @@ def parse_gpl_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
         if note_line.startswith(";") or ".mp3" not in note_line:
             # Load metadata
             if not metadata_checked:
-                for meta_key in meta_info_keys:
+                for meta_key in meta_info:
                     if meta_key in note_line:
                         meta_info[meta_key] = note_line.lstrip(f";{meta_key}:").strip()
                         continue
