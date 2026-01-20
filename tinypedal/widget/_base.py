@@ -50,8 +50,7 @@ class Overlay(QWidget):
         self.cfg = config
 
         # Widget config
-        self.wcfg = self.cfg.user.setting[widget_name]
-        validate_column_order(self.wcfg)
+        self.wcfg = validate_option(self.cfg.user.setting[widget_name])
 
         # Base setting
         self.setWindowTitle(f"{APP_NAME} - {widget_name.capitalize()}")
@@ -596,11 +595,13 @@ class Overlay(QWidget):
             layout.addLayout(target, *order)
 
 
-def validate_column_order(config: dict):
-    """Validate column/row index order, correct any overlapping indexes"""
+def validate_option(config: dict) -> dict:
+    """Post validation for options"""
+    # Check column/row index order, correct any overlapping indexes
     column_set = []
     for key in config:
         if key.startswith("column_index"):
             while config[key] in column_set:
                 config[key] += 1
             column_set.append(config[key])
+    return config
