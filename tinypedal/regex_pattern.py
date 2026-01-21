@@ -39,6 +39,7 @@ CFG_BOOL = (
     "^auto_hide_in_private_qualifying$|"
     "^check_for_updates_on_startup$|"
     "^fixed_position$|"
+    "^global$|"
     "^minimize_to_tray$|"
     "^remember_position$|"
     "^remember_size$|"
@@ -76,6 +77,7 @@ CFG_USER_PATH = "_path"
 CFG_USER_IMAGE = "_image_file"
 CFG_STRING = (
     # Exact match
+    "^bind$|"
     "^process_id$|"
     "^version$|"
     # Partial match
@@ -152,6 +154,7 @@ CFG_INVALID_FILENAME = (
     "^compounds$|"
     "^config$|"
     "^heatmap$|"
+    "^shortcuts$|"
     "^tracks$|"
     # Partial match
     "backup"
@@ -161,6 +164,7 @@ CFG_INVALID_FILENAME = (
 ABBR_PATTERN = (
     "^id | id$| id |"
     "^ui | ui$| ui |"
+    "^vr | vr$| vr |"
     "^led | led$| led |"
     "api|"
     "dpi|"

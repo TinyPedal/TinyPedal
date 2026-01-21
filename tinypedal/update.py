@@ -26,7 +26,7 @@ import asyncio
 import logging
 import threading
 
-from . import overlay_signal, version
+from . import app_signal, version
 from .async_request import get_response, set_header_get
 from .const_app import APP_NAME, REPO_NAME
 from .const_common import DATE_NA, VERSION_NA
@@ -113,7 +113,7 @@ class UpdateChecker:
         self._manual_checking = manual
         if not self._is_checking:
             self._is_checking = True
-            overlay_signal.updates.emit(True)
+            app_signal.updates.emit(True)
             threading.Thread(target=self.__checking, daemon=True).start()
 
     def __checking(self):
@@ -127,7 +127,7 @@ class UpdateChecker:
         self._last_checked_version = checked_version
         self._last_checked_date = checked_date
         # Send update signal
-        overlay_signal.updates.emit(False)
+        app_signal.updates.emit(False)
         self._is_checking = False
         # Output log
         logger.info("UPDATES: %s", self.message())

@@ -28,6 +28,7 @@ from typing import Any, Mapping
 from . import regex_pattern as rxp
 from . import version
 from .const_common import VERSION_NA
+from .hotkey.common import validate_hotkey
 from .setting_preupdate import preupdate_specific_version
 from .template.setting_brakes import BRAKEINFO_DEFAULT
 from .template.setting_classes import CLASSINFO_DEFAULT
@@ -277,6 +278,14 @@ class PresetValidator:
         """Validate global preset"""
         cls.preupdate_global_preset(dict_user)
         return cls._validate(dict_user, dict_def)
+
+    @classmethod
+    def shortcuts_preset(cls, dict_user: dict, dict_def: dict) -> dict:
+        """Validate global keyboard shortcuts preset"""
+        dict_user = cls._validate(dict_user, dict_def)
+        for options in dict_user.values():
+            options["bind"] = validate_hotkey(options["bind"])
+        return dict_user
 
     @classmethod
     def user_preset(cls, dict_user: dict, dict_def: dict) -> dict:

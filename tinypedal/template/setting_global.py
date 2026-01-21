@@ -32,6 +32,7 @@ GLOBAL_DEFAULT = {
         "remember_size": True,
         "enable_high_dpi_scaling": True,
         "enable_auto_load_preset": False,
+        "enable_global_hotkey": False,
         "show_confirmation_for_batch_toggle": True,
         'snap_distance': 10,
         "snap_gap": 0,

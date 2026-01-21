@@ -33,7 +33,7 @@ def parse_version_string(ver: str) -> tuple[int, int, int]:
         version = ver.split(".")
         return int(version[0]), int(version[1]), int(version[2])
     except (AttributeError, ValueError, TypeError, IndexError):
-        return 0, 0, 0
+        return VERSION_NA
 
 
 def is_new_version(

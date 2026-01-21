@@ -160,14 +160,17 @@ def set_style_window(base_font_pt: int) -> str:
             border: none;
             color: {color_active_highlighted_text};
         }}
+        NotifyBar #notifyPresetLocked {{
+            background: #777;
+        }}
         NotifyBar #notifySpectate {{
             background: #08C;
         }}
         NotifyBar #notifyPacenotes {{
-            background: #290;
+            background: #280;
         }}
-        NotifyBar #notifyPresetLocked {{
-            background: #777;
+        NotifyBar #notifyHotkey {{
+            background: #854;
         }}
         NotifyBar #notifyUpdates {{
             background: #A4A;
@@ -296,6 +299,49 @@ def set_style_window(base_font_pt: int) -> str:
         SpectateList QListView::item:selected {{
             selection-color: {color_active_highlighted_text};
             background: {color_active_highlight};
+        }}
+
+        /* Hotkey list (tab) */
+        HotkeyList QListView {{
+            font-size: {font_pt_item_name}pt;
+            outline: none;
+        }}
+        HotkeyList QListView::item {{
+            border: none;
+            min-height: 1.75em;
+            color: {color_active_window_text};
+        }}
+        HotkeyList QListView::item:selected {{
+            background: transparent;
+        }}
+        HotkeyList QListView::item:hover {{
+            background: {color_disabled_highlight};
+        }}
+        HotkeyList QListView::item:disabled {{
+            color: {color_disabled_window_text};
+        }}
+        HotkeyConfigItem QPushButton {{
+            font-size: {font_pt_item_toggle}pt;
+            font-weight: bold;
+            border-radius: {border_radius_button}em;
+            height: none;
+            margin: 0.25em 0.25em 0.25em 0;
+            padding: 0 0.2em;
+            color: {color_disabled_highlighted_text};
+            background: {color_disabled_highlight};
+        }}
+        HotkeyConfigItem QPushButton::checked {{
+            color: {color_inactive_highlighted_text};
+            background: {color_inactive_highlight};
+        }}
+        HotkeyConfigItem QPushButton::hover,
+        HotkeyConfigItem QPushButton::checked:hover {{
+            color: {color_active_highlighted_text};
+            background: {color_active_highlight};
+        }}
+        HotkeyConfigItem QPushButton::disabled {{
+            color: {color_disabled_highlighted_text};
+            background: {color_disabled_highlight};
         }}
 
         /* Base dialog */

@@ -44,6 +44,7 @@ from .template.setting_filelock import FILELOCK_DEFAULT
 from .template.setting_global import GLOBAL_DEFAULT
 from .template.setting_heatmap import HEATMAP_DEFAULT
 from .template.setting_module import MODULE_DEFAULT
+from .template.setting_shortcuts import SHORTCUTS_DEFAULT
 from .template.setting_tracks import TRACKS_DEFAULT
 from .template.setting_widget import WIDGET_DEFAULT
 from .userfile import set_user_data_path
@@ -64,6 +65,7 @@ class FileName:
     __slots__ = (
         "config",
         "filelock",
+        "shortcuts",
         "setting",
         "brakes",
         "brands",
@@ -77,6 +79,7 @@ class FileName:
         # Global preset
         self.config = f"config{FileExt.JSON}"
         self.filelock = f"config{FileExt.LOCK}"
+        self.shortcuts = f"shortcuts{FileExt.JSON}"
         # User preset
         self.setting = f"default{FileExt.JSON}"
         # Style preset
@@ -136,6 +139,7 @@ class Preset:
     __slots__ = (
         "config",
         "filelock",
+        "shortcuts",
         "setting",
         "brakes",
         "brands",
@@ -151,6 +155,7 @@ class Preset:
         # Global preset
         self.config = MappingProxyType(GLOBAL_DEFAULT)
         self.filelock = MappingProxyType(FILELOCK_DEFAULT)
+        self.shortcuts = MappingProxyType(SHORTCUTS_DEFAULT)
         # User preset
         self.setting = MappingProxyType(ChainMap(WIDGET_DEFAULT, MODULE_DEFAULT, API_DEFAULT, COMMON_DEFAULT))
         # Style preset
@@ -244,6 +249,13 @@ class Setting:
             dict_def=self.default.config,
             file_info="global preset",
             validator=PresetValidator.global_preset,
+        )
+        self.user.shortcuts = load_setting_json_file(
+            filename=self.filename.shortcuts,
+            filepath=self.path.config,
+            dict_def=self.default.shortcuts,
+            file_info="keyboard shortcuts",
+            validator=PresetValidator.shortcuts_preset,
         )
         self.user.filelock = load_style_json_file(
             filename=self.filename.filelock,
@@ -341,22 +353,38 @@ class Setting:
         """Get selected api config key name"""
         return API_MAP_CONFIG[self.api_name]
 
-    def preset_files(self) -> list[str]:
-        """Get user preset JSON filename list, sort by modified date in descending order
+    def preset_files(self, by_date: bool = True, reverse: bool = True) -> list[str]:
+        """Get user preset JSON filename list
+
+        Arguments:
+            by_date: whether sort by modified date or file name.
+            reverse: reverse sort.
 
         Returns:
             JSON filename (without file extension) list.
         """
-        gen_cfg_list = (
-            (os.path.getmtime(f"{self.path.settings}{_filename}"), _filename[:-5])
-            for _filename in os.listdir(self.path.settings)
-            if _filename.lower().endswith(FileExt.JSON)
-        )
-        valid_cfg_list = [
-            _filename[1]
-            for _filename in sorted(gen_cfg_list, reverse=True)
-            if is_allowed_filename(_filename[1])
-        ]
+        if by_date:
+            date_cfg_list = (
+                (os.path.getmtime(f"{self.path.settings}{_filename}"), _filename[:-5])
+                for _filename in os.listdir(self.path.settings)
+                if _filename.lower().endswith(FileExt.JSON)
+            )
+            valid_cfg_list = [
+                _filename[1]
+                for _filename in sorted(date_cfg_list, reverse=reverse)
+                if is_allowed_filename(_filename[1])
+            ]
+        else:
+            name_cfg_list = (
+                _filename[:-5]
+                for _filename in os.listdir(self.path.settings)
+                if _filename.lower().endswith(FileExt.JSON)
+            )
+            valid_cfg_list = [
+                _filename
+                for _filename in sorted(name_cfg_list, key=lambda n:n.lower(), reverse=reverse)
+                if is_allowed_filename(_filename)
+            ]
         if valid_cfg_list:
             return valid_cfg_list
         return ["default"]
@@ -396,6 +424,7 @@ class Setting:
                 if cfg_type in (
                     ConfigType.CONFIG,
                     ConfigType.FILELOCK,
+                    ConfigType.SHORTCUTS,
                 ):
                     filepath = self.path.config
                 # Save to settings (preset) path

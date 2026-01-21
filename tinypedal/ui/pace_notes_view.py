@@ -26,7 +26,7 @@ import logging
 import os
 from typing import Callable
 
-from PySide2.QtCore import QBasicTimer, Qt, QUrl
+from PySide2.QtCore import QBasicTimer, Qt, QUrl, Slot
 from PySide2.QtMultimedia import QMediaPlayer
 from PySide2.QtWidgets import (
     QCheckBox,
@@ -294,6 +294,7 @@ class PaceNotesControl(QWidget):
         self.setLayout(layout_main)
         self.refresh()
 
+    @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh state"""
         self.mcfg = cfg.user.setting["pace_notes_playback"]

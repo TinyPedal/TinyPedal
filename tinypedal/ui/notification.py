@@ -31,7 +31,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import overlay_signal
+from .. import app_signal
 from ..const_app import URL_RELEASE
 from ..update import update_checker
 
@@ -41,30 +41,36 @@ class NotifyBar(QWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.presetlocked = QPushButton("Preset Locked")
+        self.presetlocked.setObjectName("notifyPresetLocked")
+        self.presetlocked.setVisible(False)
+        self.presetlocked.clicked.connect(parent.select_preset_tab)
+
         self.spectate = QPushButton("Spectate Mode Enabled")
         self.spectate.setObjectName("notifySpectate")
         self.spectate.setVisible(False)
-        self.spectate.clicked.connect(lambda _: parent.select_tab(3))
+        self.spectate.clicked.connect(parent.select_spectate_tab)
 
         self.pacenotes = QPushButton("Pace Notes Playback Enabled")
         self.pacenotes.setObjectName("notifyPacenotes")
         self.pacenotes.setVisible(False)
-        self.pacenotes.clicked.connect(lambda _: parent.select_tab(4))
+        self.pacenotes.clicked.connect(parent.select_pacenotes_tab)
 
-        self.presetlocked = QPushButton("Preset Locked")
-        self.presetlocked.setObjectName("notifyPresetLocked")
-        self.presetlocked.setVisible(False)
-        self.presetlocked.clicked.connect(lambda _: parent.select_tab(2))
+        self.hotkey = QPushButton("Global Hotkey Enabled")
+        self.hotkey.setObjectName("notifyHotkey")
+        self.hotkey.setVisible(False)
+        self.hotkey.clicked.connect(parent.select_hotkey_tab)
 
         self.updates = UpdatesNotifyButton("")
         self.updates.setObjectName("notifyUpdates")
         self.updates.setVisible(False)
-        overlay_signal.updates.connect(self.updates.checking)
+        app_signal.updates.connect(self.updates.checking)
 
         layout = QVBoxLayout()
+        layout.addWidget(self.presetlocked)
         layout.addWidget(self.spectate)
         layout.addWidget(self.pacenotes)
-        layout.addWidget(self.presetlocked)
+        layout.addWidget(self.hotkey)
         layout.addWidget(self.updates)
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)

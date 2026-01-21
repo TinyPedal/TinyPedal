@@ -20,6 +20,7 @@
 Module & widget list view
 """
 
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -89,6 +90,7 @@ class ModuleList(QWidget):
             self.listbox_module.setItemWidget(item, module_item)
         self.listbox_module.setCurrentRow(0)
 
+    @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh module & button toggle state"""
         listbox_module = self.listbox_module

@@ -190,6 +190,16 @@ Track info recording is handled by [Mapping Module](#mapping-module).
 [**`Back to Top`**](#)
 
 
+## Shortcuts preset
+**Shortcuts preset is used for customizing global hotkey binding.**
+
+Shortcuts preset can be customized by accessing [Hotkey Tab](#hotkey) in main window.
+
+`shortcuts.json` preset will be generated and saved in [Global User Configuration](#global-user-configuration) folder after first time launch of the APP.
+
+[**`Back to Top`**](#)
+
+
 # User files
 TinyPedal generates and saves user session data in specific folders defined in `User path`. Session data can be reset by accessing `Reset data` menu from `Overlay` menu in main window; or, delete data file from corresponding folder.
 
@@ -579,6 +589,9 @@ Auto loading preset is triggered when a new or different game is started and act
 
 This option is disabled by default.
 
+    enable_global_hotkey
+Enable `Global Hotkey` support. This option can be toggled from [Hotkey Tab](#hotkey) in main window.
+
     show_confirmation_for_batch_toggle
 Show confirmation dialog for enabling or disabling all widgets or modules. This option is enabled by default.
 
@@ -745,7 +758,7 @@ Set font weight to replace `font_weight` setting of all widgets. Default selecti
 ## Spectate mode
 **Spectate mode can be accessed from `Spectate` tab in main window.**
 
-Click `Enabled` or `Disabled` button to toggle spectate mode on and off. Note, spectate mode can also be enabled by setting `enable_player_index_override` option to `true` in [Telemetry API](#telemetry-api) config.
+Click `Enabled` or `Disabled` button to toggle spectate mode on and off. Note, spectate mode can also be enabled by setting `enable_player_index_override` option to `true` in [Telemetry API](#telemetry-api) dialog.
 
 While Spectate mode is enabled, `double-click` on a player name in the list to access telemetry data and overlay readings from selected player; alternatively, select a player name and click `Spectate` button. Current spectating player name is displayed on top of player name list. Player names are listed in alphabetical order.
 
@@ -778,6 +791,54 @@ Enable `Manually Select Pace Notes File` check box to disable auto-file-name mat
 `Max Queue` sets maximum number of sound files in playback queues. Default is `5` sound files. This option only takes effect after clicked `Apply` button.
 
 `Playback volume` sets output volume for sound file. This option takes immediate effect when adjusted.
+
+[**`Back to Top`**](#)
+
+
+## Hotkey
+**Hotkey control panel can be accessed from `Hotkey` tab in main window.**
+
+Note, hotkey bindings are non-exclusive in TinyPedal, which means they will not interfere with other programs. Hotkey history can be view in `Show Log` dialog from `Help` menu. Currently global hotkey feature is not supported on Linux.
+
+Click `Enabled` or `Disabled` button to toggle global hotkey support on and off. Note, global hotkey support can also be enabled by setting `enable_global_hotkey` option to `true` in [Application](#application) dialog.
+
+To change key binding, click key button on right side of each hotkey option, then in `Key Binding` dialog, press a `key` or `key combination` to register new key binding.
+
+To clear key binding, click `Clear` button from `Key Binding` dialog.
+
+To clear all key bindings, click `Clear All` from `Hotkey Tab`.
+
+### Available options:
+
+    overlay_visibility
+Show or hide overlay.
+
+    overlay_lock
+Lock or unlock overlay.
+
+    vr_compatibility
+Enable or disable VR Compatibility.
+
+    restart_api
+Restart current Telemetry API.
+
+    select_next_api, select_previous_api
+Select next or previous Telemetry API from available API list.
+
+    reload_preset
+Reload current preset.
+
+    load_next_preset, load_previous_preset
+Load next or previous preset relative to current preset (by preset name in ascending order).
+
+    spectate_mode
+Enable or disable spectate mode.
+
+    spectate_next_driver, spectate_previous_driver
+Spectate next or previous driver relative to current driver (by driver's overall standing).
+
+    pace_notes_playback
+Enable or disable pace notes playback.
 
 [**`Back to Top`**](#)
 

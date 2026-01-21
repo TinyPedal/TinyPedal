@@ -1,5 +1,20 @@
 WIP
 -----------------------------
+* [New]Global Hotkey Support
+  - Added "Global Hotkey" support, as one of the frequently requested feature from many users.
+    Note, hotkey bindings are non-exclusive in TinyPedal, which means they will not interfere with other programs.
+    Hotkey history can be view in "Show Log" dialog from "Help" menu.
+    Currently global hotkey feature is not supported on Linux.
+  - Added "shortcuts.json" global preset file, which stores key bindings.
+  - Added "enable_global_hotkey" option to "Application" dialog.
+  - Added "Hotkey Tab" to main window, which allows to change key bindings, or enable and disable "Global Hotkey" support.
+  - Notable hotkey options:
+    - "Overlay Visibility" allows to show or hide all widgets any time.
+    - "Restart API" and "Select Next/Previous API" allow to restart or switch API.
+    - "Reload Preset" and "Load Next/Previous Preset" allow to reload or cycle through presets.
+    - "Spectate Mode" and "Spectate Next/Previous Driver" allow to enable or disable spectate mode, as well as cycle through drivers.
+  - See User Guide for more details.
+
 * Standings Widget
   - Added "enable_single_class_exclusive_mode" option (requested by user "omenek159"), which enables single-class exclusive mode that displays vehicles from player's class only. This mode takes priority over all other display mode.
   - Added "max_vehicles_exclusive_mode" option, which sets maximum amount vehicles to display when "enable_single_class_exclusive_mode" is enabled.

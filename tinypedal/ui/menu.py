@@ -415,7 +415,11 @@ class APIMenu(QMenu):
         if cfg.api_name == api_name:
             return
         cfg.api_name = api_name
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        if cfg.telemetry["enable_api_selection_from_preset"]:
+            save_type = ConfigType.SETTING
+        else:
+            save_type = ConfigType.CONFIG
+        cfg.save(cfg_type=save_type)
         self._parent.reload_only()
 
 

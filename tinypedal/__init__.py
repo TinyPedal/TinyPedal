@@ -37,6 +37,7 @@ class RealtimeState:
     Attributes:
         active: whether is active (driving or overriding) state.
         paused: whether data stopped updating.
+        hidden: whether overlay is hidden.
         overriding: whether is state override mode enabled.
         spectating: whether is spectate mode enabled.
     """
@@ -44,6 +45,7 @@ class RealtimeState:
     __slots__ = (
         "active",
         "paused",
+        "hidden",
         "overriding",
         "spectating",
     )
@@ -51,6 +53,7 @@ class RealtimeState:
     def __init__(self):
         self.active: bool = False
         self.paused: bool = True
+        self.hidden: bool = False
         self.overriding: bool = False
         self.spectating: bool = False
 
@@ -64,7 +67,6 @@ class OverlaySignal(QObject):
         reload: signal for reloading preset, should only be emitted after app fully loaded.
         paused: signal for pausing and resuming overlay timer.
         iconify: signal for toggling taskbar icon visibility state (for VR compatibility).
-        updates: signal for checking version updates.
     """
 
     hidden = Signal(bool)
@@ -72,9 +74,22 @@ class OverlaySignal(QObject):
     reload = Signal(bool)
     paused = Signal(bool)
     iconify = Signal(bool)
+    __slots__ = ()
+
+
+class ApplicationSignal(QObject):
+    """Application signal
+
+    Attributes:
+        updates: signal for checking version updates.
+        refresh: signal for refresh main GUI, such as tab view.
+    """
+
     updates = Signal(bool)
+    refresh = Signal(bool)
     __slots__ = ()
 
 
 realtime_state = RealtimeState()
 overlay_signal = OverlaySignal()
+app_signal = ApplicationSignal()

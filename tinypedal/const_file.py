@@ -36,6 +36,7 @@ class ConfigType:
     # Global preset
     CONFIG = "config"
     FILELOCK = "filelock"
+    SHORTCUTS = "shortcuts"
     # User preset
     SETTING = "setting"
     # Module ID

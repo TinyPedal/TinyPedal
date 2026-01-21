@@ -24,7 +24,7 @@ import os
 import shutil
 from typing import Callable
 
-from PySide2.QtCore import QPoint, Qt
+from PySide2.QtCore import QPoint, Qt, Slot
 from PySide2.QtWidgets import (
     QCheckBox,
     QDialogButtonBox,
@@ -99,6 +99,7 @@ class PresetList(QWidget):
         layout_main.setContentsMargins(margin, margin, margin, margin)
         self.setLayout(layout_main)
 
+    @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh preset list"""
         preset_list = cfg.preset_files()

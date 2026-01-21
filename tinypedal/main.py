@@ -199,6 +199,7 @@ def start_app(cli_args):
     # load global config
     cfg.load_global()
     cfg.save(cfg_type=ConfigType.CONFIG)
+    cfg.save(cfg_type=ConfigType.SHORTCUTS)
     set_environment()
     # Main GUI
     root = init_gui()

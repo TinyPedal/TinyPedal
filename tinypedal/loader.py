@@ -28,6 +28,7 @@ import time
 
 from .api_control import api
 from .const_file import FileExt
+from .hotkey_control import kctrl
 from .module_control import mctrl, wctrl
 from .overlay_control import octrl
 from .setting import cfg
@@ -64,7 +65,9 @@ def start():
     logger.info("FINALIZING............")
     # 1 Enable overlay control
     octrl.enable()
-    # 2 Check for updates
+    # 2 Enable hotkey control
+    kctrl.enable()
+    # 3 Check for updates
     if cfg.application["check_for_updates_on_startup"]:
         update_checker.check(False)
 
@@ -102,7 +105,8 @@ def reload(reload_preset: bool = False):
     logger.info("RELOADING............")
     # 0 wait unfinished saving
     if cfg.is_saving:
-        cfg.save(0)  # trigger immediate saving
+        # Trigger immediate saving from queue
+        cfg.save(0, next_task=True)
         while cfg.is_saving:
             time.sleep(0.01)
     # 1 unload modules
@@ -122,10 +126,12 @@ def load_modules():
     octrl.enable()  # 1 overlay control
     mctrl.start()  # 2 module
     wctrl.start()  # 3 widget
+    kctrl.enable()  # 4 hotkey
 
 
 def unload_modules():
     """Unload modules, widgets"""
-    wctrl.close()  # 1 widget
-    mctrl.close()  # 2 module
-    octrl.disable()  # 3 overlay control
+    kctrl.disable()  # 1 hotkey
+    wctrl.close()  # 2 widget
+    mctrl.close()  # 3 module
+    octrl.disable()  # 4 overlay control

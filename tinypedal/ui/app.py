@@ -36,7 +36,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import loader, overlay_signal
+from .. import app_signal, loader, overlay_signal
 from ..api_control import api
 from ..const_api import API_MAP_ALIAS
 from ..const_app import APP_NAME, VERSION
@@ -45,6 +45,7 @@ from ..module_control import mctrl, wctrl
 from ..setting import cfg
 from . import set_style_palette, set_style_window
 from ._common import UIScaler
+from .hotkey_view import HotkeyList
 from .menu import APIMenu, ConfigMenu, HelpMenu, OverlayMenu, ToolsMenu, WindowMenu
 from .module_view import ModuleList
 from .notification import NotifyBar
@@ -69,6 +70,7 @@ class TabView(QWidget):
         preset_tab = PresetList(self, parent.reload_preset, notify_bar.presetlocked.setVisible)
         spectate_tab = SpectateList(self, notify_bar.spectate.setVisible)
         pacenotes_tab = PaceNotesControl(self, notify_bar.pacenotes.setVisible)
+        hotkey_tab = HotkeyList(self, notify_bar.hotkey.setVisible)
 
         self._tabs = QTabWidget(self)
         self._tabs.addTab(widget_tab, "Widget")  # 0
@@ -76,6 +78,7 @@ class TabView(QWidget):
         self._tabs.addTab(preset_tab, "Preset")  # 2
         self._tabs.addTab(spectate_tab, "Spectate")  # 3
         self._tabs.addTab(pacenotes_tab, "Pace Notes")  # 4
+        self._tabs.addTab(hotkey_tab, "Hotkey")  # 5
 
         # Main view
         layout_main = QVBoxLayout()
@@ -85,21 +88,31 @@ class TabView(QWidget):
         layout_main.addWidget(notify_bar)
         self.setLayout(layout_main)
 
-    def refresh_tab(self, index: int = -1):
-        """Refresh tab
+    def connect_signal(self):
+        """Connect signal to tabs"""
+        for tab_index in range(self._tabs.count()):
+            app_signal.refresh.connect(self._tabs.widget(tab_index).refresh)
 
-        Args:
-            index: -1 All tabs, 0 Widget, 1 Module, 2 Preset, 3 Spectate, 4 Pace Notes
-        """
-        if index < 0:
-            for tab_index in range(self._tabs.count()):
-                self._tabs.widget(tab_index).refresh()
-        else:
-            self._tabs.widget(index).refresh()
+    def disconnect_signal(self):
+        """Disconnect signal to tabs"""
+        for tab_index in range(self._tabs.count()):
+            app_signal.refresh.disconnect(self._tabs.widget(tab_index).refresh)
 
-    def select_tab(self, index: int):
-        """Select tab"""
-        self._tabs.setCurrentIndex(index)
+    def select_preset_tab(self):
+        """Select preset tab"""
+        self._tabs.setCurrentIndex(2)
+
+    def select_spectate_tab(self):
+        """Select spectate tab"""
+        self._tabs.setCurrentIndex(3)
+
+    def select_pacenotes_tab(self):
+        """Select pace notes tab"""
+        self._tabs.setCurrentIndex(4)
+
+    def select_hotkey_tab(self):
+        """Select hotkey tab"""
+        self._tabs.setCurrentIndex(5)
 
 
 class StatusButtonBar(QStatusBar):
@@ -181,6 +194,7 @@ class StatusButtonBar(QStatusBar):
         else:
             cfg.application["window_color_theme"] = "Dark"
         cfg.save(cfg_type=ConfigType.CONFIG)
+        self.refresh()
         self._parent.load_window_style()
 
 
@@ -337,7 +351,6 @@ class AppWindow(QMainWindow):
             self.last_style = style
             set_style_palette(self.last_style)
             self.setStyleSheet(set_style_window(QApplication.font().pointSize()))
-        self.statusBar().refresh()
 
     def show_app(self):
         """Show app window"""
@@ -363,32 +376,30 @@ class AppWindow(QMainWindow):
     def restart_api(self):
         """Restart telemetry API"""
         api.restart()
-        self.statusBar().refresh()
-        self.tab_view.refresh_tab(3)
+        app_signal.refresh.emit(True)
 
     @Slot(bool)  # type: ignore[operator]
     def reload_preset(self):
         """Reload current preset"""
         loader.reload(reload_preset=True)
         self.load_window_style()
-        self.refresh_states()
+        app_signal.refresh.emit(True)
 
     def reload_only(self):
         """Reload only api, module, widget"""
         loader.reload(reload_preset=False)
-        self.refresh_states()
-
-    def refresh_states(self):
-        """Refresh state"""
-        self.statusBar().refresh()
-        self.tab_view.refresh_tab()
+        app_signal.refresh.emit(True)
 
     def __connect_signal(self):
         """Connect signal"""
+        self.tab_view.connect_signal()
+        app_signal.refresh.connect(self.statusBar().refresh)
         overlay_signal.reload.connect(self.reload_preset)
         logger.info("GUI: connect signals")
 
     def __break_signal(self):
         """Disconnect signal"""
+        self.tab_view.disconnect_signal()
+        app_signal.refresh.disconnect(self.statusBar().refresh)
         overlay_signal.reload.disconnect(self.reload_preset)
         logger.info("GUI: disconnect signals")

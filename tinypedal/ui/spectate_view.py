@@ -23,6 +23,7 @@ Spectate list view
 import logging
 from typing import Callable
 
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -103,6 +104,7 @@ class SpectateList(QWidget):
         api.setup()
         self.refresh()
 
+    @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh spectate list"""
         enabled = cfg.api["enable_player_index_override"]
