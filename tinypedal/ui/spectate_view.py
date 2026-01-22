@@ -82,27 +82,6 @@ class SpectateList(QWidget):
         layout_main.setContentsMargins(margin, margin, margin, margin)
         self.setLayout(layout_main)
 
-    def set_button_state(self, enabled: bool):
-        """Set button state"""
-        self.button_toggle.setChecked(enabled)
-        self.button_toggle.setText("Enabled" if enabled else "Disabled")
-        self.listbox_spectate.setDisabled(not enabled)
-        self.button_spectate.setDisabled(not enabled)
-        self.button_refresh.setDisabled(not enabled)
-        self.label_spectating.setDisabled(not enabled)
-        self.notify_toggle(enabled)
-        if enabled:
-            logger.info("ENABLED: spectate mode")
-        else:
-            logger.info("DISABLED: spectate mode")
-
-    def toggle_spectate(self, checked: bool):
-        """Toggle spectate mode"""
-        cfg.api["enable_player_index_override"] = checked
-        cfg.save()
-        api.setup()
-        self.refresh()
-
     @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh spectate list"""
@@ -114,10 +93,31 @@ class SpectateList(QWidget):
             self.listbox_spectate.clear()
             self.label_spectating.setText("Spectating: <b>Disabled</b>")
 
+        self.notify_toggle(cfg.notification["notify_spectate_mode"] and enabled)
         # Update button state only if changed
         if self.last_enabled != enabled:
             self.last_enabled = enabled
-            self.set_button_state(enabled)
+            self.set_enable_state(enabled)
+
+    def set_enable_state(self, enabled: bool):
+        """Set enable state"""
+        self.button_toggle.setChecked(enabled)
+        self.button_toggle.setText("Enabled" if enabled else "Disabled")
+        self.listbox_spectate.setDisabled(not enabled)
+        self.button_spectate.setDisabled(not enabled)
+        self.button_refresh.setDisabled(not enabled)
+        self.label_spectating.setDisabled(not enabled)
+        if enabled:
+            logger.info("ENABLED: spectate mode")
+        else:
+            logger.info("DISABLED: spectate mode")
+
+    def toggle_spectate(self, checked: bool):
+        """Toggle spectate mode"""
+        cfg.api["enable_player_index_override"] = checked
+        cfg.save()
+        api.setup()
+        self.refresh()
 
     def spectate_selected(self):
         """Spectate selected player"""

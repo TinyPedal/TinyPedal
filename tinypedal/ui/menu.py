@@ -274,6 +274,9 @@ class ConfigMenu(QMenu):
 
         config_userpath = self.addAction("User Path")
         config_userpath.triggered.connect(self.open_config_userpath)
+
+        config_notify = self.addAction("Notification")
+        config_notify.triggered.connect(self.open_config_notification)
         self.addSeparator()
 
         config_units = self.addAction("Units")
@@ -316,6 +319,18 @@ class ConfigMenu(QMenu):
             default_setting=cfg.default.config,
             reload_func=self._parent.reload_preset,
             option_width=22,
+        )
+        _dialog.open()
+
+    def open_config_notification(self):
+        """Config GUI notification"""
+        _dialog = UserConfig(
+            parent=self._parent,
+            key_name="notification",
+            cfg_type=ConfigType.CONFIG,
+            user_setting=cfg.user.config,
+            default_setting=cfg.default.config,
+            reload_func=self._parent.refresh_only,
         )
         _dialog.open()
 

@@ -337,6 +337,22 @@ Set PySide (Qt for Python) module version. Set `2` for PySide2 (default). Set `6
 [**`Back to Top`**](#)
 
 
+## Console Log
+**Console log can be accessed in `Show Log` dialog from `Help` menu in main window.**
+
+To save all log, click `Save` button.
+
+To copy all log to clipboard, click `Copy` button.
+
+To clear all log, click `Clear` button.
+
+To refresh log, click `Refresh` button.
+
+To enable auto-refreshing, toggle on `Auto Refresh` check box.
+
+[**`Back to Top`**](#)
+
+
 # Telemetry API
 **Telemetry API options can be accessed from `API` menu in main window.**
 
@@ -690,6 +706,26 @@ To share user path across multiple copies of TinyPedal, user must set path to pl
 [**`Back to Top`**](#)
 
 
+## Notification
+**Notification options can be accessed from `Config` menu in main window.**
+
+Note, notifications are displayed in main window. Click on any notification to quickly switch to corresponding tab. It's recommended to keep all notifications enabled.
+
+    notify_locked_preset
+Show notification for loading locked preset.
+
+    notify_spectate_mode
+Show notification while spectate mode is enabled.
+
+    notify_pace_notes_playback
+Show notification while pace notes playback is enabled.
+
+    notify_global_hotkey
+Show notification while global hotkey is enabled.
+
+[**`Back to Top`**](#)
+
+
 ## Overlay
 **Overlay options can be accessed from `Overlay` menu in main window, or from tray icon menu.**
 
@@ -798,7 +834,7 @@ Enable `Manually Select Pace Notes File` check box to disable auto-file-name mat
 ## Hotkey
 **Hotkey control panel can be accessed from `Hotkey` tab in main window.**
 
-Note, hotkey bindings are non-exclusive in TinyPedal, which means they will not interfere with other programs. Hotkey history can be view in `Show Log` dialog from `Help` menu. Currently global hotkey feature is not supported on Linux.
+Note, hotkey bindings are non-exclusive in TinyPedal, which means they will not interfere with other programs. Hotkey history can be view in [Show Log](#console-log) dialog from `Help` menu. Currently global hotkey feature is not supported on Linux.
 
 Click `Enabled` or `Disabled` button to toggle global hotkey support on and off. Note, global hotkey support can also be enabled by setting `enable_global_hotkey` option to `true` in [Application](#application) dialog.
 
@@ -1650,7 +1686,7 @@ For example, if `brake thickness` is `40`mm, and `failure thickness` is `25`mm, 
 
 Since brake failure thickness threshold data is not available from game API, it requires testing to find out, and may vary from vehicle to vehicle. Front brake failure thickness threshold can be different from rear brake. Thickness threshold value should not exceed brake maximum thickness, otherwise brake wear readings will not be displayed correctly.
 
-Note, failure thickness values are automatically saved to `brakes.json` preset when brakes failed, and most recent brake failures are logged and can be found in `Show Log` dialog from Help menu.
+Note, failure thickness values are automatically saved to `brakes.json` preset when brakes failed, and most recent brake failures are logged and can be found in [Show Log](#console-log) dialog from `Help` menu.
 
 **Tips for testing failure thickness:**
 

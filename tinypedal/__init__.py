@@ -64,14 +64,12 @@ class OverlaySignal(QObject):
     Attributes:
         hidden: signal for toggling auto hide state.
         locked: signal for toggling lock state.
-        reload: signal for reloading preset, should only be emitted after app fully loaded.
         paused: signal for pausing and resuming overlay timer.
         iconify: signal for toggling taskbar icon visibility state (for VR compatibility).
     """
 
     hidden = Signal(bool)
     locked = Signal(bool)
-    reload = Signal(bool)
     paused = Signal(bool)
     iconify = Signal(bool)
     __slots__ = ()
@@ -81,11 +79,13 @@ class ApplicationSignal(QObject):
     """Application signal
 
     Attributes:
+        reload: signal for reloading preset, should only be emitted after app fully loaded.
         updates: signal for checking version updates.
         refresh: signal for refreshing main GUI.
         quitapp: signal for closing APP.
     """
 
+    reload = Signal(bool)
     updates = Signal(bool)
     refresh = Signal(bool)
     quitapp = Signal(bool)

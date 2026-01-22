@@ -84,13 +84,22 @@ class HotkeyList(QWidget):
         layout_main.setContentsMargins(margin, margin, margin, margin)
         self.setLayout(layout_main)
 
-    def set_button_state(self, enabled: bool):
-        """Set button state"""
+    @Slot(bool)  # type: ignore[operator]
+    def refresh(self):
+        """Refresh hotkey list"""
+        enabled = cfg.application["enable_global_hotkey"]
+        self.notify_toggle(cfg.notification["notify_global_hotkey"] and enabled)
+        # Update button state only if changed
+        if self.last_enabled != enabled:
+            self.last_enabled = enabled
+            self.set_enable_state(enabled)
+
+    def set_enable_state(self, enabled: bool):
+        """Set enable state"""
         self.button_toggle.setChecked(enabled)
         self.button_toggle.setText("Enabled" if enabled else "Disabled")
         self.button_reset.setDisabled(not enabled)
         self.listbox_hotkey.setDisabled(not enabled)
-        self.notify_toggle(enabled)
 
     def toggle_hotkey(self, checked: bool):
         """Toggle hotkey mode"""
@@ -108,15 +117,6 @@ class HotkeyList(QWidget):
             self.listbox_hotkey.addItem(item)
             self.listbox_hotkey.setItemWidget(item, module_item)
         self.listbox_hotkey.setCurrentRow(0)
-
-    @Slot(bool)  # type: ignore[operator]
-    def refresh(self):
-        """Refresh hotkey list"""
-        enabled = cfg.application["enable_global_hotkey"]
-        # Update button state only if changed
-        if self.last_enabled != enabled:
-            self.last_enabled = enabled
-            self.set_button_state(enabled)
 
     def reset_hotkey(self):
         """Reset hotkey"""

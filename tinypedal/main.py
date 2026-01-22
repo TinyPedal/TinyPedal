@@ -72,20 +72,6 @@ def is_pid_exist() -> bool:
     return False  # no running
 
 
-#def is_exe_running() -> bool:
-#    """Check running executable (windows only), this is only used as fallback"""
-#    # Skip exe check if not on windows system
-#    if PLATFORM != "Windows":
-#        return False
-#    app_pid = os.getpid()
-#    EXE_FILE = "tinypedal.exe"
-#    for app in psutil.process_iter(["name", "pid"]):
-#        # Compare found APP name & pid
-#        if app.info["name"] == EXE_FILE and app.info["pid"] != app_pid:
-#            return True
-#    return False
-
-
 def single_instance_check(is_single_instance: bool):
     """Single instance check"""
     # Check if single instance mode enabled

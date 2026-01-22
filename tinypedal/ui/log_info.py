@@ -20,8 +20,10 @@
 Log window
 """
 
+from PySide2.QtCore import QBasicTimer
 from PySide2.QtGui import QTextCursor, QTextOption
 from PySide2.QtWidgets import (
+    QCheckBox,
     QFileDialog,
     QHBoxLayout,
     QMessageBox,
@@ -41,16 +43,21 @@ class LogInfo(BaseDialog):
         super().__init__(parent)
         self.set_utility_title("Log")
 
+        self._update_timer = QBasicTimer()
+        self.last_position = -1
+
         # Text view
         self.log_view = QTextBrowser(self)
         self.log_view.setMinimumSize(UIScaler.size(42), UIScaler.size(22))
         self.log_view.setWordWrapMode(QTextOption.NoWrap)
         self.refresh_log()
 
-        # Button
-        button_refresh = CompactButton("Refresh")
-        button_refresh.clicked.connect(self.refresh_log)
+        # Check box
+        checkbox_autorefresh = QCheckBox("Auto Refresh")
+        checkbox_autorefresh.setChecked(False)
+        checkbox_autorefresh.toggled.connect(self.toggle_auto_refresh)
 
+        # Button
         button_save = CompactButton("Save")
         button_save.clicked.connect(self.save_log)
 
@@ -60,15 +67,19 @@ class LogInfo(BaseDialog):
         button_clear = CompactButton("Clear")
         button_clear.clicked.connect(self.clear_log)
 
+        self.button_refresh = CompactButton("Refresh")
+        self.button_refresh.clicked.connect(self.refresh_log)
+
         button_close = CompactButton("Close")
         button_close.clicked.connect(self.reject)
 
         # Layout
         layout_button = QHBoxLayout()
-        layout_button.addWidget(button_refresh)
         layout_button.addWidget(button_save)
         layout_button.addWidget(button_copy)
         layout_button.addWidget(button_clear)
+        layout_button.addWidget(self.button_refresh)
+        layout_button.addWidget(checkbox_autorefresh)
         layout_button.addStretch(1)
         layout_button.addWidget(button_close)
 
@@ -77,6 +88,22 @@ class LogInfo(BaseDialog):
         layout_main.addLayout(layout_button)
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(layout_main)
+
+    def timerEvent(self, event):
+        """Refresh log"""
+        position = log_stream.tell()
+        if self.last_position != position:
+            self.last_position = position
+            self.refresh_log()
+
+    def toggle_auto_refresh(self, checked: bool):
+        """Toggle auto refresh"""
+        if checked:
+            self._update_timer.start(200, self)
+            self.button_refresh.setDisabled(True)
+        else:
+            self._update_timer.stop()
+            self.button_refresh.setDisabled(False)
 
     def refresh_log(self):
         """Refresh log"""

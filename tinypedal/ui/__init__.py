@@ -160,24 +160,12 @@ def set_style_window(base_font_pt: int) -> str:
             border: none;
             color: {color_active_highlighted_text};
         }}
-        NotifyBar #notifyPresetLocked {{
-            background: #777;
-        }}
-        NotifyBar #notifySpectate {{
-            background: #08C;
-        }}
-        NotifyBar #notifyPacenotes {{
-            background: #280;
-        }}
-        NotifyBar #notifyHotkey {{
-            background: #854;
-        }}
-        NotifyBar #notifyUpdates {{
-            background: #A4A;
-        }}
-        NotifyBar #notifyUpdates::menu-indicator {{
+        NotifyBar QPushButton::menu-indicator {{
             image: none;
             width: 0;
+        }}
+        NotifyBar UpdatesNotifyButton {{
+            background: #638;
         }}
 
         /* Module list (tab) */

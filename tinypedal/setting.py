@@ -211,6 +211,11 @@ class Setting:
         return self.user.config["compatibility"]
 
     @property
+    def notification(self) -> dict[str, Any]:
+        """Notification (global) setting (quick reference)"""
+        return self.user.config["notification"]
+
+    @property
     def overlay(self) -> dict[str, Any]:
         """Overlay setting (quick reference)"""
         return self.user.setting["overlay"]

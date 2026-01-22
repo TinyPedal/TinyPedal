@@ -51,6 +51,7 @@ def hotkey_vr_compatibility():
 def hotkey_restart_api():
     """Command - restart api"""
     api.restart()
+    app_signal.refresh.emit(True)
 
 
 def hotkey_select_next_api():
@@ -93,7 +94,7 @@ def hotkey_select_previous_api():
 
 def hotkey_reload_preset():
     """Command - reload preset"""
-    overlay_signal.reload.emit(True)
+    app_signal.reload.emit(True)
 
 
 def hotkey_load_next_preset():
@@ -106,7 +107,7 @@ def hotkey_load_next_preset():
         if next_index >= len(preset_list):
             next_index = 0
     cfg.set_next_to_load(f"{preset_list[next_index]}{FileExt.JSON}")
-    overlay_signal.reload.emit(True)
+    app_signal.reload.emit(True)
 
 
 def hotkey_load_previous_preset():
@@ -119,7 +120,7 @@ def hotkey_load_previous_preset():
         if next_index < 0:
             next_index = max(len(preset_list) - 1, 0)
     cfg.set_next_to_load(f"{preset_list[next_index]}{FileExt.JSON}")
-    overlay_signal.reload.emit(True)
+    app_signal.reload.emit(True)
 
 
 def hotkey_spectate_mode():

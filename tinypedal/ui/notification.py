@@ -32,6 +32,7 @@ from PySide2.QtWidgets import (
 )
 
 from ..const_app import URL_RELEASE
+from ..setting import cfg
 from ..update import update_checker
 
 
@@ -41,23 +42,18 @@ class NotifyBar(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.presetlocked = QPushButton("Preset Locked")
-        self.presetlocked.setObjectName("notifyPresetLocked")
         self.presetlocked.setVisible(False)
 
         self.spectate = QPushButton("Spectate Mode Enabled")
-        self.spectate.setObjectName("notifySpectate")
         self.spectate.setVisible(False)
 
         self.pacenotes = QPushButton("Pace Notes Playback Enabled")
-        self.pacenotes.setObjectName("notifyPacenotes")
         self.pacenotes.setVisible(False)
 
         self.hotkey = QPushButton("Global Hotkey Enabled")
-        self.hotkey.setObjectName("notifyHotkey")
         self.hotkey.setVisible(False)
 
         self.updates = UpdatesNotifyButton("")
-        self.updates.setObjectName("notifyUpdates")
         self.updates.setVisible(False)
 
         layout = QVBoxLayout()
@@ -69,6 +65,25 @@ class NotifyBar(QWidget):
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
+
+    def refresh(self):
+        """Refresh & update style"""
+        self.presetlocked.setStyleSheet(
+            f"color: {cfg.notification['font_color_locked_preset']};"
+            f"background: {cfg.notification['bkg_color_locked_preset']};"
+        )
+        self.spectate.setStyleSheet(
+            f"color: {cfg.notification['font_color_spectate_mode']};"
+            f"background: {cfg.notification['bkg_color_spectate_mode']};"
+        )
+        self.pacenotes.setStyleSheet(
+            f"color: {cfg.notification['font_color_pace_notes_playback']};"
+            f"background: {cfg.notification['bkg_color_pace_notes_playback']};"
+        )
+        self.hotkey.setStyleSheet(
+            f"color: {cfg.notification['font_color_global_hotkey']};"
+            f"background: {cfg.notification['bkg_color_global_hotkey']};"
+        )
 
 
 class UpdatesNotifyButton(QPushButton):

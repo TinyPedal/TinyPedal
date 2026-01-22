@@ -45,6 +45,7 @@ CFG_BOOL = (
     "^remember_size$|"
     "^vr_compatibility$|"
     # Partial match
+    "^notify_|"
     "align_center|"
     "enable|"
     "shorten|"

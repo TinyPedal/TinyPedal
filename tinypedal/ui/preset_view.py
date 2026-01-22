@@ -40,7 +40,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import overlay_signal
+from .. import app_signal
 from ..const_app import VERSION
 from ..const_file import ConfigType, FileExt
 from ..formatter import strip_filename_extension
@@ -118,7 +118,7 @@ class PresetList(QWidget):
         locked_tag = " (locked)" if is_locked else ""
         self.label_loaded.setText(f"Loaded: <b>{loaded_preset[:-5]}{locked_tag}</b>")
         self.checkbox_autoload.setChecked(cfg.application["enable_auto_load_preset"])
-        self.notify_toggle(is_locked)
+        self.notify_toggle(cfg.notification["notify_locked_preset"] and is_locked)
 
     def load_preset(self):
         """Load selected preset"""
@@ -126,7 +126,7 @@ class PresetList(QWidget):
         if selected_index >= 0:
             selected_preset_name = self.listbox_preset.item(selected_index).text()
             cfg.set_next_to_load(f"{selected_preset_name}{FileExt.JSON}")
-            overlay_signal.reload.emit(True)
+            app_signal.reload.emit(True)
         else:
             QMessageBox.warning(
                 self, "Error",
@@ -318,7 +318,7 @@ class CreatePreset(BaseDialog):
             # Reload if renamed file was loaded
             if cfg.is_loaded(source_filename):
                 cfg.set_next_to_load(f"{entered_filename}{FileExt.JSON}")
-                overlay_signal.reload.emit(True)
+                app_signal.reload.emit(True)
             else:
                 self._parent.refresh()
         # Create new preset

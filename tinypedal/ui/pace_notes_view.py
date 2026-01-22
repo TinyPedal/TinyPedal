@@ -176,6 +176,8 @@ class PaceNotesControl(QWidget):
     def __init__(self, parent, notify_toggle: Callable):
         super().__init__(parent)
         self.notify_toggle = notify_toggle
+        self.last_enabled = None
+
         self.mcfg = cfg.user.setting["pace_notes_playback"]
         self.pace_notes_player = PaceNotesPlayer(self, self.mcfg)
 
@@ -298,6 +300,8 @@ class PaceNotesControl(QWidget):
         """Refresh state"""
         self.mcfg = cfg.user.setting["pace_notes_playback"]
         self.pace_notes_player.mcfg = self.mcfg
+        enabled = self.mcfg["enable"]
+
         self.toggle_playinpit_state(self.mcfg["enable_playback_while_in_pit"])
         self.toggle_selector_state(self.mcfg["enable_manual_file_selector"])
         self.file_selector.setText(self.mcfg["pace_notes_file_name"])
@@ -307,7 +311,20 @@ class PaceNotesControl(QWidget):
         self.spinbox_max_duration.setValue(self.mcfg["pace_notes_sound_max_duration"])
         self.spinbox_max_queue.setValue(self.mcfg["pace_notes_sound_max_queue"])
         self.slider_volume.setValue(self.mcfg["pace_notes_sound_volume"])
-        self.set_enable_state(self.mcfg["enable"])
+
+        self.notify_toggle(cfg.notification["notify_pace_notes_playback"] and enabled)
+        # Update button state only if changed
+        if self.last_enabled != enabled:
+            self.last_enabled = enabled
+            self.set_enable_state(enabled)
+
+    def set_enable_state(self, enabled: bool):
+        """Set enabled state"""
+        self.button_toggle.setText("  Playback Enabled  " if enabled else "  Playback Disabled  ")
+        self.button_toggle.setChecked(enabled)
+        self.button_apply.setDisabled(not enabled)
+        self.frame_control.setDisabled(not enabled)
+        self.pace_notes_player.set_playback(enabled)
 
     def set_notes_path(self):
         """Set pace notes file path"""
@@ -367,17 +384,8 @@ class PaceNotesControl(QWidget):
 
     def toggle_button_state(self, checked: bool):
         """Toggle button state"""
-        self.set_enable_state(checked)
         self.update_config("enable", checked)
-
-    def set_enable_state(self, enabled: bool):
-        """Set pace notes enabled state"""
-        self.button_toggle.setText("  Playback Enabled  " if enabled else "  Playback Disabled  ")
-        self.button_toggle.setChecked(enabled)
-        self.button_apply.setDisabled(not enabled)
-        self.frame_control.setDisabled(not enabled)
-        self.pace_notes_player.set_playback(enabled)
-        self.notify_toggle(enabled)
+        self.refresh()
 
     def update_config(self, key: str, value: int | float | str) -> bool:
         """Update pace note playback setting, save if changed"""

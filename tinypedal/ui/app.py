@@ -36,7 +36,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal, loader, overlay_signal
+from .. import app_signal, loader
 from ..api_control import api
 from ..const_api import API_MAP_ALIAS
 from ..const_app import APP_NAME, VERSION
@@ -68,7 +68,9 @@ class TabView(QWidget):
         notify_bar.spectate.clicked.connect(self.select_spectate_tab)
         notify_bar.pacenotes.clicked.connect(self.select_pacenotes_tab)
         notify_bar.hotkey.clicked.connect(self.select_hotkey_tab)
+
         app_signal.updates.connect(notify_bar.updates.checking)
+        app_signal.refresh.connect(notify_bar.refresh)
 
         # Tabs
         widget_tab = ModuleList(self, wctrl)
@@ -123,8 +125,6 @@ class StatusButtonBar(QStatusBar):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self._parent = parent
-
         self.button_api = QPushButton("")
         self.button_api.clicked.connect(self.refresh)
         self.button_api.setToolTip("Config Telemetry API")
@@ -199,8 +199,7 @@ class StatusButtonBar(QStatusBar):
         else:
             cfg.application["window_color_theme"] = "Dark"
         cfg.save(cfg_type=ConfigType.CONFIG)
-        self.refresh()
-        self._parent.load_window_style()
+        app_signal.refresh.emit(True)
 
 
 class AppWindow(QMainWindow):
@@ -210,6 +209,7 @@ class AppWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(f"{APP_NAME} v{VERSION}")
         self.setAttribute(Qt.WA_DeleteOnClose, True)
+        self.last_style = None
 
         # Status bar
         self.setStatusBar(StatusButtonBar(self))
@@ -224,16 +224,23 @@ class AppWindow(QMainWindow):
         # Tray icon
         self.set_tray_icon()
 
-        # Apply color style
-        self.last_style = None
-        self.load_window_style()
-
         # Window state
         self.set_window_state()
         self.__connect_signal()
 
         # Refresh GUI
-        app_signal.refresh.emit(True)
+        self.refresh_only()
+
+    @Slot(bool)  # type: ignore[operator]
+    def refresh(self):
+        """Refresh GUI"""
+        # Window style
+        style = cfg.application["window_color_theme"]
+        logger.info("GUI: loading window color theme: %s", style)
+        if self.last_style != style:
+            self.last_style = style
+            set_style_palette(self.last_style)
+            self.setStyleSheet(set_style_window(QApplication.font().pointSize()))
 
     def set_menu_bar(self):
         """Set menu bar"""
@@ -351,15 +358,6 @@ class AppWindow(QMainWindow):
         if save_changes:
             cfg.save(0, cfg_type=ConfigType.CONFIG)
 
-    def load_window_style(self):
-        """Load window style"""
-        style = cfg.application["window_color_theme"]
-        logger.info("GUI: loading window color theme: %s", style)
-        if self.last_style != style:
-            self.last_style = style
-            set_style_palette(self.last_style)
-            self.setStyleSheet(set_style_window(QApplication.font().pointSize()))
-
     def show_app(self):
         """Show app window"""
         self.showNormal()
@@ -385,28 +383,34 @@ class AppWindow(QMainWindow):
     def restart_api(self):
         """Restart telemetry API"""
         api.restart()
-        app_signal.refresh.emit(True)
+        self.refresh_only()
 
     @Slot(bool)  # type: ignore[operator]
     def reload_preset(self):
         """Reload current preset"""
         loader.reload(reload_preset=True)
-        self.load_window_style()
-        app_signal.refresh.emit(True)
+        self.refresh_only()
 
     def reload_only(self):
         """Reload only api, module, widget"""
         loader.reload(reload_preset=False)
+        self.refresh_only()
+
+    def refresh_only(self):
+        """Refresh GUI only"""
         app_signal.refresh.emit(True)
 
     def __connect_signal(self):
         """Connect signal"""
+        app_signal.refresh.connect(self.refresh)
         app_signal.quitapp.connect(self.quit_app)
-        overlay_signal.reload.connect(self.reload_preset)
+        app_signal.reload.connect(self.reload_preset)
         logger.info("GUI: connect signals")
 
     def __break_signal(self):
         """Disconnect signal"""
-        app_signal.quitapp.disconnect(self.quit_app)
-        overlay_signal.reload.disconnect(self.reload_preset)
+        app_signal.updates.disconnect()
+        app_signal.refresh.disconnect()
+        app_signal.quitapp.disconnect()
+        app_signal.reload.disconnect()
         logger.info("GUI: disconnect signals")
