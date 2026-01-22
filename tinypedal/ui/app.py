@@ -64,13 +64,26 @@ class TabView(QWidget):
         # Notify bar
         notify_bar = NotifyBar(self)
 
+        notify_bar.presetlocked.clicked.connect(self.select_preset_tab)
+        notify_bar.spectate.clicked.connect(self.select_spectate_tab)
+        notify_bar.pacenotes.clicked.connect(self.select_pacenotes_tab)
+        notify_bar.hotkey.clicked.connect(self.select_hotkey_tab)
+        app_signal.updates.connect(notify_bar.updates.checking)
+
         # Tabs
         widget_tab = ModuleList(self, wctrl)
         module_tab = ModuleList(self, mctrl)
-        preset_tab = PresetList(self, parent.reload_preset, notify_bar.presetlocked.setVisible)
+        preset_tab = PresetList(self, notify_bar.presetlocked.setVisible)
         spectate_tab = SpectateList(self, notify_bar.spectate.setVisible)
         pacenotes_tab = PaceNotesControl(self, notify_bar.pacenotes.setVisible)
         hotkey_tab = HotkeyList(self, notify_bar.hotkey.setVisible)
+
+        app_signal.refresh.connect(widget_tab.refresh)
+        app_signal.refresh.connect(module_tab.refresh)
+        app_signal.refresh.connect(preset_tab.refresh)
+        app_signal.refresh.connect(spectate_tab.refresh)
+        app_signal.refresh.connect(pacenotes_tab.refresh)
+        app_signal.refresh.connect(hotkey_tab.refresh)
 
         self._tabs = QTabWidget(self)
         self._tabs.addTab(widget_tab, "Widget")  # 0
@@ -87,16 +100,6 @@ class TabView(QWidget):
         layout_main.addWidget(self._tabs)
         layout_main.addWidget(notify_bar)
         self.setLayout(layout_main)
-
-    def connect_signal(self):
-        """Connect signal to tabs"""
-        for tab_index in range(self._tabs.count()):
-            app_signal.refresh.connect(self._tabs.widget(tab_index).refresh)
-
-    def disconnect_signal(self):
-        """Disconnect signal to tabs"""
-        for tab_index in range(self._tabs.count()):
-            app_signal.refresh.disconnect(self._tabs.widget(tab_index).refresh)
 
     def select_preset_tab(self):
         """Select preset tab"""
@@ -126,11 +129,11 @@ class StatusButtonBar(QStatusBar):
         self.button_api.clicked.connect(self.refresh)
         self.button_api.setToolTip("Config Telemetry API")
 
-        self.button_style = QPushButton("Light")
+        self.button_style = QPushButton("")
         self.button_style.clicked.connect(self.toggle_color_theme)
         self.button_style.setToolTip("Toggle Window Color Theme")
 
-        self.button_dpiscale = QPushButton("Scale: Auto")
+        self.button_dpiscale = QPushButton("")
         self.button_dpiscale.clicked.connect(self.toggle_dpi_scaling)
         self.button_dpiscale.setToolTip("Toggle High DPI Scaling")
         self._last_dpi_scaling = cfg.application["enable_high_dpi_scaling"]
@@ -138,8 +141,10 @@ class StatusButtonBar(QStatusBar):
         self.addPermanentWidget(self.button_api)
         self.addWidget(self.button_style)
         self.addWidget(self.button_dpiscale)
-        self.refresh()
 
+        app_signal.refresh.connect(self.refresh)
+
+    @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh status bar"""
         if cfg.api["enable_active_state_override"]:
@@ -226,6 +231,9 @@ class AppWindow(QMainWindow):
         # Window state
         self.set_window_state()
         self.__connect_signal()
+
+        # Refresh GUI
+        app_signal.refresh.emit(True)
 
     def set_menu_bar(self):
         """Set menu bar"""
@@ -357,6 +365,7 @@ class AppWindow(QMainWindow):
         self.showNormal()
         self.activateWindow()
 
+    @Slot(bool)  # type: ignore[operator]
     def quit_app(self):
         """Quit manager"""
         loader.close()  # must close this first
@@ -392,14 +401,12 @@ class AppWindow(QMainWindow):
 
     def __connect_signal(self):
         """Connect signal"""
-        self.tab_view.connect_signal()
-        app_signal.refresh.connect(self.statusBar().refresh)
+        app_signal.quitapp.connect(self.quit_app)
         overlay_signal.reload.connect(self.reload_preset)
         logger.info("GUI: connect signals")
 
     def __break_signal(self):
         """Disconnect signal"""
-        self.tab_view.disconnect_signal()
-        app_signal.refresh.disconnect(self.statusBar().refresh)
+        app_signal.quitapp.disconnect(self.quit_app)
         overlay_signal.reload.disconnect(self.reload_preset)
         logger.info("GUI: disconnect signals")

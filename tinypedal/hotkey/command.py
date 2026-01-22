@@ -22,7 +22,7 @@ Hotkey command function
 
 from __future__ import annotations
 
-from .. import app_signal, overlay_signal, realtime_state
+from .. import app_signal, loader, overlay_signal, realtime_state
 from ..api_control import API_PACK, api
 from ..const_file import ConfigType, FileExt
 from ..setting import cfg
@@ -168,6 +168,16 @@ def hotkey_pace_notes_playback():
     app_signal.refresh.emit(True)
 
 
+def hotkey_restart_application():
+    """Command - restart application"""
+    loader.restart()
+
+
+def hotkey_quit_application():
+    """Command - quit application"""
+    app_signal.quitapp.emit(True)
+
+
 COMMANDS_HOTKEY = (
     ("overlay_visibility", hotkey_overlay_visibility),
     ("overlay_lock", hotkey_overlay_lock),
@@ -182,4 +192,6 @@ COMMANDS_HOTKEY = (
     ("spectate_next_driver", hotkey_spectate_next_driver),
     ("spectate_previous_driver", hotkey_spectate_previous_driver),
     ("pace_notes_playback", hotkey_pace_notes_playback),
+    ("restart_application", hotkey_restart_application),
+    ("quit_application", hotkey_quit_application),
 )

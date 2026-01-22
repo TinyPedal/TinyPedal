@@ -149,7 +149,10 @@ class ModuleControlItem(QWidget):
 
         self.button_toggle = QPushButton("")
         self.button_toggle.setObjectName("buttonToggle")
-        self.set_button_toggle()
+        self.button_toggle.setCheckable(True)
+        self.button_toggle.setChecked(self.is_enabled())
+        # Use "clicked" to avoid trigger with "setChecked"
+        self.button_toggle.clicked.connect(self.toggle_state)
 
         button_config = QPushButton("Config")
         button_config.setObjectName("buttonConfig")
@@ -166,14 +169,6 @@ class ModuleControlItem(QWidget):
     def is_enabled(self) -> bool:
         """Is module enabled"""
         return cfg.user.setting[self.module_name]["enable"]
-
-    def set_button_toggle(self):
-        """Set toggle button"""
-        self.button_toggle.setCheckable(True)
-        self.button_toggle.setChecked(self.is_enabled())
-        # Use "clicked" to avoid trigger with "setChecked"
-        self.button_toggle.clicked.connect(self.toggle_state)
-        self.update_button_text()
 
     def toggle_state(self):
         """Toggle button state"""

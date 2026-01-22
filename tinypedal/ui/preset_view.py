@@ -40,6 +40,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import overlay_signal
 from ..const_app import VERSION
 from ..const_file import ConfigType, FileExt
 from ..formatter import strip_filename_extension
@@ -52,9 +53,8 @@ from .preset_transfer import PresetTransfer
 class PresetList(QWidget):
     """Preset list view"""
 
-    def __init__(self, parent, reload_func: Callable, notify_toggle: Callable):
+    def __init__(self, parent, notify_toggle: Callable):
         super().__init__(parent)
-        self.reload_preset = reload_func
         self.notify_toggle = notify_toggle
 
         # Label
@@ -81,7 +81,6 @@ class PresetList(QWidget):
         self.listbox_preset.itemDoubleClicked.connect(self.load_preset)
         self.listbox_preset.setContextMenuPolicy(Qt.CustomContextMenu)
         self.listbox_preset.customContextMenuRequested.connect(self.open_context_menu)
-        self.refresh()
 
         layout_button = QHBoxLayout()
         layout_button.addWidget(button_refresh)
@@ -127,7 +126,7 @@ class PresetList(QWidget):
         if selected_index >= 0:
             selected_preset_name = self.listbox_preset.item(selected_index).text()
             cfg.set_next_to_load(f"{selected_preset_name}{FileExt.JSON}")
-            self.reload_preset()
+            overlay_signal.reload.emit(True)
         else:
             QMessageBox.warning(
                 self, "Error",
@@ -319,7 +318,7 @@ class CreatePreset(BaseDialog):
             # Reload if renamed file was loaded
             if cfg.is_loaded(source_filename):
                 cfg.set_next_to_load(f"{entered_filename}{FileExt.JSON}")
-                self._parent.reload_preset()
+                overlay_signal.reload.emit(True)
             else:
                 self._parent.refresh()
         # Create new preset

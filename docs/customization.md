@@ -840,6 +840,12 @@ Spectate next or previous driver relative to current driver (by driver's overall
     pace_notes_playback
 Enable or disable pace notes playback.
 
+    restart_application
+Restart TinyPedal.
+
+    quit_application
+Quit TinyPedal.
+
 [**`Back to Top`**](#)
 
 

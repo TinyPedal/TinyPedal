@@ -66,7 +66,6 @@ class SpectateList(QWidget):
         self.button_toggle = QPushButton("")
         self.button_toggle.setCheckable(True)
         self.button_toggle.toggled.connect(self.toggle_spectate)
-        self.refresh()
 
         layout_button = QHBoxLayout()
         layout_button.addWidget(self.button_spectate)

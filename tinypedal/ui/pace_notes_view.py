@@ -292,7 +292,6 @@ class PaceNotesControl(QWidget):
         margin = UIScaler.pixel(6)
         layout_main.setContentsMargins(margin, margin, margin, margin)
         self.setLayout(layout_main)
-        self.refresh()
 
     @Slot(bool)  # type: ignore[operator]
     def refresh(self):

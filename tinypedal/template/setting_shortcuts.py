@@ -60,4 +60,10 @@ SHORTCUTS_DEFAULT = {
     "pace_notes_playback": {
         "bind": "",
     },
+    "restart_application": {
+        "bind": "",
+    },
+    "quit_application": {
+        "bind": "",
+    },
 }

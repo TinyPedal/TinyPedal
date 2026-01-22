@@ -319,15 +319,6 @@ class ConfigMenu(QMenu):
         )
         _dialog.open()
 
-    def open_config_font(self):
-        """Config global font"""
-        _dialog = FontConfig(
-            parent=self._parent,
-            user_setting=cfg.user.setting,
-            reload_func=self._parent.reload_only,
-        )
-        _dialog.open()
-
     def open_config_units(self):
         """Config display units"""
         _dialog = UserConfig(
@@ -336,6 +327,15 @@ class ConfigMenu(QMenu):
             cfg_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,
+            reload_func=self._parent.reload_only,
+        )
+        _dialog.open()
+
+    def open_config_font(self):
+        """Config global font"""
+        _dialog = FontConfig(
+            parent=self._parent,
+            user_setting=cfg.user.setting,
             reload_func=self._parent.reload_only,
         )
         _dialog.open()

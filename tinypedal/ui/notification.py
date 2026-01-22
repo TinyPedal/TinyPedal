@@ -31,7 +31,6 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal
 from ..const_app import URL_RELEASE
 from ..update import update_checker
 
@@ -44,27 +43,22 @@ class NotifyBar(QWidget):
         self.presetlocked = QPushButton("Preset Locked")
         self.presetlocked.setObjectName("notifyPresetLocked")
         self.presetlocked.setVisible(False)
-        self.presetlocked.clicked.connect(parent.select_preset_tab)
 
         self.spectate = QPushButton("Spectate Mode Enabled")
         self.spectate.setObjectName("notifySpectate")
         self.spectate.setVisible(False)
-        self.spectate.clicked.connect(parent.select_spectate_tab)
 
         self.pacenotes = QPushButton("Pace Notes Playback Enabled")
         self.pacenotes.setObjectName("notifyPacenotes")
         self.pacenotes.setVisible(False)
-        self.pacenotes.clicked.connect(parent.select_pacenotes_tab)
 
         self.hotkey = QPushButton("Global Hotkey Enabled")
         self.hotkey.setObjectName("notifyHotkey")
         self.hotkey.setVisible(False)
-        self.hotkey.clicked.connect(parent.select_hotkey_tab)
 
         self.updates = UpdatesNotifyButton("")
         self.updates.setObjectName("notifyUpdates")
         self.updates.setVisible(False)
-        app_signal.updates.connect(self.updates.checking)
 
         layout = QVBoxLayout()
         layout.addWidget(self.presetlocked)

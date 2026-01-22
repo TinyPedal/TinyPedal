@@ -82,11 +82,13 @@ class ApplicationSignal(QObject):
 
     Attributes:
         updates: signal for checking version updates.
-        refresh: signal for refresh main GUI, such as tab view.
+        refresh: signal for refreshing main GUI.
+        quitapp: signal for closing APP.
     """
 
     updates = Signal(bool)
     refresh = Signal(bool)
+    quitapp = Signal(bool)
     __slots__ = ()
 
 
