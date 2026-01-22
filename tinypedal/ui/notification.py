@@ -66,6 +66,7 @@ class NotifyBar(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
+    @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh & update style"""
         self.presetlocked.setStyleSheet(

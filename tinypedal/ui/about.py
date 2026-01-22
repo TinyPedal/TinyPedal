@@ -67,7 +67,7 @@ class About(BaseDialog):
         layout_main.addLayout(layout_button)
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(layout_main)
-        self.setFixedSize(self.sizeHint().width(), self.sizeHint().height())
+        self.setFixedSize(self.sizeHint())
 
     def add_tabs(self):
         """Add tabs"""
