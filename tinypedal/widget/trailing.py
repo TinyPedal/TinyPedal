@@ -50,6 +50,7 @@ class Realtime(Overlay):
             self.wcfg["clutch_line_width"],
             self.wcfg["ffb_line_width"],
             self.wcfg["steering_line_width"],
+            self.wcfg["speed_line_width"],
         ))
         max_samples = 3 + max_line_width  # 3 offset + max line width
         self.samples_offset = max_samples - 2
@@ -74,12 +75,15 @@ class Realtime(Overlay):
             self.data_ffb = self.create_data_samples(max_samples)
         if self.wcfg["show_steering"]:
             self.data_steering = self.create_data_samples(max_samples)
+        if self.wcfg["show_speed"]:
+            self.data_speed = self.create_data_samples(max_samples)
+            self.max_speed = 0
         if self.wcfg["show_wheel_lock"]:
             self.data_wheel_lock = self.create_data_samples(max_samples)
         if self.wcfg["show_wheel_slip"]:
             self.data_wheel_slip = self.create_data_samples(max_samples)
 
-        self.draw_queue = sorted(self.config_draw_order(), reverse=True)
+        self.draw_queue = tuple(d[1:] for d in sorted(self.config_draw_order(), reverse=True))
         self.draw_background()
 
         # Last data
@@ -122,6 +126,13 @@ class Realtime(Overlay):
                     clutch = api.read.inputs.clutch()
                 self.update_sample(self.data_clutch, clutch)
 
+            if self.wcfg["show_ffb"]:
+                if self.wcfg["show_absolute_ffb"]:
+                    ffb = abs(api.read.inputs.force_feedback())
+                else:
+                    ffb = (api.read.inputs.force_feedback() + 1) / 2
+                self.update_sample(self.data_ffb, ffb)
+
             if self.wcfg["show_steering"]:
                 if self.wcfg["show_inverted_steering"]:
                     steering = 1 - (api.read.inputs.steering() + 1) / 2
@@ -129,12 +140,17 @@ class Realtime(Overlay):
                     steering = (api.read.inputs.steering() + 1) / 2
                 self.update_sample(self.data_steering, steering)
 
-            if self.wcfg["show_ffb"]:
-                if self.wcfg["show_absolute_ffb"]:
-                    ffb = abs(api.read.inputs.force_feedback())
+            if self.wcfg["show_speed"]:
+                speed = api.read.vehicle.speed()
+                if self.max_speed < speed:
+                    self.max_speed = speed
+                if speed < 0.1:  # reset if stopped
+                    self.max_speed = 0
+                elif self.max_speed > 0:
+                    speed /= self.max_speed
                 else:
-                    ffb = (api.read.inputs.force_feedback() + 1) / 2
-                self.update_sample(self.data_ffb, ffb)
+                    speed = 0
+                self.update_sample(self.data_speed, speed)
 
             if self.wcfg["show_wheel_lock"]:
                 wheel_lock = min(abs(min(minfo.wheels.slipRatio)), 1)
@@ -204,7 +220,7 @@ class Realtime(Overlay):
         self.pixmap_plot_section.fill(Qt.transparent)
         painter = QPainter(self.pixmap_plot_section)
         painter.setRenderHint(QPainter.Antialiasing, True)
-        for _, data, pen, line_style in self.draw_queue:
+        for data, pen, line_style in self.draw_queue:
             painter.setPen(pen)
             if line_style:
                 painter.drawPoints(data)
@@ -248,6 +264,7 @@ class Realtime(Overlay):
             "clutch",
             "ffb",
             "steering",
+            "speed",
             "wheel_lock",
             "wheel_slip",
         )

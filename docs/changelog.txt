@@ -14,6 +14,9 @@ WIP
     - "Spectate Mode" and "Spectate Next/Previous Driver" allow to enable or disable spectate mode, as well as cycle through drivers.
     - See User Guide for detailed explanation of each option.
 
+* Notification
+  - Added "Notification" dialog that can be accessed from "Config" menu, which allows to customize notification visibility and color.
+
 * Standings Widget
   - Added "enable_single_class_exclusive_mode" option (requested by user "omenek159"), which enables single-class exclusive mode that displays vehicles from player's class only. This mode takes priority over all other display mode.
   - Added "max_vehicles_exclusive_mode" option, which sets maximum amount vehicles to display when "enable_single_class_exclusive_mode" is enabled.
@@ -24,8 +27,8 @@ WIP
     While this option is enabled, "pitout_duration_minimum" and "pitout_duration_increment" options will have no effect.
   - Added "fixed_pitstop_duration" option, which sets fixed amount pit stop duration (in seconds). Note, only "stopped" time should be considered for this option. Set to "0" if only passing through pit lane (such as "Drive Through"). Set to "-1" to disable this option.
 
-* Notification
-  - Added "Notification" dialog from "Config" menu, which allows to customize notification visibility and color.
+* Trailing Widget
+  - Added "show_speed" option (requested by user "nutellabrot155"), which shows speed plot relative to player's top reference speed from current stint. Note, at least one lap is required to calibrate top reference speed. Top reference speed resets when vehicle stopped on track. This option is disabled by default.
 
 * Misc
   - Added "Auto Refresh" checkbox in "Show Log" dialog, which auto-refreshes console log.

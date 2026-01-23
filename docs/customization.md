@@ -3845,6 +3845,11 @@ Show steering plot.
     show_inverted_steering
 Invert steering plot direction.
 
+    show_speed
+Show speed plot relative to player's top reference speed from current stint.
+
+Note, at least one lap is required to calibrate top reference speed. Top reference speed resets when vehicle stopped on track.
+
     *_line_width
 Set trailing line width in pixels.
 
