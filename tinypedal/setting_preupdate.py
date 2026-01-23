@@ -32,7 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 39, 1), _user_prior_2_39_1),  # 2026-01-16
+        ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
         ((2, 37, 0), _user_prior_2_37_0),  # 2025-12-24
         ((2, 36, 0), _user_prior_2_36_0),  # 2025-12-13
@@ -44,8 +44,8 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
-def _user_prior_2_39_1(dict_user: dict):
-    """Update user setting prior to 2.39.1"""
+def _user_prior_2_40_0(dict_user: dict):
+    """Update user setting prior to 2.40.0"""
     track_map = dict_user.get("track_map")
     if isinstance(track_map, dict):
         if "pitstop_duration_minimum" in track_map:

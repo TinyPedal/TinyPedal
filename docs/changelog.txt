@@ -1,4 +1,4 @@
-WIP
+2.40.0 (2026-01-23)
 -----------------------------
 * [New]Global Hotkey Support
   - Added "Global Hotkey" support, as one of the frequently requested feature from many users.
@@ -11,7 +11,7 @@ WIP
     - "Overlay Visibility" allows to show or hide all widgets any time (requested by user "erickbsouza", "mzluzifer", "fmcconstantino").
     - "Restart API" and "Select Next/Previous API" allow to restart or switch API.
     - "Reload Preset" and "Load Next/Previous Preset" allow to reload preset, or cycle through preset list by name (requested by user "Wigg1es").
-    - "Spectate Mode" and "Spectate Next/Previous Driver" allow to enable or disable spectate mode, as well as cycle through drivers.
+    - "Spectate Mode" and "Spectate Next/Previous Driver" allow to enable or disable spectate mode, as well as cycle through drivers by overall standing.
     - See User Guide for detailed explanation of each option.
 
 * API
