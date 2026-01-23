@@ -806,7 +806,7 @@ Click `Refresh` button to manually refresh player name list.
 
 
 ## Pace notes playback
-**Pace notes playback control panel can be accessed from `Pace Notes` tab in main window.**
+**Pace notes playback control panel can be accessed from `Pacenotes` tab in main window.**
 
 Note, [Notes Module](#notes-module) must be enabled to allow pace notes playback.
 
@@ -836,7 +836,7 @@ Enable `Manually Select Pace Notes File` check box to disable auto-file-name mat
 
 Note, hotkey bindings are non-exclusive in TinyPedal, which means they will not interfere with other programs. Hotkey history can be view in [Show Log](#console-log) dialog from `Help` menu. Currently global hotkey feature is not supported on Linux.
 
-Click `Enabled` or `Disabled` button to toggle global hotkey support on and off. Note, global hotkey support can also be enabled by setting `enable_global_hotkey` option to `true` in [Application](#application) dialog.
+Click `Enabled` or `Disabled` button to toggle global hotkey on and off. Note, global hotkey can also be enabled by setting `enable_global_hotkey` option to `true` in [Application](#application) dialog.
 
 To change key binding, click key button on right side of each hotkey option, then in `Key Binding` dialog, press a `key` or `key combination` to register new key binding.
 

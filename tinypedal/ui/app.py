@@ -92,9 +92,9 @@ class TabView(QWidget):
         self._tabs.addTab(module_tab, "Module")  # 1
         self._tabs.addTab(preset_tab, "Preset")  # 2
         self._tabs.addTab(spectate_tab, "Spectate")  # 3
-        self._tabs.addTab(pacenotes_tab, "Pace Notes")  # 4
+        self._tabs.addTab(pacenotes_tab, "Pacenotes")  # 4
         self._tabs.addTab(hotkey_tab, "Hotkey")  # 5
-        self._tabs.currentChanged.connect(parent.refresh)
+        self._tabs.currentChanged.connect(self.refresh)
 
         # Main view
         layout_main = QVBoxLayout()
@@ -103,6 +103,14 @@ class TabView(QWidget):
         layout_main.addWidget(self._tabs)
         layout_main.addWidget(notify_bar)
         self.setLayout(layout_main)
+
+    def refresh(self):
+        """Refresh tab area"""
+        # Workaround to correct tab scroll area size after height changed
+        width = self.width()
+        height = self.height()
+        self.resize(width, height - 1)
+        self.resize(width, height + 1)
 
     def select_preset_tab(self):
         """Select preset tab"""
@@ -219,8 +227,7 @@ class AppWindow(QMainWindow):
         self.set_menu_bar()
 
         # Tab view
-        self.tab_view = TabView(self)
-        self.setCentralWidget(self.tab_view)
+        self.setCentralWidget(TabView(self))
 
         # Tray icon
         self.set_tray_icon()
@@ -235,11 +242,6 @@ class AppWindow(QMainWindow):
     @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh GUI"""
-        # Workaround to correct tab scroll area size after height changed
-        tab_view_width = self.tab_view.width()
-        tab_view_height = self.tab_view.height()
-        self.tab_view.resize(tab_view_width, tab_view_height - 1)
-        self.tab_view.resize(tab_view_width, tab_view_height + 1)
         # Window style
         style = cfg.application["window_color_theme"]
         if self.last_style != style:
