@@ -27,7 +27,7 @@ GLOBAL_DEFAULT = {
     "application": {
         "show_at_startup": True,
         "check_for_updates_on_startup": True,
-        "minimize_to_tray": True,
+        "minimize_to_tray": (PLATFORM == "Windows"),
         "remember_position": True,
         "remember_size": True,
         "enable_high_dpi_scaling": True,
@@ -46,16 +46,17 @@ GLOBAL_DEFAULT = {
         "window_color_theme": "Dark",
     },
     "compatibility": {
-        "enable_bypass_window_manager": False,
+        "enable_bypass_window_manager": (PLATFORM != "Windows"),
         "enable_translucent_background": True,
         "enable_window_position_correction": True,
-        "enable_x11_platform_plugin_override": False,
+        "enable_x11_platform_plugin_override": (PLATFORM != "Windows"),
         "global_bkg_color": "#000000",
         "multimedia_plugin_on_windows": "WMF",
     },
     "telemetry": {
         "api_name": API_LMU_NAME,
         "enable_api_selection_from_preset": True,
+        "enable_legacy_api_selection": (PLATFORM != "Windows"),
     },
     "user_path": {
         "settings_path": "settings/",
@@ -152,11 +153,6 @@ GLOBAL_DEFAULT = {
 def _set_platform_default(global_def: dict):
     """Set platform default setting"""
     if PLATFORM != "Windows":
-        # Global config
-        global_def["application"]["show_at_startup"] = True
-        global_def["application"]["minimize_to_tray"] = False
-        global_def["compatibility"]["enable_bypass_window_manager"] = True
-        global_def["compatibility"]["enable_x11_platform_plugin_override"] = True
         # Global path
         from xdg import BaseDirectory as BD
 

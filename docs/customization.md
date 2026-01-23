@@ -368,6 +368,9 @@ Set API name for accessing data from supported API.
     enable_api_selection_from_preset
 Set `true` to remember and load API selection from preset; set `false` to select API globally for all presets.
 
+    enable_legacy_api_selection
+Enable legacy API selection. This option is disabled on Windows by default, and enabled on Linux.
+
 [**`Back to Top`**](#)
 
 

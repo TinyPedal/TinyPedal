@@ -34,7 +34,6 @@ from .adapter import (
     rf2_restapi,
 )
 from .const_api import API_LMU_NAME, API_LMULEGACY_NAME, API_RF2_NAME
-from .const_app import PLATFORM
 from .validator import bytes_to_str
 
 
@@ -178,21 +177,3 @@ class SimLMULegacy(SimRF2):
     def __init__(self):
         self.shmmapi = rf2_connector.RF2Info()
         self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_LMU, rf2_restapi.RestAPIData())
-
-
-def _set_available_api():
-    """Set available API for specific platform"""
-    platform_all = (
-        SimLMULegacy,
-        SimRF2,
-    )
-    platform_win = (
-        SimLMU,
-    )
-    if PLATFORM == "Windows":
-        platform_all += platform_win
-    # Sort API by name
-    return tuple(sorted((_api for _api in platform_all), key=lambda cls:cls.NAME))
-
-
-API_PACK = _set_available_api()

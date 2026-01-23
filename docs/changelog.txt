@@ -14,6 +14,9 @@ WIP
     - "Spectate Mode" and "Spectate Next/Previous Driver" allow to enable or disable spectate mode, as well as cycle through drivers.
     - See User Guide for detailed explanation of each option.
 
+* API
+  - Added "enable_legacy_api_selection" option to API menu, which allows to enable or disable legacy API selection. This option is disabled on Windows by default, and enabled on Linux.
+
 * Notification
   - Added "Notification" dialog that can be accessed from "Config" menu, which allows to customize notification visibility and color.
 

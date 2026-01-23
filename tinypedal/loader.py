@@ -84,7 +84,13 @@ def close():
 def restart():
     """Restart APP"""
     logger.info("RESTARTING............")
-    # Set restart env for skipping single instance check
+    # 0 wait unfinished saving
+    if cfg.is_saving:
+        # Trigger immediate saving from queue
+        cfg.save(0, next_task=True)
+        while cfg.is_saving:
+            time.sleep(0.01)
+    # 1 set restart env for skipping single instance check
     os.environ["TINYPEDAL_RESTART"] = "TRUE"
     if "tinypedal.exe" in sys.executable:  # if run as exe
         os.execl(sys.executable, *sys.argv)

@@ -22,11 +22,30 @@ API control
 
 import logging
 
-from . import realtime_state
-from .api_connector import API_PACK
+from . import api_connector, realtime_state
+from .const_app import PLATFORM
 from .setting import cfg
 
 logger = logging.getLogger(__name__)
+
+
+def _set_available_api():
+    """Set available API for specific platform"""
+    enable_legacy = cfg.telemetry["enable_legacy_api_selection"]
+    if PLATFORM == "Windows":
+        available_api = (
+            (api_connector.SimLMU, False),  # API, is legacy
+            (api_connector.SimLMULegacy, not enable_legacy),
+            (api_connector.SimRF2, False),
+        )
+    else:
+        available_api = (
+            (api_connector.SimLMULegacy, not enable_legacy),
+            (api_connector.SimRF2, False),
+        )
+    # Sort API by name
+    api_gen = (_api for _api, _legacy in available_api if not _legacy)
+    return tuple(sorted(api_gen, key=lambda cls:cls.NAME))
 
 
 class APIControl:
@@ -34,12 +53,14 @@ class APIControl:
 
     __slots__ = (
         "_api",
+        "_available_api",
         "_same_api_loaded",
         "read",
     )
 
     def __init__(self):
         self._api = None
+        self._available_api = _set_available_api()
         self._same_api_loaded = False
         self.read = None
 
@@ -58,13 +79,13 @@ class APIControl:
             logger.info("CONNECTING: same API detected, fast restarting")
             return
 
-        for _api in API_PACK:
+        for _api in self._available_api:
             if _api.NAME == name:
                 self._api = _api()
                 return
 
         logger.warning("CONNECTING: Invalid API name, fall back to default")
-        self._api = API_PACK[0]()
+        self._api = self._available_api[0]()
         cfg.api_name = self._api.NAME
 
     def start(self):
@@ -100,6 +121,11 @@ class APIControl:
         realtime_state.overriding = setting_api["enable_active_state_override"]
         realtime_state.spectating = setting_api["enable_player_index_override"]
         self._api.setup(setting_api)
+
+    @property
+    def available(self):
+        """Available API"""
+        return self._available_api
 
     @property
     def name(self) -> str:

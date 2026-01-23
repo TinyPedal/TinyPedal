@@ -26,7 +26,7 @@ from PySide2.QtGui import QDesktopServices
 from PySide2.QtWidgets import QMenu, QMessageBox
 
 from .. import loader
-from ..api_control import API_PACK, api
+from ..api_control import api
 from ..const_app import URL_FAQ, URL_USER_GUIDE
 from ..const_file import ConfigType
 from ..module_info import minfo
@@ -371,6 +371,10 @@ class APIMenu(QMenu):
         self.api_selection.setCheckable(True)
         self.api_selection.triggered.connect(self.toggle_api_selection)
 
+        self.legacy_api = self.addAction("Enable Legacy API Selection")
+        self.legacy_api.setCheckable(True)
+        self.legacy_api.triggered.connect(self.toggle_legacy_api)
+
         config_api = self.addAction("Options")
         config_api.triggered.connect(self.open_config_api)
         self.addSeparator()
@@ -388,6 +392,7 @@ class APIMenu(QMenu):
                 action.setChecked(True)
                 break
         self.api_selection.setChecked(cfg.telemetry["enable_api_selection_from_preset"])
+        self.legacy_api.setChecked(cfg.telemetry["enable_legacy_api_selection"])
 
     def toggle_api_selection(self):
         """Toggle API selection mode"""
@@ -395,6 +400,27 @@ class APIMenu(QMenu):
         cfg.telemetry["enable_api_selection_from_preset"] = not enabled
         cfg.save(cfg_type=ConfigType.CONFIG)
         self._parent.reload_only()
+
+    def toggle_legacy_api(self):
+        """Toggle legacy API selection"""
+        enabled = cfg.telemetry["enable_legacy_api_selection"]
+        if enabled:
+            state = "Disable"
+        else:
+            state = "Enable"
+        msg_text = (
+            f"{state} <b>Legacy API</b> selection and restart <b>TinyPedal</b>?"
+        )
+        restart_msg = QMessageBox.question(
+            self._parent, "Legacy API", msg_text,
+            buttons=QMessageBox.Yes | QMessageBox.No,
+            defaultButton=QMessageBox.No,
+        )
+        if restart_msg != QMessageBox.Yes:
+            return
+        cfg.telemetry["enable_legacy_api_selection"] = not enabled
+        cfg.save(cfg_type=ConfigType.CONFIG)
+        loader.restart()
 
     def open_config_api(self):
         """Config API"""
@@ -417,7 +443,7 @@ class APIMenu(QMenu):
 
         actions_api = QActionGroup(self)
 
-        for _api in API_PACK:
+        for _api in api.available:
             api_name = _api.NAME
             option = self.addAction(api_name)
             option.setCheckable(True)

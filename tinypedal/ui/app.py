@@ -21,7 +21,6 @@ Main application window
 """
 
 import logging
-import time
 
 from PySide2.QtCore import Qt, Slot
 from PySide2.QtWidgets import (
@@ -195,10 +194,7 @@ class StatusButtonBar(QStatusBar):
             return
 
         cfg.application["enable_high_dpi_scaling"] = not cfg.application["enable_high_dpi_scaling"]
-        cfg.save(0, cfg_type=ConfigType.CONFIG)
-        # Wait saving finish
-        while cfg.is_saving:
-            time.sleep(0.01)
+        cfg.save(cfg_type=ConfigType.CONFIG)
         loader.restart()
 
     def toggle_color_theme(self):

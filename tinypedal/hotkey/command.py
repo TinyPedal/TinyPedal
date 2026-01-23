@@ -23,7 +23,7 @@ Hotkey command function
 from __future__ import annotations
 
 from .. import app_signal, loader, overlay_signal, realtime_state
-from ..api_control import API_PACK, api
+from ..api_control import api
 from ..const_file import ConfigType, FileExt
 from ..setting import cfg
 
@@ -57,7 +57,7 @@ def hotkey_restart_api():
 def hotkey_select_next_api():
     """Command - select next api"""
     api_name = api.name
-    api_list = tuple(_api.NAME for _api in API_PACK)
+    api_list = tuple(_api.NAME for _api in api.available)
     next_index = 0
     if api_name in api_list:
         next_index = api_list.index(api_name) + 1
@@ -76,7 +76,7 @@ def hotkey_select_next_api():
 def hotkey_select_previous_api():
     """Command - select previous api"""
     api_name = api.name
-    api_list = tuple(_api.NAME for _api in API_PACK)
+    api_list = tuple(_api.NAME for _api in api.available)
     next_index = 0
     if api_name in api_list:
         next_index = api_list.index(api_name) - 1
