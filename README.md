@@ -30,7 +30,7 @@ Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fu
 
 ### rF2 Shared Memory Map Plugin
 
-TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `RF2` or `LMU (legacy)` API. It can be found from `Download` section of following page:  
+TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `RF2` API. It can be found from `Download` section of following page:  
 https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin
 
 The plugin file `rFactor2SharedMemoryMapPlugin64.dll` should be placed in:
@@ -55,12 +55,16 @@ Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `Cu
 
 ## Quick Start
 
-**Important:** make sure required plugins for specific game are installed as mentioned in [Requirements](#requirements) section.
+> [!IMPORTANT]
+> Make sure required plugins for specific game are installed according to [Requirements](#requirements).
+>
+> DO NOT extract TinyPedal into `system` or `game` folder, such as `Program Files` or `rFactor 2` folder, otherwise it may fail to run.
+>
+> See [Frequently Asked Questions](https://github.com/TinyPedal/TinyPedal/wiki/Frequently-Asked-Questions) for common issues, and [User Guide](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide) for usage info.
+>
+> For Linux user, please follow [Running on Linux](#running-on-linux) section for instruction.
 
-1. Download latest TinyPedal version from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page, extract it into a clean folder, and run `tinypedal.exe`.  
-Note, DO NOT extract TinyPedal into `system` or `game` folder, such as `Program Files` or `rFactor 2` folder, otherwise it may fail to run.  
-Alternatively, run TinyPedal from source, see [Run from source](#run-from-source) section for details.  
-For Linux user, please follow [Running on Linux](#running-on-linux) section for instruction.  
+1. Download latest TinyPedal version from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page, extract it into a clean folder, and run `tinypedal.exe`.
 
 2. A tray icon will appear at system tray. If not shown, check hidden tray icon. `Right Click` on tray icon will bring up context menu.
 
@@ -72,10 +76,6 @@ For Linux user, please follow [Running on Linux](#running-on-linux) section for 
 
 6. To quit APP, `Right Click` on tray icon and select `Quit`; or, click `Overlay` menu from main window and select `Quit`.
 
-See [Frequently Asked Questions](https://github.com/TinyPedal/TinyPedal/wiki/Frequently-Asked-Questions) for common issues.
-
-See [User Guide](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide) for usage info.
-
 ## Run from source
 
 ### Dependencies:
@@ -85,7 +85,10 @@ See [User Guide](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide) for usa
 * pyRfactor2SharedMemory
 * psutil
 
-Note, PySide2 may not be available for Python version higher than 3.10; or requires PySide6 instead for running with newer Python version. PySide6 is currently supported only via command line argument, see `Command line arguments` section in `User Guide` for details.
+> [!IMPORTANT]
+> Make sure to check Python version before installing additional dependencies.
+>
+> PySide2 may not be available for Python version higher than 3.10; or requires PySide6 instead for running with newer Python version. PySide6 is currently supported only via command line argument, see [Command Line Arguments](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide#command-line-arguments) in User Guide for details.
 
 ### Download source code
 
@@ -126,7 +129,8 @@ To build executable file, run command:
 
 After building completed, executable file can be found in `dist\TinyPedal` folder.
 
-Note: the build script only supports py2exe `v0.12.0.0` or higher.
+> [!NOTE]
+> The build script only supports py2exe `v0.12.0.0` or higher. The build script does not support PySide6.
 
 ## Running on Linux
 
@@ -176,6 +180,7 @@ You can run the script as (it doesn't support any arguments or options):
 
 ### Known issues
 
+- Some features may not be available on Linux currently.
 - Widgets don't appear over the game window in KDE. Workaround: enable `Bypass Window Manager` option in `Compatibility` dialog from `Config` menu in main window.
 - Transparency of widgets doesn't work when desktop compositing is disabled. Workaround: enable `window manager compositing` in your DE.
 
