@@ -24,30 +24,33 @@ Currently supports `rFactor 2` and `Le Mans Ultimate`, and runs on `Windows` and
 | Le Mans Ultimate (legacy) | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
 | rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
 
+> [!IMPORTANT]
+> `Le Mans Ultimate (legacy)` API is provided only as a fallback option for Linux user. This option will be removed in the future.
+
 ### Display Mode
 
 Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fullscreen` mode is not supported.
 
 ### rF2 Shared Memory Map Plugin
 
-TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `RF2` API. It can be found from `Download` section of following page:  
+TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `rFactor 2` API. It can be found from `Download` section of following page:  
 https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin
 
-The plugin file `rFactor2SharedMemoryMapPlugin64.dll` should be placed in:
+The plugin file is named `rFactor2SharedMemoryMapPlugin64.dll` and should be placed in:
 
-1. For `rFactor 2`, it is `rFactor 2\Bin64\Plugins` folder.
+- For `rFactor 2`, it is `rFactor 2\Bin64\Plugins` folder.
 
-2. For `Le Mans Ultimate`, it is `Le Mans Ultimate\Plugins` folder.
+- For `Le Mans Ultimate` (legacy API only), it is `Le Mans Ultimate\Plugins` folder.
 
 Note, if `Plugins` folder is missing from game folder, you will have to manually create this `Plugins` folder.
-
-Some popular rF2/LMU Apps may also have this plugin pre-installed, check corresponding game's plugins folder first to see if it was installed already.
 
 Enable plugin in game:
 
 - For `rFactor 2`, in game `Settings` -> `Gameplay` page, find `Plugins` section and toggle on `rFactor2SharedMemoryMapPlugin64.dll`.
 
-- For `Le Mans Ultimate`, user may have to manually enable plugin by editing `CustomPluginVariables.JSON` file (set `" Enabled"` value to `1` ) under `Le Mans Ultimate\UserData\player` folder.
+- For `Le Mans Ultimate` (legacy API only):
+    1. In `Le Mans Ultimate\UserData\player` folder, find and open `CustomPluginVariables.JSON` file with notepad, then set `" Enabled"` value to `1`.
+    2. In game `Settings` -> `Gameplay` page, find `Enable Plugins` option and make sure it is turned `ON`.
 
 After plugin enabled, must `restart game` to take effect.
 

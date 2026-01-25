@@ -362,6 +362,8 @@ To enable auto-refreshing, toggle on `Auto Refresh` check box.
 | Le Mans Ultimate (legacy) | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
 | rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
 
+**Important note:** `Le Mans Ultimate (legacy)` API is provided only as a fallback option for Linux user. This option will be removed in the future.
+
     api_name
 Set API name for accessing data from supported API.
 
