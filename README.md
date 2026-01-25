@@ -20,7 +20,7 @@ Currently supports `rFactor 2` and `Le Mans Ultimate`, and runs on `Windows` and
 
 | Supported API | Requirement | Windows | Linux |
 |:-:|---|:-:|:-:|
-| Le Mans Ultimate | Game's built-in API, no plugin required. | Yes | No |
+| Le Mans Ultimate | No plugin required. | Yes | No |
 | Le Mans Ultimate (legacy) | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
 | rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
 
@@ -31,7 +31,13 @@ Currently supports `rFactor 2` and `Le Mans Ultimate`, and runs on `Windows` and
 
 Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fullscreen` mode is not supported.
 
-### rF2 Shared Memory Map Plugin
+### Setup for Le Mans Ultimate
+
+There is no plugin required for accessing LMU's built-in API. However, make sure `Enable Plugins` option is turned `ON` from in game `Settings` -> `Gameplay` page.
+
+For Linux user, LMU's built-in API is not supported on Linux currently, the `rF2 Shared Memory Map Plugin` is required instead. Please follow [Setup for rFactor 2](#setup-for-rfactor-2) and [Running on Linux](#running-on-linux) sections for instruction.
+
+### Setup for rFactor 2
 
 TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `rFactor 2` API. It can be found from `Download` section of following page:  
 https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin

@@ -358,7 +358,7 @@ To enable auto-refreshing, toggle on `Auto Refresh` check box.
 
 | Supported API | Requirement | Windows | Linux |
 |:-:|---|:-:|:-:|
-| Le Mans Ultimate | Game's built-in API, no requirements. | Yes | No |
+| Le Mans Ultimate | No plugin required. | Yes | No |
 | Le Mans Ultimate (legacy) | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
 | rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
 
