@@ -8,13 +8,19 @@ arch=('any')
 url="https://github.com/TinyPedal/TinyPedal"
 license=('GPL3' 'CC-BY-SA-4.0')
 depends=('python' 'python-psutil' 'python-pyxdg' 'pyside6')
+makedepends=('git')
 optdepends=('python-pyside2: Use PySide2 instead of PySide6')
 install=tinypedal.install
-source=("${pkgname}-${pkgver}.tar.gz::https://github.com/TinyPedal/TinyPedal/archive/refs/tags/v${pkgver}.tar.gz")
+source=("git+https://github.com/TinyPedal/TinyPedal.git#tag=v${pkgver}")
 sha256sums=('SKIP')
 
+prepare() {
+    cd "$srcdir/TinyPedal"
+    git submodule update --init --recursive
+}
+
 package() {
-    cd "$srcdir/TinyPedal-$pkgver"
+    cd "$srcdir/TinyPedal"
 
     install -d "$pkgdir/usr/share/TinyPedal"
     cp -r \
