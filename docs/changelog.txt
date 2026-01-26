@@ -1,3 +1,14 @@
+WIP
+-----------------------------
+* Launcher config & script update for Linux (by @Bykow)
+  - Added support for per-user launch arguments via "~/.config/TinyPedal/launcher.conf" file. Updated desktop entry to support user config and run from "/usr/local/bin/TinyPedal".
+    To set persistent launch arguments (for example, to force PySide6), create "~/.config/TinyPedal/launcher.conf" file, and add following line:
+    TINYPEDAL_RUN_ARGS="--pyside 6"
+  - See README.md "Installation" section for usage.
+
+- Misc
+  - Added new contributor "Bykow" to contributors.md in "Cross-platform" section.
+
 2.40.0 (2026-01-23)
 -----------------------------
 * [New]Global Hotkey Support
