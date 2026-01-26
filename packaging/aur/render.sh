@@ -10,6 +10,11 @@ if [ -f "${VARS_FILE}" ]; then
 fi
 
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
+
+if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
+    git -C "${REPO_ROOT}" submodule update --init --recursive
+fi
+
 TAG="$(git -C "${REPO_ROOT}" describe --tags --abbrev=0 2>/dev/null || true)"
 if [ -z "${TAG}" ]; then
     echo "Error: could not detect a git tag. Set AUR_PKGVER manually." >&2
