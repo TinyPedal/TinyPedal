@@ -9,16 +9,5 @@ Copy the DLL into your Steam game install:
   ~/.steam/steam/steamapps/common/Le Mans Ultimate/Plugins/
 
 If your Steam library is elsewhere, adjust the path accordingly.
-
-PySide6 launcher config (required for Archlinux)
-
-You need to force PySide6, create:
-  ~/.config/TinyPedal/launcher.conf
-
-Add:
-  TINYPEDAL_RUN_ARGS="--pyside 6"
-
-One-liner:
-  mkdir -p ~/.config/TinyPedal && printf 'TINYPEDAL_RUN_ARGS="--pyside 6"\n' > ~/.config/TinyPedal/launcher.conf
 EOF
 }
