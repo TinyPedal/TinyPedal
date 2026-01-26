@@ -1,0 +1,55 @@
+# Maintainer: TinyPedal AUR maintainers
+
+pkgname=tinypedal
+pkgver={{PKGVER}}
+pkgrel=1
+pkgdesc="TinyPedal is a Free and Open Source telemetry overlay application for racing simulation."
+arch=('any')
+url="https://github.com/TinyPedal/TinyPedal"
+license=('GPL3' 'CC-BY-SA-4.0')
+depends=('python' 'python-psutil' 'python-pyxdg' 'pyside6')
+optdepends=('python-pyside2: Use PySide2 instead of PySide6')
+install=tinypedal.install
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/TinyPedal/TinyPedal/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+    cd "$srcdir/TinyPedal-$pkgver"
+
+    install -d "$pkgdir/usr/share/TinyPedal"
+    cp -r \
+        LICENSE.txt \
+        README.md \
+        images \
+        pyLMUSharedMemory \
+        pyRfactor2SharedMemory \
+        run.py \
+        tinypedal \
+        TinyPedal-overlay.desktop \
+        TinyPedal.sh \
+        "$pkgdir/usr/share/TinyPedal"
+
+    install -d "$pkgdir/usr/bin"
+    cat >"$pkgdir/usr/bin/TinyPedal" <<'EOF'
+#!/bin/sh
+set -eu
+
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/TinyPedal/launcher.conf"
+if [ -f "${CONFIG_FILE}" ] && [ -z "${TINYPEDAL_RUN_ARGS:-}" ];
+then
+    # shellcheck disable=SC1090
+    . "${CONFIG_FILE}"
+fi
+
+exec /usr/share/TinyPedal/run.py ${TINYPEDAL_RUN_ARGS:-} "$@"
+EOF
+    chmod 0755 "$pkgdir/usr/bin/TinyPedal"
+
+    sed -i "s|/usr/local/share|/usr/share|g" "$pkgdir/usr/share/TinyPedal/TinyPedal-overlay.desktop"
+    sed -i "s|Exec=.*|Exec=/usr/bin/TinyPedal|g" "$pkgdir/usr/share/TinyPedal/TinyPedal-overlay.desktop"
+
+    install -d "$pkgdir/usr/share/applications"
+    install -m 0644 \
+        "$pkgdir/usr/share/TinyPedal/TinyPedal-overlay.desktop" \
+        "$pkgdir/usr/share/applications/TinyPedal-overlay.desktop"
+}

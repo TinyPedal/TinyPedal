@@ -6,6 +6,8 @@
 /dist/TinyPedal/
 /settings/
 /trackmap/
+/packaging/aur/out/
+/packaging/aur/vars.env
 
 __pycache__/
 
