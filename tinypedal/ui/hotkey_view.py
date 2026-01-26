@@ -41,10 +41,9 @@ from ..formatter import format_option_name
 from ..hotkey.common import (
     format_hotkey_name,
     get_key_state_function,
-    modifier_priority,
     refresh_keystate,
+    set_hotkey_win,
 )
-from ..hotkey.keymap import KEYMAP_GENERAL, KEYMAP_MODIFIER
 from ..hotkey_control import kctrl
 from ..setting import cfg
 from ._common import BaseDialog, UIScaler
@@ -238,29 +237,11 @@ class ConfigHotkey(BaseDialog):
     def timerEvent(self, event):
         """Monitor key press"""
         if PLATFORM == "Windows":
-            self.monitor_key_win(KEYMAP_GENERAL, KEYMAP_MODIFIER)
+            key_combo = set_hotkey_win(self.get_key_state)
+        else:
+            key_combo = ()
 
-    def monitor_key_win(self, key_general, key_modifier):
-        """Monitor key press - Windows"""
-        key_combo = [""] * 4  # Ctrl, Alt, Shift, Key
-        is_combo_set = False
-
-        # Key state: 0=off, 1=pressed, <1=down
-        # Assign mod key
-        for key, code in key_modifier.items():
-            priority = modifier_priority(key)
-            if self.get_key_state(code) != 0:
-                key_combo[priority] = key
-            else:  # remove if not pressed
-                key_combo[priority] = ""
-        # Assign common key
-        for key, code in key_general.items():
-            if self.get_key_state(code) != 0:
-                key_combo[-1] = key
-                is_combo_set = True
-                break
-
-        if is_combo_set:
+        if key_combo:
             hotkey_name = "+".join(_key for _key in key_combo if _key)
             self.temp_hotkey = hotkey_name
             self.update_text(format_hotkey_name(hotkey_name, delimiter=" + "))

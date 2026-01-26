@@ -107,6 +107,29 @@ def load_hotkey(
     return tuple(output_combo)
 
 
+def set_hotkey_win(
+    get_key_state: Callable,
+    key_general: Mapping[str, int] = KEYMAP_GENERAL,
+    key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
+) -> tuple[str, ...]:
+    """Set hotkey string"""
+    key_combo = [""] * 4  # Ctrl, Alt, Shift, Key
+    # Key state: 0=off, 1=pressed, <1=down
+    # Assign mod key
+    for key, code in key_modifier.items():
+        priority = modifier_priority(key)
+        if get_key_state(code) != 0:
+            key_combo[priority] = key
+        else:  # remove if not pressed
+            key_combo[priority] = ""
+    # Assign common key
+    for key, code in key_general.items():
+        if get_key_state(code) != 0:
+            key_combo[-1] = key
+            return tuple(key_combo)
+    return ()
+
+
 # Private
 def _get_key_state_linux(key_code: int) -> int:
     """Get key state - Linux (placeholder)"""
