@@ -23,7 +23,6 @@ Constants
 import platform
 
 from . import version_check
-from .userfile import set_global_user_path
 
 # System info
 PLATFORM = platform.system()
@@ -43,6 +42,3 @@ URL_WEBSITE = f"https://github.com/{REPO_NAME}"
 URL_USER_GUIDE = f"{URL_WEBSITE}/wiki/User-Guide"
 URL_FAQ = f"{URL_WEBSITE}/wiki/Frequently-Asked-Questions"
 URL_RELEASE = f"{URL_WEBSITE}/releases"
-
-# Global path
-PATH_GLOBAL = set_global_user_path(APP_NAME, PLATFORM)

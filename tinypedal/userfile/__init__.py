@@ -23,6 +23,8 @@ User file access function
 import logging
 import os
 
+from ..const_app import APP_NAME, PLATFORM
+
 logger = logging.getLogger(__name__)
 
 
@@ -36,17 +38,6 @@ def set_user_data_path(filepath: str) -> str:
             logger.error("failed to create %s folder", filepath)
             return ""
     return filepath
-
-
-def set_global_user_path(filepath: str, platform: str) -> str:
-    """Set global user data path, create if not exist"""
-    if platform == "Windows":
-        path = set_user_data_path(f"{os.getenv('APPDATA', '.')}\\{filepath}\\")
-    else:
-        from xdg import BaseDirectory as BD
-
-        path = BD.save_config_path(filepath) + "/"
-    return path
 
 
 def set_relative_path(filepath: str) -> str:
@@ -65,3 +56,42 @@ def set_relative_path(filepath: str) -> str:
     if not output_path.endswith("/"):
         output_path += "/"
     return output_path
+
+
+def set_global_config_path(filepath: str) -> str:
+    """Set path for global configurable user files, create if not exist
+
+    Default to APPDATA folder (AppData/Roaming) on Windows.
+    Default to XDG_CONFIG_HOME ($HOME/.config) on Linux.
+    """
+    if PLATFORM == "Windows":
+        return set_user_data_path(f"{os.getenv('APPDATA', '.')}\\{filepath}\\")
+    # Linux
+    from xdg import BaseDirectory as BD
+    return BD.save_config_path(filepath) + "/"
+
+
+def set_default_config_path(filepath: str) -> str:
+    """Set path for default configurable user files
+
+    Default to TinyPedal local folder (./) on Windows.
+    Default to XDG_CONFIG_HOME ($HOME/.config) on Linux.
+    """
+    if PLATFORM == "Windows":
+        return filepath
+    # Linux
+    from xdg import BaseDirectory as BD
+    return BD.save_config_path(APP_NAME, filepath)
+
+
+def set_default_data_path(filepath: str) -> str:
+    """Set path for default non-configurable data files
+
+    Default to TinyPedal local folder (./) on Windows.
+    Default to XDG_DATA_HOME ($HOME/.local/share) on Linux
+    """
+    if PLATFORM == "Windows":
+        return filepath
+    # Linux
+    from xdg import BaseDirectory as BD
+    return BD.save_data_path(APP_NAME, filepath)

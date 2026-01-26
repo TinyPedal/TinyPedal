@@ -23,9 +23,6 @@ Log handler setup
 import logging
 import sys
 
-from .const_app import PATH_GLOBAL
-from .const_file import LogFile
-
 
 def new_stream_handler(_logger: logging.Logger, stream) -> logging.StreamHandler:
     """Create new stream handler
@@ -64,11 +61,12 @@ def new_file_handler(_logger: logging.Logger, filepath: str, filename: str) -> l
     return _handler
 
 
-def set_logging_level(_logger: logging.Logger, log_stream=None, log_level=1) -> None:
+def set_logging_level(_logger: logging.Logger, filepath: str, filename: str, log_stream=None, log_level=1) -> None:
     """Set logging level
 
     Args:
         _logger: logger instance.
+        filepath: log file path.
         log_stream: log stream object.
         log_level:
             0 = output only warning or error to console.
@@ -82,5 +80,5 @@ def set_logging_level(_logger: logging.Logger, log_stream=None, log_level=1) -> 
         new_stream_handler(_logger, sys.stdout)
         _logger.info("LOGGING: output to console")
     if log_level == 2:
-        new_file_handler(_logger, PATH_GLOBAL, LogFile.APP_LOG)
-        _logger.info("LOGGING: output to %s", LogFile.APP_LOG)
+        new_file_handler(_logger, filepath, filename)
+        _logger.info("LOGGING: output to %s", filename)

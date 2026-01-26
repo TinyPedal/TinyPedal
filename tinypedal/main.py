@@ -33,7 +33,6 @@ from PySide2.QtWidgets import QApplication, QMessageBox
 from . import version_check
 from .const_app import (
     APP_NAME,
-    PATH_GLOBAL,
     PLATFORM,
     VERSION,
 )
@@ -47,7 +46,7 @@ log_stream = io.StringIO()
 
 def save_pid_file():
     """Save PID info to file"""
-    with open(f"{PATH_GLOBAL}{LogFile.PID}", "w", encoding="utf-8") as f:
+    with open(f"{cfg.path.config}{LogFile.PID}", "w", encoding="utf-8") as f:
         current_pid = os.getpid()
         pid_create_time = psutil.Process(current_pid).create_time()
         pid_str = f"{current_pid},{pid_create_time}"
@@ -58,7 +57,7 @@ def is_pid_exist() -> bool:
     """Check and verify PID existence"""
     try:
         # Load last recorded PID and creation time from pid log file
-        with open(f"{PATH_GLOBAL}{LogFile.PID}", "r", encoding="utf-8") as f:
+        with open(f"{cfg.path.config}{LogFile.PID}", "r", encoding="utf-8") as f:
             pid_read = f.readline()
         pid = pid_read.split(",")
         pid_last = int(pid[0])
@@ -180,7 +179,7 @@ def set_environment():
 def start_app(cli_args):
     """Init main window"""
     unset_environment()
-    set_logging_level(logger, log_stream, cli_args.log_level)
+    set_logging_level(logger, cfg.path.config, LogFile.APP_LOG, log_stream, cli_args.log_level)
     get_version()
     # load global config
     cfg.load_global()

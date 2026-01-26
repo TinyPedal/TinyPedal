@@ -21,7 +21,8 @@ Default global (config) setting template
 """
 
 from ..const_api import API_LMU_NAME
-from ..const_app import APP_NAME, PLATFORM
+from ..const_app import PLATFORM
+from ..userfile import set_default_config_path, set_default_data_path
 
 GLOBAL_DEFAULT = {
     "application": {
@@ -59,15 +60,15 @@ GLOBAL_DEFAULT = {
         "enable_legacy_api_selection": (PLATFORM != "Windows"),
     },
     "user_path": {
-        "settings_path": "settings/",
-        "brand_logo_path": "brandlogo/",
-        "delta_best_path": "deltabest/",
-        "sector_best_path": "deltabest/",
-        "energy_delta_path": "deltabest/",
-        "fuel_delta_path": "deltabest/",
-        "track_map_path": "trackmap/",
-        "pace_notes_path": "pacenotes/",
-        "track_notes_path": "tracknotes/",
+        "settings_path": set_default_config_path("settings/"),
+        "brand_logo_path": set_default_config_path("brandlogo/"),
+        "delta_best_path": set_default_data_path("deltabest/"),
+        "sector_best_path": set_default_data_path("deltabest/"),
+        "energy_delta_path": set_default_data_path("deltabest/"),
+        "fuel_delta_path": set_default_data_path("deltabest/"),
+        "track_map_path": set_default_data_path("trackmap/"),
+        "pace_notes_path": set_default_config_path("pacenotes/"),
+        "track_notes_path": set_default_config_path("tracknotes/"),
     },
     "notification": {
         "notify_locked_preset": True,
@@ -148,26 +149,3 @@ GLOBAL_DEFAULT = {
         "slope_grade_cliff": 1,
     },
 }
-
-
-def _set_platform_default(global_def: dict):
-    """Set platform default setting"""
-    if PLATFORM != "Windows":
-        # Global path
-        from xdg import BaseDirectory as BD
-
-        config_paths = (
-            "settings_path",
-            "brand_logo_path",
-            "pace_notes_path",
-            "track_notes_path",
-        )
-        user_path = global_def["user_path"]
-        for key, path in user_path.items():
-            if key in config_paths:
-                user_path[key] = BD.save_config_path(APP_NAME, path)
-            else:
-                user_path[key] = BD.save_data_path(APP_NAME, path)
-
-
-_set_platform_default(GLOBAL_DEFAULT)
