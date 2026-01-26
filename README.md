@@ -39,7 +39,7 @@ For Linux user, LMU's built-in API is not supported on Linux currently, the `rF2
 
 ### Setup for rFactor 2
 
-TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `rFactor 2` API. It can be found from `Download` section of following page:
+TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `rFactor 2` API. It can be found from `Download` section of following page:\
 https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin
 
 The plugin file is named `rFactor2SharedMemoryMapPlugin64.dll` and should be placed in:
@@ -113,27 +113,27 @@ Method 1:
 
 Method 2:
 
-1. Use [Git](https://git-scm.com/) tool and run following command to clone TinyPedal source code alongside required submodules:
+1. Use [Git](https://git-scm.com/) tool and run following command to clone TinyPedal source code alongside required submodules:\
     `git clone --recursive https://github.com/TinyPedal/TinyPedal.git`
-2. To update submodules, run command:
+2. To update submodules, run command:\
     `git submodule update --init`
 
 ### Install dependencies
 
-Install additional dependencies by using command:
+Install additional dependencies by using command:\
 `pip3 install PySide2 psutil`
 
-To start TinyPedal, type command from root folder:
+To start TinyPedal, type command from root folder:\
 `python run.py`
 
 ## Build executable for Windows
 
 Executable file can be built with [py2exe](http://www.py2exe.org).
 
-To install py2exe, run command:
+To install py2exe, run command:\
 `pip3 install py2exe`
 
-To build executable file, run command:
+To build executable file, run command:\
 `python freeze_py2exe.py`
 
 After building completed, executable file can be found in `dist\TinyPedal` folder.
@@ -169,7 +169,7 @@ The Iron Wolf's rF2 Shared Memory Map Plugin has to be replaced with [this fork
 for
 Wine](https://github.com/schlegp/rF2SharedMemoryMapPlugin_Wine/blob/master/build).
 
-To start TinyPedal type the following command:
+To start TinyPedal type the following command:\
 `./run.py`
 
 ### Installation
@@ -184,7 +184,7 @@ available as a command from the terminal.
 The files will be installed at the `/usr/local/` prefix. You'll need
 appropriate permissions to write there, for example, by using `sudo`.
 
-You can run the script as (it doesn't support any arguments or options):
+You can run the script as (it doesn't support any arguments or options):\
 `sudo ./install.sh`
 
 If you need persistent launch arguments (for example, to force PySide6), create
