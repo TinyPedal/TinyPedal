@@ -1,10 +1,12 @@
 [Desktop Entry]
-Exec=/usr/local/share/TinyPedal/run.py
-GenericName=Overlay for rFactor2
+Exec=/usr/local/bin/TinyPedal
+GenericName=Overlay for Racing Simulator
 Icon=/usr/local/share/TinyPedal/images/icon.png
 Name=TinyPedal
+Keywords=tiny;tinypedal;overlay;rfactor2;
 Path=/usr/local/share/TinyPedal
 StartupNotify=true
 Terminal=false
 Type=Application
 StartupWMClass=TinyPedal
+Categories=Game
