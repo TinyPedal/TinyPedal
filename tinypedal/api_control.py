@@ -40,6 +40,7 @@ def _set_available_api():
         )
     else:
         available_api = (
+            (api_connector.SimLMU, False),  # API, is legacy
             (api_connector.SimLMULegacy, not enable_legacy),
             (api_connector.SimRF2, False),
         )
