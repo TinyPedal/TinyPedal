@@ -245,7 +245,6 @@ class ConfigHotkey(BaseDialog):
             hotkey_name = "+".join(_key for _key in key_combo if _key)
             self.temp_hotkey = hotkey_name
             self.update_text(format_hotkey_name(hotkey_name, delimiter=" + "))
-            refresh_keystate(self.get_key_state)
 
     def reset(self):
         """Reset hotkey"""
@@ -259,21 +258,27 @@ class ConfigHotkey(BaseDialog):
     def accept(self):
         """Saving hotkey"""
         if self.temp_hotkey != self.hotkey_name:
-            # Check for duplicated hotkey
-            for option_name, options in cfg.user.shortcuts.items():
-                other_hotkey = options["bind"]
-                if "" != other_hotkey == self.temp_hotkey:
-                    msg_text = (
-                        f"<b>{format_hotkey_name(self.temp_hotkey)}</b> already used for """
-                        f"<b>{format_option_name(option_name)}</b>.<br><br>"
-                        "Please set a different hotkey."
-                    )
-                    QMessageBox.warning(self, "Error", msg_text)
-                    return
-
+            if self.check_duplicates(self.temp_hotkey):
+                return
             cfg.user.shortcuts[self.option_name]["bind"] = self.temp_hotkey
             cfg.save(0, cfg_type=ConfigType.SHORTCUTS)
         self.close()
+
+    def check_duplicates(self, temp_hotkey: str) -> bool:
+        """Check for duplicated hotkeys - True if duplicates"""
+        if temp_hotkey == "":  # ignore empty
+            return False
+        for option_name, options in cfg.user.shortcuts.items():
+            if options["bind"] != temp_hotkey:
+                continue
+            msg_text = (
+                f"<b>{format_hotkey_name(temp_hotkey)}</b> already used for """
+                f"<b>{format_option_name(option_name)}</b>.<br><br>"
+                "Please set a different hotkey."
+            )
+            QMessageBox.warning(self, "Error", msg_text)
+            return True
+        return False
 
     def reject(self):
         """Reject(ESC)"""

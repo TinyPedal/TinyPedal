@@ -108,7 +108,7 @@ def load_hotkey(
 
 
 def set_hotkey_win(
-    get_key_state: Callable,
+    get_key_state: Callable[[int], int],
     key_general: Mapping[str, int] = KEYMAP_GENERAL,
     key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
 ) -> tuple[str, ...]:
