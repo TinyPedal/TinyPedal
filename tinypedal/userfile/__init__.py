@@ -88,7 +88,7 @@ def set_default_data_path(filepath: str) -> str:
     """Set path for default non-configurable data files
 
     Default to TinyPedal local folder (./) on Windows.
-    Default to XDG_DATA_HOME ($HOME/.local/share) on Linux
+    Default to XDG_DATA_HOME ($HOME/.local/share) on Linux.
     """
     if PLATFORM == "Windows":
         return filepath

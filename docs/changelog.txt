@@ -6,6 +6,9 @@ WIP
     TINYPEDAL_RUN_ARGS="--pyside 6"
   - See README.md "Installation" section for usage.
 
+* Config Menu
+  - Added "Open Folder" sub-menu to "Config" menu in main window, which allows to quickly open user folders in File Manager.
+
 - Misc
   - Added new contributor "Bykow" to contributors.md in "Cross-platform" section.
 

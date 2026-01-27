@@ -682,6 +682,8 @@ To change user path, double-clicking on edit box to open `Select folder` dialog;
 
 Click `Apply` or `Save` button to verify and apply new paths. Invalid path will not be applied.
 
+User folders can be opened in File Manager via `Open Folder` sub-menu from `Config` menu.
+
 **Notes to relative and absolute path**
 
 User path that sets inside TinyPedal root folder will be automatically converted to relative path. Relative path is not considered global path, and does not share data between multiple copies of TinyPedal. This is done to retain portability and compatibility with old version.

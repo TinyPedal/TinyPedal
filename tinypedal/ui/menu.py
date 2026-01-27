@@ -27,8 +27,9 @@ from PySide2.QtWidgets import QMenu, QMessageBox
 
 from .. import loader
 from ..api_control import api
-from ..const_app import URL_FAQ, URL_USER_GUIDE
+from ..const_app import PLATFORM, URL_FAQ, URL_USER_GUIDE
 from ..const_file import ConfigType
+from ..formatter import format_option_name
 from ..module_info import minfo
 from ..overlay_control import octrl
 from ..setting import cfg
@@ -272,9 +273,6 @@ class ConfigMenu(QMenu):
         config_compat = self.addAction("Compatibility")
         config_compat.triggered.connect(self.open_config_compatibility)
 
-        config_userpath = self.addAction("User Path")
-        config_userpath.triggered.connect(self.open_config_userpath)
-
         config_notify = self.addAction("Notification")
         config_notify.triggered.connect(self.open_config_notification)
         self.addSeparator()
@@ -284,6 +282,38 @@ class ConfigMenu(QMenu):
 
         config_font = self.addAction("Global Font Override")
         config_font.triggered.connect(self.open_config_font)
+        self.addSeparator()
+
+        config_userpath = self.addAction("User Path")
+        config_userpath.triggered.connect(self.open_config_userpath)
+
+        open_folder = self.addMenu("Open Folder")
+        for path_name in cfg.path.__slots__:
+            _folder = open_folder.addAction(format_option_name(path_name))
+            _folder.triggered.connect(lambda checked=True, p=path_name: self.open_folder(checked, p))
+
+    def open_folder(self, checked: bool, path_name: str):
+        """Open folder in file manager"""
+        filepath = getattr(cfg.path, path_name)
+        error = False
+        if PLATFORM == "Windows":
+            try:
+                filepath = filepath.replace("/", "\\")
+                os.startfile(filepath)
+            except (FileNotFoundError, RuntimeError):
+                error = True
+        else:  # Linux
+            try:
+                import subprocess
+                subprocess.run(["xdg-open", filepath])
+            except (FileNotFoundError, subprocess.SubprocessError):
+                error = True
+        if error:
+            QMessageBox.warning(
+                self._parent,
+                "Error",
+                f"Cannot open folder:<br><b>{filepath}</b>",
+            )
 
     def open_config_application(self):
         """Config global application"""
