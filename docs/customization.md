@@ -3467,6 +3467,15 @@ Some cases where interpolation may not be applied:
 
 In either case, just wait another lap and energy readings will be synchronized.
 
+    energy_remaining_decimal_places
+Set additional decimals to be displayed.
+
+**Important notes on decimal place accuracy:**
+
+Currently due to known limitation from game API (as explained above), energy remaining readings from game API does not grant decimal place accuracy, and the margin of error for energy readings is expected to be as high as 1.0% per lap. This means that by enabling more decimals from this option, it may not provide more accuracy than without decimals.
+
+This option is provided solely on user's request, please do not report for any inaccuracy issue associated with this option.
+
     show_vehicle_integrity
 Show opponent vehicle integrity reading.
 

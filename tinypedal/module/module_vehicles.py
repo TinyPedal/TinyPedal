@@ -353,5 +353,5 @@ def update_stint_usage(data: VehicleDataSet, laps_completed: int) -> None:
     # Stint energy usage
     if ve_remaining <= -1.0 or ve_used <= 0 or (data.pitTimer.pitting and not data.inPit):
         data.energyRemaining = ve_remaining
-    else:  # Apply linear interpolation at 95% of expected lap usage
-        data.energyRemaining = ve_remaining - ve_used * 0.95 * (data.totalLapProgress - total_laps_done)
+    else:  # Apply linear interpolation
+        data.energyRemaining = ve_remaining - ve_used * (data.totalLapProgress - total_laps_done)
