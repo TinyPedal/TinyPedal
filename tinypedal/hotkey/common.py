@@ -22,10 +22,26 @@ Hotkey function
 
 from __future__ import annotations
 
-from typing import Callable, Mapping
+from itertools import chain
+from typing import Callable, Iterable, Mapping
 
 from ..const_app import PLATFORM
 from .keymap import KEYMAP_GENERAL, KEYMAP_MODIFIER
+
+
+def sort_key_codes(
+    available_commands: Iterable[tuple[int, ...]],
+    key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
+) -> tuple[int, ...]:
+    """Sort available key codes in order - modifiers > keys"""
+    all_keys = set(chain(*(_keys for _keys in available_commands)))
+    all_modifiers = set(key_modifier.values())
+    keys_only = tuple(all_keys - all_modifiers)
+    modifiers_only = tuple(
+        _mod for _mod in key_modifier.values()
+        if _mod in all_keys
+    )
+    return modifiers_only + keys_only
 
 
 def format_hotkey_name(name: str, notset: str = "", delimiter: str = "+") -> str:
