@@ -120,16 +120,16 @@ class HotkeyList(QWidget):
     def add_hotkey_category(self, name: str):
         """Add hotkey category header"""
         item = QListWidgetItem()
-        self.listbox_hotkey.addItem(item)
         label = QLabel(f"{name} Keybinding", self.listbox_hotkey)
         label.setAlignment(Qt.AlignCenter)
+        self.listbox_hotkey.addItem(item)
         self.listbox_hotkey.setItemWidget(item, label)
 
-    def add_hotkey_item(self, option_name: str):
+    def add_hotkey_item(self, option_name: str, display_name: str):
         """Add hotkey item"""
-        module_item = HotkeyConfigItem(self, option_name)
         item = QListWidgetItem()
-        item.setText(format_option_name(option_name))
+        item.setText(format_option_name(display_name))
+        module_item = HotkeyConfigItem(self, option_name)
         self.listbox_hotkey.addItem(item)
         self.listbox_hotkey.setItemWidget(item, module_item)
 
@@ -137,15 +137,15 @@ class HotkeyList(QWidget):
         """Create hotkey option list"""
         self.add_hotkey_category("General")
         for option_name in SHORTCUTS_GENERAL:
-            self.add_hotkey_item(option_name)
+            self.add_hotkey_item(option_name, option_name)
 
         self.add_hotkey_category("Widget")
         for option_name in SHORTCUTS_WIDGET:
-            self.add_hotkey_item(option_name)
+            self.add_hotkey_item(option_name, option_name.replace("widget_", ""))
 
         self.add_hotkey_category("Module")
         for option_name in SHORTCUTS_MODULE:
-            self.add_hotkey_item(option_name)
+            self.add_hotkey_item(option_name, option_name.replace("module_", ""))
 
         self.listbox_hotkey.setCurrentRow(0)
 
