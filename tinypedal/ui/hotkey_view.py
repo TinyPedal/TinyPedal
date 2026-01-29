@@ -36,6 +36,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import app_signal
 from ..const_app import PLATFORM
 from ..const_file import ConfigType
 from ..formatter import format_option_name
@@ -58,10 +59,9 @@ from ._common import BaseDialog, UIScaler
 class HotkeyList(QWidget):
     """Hotkey list view"""
 
-    def __init__(self, parent, notify_toggle: Callable):
+    def __init__(self, parent):
         """Initialize hotkey list setting"""
         super().__init__(parent)
-        self.notify_toggle = notify_toggle
         self.last_enabled = None
 
         # List box
@@ -98,7 +98,6 @@ class HotkeyList(QWidget):
     def refresh(self):
         """Refresh hotkey list"""
         enabled = cfg.application["enable_global_hotkey"]
-        self.notify_toggle(cfg.notification["notify_global_hotkey"] and enabled)
         # Update button state only if changed
         if self.last_enabled != enabled:
             self.last_enabled = enabled
@@ -116,7 +115,7 @@ class HotkeyList(QWidget):
         cfg.application["enable_global_hotkey"] = checked
         cfg.save(cfg_type=ConfigType.CONFIG)
         kctrl.reload()
-        self.refresh()
+        app_signal.refresh.emit(True)
 
     def add_hotkey_category(self, name: str):
         """Add hotkey category header"""

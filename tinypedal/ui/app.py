@@ -70,10 +70,10 @@ class TabView(QWidget):
         # Tabs
         widget_tab = ModuleList(self, wctrl)
         module_tab = ModuleList(self, mctrl)
-        preset_tab = PresetList(self, notify_bar.presetlocked.setVisible)
-        spectate_tab = SpectateList(self, notify_bar.spectate.setVisible)
-        pacenotes_tab = PaceNotesControl(self, notify_bar.pacenotes.setVisible)
-        hotkey_tab = HotkeyList(self, notify_bar.hotkey.setVisible)
+        preset_tab = PresetList(self)
+        spectate_tab = SpectateList(self)
+        pacenotes_tab = PaceNotesControl(self)
+        hotkey_tab = HotkeyList(self)
 
         self._tabs = QTabWidget(self)
         self._tabs.addTab(widget_tab, "Widget")  # 0

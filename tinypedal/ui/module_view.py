@@ -32,6 +32,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import app_signal
 from ..formatter import format_module_name
 from ..module_control import ModuleControl
 from ..setting import cfg
@@ -110,14 +111,14 @@ class ModuleList(QWidget):
         if self.module_control.number_active != self.module_control.number_total:
             if self.confirm_batch_toggle("Enable"):
                 self.module_control.enable_all()
-                self.refresh()
+                app_signal.refresh.emit(True)
 
     def module_button_disable_all(self):
         """Disable all modules"""
         if self.module_control.number_active:
             if self.confirm_batch_toggle("Disable"):
                 self.module_control.disable_all()
-                self.refresh()
+                app_signal.refresh.emit(True)
 
     def confirm_batch_toggle(self, confirm_type: str) -> bool:
         """Batch toggle confirmation"""

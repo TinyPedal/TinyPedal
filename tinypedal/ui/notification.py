@@ -69,22 +69,46 @@ class NotifyBar(QWidget):
     @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh & update style"""
-        self.presetlocked.setStyleSheet(
-            f"color: {cfg.notification['font_color_locked_preset']};"
-            f"background: {cfg.notification['bkg_color_locked_preset']};"
+        # Locked preset
+        self.presetlocked.setVisible(
+            cfg.notification["notify_locked_preset"]
+            and cfg.filename.setting in cfg.user.filelock
         )
-        self.spectate.setStyleSheet(
-            f"color: {cfg.notification['font_color_spectate_mode']};"
-            f"background: {cfg.notification['bkg_color_spectate_mode']};"
+        if self.presetlocked.isVisible():
+            self.presetlocked.setStyleSheet(
+                f"color: {cfg.notification['font_color_locked_preset']};"
+                f"background: {cfg.notification['bkg_color_locked_preset']};"
+            )
+        # Spectate mode
+        self.spectate.setVisible(
+            cfg.notification["notify_spectate_mode"]
+            and cfg.api["enable_player_index_override"]
         )
-        self.pacenotes.setStyleSheet(
-            f"color: {cfg.notification['font_color_pace_notes_playback']};"
-            f"background: {cfg.notification['bkg_color_pace_notes_playback']};"
+        if self.spectate.isVisible():
+            self.spectate.setStyleSheet(
+                f"color: {cfg.notification['font_color_spectate_mode']};"
+                f"background: {cfg.notification['bkg_color_spectate_mode']};"
+            )
+        # Pace notes playback
+        self.pacenotes.setVisible(
+            cfg.notification["notify_pace_notes_playback"]
+            and cfg.user.setting["pace_notes_playback"]["enable"]
         )
-        self.hotkey.setStyleSheet(
-            f"color: {cfg.notification['font_color_global_hotkey']};"
-            f"background: {cfg.notification['bkg_color_global_hotkey']};"
+        if self.pacenotes.isVisible():
+            self.pacenotes.setStyleSheet(
+                f"color: {cfg.notification['font_color_pace_notes_playback']};"
+                f"background: {cfg.notification['bkg_color_pace_notes_playback']};"
+            )
+        # Global hotkey
+        self.hotkey.setVisible(
+            cfg.notification["notify_global_hotkey"]
+            and cfg.application["enable_global_hotkey"]
         )
+        if self.hotkey.isVisible():
+            self.hotkey.setStyleSheet(
+                f"color: {cfg.notification['font_color_global_hotkey']};"
+                f"background: {cfg.notification['bkg_color_global_hotkey']};"
+            )
 
 
 class UpdatesNotifyButton(QPushButton):

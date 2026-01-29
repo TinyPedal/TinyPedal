@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Callable
 
 from PySide2.QtCore import QBasicTimer, Qt, QUrl, Slot
 from PySide2.QtMultimedia import QMediaPlayer
@@ -44,7 +43,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import realtime_state
+from .. import app_signal, realtime_state
 from ..api_control import api
 from ..const_file import FileFilter
 from ..module_control import mctrl
@@ -173,9 +172,8 @@ class PaceNotesPlayer(QMediaPlayer):
 class PaceNotesControl(QWidget):
     """Pace notes control"""
 
-    def __init__(self, parent, notify_toggle: Callable):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.notify_toggle = notify_toggle
         self.last_enabled = None
 
         self.mcfg = cfg.user.setting["pace_notes_playback"]
@@ -312,7 +310,6 @@ class PaceNotesControl(QWidget):
         self.spinbox_max_queue.setValue(self.mcfg["pace_notes_sound_max_queue"])
         self.slider_volume.setValue(self.mcfg["pace_notes_sound_volume"])
 
-        self.notify_toggle(cfg.notification["notify_pace_notes_playback"] and enabled)
         # Update button state only if changed
         if self.last_enabled != enabled:
             self.last_enabled = enabled
@@ -385,7 +382,7 @@ class PaceNotesControl(QWidget):
     def toggle_button_state(self, checked: bool):
         """Toggle button state"""
         self.update_config("enable", checked)
-        self.refresh()
+        app_signal.refresh.emit(True)
 
     def update_config(self, key: str, value: int | float | str) -> bool:
         """Update pace note playback setting, save if changed"""
