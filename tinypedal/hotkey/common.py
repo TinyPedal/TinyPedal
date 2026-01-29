@@ -107,6 +107,8 @@ def load_hotkey(
     delimiter: str = "+",
 ) -> tuple[int, ...]:
     """Load hotkey string and export as key code sequence"""
+    if not key_string:
+        return ()
     key_split = key_string.split(delimiter)
     max_index = len(key_split) - 1
     output_combo = []

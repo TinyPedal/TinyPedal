@@ -62,14 +62,10 @@ class TabView(QWidget):
         super().__init__(parent)
         # Notify bar
         notify_bar = NotifyBar(self)
-
         notify_bar.presetlocked.clicked.connect(self.select_preset_tab)
         notify_bar.spectate.clicked.connect(self.select_spectate_tab)
         notify_bar.pacenotes.clicked.connect(self.select_pacenotes_tab)
         notify_bar.hotkey.clicked.connect(self.select_hotkey_tab)
-
-        app_signal.updates.connect(notify_bar.updates.checking)
-        app_signal.refresh.connect(notify_bar.refresh)
 
         # Tabs
         widget_tab = ModuleList(self, wctrl)
@@ -78,13 +74,6 @@ class TabView(QWidget):
         spectate_tab = SpectateList(self, notify_bar.spectate.setVisible)
         pacenotes_tab = PaceNotesControl(self, notify_bar.pacenotes.setVisible)
         hotkey_tab = HotkeyList(self, notify_bar.hotkey.setVisible)
-
-        app_signal.refresh.connect(widget_tab.refresh)
-        app_signal.refresh.connect(module_tab.refresh)
-        app_signal.refresh.connect(preset_tab.refresh)
-        app_signal.refresh.connect(spectate_tab.refresh)
-        app_signal.refresh.connect(pacenotes_tab.refresh)
-        app_signal.refresh.connect(hotkey_tab.refresh)
 
         self._tabs = QTabWidget(self)
         self._tabs.addTab(widget_tab, "Widget")  # 0
@@ -102,6 +91,19 @@ class TabView(QWidget):
         layout_main.addWidget(self._tabs)
         layout_main.addWidget(notify_bar)
         self.setLayout(layout_main)
+
+        # Connect app signal
+        app_signal.updates.connect(notify_bar.updates.checking)
+        app_signal.refresh.connect(notify_bar.refresh)
+
+        app_signal.refresh.connect(widget_tab.refresh)
+        app_signal.refresh.connect(module_tab.refresh)
+        app_signal.refresh.connect(preset_tab.refresh)
+        app_signal.refresh.connect(spectate_tab.refresh)
+        app_signal.refresh.connect(pacenotes_tab.refresh)
+        app_signal.refresh.connect(hotkey_tab.refresh)
+
+        app_signal.hotkey.connect(hotkey_tab.run_command)
 
     def refresh(self):
         """Refresh tab area"""
@@ -413,6 +415,7 @@ class AppWindow(QMainWindow):
 
     def __break_signal(self):
         """Disconnect signal"""
+        app_signal.hotkey.disconnect()
         app_signal.updates.disconnect()
         app_signal.refresh.disconnect()
         app_signal.quitapp.disconnect()

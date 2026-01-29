@@ -18,79 +18,10 @@
 
 """
 Widget modules
-
-Add new widget to import list below in ascending order,
-file name must match corresponding key name
-in template/setting_widget.py dictionary.
 """
 
-__all__ = [
-    "battery",
-    "brake_bias",
-    "brake_performance",
-    "brake_pressure",
-    "brake_temperature",
-    "brake_wear",
-    "cruise",
-    "damage",
-    "deltabest",
-    "deltabest_extended",
-    "differential",
-    "drs",
-    "electric_motor",
-    "elevation",
-    "engine",
-    "flag",
-    "force",
-    "friction_circle",
-    "fuel",
-    "fuel_energy_saver",
-    "gear",
-    "heading",
-    "instrument",
-    "lap_time_history",
-    "laps_and_position",
-    "navigation",
-    "p2p",
-    "pace_notes",
-    "pedal",
-    "pit_stop_estimate",
-    "radar",
-    "rake_angle",
-    "relative",
-    "relative_finish_order",
-    "ride_height",
-    "rivals",
-    "roll_angle",
-    "rpm_led",
-    "sectors",
-    "session",
-    "slip_ratio",
-    "speedometer",
-    "standings",
-    "steering",
-    "steering_wheel",
-    "stint_history",
-    "suspension_force",
-    "suspension_position",
-    "suspension_travel",
-    "system_performance",
-    "timing",
-    "track_map",
-    "track_notes",
-    "trailing",
-    "tyre_carcass",
-    "tyre_inner_layer",
-    "tyre_load",
-    "tyre_pressure",
-    "tyre_temperature",
-    "tyre_wear",
-    "virtual_energy",
-    "weather",
-    "weather_forecast",
-    "weight_distribution",
-    "wheel_camber",
-    "wheel_toe",
-]
+from ..const_widget import WIDGET_FILENAME
+
+__all__ = WIDGET_FILENAME
 
 from . import *

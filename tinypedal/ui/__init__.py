@@ -294,6 +294,16 @@ def set_style_window(base_font_pt: int) -> str:
             font-size: {font_pt_item_name}pt;
             outline: none;
         }}
+        HotkeyList QListView QLabel {{
+            font-size: {font_pt_item_name}pt;
+            font-weight: bold;
+            color: {color_inactive_highlighted_text};
+            background: {color_inactive_highlight};
+        }}
+        HotkeyList QListView QLabel:disabled {{
+            color: {color_disabled_window_text};
+            background: {color_disabled_highlight};
+        }}
         HotkeyList QListView::item {{
             border: none;
             min-height: 1.75em;

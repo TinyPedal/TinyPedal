@@ -1,5 +1,10 @@
 WIP
 -----------------------------
+* Hotkey Tab
+  - Show keybinding categories. Added "General", "Widget", "Module" keybinding categories.
+  - Support keybinding for "Widget" & "Module" (requested by user "Deckard9999").
+  - Improved hoykey detection methods.
+
 * Relative, Rivals, Standings Widget
   - Added "energy_remaining_decimal_places" option (requested by user "chaplinchan", "NoXiD211", "ssalamon"), which sets additional decimals to be displayed.
   - Important notes on decimal place accuracy:

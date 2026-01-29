@@ -22,10 +22,27 @@ Hotkey command function
 
 from __future__ import annotations
 
+from functools import partial
+
 from .. import app_signal, loader, overlay_signal, realtime_state
 from ..api_control import api
 from ..const_file import ConfigType, FileExt
+from ..const_module import MODULE_FILENAME
+from ..const_widget import WIDGET_FILENAME
+from ..module_control import mctrl, wctrl
 from ..setting import cfg
+
+
+def hotkey_module_toggle(module_name: str):
+    """Command - module toggle"""
+    mctrl.toggle(module_name)
+    app_signal.refresh.emit(True)
+
+
+def hotkey_widget_toggle(widget_name: str):
+    """Command - widget toggle"""
+    wctrl.toggle(widget_name)
+    app_signal.refresh.emit(True)
 
 
 def hotkey_overlay_visibility():
@@ -179,7 +196,9 @@ def hotkey_quit_application():
     app_signal.quitapp.emit(True)
 
 
-COMMANDS_HOTKEY = (
+# Define command list:
+# 0 hotkey name, 1 hotkey function
+COMMANDS_GENERAL = (
     ("overlay_visibility", hotkey_overlay_visibility),
     ("overlay_lock", hotkey_overlay_lock),
     ("vr_compatibility", hotkey_vr_compatibility),
@@ -195,4 +214,12 @@ COMMANDS_HOTKEY = (
     ("pace_notes_playback", hotkey_pace_notes_playback),
     ("restart_application", hotkey_restart_application),
     ("quit_application", hotkey_quit_application),
+)
+COMMANDS_MODULE = tuple(
+    (hotkey_name, partial(hotkey_module_toggle, hotkey_name))
+    for hotkey_name in MODULE_FILENAME
+)
+COMMANDS_WIDGET = tuple(
+    (f"widget_{hotkey_name}", partial(hotkey_widget_toggle, hotkey_name))
+    for hotkey_name in WIDGET_FILENAME
 )

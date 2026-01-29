@@ -27,7 +27,8 @@ import threading
 from time import sleep
 from typing import Callable
 
-from .hotkey.command import COMMANDS_HOTKEY
+from . import app_signal
+from .hotkey.command import COMMANDS_GENERAL, COMMANDS_MODULE, COMMANDS_WIDGET
 from .hotkey.common import (
     get_key_state_function,
     load_hotkey,
@@ -39,10 +40,10 @@ from .setting import cfg
 logger = logging.getLogger(__name__)
 
 
-def gather_command() -> dict[tuple[int, ...], tuple[str, Callable]]:
+def gather_command(commands: tuple) -> dict[tuple[int, ...], tuple[str, Callable]]:
     """Gather & validate hotkey commands"""
     temp_keys = {}
-    for hotkey_name, hotkey_func in COMMANDS_HOTKEY:
+    for hotkey_name, hotkey_func in commands:
         key_string = cfg.user.shortcuts[hotkey_name]["bind"]
         key_codes = load_hotkey(key_string)
         if key_codes:
@@ -84,7 +85,11 @@ class HotkeyControl:
     def __updating(self):
         """Update hotkey state"""
         _event_wait = self._event.wait
-        available_commands = gather_command()
+        available_commands = {
+            **gather_command(COMMANDS_GENERAL),
+            **gather_command(COMMANDS_MODULE),
+            **gather_command(COMMANDS_WIDGET),
+        }
         available_key_codes = sort_key_codes(available_commands.keys())
 
         get_key_state = get_key_state_function()
@@ -98,7 +103,8 @@ class HotkeyControl:
             detected_key_codes = tuple(_key for _key in available_key_codes if get_key_state(_key))
             if detected_key_codes in available_commands:
                 hotkey_name, hotkey_func = available_commands[detected_key_codes]
-                hotkey_func()
+                # Run command in main thread
+                app_signal.hotkey.emit(hotkey_func)
                 logger.info(
                     "HOTKEY: %s (command: %s)",
                     cfg.user.shortcuts[hotkey_name]["bind"],
