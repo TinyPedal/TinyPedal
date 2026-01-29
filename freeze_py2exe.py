@@ -181,14 +181,14 @@ def build_exe() -> None:
 
 def build_start() -> None:
     """Start building"""
-    print("INFO:platform:", PLATFORM)
+    print("INFO:platform:", PLATFORM.SYSTEM)
     print("INFO:TinyPedal:", VERSION)
     print("INFO:Python:", version_check.python())
     print("INFO:Qt:", version_check.qt())
     print("INFO:PySide:", version_check.pyside())
     print("INFO:psutil:", version_check.psutil())
 
-    if PLATFORM != "Windows":
+    if not PLATFORM.WINDOWS:
         print("ERROR:Build script does not support none Windows platform")
         print("INFO:Building canceled")
         return

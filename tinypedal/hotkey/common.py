@@ -62,7 +62,7 @@ def modifier_priority(key: str) -> int:
 
 def get_key_state_function() -> Callable[[int], int]:
     """Platform specific 'get key state' function"""
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         from ctypes import windll
 
         return windll.user32.GetAsyncKeyState
@@ -71,7 +71,7 @@ def get_key_state_function() -> Callable[[int], int]:
 
 def refresh_keystate(get_key_state: Callable[[int], int]) -> None:
     """Refresh and clean up key state - Windows"""
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         _refresh_keystate_win(get_key_state)
     else:
         _refresh_keystate_linux(get_key_state)

@@ -296,7 +296,7 @@ class ConfigMenu(QMenu):
         """Open folder in file manager"""
         filepath = getattr(cfg.path, path_name)
         error = False
-        if PLATFORM == "Windows":
+        if PLATFORM.WINDOWS:
             try:
                 filepath = filepath.replace("/", "\\")
                 os.startfile(filepath)

@@ -64,7 +64,7 @@ def set_global_config_path(filepath: str) -> str:
     Default to APPDATA folder (AppData/Roaming) on Windows.
     Default to XDG_CONFIG_HOME ($HOME/.config) on Linux.
     """
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         return set_user_data_path(f"{os.getenv('APPDATA', '.')}\\{filepath}\\")
     # Linux
     from xdg import BaseDirectory as BD
@@ -77,7 +77,7 @@ def set_default_config_path(filepath: str) -> str:
     Default to TinyPedal local folder (./) on Windows.
     Default to XDG_CONFIG_HOME ($HOME/.config) on Linux.
     """
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         return filepath
     # Linux
     from xdg import BaseDirectory as BD
@@ -90,7 +90,7 @@ def set_default_data_path(filepath: str) -> str:
     Default to TinyPedal local folder (./) on Windows.
     Default to XDG_DATA_HOME ($HOME/.local/share) on Linux.
     """
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         return filepath
     # Linux
     from xdg import BaseDirectory as BD

@@ -259,7 +259,7 @@ class ConfigHotkey(BaseDialog):
         self.get_key_state = get_key_state_function()
         refresh_keystate(self.get_key_state)
 
-        if PLATFORM == "Windows":
+        if PLATFORM.WINDOWS:
             self.text_placeholder = "Press a key or key combination"
             self.update_text(format_hotkey_name(hotkey_name, self.text_placeholder, delimiter=" + "))
             self._update_timer.start(200, self)
@@ -269,7 +269,7 @@ class ConfigHotkey(BaseDialog):
 
     def timerEvent(self, event):
         """Monitor key press"""
-        if PLATFORM == "Windows":
+        if PLATFORM.WINDOWS:
             key_combo = set_hotkey_win(self.get_key_state)
         else:
             key_combo = ()

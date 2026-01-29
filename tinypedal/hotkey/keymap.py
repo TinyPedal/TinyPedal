@@ -206,7 +206,7 @@ _WIN_KEYMAP_GENERAL = {
 }
 
 # Windows
-if PLATFORM == "Windows":
+if PLATFORM.WINDOWS:
     KEYMAP_MODIFIER = MappingProxyType(_WIN_KEYMAP_MODIFIER)
     KEYMAP_GENERAL = MappingProxyType(_WIN_KEYMAP_GENERAL)
 # Other platform (placeholder)
