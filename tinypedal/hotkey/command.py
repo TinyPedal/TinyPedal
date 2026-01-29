@@ -27,10 +27,10 @@ from functools import partial
 from .. import app_signal, loader, overlay_signal, realtime_state
 from ..api_control import api
 from ..const_file import ConfigType, FileExt
-from ..const_module import MODULE_FILENAME
-from ..const_widget import WIDGET_FILENAME
 from ..module_control import mctrl, wctrl
 from ..setting import cfg
+from ..template.setting_module import MODULE_FILENAME
+from ..template.setting_widget import WIDGET_FILENAME
 
 
 def hotkey_module_toggle(module_name: str):

@@ -18,6 +18,8 @@
 
 """
 Default widget setting template
+
+Widget key name must match corresponding file name in 'widget' folder
 """
 
 from .setting_heatmap import HEATMAP_DEFAULT_BRAKE, HEATMAP_DEFAULT_TYRE
@@ -3101,3 +3103,5 @@ WIDGET_DEFAULT = {
         "bkg_color_caption": "#777777",
     },
 }
+
+WIDGET_FILENAME = tuple(WIDGET_DEFAULT)

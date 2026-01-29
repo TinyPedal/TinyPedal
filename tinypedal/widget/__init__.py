@@ -20,7 +20,7 @@
 Widget modules
 """
 
-from ..const_widget import WIDGET_FILENAME
+from ..template.setting_widget import WIDGET_FILENAME
 
 __all__ = WIDGET_FILENAME
 

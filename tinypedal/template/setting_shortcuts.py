@@ -22,8 +22,8 @@ Default keyboard shortcuts template
 
 from types import MappingProxyType
 
-from ..const_module import MODULE_FILENAME
-from ..const_widget import WIDGET_FILENAME
+from ..template.setting_module import MODULE_FILENAME
+from ..template.setting_widget import WIDGET_FILENAME
 
 SHORTCUT_DEFAULT = MappingProxyType({
     "bind": "",
