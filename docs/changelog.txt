@@ -1,15 +1,15 @@
-WIP
+2.40.1 (2026-01-30)
 -----------------------------
 * Hotkey Tab
   - Show keybinding categories. Added "General", "Widget", "Module" keybinding categories.
   - Support keybinding for "Widget" & "Module" (requested by user "Deckard9999").
-  - Improved hoykey detection methods.
+  - Improved hoykey detection methods for handling large amount hotkeys efficiently.
 
 * Relative, Rivals, Standings Widget
   - Added "energy_remaining_decimal_places" option (requested by user "chaplinchan", "NoXiD211", "ssalamon"), which sets additional decimals to be displayed.
   - Important notes on decimal place accuracy:
-    Currently due to known limitation from game API (as explained in User Guide), energy remaining readings from game API does not grant decimal place accuracy, and the margin of error for energy readings is expected to be as high as 1.0% per lap. This means that by enabling more decimals from this option, it may not provide more accuracy than without decimals.
-    This option is provided solely on user's request, please do not report for any inaccuracy issue associated with this option.
+    Currently due to known limitation from game API (as explained in User Guide), energy remaining readings from game API does not grant decimal place accuracy.
+    The margin of error from this option can be as high as 1.0% per lap, which may not provide more accuracy than without decimals.
 
 * Launcher config & script update for Linux (by @Bykow)
   - Added support for per-user launch arguments via "~/.config/TinyPedal/launcher.conf" file. Updated desktop entry to support user config and run from "/usr/local/bin/TinyPedal".
@@ -17,10 +17,14 @@ WIP
     TINYPEDAL_RUN_ARGS="--pyside 6"
   - See README.md "Installation" section for usage.
 
+* API (Linux)
+  - LMU built-in API can now be selected from API menu on Linux, but may not work without support from third-party plugin (see discussion #9).
+
 * Config Menu
   - Added "Open Folder" sub-menu to "Config" menu in main window, which allows to quickly open user folders in File Manager.
 
 - Misc
+  - Added "Disable Widget" option to right-click context menu on each widget, which allows to disable and close widget.
   - Added new contributor "Bykow" to contributors.md in "Cross-platform" section.
 
 2.40.0 (2026-01-23)

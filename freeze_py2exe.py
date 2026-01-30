@@ -181,7 +181,7 @@ def build_exe() -> None:
 
 def build_start() -> None:
     """Start building"""
-    print("INFO:platform:", PLATFORM.SYSTEM)
+    print("INFO:Platform:", PLATFORM.SYSTEM)
     print("INFO:TinyPedal:", VERSION)
     print("INFO:Python:", version_check.python())
     print("INFO:Qt:", version_check.qt())
