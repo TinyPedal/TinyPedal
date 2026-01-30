@@ -28,7 +28,7 @@ from . import version_check
 # System info
 class PLATFORM:
     SYSTEM: str = platform.system()
-    WINDOWS: bool = (platform.system() == "Windows")
+    WINDOWS: bool = (SYSTEM == "Windows")
 
 # App version
 VERSION = version_check.tinypedal()

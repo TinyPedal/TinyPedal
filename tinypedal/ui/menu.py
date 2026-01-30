@@ -650,7 +650,7 @@ class HelpMenu(QMenu):
         app_guide = self.addAction("User Guide")
         app_guide.triggered.connect(self.open_user_guide)
 
-        app_faq = self.addAction("FAQ")
+        app_faq = self.addAction("Frequently Asked Questions")
         app_faq.triggered.connect(self.open_faq)
 
         app_log = self.addAction("Show Log")
