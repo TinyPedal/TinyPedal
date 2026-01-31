@@ -44,7 +44,7 @@ jobs:
     - name: ZIP Linux file
       run: |
         file_name=TinyPedal-${{ steps.get_ver.outputs.app_ver }}-linux.zip
-        zip -r $file_name . -x *.git*
+        zip -r $file_name . -x *.git/* -x *.github/*
 
     - name: Check hash sum
       id: get_hash

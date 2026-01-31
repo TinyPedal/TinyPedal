@@ -26,6 +26,7 @@ from PySide2.QtCore import QBasicTimer, Qt, Slot
 from PySide2.QtWidgets import (
     QDialogButtonBox,
     QHBoxLayout,
+    QLabel,
     QLineEdit,
     QListWidget,
     QListWidgetItem,
@@ -35,6 +36,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import app_signal
 from ..const_app import PLATFORM
 from ..const_file import ConfigType
 from ..formatter import format_option_name
@@ -46,16 +48,20 @@ from ..hotkey.common import (
 )
 from ..hotkey_control import kctrl
 from ..setting import cfg
+from ..template.setting_shortcuts import (
+    SHORTCUTS_GENERAL,
+    SHORTCUTS_MODULE,
+    SHORTCUTS_WIDGET,
+)
 from ._common import BaseDialog, UIScaler
 
 
 class HotkeyList(QWidget):
     """Hotkey list view"""
 
-    def __init__(self, parent, notify_toggle: Callable):
+    def __init__(self, parent):
         """Initialize hotkey list setting"""
         super().__init__(parent)
-        self.notify_toggle = notify_toggle
         self.last_enabled = None
 
         # List box
@@ -83,11 +89,15 @@ class HotkeyList(QWidget):
         layout_main.setContentsMargins(margin, margin, margin, margin)
         self.setLayout(layout_main)
 
+    @Slot(object)  # type: ignore[operator]
+    def run_command(self, hotkey_func: Callable):
+        """Hotkey command must be run in main thread"""
+        hotkey_func()
+
     @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh hotkey list"""
         enabled = cfg.application["enable_global_hotkey"]
-        self.notify_toggle(cfg.notification["notify_global_hotkey"] and enabled)
         # Update button state only if changed
         if self.last_enabled != enabled:
             self.last_enabled = enabled
@@ -105,16 +115,38 @@ class HotkeyList(QWidget):
         cfg.application["enable_global_hotkey"] = checked
         cfg.save(cfg_type=ConfigType.CONFIG)
         kctrl.reload()
-        self.refresh()
+        app_signal.refresh.emit(True)
+
+    def add_hotkey_category(self, name: str):
+        """Add hotkey category header"""
+        item = QListWidgetItem()
+        label = QLabel(f"{name} Keybinding", self.listbox_hotkey)
+        label.setAlignment(Qt.AlignCenter)
+        self.listbox_hotkey.addItem(item)
+        self.listbox_hotkey.setItemWidget(item, label)
+
+    def add_hotkey_item(self, option_name: str, display_name: str):
+        """Add hotkey item"""
+        item = QListWidgetItem()
+        item.setText(format_option_name(display_name))
+        module_item = HotkeyConfigItem(self, option_name)
+        self.listbox_hotkey.addItem(item)
+        self.listbox_hotkey.setItemWidget(item, module_item)
 
     def create_list(self):
         """Create hotkey option list"""
-        for option_name in cfg.user.shortcuts:
-            module_item = HotkeyConfigItem(self, option_name)
-            item = QListWidgetItem()
-            item.setText(format_option_name(option_name))
-            self.listbox_hotkey.addItem(item)
-            self.listbox_hotkey.setItemWidget(item, module_item)
+        self.add_hotkey_category("General")
+        for option_name in SHORTCUTS_GENERAL:
+            self.add_hotkey_item(option_name, option_name)
+
+        self.add_hotkey_category("Widget")
+        for option_name in SHORTCUTS_WIDGET:
+            self.add_hotkey_item(option_name, option_name.replace("widget_", ""))
+
+        self.add_hotkey_category("Module")
+        for option_name in SHORTCUTS_MODULE:
+            self.add_hotkey_item(option_name, option_name.replace("module_", ""))
+
         self.listbox_hotkey.setCurrentRow(0)
 
     def reset_hotkey(self):
@@ -134,7 +166,8 @@ class HotkeyList(QWidget):
             listbox_hotkey = self.listbox_hotkey
             for row_index in range(listbox_hotkey.count()):
                 item = listbox_hotkey.itemWidget(listbox_hotkey.item(row_index))
-                item.reload_hotkey()
+                if isinstance(item, HotkeyConfigItem):
+                    item.reload_hotkey()
             # Reload
             kctrl.reload()
 
@@ -226,7 +259,7 @@ class ConfigHotkey(BaseDialog):
         self.get_key_state = get_key_state_function()
         refresh_keystate(self.get_key_state)
 
-        if PLATFORM == "Windows":
+        if PLATFORM.WINDOWS:
             self.text_placeholder = "Press a key or key combination"
             self.update_text(format_hotkey_name(hotkey_name, self.text_placeholder, delimiter=" + "))
             self._update_timer.start(200, self)
@@ -236,7 +269,7 @@ class ConfigHotkey(BaseDialog):
 
     def timerEvent(self, event):
         """Monitor key press"""
-        if PLATFORM == "Windows":
+        if PLATFORM.WINDOWS:
             key_combo = set_hotkey_win(self.get_key_state)
         else:
             key_combo = ()
@@ -245,7 +278,6 @@ class ConfigHotkey(BaseDialog):
             hotkey_name = "+".join(_key for _key in key_combo if _key)
             self.temp_hotkey = hotkey_name
             self.update_text(format_hotkey_name(hotkey_name, delimiter=" + "))
-            refresh_keystate(self.get_key_state)
 
     def reset(self):
         """Reset hotkey"""
@@ -259,21 +291,27 @@ class ConfigHotkey(BaseDialog):
     def accept(self):
         """Saving hotkey"""
         if self.temp_hotkey != self.hotkey_name:
-            # Check for duplicated hotkey
-            for option_name, options in cfg.user.shortcuts.items():
-                other_hotkey = options["bind"]
-                if "" != other_hotkey == self.temp_hotkey:
-                    msg_text = (
-                        f"<b>{format_hotkey_name(self.temp_hotkey)}</b> already used for """
-                        f"<b>{format_option_name(option_name)}</b>.<br><br>"
-                        "Please set a different hotkey."
-                    )
-                    QMessageBox.warning(self, "Error", msg_text)
-                    return
-
+            if self.check_duplicates(self.temp_hotkey):
+                return
             cfg.user.shortcuts[self.option_name]["bind"] = self.temp_hotkey
             cfg.save(0, cfg_type=ConfigType.SHORTCUTS)
         self.close()
+
+    def check_duplicates(self, temp_hotkey: str) -> bool:
+        """Check for duplicated hotkeys - True if duplicates"""
+        if temp_hotkey == "":  # ignore empty
+            return False
+        for option_name, options in cfg.user.shortcuts.items():
+            if options["bind"] != temp_hotkey:
+                continue
+            msg_text = (
+                f"<b>{format_hotkey_name(temp_hotkey)}</b> already used for """
+                f"<b>{format_option_name(option_name)}</b>.<br><br>"
+                "Please set a different hotkey."
+            )
+            QMessageBox.warning(self, "Error", msg_text)
+            return True
+        return False
 
     def reject(self):
         """Reject(ESC)"""

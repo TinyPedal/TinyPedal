@@ -22,7 +22,6 @@ Preset list view
 
 import os
 import shutil
-from typing import Callable
 
 from PySide2.QtCore import QPoint, Qt, Slot
 from PySide2.QtWidgets import (
@@ -53,10 +52,8 @@ from .preset_transfer import PresetTransfer
 class PresetList(QWidget):
     """Preset list view"""
 
-    def __init__(self, parent, notify_toggle: Callable):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.notify_toggle = notify_toggle
-
         # Label
         self.label_loaded = QLabel("")
 
@@ -114,11 +111,9 @@ class PresetList(QWidget):
             self.listbox_preset.setItemWidget(item, label_item)
 
         loaded_preset = cfg.filename.setting
-        is_locked = loaded_preset in cfg.user.filelock
-        locked_tag = " (locked)" if is_locked else ""
+        locked_tag = " (locked)" if loaded_preset in cfg.user.filelock else ""
         self.label_loaded.setText(f"Loaded: <b>{loaded_preset[:-5]}{locked_tag}</b>")
         self.checkbox_autoload.setChecked(cfg.application["enable_auto_load_preset"])
-        self.notify_toggle(cfg.notification["notify_locked_preset"] and is_locked)
 
     def load_preset(self):
         """Load selected preset"""
@@ -185,14 +180,12 @@ class PresetList(QWidget):
         if action in cfg.user.classes:
             cfg.user.classes[action]["preset"] = selected_preset_name
             cfg.save(cfg_type=ConfigType.CLASSES)
-            self.refresh()
         # Clear primary preset tag
         elif action == "Clear Primary Tag":
             for class_name, class_data in cfg.user.classes.items():
                 if selected_preset_name == class_data["preset"]:
                     class_data["preset"] = ""
                     cfg.save(cfg_type=ConfigType.CLASSES)
-                self.refresh()
         # Lock/unlock preset
         elif action == "Lock Preset":
             msg_text = (
@@ -202,13 +195,11 @@ class PresetList(QWidget):
             if self.confirm_operation(title="Lock Preset", message=msg_text):
                 cfg.user.filelock[selected_filename] = {"version": VERSION}
                 cfg.save(cfg_type=ConfigType.FILELOCK)
-                self.refresh()
         elif action == "Unlock Preset":
             msg_text = f"Unlock <b>{selected_filename}</b> preset?"
             if self.confirm_operation(title="Unlock Preset", message=msg_text):
                 if cfg.user.filelock.pop(selected_filename, None):
                     cfg.save(cfg_type=ConfigType.FILELOCK)
-                self.refresh()
         # Duplicate preset
         elif action == "Duplicate":
             _dialog = CreatePreset(
@@ -236,7 +227,8 @@ class PresetList(QWidget):
             if self.confirm_operation(title="Delete Preset", message=msg_text):
                 if os.path.exists(f"{cfg.path.settings}{selected_filename}"):
                     os.remove(f"{cfg.path.settings}{selected_filename}")
-                self.refresh()
+        # Refresh
+        app_signal.refresh.emit(True)
 
     def confirm_operation(self, title: str = "Confirm", message: str = "") -> bool:
         """Confirm operation"""
@@ -260,7 +252,6 @@ class CreatePreset(BaseDialog):
             source_filename: Source setting filename.
         """
         super().__init__(parent)
-        self._parent = parent
         self.edit_mode = mode
         self.source_filename = source_filename
 
@@ -274,7 +265,7 @@ class CreatePreset(BaseDialog):
 
         # Button
         button_create = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        button_create.accepted.connect(self.creating)
+        button_create.accepted.connect(self.create)
         button_create.rejected.connect(self.reject)
 
         # Layout
@@ -285,17 +276,15 @@ class CreatePreset(BaseDialog):
         self.setMinimumWidth(UIScaler.size(21))
         self.setFixedHeight(self.sizeHint().height())
 
-    def creating(self):
-        """Creating new preset"""
+    def create(self):
+        """Create & save new preset"""
         entered_filename = strip_filename_extension(self.preset_entry.text(), FileExt.JSON)
-
-        if is_allowed_filename(entered_filename):
-            self.__saving(cfg.path.settings, entered_filename, self.source_filename)
-        else:
+        source_filename = self.source_filename
+        filepath = cfg.path.settings
+        # Check invalid file name
+        if not is_allowed_filename(entered_filename):
             QMessageBox.warning(self, "Error", "Invalid preset name.")
-
-    def __saving(self, filepath: str, entered_filename: str, source_filename: str):
-        """Saving new preset"""
+            return
         # Check existing preset
         temp_list = cfg.preset_files()
         for preset in temp_list:
@@ -308,7 +297,6 @@ class CreatePreset(BaseDialog):
                 f"{filepath}{source_filename}",
                 f"{filepath}{entered_filename}{FileExt.JSON}"
             )
-            self._parent.refresh()
         # Rename preset
         elif self.edit_mode == "rename":
             os.rename(
@@ -319,13 +307,13 @@ class CreatePreset(BaseDialog):
             if cfg.is_loaded(source_filename):
                 cfg.set_next_to_load(f"{entered_filename}{FileExt.JSON}")
                 app_signal.reload.emit(True)
-            else:
-                self._parent.refresh()
+                self.accept()
+                return
         # Create new preset
         else:
             cfg.create(f"{entered_filename}{FileExt.JSON}")
-            self._parent.refresh()
         # Close window
+        app_signal.refresh.emit(True)
         self.accept()
 
 

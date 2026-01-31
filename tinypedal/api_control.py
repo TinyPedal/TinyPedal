@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 def _set_available_api():
     """Set available API for specific platform"""
     enable_legacy = cfg.telemetry["enable_legacy_api_selection"]
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         available_api = (
             (api_connector.SimLMU, False),  # API, is legacy
             (api_connector.SimLMULegacy, not enable_legacy),
@@ -40,6 +40,7 @@ def _set_available_api():
         )
     else:
         available_api = (
+            (api_connector.SimLMU, False),  # API, is legacy
             (api_connector.SimLMULegacy, not enable_legacy),
             (api_connector.SimRF2, False),
         )

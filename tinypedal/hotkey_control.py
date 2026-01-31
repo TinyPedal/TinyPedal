@@ -25,12 +25,30 @@ from __future__ import annotations
 import logging
 import threading
 from time import sleep
+from typing import Callable
 
-from .hotkey.command import COMMANDS_HOTKEY
-from .hotkey.common import get_key_state_function, load_hotkey, refresh_keystate
+from . import app_signal
+from .hotkey.command import COMMANDS_GENERAL, COMMANDS_MODULE, COMMANDS_WIDGET
+from .hotkey.common import (
+    get_key_state_function,
+    load_hotkey,
+    refresh_keystate,
+    sort_key_codes,
+)
 from .setting import cfg
 
 logger = logging.getLogger(__name__)
+
+
+def gather_command(commands: tuple) -> dict[tuple[int, ...], tuple[str, Callable]]:
+    """Gather & validate hotkey commands"""
+    temp_keys = {}
+    for hotkey_name, hotkey_func in commands:
+        key_string = cfg.user.shortcuts[hotkey_name]["bind"]
+        key_codes = load_hotkey(key_string)
+        if key_codes:
+            temp_keys[key_codes] = (hotkey_name, hotkey_func)
+    return temp_keys
 
 
 class HotkeyControl:
@@ -64,34 +82,34 @@ class HotkeyControl:
         self.disable()
         self.enable()
 
-    def __gather_command(self):
-        """Gather & validate hotkey commands"""
-        for hotkey_name, hotkey_func in COMMANDS_HOTKEY:
-            key_string = cfg.user.shortcuts[hotkey_name]["bind"]
-            key_codes = load_hotkey(key_string)
-            if key_codes:
-                yield key_codes, hotkey_name, hotkey_func
-
     def __updating(self):
         """Update hotkey state"""
         _event_wait = self._event.wait
-        commands = tuple(self.__gather_command())
+        available_commands = {
+            **gather_command(COMMANDS_GENERAL),
+            **gather_command(COMMANDS_MODULE),
+            **gather_command(COMMANDS_WIDGET),
+        }
+        available_key_codes = sort_key_codes(available_commands.keys())
+
         get_key_state = get_key_state_function()
         refresh_keystate(get_key_state)
 
         while not _event_wait(0.2):
             # Close & disable if no commands
-            if not commands:
+            if not available_commands:
                 break
             # Run command
-            for key_codes, hotkey_name, hotkey_func in commands:
-                if min(get_key_state(code) != 0 for code in key_codes):
-                    hotkey_func()
-                    logger.info(
-                        "HOTKEY: %s (command: %s)",
-                        cfg.user.shortcuts[hotkey_name]["bind"],
-                        hotkey_name,
-                    )
+            detected_key_codes = tuple(_key for _key in available_key_codes if get_key_state(_key))
+            if detected_key_codes in available_commands:
+                hotkey_name, hotkey_func = available_commands[detected_key_codes]
+                # Run command in main thread
+                app_signal.hotkey.emit(hotkey_func)
+                logger.info(
+                    "HOTKEY: %s (command: %s)",
+                    cfg.user.shortcuts[hotkey_name]["bind"],
+                    hotkey_name,
+                )
 
         self._stopped = True
         logger.info("DISABLED: hotkey control")

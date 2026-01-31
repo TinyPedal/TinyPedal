@@ -20,7 +20,7 @@
 Default global (config) setting template
 """
 
-from ..const_api import API_LMU_NAME
+from ..const_api import API_DEFAULT_NAME
 from ..const_app import PLATFORM
 from ..userfile import set_default_config_path, set_default_data_path
 
@@ -28,7 +28,7 @@ GLOBAL_DEFAULT = {
     "application": {
         "show_at_startup": True,
         "check_for_updates_on_startup": True,
-        "minimize_to_tray": (PLATFORM == "Windows"),
+        "minimize_to_tray": PLATFORM.WINDOWS,
         "remember_position": True,
         "remember_size": True,
         "enable_high_dpi_scaling": True,
@@ -47,17 +47,17 @@ GLOBAL_DEFAULT = {
         "window_color_theme": "Dark",
     },
     "compatibility": {
-        "enable_bypass_window_manager": (PLATFORM != "Windows"),
+        "enable_bypass_window_manager": (not PLATFORM.WINDOWS),
         "enable_translucent_background": True,
         "enable_window_position_correction": True,
-        "enable_x11_platform_plugin_override": (PLATFORM != "Windows"),
+        "enable_x11_platform_plugin_override": (not PLATFORM.WINDOWS),
         "global_bkg_color": "#000000",
         "multimedia_plugin_on_windows": "WMF",
     },
     "telemetry": {
-        "api_name": API_LMU_NAME,
+        "api_name": API_DEFAULT_NAME,
         "enable_api_selection_from_preset": True,
-        "enable_legacy_api_selection": (PLATFORM != "Windows"),
+        "enable_legacy_api_selection": (not PLATFORM.WINDOWS),
     },
     "user_path": {
         "settings_path": set_default_config_path("settings/"),

@@ -308,9 +308,6 @@ class LMUInfo:
         "_state_override",
         "_active_state",
         "_shmm",
-        "_tele",
-        "_ext",
-        "_ffb",
     )
 
     def __init__(self) -> None:

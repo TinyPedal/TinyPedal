@@ -356,13 +356,7 @@ To enable auto-refreshing, toggle on `Auto Refresh` check box.
 # Telemetry API
 **Telemetry API options can be accessed from `API` menu in main window.**
 
-| Supported API | Requirement | Windows | Linux |
-|:-:|---|:-:|:-:|
-| Le Mans Ultimate | No plugin required. | Yes | No |
-| Le Mans Ultimate (legacy) | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
-| rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
-
-**Important note:** `Le Mans Ultimate (legacy)` API is provided only as a fallback option for Linux user. This option will be removed in the future.
+See [Requirements](https://github.com/TinyPedal/TinyPedal#requirements) section from project page for list of supported API and setup info.
 
     api_name
 Set API name for accessing data from supported API.
@@ -681,6 +675,8 @@ User path dialog allows customization to global user path for storing different 
 To change user path, double-clicking on edit box to open `Select folder` dialog; or manually editing path text. Folder will be automatically created if does not exist.
 
 Click `Apply` or `Save` button to verify and apply new paths. Invalid path will not be applied.
+
+User folders can be opened in File Manager via `Open Folder` sub-menu from `Config` menu.
 
 **Notes to relative and absolute path**
 
@@ -3464,6 +3460,13 @@ Some cases where interpolation may not be applied:
 - During pit stop, refilled energy reading may not be updated until driver finishes his pit-out lap (as mentioned earlier), which means old energy reading persists during pit-out lap and would result wrong estimates with interpolation. For this reason, interpolation is disabled during pit-out lap.
 
 In either case, just wait another lap and energy readings will be synchronized.
+
+    energy_remaining_decimal_places
+Set additional decimals to be displayed.
+
+**Important notes on decimal place accuracy:**
+
+Currently due to known limitation from game API (as explained in User Guide), energy remaining readings from game API does not grant decimal place accuracy. The margin of error from this option can be as high as 1.0% per lap, which may not provide more accuracy than without decimals.
 
     show_vehicle_integrity
 Show opponent vehicle integrity reading.

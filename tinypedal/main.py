@@ -124,7 +124,7 @@ def init_gui() -> QApplication:
     root.setApplicationName(APP_NAME)
     root.setWindowIcon(QIcon(ImageFile.APP_ICON))
     # Set window icon for X11/Wayland (workaround)
-    if PLATFORM != "Windows":
+    if not PLATFORM.WINDOWS:
         root.setDesktopFileName("TinyPedal-overlay")
     # Set default font
     font = root.font()
@@ -151,7 +151,7 @@ def unset_environment():
 def set_environment():
     """Set environment before starting GUI"""
     # Windows only
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         if os.getenv("PYSIDE_OVERRIDE") == "6":
             # Use "freetype" to avoid high memory usage in pyside6
             os.environ["QT_QPA_PLATFORM"] = "windows:fontengine=freetype"

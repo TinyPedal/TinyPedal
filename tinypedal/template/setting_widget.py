@@ -18,6 +18,8 @@
 
 """
 Default widget setting template
+
+Widget key name must match corresponding file name in 'widget' folder
 """
 
 from .setting_heatmap import HEATMAP_DEFAULT_BRAKE, HEATMAP_DEFAULT_TYRE
@@ -1529,6 +1531,7 @@ WIDGET_DEFAULT = {
         "font_color_pit_request": "#000000",
         "bkg_color_pit_request": "#22AA00",
         "show_energy_remaining": True,
+        "energy_remaining_decimal_places": 0,
         "font_color_energy_remaining_unavailable": "#AAAAAA",
         "font_color_energy_remaining_high": "#88FF00",
         "font_color_energy_remaining_low": "#FFAA00",
@@ -1751,6 +1754,7 @@ WIDGET_DEFAULT = {
         "font_color_pit_request": "#000000",
         "bkg_color_pit_request": "#22AA00",
         "show_energy_remaining": True,
+        "energy_remaining_decimal_places": 0,
         "font_color_energy_remaining_unavailable": "#AAAAAA",
         "font_color_energy_remaining_high": "#88FF00",
         "font_color_energy_remaining_low": "#FFAA00",
@@ -2120,6 +2124,7 @@ WIDGET_DEFAULT = {
         "font_color_pit_request": "#000000",
         "bkg_color_pit_request": "#22AA00",
         "show_energy_remaining": True,
+        "energy_remaining_decimal_places": 0,
         "font_color_energy_remaining_unavailable": "#AAAAAA",
         "font_color_energy_remaining_high": "#88FF00",
         "font_color_energy_remaining_low": "#FFAA00",
@@ -3098,3 +3103,5 @@ WIDGET_DEFAULT = {
         "bkg_color_caption": "#777777",
     },
 }
+
+WIDGET_FILENAME = tuple(WIDGET_DEFAULT)

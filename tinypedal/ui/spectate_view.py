@@ -21,7 +21,6 @@ Spectate list view
 """
 
 import logging
-from typing import Callable
 
 from PySide2.QtCore import Slot
 from PySide2.QtWidgets import (
@@ -33,6 +32,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import app_signal
 from ..api_control import api
 from ..setting import cfg
 from ._common import UIScaler
@@ -43,9 +43,8 @@ logger = logging.getLogger(__name__)
 class SpectateList(QWidget):
     """Spectate list view"""
 
-    def __init__(self, parent, notify_toggle: Callable):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.notify_toggle = notify_toggle
         self.last_enabled = None
 
         # Label
@@ -93,7 +92,6 @@ class SpectateList(QWidget):
             self.listbox_spectate.clear()
             self.label_spectating.setText("Spectating: <b>Disabled</b>")
 
-        self.notify_toggle(cfg.notification["notify_spectate_mode"] and enabled)
         # Update button state only if changed
         if self.last_enabled != enabled:
             self.last_enabled = enabled
@@ -117,7 +115,7 @@ class SpectateList(QWidget):
         cfg.api["enable_player_index_override"] = checked
         cfg.save()
         api.setup()
-        self.refresh()
+        app_signal.refresh.emit(True)
 
     def spectate_selected(self):
         """Spectate selected player"""

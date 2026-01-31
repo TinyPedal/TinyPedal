@@ -83,12 +83,14 @@ class ApplicationSignal(QObject):
         updates: signal for checking version updates.
         refresh: signal for refreshing main GUI.
         quitapp: signal for closing APP.
+        hotkey: signal for run hotkey command from main thread.
     """
 
     reload = Signal(bool)
     updates = Signal(bool)
     refresh = Signal(bool)
     quitapp = Signal(bool)
+    hotkey = Signal(object)
     __slots__ = ()
 
 

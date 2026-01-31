@@ -22,10 +22,26 @@ Hotkey function
 
 from __future__ import annotations
 
-from typing import Callable, Mapping
+from itertools import chain
+from typing import Callable, Iterable, Mapping
 
 from ..const_app import PLATFORM
 from .keymap import KEYMAP_GENERAL, KEYMAP_MODIFIER
+
+
+def sort_key_codes(
+    available_commands: Iterable[tuple[int, ...]],
+    key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
+) -> tuple[int, ...]:
+    """Sort available key codes in order - modifiers > keys"""
+    all_keys = set(chain(*(_keys for _keys in available_commands)))
+    all_modifiers = set(key_modifier.values())
+    keys_only = tuple(all_keys - all_modifiers)
+    modifiers_only = tuple(
+        _mod for _mod in key_modifier.values()
+        if _mod in all_keys
+    )
+    return modifiers_only + keys_only
 
 
 def format_hotkey_name(name: str, notset: str = "", delimiter: str = "+") -> str:
@@ -46,7 +62,7 @@ def modifier_priority(key: str) -> int:
 
 def get_key_state_function() -> Callable[[int], int]:
     """Platform specific 'get key state' function"""
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         from ctypes import windll
 
         return windll.user32.GetAsyncKeyState
@@ -55,7 +71,7 @@ def get_key_state_function() -> Callable[[int], int]:
 
 def refresh_keystate(get_key_state: Callable[[int], int]) -> None:
     """Refresh and clean up key state - Windows"""
-    if PLATFORM == "Windows":
+    if PLATFORM.WINDOWS:
         _refresh_keystate_win(get_key_state)
     else:
         _refresh_keystate_linux(get_key_state)
@@ -91,6 +107,8 @@ def load_hotkey(
     delimiter: str = "+",
 ) -> tuple[int, ...]:
     """Load hotkey string and export as key code sequence"""
+    if not key_string:
+        return ()
     key_split = key_string.split(delimiter)
     max_index = len(key_split) - 1
     output_combo = []
@@ -108,7 +126,7 @@ def load_hotkey(
 
 
 def set_hotkey_win(
-    get_key_state: Callable,
+    get_key_state: Callable[[int], int],
     key_general: Mapping[str, int] = KEYMAP_GENERAL,
     key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
 ) -> tuple[str, ...]:

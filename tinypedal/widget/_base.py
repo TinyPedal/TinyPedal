@@ -28,7 +28,7 @@ from PySide2.QtCore import QBasicTimer, Qt, Slot
 from PySide2.QtGui import QFont, QFontMetrics, QPalette, QPixmap
 from PySide2.QtWidgets import QGridLayout, QLabel, QLayout, QMenu, QWidget
 
-from .. import overlay_signal, realtime_state
+from .. import app_signal, overlay_signal, realtime_state
 from .. import regex_pattern as rxp
 from ..const_app import APP_NAME
 from ..formatter import format_module_name
@@ -124,6 +124,8 @@ class Overlay(QWidget):
 
         menu.addAction("Center Horizontally")
         menu.addAction("Center Vertically")
+        menu.addSeparator()
+        menu.addAction("Disable Widget")
 
         selected_action = menu.exec_(event.globalPos())
         if not selected_action:
@@ -136,6 +138,10 @@ class Overlay(QWidget):
         elif action == "Center Vertically":
             self.move(self.x(), (self.screen().geometry().height() - self.height()) // 2)
             self.__save_position()
+        elif action == "Disable Widget":
+            from ..module_control import wctrl
+            wctrl.toggle(self.widget_name)
+            app_signal.refresh.emit(True)
 
     def mouseMoveEvent(self, event):
         """Update widget position"""

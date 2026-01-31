@@ -18,25 +18,10 @@
 
 """
 Data modules
-
-Add new module to import list below in ascending order,
-file name must match corresponding key name
-in template/setting_module.py dictionary.
 """
 
-__all__ = [
-    "module_delta",
-    "module_energy",
-    "module_force",
-    "module_fuel",
-    "module_hybrid",
-    "module_mapping",
-    "module_notes",
-    "module_relative",
-    "module_sectors",
-    "module_stats",
-    "module_vehicles",
-    "module_wheels",
-]
+from ..template.setting_module import MODULE_FILENAME
+
+__all__ = MODULE_FILENAME
 
 from . import *

@@ -5,6 +5,7 @@
 
 ## Cross-platform
 * Bernat (berarma) - Cross-platform (Linux) implementation & maintainer
+* Lawrence Stalder (Bykow) - Cross-platform (Linux) features
 * SynthetikzZ - Cross-platform (Linux) assistance, features
 * Sergio Rafael Lemke (srlemke) - Cross-platform (Linux) assistance, features, bug fixes
 

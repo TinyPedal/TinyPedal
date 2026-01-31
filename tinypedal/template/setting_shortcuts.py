@@ -20,7 +20,25 @@
 Default keyboard shortcuts template
 """
 
-SHORTCUTS_DEFAULT = {
+from types import MappingProxyType
+
+from ..template.setting_module import MODULE_FILENAME
+from ..template.setting_widget import WIDGET_FILENAME
+
+SHORTCUT_DEFAULT = MappingProxyType({
+    "bind": "",
+})
+
+
+def generate_setting(source: tuple, prefix: str):
+    if not prefix:
+        return {name: SHORTCUT_DEFAULT.copy() for name in source}
+    return {f"{prefix}_{name}": SHORTCUT_DEFAULT.copy() for name in source}
+
+
+SHORTCUTS_WIDGET = generate_setting(WIDGET_FILENAME, "widget")
+SHORTCUTS_MODULE = generate_setting(MODULE_FILENAME, "")
+SHORTCUTS_GENERAL = {
     "overlay_visibility": {
         "bind": "",
     },

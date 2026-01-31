@@ -18,6 +18,29 @@ then
     echo
 fi
 
+submodule_missing="false"
+if [ ! -f ".gitmodules" ];
+then
+    submodule_missing="true"
+    echo "Error: '.gitmodules' not found"
+else
+    for line in $(awk -F= '/^\spath/{print $2}' '.gitmodules');
+    do
+        if [ ! -f "${line}/__init__.py" ];
+        then
+            submodule_missing="true"
+            echo "Error: Submodule '${line}' not found"
+        fi
+    done
+fi
+
+if [ $submodule_missing == "true" ];
+then
+    echo "Error: Missing one or more submodules."
+    echo "Please, use a Linux source release file or 'git clone --recurse-submodules'."
+    exit 1
+fi
+
 SHARE_PATH="${DESTINATION_PREFIX}/share"
 APPLICATIONS_PATH="${SHARE_PATH}/applications"
 BIN_PATH="${DESTINATION_PREFIX}/bin"
@@ -30,12 +53,6 @@ replace() {
         echo "${LINE/${PATTERN}/${STRING}}"
     done
 }
-
-if [ ! -f "pyLMUSharedMemory/__init__.py" ] || [ ! -f "pyRfactor2SharedMemory/__init__.py" ];
-then
-    echo "Error: Missing files. Please, use a Linux source release file or 'git clone --recurse-submodules'."
-    exit 1
-fi
 
 if [ ! -w "${SHARE_PATH}" -o ! -w "${BIN_PATH}" -o ! -w "${APPLICATIONS_PATH}" ];
 then

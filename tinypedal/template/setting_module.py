@@ -18,6 +18,8 @@
 
 """
 Default module setting template
+
+Module key name must match corresponding file name in 'module' folder
 """
 
 
@@ -110,3 +112,5 @@ MODULE_DEFAULT = {
         "cornering_radius_sampling_interval": 10,
     },
 }
+
+MODULE_FILENAME = tuple(MODULE_DEFAULT)

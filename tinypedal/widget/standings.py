@@ -62,6 +62,8 @@ class Realtime(Overlay):
         self.show_class_interval = (self.wcfg["enable_multi_class_split_mode"]
             and self.wcfg["show_time_interval_from_same_class"])
         self.max_delta = calc.asym_max(int(self.wcfg["number_of_delta_laptime"]), 2, 5)
+        self.nrg_decimals = max(int(self.wcfg["energy_remaining_decimal_places"]), 0)
+        self.nrg_width = 3 + self.nrg_decimals + (self.nrg_decimals > 0)
 
         # Base style
         self.set_base_style(self.set_qss(
@@ -450,7 +452,7 @@ class Realtime(Overlay):
             )
             self.bars_nrg = self.set_qlabel(
                 style=self.bar_style_nrg[0],
-                width=3 * font_m.width + bar_padx,
+                width=self.nrg_width * font_m.width + bar_padx,
                 count=self.veh_range,
             )
             self.set_grid_layout_table_column(
@@ -866,9 +868,9 @@ class Realtime(Overlay):
             else:
                 color_index = 1
             if ve <= -1:
-                text = "---"
+                text = "-" * self.nrg_width
             else:
-                text = f"{ve:03.0%}"[:3]
+                text = f"{ve:0{self.nrg_width}.{self.nrg_decimals}%}"[:self.nrg_width]
             target.setText(text)
             target.updateStyle(self.bar_style_nrg[color_index])
             self.toggle_visibility(target, data[-1])

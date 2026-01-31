@@ -18,11 +18,11 @@ Currently supports `rFactor 2` and `Le Mans Ultimate`, and runs on `Windows` and
 
 ## Requirements
 
-| Supported API | Requirement | Windows | Linux |
-|:-:|---|:-:|:-:|
-| Le Mans Ultimate | No plugin required. | Yes | No |
-| Le Mans Ultimate (legacy) | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
-| rFactor 2 | Requires `rF2 Shared Memory Map Plugin` to access. | Yes | Yes |
+| Supported API | Windows | Linux |
+|:-:|:-:|:-:|
+| Le Mans Ultimate | No plugin required | Requires third-party plugin |
+| Le Mans Ultimate (legacy) | rF2SharedMemoryMapPlugin | rF2SharedMemoryMapPlugin(Wine) |
+| rFactor 2 | rF2SharedMemoryMapPlugin | rF2SharedMemoryMapPlugin(Wine) |
 
 > [!IMPORTANT]
 > `Le Mans Ultimate (legacy)` API is provided only as a fallback option for Linux user. This option will be removed in the future.
@@ -33,9 +33,15 @@ Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fu
 
 ### Setup for Le Mans Ultimate
 
-There is no plugin required for accessing LMU's built-in API. However, make sure `Enable Plugins` option is turned `ON` from in game `Settings` -> `Gameplay` page.
+**Windows**
 
-For Linux user, LMU's built-in API is not supported on Linux currently, the `rF2 Shared Memory Map Plugin` is required instead. Please follow [Setup for rFactor 2](#setup-for-rfactor-2) and [Running on Linux](#running-on-linux) sections for instruction.
+* There is no plugin required for accessing LMU's built-in API on Windows. However, make sure `Enable Plugins` option is turned `ON` from in game `Settings` -> `Gameplay` page.
+
+**Linux**
+
+* LMU's built-in API can be selected on Linux, but may not work without support from third-party plugin (see discussion [#9](https://github.com/TinyPedal/TinyPedal/issues/9)).
+
+* Alternatively, `rF2 Shared Memory Map Plugin` can be used for accessing LMU legacy API. Please follow [Setup for rFactor 2](#setup-for-rfactor-2) and [Running on Linux](#running-on-linux) sections for instruction.
 
 ### Setup for rFactor 2
 

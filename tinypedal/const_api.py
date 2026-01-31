@@ -22,6 +22,8 @@ API constants
 
 from types import MappingProxyType
 
+from .const_app import PLATFORM
+
 API_LMU_NAME = "Le Mans Ultimate"
 API_LMU_ALIAS = "LMU"
 API_LMU_CONFIG = "api_lmu"
@@ -33,6 +35,12 @@ API_LMULEGACY_CONFIG = "api_lmu"
 API_RF2_NAME = "rFactor 2"
 API_RF2_ALIAS = "RF2"
 API_RF2_CONFIG = "api_rf2"
+
+# DEFAULT API
+if PLATFORM.WINDOWS:
+    API_DEFAULT_NAME = API_LMU_NAME
+else:
+    API_DEFAULT_NAME = API_LMULEGACY_NAME
 
 # Reference
 API_MAP_ALIAS = MappingProxyType({
