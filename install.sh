@@ -19,14 +19,20 @@ then
 fi
 
 submodule_missing="false"
-for line in $(awk -F= '/^\spath/{print $2}' '.gitmodules');
-do
-    if [ ! -f "${line}/__init__.py" ];
-    then
-        submodule_missing="true"
-        echo "Error: Submodule '${line}' not found"
-    fi
-done
+if [ ! -f ".gitmodules" ];
+then
+    submodule_missing="true"
+    echo "Error: '.gitmodules' not found"
+else
+    for line in $(awk -F= '/^\spath/{print $2}' '.gitmodules');
+    do
+        if [ ! -f "${line}/__init__.py" ];
+        then
+            submodule_missing="true"
+            echo "Error: Submodule '${line}' not found"
+        fi
+    done
+fi
 
 if [ $submodule_missing == "true" ];
 then
