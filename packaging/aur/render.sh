@@ -15,7 +15,11 @@ if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
     git -C "${REPO_ROOT}" submodule update --init --recursive
 fi
 
-TAG="$(git -C "${REPO_ROOT}" describe --tags --abbrev=0 2>/dev/null || true)"
+# Prefer the highest semver tag in the repo, not the nearest tag on HEAD.
+TAG="$(git -C "${REPO_ROOT}" tag --list 'v*' --sort=-version:refname | head -n1 || true)"
+if [ -z "${TAG}" ]; then
+    TAG="$(git -C "${REPO_ROOT}" describe --tags --abbrev=0 2>/dev/null || true)"
+fi
 if [ -z "${TAG}" ]; then
     echo "Error: could not detect a git tag. Set AUR_PKGVER manually." >&2
     exit 1
