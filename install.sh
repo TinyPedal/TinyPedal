@@ -3,6 +3,7 @@
 SOURCE_PATH=$(dirname $(readlink -f $0))
 DESTINATION_PREFIX="/usr/local"
 
+# Check argument
 if [ -n "$1" ];
 then
     DESTINATION_PREFIX="${1%/}"
@@ -18,31 +19,39 @@ then
     echo
 fi
 
-submodule_missing="false"
-SUBMODULE_FILE=""
+# Check submodule
 if [ ! -f ".gitmodules" ];
 then
-    submodule_missing="true"
-    echo "Error: '.gitmodules' not found"
-else
-    SUBMODULE_FILE=$(awk -F= '/^\spath/{print $2}' '.gitmodules')
-    for line in ${SUBMODULE_FILE};
-    do
-        if [ ! -f "${line}/__init__.py" ];
-        then
-            submodule_missing="true"
-            echo "Error: Submodule '${line}' not found"
-        fi
-    done
+    echo "Error: File '.gitmodules' not found, please redownload source code."
+    exit 1
 fi
 
-if [ $submodule_missing == "true" ];
+SUBMODULE_FILE=$(awk -F= '/^\spath/{print $2}' '.gitmodules')
+SUBMODULE_MISSING="false"
+
+if [ -z "${SUBMODULE_FILE}" ];
+then
+    echo "Error: Invalid '.gitmodules' file, please redownload source code."
+    exit 1
+fi
+
+for LINE in ${SUBMODULE_FILE};
+do
+    if [ ! -f "${LINE}/__init__.py" ];
+    then
+        SUBMODULE_MISSING="true"
+        echo "Error: Submodule '${LINE}' not found"
+    fi
+done
+
+if [ "${SUBMODULE_MISSING}" == "true" ];
 then
     echo "Error: Missing one or more submodules."
     echo "Please, use a Linux source release file or 'git clone --recurse-submodules'."
     exit 1
 fi
 
+# Set & check path
 SHARE_PATH="${DESTINATION_PREFIX}/share"
 APPLICATIONS_PATH="${SHARE_PATH}/applications"
 BIN_PATH="${DESTINATION_PREFIX}/bin"
@@ -89,20 +98,20 @@ replace() {
 }
 
 copyfiles() {
-    for line in ${1}/*;
+    for LINE in ${1}/*;
     do
-        if [ -d "${line}" ];
+        if [ -d "${LINE}" ];
         then
             # Create folder & copy content, exclude '__pycache__' folder
-            if [[ "${line}" != *__pycache__* ]];
+            if [[ "${LINE}" != *__pycache__* ]];
             then
-                mkdir -p "${DESTINATION_PATH}/${line}"
-                copyfiles "${line}"
+                mkdir -p "${DESTINATION_PATH}/${LINE}"
+                copyfiles "${LINE}"
             fi
         else
             # Copy file
             echo -n "."
-            cp "${line}" "${DESTINATION_PATH}/${line}"
+            cp "${LINE}" "${DESTINATION_PATH}/${LINE}"
         fi
     done
 }
@@ -119,25 +128,25 @@ chmod a+x "${BIN_PATH}/TinyPedal"
 # Copy base folder file
 echo "Writing ${DESTINATION_PATH}"
 mkdir -p "${DESTINATION_PATH}"
-for line in ${BASE_FILE};
+for LINE in ${BASE_FILE};
 do
-    cp "${line}" "${DESTINATION_PATH}"
+    cp "${LINE}" "${DESTINATION_PATH}"
 done
 
 # Copy images folder file
 echo "Writing ${DESTINATION_PATH}/images"
 mkdir -p "${DESTINATION_PATH}/images"
-for line in ${IMAGE_FILE};
+for LINE in ${IMAGE_FILE};
 do
-    cp "${line}" "${DESTINATION_PATH}/images"
+    cp "${LINE}" "${DESTINATION_PATH}/images"
 done
 
 # Copy submodule folder file
-for line in ${SUBMODULE_FILE};
+for LINE in ${SUBMODULE_FILE};
 do
-    echo "Writing ${DESTINATION_PATH}/${line}"
-    mkdir -p "${DESTINATION_PATH}/${line}"
-    cp "${line}/"*.{py,md,txt} "${DESTINATION_PATH}/${line}"
+    echo "Writing ${DESTINATION_PATH}/${LINE}"
+    mkdir -p "${DESTINATION_PATH}/${LINE}"
+    cp "${LINE}/"*.{py,md,txt} "${DESTINATION_PATH}/${LINE}"
 done
 
 # Copy docs folder file
