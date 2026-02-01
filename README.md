@@ -33,11 +33,11 @@ Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fu
 
 ### Setup for Le Mans Ultimate
 
-**Windows**
+#### Windows
 
 * There is no plugin required for accessing LMU's built-in API on Windows. However, make sure `Enable Plugins` option is turned `ON` from in game `Settings` -> `Gameplay` page.
 
-**Linux**
+#### Linux
 
 * LMU's built-in API can be selected on Linux, but may not work without support from third-party plugin (see discussion [#9](https://github.com/TinyPedal/TinyPedal/issues/9)).
 
@@ -45,8 +45,19 @@ Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fu
 
 ### Setup for rFactor 2
 
-TheIronWolf’s `rF2 Shared Memory Map Plugin` is required for accessing `rFactor 2` API. It can be found from `Download` section of following page:\
-https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin
+TheIronWolf's [rF2 Shared Memory Map Plugin](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) is required for accessing `rFactor 2` API.
+
+#### Windows
+
+* Download the plugin from:\
+https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin#download
+
+#### Linux
+
+* Download the forked plugin for Wine from:\
+https://github.com/schlegp/rF2SharedMemoryMapPlugin_Wine/blob/master/build
+
+#### Install plugin
 
 The plugin file is named `rFactor2SharedMemoryMapPlugin64.dll` and should be placed in:
 
@@ -54,9 +65,9 @@ The plugin file is named `rFactor2SharedMemoryMapPlugin64.dll` and should be pla
 
 - For `Le Mans Ultimate` (legacy API only), it is `Le Mans Ultimate\Plugins` folder.
 
-Note, if `Plugins` folder is missing from game folder, you will have to manually create this `Plugins` folder.
+Note, manually create this `Plugins` folder if it is missing.
 
-Enable plugin in game:
+#### Enable plugin in game
 
 - For `rFactor 2`, in game `Settings` -> `Gameplay` page, find `Plugins` section and toggle on `rFactor2SharedMemoryMapPlugin64.dll`.
 
@@ -107,17 +118,17 @@ Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `Cu
 
 ### Download source code
 
-Method 1:
+#### Method 1
 
 1. Download TinyPedal source code from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page; or click `Code` button at the top of repository and select `Download ZIP`.
 
 2. Download submodule source code from following links:
-    - pyLMUSharedMemory: https://github.com/s-victor/pyLMUSharedMemory
-    - pyRfactor2SharedMemory: https://github.com/s-victor/pyRfactor2SharedMemory
+    - pyLMUSharedMemory: https://github.com/TinyPedal/pyLMUSharedMemory
+    - pyRfactor2SharedMemory: https://github.com/TinyPedal/pyRfactor2SharedMemory
 
 3. Extract TinyPedal source code ZIP file. Then extract submodule ZIP files and put them in corresponding folder in the root folder of TinyPedal.
 
-Method 2:
+#### Method 2
 
 1. Use [Git](https://git-scm.com/) tool and run following command to clone TinyPedal source code alongside required submodules:\
     `git clone --recursive https://github.com/TinyPedal/TinyPedal.git`
@@ -154,8 +165,9 @@ except some differences in the dependencies, and that no executable can be
 built. The differences are explained here.
 
 Configuration and data files will be stored in the defined user-specific
-directories, usually at `$HOME/.config/TinyPedal/` and
-`$HOME/.local/share/TinyPedal/` respectively.
+directories, default to:\
+`$HOME/.config/TinyPedal/`\
+`$HOME/.local/share/TinyPedal/`
 
 The required Python packages are `PySide2`, `psutil` and `pyxdg`. Most distros
 name the package with a prefix, like `python3-pyside2`, `python3-psutil` and
@@ -167,13 +179,8 @@ Some distros split `PySide2` in subpackages. If you don't find
 
 Alternatively, you can install them using `pip3` but this will bypass your
 system package manager and it isn't the recommended option. The command to
-install the dependencies with this method is:
-
+install the dependencies with this method is:\
 `pip3 install PySide2 psutil pyxdg`
-
-The Iron Wolf's rF2 Shared Memory Map Plugin has to be replaced with [this fork
-for
-Wine](https://github.com/schlegp/rF2SharedMemoryMapPlugin_Wine/blob/master/build).
 
 To start TinyPedal type the following command:\
 `./run.py`
@@ -206,7 +213,7 @@ The installed launcher and desktop entry will read this file automatically. This
 
 - Some features may not be available on Linux currently.
 - Widgets don't appear over the game window in KDE. Workaround: enable `Bypass Window Manager` option in `Compatibility` dialog from `Config` menu in main window.
-- Transparency of widgets doesn't work when desktop compositing is disabled. Workaround: enable `window manager compositing` in your DE.
+- Transparency of widgets doesn't work when desktop compositing is disabled. Workaround: enable `window manager compositing` in your Desktop Environment.
 
 ## License
 

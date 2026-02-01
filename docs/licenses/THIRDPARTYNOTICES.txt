@@ -17,8 +17,8 @@ TinyPedal relies on following third-party software:
   license: https://github.com/TonyWhitley/pyRfactor2SharedMemory/blob/master/License.txt
 
 - pyLMUSharedMemory, the MIT license.
-  website: https://github.com/s-victor/pyLMUSharedMemory
-  license: https://github.com/s-victor/pyLMUSharedMemory/blob/master/License.txt
+  website: https://github.com/TinyPedal/pyLMUSharedMemory
+  license: https://github.com/TinyPedal/pyLMUSharedMemory/blob/master/License.txt
 
 - psutil, the BSD 3-Clause License.
   website: https://github.com/giampaolo/psutil
