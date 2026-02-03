@@ -56,7 +56,6 @@ from PySide2.QtWidgets import (
 
 from ..const_app import APP_NAME
 from ..const_file import FileFilter
-from ..module_control import mctrl, wctrl
 from ..userfile import set_relative_path
 from ..validator import image_exists, is_hex_color, is_string_number
 
@@ -77,23 +76,24 @@ color_pick_history = deque(
 class UIScaler:
     """UI font & size scaler"""
     # Global base font size in point (not counting dpi scale)
-    FONT_BASE_POINT = QApplication.font().pointSize()
+    FONT_POINT = QApplication.font().pointSize()
+    FONT_DPI = QApplication.fontMetrics().fontDpi()
     # Global base font size in pixel (dpi scaled)
     # dpi scale = font dpi / 96
     # px = (pt * dpi scale) * 96 / 72
     # px = pt * font dpi / 72
-    FONT_DPI_SCALE = QApplication.fontMetrics().fontDpi() / 96
-    FONT_BASE_PIXEL_SCALED = QApplication.font().pointSize() * QApplication.fontMetrics().fontDpi() / 72
+    FONT_DPI_SCALE = FONT_DPI / 96
+    FONT_PIXEL_SCALED = FONT_POINT * FONT_DPI / 72
 
     @staticmethod
     def font(scale: float) -> float:
         """Scale UI font size (points) by base font size (not counting dpi scale)"""
-        return UIScaler.FONT_BASE_POINT * scale
+        return UIScaler.FONT_POINT * scale
 
     @staticmethod
     def size(scale: float) -> int:
         """Scale UI size (pixels) by base font size (scaled with dpi)"""
-        return round(UIScaler.FONT_BASE_PIXEL_SCALED * scale)
+        return round(UIScaler.FONT_PIXEL_SCALED * scale)
 
     @staticmethod
     def pixel(pixel: int):
@@ -108,7 +108,7 @@ class CompactButton(QPushButton):
         super().__init__(text, parent)
         self.setFixedWidth(
             self.fontMetrics().boundingRect(text).width()
-            + UIScaler.FONT_BASE_PIXEL_SCALED * (1 + has_menu)
+            + UIScaler.FONT_PIXEL_SCALED * (1 + has_menu)
         )
 
 
@@ -221,7 +221,10 @@ class BaseEditor(BaseDialog):
 
     @staticmethod
     def reloading(reload_module: bool = True, reload_widget: bool = True) -> None:
-        """Reloading"""
+        """Reloading module & widget only"""
+        # Delay import
+        from ..module_control import mctrl, wctrl
+
         if reload_module:
             mctrl.reload()
         if reload_widget:
