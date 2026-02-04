@@ -21,6 +21,7 @@ Main application window
 """
 
 import logging
+from typing import Callable
 
 from PySide2.QtCore import Qt, Slot
 from PySide2.QtWidgets import (
@@ -102,8 +103,6 @@ class TabView(QWidget):
         app_signal.refresh.connect(spectate_tab.refresh)
         app_signal.refresh.connect(pacenotes_tab.refresh)
         app_signal.refresh.connect(hotkey_tab.refresh)
-
-        app_signal.hotkey.connect(hotkey_tab.run_command)
 
     def refresh(self):
         """Refresh tab area"""
@@ -412,8 +411,14 @@ class AppWindow(QMainWindow):
         """Refresh GUI only"""
         app_signal.refresh.emit(True)
 
+    @Slot(object)  # type: ignore[operator]
+    def hotkey_command(self, hotkey_func: Callable):
+        """Hotkey command must be run in main thread"""
+        hotkey_func()
+
     def __connect_signal(self):
         """Connect signal"""
+        app_signal.hotkey.connect(self.hotkey_command)
         app_signal.refresh.connect(self.refresh)
         app_signal.quitapp.connect(self.quit_app)
         app_signal.reload.connect(self.reload_preset)

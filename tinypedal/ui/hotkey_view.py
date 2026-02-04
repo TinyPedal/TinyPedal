@@ -89,11 +89,6 @@ class HotkeyList(QWidget):
         layout_main.setContentsMargins(margin, margin, margin, margin)
         self.setLayout(layout_main)
 
-    @Slot(object)  # type: ignore[operator]
-    def run_command(self, hotkey_func: Callable):
-        """Hotkey command must be run in main thread"""
-        hotkey_func()
-
     @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh hotkey list"""
