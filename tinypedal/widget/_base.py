@@ -119,13 +119,18 @@ class Overlay(QWidget):
         menu = QMenu()
 
         show_name = menu.addAction(format_module_name(self.widget_name))
-        show_name.setDisabled(True)
+        show_name_font = show_name.font()
+        show_name_font.setBold(True)
+        show_name.setFont(show_name_font)
         menu.addSeparator()
 
+        menu.addAction("Config")
+        menu.addSeparator()
         menu.addAction("Center Horizontally")
         menu.addAction("Center Vertically")
         menu.addSeparator()
-        menu.addAction("Disable Widget")
+        menu.addAction("Reload")
+        menu.addAction("Disable")
 
         selected_action = menu.exec_(event.globalPos())
         if not selected_action:
@@ -138,10 +143,12 @@ class Overlay(QWidget):
         elif action == "Center Vertically":
             self.move(self.x(), (self.screen().geometry().height() - self.height()) // 2)
             self.__save_position()
-        elif action == "Disable Widget":
-            from ..module_control import wctrl
-            wctrl.toggle(self.widget_name)
-            app_signal.refresh.emit(True)
+        elif action == "Config":
+            config_widget(self.widget_name)
+        elif action == "Reload":
+            reload_widget(self.widget_name)
+        elif action == "Disable":
+            disable_widget(self.widget_name)
 
     def mouseMoveEvent(self, event):
         """Update widget position"""
@@ -292,7 +299,7 @@ class Overlay(QWidget):
 
     def set_base_style(self, style_sheet: str):
         """Set base style sheet"""
-        self.setStyleSheet(style_sheet)
+        self.setStyleSheet(f"ExLabel{{{style_sheet}}}")
 
     @staticmethod
     def set_padding(size: int, scale: float, side: int = 2) -> int:
@@ -611,3 +618,42 @@ def validate_option(config: dict) -> dict:
                 config[key] += 1
             column_set.append(config[key])
     return config
+
+
+def disable_widget(widget_name: str):
+    """Disable widget"""
+    from ..module_control import wctrl
+    wctrl.toggle(widget_name)
+    app_signal.refresh.emit(True)
+
+
+def reload_widget(widget_name: str):
+    """Reload widget"""
+    from ..module_control import wctrl
+    wctrl.reload(widget_name)
+    app_signal.refresh.emit(True)
+
+
+def config_widget(widget_name: str):
+    """Open widget config dialog"""
+    from PySide2.QtWidgets import QApplication, QMainWindow
+
+    from ..module_control import wctrl
+    from ..setting import cfg
+    from ..ui.config import UserConfig
+
+    # Find main window instance
+    for _widget in QApplication.topLevelWidgets():
+        if isinstance(_widget, QMainWindow):
+            break
+    else:
+        return
+    _dialog = UserConfig(
+        parent=_widget,
+        key_name=widget_name,
+        cfg_type=wctrl.type_id,
+        user_setting=cfg.user.setting,
+        default_setting=cfg.default.setting,
+        reload_func=lambda name=widget_name: reload_widget(name),
+    )
+    _dialog.open()
