@@ -73,6 +73,26 @@ color_pick_history = deque(
 )
 
 
+def singleton_dialog(dialog_type: str, show_error: bool = True):
+    """Singleton dialog decorator"""
+
+    def decorator(dialog_class: BaseDialog):
+
+        def unset_dialog_state(pointer):
+            DialogSingleton.remove(dialog_type)
+
+        def wrapper(*args, **kwargs):
+            if DialogSingleton.new(dialog_type):
+                instance = dialog_class(*args, **kwargs)
+                instance.destroyed.connect(unset_dialog_state)
+                return instance
+            return DialogSingletonError(dialog_type, show_error)
+
+        return wrapper
+
+    return decorator
+
+
 class UIScaler:
     """UI font & size scaler"""
     # Global base font size in point (not counting dpi scale)
@@ -112,42 +132,61 @@ class CompactButton(QPushButton):
         )
 
 
-# Class
-class _DialogSingleton:
+class DialogSingleton:
     """Singleton dialog"""
 
-    _instance: set[str] = set()
-    __slots__ = ()
+    _instance_type: set[str] = set()
 
-    @staticmethod
-    def open(parent=None):
-        """Error for qdialog open()"""
+    def __init__(self):
+        raise TypeError("not for instantiate")
+
+    @classmethod
+    def is_opened(cls, dialog_type: str) -> bool:
+        """Is dialog open"""
+        return dialog_type in cls._instance_type
+
+    @classmethod
+    def new(cls, dialog_type: str) -> bool:
+        """Append new dialog type if not exist"""
+        if dialog_type not in cls._instance_type:
+            cls._instance_type.add(dialog_type)
+            return True
+        return False
+
+    @classmethod
+    def remove(cls, dialog_type: str):
+        """Remove dialog type"""
+        cls._instance_type.remove(dialog_type)
+
+
+class DialogSingletonError:
+    """Error dialog for singleton"""
+
+    def __init__(self, dialog_type: str, show_error: bool = True):
+        self._dialog_type = dialog_type
+        self._show_error = show_error
+
+    def _message(self, parent=None):
+        """Error for qdialog"""
+        if not self._show_error:
+            return
         msg_text = (
-            "Already opened a dialog.<br><br>"
-            "Please close previous dialog first."
+            f"Already opened <b>{self._dialog_type.title()} dialog</b>."
+            "<br><br>Please close previous dialog first."
         )
         QMessageBox.warning(parent, "Error", msg_text)
 
+    def open(self, parent=None):
+        self._message(parent)
 
-def singleton_dialog(dialog_type: str):
-    """Singleton dialog decorator"""
+    def show(self, parent=None):
+        self._message(parent)
 
-    def decorator(dialog_class: BaseDialog):
+    def exec(self, parent=None):
+        self._message(parent)
 
-        def unset_dialog_state(pointer):
-            _DialogSingleton._instance.remove(dialog_type)
-
-        def wrapper(*args, **kwargs):
-            if dialog_type not in _DialogSingleton._instance:
-                _DialogSingleton._instance.add(dialog_type)
-                _instance = dialog_class(*args, **kwargs)
-                _instance.destroyed.connect(unset_dialog_state)
-                return _instance
-            return _DialogSingleton
-
-        return wrapper
-
-    return decorator
+    def exec_(self, parent=None):
+        self._message(parent)
 
 
 class BaseDialog(QDialog):

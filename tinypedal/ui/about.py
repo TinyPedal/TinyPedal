@@ -36,11 +36,12 @@ from PySide2.QtWidgets import (
 
 from ..const_app import APP_NAME, COPYRIGHT, DESCRIPTION, LICENSE, URL_WEBSITE, VERSION
 from ..const_file import ImageFile
-from ._common import BaseDialog, UIScaler
+from ._common import BaseDialog, UIScaler, singleton_dialog
 
 logger = logging.getLogger(__name__)
 
 
+@singleton_dialog("about", show_error=False)
 class About(BaseDialog):
     """Create about window
 

@@ -43,7 +43,7 @@ from ..const_file import ConfigType
 from ..module_control import mctrl, wctrl
 from ..setting import cfg
 from . import set_style_palette, set_style_window
-from ._common import UIScaler
+from ._common import DialogSingleton, UIScaler
 from .hotkey_view import HotkeyList
 from .menu import APIMenu, ConfigMenu, HelpMenu, OverlayMenu, ToolsMenu, WindowMenu
 from .module_view import ModuleList
@@ -394,6 +394,12 @@ class AppWindow(QMainWindow):
     @Slot(bool)  # type: ignore[operator]
     def reload_preset(self):
         """Reload current preset"""
+        # Cancel loading while any config dialog opened
+        if DialogSingleton.is_opened(ConfigType.CONFIG):
+            msg_text = "Cannot load preset while Config dialog is opened."
+            QMessageBox.warning(self, "Error", msg_text)
+            cfg.set_next_to_load("")
+            return
         loader.reload(reload_preset=True)
         self.refresh_only()
 
