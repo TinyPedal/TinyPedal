@@ -58,6 +58,7 @@ from ._common import (
     BaseDialog,
     DoubleClickEdit,
     UIScaler,
+    singleton_dialog,
 )
 
 COLUMN_LABEL = 0  # grid layout column index
@@ -71,6 +72,7 @@ def get_font_list() -> list[str]:
     return QFontDatabase().families()
 
 
+@singleton_dialog(ConfigType.CONFIG)
 class FontConfig(BaseDialog):
     """Config global font setting"""
 
@@ -160,6 +162,7 @@ class FontConfig(BaseDialog):
         self.reloading()
 
 
+@singleton_dialog(ConfigType.CONFIG)
 class UserConfig(BaseDialog):
     """User configuration"""
 

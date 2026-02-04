@@ -113,6 +113,43 @@ class CompactButton(QPushButton):
 
 
 # Class
+class _DialogSingleton:
+    """Singleton dialog"""
+
+    _instance: set[str] = set()
+    __slots__ = ()
+
+    @staticmethod
+    def open(parent=None):
+        """Error for qdialog open()"""
+        msg_text = (
+            "Already opened a dialog.<br><br>"
+            "Please close previous dialog first."
+        )
+        QMessageBox.warning(parent, "Error", msg_text)
+
+
+def singleton_dialog(dialog_type: str):
+    """Singleton dialog decorator"""
+
+    def decorator(dialog_class: BaseDialog):
+
+        def unset_dialog_state(pointer):
+            _DialogSingleton._instance.remove(dialog_type)
+
+        def wrapper(*args, **kwargs):
+            if dialog_type not in _DialogSingleton._instance:
+                _DialogSingleton._instance.add(dialog_type)
+                _instance = dialog_class(*args, **kwargs)
+                _instance.destroyed.connect(unset_dialog_state)
+                return _instance
+            return _DialogSingleton
+
+        return wrapper
+
+    return decorator
+
+
 class BaseDialog(QDialog):
     """Base dialog class"""
     MARGIN = UIScaler.pixel(6)

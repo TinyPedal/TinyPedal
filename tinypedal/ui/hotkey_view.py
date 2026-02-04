@@ -306,8 +306,7 @@ class ConfigHotkey(BaseDialog):
                 continue
             msg_text = (
                 f"<b>{format_hotkey_name(temp_hotkey)}</b> already used for """
-                f"<b>{format_option_name(option_name)}</b>.<br><br>"
-                "Please set a different hotkey."
+                f"<b>{format_option_name(option_name)}</b>."
             )
             QMessageBox.warning(self, "Error", msg_text)
             return True

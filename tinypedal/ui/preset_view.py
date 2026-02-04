@@ -123,9 +123,7 @@ class PresetList(QWidget):
             cfg.set_next_to_load(f"{selected_preset_name}{FileExt.JSON}")
             app_signal.reload.emit(True)
         else:
-            QMessageBox.warning(
-                self, "Error",
-                "No preset selected.\nPlease select a preset to continue.")
+            QMessageBox.warning(self, "Error", "No preset selected.")
 
     def open_create_preset(self):
         """Create new preset"""
