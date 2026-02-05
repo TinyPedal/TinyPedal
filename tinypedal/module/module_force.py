@@ -26,6 +26,7 @@ from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
 from ..module_info import minfo
+from ..validator import generator_init
 from ._base import DataModule
 
 
@@ -51,11 +52,11 @@ class Realtime(DataModule):
             calc.ema_factor(self.mcfg["max_average_g_force_samples"], 3)
         )
 
-        calc_max_lgt = TransientMax(self.mcfg["max_g_force_reset_delay"])
-        calc_max_lat = TransientMax(self.mcfg["max_g_force_reset_delay"])
-        calc_max_avg_lat = TransientMax(self.mcfg["max_average_g_force_reset_delay"], True)
-        calc_transient_rate = TransientMax(3)
-        calc_max_braking_rate = TransientMax(self.mcfg["max_braking_rate_reset_delay"], True)
+        calc_max_lgt = transient_max(self.mcfg["max_g_force_reset_delay"])
+        calc_max_lat = transient_max(self.mcfg["max_g_force_reset_delay"])
+        calc_max_avg_lat = transient_max(self.mcfg["max_average_g_force_reset_delay"], True)
+        calc_max_transient_rate = transient_max(3)
+        calc_max_braking_rate = transient_max(self.mcfg["max_braking_rate_reset_delay"], True)
 
         while not _event_wait(update_interval):
             if realtime_state.active:
@@ -64,11 +65,11 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
-                    calc_max_lgt.reset()
-                    calc_max_lat.reset()
-                    calc_max_avg_lat.reset()
-                    calc_transient_rate.reset()
-                    calc_max_braking_rate.reset()
+                    calc_max_lgt.send(None)
+                    calc_max_lat.send(None)
+                    calc_max_avg_lat.send(None)
+                    calc_max_transient_rate.send(None)
+                    calc_max_braking_rate.send(None)
 
                     avg_lat_gforce_ema = 0
                     max_braking_rate = 0
@@ -81,30 +82,33 @@ class Realtime(DataModule):
                 dforce_f = api.read.vehicle.downforce_front()
                 dforce_r = api.read.vehicle.downforce_rear()
                 brake_raw = api.read.inputs.brake_raw()
-                impact_time = api.read.vehicle.impact_time()
 
                 # G raw
                 lgt_gforce_raw = lgt_accel / g_accel
                 lat_gforce_raw = lat_accel / g_accel
 
                 # Max G
-                max_lgt_gforce = calc_max_lgt.update(abs(lgt_gforce_raw), lap_etime)
-                max_lat_gforce = calc_max_lat.update(abs(lat_gforce_raw), lap_etime)
+                max_lgt_gforce = calc_max_lgt.send((abs(lgt_gforce_raw), lap_etime))
+                max_lat_gforce = calc_max_lat.send((abs(lat_gforce_raw), lap_etime))
 
                 # Max average lateral G
                 avg_lat_gforce_ema = calc_ema_gforce(
                     avg_lat_gforce_ema,
                     min(abs(lat_gforce_raw), avg_lat_gforce_ema + max_g_diff)
                 )
-                max_avg_lat_gforce = calc_max_avg_lat.update(avg_lat_gforce_ema, lap_etime)
+                max_avg_lat_gforce = calc_max_avg_lat.send((avg_lat_gforce_ema, lap_etime))
 
                 # Downforce
                 dforce_ratio = calc.force_ratio(dforce_f, dforce_f + dforce_r)
 
-                # Braking rate
-                braking_rate = calc.braking_rate(lgt_gforce_raw, brake_raw > 0.02, lap_etime - impact_time > 2)
-                max_transient_rate = calc_transient_rate.update(braking_rate, lap_etime)
-                temp_max_rate = calc_max_braking_rate.update(max_transient_rate, lap_etime)
+                # Braking rate (longitudinal G force)
+                if brake_raw > 0.02 and lap_etime - api.read.vehicle.impact_time() > 2:
+                    braking_rate = lgt_gforce_raw
+                else:
+                    braking_rate = 0.0
+
+                max_transient_rate = calc_max_transient_rate.send((braking_rate, lap_etime))
+                temp_max_rate = calc_max_braking_rate.send((max_transient_rate, lap_etime))
                 if max_transient_rate > 0:
                     delta_braking_rate = max_transient_rate - max_braking_rate
                 else:  # Set after reset max_transient_rate
@@ -130,53 +134,37 @@ class Realtime(DataModule):
                     update_interval = self.idle_interval
 
 
-class TransientMax:
-    """Transient max"""
+@generator_init
+def transient_max(reset_delay: float, store_recent: bool = False):
+    """Transient max
 
-    __slots__ = (
-        "_reset_delay",
-        "_store_recent",
-        "_reset_timer",
-        "_max_value",
-        "_stored_value",
-    )
+    Args:
+        reset_delay: auto reset delay (seconds).
+        store_recent: whether store a recent fallback max value.
+    """
+    reset_timer = 0.0
+    max_value = 0.0
+    stored_value = 0.0
 
-    def __init__(self, reset_delay: float, store_recent: bool = False):
-        """
-        Args:
-            reset_delay: auto reset delay (seconds).
-            store_recent: whether store a recent fallback max value.
-        """
-        self._reset_delay = reset_delay
-        self._store_recent = store_recent
-        self._reset_timer = 0.0
-        self._max_value = 0.0
-        self._stored_value = 0.0
+    while True:
+        data = yield max_value
 
-    def update(self, value: float, elapsed_time: float) -> float:
-        """Record transient max value, reset periodically
+        # Reset check
+        if data is None:
+            reset_timer = 0.0
+            max_value = 0.0
+            stored_value = 0.0
+            continue
 
-        Args:
-            value: current value.
-            elapsed_time: elapsed time (seconds).
+        value, elapsed_time = data
 
-        Returns:
-            Max value.
-        """
-        if value > self._max_value:
-            self._max_value = value
-            self._reset_timer = elapsed_time
-        elif self._store_recent and self._max_value > value > self._stored_value:
-            self._stored_value = value
-            self._reset_timer = elapsed_time
-        elif elapsed_time - self._reset_timer > self._reset_delay:
-            self._max_value = self._stored_value
-            self._stored_value = 0
-            self._reset_timer = elapsed_time
-        return self._max_value
-
-    def reset(self):
-        """Reset"""
-        self._reset_timer = 0.0
-        self._max_value = 0.0
-        self._stored_value = 0.0
+        if value > max_value:
+            max_value = value
+            reset_timer = elapsed_time
+        elif store_recent and max_value > value > stored_value:
+            stored_value = value
+            reset_timer = elapsed_time
+        elif elapsed_time - reset_timer > reset_delay:
+            max_value = stored_value
+            stored_value = 0
+            reset_timer = elapsed_time

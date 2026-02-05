@@ -22,7 +22,7 @@ Battery Widget
 
 from ..module_info import minfo
 from ._base import Overlay
-from ._common import WarningFlash
+from ._common import warning_flash
 
 
 class Realtime(Overlay):
@@ -138,7 +138,7 @@ class Realtime(Overlay):
             )
 
         if self.wcfg["show_battery_charge_warning_flash"]:
-            self.warn_flash = WarningFlash(
+            self.warn_flash = warning_flash(
                 self.wcfg["warning_flash_highlight_duration"],
                 self.wcfg["warning_flash_interval"],
                 self.wcfg["number_of_warning_flashes"],
@@ -158,7 +158,7 @@ class Realtime(Overlay):
                 batt_warning = 0
 
             if self.wcfg["show_battery_charge_warning_flash"]:
-                batt_highlight = self.warn_flash.state(batt_warning)
+                batt_highlight = self.warn_flash.send(batt_warning)
                 if batt_highlight:
                     padding = 0.00000001  # add padding for switching state
                 else:

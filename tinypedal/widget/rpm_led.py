@@ -26,7 +26,7 @@ from PySide2.QtGui import QBrush, QPainter, QPen
 from ..api_control import api
 from ..const_common import FLOAT_INF
 from ._base import Overlay
-from ._common import WarningFlash
+from ._common import warning_flash
 
 
 class Realtime(Overlay):
@@ -78,7 +78,7 @@ class Realtime(Overlay):
         )
 
         if self.wcfg["show_speed_limiter_flash"]:
-            self.warn_flash_limiter = WarningFlash(
+            self.warn_flash = warning_flash(
                 self.wcfg["speed_limiter_flash_interval"],
                 self.wcfg["speed_limiter_flash_interval"],
                 FLOAT_INF,
@@ -148,7 +148,7 @@ class Realtime(Overlay):
 
         # Set flicker state
         if self.wcfg["show_speed_limiter_flash"] and self.limiter:
-            self.flicker = self.warn_flash_limiter.state(True)
+            self.flicker = self.warn_flash.send(True)
         elif (
             self.wcfg["show_rpm_flickering_above_critical"]
             and rpm >= self.rpm_critical

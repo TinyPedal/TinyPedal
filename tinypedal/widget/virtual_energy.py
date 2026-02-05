@@ -23,7 +23,7 @@ Virtual energy Widget
 from .. import calculation as calc
 from ..module_info import minfo
 from ._base import Overlay
-from ._common import WarningFlash
+from ._common import warning_flash
 from ._painter import FuelLevelBar
 
 
@@ -361,7 +361,7 @@ class Realtime(Overlay):
             layout.addWidget(self.bar_level, self.wcfg["column_index_middle"], 0)
 
         if self.wcfg["show_low_energy_warning_flash"]:
-            self.warn_flash = WarningFlash(
+            self.warn_flash = warning_flash(
                 self.wcfg["warning_flash_highlight_duration"],
                 self.wcfg["warning_flash_interval"],
                 self.wcfg["number_of_warning_flashes"],
@@ -371,7 +371,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         is_low_energy = minfo.energy.estimatedLaps <= self.wcfg["low_energy_lap_threshold"]
         if self.wcfg["show_low_energy_warning_flash"] and minfo.energy.estimatedValidConsumption:
-            is_low_energy = self.warn_flash.state(is_low_energy)
+            is_low_energy = self.warn_flash.send(is_low_energy)
             if is_low_energy:
                 padding = 0.00000001  # add padding for switching state
             else:

@@ -28,6 +28,8 @@ from typing import NamedTuple
 from PySide2.QtCore import QPoint
 from PySide2.QtWidgets import QApplication, QFrame, QLabel, QWidget
 
+from ..validator import generator_init
+
 
 class FontMetrics(NamedTuple):
     """Font metrics info"""
@@ -202,55 +204,43 @@ class MousePosition:
         return pos
 
 
-class WarningFlash:
+@generator_init
+def warning_flash(duration: float, interval: float, max_count: int):
     """Warning flash state"""
+    last_condition = False
+    highlight = False
+    highlight_seconds = max(duration, 0.2)
+    highlight_timer = 0.0
+    interval_seconds = max(interval, 0.2)
+    interval_timer = 0.0
+    flash_count = 0
+    flash_max = max(max_count, 3)
 
-    __slots__ = (
-        "_last_condition",
-        "_highlight",
-        "_highlight_seconds",
-        "_highlight_timer",
-        "_interval_seconds",
-        "_interval_timer",
-        "_flash_count",
-        "_flash_max",
-    )
-
-    def __init__(self, duration: float, interval: float, max_count: int):
-        self._last_condition = False
-        self._highlight = False
-        self._highlight_seconds = max(duration, 0.2)
-        self._highlight_timer = 0.0
-        self._interval_seconds = max(interval, 0.2)
-        self._interval_timer = 0.0
-        self._flash_count = 0
-        self._flash_max = max(max_count, 3)
-
-    def state(self, condition: bool) -> bool:
-        """Update warning flash state"""
+    while True:
+        condition = yield highlight
         elapsed = monotonic()
 
-        if self._last_condition != condition:
-            self._last_condition = condition
+        if last_condition != condition:
+            last_condition = condition
             if condition:
-                self._highlight_timer = elapsed
-                self._highlight = False
-                self._interval_timer = 0
-                self._flash_count = 0
+                highlight_timer = elapsed
+                highlight = False
+                interval_timer = 0
+                flash_count = 0
 
         if not condition:
-            return False
-        elif self._flash_count >= self._flash_max:
-            return True
+            highlight = False
+            continue
+        elif flash_count >= flash_max:
+            highlight = True
+            continue
 
-        if elapsed - self._highlight_timer < self._highlight_seconds:
-            if not self._highlight:
-                self._flash_count += 1
-            self._highlight = True
-            self._interval_timer = elapsed
+        if elapsed - highlight_timer < highlight_seconds:
+            if not highlight:
+                flash_count += 1
+            highlight = True
+            interval_timer = elapsed
         else:
-            self._highlight = False
-            if elapsed - self._interval_timer >= self._interval_seconds:
-                self._highlight_timer = elapsed
-
-        return self._highlight
+            highlight = False
+            if elapsed - interval_timer >= interval_seconds:
+                highlight_timer = elapsed

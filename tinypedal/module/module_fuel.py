@@ -84,7 +84,10 @@ class Realtime(DataModule):
                 gen_calc_fuel.send(True)
 
                 # Update consumption history
-                update_consumption_history()
+                if (minfo.delta.lapTimeCurrent < 10
+                    and minfo.delta.lapTimeCurrent > 2
+                    and minfo.delta.lapTimeLast > 0):
+                    update_consumption_history()
 
             else:
                 if reset:
@@ -97,9 +100,6 @@ class Realtime(DataModule):
 
 def update_consumption_history():
     """Update consumption history"""
-    if not (10 > minfo.delta.lapTimeCurrent > 2) or minfo.delta.lapTimeLast < 1:
-        return
-
     lap_number = api.read.lap.completed_laps() - 1
     if (
         minfo.history.consumptionDataSet[0].lapTimeLast != minfo.delta.lapTimeLast

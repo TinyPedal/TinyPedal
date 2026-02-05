@@ -28,7 +28,7 @@ from ..const_common import MAX_SECONDS
 from ..module_info import SectorsInfo, minfo
 from ..userfile.sector_best import load_sector_best_file, save_sector_best_file
 from ..validator import generator_init, valid_sectors
-from ._base import DataModule, round6
+from ._base import DataModule
 
 
 class Realtime(DataModule):
@@ -72,39 +72,29 @@ class Realtime(DataModule):
                         gen_calc_sectors_alltime = calc_sectors(None, all_best_s_tb, all_best_s_pb)
 
                 # Run calculation
-                tele_sectors = telemetry_sectors()
-                gen_calc_sectors_session.send(tele_sectors)
-                gen_calc_sectors_alltime.send(tele_sectors)
+                sector_idx = api.read.lap.sector_index()
+                gen_calc_sectors_session.send(sector_idx)
+                gen_calc_sectors_alltime.send(sector_idx)
 
             else:
                 if reset:
                     reset = False
                     update_interval = self.idle_interval
 
-                    best_s_tb, best_s_pb, new_best_session = gen_calc_sectors_session.send(tele_sectors)
-                    all_best_s_tb, all_best_s_pb, new_best_all = gen_calc_sectors_alltime.send(tele_sectors)
+                    best_s_tb, best_s_pb, new_best_session = gen_calc_sectors_session.send(sector_idx)
+                    all_best_s_tb, all_best_s_pb, new_best_all = gen_calc_sectors_alltime.send(sector_idx)
                     if new_best_all or new_best_session:
                         save_sector_best_file(
                             filepath=userpath_sector_best,
                             filename=combo_name,
                             dataset=(
                                 session_id,
-                                list(map(round6, best_s_tb)),
-                                list(map(round6, best_s_pb)),
-                                list(map(round6, all_best_s_tb)),
-                                list(map(round6, all_best_s_pb))
+                                best_s_tb,
+                                best_s_pb,
+                                all_best_s_tb,
+                                all_best_s_pb,
                             ),
                         )
-
-
-def telemetry_sectors() -> tuple[int, float, float, float, float]:
-    """Telemetry sectors"""
-    sector_idx = api.read.lap.sector_index()
-    laptime_valid = api.read.timing.last_laptime()
-    curr_sector1 = api.read.timing.current_sector1()
-    curr_sector2 = api.read.timing.current_sector2()
-    last_sector2 = api.read.timing.last_sector2()
-    return sector_idx, laptime_valid, curr_sector1, curr_sector2, last_sector2
 
 
 @generator_init
@@ -119,11 +109,15 @@ def calc_sectors(output: SectorsInfo, best_s_tb: list[float], best_s_pb: list[fl
     laptime_best = sum(best_s_pb)
 
     while True:
-        (sector_idx, laptime_valid, curr_sector1, curr_sector2, last_sector2
-         ) = yield best_s_tb, best_s_pb, new_best
+        sector_idx = yield best_s_tb, best_s_pb, new_best
 
         # Update previous & best sector time
         if last_sector_idx != sector_idx:  # keep checking until conditions met
+
+            laptime_valid = api.read.timing.last_laptime()
+            curr_sector1 = api.read.timing.current_sector1()
+            curr_sector2 = api.read.timing.current_sector2()
+            last_sector2 = api.read.timing.last_sector2()
 
             # While vehicle in S1, update S3 data
             if sector_idx == 0 and laptime_valid > 0 and last_sector2 > 0:

@@ -24,7 +24,7 @@ from .. import calculation as calc
 from ..module_info import minfo
 from ..units import set_unit_fuel
 from ._base import Overlay
-from ._common import WarningFlash
+from ._common import warning_flash
 from ._painter import FuelLevelBar
 
 
@@ -321,7 +321,7 @@ class Realtime(Overlay):
             layout.addWidget(self.bar_level, self.wcfg["column_index_middle"], 0)
 
         if self.wcfg["show_low_fuel_warning_flash"]:
-            self.warn_flash = WarningFlash(
+            self.warn_flash = warning_flash(
                 self.wcfg["warning_flash_highlight_duration"],
                 self.wcfg["warning_flash_interval"],
                 self.wcfg["number_of_warning_flashes"],
@@ -331,7 +331,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         is_low_fuel = minfo.fuel.estimatedLaps <= self.wcfg["low_fuel_lap_threshold"]
         if self.wcfg["show_low_fuel_warning_flash"] and minfo.fuel.estimatedValidConsumption:
-            is_low_fuel = self.warn_flash.state(is_low_fuel)
+            is_low_fuel = self.warn_flash.send(is_low_fuel)
             if is_low_fuel:
                 padding = 0.00000001  # add padding for switching state
             else:

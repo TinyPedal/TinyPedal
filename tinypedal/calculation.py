@@ -146,13 +146,6 @@ def part_to_whole_ratio(part: float, whole: float, median: float = 0) -> float:
     return median
 
 
-def braking_rate(lgt_gforce: float, is_braking: bool, not_impacted: bool = True) -> float:
-    """Braking rate (longitudinal G force)"""
-    if is_braking and not_impacted:
-        return lgt_gforce
-    return 0.0
-
-
 def rotate_coordinate(ori_rad: float, pos_x: float, pos_y: float) -> CoordXY:
     """Rotate x y coordinates"""
     sin_rad = sin(ori_rad)

@@ -27,7 +27,7 @@ from .. import calculation as calc
 from ..api_control import api
 from ..const_common import FLOAT_INF, WHEELS_ZERO
 from ._base import Overlay
-from ._common import WarningFlash
+from ._common import warning_flash
 
 
 class Realtime(Overlay):
@@ -97,7 +97,7 @@ class Realtime(Overlay):
         self.brush_cone.setColor(self.wcfg["last_impact_cone_color"])
 
         if self.wcfg["show_detached_warning_flash"]:
-            self.warn_flash = WarningFlash(
+            self.warn_flash = warning_flash(
                 self.wcfg["warning_flash_highlight_duration"],
                 self.wcfg["warning_flash_interval"],
                 FLOAT_INF,
@@ -227,7 +227,7 @@ class Realtime(Overlay):
         # body parts detached
         if value >= 3:
             self.detached_parts = True
-            if self.wcfg["show_detached_warning_flash"] and self.warn_flash.state(True):
+            if self.wcfg["show_detached_warning_flash"] and self.warn_flash.send(True):
                 return self.wcfg["warning_color_detached"]
             return self.wcfg["body_color_detached"]
         # no damage
@@ -238,7 +238,7 @@ class Realtime(Overlay):
         # wheel detached
         if wheel_detached:
             self.detached_parts = True
-            if self.wcfg["show_detached_warning_flash"] and self.warn_flash.state(True):
+            if self.wcfg["show_detached_warning_flash"] and self.warn_flash.send(True):
                 return self.wcfg["warning_color_detached"]
             return self.wcfg["wheel_color_detached"]
         # no damage
