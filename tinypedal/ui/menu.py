@@ -88,6 +88,10 @@ class OverlayMenu(QMenu):
             self.aboutToShow.connect(self.refresh_preset_name)
             self.addSeparator()
 
+            app_config = self.addAction("Config")
+            app_config.triggered.connect(parent.show_app)
+            self.addSeparator()
+
         # Lock overlay
         self.overlay_lock = self.addAction("Lock Overlay")
         self.overlay_lock.setCheckable(True)
@@ -117,12 +121,6 @@ class OverlayMenu(QMenu):
         menu_reset_data = ResetDataMenu("Reset Data", parent)
         self.addMenu(menu_reset_data)
         self.addSeparator()
-
-        # Config
-        if is_tray:
-            app_config = self.addAction("Config")
-            app_config.triggered.connect(parent.show_app)
-            self.addSeparator()
 
         # Quit
         app_quit = self.addAction("Quit")
