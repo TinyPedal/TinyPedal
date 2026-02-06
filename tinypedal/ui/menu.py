@@ -25,7 +25,7 @@ import os
 from PySide2.QtGui import QDesktopServices
 from PySide2.QtWidgets import QMenu, QMessageBox
 
-from .. import loader
+from .. import app_signal, loader
 from ..api_control import api
 from ..const_app import PLATFORM, URL_FAQ, URL_USER_GUIDE
 from ..const_file import ConfigType
@@ -49,14 +49,42 @@ from .vehicle_brand_editor import VehicleBrandEditor
 from .vehicle_class_editor import VehicleClassEditor
 
 
+# Define menu command
+def menu_reload_preset():
+    """Command - full reload"""
+    loader.reload(reload_preset=True)
+    app_signal.refresh.emit(True)
+
+
+def menu_reload_only():
+    """Command - fast reload"""
+    loader.reload(reload_preset=False)
+    app_signal.refresh.emit(True)
+
+
+def menu_refresh_only():
+    """Command - refresh GUI"""
+    app_signal.refresh.emit(True)
+
+
+def menu_restart_api():
+    """Command - restart api"""
+    api.restart()
+    app_signal.refresh.emit(True)
+
+
 class OverlayMenu(QMenu):
     """Overlay menu, shared between main & tray menu"""
 
     def __init__(self, title, parent, is_tray: bool = False):
         super().__init__(title, parent)
         if is_tray:
+            self._parent = parent
+            loaded_preset_font = self.font()
+            loaded_preset_font.setBold(True)
             self.loaded_preset = self.addAction("")
-            self.loaded_preset.setDisabled(True)
+            self.loaded_preset.setFont(loaded_preset_font)
+            self.loaded_preset.triggered.connect(self.open_preset_tab)
             self.aboutToShow.connect(self.refresh_preset_name)
             self.addSeparator()
 
@@ -80,7 +108,7 @@ class OverlayMenu(QMenu):
         self.overlay_vr.setCheckable(True)
         self.overlay_vr.triggered.connect(self.vr_compatibility)
 
-        # Reload preset
+        # Reload preset (check for opened config dialog)
         reload_preset = self.addAction("Reload")
         reload_preset.triggered.connect(parent.reload_preset)
         self.addSeparator()
@@ -116,6 +144,11 @@ class OverlayMenu(QMenu):
         if len(loaded_preset) > 16:
             loaded_preset = f"{loaded_preset[:16]}..."
         self.loaded_preset.setText(loaded_preset)
+
+    def open_preset_tab(self):
+        """Open preset tab"""
+        self._parent.centralWidget().select_preset_tab()
+        self._parent.show_app()
 
     @staticmethod
     def is_locked():
@@ -323,7 +356,7 @@ class ConfigMenu(QMenu):
             cfg_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
-            reload_func=self._parent.reload_preset,
+            reload_func=menu_reload_preset,
         )
         _dialog.open()
 
@@ -335,7 +368,7 @@ class ConfigMenu(QMenu):
             cfg_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
-            reload_func=self._parent.reload_preset,
+            reload_func=menu_reload_preset,
         )
         _dialog.open()
 
@@ -347,7 +380,7 @@ class ConfigMenu(QMenu):
             cfg_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
-            reload_func=self._parent.reload_preset,
+            reload_func=menu_reload_preset,
             option_width=22,
         )
         _dialog.open()
@@ -360,7 +393,7 @@ class ConfigMenu(QMenu):
             cfg_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
-            reload_func=self._parent.refresh_only,
+            reload_func=menu_refresh_only,
         )
         _dialog.open()
 
@@ -372,7 +405,7 @@ class ConfigMenu(QMenu):
             cfg_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,
-            reload_func=self._parent.reload_only,
+            reload_func=menu_reload_only,
         )
         _dialog.open()
 
@@ -381,7 +414,7 @@ class ConfigMenu(QMenu):
         _dialog = FontConfig(
             parent=self._parent,
             user_setting=cfg.user.setting,
-            reload_func=self._parent.reload_only,
+            reload_func=menu_reload_only,
         )
         _dialog.open()
 
@@ -410,7 +443,7 @@ class APIMenu(QMenu):
         self.addSeparator()
 
         restart_api = self.addAction("Restart API")
-        restart_api.triggered.connect(parent.restart_api)
+        restart_api.triggered.connect(menu_restart_api)
 
         self.aboutToShow.connect(self.refresh_menu)
 
@@ -429,7 +462,7 @@ class APIMenu(QMenu):
         enabled = cfg.telemetry["enable_api_selection_from_preset"]
         cfg.telemetry["enable_api_selection_from_preset"] = not enabled
         cfg.save(cfg_type=ConfigType.CONFIG)
-        self._parent.reload_only()
+        menu_reload_only()
 
     def toggle_legacy_api(self):
         """Toggle legacy API selection"""
@@ -460,7 +493,7 @@ class APIMenu(QMenu):
             cfg_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,
-            reload_func=self._parent.restart_api,
+            reload_func=menu_restart_api,
         )
         _dialog.open()
 
@@ -491,7 +524,7 @@ class APIMenu(QMenu):
         else:
             save_type = ConfigType.CONFIG
         cfg.save(cfg_type=save_type)
-        self._parent.reload_only()
+        menu_reload_only()
 
 
 class ToolsMenu(QMenu):

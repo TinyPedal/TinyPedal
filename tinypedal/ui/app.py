@@ -234,7 +234,7 @@ class AppWindow(QMainWindow):
         self.__connect_signal()
 
         # Refresh GUI
-        self.refresh_only()
+        app_signal.refresh.emit(True)
 
     @Slot(bool)  # type: ignore[operator]
     def refresh(self):
@@ -385,11 +385,6 @@ class AppWindow(QMainWindow):
         else:
             self.quit_app()
 
-    def restart_api(self):
-        """Restart telemetry API"""
-        api.restart()
-        self.refresh_only()
-
     @Slot(bool)  # type: ignore[operator]
     def reload_preset(self):
         """Reload current preset"""
@@ -400,15 +395,6 @@ class AppWindow(QMainWindow):
             cfg.set_next_to_load("")
             return
         loader.reload(reload_preset=True)
-        self.refresh_only()
-
-    def reload_only(self):
-        """Reload only api, module, widget"""
-        loader.reload(reload_preset=False)
-        self.refresh_only()
-
-    def refresh_only(self):
-        """Refresh GUI only"""
         app_signal.refresh.emit(True)
 
     @Slot(object)  # type: ignore[operator]
