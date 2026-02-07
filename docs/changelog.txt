@@ -1,6 +1,7 @@
 WIP
 -----------------------------
 * Misc
+  - Fixed an issue that would prevent TinyPedal from restarting if attempted while driving.
   - Added "Config" & "Reload" options to right-click context menu on each widget for quick access.
   - Installer script (install.sh) now installs only the necessary files and documents for running TinyPedal on Linux.
 
