@@ -209,7 +209,6 @@ def update_vehicle_data(
             data.isClassFastestLastLap = class_pos[7]
 
             data.positionOverall = api.read.vehicle.place(index)
-            data.lastLapTime = api.read.timing.last_laptime(index)
             data.bestLapTime = api.read.timing.best_laptime(index)
             data.numPitStops = api.read.vehicle.number_pitstops(index, api.read.vehicle.number_penalties(index))
             data.pitRequested = api.read.vehicle.pit_request(index)
@@ -218,14 +217,17 @@ def update_vehicle_data(
             data.vehicleClass = api.read.vehicle.class_name(index)
             data.tireCompoundFront = f"{data.vehicleClass} - {api.read.tyre.compound_name_front(index)}"
             data.tireCompoundRear = f"{data.vehicleClass} - {api.read.tyre.compound_name_rear(index)}"
+            data.vehicleIntegrity = api.read.vehicle.integrity(index)
 
             data.gapBehindNext = calc_gap_behind_next(index)
             data.gapBehindLeader = calc_gap_behind_leader(index)
             data.gapBehindNextInClass = calc_time_gap_behind(opt_index_ahead, index, track_length, data.totalLapProgress)
             data.gapBehindLeaderInClass = calc_time_gap_behind(opt_index_leader, index, track_length, data.totalLapProgress)
 
-            data.vehicleIntegrity = api.read.vehicle.integrity(index)
-            data.lapTimeHistory.update(api.read.timing.start(index), elapsed_time, data.lastLapTime)
+            data.lapTimeHistory.update(api.read.timing.start(index))
+            last_laptime = api.read.timing.last_laptime(index)
+            data.isValidLap = last_laptime > 0
+            data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last()
 
             update_stint_usage(data, laps_completed)
 

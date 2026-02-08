@@ -611,7 +611,7 @@ class Realtime(Overlay):
                         laptime = self.set_pittime(veh_info.inPit, veh_info.pitTimer.elapsed)
                         is_class_best = False
                     else:
-                        laptime = self.set_laptime(veh_info.lastLapTime)
+                        laptime = self.set_laptime(veh_info.lastLapTime, veh_info.isValidLap)
                         is_class_best = veh_info.isClassFastestLastLap
                 else:
                     laptime = self.set_laptime(veh_info.bestLapTime)
@@ -753,7 +753,7 @@ class Realtime(Overlay):
                 color_index = 2 + data[2]
             else:
                 color_index = data[2]
-            target.setText(data[0])
+            target.setText(data[0][:8])
             target.updateStyle(self.bar_style_lpt[color_index])
             self.toggle_visibility(target, data[-1])
 
@@ -761,7 +761,7 @@ class Realtime(Overlay):
         """Vehicle best laptime"""
         if target.last != data:
             target.last = data
-            target.setText(self.set_laptime(data[0]))
+            target.setText(self.set_laptime(data[0])[:8])
             target.updateStyle(self.bar_style_blp[data[1]])
             self.toggle_visibility(target, data[-1])
 
@@ -967,17 +967,19 @@ class Realtime(Overlay):
         return class_name, self.wcfg["bkg_color_class"]
 
     @staticmethod
-    def set_laptime(laptime):
+    def set_laptime(laptime, valid: bool = True):
         """Set lap time"""
         if 0 < laptime < MAX_SECONDS:
-            return calc.sec2laptime_full(laptime)[:8]
+            if valid:
+                return calc.sec2laptime_full(laptime)
+            return f"*{calc.sec2laptime_full(laptime)}"
         return TEXT_NOLAPTIME
 
     @staticmethod
     def set_pittime(inpit, pit_time):
         """Set lap time"""
         if 0 < pit_time < MAX_SECONDS:
-            return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
+            return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"
         return TEXT_NOLAPTIME
 
     def gap_to_leader_best(self, player_best, leader_best):

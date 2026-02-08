@@ -63,17 +63,12 @@ class DeltaLapTime(array):
 
     __slots__ = ()
 
-    def update(self, lap_start: float, lap_elapsed: float, laptime_last: float):
+    def update(self, lap_start: float):
         """Update delta lap time history"""
-        # Check 2 sec after start new lap (for validating last lap time)
-        # Store lap start time in index 5
-        if self[-1] != lap_start and lap_elapsed - lap_start > 2:
+        if self[-1] != lap_start:
             if self[-1] < lap_start:
                 self[0], self[1], self[2], self[3] = self[1], self[2], self[3], self[4]
-                if laptime_last > 0:  # valid last lap time
-                    self[4] = laptime_last
-                else:
-                    self[4] = 0.0
+                self[4] = lap_start - self[-1]  # last lap time
             else:  # reset all laptime on session change
                 self[0] = self[1] = self[2] = self[3] = self[4] = 0.0
             self[-1] = lap_start
@@ -86,6 +81,10 @@ class DeltaLapTime(array):
                 yield target[index] - self[index]
             else:
                 yield MAX_SECONDS
+
+    def last(self) -> float:
+        """Last lap time, can be invalid"""
+        return self[4]
 
     def best(self) -> float:
         """Best lap time from recent laps"""
@@ -249,6 +248,7 @@ class VehicleDataSet:
         "gapBehindLeaderInClass",
         "isLapped",
         "isYellow",
+        "isValidLap",
         "inPit",
         "isClassFastestLastLap",
         "numPitStops",
@@ -291,6 +291,7 @@ class VehicleDataSet:
         self.gapBehindLeaderInClass: float = 0.0
         self.isLapped: float = 0.0
         self.isYellow: bool = False
+        self.isValidLap: bool = False
         self.inPit: int = 0
         self.isClassFastestLastLap: bool = False
         self.numPitStops: int = 0

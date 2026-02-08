@@ -3012,7 +3012,7 @@ Show highlighted color on opponents within nearest time gap threshold.
 Set nearest time gap threshold (in seconds) for opponent who is in front of or behind player. Default is `1` second for front, and `2` seconds for behind.
 
     show_laptime
-Show driver's last lap time or pit stop duration if available.
+Show driver's last lap time or pit stop duration if available. Invalid lap time is preceded by asterisk mark, such as *1:23.54.
 
     show_pitstop_duration_while_requested_pitstop
 Show driver's last recorded pit stop duration (in lap time column) while you have requested pit stop.
@@ -3433,7 +3433,9 @@ Show time interval from same class. This option only takes effect while `enable_
 Set text indicator for race leader in time interval column.
 
     show_laptime
-Show driver's last lap time or pit timer if available. If `show_best_laptime` is not enabled, this option will show driver's session best lap time in none-race sessions.
+Show driver's last lap time or pit stop duration if available. Invalid lap time is preceded by asterisk mark, such as *1:23.54.
+
+Note, if `show_best_laptime` is not enabled, this option will show driver's session best lap time in none-race sessions.
 
     show_best_laptime
 Show driver's session best lap time.

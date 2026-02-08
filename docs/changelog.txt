@@ -4,6 +4,9 @@ WIP
   - Added "show_delta" option, which shows lap time delta between two consecutive laps. This option can be useful to quickly check stint pace.
   - Added options to show or hide individual column.
 
+* Relative, Rivals, Standings Widget
+  - Invalid lap time is now displayed and preceded by asterisk mark (requested by user "KnaniOussama"), such as *1:23.54.
+
 * Misc
   - Fixed an issue that would prevent TinyPedal from restarting if attempted to restart while driving.
   - Added "Config" & "Reload" options to right-click context menu on each widget for quick access.

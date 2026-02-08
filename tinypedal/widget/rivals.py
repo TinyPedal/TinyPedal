@@ -497,7 +497,7 @@ class Realtime(Overlay):
                     if veh_info.pitTimer.pitting:
                         laptime = self.set_pittime(veh_info.inPit, veh_info.pitTimer.elapsed)
                     else:
-                        laptime = self.set_laptime(veh_info.lastLapTime)
+                        laptime = self.set_laptime(veh_info.lastLapTime, veh_info.isValidLap)
                 else:
                     laptime = self.set_laptime(veh_info.bestLapTime)
                 self.update_lpt(self.bars_lpt[idx], laptime, state)
@@ -623,14 +623,14 @@ class Realtime(Overlay):
         """Vehicle laptime"""
         if target.last != data:
             target.last = data
-            target.setText(data[0])
+            target.setText(data[0][:8])
             self.toggle_visibility(target, data[-1])
 
     def update_blp(self, target, *data):
         """Vehicle best laptime"""
         if target.last != data:
             target.last = data
-            target.setText(self.set_laptime(data[0]))
+            target.setText(self.set_laptime(data[0])[:8])
             self.toggle_visibility(target, data[-1])
 
     def update_dlt(self, target, *data):
@@ -802,17 +802,19 @@ class Realtime(Overlay):
         return class_name, self.wcfg["bkg_color_class"]
 
     @staticmethod
-    def set_laptime(laptime):
+    def set_laptime(laptime, valid: bool = True):
         """Set lap time"""
         if 0 < laptime < MAX_SECONDS:
-            return calc.sec2laptime_full(laptime)[:8]
+            if valid:
+                return calc.sec2laptime_full(laptime)
+            return f"*{calc.sec2laptime_full(laptime)}"
         return TEXT_NOLAPTIME
 
     @staticmethod
     def set_pittime(inpit, pit_time):
         """Set lap time"""
         if 0 < pit_time < MAX_SECONDS:
-            return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"[:8]
+            return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"
         return TEXT_NOLAPTIME
 
     def int_to_next(self, gap_behind_class, is_ahead):
