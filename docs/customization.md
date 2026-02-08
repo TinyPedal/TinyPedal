@@ -2551,7 +2551,7 @@ Set percentage threshold for triggering wheel slip warning under acceleration. `
 ## Lap time history
 **This widget displays lap time history info.**
 
-This widget consists of four columns from left to right (default order): `Lap number`, `Lap time`, `Fuel or virtual energy consumption per lap`, `Average tyre wear per lap (percent)`. History data are loaded and updated from corresponding [Consumption History](#consumption-history) file.
+Note, history data are loaded and updated from corresponding [Consumption History](#consumption-history) file.
 
     layout
 2 layouts are available: `0` = vertical layout, `1` = reversed vertical layout.
@@ -2559,11 +2559,26 @@ This widget consists of four columns from left to right (default order): `Lap nu
     lap_time_history_count
 Set the number of lap time history display. Default is to show `10` most recent lap times.
 
+    show_empty_history
+Show empty lap time history. Default is `false`, which hides empty rows.
+
+    show_laps
+Show lap number.
+
+    show_time
+Show lap time.
+
+    show_delta
+Show lap time delta between two consecutive laps.
+
+    show_fuel
+Show fuel consumption per lap.
+
     show_virtual_energy_if_available
 Show virtual energy consumption instead of fuel consumption if available. This option is enabled by default.
 
-    show_empty_history
-Show empty lap time history. Default is `false`, which hides empty rows.
+    show_wear
+Show average tyre wear (percent) per lap.
 
 [**`Back to Top`**](#)
 
