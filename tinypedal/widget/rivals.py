@@ -21,11 +21,11 @@ Rivals Widget
 """
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
-from ..units import set_unit_speed
 from ..userfile.brand_logo import load_brand_logo_file
 from ..userfile.heatmap import select_compound_symbol
 from ._base import Overlay
@@ -417,7 +417,7 @@ class Realtime(Overlay):
             )
         # Speed trap
         if self.wcfg["show_speed_trap"]:
-            self.unit_speed = set_unit_speed(self.cfg.units["speed_unit"])
+            self.unit_speed = units.set_unit_speed(self.cfg.units["speed_unit"])
             bar_style_spd = self.set_qss(
                 fg_color=self.wcfg["font_color_speed_trap"],
                 bg_color=self.wcfg["bkg_color_speed_trap"]

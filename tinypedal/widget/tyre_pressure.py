@@ -23,9 +23,9 @@ Tyre pressure Widget
 from functools import partial
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import TEXT_NA, TEXT_PLACEHOLDER, WHEELS_ZERO
-from ..units import set_unit_pressure
 from ..userfile.heatmap import select_compound_symbol
 from ._base import Overlay
 
@@ -50,7 +50,7 @@ class Realtime(Overlay):
         self.hot_pres_temp = max(self.wcfg["hot_pressure_temperature_threshold"], 0)
 
         # Config units
-        self.unit_pres = set_unit_pressure(self.cfg.units["tyre_pressure_unit"])
+        self.unit_pres = units.set_unit_pressure(self.cfg.units["tyre_pressure_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(
@@ -131,7 +131,8 @@ class Realtime(Overlay):
             )
 
             self.tpavg = list(WHEELS_ZERO)
-            average_samples = int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (self._update_interval * 0.001))
+            update_interval = max(self.wcfg["update_interval"], 0.01)
+            average_samples = int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (update_interval * 0.001))
             self.calc_ema_tpres = partial(
                 calc.exp_mov_avg,
                 calc.ema_factor(average_samples)

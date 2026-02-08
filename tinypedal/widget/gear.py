@@ -20,9 +20,9 @@
 Gear Widget
 """
 
+from .. import units
 from ..api_control import api
 from ..module_info import minfo
-from ..units import set_unit_speed
 from ._base import Overlay
 from ._painter import GearGaugeBar, ProgressBar, TextBar
 
@@ -58,7 +58,7 @@ class Realtime(Overlay):
         )
 
         # Config units
-        self.unit_speed = set_unit_speed(self.cfg.units["speed_unit"])
+        self.unit_speed = units.set_unit_speed(self.cfg.units["speed_unit"])
 
         # Gear gauge
         self.gauge_color = (

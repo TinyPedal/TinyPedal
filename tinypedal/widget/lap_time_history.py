@@ -21,10 +21,10 @@ Lap time history Widget
 """
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import TEXT_NOLAPTIME
 from ..module_info import minfo
-from ..units import set_unit_fuel
 from ._base import Overlay
 
 
@@ -47,7 +47,7 @@ class Realtime(Overlay):
         self.history_slot = min(max(self.wcfg["lap_time_history_count"], 1), 100)
 
         # Config units
-        self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
+        self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

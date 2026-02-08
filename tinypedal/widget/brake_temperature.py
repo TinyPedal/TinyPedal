@@ -23,9 +23,9 @@ Brake temperature Widget
 from functools import partial
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import TEXT_NA, TEXT_PLACEHOLDER
-from ..units import set_unit_temperature
 from ..userfile.heatmap import (
     HEATMAP_DEFAULT_BRAKE,
     load_heatmap_style,
@@ -57,7 +57,7 @@ class Realtime(Overlay):
         self.off_brake_duration = max(self.wcfg["off_brake_duration"], 0)
 
         # Config units
-        self.unit_temp = set_unit_temperature(self.cfg.units["temperature_unit"])
+        self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(
@@ -121,7 +121,8 @@ class Realtime(Overlay):
                 target=layout_btavg,
                 column=self.wcfg["column_index_average"],
             )
-            average_samples = int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (self._update_interval * 0.001))
+            update_interval = max(self.wcfg["update_interval"], 0.01)
+            average_samples = int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (update_interval * 0.001))
             self.calc_ema_btemp = partial(calc.exp_mov_avg, calc.ema_factor(average_samples))
 
         # Last data

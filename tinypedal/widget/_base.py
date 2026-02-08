@@ -22,6 +22,7 @@ Overlay base window, events.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from PySide2.QtCore import QBasicTimer, Qt, Slot
@@ -35,16 +36,16 @@ from ..formatter import format_module_name
 from ..setting import Setting
 from ._common import ExLabel, FontMetrics, MousePosition
 
+logger = logging.getLogger(__name__)
 mousepos = MousePosition()  # single instance shared by all widgets
 
 
-class Overlay(QWidget):
-    """Overlay window"""
+class Base(QWidget):
+    """Base window"""
 
     def __init__(self, config: Setting, widget_name: str):
         super().__init__()
         self.widget_name = widget_name
-        self.closed = False
 
         # Base config
         self.cfg = config
@@ -74,20 +75,25 @@ class Overlay(QWidget):
         """Stop and close widget"""
         self.__toggle_timer(True)
         self.__break_signal()
-        self.unload_resource()
-        self.wcfg = None
-        self.cfg = None
-        self.closed = self.close()
+        self.__unload_resource()
+        if not self.close():
+            logger.error(
+                "FAILED TO CLOSE: widget %s",
+                self._overlay.widget_name,
+            )
+
+    @property
+    def closed(self) -> bool:
+        """Close state"""
+        return self.cfg is None and self.close()
 
     def post_update(self):
         """Run once after state inactive"""
 
-    def unload_resource(self):
-        """Unload resource (such as images) on close, can re-implement in widget"""
-        instance_var_list = dir(self)
-        for var in instance_var_list:
-            if var.startswith("pixmap_"):  # unload all pixmap instance
-                setattr(self, var, None)
+    def __unload_resource(self):
+        """Unload widget resource"""
+        for var in self.__dict__:
+            setattr(self, var, None)
 
     def __set_window_attributes(self):
         """Set window attributes"""
@@ -113,70 +119,6 @@ class Overlay(QWidget):
         palette = self.palette()
         palette.setColor(QPalette.Window, self.cfg.compatibility["global_bkg_color"])
         self.setPalette(palette)
-
-    def contextMenuEvent(self, event):
-        """Widget context menu"""
-        menu = QMenu()
-
-        show_name = menu.addAction(format_module_name(self.widget_name))
-        show_name_font = show_name.font()
-        show_name_font.setBold(True)
-        show_name.setFont(show_name_font)
-        menu.addSeparator()
-
-        menu.addAction("Config")
-        menu.addSeparator()
-        menu.addAction("Center Horizontally")
-        menu.addAction("Center Vertically")
-        menu.addSeparator()
-        menu.addAction("Reload")
-        menu.addAction("Disable")
-
-        selected_action = menu.exec_(event.globalPos())
-        if not selected_action:
-            return
-
-        action = selected_action.text()
-        if action == "Center Horizontally":
-            self.move((self.screen().geometry().width() - self.width()) // 2, self.y())
-            self.__save_position()
-        elif action == "Center Vertically":
-            self.move(self.x(), (self.screen().geometry().height() - self.height()) // 2)
-            self.__save_position()
-        elif action == "Config":
-            config_widget(self.widget_name)
-        elif action == "Reload":
-            reload_widget(self.widget_name)
-        elif action == "Disable":
-            disable_widget(self.widget_name)
-
-    def mouseMoveEvent(self, event):
-        """Update widget position"""
-        if mousepos.valid() and event.buttons() == Qt.LeftButton:
-            # Snapping to reference grid if Ctrl is pressed
-            if (event.modifiers() & Qt.ControlModifier):
-                self.move(mousepos.snapping(self, event.globalPos()))
-            else:
-                self.move(mousepos.moving(event.globalPos()))
-
-    def mousePressEvent(self, event):
-        """Set offset position & press state"""
-        # Make sure overlay cannot be dragged while "fixed_position" enabled
-        if self.cfg.overlay["fixed_position"]:
-            return
-        if event.buttons() == Qt.LeftButton:
-            mousepos.config(
-                event.pos(),
-                self.cfg.overlay["enable_grid_move"],
-                self.cfg.application["grid_move_size"],
-                self.cfg.application["snap_gap"],
-                self.cfg.application["snap_distance"],
-            )
-
-    def mouseReleaseEvent(self, event):
-        """Save position on release"""
-        mousepos.reset()
-        self.__save_position()
 
     def __save_position(self):
         """Save widget position"""
@@ -227,12 +169,78 @@ class Overlay(QWidget):
         overlay_signal.paused.disconnect(self.__toggle_timer)
         overlay_signal.iconify.disconnect(self.__toggle_vr_compat)
 
+    def mouseMoveEvent(self, event):
+        """Update widget position"""
+        if mousepos.valid() and event.buttons() == Qt.LeftButton:
+            # Snapping to reference grid if Ctrl is pressed
+            if (event.modifiers() & Qt.ControlModifier):
+                self.move(mousepos.snapping(self, event.globalPos()))
+            else:
+                self.move(mousepos.moving(event.globalPos()))
+
+    def mousePressEvent(self, event):
+        """Set offset position & press state"""
+        # Certain situation or platform can bypass "WindowTransparentForInput" flag
+        # Make sure overlay cannot be dragged while "fixed_position" enabled
+        if not self.cfg.overlay["fixed_position"] and event.buttons() == Qt.LeftButton:
+            mousepos.config(
+                event.pos(),
+                self.cfg.overlay["enable_grid_move"],
+                self.cfg.application["grid_move_size"],
+                self.cfg.application["snap_gap"],
+                self.cfg.application["snap_distance"],
+            )
+
+    def mouseReleaseEvent(self, event):
+        """Save position on release"""
+        mousepos.reset()
+        self.__save_position()
+
+    def contextMenuEvent(self, event):
+        """Widget context menu"""
+        menu = QMenu()
+
+        show_name = menu.addAction(format_module_name(self.widget_name))
+        show_name_font = show_name.font()
+        show_name_font.setBold(True)
+        show_name.setFont(show_name_font)
+        menu.addSeparator()
+
+        menu.addAction("Config")
+        menu.addSeparator()
+        menu.addAction("Center Horizontally")
+        menu.addAction("Center Vertically")
+        menu.addSeparator()
+        menu.addAction("Reload")
+        menu.addAction("Disable")
+
+        selected_action = menu.exec_(event.globalPos())
+        if not selected_action:
+            return
+
+        action = selected_action.text()
+        if action == "Center Horizontally":
+            self.move((self.screen().geometry().width() - self.width()) // 2, self.y())
+            self.__save_position()
+        elif action == "Center Vertically":
+            self.move(self.x(), (self.screen().geometry().height() - self.height()) // 2)
+            self.__save_position()
+        elif action == "Config":
+            config_widget(self.widget_name)
+        elif action == "Reload":
+            reload_widget(self.widget_name)
+        elif action == "Disable":
+            disable_widget(self.widget_name)
+
     def closeEvent(self, event):
         """Ignore attempts to close via window Close button when VR compatibility enabled"""
         if self.cfg is not None:
             event.ignore()
 
-    # Common GUI methods
+
+class Overlay(Base):
+    """Inherit base window, add common GUI methods"""
+
     def config_font(self, name: str = "", size: int = 1, weight: str = "") -> QFont:
         """Config font
 
@@ -255,18 +263,18 @@ class Overlay(QWidget):
         return font
 
     @staticmethod
-    def get_font_metrics(qfont: QFont) -> FontMetrics:
+    def get_font_metrics(font: QFont) -> FontMetrics:
         """Get font metrics
 
         Args:
-            qfont: QFont object.
+            font: QFont object.
 
         Returns:
             FontMetrics object.
         """
         # Disable font hinting for more accuracy (necessary for pyside6)
-        qfont.setHintingPreference(QFont.PreferNoHinting)
-        font_metrics = QFontMetrics(qfont)
+        font.setHintingPreference(QFont.PreferNoHinting)
+        font_metrics = QFontMetrics(font)
         return FontMetrics(
             width=font_metrics.averageCharWidth(),
             height=font_metrics.height(),
@@ -596,12 +604,12 @@ class Overlay(QWidget):
             option: layout option name in Widget JSON.
             default: default layout value.
         """
+        layout = self.layout()
+        assert isinstance(layout, QGridLayout)
         if self.wcfg.get(option, 0) == default:
             order = column, row  # Vertical layout
         else:
             order = row, column  # Horizontal layout
-        layout = self.layout()
-        assert isinstance(layout, QGridLayout)
         if isinstance(target, QWidget):
             layout.addWidget(target, *order)
         else:

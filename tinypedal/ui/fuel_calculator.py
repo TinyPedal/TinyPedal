@@ -48,12 +48,12 @@ from PySide2.QtWidgets import (
 )
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_file import FileFilter
 from ..formatter import laptime_string_to_seconds
 from ..module_info import ConsumptionDataSet, minfo
 from ..setting import cfg
-from ..units import set_symbol_fuel, set_unit_fuel
 from ..userfile.consumption_history import load_consumption_history_file
 from ._common import BaseDialog, UIScaler
 
@@ -158,8 +158,8 @@ class FuelCalculator(BaseDialog):
 
         # Set (freeze) fuel unit
         self.is_gallon = cfg.units["fuel_unit"] == "Gallon"
-        self.unit_fuel = set_unit_fuel(cfg.units["fuel_unit"])
-        self.symbol_fuel = set_symbol_fuel(cfg.units["fuel_unit"])
+        self.unit_fuel = units.set_unit_fuel(cfg.units["fuel_unit"])
+        self.symbol_fuel = units.set_symbol_fuel(cfg.units["fuel_unit"])
 
         # Set status bar
         self.status_bar = QStatusBar(self)

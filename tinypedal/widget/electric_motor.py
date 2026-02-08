@@ -21,8 +21,8 @@ Electric motor Widget
 """
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
-from ..units import set_symbol_power, set_unit_power, set_unit_temperature
 from ._base import Overlay
 
 
@@ -44,9 +44,9 @@ class Realtime(Overlay):
         bar_width = font_m.width * 8 + bar_padx
 
         # Config units
-        self.unit_temp = set_unit_temperature(self.cfg.units["temperature_unit"])
-        self.unit_power = set_unit_power(self.cfg.units["power_unit"])
-        self.symbol_power = set_symbol_power(self.cfg.units["power_unit"])
+        self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
+        self.unit_power = units.set_unit_power(self.cfg.units["power_unit"])
+        self.symbol_power = units.set_symbol_power(self.cfg.units["power_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

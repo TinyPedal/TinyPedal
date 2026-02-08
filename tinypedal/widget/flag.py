@@ -21,10 +21,10 @@ Flag Widget
 """
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import MAX_SECONDS
 from ..module_info import minfo
-from ..units import set_symbol_distance, set_unit_distance, set_unit_fuel
 from ._base import Overlay
 
 
@@ -46,9 +46,9 @@ class Realtime(Overlay):
         bar_width = font_m.width * 7 + bar_padx
 
         # Config units
-        self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
-        self.unit_dist = set_unit_distance(self.cfg.units["distance_unit"])
-        self.symbol_dist = set_symbol_distance(self.cfg.units["distance_unit"])
+        self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
+        self.unit_dist = units.set_unit_distance(self.cfg.units["distance_unit"])
+        self.symbol_dist = units.set_symbol_distance(self.cfg.units["distance_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

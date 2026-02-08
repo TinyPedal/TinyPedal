@@ -21,9 +21,9 @@ Pit stop estimate Widget
 """
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..module_info import minfo
-from ..units import set_unit_fuel
 from ._base import Overlay
 
 
@@ -47,7 +47,7 @@ class Realtime(Overlay):
         style_width = font_m.width * self.bar_width + bar_padx
 
         # Config units
-        self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
+        self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

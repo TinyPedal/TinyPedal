@@ -23,6 +23,7 @@ Relative finish order Widget
 from math import ceil
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import (
     ENERGY_TYPE_ID,
@@ -31,7 +32,6 @@ from ..const_common import (
     TEXT_PLACEHOLDER,
 )
 from ..module_info import minfo
-from ..units import set_unit_fuel
 from ..validator import generator_init
 from ._base import Overlay
 
@@ -65,7 +65,7 @@ class Realtime(Overlay):
         self.refill_sign = "" if self.wcfg["show_absolute_refilling"] else "+"
 
         # Config units
-        self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
+        self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
         self.gen_leader_pace = calc_laptime_pace(
             self.wcfg["leader_laptime_pace_samples"],

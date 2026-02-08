@@ -23,10 +23,10 @@ Cruise Widget
 from time import gmtime, strftime
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import COMPASS_BEARINGS, TEXT_NA
 from ..module_info import minfo
-from ..units import set_symbol_distance, set_unit_distance
 from ._base import Overlay
 
 
@@ -55,10 +55,10 @@ class Realtime(Overlay):
             self.odm_digits += 2.1
 
         # Config units
-        self.unit_dist = set_unit_distance(self.cfg.units["distance_unit"])
-        self.symbol_dist = set_symbol_distance(self.cfg.units["distance_unit"])
-        self.unit_odm = set_unit_distance(self.cfg.units["odometer_unit"])
-        self.symbol_odm = set_symbol_distance(self.cfg.units["odometer_unit"])
+        self.unit_dist = units.set_unit_distance(self.cfg.units["distance_unit"])
+        self.symbol_dist = units.set_symbol_distance(self.cfg.units["distance_unit"])
+        self.unit_odm = units.set_unit_distance(self.cfg.units["odometer_unit"])
+        self.symbol_odm = units.set_symbol_distance(self.cfg.units["odometer_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

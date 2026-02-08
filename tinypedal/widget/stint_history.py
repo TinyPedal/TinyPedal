@@ -23,9 +23,9 @@ Stint history Widget
 from collections import deque
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..module_info import minfo
-from ..units import set_unit_fuel
 from ..userfile.heatmap import select_compound_symbol
 from ._base import Overlay
 
@@ -50,7 +50,7 @@ class Realtime(Overlay):
         self.minimum_stint_seconds = self.wcfg["minimum_stint_threshold_minutes"] * 60
 
         # Config units
-        self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
+        self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

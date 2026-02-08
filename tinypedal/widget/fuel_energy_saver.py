@@ -23,10 +23,10 @@ Fuel energy saver Widget
 from math import floor
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import ENERGY_TYPE_ID, MAX_SECONDS, TEXT_PLACEHOLDER
 from ..module_info import minfo
-from ..units import set_unit_fuel
 from ._base import Overlay
 
 
@@ -57,7 +57,7 @@ class Realtime(Overlay):
         self.min_reserve = max(self.wcfg["minimum_reserve"], 0)
 
         # Config units
-        self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
+        self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

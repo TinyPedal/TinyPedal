@@ -20,10 +20,10 @@
 Weather Widget
 """
 
+from .. import units
 from ..api_control import api
 from ..const_common import TEXT_TREND_SIGN
 from ..module_info import minfo
-from ..units import set_symbol_temperature, set_unit_temperature
 from ._base import Overlay
 
 
@@ -68,8 +68,8 @@ class Realtime(Overlay):
         )
 
         # Config units
-        self.unit_temp = set_unit_temperature(self.cfg.units["temperature_unit"])
-        self.symbol_temp = set_symbol_temperature(self.cfg.units["temperature_unit"])
+        self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
+        self.symbol_temp = units.set_symbol_temperature(self.cfg.units["temperature_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

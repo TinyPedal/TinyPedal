@@ -24,9 +24,9 @@ from PySide2.QtCore import QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPainterPath, QPen, QPixmap
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..module_info import minfo
-from ..units import set_symbol_distance, set_unit_distance
 from ._base import Overlay
 
 
@@ -70,8 +70,8 @@ class Realtime(Overlay):
         self.scale_text_alignment = self.set_text_alignment(self.wcfg["elevation_scale_text_alignment"])
 
         # Config units
-        self.unit_dist = set_unit_distance(self.cfg.units["distance_unit"])
-        self.symbol_dist = set_symbol_distance(self.cfg.units["distance_unit"])
+        self.unit_dist = units.set_unit_distance(self.cfg.units["distance_unit"])
+        self.symbol_dist = units.set_symbol_distance(self.cfg.units["distance_unit"])
 
         # Config canvas
         self.resize(self.display_width, self.display_height)

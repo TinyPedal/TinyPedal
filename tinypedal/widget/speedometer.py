@@ -20,8 +20,8 @@
 Speedometer Widget
 """
 
+from .. import units
 from ..api_control import api
-from ..units import set_unit_speed
 from ._base import Overlay
 
 
@@ -46,7 +46,7 @@ class Realtime(Overlay):
         self.leading_zero = min(max(self.wcfg["leading_zero"], 1), 3) + zero_offset + decimals + decimals / 10
 
         # Config units
-        self.unit_speed = set_unit_speed(self.cfg.units["speed_unit"])
+        self.unit_speed = units.set_unit_speed(self.cfg.units["speed_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

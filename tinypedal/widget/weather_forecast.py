@@ -25,6 +25,7 @@ from __future__ import annotations
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPainter, QPixmap
 
+from .. import units
 from ..api_control import api
 from ..const_common import (
     ABS_ZERO_CELSIUS,
@@ -34,7 +35,6 @@ from ..const_common import (
 )
 from ..const_file import ImageFile
 from ..process.weather import WeatherNode, forecast_sky_type
-from ..units import set_unit_temperature
 from ._base import Overlay
 from ._painter import split_pixmap_icon
 
@@ -61,7 +61,7 @@ class Realtime(Overlay):
         self.bar_rain_height = max(self.wcfg["rain_chance_bar_height"], 1)
 
         # Config units
-        self.unit_temp = set_unit_temperature(self.cfg.units["temperature_unit"])
+        self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

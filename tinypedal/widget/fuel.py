@@ -21,8 +21,8 @@ Fuel Widget
 """
 
 from .. import calculation as calc
+from .. import units
 from ..module_info import minfo
-from ..units import set_unit_fuel
 from ._base import Overlay
 from ._common import warning_flash
 from ._painter import FuelLevelBar
@@ -49,7 +49,7 @@ class Realtime(Overlay):
         column_count = 0
 
         # Config units
-        self.unit_fuel = set_unit_fuel(self.cfg.units["fuel_unit"])
+        self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(

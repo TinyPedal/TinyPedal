@@ -23,9 +23,9 @@ Tyre carcass temperature Widget
 from functools import partial
 
 from .. import calculation as calc
+from .. import units
 from ..api_control import api
 from ..const_common import TEXT_NA, TEXT_PLACEHOLDER, WHEELS_ZERO
-from ..units import set_unit_temperature
 from ..userfile.heatmap import (
     HEATMAP_DEFAULT_TYRE,
     load_heatmap_style,
@@ -57,7 +57,7 @@ class Realtime(Overlay):
         text_width = 3 + len(self.sign_text) + (self.cfg.units["temperature_unit"] == "Fahrenheit")
 
         # Config units
-        self.unit_temp = set_unit_temperature(self.cfg.units["temperature_unit"])
+        self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
 
         # Base style
         self.set_base_style(self.set_qss(
