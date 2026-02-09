@@ -44,7 +44,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         self.area_size = max(int(self.wcfg["display_size"]), 20)
@@ -66,13 +65,13 @@ class Realtime(Overlay):
         )
         self.rect_text_yaw = QRectF(
             self.area_size * self.wcfg["yaw_angle_offset_x"] - text_width * 0.5,
-            self.area_size * self.wcfg["yaw_angle_offset_y"] - font_m.height * 0.5 + font_offset,
+            self.area_size * self.wcfg["yaw_angle_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             text_width,
             font_m.height
         )
         self.rect_text_slip = QRectF(
             self.area_size * self.wcfg["slip_angle_offset_x"] - text_width * 0.5,
-            self.area_size * self.wcfg["slip_angle_offset_y"] - font_m.height * 0.5 + font_offset,
+            self.area_size * self.wcfg["slip_angle_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             text_width,
             font_m.height
         )

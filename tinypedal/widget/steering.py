@@ -43,7 +43,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         padx = round(font_m.width * self.wcfg["bar_padding_horizontal"])
@@ -60,7 +59,7 @@ class Realtime(Overlay):
         # Rect
         self.rect_steer = QRectF(0, 0, side_width * 2, self.bar_height)
         self.rect_steerpos = QRectF(0, 0, side_width, self.bar_height)
-        self.rect_text = self.rect_steer.adjusted(text_pad, font_offset, -text_pad, 0)
+        self.rect_text = self.rect_steer.adjusted(text_pad, font_m.voffset, -text_pad, 0)
 
         self.rect_center = QRectF(side_width - 1, 0, 2, self.bar_height)
         self.rect_edge_l = QRectF(0, 0, self.bar_edge, self.bar_height)

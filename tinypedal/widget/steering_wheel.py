@@ -44,7 +44,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         area_size = max(int(self.wcfg["display_size"] / 2) * 2, 10)
@@ -75,7 +74,7 @@ class Realtime(Overlay):
         )
         self.rect_text = QRect(
             area_size * self.wcfg["steering_angle_offset_x"] - text_width * 0.5,
-            area_size * self.wcfg["steering_angle_offset_y"] - font_m.height * 0.5 + font_offset,
+            area_size * self.wcfg["steering_angle_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             text_width,
             font_m.height,
         )

@@ -43,9 +43,18 @@ class Realtime(Overlay):
             self.wcfg["font_weight_gear"]
         )
         self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
-        (font_speed, font_offset, limiter_width, gauge_width, gauge_height, gear_size, speed_size
-         ) = self.set_gauge_size(font)
+        if self.wcfg["show_speed_below_gear"]:
+            font_scale_speed = self.wcfg["font_scale_speed"]
+        else:
+            font_scale_speed = 1
+        font_speed = self.config_font(
+            self.wcfg["font_name"],
+            round(self.wcfg["font_size"] * font_scale_speed),
+            self.wcfg["font_weight_speed"]
+        )
+
         font_rpm = self.config_font(
             self.wcfg["font_name"],
             self.wcfg["font_size_rpm"],
@@ -61,6 +70,8 @@ class Realtime(Overlay):
         self.unit_speed = units.set_unit_speed(self.cfg.units["speed_unit"])
 
         # Gear gauge
+        (limiter_width, gauge_width, gauge_height, gear_size, speed_size
+         ) = self.set_gauge_size(font_m, font_scale_speed)
         self.gauge_color = (
             self.wcfg["bkg_color"],  # 0, -4 flicker
             self.wcfg["rpm_color_safe"],  # 1
@@ -85,12 +96,13 @@ class Realtime(Overlay):
 
         # RPM bar
         if self.wcfg["show_rpm_bar"]:
+            font_rpm_m = self.get_font_metrics(font_rpm)
             self.bar_rpmbar = ProgressBar(
                 self,
                 width=gauge_width,
                 height=max(self.wcfg["rpm_bar_height"], 1),
                 offset_x=self.wcfg["rpm_reading_offset_x"],
-                offset_y=self.calc_font_offset(self.get_font_metrics(font_rpm)),
+                offset_y=font_rpm_m.voffset,
                 font=font_rpm,
                 input_color=self.wcfg["rpm_bar_color"],
                 fg_color=self.wcfg["font_color_rpm"],
@@ -107,6 +119,7 @@ class Realtime(Overlay):
 
         # Battery bar
         if self.wcfg["show_battery_bar"]:
+            font_batt_m = self.get_font_metrics(font_batt)
             self.battbar_color = (
                 self.wcfg["battery_bar_color"],
                 self.wcfg["battery_bar_color_regen"],
@@ -118,7 +131,7 @@ class Realtime(Overlay):
                 width=gauge_width,
                 height=max(self.wcfg["battery_bar_height"], 1),
                 offset_x=self.wcfg["battery_reading_offset_x"],
-                offset_y=self.calc_font_offset(self.get_font_metrics(font_batt)),
+                offset_y=font_batt_m.voffset,
                 font=font_batt,
                 input_color=self.battbar_color[0],
                 fg_color=self.wcfg["font_color_battery"],
@@ -140,7 +153,7 @@ class Realtime(Overlay):
                 self,
                 width=limiter_width,
                 height=gauge_height,
-                font_offset=font_offset,
+                font_offset=font_m.voffset,
                 fg_color=self.wcfg["font_color_speed_limiter"],
                 bg_color=self.wcfg["bkg_color_speed_limiter"],
                 text=self.wcfg["speed_limiter_text"],
@@ -275,21 +288,8 @@ class Realtime(Overlay):
             return 1
         return 0
 
-    def set_gauge_size(self, font):
+    def set_gauge_size(self, font_m, font_scale_speed):
         """Set gauge size"""
-        font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
-        if self.wcfg["show_speed_below_gear"]:
-            font_scale_speed = self.wcfg["font_scale_speed"]
-        else:
-            font_scale_speed = 1
-        font_speed = self.config_font(
-            self.wcfg["font_name"],
-            round(self.wcfg["font_size"] * font_scale_speed),
-            self.wcfg["font_weight_speed"]
-        )
-
-        # Config variable
         inner_gap = self.wcfg["inner_gap"]
         padx = round(font_m.width * self.wcfg["bar_padding_horizontal"])
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
@@ -305,12 +305,11 @@ class Realtime(Overlay):
         if self.wcfg["show_speed_below_gear"]:
             gauge_width = gear_width
             gauge_height = gear_height + (inner_gap + speed_height) * self.wcfg["show_speed"]
-            speed_size = (0, gear_height + inner_gap + font_offset, gear_width, speed_height)
+            speed_size = (0, gear_height + inner_gap + font_m.voffset, gear_width, speed_height)
 
         else:
             gauge_width = gear_width + (inner_gap + speed_width) * self.wcfg["show_speed"]
             gauge_height = gear_height
-            speed_size = (gear_width + inner_gap, font_offset, speed_width, gear_height)
-        gear_size = (0, font_offset, gear_width, gear_height)
-        return (font_speed, font_offset, limiter_width, gauge_width, gauge_height,
-                gear_size, speed_size)
+            speed_size = (gear_width + inner_gap, font_m.voffset, speed_width, gear_height)
+        gear_size = (0, font_m.voffset, gear_width, gear_height)
+        return limiter_width, gauge_width, gauge_height, gear_size, speed_size

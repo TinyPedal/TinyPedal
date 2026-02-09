@@ -45,7 +45,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         self.show_position_in_class = self.wcfg["enable_multi_class_styling"] and self.wcfg["show_position_in_class"]
@@ -57,7 +56,7 @@ class Realtime(Overlay):
 
         self.veh_shape = QRectF(-veh_size_opt * 0.5, -veh_size_opt * 0.5, veh_size_opt, veh_size_opt)
         self.veh_shape_player = QRectF(-veh_size_plr * 0.5, -veh_size_plr * 0.5, veh_size_plr, veh_size_plr)
-        self.veh_text_shape = QRectF(-veh_size_base * 0.5, -veh_size_base * 0.5 + font_offset, veh_size_base, veh_size_base)
+        self.veh_text_shape = QRectF(-veh_size_base * 0.5, -veh_size_base * 0.5 + font_m.voffset, veh_size_base, veh_size_base)
 
         # Config canvas
         self.area_size = max(self.wcfg["area_size"], 100)
@@ -91,7 +90,12 @@ class Realtime(Overlay):
                 self.set_veh_pen_style(self.wcfg["prediction_outline_color"], self.wcfg["prediction_outline_width"]),
                 QPen(self.wcfg["font_color_pitstop_duration"]),
             )
-            self.pit_text_shape = QRectF(-veh_size_base * 0.5 - 2, font_offset - veh_size_opt * 0.5 - veh_size_base - 3, veh_size_base + 4, veh_size_base)
+            self.pit_text_shape = QRectF(
+                -veh_size_base * 0.5 - 2,
+                font_m.voffset - veh_size_opt * 0.5 - veh_size_base - 3,
+                veh_size_base + 4,
+                veh_size_base,
+            )
 
         if self.wcfg["show_proximity_circle"]:
             self.pen_proximity = self.set_veh_pen_style(

@@ -45,7 +45,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         self.display_width = max(self.wcfg["display_width"], 20)
@@ -56,13 +55,13 @@ class Realtime(Overlay):
 
         self.rect_text_elevation = QRectF(
             self.display_width * self.wcfg["elevation_reading_offset_x"] - font_m.width * 5,
-            self.display_height * self.wcfg["elevation_reading_offset_y"] - font_m.height * 0.5 + font_offset,
+            self.display_height * self.wcfg["elevation_reading_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             font_m.width * 10,
             font_m.height
         )
         self.rect_text_scale = QRectF(
             self.display_width * self.wcfg["elevation_scale_offset_x"] - font_m.width * 5,
-            self.display_height * self.wcfg["elevation_scale_offset_y"] - font_m.height * 0.5 + font_offset,
+            self.display_height * self.wcfg["elevation_scale_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             font_m.width * 10,
             font_m.height
         )

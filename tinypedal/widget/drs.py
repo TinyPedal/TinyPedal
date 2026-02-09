@@ -42,7 +42,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         padx = round(font_m.width * self.wcfg["bar_padding_horizontal"])
@@ -59,7 +58,7 @@ class Realtime(Overlay):
 
         # Rect
         self.rect_drs = QRectF(0, 0, drs_width, drs_height)
-        self.rect_text = self.rect_drs.adjusted(0, font_offset, 0, 0)
+        self.rect_text = self.rect_drs.adjusted(0, font_m.voffset, 0, 0)
 
         # Config canvas
         self.resize(drs_width, drs_height)

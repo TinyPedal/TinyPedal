@@ -43,7 +43,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         self.laptime_source = f"lapTime{self.wcfg['deltabest_source']}"
@@ -78,7 +77,7 @@ class Realtime(Overlay):
         self.rect_deltabar = QRectF(0, pos_y1, self.dbar_length * 2, dbar_height)
         self.rect_deltapos = QRectF(0, pos_y1, self.dbar_length, dbar_height)
         self.rect_delta = QRectF(pos_x2, pos_y2, self.delta_width, delta_height)
-        self.rect_text_delta = self.rect_delta.adjusted(0, font_offset, 0, 0)
+        self.rect_text_delta = self.rect_delta.adjusted(0, font_m.voffset, 0, 0)
 
         self.freeze_duration = min(max(self.wcfg["freeze_duration"], 0), 30)
         self.delta_color = self.wcfg["bkg_color_time_gain"], self.wcfg["bkg_color_time_loss"]

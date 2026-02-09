@@ -44,7 +44,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         self.area_size = max(int(self.wcfg["display_size"]), 20)
@@ -70,7 +69,7 @@ class Realtime(Overlay):
             )
         self.veh_text_shape = QRectF(
             -self.veh_size * 0.5,
-            -self.veh_size * 0.5 + font_offset,
+            -self.veh_size * 0.5 + font_m.voffset,
             self.veh_size,
             self.veh_size
         )

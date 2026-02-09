@@ -46,7 +46,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         padx = round(font_m.width * self.wcfg["bar_padding_horizontal"])
@@ -81,7 +80,7 @@ class Realtime(Overlay):
                 padding_x=padx,
                 bar_width=bar_width,
                 bar_height=bar_height,
-                font_offset=font_offset,
+                font_offset=font_m.voffset,
                 input_color=self.wcfg["highlight_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["bkg_color"],

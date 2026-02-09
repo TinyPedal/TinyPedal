@@ -45,7 +45,6 @@ class Realtime(Overlay):
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
-        font_offset = self.calc_font_offset(font_m)
 
         # Config variable
         display_margin = max(int(self.wcfg["display_margin"]), 0)
@@ -80,7 +79,7 @@ class Realtime(Overlay):
 
         # Rect
         self.rect_background = QRect(0, 0, display_width, display_height)
-        self.rect_integrity = self.rect_background.adjusted(0, font_offset, 0, 0)
+        self.rect_integrity = self.rect_background.adjusted(0, font_m.voffset, 0, 0)
         self.rect_impact_cone = QRect(
             display_width * 0.5 - impact_cone_size,
             display_height * 0.5 - impact_cone_size,

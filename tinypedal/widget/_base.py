@@ -262,8 +262,7 @@ class Overlay(Base):
             font.setWeight(getattr(QFont, weight.capitalize()))
         return font
 
-    @staticmethod
-    def get_font_metrics(font: QFont) -> FontMetrics:
+    def get_font_metrics(self, font: QFont) -> FontMetrics:
         """Get font metrics
 
         Args:
@@ -281,9 +280,10 @@ class Overlay(Base):
             leading=font_metrics.leading(),
             capital=font_metrics.capHeight(),
             descent=font_metrics.descent(),
+            voffset=self.__calc_font_offset(font_metrics),
         )
 
-    def calc_font_offset(self, metrics: FontMetrics) -> int:
+    def __calc_font_offset(self, metrics: QFontMetrics) -> int:
         """Calculate auto font vertical offset
 
         Find difference between actual height and height reading
@@ -296,14 +296,14 @@ class Overlay(Base):
         Returns:
             Calculated font offset in pixel.
         """
-        if self.wcfg["enable_auto_font_offset"]:
+        if self.wcfg.get("enable_auto_font_offset", False):
             return (
-                metrics.capital
-                + metrics.descent * 2
-                + metrics.leading * 2
-                - metrics.height
+                metrics.capHeight()
+                + metrics.descent() * 2
+                + metrics.leading() * 2
+                - metrics.height()
             )
-        return self.wcfg["font_offset_vertical"]
+        return self.wcfg.get("font_offset_vertical", 0)
 
     def set_base_style(self, style_sheet: str):
         """Set base style sheet"""

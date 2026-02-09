@@ -39,6 +39,7 @@ class FontMetrics(NamedTuple):
     leading: int = 0
     capital: int = 0
     descent: int = 0
+    voffset: int = 0
 
 
 class ExLabel(QLabel):
