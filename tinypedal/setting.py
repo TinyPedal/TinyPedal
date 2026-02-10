@@ -419,64 +419,66 @@ class Setting:
             next_task:
                 Skip adding save task, run next save task in queue.
         """
-        if not next_task:
-            filename = getattr(self.filename, cfg_type, None)
-            # Check if valid file name
-            if filename is None:
-                logger.error("USERDATA: invalid config type %s, abort saving", cfg_type)
-            # Check if file is locked
-            elif filename in self.user.filelock:
-                logger.info("USERDATA: %s is locked, changes not saved", filename)
-            # Add to save queue
-            elif filename not in self._save_queue:
-                # Save to global config path
-                if cfg_type in (
-                    ConfigType.CONFIG,
-                    ConfigType.FILELOCK,
-                    ConfigType.SHORTCUTS,
-                ):
-                    filepath = self.path.config
-                # Save to settings (preset) path
-                else:
-                    filepath = self.path.settings
-                dict_user = getattr(self.user, cfg_type)
-                self._save_queue[filename] = (filepath, dict_user)
-
-        for queue_filename, queue_filedata in self._save_queue.items():
-            break  # get next file in queue
-        else:
+        self._save_delay = delay
+        if next_task:
+            self._save_delay = 0
             return
 
-        self._save_delay = delay
+        filename = getattr(self.filename, cfg_type, None)
+        if filename in self._save_queue:
+            return
+
+        # Check if valid file name
+        if filename is None:
+            logger.error("USERDATA: invalid config type %s, abort saving", cfg_type)
+        # Check if file is locked
+        elif filename in self.user.filelock:
+            logger.info("USERDATA: %s is locked, changes not saved", filename)
+        # Add to save queue
+        elif filename not in self._save_queue:
+            # Save to global config path
+            if cfg_type in (
+                ConfigType.CONFIG,
+                ConfigType.FILELOCK,
+                ConfigType.SHORTCUTS,
+            ):
+                filepath = self.path.config
+            # Save to settings (preset) path
+            else:
+                filepath = self.path.settings
+            dict_user = getattr(self.user, cfg_type)
+            self._save_queue[filename] = (filepath, dict_user)
+
+        if not self._save_queue:
+            return
 
         if not self.is_saving:
             self.is_saving = True
-            threading.Thread(
-                target=self.__saving,
-                args=(queue_filename, *queue_filedata),
-            ).start()
+            threading.Thread(target=self.__saving).start()
 
-    def __saving(self, filename: str, filepath: str, dict_user: dict):
+    def __saving(self):
         """Saving thread"""
         # Update save delay
         while self._save_delay > 0:
             self._save_delay -= 1
             sleep(0.01)
 
-        save_and_verify_json_file(
-            dict_user=dict_user,
-            filename=filename,
-            filepath=filepath,
-            max_attempts=self.max_saving_attempts,
-        )
+        # Run next save task until queue empty
+        saving_attempts = self.max_saving_attempts
+        while self._save_queue:
+            for filename, (filepath, dict_user) in self._save_queue.items():
+                break  # get next file in queue
 
-        self._save_queue.pop(filename, None)
+            save_and_verify_json_file(
+                dict_user=dict_user,
+                filename=filename,
+                filepath=filepath,
+                max_attempts=saving_attempts,
+            )
+            self._save_queue.pop(filename, None)
+
         self.is_saving = False
         self.version_update += 1
-
-        # Run next save task in save queue if any
-        if self._save_queue:
-            self.save(0, next_task=True)
 
     @property
     def max_saving_attempts(self) -> int:

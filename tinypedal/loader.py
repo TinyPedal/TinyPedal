@@ -89,7 +89,7 @@ def restart():
     # 1 wait unfinished saving
     if cfg.is_saving:
         # Trigger immediate saving from queue
-        cfg.save(0, next_task=True)
+        cfg.save(next_task=True)
         while cfg.is_saving:
             time.sleep(0.01)
     # 2 set restart env for skipping single instance check
@@ -114,7 +114,7 @@ def reload(reload_preset: bool = False):
     # 0 wait unfinished saving
     if cfg.is_saving:
         # Trigger immediate saving from queue
-        cfg.save(0, next_task=True)
+        cfg.save(next_task=True)
         while cfg.is_saving:
             time.sleep(0.01)
     # 1 unload modules
