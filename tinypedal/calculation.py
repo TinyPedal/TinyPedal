@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from math import acos, atan, atan2, ceil, cos, degrees, dist, hypot, radians, sin
 from statistics import fmean
-from typing import Sequence, Tuple
+from typing import Any, Sequence, Tuple
 
 from .const_common import FLOAT_INF
 
@@ -480,7 +480,7 @@ def binary_search_higher_column(
     return end
 
 
-def select_grade(data: Sequence[Sequence], source: float) -> str:
+def select_grade(data: Sequence[Sequence], source: float) -> Any:
     """Select grade (linear lower) from reference list (column: 0 target, 1 value)"""
     last = data[0][1]
     for target, value in data:

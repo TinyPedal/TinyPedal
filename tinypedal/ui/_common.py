@@ -36,7 +36,6 @@ from PySide2.QtGui import (
     qGray,
 )
 from PySide2.QtWidgets import (
-    QApplication,
     QCheckBox,
     QColorDialog,
     QComboBox,
@@ -60,6 +59,7 @@ from ..const_app import APP_NAME
 from ..const_file import FileFilter
 from ..userfile import set_relative_path
 from ..validator import image_exists, is_hex_color, is_string_number
+from . import UIScaler
 
 # Validator
 QVAL_INTEGER = QIntValidator(-999999, 999999)
@@ -93,45 +93,6 @@ def singleton_dialog(dialog_type: str, show_error: bool = True):
         return wrapper
 
     return decorator
-
-
-class UIScaler:
-    """UI font & size scaler"""
-    # Global base font size in point (not counting dpi scale)
-    FONT_POINT = QApplication.font().pointSize()
-    FONT_DPI = QApplication.fontMetrics().fontDpi()
-    # Global base font size in pixel (dpi scaled)
-    # dpi scale = font dpi / 96
-    # px = (pt * dpi scale) * 96 / 72
-    # px = pt * font dpi / 72
-    FONT_DPI_SCALE = FONT_DPI / 96
-    FONT_PIXEL_SCALED = FONT_POINT * FONT_DPI / 72
-
-    @staticmethod
-    def font(scale: float) -> float:
-        """Scale UI font size (points) by base font size (not counting dpi scale)"""
-        return UIScaler.FONT_POINT * scale
-
-    @staticmethod
-    def size(scale: float) -> int:
-        """Scale UI size (pixels) by base font size (scaled with dpi)"""
-        return round(UIScaler.FONT_PIXEL_SCALED * scale)
-
-    @staticmethod
-    def pixel(pixel: int):
-        """Scale pixel size by base font DPI scale"""
-        return round(UIScaler.FONT_DPI_SCALE * pixel)
-
-
-class CompactButton(QPushButton):
-    """Compact button style"""
-
-    def __init__(self, text, parent=None, has_menu=False):
-        super().__init__(text, parent)
-        self.setFixedWidth(
-            self.fontMetrics().boundingRect(text).width()
-            + UIScaler.FONT_PIXEL_SCALED * (1 + has_menu)
-        )
 
 
 class DialogSingleton:
@@ -189,6 +150,17 @@ class DialogSingletonError:
 
     def exec_(self, parent=None):
         self._message(parent)
+
+
+class CompactButton(QPushButton):
+    """Compact button style"""
+
+    def __init__(self, text, parent=None, has_menu=False):
+        super().__init__(text, parent)
+        self.setFixedWidth(
+            self.fontMetrics().boundingRect(text).width()
+            + UIScaler.FONT_PIXEL_SCALED * (1 + has_menu)
+        )
 
 
 class BaseDialog(QDialog):

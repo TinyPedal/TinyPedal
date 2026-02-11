@@ -419,11 +419,11 @@ class Setting:
             next_task:
                 Skip adding save task, run next save task in queue.
         """
-        self._save_delay = delay
         if next_task:
             self._save_delay = 0
             return
 
+        self._save_delay = delay
         filename = getattr(self.filename, cfg_type, None)
         if filename in self._save_queue:
             return

@@ -20,8 +20,38 @@
 Application UI, style
 """
 
+import re
+
 from PySide2.QtGui import QGuiApplication, QPalette
 from PySide2.QtWidgets import QApplication
+
+
+class UIScaler:
+    """UI font & size scaler"""
+    # Global base font size in point (not counting dpi scale)
+    FONT_POINT = QApplication.font().pointSize()
+    FONT_DPI = QApplication.fontMetrics().fontDpi()
+    # Global base font size in pixel (dpi scaled)
+    # dpi scale = font dpi / 96
+    # px = (pt * dpi scale) * 96 / 72
+    # px = pt * font dpi / 72
+    FONT_DPI_SCALE = FONT_DPI / 96
+    FONT_PIXEL_SCALED = FONT_POINT * FONT_DPI / 72
+
+    @classmethod
+    def font(cls, scale: float) -> float:
+        """Scale UI font size (points) by base font size (not counting dpi scale)"""
+        return cls.FONT_POINT * scale
+
+    @classmethod
+    def size(cls, scale: float) -> int:
+        """Scale UI size (pixels) by base font size (scaled with dpi)"""
+        return round(cls.FONT_PIXEL_SCALED * scale)
+
+    @classmethod
+    def pixel(cls, pixel: int):
+        """Scale pixel size by base font DPI scale"""
+        return round(cls.FONT_DPI_SCALE * pixel)
 
 
 def set_style_palette(color_theme: str):
@@ -126,7 +156,8 @@ def set_style_window(base_font_pt: int) -> str:
     color_disabled_highlighted_text = palette.highlightedText().color().name()
     color_disabled_highlight = palette.highlight().color().name()
 
-    style = f"""
+    # Strip off indentation & comment
+    return re.sub(r"\s{4,}|\/\*.*\/", "", f"""
         /* Misc */
         QSizeGrip {{
             image: none;
@@ -376,5 +407,4 @@ def set_style_window(base_font_pt: int) -> str:
         About #labelAppName {{
             font-size: {font_pt_app_name}pt;
         }}
-    """
-    return style
+    """)
