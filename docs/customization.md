@@ -789,6 +789,12 @@ Set a value that will be added (or subtracted if negative) to `font_size` value 
     Font Weight
 Set font weight to replace `font_weight` setting of all widgets. Default selection is `no change`, which no changes will be applied.
 
+    Enable Auto Font Offset
+Enable or disable auto font offset for all widgets. Default selection is `no change`, which no changes will be applied.
+
+    Font Offset Vertical Addend
+Set a value that will be added (or subtracted if negative) to `font_offset_vertical` value of all widgets. Default is `0`, which no changes will be applied.
+
 [**`Back to Top`**](#)
 
 

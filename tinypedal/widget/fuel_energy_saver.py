@@ -40,8 +40,20 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
+
+        font_cap = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"] * 0.8,
+            self.wcfg["font_weight"],
+        )
+        font_cap_m = self.get_font_metrics(font_cap)
 
         # Config variable
         self.pit_bias = self.wcfg["enable_pit_entry_bias"]
@@ -59,37 +71,25 @@ class Realtime(Overlay):
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Target lap row
-        bar_style_lap = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_target_laps"],
-                bg_color=self.wcfg["bkg_color_target_laps"],
-                font_size=int(self.wcfg['font_size'] * 0.8)),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_current_laps"],
-                bg_color=self.wcfg["bkg_color_current_laps"],
-                font_size=int(self.wcfg['font_size'] * 0.8))
-        )
-        self.bars_target_lap = self.set_qlabel(
+        self.bars_target_lap = self.set_rawtext(
+            font=font_cap,
             text=TEXT_PLACEHOLDER,
-            style=bar_style_lap[0],
             width=bar_width,
+            fixed_height=font_cap_m.height,
+            offset_y=font_cap_m.voffset,
+            fg_color=self.wcfg["font_color_target_laps"],
+            bg_color=self.wcfg["bkg_color_target_laps"],
             count=self.total_slot,
             last=-MAX_SECONDS,
         )
         if self.pit_bias:
-            self.bars_target_lap[0].setText("BIAS")
-            self.bars_target_lap[1].setText("LAST")
+            self.bars_target_lap[0].text = "BIAS"
+            self.bars_target_lap[1].text = "LAST"
         else:
-            self.bars_target_lap[0].setText("LAST")
-        self.bars_target_lap[self.center_slot].updateStyle(bar_style_lap[1])
+            self.bars_target_lap[0].text = "LAST"
+        self.bars_target_lap[self.center_slot].fg = self.wcfg["font_color_current_laps"]
+        self.bars_target_lap[self.center_slot].bg = self.wcfg["bkg_color_current_laps"]
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_target_lap,
@@ -98,14 +98,13 @@ class Realtime(Overlay):
         )
 
         # Target consumption row
-        bar_style_target_use = self.set_qss(
-            fg_color=self.wcfg["font_color_target_consumption"],
-            bg_color=self.wcfg["bkg_color_target_consumption"]
-        )
-        self.bars_target_use = self.set_qlabel(
+        self.bars_target_use = self.set_rawtext(
             text=TEXT_PLACEHOLDER,
-            style=bar_style_target_use,
             width=bar_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_target_consumption"],
+            bg_color=self.wcfg["bkg_color_target_consumption"],
             last=-MAX_SECONDS,
             count=self.total_slot,
         )
@@ -118,20 +117,17 @@ class Realtime(Overlay):
 
         # Delat consumption row
         self.delta_color = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_lap_gain"],
-                bg_color=self.wcfg["bkg_color_delta_consumption"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_lap_loss"],
-                bg_color=self.wcfg["bkg_color_delta_consumption"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_delta_consumption"],
-                bg_color=self.wcfg["bkg_color_delta_consumption"])
+            self.wcfg["font_color_lap_gain"],
+            self.wcfg["font_color_lap_loss"],
+            self.wcfg["font_color_delta_consumption"],
         )
-        self.bars_delta = self.set_qlabel(
+        self.bars_delta = self.set_rawtext(
             text=TEXT_PLACEHOLDER,
-            style=self.delta_color[2],
             width=bar_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.delta_color[2],
+            bg_color=self.wcfg["bkg_color_delta_consumption"],
             count=self.total_slot,
             last=-MAX_SECONDS,
         )
@@ -249,7 +245,8 @@ class Realtime(Overlay):
                 use_text = f"{data:.{self.decimals_consumption}f}"[:self.char_width]
             else:
                 use_text = TEXT_PLACEHOLDER
-            target.setText(use_text)
+            target.text = use_text
+            target.update()
 
     def update_delta(self, target, data, energy_type):
         """Delta consumption between target & current"""
@@ -259,27 +256,31 @@ class Realtime(Overlay):
                 if not energy_type:
                     data = self.unit_fuel(data)
                 delta_text = f"{data:+.{self.decimals_delta}f}"[:self.char_width]
-                style = self.delta_color[data >= 0]
+                color_index = (data >= 0)
             else:
                 delta_text = TEXT_PLACEHOLDER
-                style = self.delta_color[2]
-            target.setText(delta_text)
-            target.updateStyle(style)
+                color_index = 2
+            target.text = delta_text
+            target.fg = self.delta_color[color_index]
+            target.update()
 
     def update_total_laps(self, target, data):
         """Total laps"""
         if target.last != data:
             target.last = data
-            target.setText(data)
+            target.text = data
+            target.update()
 
     def update_energy_type(self, target, data):
         """Energy type"""
         if target.last != data:
             target.last = data
-            target.setText(ENERGY_TYPE_ID[data > 0])
+            target.text = ENERGY_TYPE_ID[data > 0]
+            target.update()
 
     def update_pit_bias(self, target, data):
         """Pit entry bias"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:.1%}"[:self.char_width])
+            target.text = f"{data:.1%}"[:self.char_width]
+            target.update()

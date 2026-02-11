@@ -28,7 +28,7 @@ from ..api_control import api
 from ..const_common import TEXT_NA, TEXT_PLACEHOLDER, WHEELS_ZERO
 from ..userfile.heatmap import (
     HEATMAP_DEFAULT_TYRE,
-    load_heatmap_style,
+    load_heatmap_color,
     select_compound_symbol,
     select_tyre_heatmap_name,
 )
@@ -45,8 +45,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -59,24 +64,9 @@ class Realtime(Overlay):
         # Config units
         self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-        bar_style_tcmpd = self.set_qss(
-            fg_color=self.wcfg["font_color_tyre_compound"],
-            bg_color=self.wcfg["bkg_color_tyre_compound"]
-        )
-        bar_style_ctemp = self.set_qss(
-            fg_color=self.wcfg["font_color_carcass"],
-            bg_color=self.wcfg["bkg_color_carcass"]
-        )
-
         # Heatmap style list: 0 - fl, 1 - fr, 2 - rl, 3 - rr
         self.heatmap_styles = 4 * [
-            load_heatmap_style(
+            load_heatmap_color(
                 heatmap_name=self.wcfg["heatmap_name"],
                 default_name=HEATMAP_DEFAULT_TYRE,
                 swap_style=self.wcfg["swap_style"],
@@ -87,10 +77,13 @@ class Realtime(Overlay):
 
         # Tyre carcass temperature
         layout_ctemp = self.set_grid_layout(gap=inner_gap)
-        self.bars_ctemp = self.set_qlabel(
+        self.bars_ctemp = self.set_rawtext(
             text=TEXT_NA,
-            style=bar_style_ctemp,
             width=font_m.width * text_width + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_carcass"],
+            bg_color=self.wcfg["bkg_color_carcass"],
             count=4,
             last=0,
         )
@@ -104,10 +97,13 @@ class Realtime(Overlay):
         )
 
         if self.wcfg["show_tyre_compound"]:
-            self.bars_tcmpd = self.set_qlabel(
+            self.bars_tcmpd = self.set_rawtext(
                 text=TEXT_PLACEHOLDER,
-                style=bar_style_tcmpd,
                 width=font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_tyre_compound"],
+                bg_color=self.wcfg["bkg_color_tyre_compound"],
                 count=2,
             )
             self.set_grid_layout_vert(
@@ -119,30 +115,43 @@ class Realtime(Overlay):
         if self.wcfg["show_rate_of_change"]:
             layout_rtemp = self.set_grid_layout(gap=inner_gap)
             self.bar_style_rtemp = (
-                self.set_qss(
-                    fg_color=self.wcfg["bkg_color_rate_of_change"],
-                    bg_color=self.wcfg["font_color_rate_loss"]),
-                self.set_qss(
-                    fg_color=self.wcfg["bkg_color_rate_of_change"],
-                    bg_color=self.wcfg["font_color_rate_gain"]),
-                self.set_qss(
-                    fg_color=self.wcfg["bkg_color_rate_of_change"],
-                    bg_color=self.wcfg["font_color_rate_of_change"]),
-            ) if self.wcfg["swap_style"] else (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_rate_loss"],
-                    bg_color=self.wcfg["bkg_color_rate_of_change"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_rate_gain"],
-                    bg_color=self.wcfg["bkg_color_rate_of_change"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_rate_of_change"],
-                    bg_color=self.wcfg["bkg_color_rate_of_change"]),
+                (
+                    (
+                        self.wcfg["bkg_color_rate_of_change"],
+                        self.wcfg["font_color_rate_loss"],
+                    ),
+                    (
+                        self.wcfg["bkg_color_rate_of_change"],
+                        self.wcfg["font_color_rate_gain"],
+                    ),
+                    (
+                        self.wcfg["bkg_color_rate_of_change"],
+                        self.wcfg["font_color_rate_of_change"],
+                    ),
+                )
+                if self.wcfg["swap_style"]
+                else (
+                    (
+                        self.wcfg["font_color_rate_loss"],
+                        self.wcfg["bkg_color_rate_of_change"],
+                    ),
+                    (
+                        self.wcfg["font_color_rate_gain"],
+                        self.wcfg["bkg_color_rate_of_change"],
+                    ),
+                    (
+                        self.wcfg["font_color_rate_of_change"],
+                        self.wcfg["bkg_color_rate_of_change"],
+                    ),
+                )
             )
-            self.bars_rdiff = self.set_qlabel(
+            self.bars_rdiff = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_rtemp[2],
                 width=font_m.width * text_width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_rtemp[2][0],
+                bg_color=self.bar_style_rtemp[2][1],
                 count=4,
                 last=0,
             )
@@ -160,10 +169,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_tyre_compound"]:
-                bars_blank = self.set_qlabel(
+                bars_blank = self.set_rawtext(
                     text="",
-                    style=bar_style_tcmpd,
                     width=font_m.width + bar_padx,
+                    fixed_height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.wcfg["font_color_tyre_compound"],
+                    bg_color=self.wcfg["bkg_color_tyre_compound"],
                     count=2,
                 )
                 self.set_grid_layout_vert(
@@ -231,27 +243,30 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data < -100:
-                target.setText(TEXT_PLACEHOLDER)
+                target.text = TEXT_PLACEHOLDER
             else:
-                target.setText(f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}")
-            target.updateStyle(calc.select_grade(self.heatmap_styles[index], data))
+                target.text = f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}"
+            target.fg, target.bg = calc.select_grade(self.heatmap_styles[index], data)
+            target.update()
 
     def update_rdiff(self, target, data):
         """Rate of change"""
         if target.last != data:
             target.last = data
-            target.setText(f"{self.unit_temp(abs(data)):.1f}"[:3].strip("."))
-            target.updateStyle(self.bar_style_rtemp[data > 0])
+            target.text = f"{self.unit_temp(abs(data)):.1f}"[:3].strip(".")
+            target.fg, target.bg = self.bar_style_rtemp[data > 0]
+            target.update()
 
     def update_tcmpd(self, target, data):
         """Tyre compound"""
         if target.last != data:
             target.last = data
-            target.setText(select_compound_symbol(data))
+            target.text = select_compound_symbol(data)
+            target.update()
 
     def update_heatmap(self, compound, index):
         """Heatmap style"""
-        heatmap_style = load_heatmap_style(
+        heatmap_style = load_heatmap_color(
             heatmap_name=select_tyre_heatmap_name(compound),
             default_name=HEATMAP_DEFAULT_TYRE,
             swap_style=self.wcfg["swap_style"],

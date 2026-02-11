@@ -36,8 +36,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         text_def = "00/00"
@@ -58,28 +63,20 @@ class Realtime(Overlay):
         self.prefix_pos_overall = self.wcfg["prefix_position_overall"].ljust(prefix_just)
         self.prefix_pos_inclass = self.wcfg["prefix_position_in_class"].ljust(prefix_just)
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Lap number
         if self.wcfg["show_lap_number"]:
             text_lap_number = f"{self.prefix_lap_number}   0.00/0.00"
             self.bar_style_lap_number = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_lap_number"],
-                    bg_color=self.wcfg["bkg_color_lap_number"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_lap_number"],
-                    bg_color=self.wcfg["bkg_color_maxlap_warn"])
+                self.wcfg["bkg_color_lap_number"],
+                self.wcfg["bkg_color_maxlap_warn"],
             )
-            self.bar_lap_number = self.set_qlabel(
+            self.bar_lap_number = self.set_rawtext(
                 text=text_lap_number,
-                style=self.bar_style_lap_number[0],
                 width=font_m.width * len(text_lap_number) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_lap_number"],
+                bg_color=self.bar_style_lap_number[0],
             )
             self.set_primary_orient(
                 target=self.bar_lap_number,
@@ -89,14 +86,13 @@ class Realtime(Overlay):
         # Position overall
         if self.wcfg["show_position_overall"]:
             text_pos_overall = f"{self.prefix_pos_overall}{text_def: >{self.just_right}}"
-            bar_style_pos_overall = self.set_qss(
-                fg_color=self.wcfg["font_color_position_overall"],
-                bg_color=self.wcfg["bkg_color_position_overall"]
-            )
-            self.bar_pos_overall = self.set_qlabel(
+            self.bar_pos_overall = self.set_rawtext(
                 text=text_pos_overall,
-                style=bar_style_pos_overall,
                 width=font_m.width * len(text_pos_overall) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_position_overall"],
+                bg_color=self.wcfg["bkg_color_position_overall"],
             )
             self.set_primary_orient(
                 target=self.bar_pos_overall,
@@ -106,14 +102,13 @@ class Realtime(Overlay):
         # Position in class
         if self.wcfg["show_position_in_class"]:
             text_pos_inclass = f"{self.prefix_pos_inclass}{text_def: >{self.just_right}}"
-            bar_style_pos_inclass = self.set_qss(
-                fg_color=self.wcfg["font_color_position_in_class"],
-                bg_color=self.wcfg["bkg_color_position_in_class"]
-            )
-            self.bar_pos_inclass = self.set_qlabel(
+            self.bar_pos_inclass = self.set_rawtext(
                 text=text_pos_inclass,
-                style=bar_style_pos_inclass,
                 width=font_m.width * len(text_pos_inclass) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_position_in_class"],
+                bg_color=self.wcfg["bkg_color_position_in_class"],
             )
             self.set_primary_orient(
                 target=self.bar_pos_inclass,
@@ -186,10 +181,12 @@ class Realtime(Overlay):
 
             text_laps_done = f"{lap_num + data:.2f}"[:5]
             text_laps = f"{text_laps_done}/{text_lap_total}"[:12]
-            target.setText(f"{self.prefix_lap_number}{text_laps: >12}")
-            target.updateStyle(self.bar_style_lap_number[lap_num - lap_max >= -1])
+            target.text = f"{self.prefix_lap_number}{text_laps: >12}"
+            target.bg = self.bar_style_lap_number[lap_num - lap_max >= -1]
+            target.update()
 
     def update_position(self, target, place, total, prefix):
         """Driver place & total vehicles"""
         text_pos = f"{place:02.0f}/{total:02.0f}"
-        target.setText(f"{prefix}{text_pos: >{self.just_right}}")
+        target.text = f"{prefix}{text_pos: >{self.just_right}}"
+        target.update()

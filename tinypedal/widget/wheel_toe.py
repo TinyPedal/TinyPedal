@@ -38,28 +38,32 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         if self.wcfg["show_caption"]:
-            bar_style_desc = self.set_qss(
+            font_cap = self.config_font(
+                self.wcfg["font_name"],
+                self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+                self.wcfg["font_weight"],
+            )
+            font_cap_m = self.get_font_metrics(font_cap)
+
+            cap_toe_in = self.set_rawtext(
+                font=font_cap,
+                text=self.wcfg["caption_text"],
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
                 bg_color=self.wcfg["bkg_color_caption"],
-                font_size=int(self.wcfg['font_size'] * 0.8)
-            )
-            cap_toe_in = self.set_qlabel(
-                text=self.wcfg["caption_text"],
-                style=bar_style_desc,
             )
             self.set_primary_orient(
                 target=cap_toe_in,
@@ -71,15 +75,14 @@ class Realtime(Overlay):
             gap_hori=self.wcfg["horizontal_gap"],
             gap_vert=self.wcfg["vertical_gap"],
         )
-        bar_style_toe_in = self.set_qss(
-            fg_color=self.wcfg["font_color_toe_in"],
-            bg_color=self.wcfg["bkg_color_toe_in"]
-        )
         self.decimals_toe_in = max(self.wcfg["decimal_places_toe_in"], 1)
-        self.bars_toe_in = self.set_qlabel(
+        self.bars_toe_in = self.set_rawtext(
             text=TEXT_NA,
-            style=bar_style_toe_in,
             width=font_m.width * (3 + self.decimals_toe_in) + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_toe_in"],
+            bg_color=self.wcfg["bkg_color_toe_in"],
             count=4,
             last=0,
         )
@@ -98,15 +101,14 @@ class Realtime(Overlay):
 
         # Total toe angle
         if self.wcfg["show_total_toe_angle"]:
-            bar_style_total = self.set_qss(
-                fg_color=self.wcfg["font_color_total_toe_angle"],
-                bg_color=self.wcfg["bkg_color_total_toe_angle"]
-            )
             self.decimals_total = max(self.wcfg["decimal_places_total_toe_angle"], 1)
-            self.bars_total = self.set_qlabel(
+            self.bars_total = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_total,
                 width=font_m.width * (2 + self.decimals_total) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_total_toe_angle"],
+                bg_color=self.wcfg["bkg_color_total_toe_angle"],
                 count=2,
                 last=0,
             )
@@ -136,10 +138,12 @@ class Realtime(Overlay):
         """Toe in data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{calc.rad2deg(data):+.{self.decimals_toe_in + 1}f}"[:3 + self.decimals_toe_in])
+            target.text = f"{calc.rad2deg(data):+.{self.decimals_toe_in + 1}f}"[:3 + self.decimals_toe_in]
+            target.update()
 
     def update_total(self, target, data):
         """Total toe angle data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{calc.rad2deg(abs(data)):.{self.decimals_total + 1}f}"[:2 + self.decimals_total])
+            target.text = f"{calc.rad2deg(abs(data)):.{self.decimals_total + 1}f}"[:2 + self.decimals_total]
+            target.update()

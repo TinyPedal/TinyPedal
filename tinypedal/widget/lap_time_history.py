@@ -38,8 +38,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         layout_reversed = self.wcfg["layout"] != 0
@@ -49,30 +54,19 @@ class Realtime(Overlay):
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Laps
         if self.wcfg["show_laps"]:
-            bar_style_laps = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_laps"],
-                    bg_color=self.wcfg["bkg_color_laps"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_last_laps"],
-                    bg_color=self.wcfg["bkg_color_last_laps"])
-            )
-            self.bars_laps = self.set_qlabel(
+            self.bars_laps = self.set_rawtext(
                 text="---",
-                style=bar_style_laps[1],
                 width=font_m.width * 3 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_last_laps"],
+                bg_color=self.wcfg["bkg_color_last_laps"],
                 count=self.history_slot + 1,
             )
-            self.bars_laps[0].updateStyle(bar_style_laps[0])
+            self.bars_laps[0].fg = self.wcfg["font_color_laps"]
+            self.bars_laps[0].bg = self.wcfg["bkg_color_laps"]
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_laps,
@@ -83,23 +77,30 @@ class Realtime(Overlay):
         # Time
         if self.wcfg["show_time"]:
             self.bar_style_time = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_time"],
-                    bg_color=self.wcfg["bkg_color_time"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_last_time"],
-                    bg_color=self.wcfg["bkg_color_last_time"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_invalid_laptime"],
-                    bg_color=self.wcfg["bkg_color_last_time"])
+                (
+                    self.wcfg["font_color_time"],
+                    self.wcfg["bkg_color_time"],
+                ),
+                (
+                    self.wcfg["font_color_last_time"],
+                    self.wcfg["bkg_color_last_time"],
+                ),
+                (
+                    self.wcfg["font_color_invalid_laptime"],
+                    self.wcfg["bkg_color_last_time"],
+                ),
             )
-            self.bars_time = self.set_qlabel(
+            self.bars_time = self.set_rawtext(
                 text=TEXT_NOLAPTIME,
-                style=self.bar_style_time[1],
                 width=font_m.width * 8 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_time[1][0],
+                bg_color=self.bar_style_time[1][1],
                 count=self.history_slot + 1,
             )
-            self.bars_time[0].updateStyle(self.bar_style_time[0])
+            self.bars_time[0].fg = self.bar_style_time[0][0]
+            self.bars_time[0].bg = self.bar_style_time[0][1]
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_time,
@@ -110,20 +111,26 @@ class Realtime(Overlay):
         # Lap time delta
         if self.wcfg["show_delta"]:
             self.bar_style_delta = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_delta"],
-                    bg_color=self.wcfg["bkg_color_delta"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_last_delta"],
-                    bg_color=self.wcfg["bkg_color_last_delta"])
+                (
+                    self.wcfg["font_color_delta"],
+                    self.wcfg["bkg_color_delta"],
+                ),
+                (
+                    self.wcfg["font_color_last_delta"],
+                    self.wcfg["bkg_color_last_delta"],
+                ),
             )
-            self.bars_delta = self.set_qlabel(
+            self.bars_delta = self.set_rawtext(
                 text="--.--",
-                style=self.bar_style_delta[1],
                 width=font_m.width * 5 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_delta[1][0],
+                bg_color=self.bar_style_delta[1][1],
                 count=self.history_slot + 1,
             )
-            self.bars_delta[0].updateStyle(self.bar_style_delta[0])
+            self.bars_delta[0].fg = self.bar_style_delta[0][0]
+            self.bars_delta[0].bg = self.bar_style_delta[0][1]
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_delta,
@@ -133,21 +140,17 @@ class Realtime(Overlay):
 
         # Fuel
         if self.wcfg["show_fuel"]:
-            bar_style_fuel = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_fuel"],
-                    bg_color=self.wcfg["bkg_color_fuel"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_last_fuel"],
-                    bg_color=self.wcfg["bkg_color_last_fuel"])
-            )
-            self.bars_fuel = self.set_qlabel(
+            self.bars_fuel = self.set_rawtext(
                 text="-.--",
-                style=bar_style_fuel[1],
                 width=font_m.width * 4 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_last_fuel"],
+                bg_color=self.wcfg["bkg_color_last_fuel"],
                 count=self.history_slot + 1,
             )
-            self.bars_fuel[0].updateStyle(bar_style_fuel[0])
+            self.bars_fuel[0].fg = self.wcfg["font_color_fuel"]
+            self.bars_fuel[0].bg = self.wcfg["bkg_color_fuel"]
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_fuel,
@@ -157,21 +160,17 @@ class Realtime(Overlay):
 
         # Tyre wear
         if self.wcfg["show_wear"]:
-            bar_style_wear = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_wear"],
-                    bg_color=self.wcfg["bkg_color_wear"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_last_wear"],
-                    bg_color=self.wcfg["bkg_color_last_wear"])
-            )
-            self.bars_wear = self.set_qlabel(
+            self.bars_wear = self.set_rawtext(
                 text="---",
-                style=bar_style_wear[1],
                 width=font_m.width * 3 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_last_wear"],
+                bg_color=self.wcfg["bkg_color_last_wear"],
                 count=self.history_slot + 1,
             )
-            self.bars_wear[0].updateStyle(bar_style_wear[0])
+            self.bars_wear[0].fg = self.wcfg["font_color_wear"]
+            self.bars_wear[0].bg = self.wcfg["bkg_color_wear"]
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_wear,
@@ -220,31 +219,36 @@ class Realtime(Overlay):
         """Laps data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:03.0f}"[:3])
+            target.text = f"{data:03.0f}"[:3]
+            target.update()
 
     def update_time(self, target, data):
         """Time data"""
         if target.last != data:
             target.last = data
-            target.setText(calc.sec2laptime_full(data)[:8])
+            target.text = calc.sec2laptime_full(data)[:8]
+            target.update()
 
     def update_delta(self, target, data):
         """Delta data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{calc.sym_max(data, 99.9):+.3f}"[:5])
+            target.text = f"{calc.sym_max(data, 99.9):+.3f}"[:5]
+            target.update()
 
     def update_fuel(self, target, data):
         """Fuel data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:04.2f}"[:4])
+            target.text = f"{data:04.2f}"[:4]
+            target.update()
 
     def update_wear(self, target, data):
         """Wear data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:03.1f}"[:3])
+            target.text = f"{data:03.1f}"[:3]
+            target.update()
 
     def update_laps_history(self, dataset):
         """Laps history data"""
@@ -263,9 +267,10 @@ class Realtime(Overlay):
                 self.bars_laps[index].setHidden(hidden)
 
             if self.wcfg["show_time"]:
-                self.update_time(self.bars_time[index], data.lapTimeLast)
                 invalid = (2 - data.isValidLap) if (data.lapTimeLast > 0) else 1
-                self.bars_time[index].updateStyle(self.bar_style_time[invalid])
+                self.bars_time[index].fg = self.bar_style_time[invalid][0]
+                self.bars_time[index].bg = self.bar_style_time[invalid][1]
+                self.update_time(self.bars_time[index], data.lapTimeLast)
                 self.bars_time[index].setHidden(hidden)
 
             if self.wcfg["show_delta"]:

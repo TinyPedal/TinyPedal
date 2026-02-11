@@ -34,7 +34,7 @@ class WeatherNode(NamedTuple):
     start_percent: float = MAX_SECONDS
     sky_type: int = -1
     temperature: float = ABS_ZERO_CELSIUS
-    rain_chance: float = -1.0
+    rain_chance: float = -1.0  # fraction
 
 
 FORECAST_DEFAULT = (WeatherNode(),)
@@ -48,8 +48,8 @@ def forecast_rf2(data: dict) -> tuple[WeatherNode, ...]:
             WeatherNode(
                 start_percent=round(index * 0.2, 1),
                 sky_type=data[node]["WNV_SKY"]["currentValue"],
-                temperature=round(data[node]["WNV_TEMPERATURE"]["currentValue"]),
-                rain_chance=round(data[node]["WNV_RAIN_CHANCE"]["currentValue"]),
+                temperature=data[node]["WNV_TEMPERATURE"]["currentValue"],
+                rain_chance=data[node]["WNV_RAIN_CHANCE"]["currentValue"] * 0.01,
             )
             for index, node in enumerate(FORECAST_NODES_RF2)
         )

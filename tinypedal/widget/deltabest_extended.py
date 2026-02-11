@@ -35,8 +35,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -61,24 +66,16 @@ class Realtime(Overlay):
         self.prefix_stbest = self.wcfg["prefix_stint_deltabest"].ljust(prefix_just)
         self.prefix_labest = self.wcfg["prefix_deltalast"].ljust(prefix_just)
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # All time deltabest
         if self.wcfg["show_all_time_deltabest"]:
             text_atbest = f"{self.prefix_atbest}{text_def}"
-            bar_style_atbest = self.set_qss(
-                fg_color=self.wcfg["font_color_all_time_deltabest"],
-                bg_color=self.wcfg["bkg_color_all_time_deltabest"]
-            )
-            self.bar_atbest = self.set_qlabel(
+            self.bar_atbest = self.set_rawtext(
                 text=text_atbest,
-                style=bar_style_atbest,
                 width=font_m.width * len(text_atbest) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_all_time_deltabest"],
+                bg_color=self.wcfg["bkg_color_all_time_deltabest"],
                 last=0,
             )
             self.set_primary_orient(
@@ -89,14 +86,13 @@ class Realtime(Overlay):
         # Session deltabest
         if self.wcfg["show_session_deltabest"]:
             text_ssbest = f"{self.prefix_ssbest}{text_def}"
-            bar_style_ssbest = self.set_qss(
-                fg_color=self.wcfg["font_color_session_deltabest"],
-                bg_color=self.wcfg["bkg_color_session_deltabest"]
-            )
-            self.bar_ssbest = self.set_qlabel(
+            self.bar_ssbest = self.set_rawtext(
                 text=text_ssbest,
-                style=bar_style_ssbest,
                 width=font_m.width * len(text_ssbest) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_session_deltabest"],
+                bg_color=self.wcfg["bkg_color_session_deltabest"],
                 last=0,
             )
             self.set_primary_orient(
@@ -107,14 +103,13 @@ class Realtime(Overlay):
         # Stint deltabest
         if self.wcfg["show_stint_deltabest"]:
             text_stbest = f"{self.prefix_stbest}{text_def}"
-            bar_style_stbest = self.set_qss(
-                fg_color=self.wcfg["font_color_stint_deltabest"],
-                bg_color=self.wcfg["bkg_color_stint_deltabest"]
-            )
-            self.bar_stbest = self.set_qlabel(
+            self.bar_stbest = self.set_rawtext(
                 text=text_stbest,
-                style=bar_style_stbest,
                 width=font_m.width * len(text_stbest) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_stint_deltabest"],
+                bg_color=self.wcfg["bkg_color_stint_deltabest"],
                 last=0,
             )
             self.set_primary_orient(
@@ -125,14 +120,13 @@ class Realtime(Overlay):
         # Deltalast
         if self.wcfg["show_deltalast"]:
             text_labest = f"{self.prefix_labest}{text_def}"
-            bar_style_labest = self.set_qss(
-                fg_color=self.wcfg["font_color_deltalast"],
-                bg_color=self.wcfg["bkg_color_deltalast"]
-            )
-            self.bar_labest = self.set_qlabel(
+            self.bar_labest = self.set_rawtext(
                 text=text_labest,
-                style=bar_style_labest,
                 width=font_m.width * len(text_labest) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_deltalast"],
+                bg_color=self.wcfg["bkg_color_deltalast"],
                 last=0,
             )
             self.set_primary_orient(
@@ -187,4 +181,5 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             text = f"{calc.sym_max(data, self.delta_display_range): >+{self.max_padding}.{self.decimals}f}"[:self.max_padding]
-            target.setText(f"{prefix}{text}")
+            target.text = f"{prefix}{text}"
+            target.update()

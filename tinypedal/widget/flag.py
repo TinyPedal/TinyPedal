@@ -38,8 +38,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -50,30 +55,29 @@ class Realtime(Overlay):
         self.unit_dist = units.set_unit_distance(self.cfg.units["distance_unit"])
         self.symbol_dist = units.set_symbol_distance(self.cfg.units["distance_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Pit status
         if self.wcfg["show_pit_timer"]:
             self.bar_style_pit_timer = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_pit_timer"],
-                    bg_color=self.wcfg["bkg_color_pit_timer"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_pit_timer_stopped"],
-                    bg_color=self.wcfg["bkg_color_pit_timer_stopped"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_pit_closed"],
-                    bg_color=self.wcfg["bkg_color_pit_closed"])
+                (
+                    self.wcfg["font_color_pit_timer"],
+                    self.wcfg["bkg_color_pit_timer"],
+                ),
+                (
+                    self.wcfg["font_color_pit_timer_stopped"],
+                    self.wcfg["bkg_color_pit_timer_stopped"],
+                ),
+                (
+                    self.wcfg["font_color_pit_closed"],
+                    self.wcfg["bkg_color_pit_closed"],
+                ),
             )
-            self.bar_pit_timer = self.set_qlabel(
+            self.bar_pit_timer = self.set_rawtext(
                 text="PITST0P",
-                style=self.bar_style_pit_timer[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_pit_timer[0][0],
+                bg_color=self.bar_style_pit_timer[0][1],
             )
             self.set_primary_orient(
                 target=self.bar_pit_timer,
@@ -82,14 +86,13 @@ class Realtime(Overlay):
 
         # Low fuel warning
         if self.wcfg["show_low_fuel"]:
-            bar_style_lowfuel = self.set_qss(
-                fg_color=self.wcfg["font_color_low_fuel"],
-                bg_color=self.wcfg["bkg_color_low_fuel"]
-            )
-            self.bar_lowfuel = self.set_qlabel(
+            self.bar_lowfuel = self.set_rawtext(
                 text="LOWFUEL",
-                style=bar_style_lowfuel,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_low_fuel"],
+                bg_color=self.wcfg["bkg_color_low_fuel"],
             )
             self.set_primary_orient(
                 target=self.bar_lowfuel,
@@ -98,14 +101,13 @@ class Realtime(Overlay):
 
         # Speed limiter
         if self.wcfg["show_speed_limiter"]:
-            bar_style_limiter = self.set_qss(
-                fg_color=self.wcfg["font_color_speed_limiter"],
-                bg_color=self.wcfg["bkg_color_speed_limiter"]
-            )
-            self.bar_limiter = self.set_qlabel(
+            self.bar_limiter = self.set_rawtext(
                 text=self.wcfg["speed_limiter_text"],
-                style=bar_style_limiter,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_speed_limiter"],
+                bg_color=self.wcfg["bkg_color_speed_limiter"],
             )
             self.set_primary_orient(
                 target=self.bar_limiter,
@@ -114,14 +116,13 @@ class Realtime(Overlay):
 
         # Yellow flag
         if self.wcfg["show_yellow_flag"]:
-            bar_style_yellowflag = self.set_qss(
-                fg_color=self.wcfg["font_color_yellow_flag"],
-                bg_color=self.wcfg["bkg_color_yellow_flag"]
-            )
-            self.bar_yellowflag = self.set_qlabel(
+            self.bar_yellowflag = self.set_rawtext(
                 text="YELLOW",
-                style=bar_style_yellowflag,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_yellow_flag"],
+                bg_color=self.wcfg["bkg_color_yellow_flag"],
             )
             self.set_primary_orient(
                 target=self.bar_yellowflag,
@@ -130,14 +131,13 @@ class Realtime(Overlay):
 
         # Blue flag
         if self.wcfg["show_blue_flag"]:
-            bar_style_blueflag = self.set_qss(
-                fg_color=self.wcfg["font_color_blue_flag"],
-                bg_color=self.wcfg["bkg_color_blue_flag"]
-            )
-            self.bar_blueflag = self.set_qlabel(
+            self.bar_blueflag = self.set_rawtext(
                 text="BLUE",
-                style=bar_style_blueflag,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_blue_flag"],
+                bg_color=self.wcfg["bkg_color_blue_flag"],
             )
             self.set_primary_orient(
                 target=self.bar_blueflag,
@@ -147,17 +147,16 @@ class Realtime(Overlay):
         # Start lights
         if self.wcfg["show_startlights"]:
             self.bar_style_startlights = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_startlights"],
-                    bg_color=self.wcfg["bkg_color_red_lights"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_startlights"],
-                    bg_color=self.wcfg["bkg_color_green_flag"])
+                self.wcfg["bkg_color_red_lights"],
+                self.wcfg["bkg_color_green_flag"],
             )
-            self.bar_startlights = self.set_qlabel(
+            self.bar_startlights = self.set_rawtext(
                 text="SLIGHTS",
-                style=self.bar_style_startlights[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_startlights"],
+                bg_color=self.bar_style_startlights[0],
             )
             self.set_primary_orient(
                 target=self.bar_startlights,
@@ -166,14 +165,13 @@ class Realtime(Overlay):
 
         # Incoming traffic
         if self.wcfg["show_traffic"]:
-            bar_style_traffic = self.set_qss(
-                fg_color=self.wcfg["font_color_traffic"],
-                bg_color=self.wcfg["bkg_color_traffic"]
-            )
-            self.bar_traffic = self.set_qlabel(
+            self.bar_traffic = self.set_rawtext(
                 text="TRAFFIC",
-                style=bar_style_traffic,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_traffic"],
+                bg_color=self.wcfg["bkg_color_traffic"],
             )
             self.set_primary_orient(
                 target=self.bar_traffic,
@@ -182,14 +180,13 @@ class Realtime(Overlay):
 
         # Pit request
         if self.wcfg["show_pit_request"]:
-            bar_style_pit_request = self.set_qss(
-                fg_color=self.wcfg["font_color_pit_request"],
-                bg_color=self.wcfg["bkg_color_pit_request"]
-            )
-            self.bar_pit_request = self.set_qlabel(
+            self.bar_pit_request = self.set_rawtext(
                 text="PIT REQ",
-                style=bar_style_pit_request,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_pit_request"],
+                bg_color=self.wcfg["bkg_color_pit_request"],
             )
             self.set_primary_orient(
                 target=self.bar_pit_request,
@@ -199,17 +196,22 @@ class Realtime(Overlay):
         # Finish state
         if self.wcfg["show_finish_state"]:
             self.bar_style_finish_state = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_finish"],
-                    bg_color=self.wcfg["bkg_color_finish"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_disqualify"],
-                    bg_color=self.wcfg["bkg_color_disqualify"])
+                (
+                    self.wcfg["font_color_finish"],
+                    self.wcfg["bkg_color_finish"],
+                ),
+                (
+                    self.wcfg["font_color_disqualify"],
+                    self.wcfg["bkg_color_disqualify"],
+                ),
             )
-            self.bar_finish_state = self.set_qlabel(
+            self.bar_finish_state = self.set_rawtext(
                 text="FINISH",
-                style=self.bar_style_finish_state[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_finish_state[0][0],
+                bg_color=self.bar_style_finish_state[0][1],
             )
             self.set_primary_orient(
                 target=self.bar_finish_state,
@@ -294,48 +296,60 @@ class Realtime(Overlay):
             target.last = data
             if data != MAX_SECONDS:
                 if data < 0:  # finished pits
-                    color = self.bar_style_pit_timer[1]
+                    color_index = 1
                     state = f"F{-data: >6.2f}"[:7]
                 elif api.read.session.pit_open():
-                    color = self.bar_style_pit_timer[0]
+                    color_index = 0
                     state = f"P{data: >6.2f}"[:7]
                 else:  # pit closed
-                    color = self.bar_style_pit_timer[2]
+                    color_index = 2
                     state = self.wcfg["pit_closed_text"]
-                target.setText(state)
-                target.updateStyle(color)
-                target.show()
+                target.text = state
+                target.fg, target.bg = self.bar_style_pit_timer[color_index]
+                target.update()
+                hidden = False
             else:
-                target.hide()
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     def update_lowfuel(self, target, data):
         """Low fuel warning"""
         if target.last != data:
             target.last = data
             if data != "":
-                target.setText(data)
-                target.show()
+                target.text = data
+                target.update()
+                hidden = False
             else:
-                target.hide()
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     def update_limiter(self, target, data):
         """Speed limiter"""
         if target.last != data:
             target.last = data
-            if data == 1:
-                target.show()
-            else:
-                target.hide()
+            target.setHidden(not data)
 
     def update_blueflag(self, target, data):
         """Blue flag"""
         if target.last != data:
             target.last = data
             if data != MAX_SECONDS:
-                target.setText(f"BLUE{data:3.0f}"[:7])
-                target.show()
+                target.text = f"BLUE{data:3.0f}"[:7]
+                target.update()
+                hidden = False
             else:
-                target.hide()
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     def update_yellowflag(self, target, data):
         """Yellow flag"""
@@ -343,60 +357,87 @@ class Realtime(Overlay):
             target.last = data
             if data != MAX_SECONDS:
                 text = f"{self.unit_dist(data):+.0f}{self.symbol_dist}"
-                target.setText(f"Y{text: >6}"[:7])
-                target.show()
+                target.text = f"Y{text: >6}"[:7]
+                target.update()
+                hidden = False
             else:
-                target.hide()
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     def update_startlights(self, target, data):
         """Start lights"""
         if target.last != data:
             target.last = data
             if data > 0:
-                target.setText(f"{self.wcfg['red_lights_text'][:6]: <6}{data}")
-                target.updateStyle(self.bar_style_startlights[0])
-                target.show()
+                target.text = f"{self.wcfg['red_lights_text'][:6]: <6}{data}"
+                target.bg = self.bar_style_startlights[0]
+                target.update()
+                hidden = False
             elif data == 0:
-                target.setText(self.wcfg["green_flag_text"])
-                target.updateStyle(self.bar_style_startlights[1])
-                target.show()
+                target.text = self.wcfg["green_flag_text"]
+                target.bg = self.bar_style_startlights[1]
+                target.update()
+                hidden = False
             else:
-                target.hide()
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     def update_traffic(self, target, data):
         """Incoming traffic"""
         if target.last != data:
             target.last = data
             if data != MAX_SECONDS:
-                target.setText(f"≥{data: >5.1f}s"[:7])
-                target.show()
+                target.text = f"≥{data: >5.1f}s"[:7]
+                target.update()
+                hidden = False
             else:
-                target.hide()
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     def update_pit_request(self, target, data):
         """Pit request"""
         if target.last != data:
             target.last = data
             if data != "":
-                target.setText(data)
-                target.show()
+                target.text = data
+                target.update()
+                hidden = False
             else:
-                target.hide()
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     def update_finish_state(self, target, data):
         """Finish state"""
         if target.last != data:
             target.last = data
             if data == 1:
-                target.setText(self.wcfg["finish_text"])
-                target.updateStyle(self.bar_style_finish_state[0])
-                target.show()
+                target.text = self.wcfg["finish_text"]
+                target.fg, target.bg = self.bar_style_finish_state[0]
+                target.update()
+                hidden = False
             elif data == 3:
-                target.setText(self.wcfg["disqualify_text"])
-                target.updateStyle(self.bar_style_finish_state[1])
-                target.show()
+                target.text = self.wcfg["disqualify_text"]
+                target.fg, target.bg = self.bar_style_finish_state[1]
+                target.update()
+                hidden = False
             else:
-                target.hide()
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     # Additional methods
     def is_lowfuel(self, in_race):

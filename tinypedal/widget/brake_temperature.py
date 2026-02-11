@@ -28,7 +28,7 @@ from ..api_control import api
 from ..const_common import TEXT_NA, TEXT_PLACEHOLDER
 from ..userfile.heatmap import (
     HEATMAP_DEFAULT_BRAKE,
-    load_heatmap_style,
+    load_heatmap_color,
     select_brake_heatmap_name,
     set_predefined_brake_name,
 )
@@ -45,8 +45,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -59,16 +64,9 @@ class Realtime(Overlay):
         # Config units
         self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Heatmap style list: 0 - fl, 1 - fr, 2 - rl, 3 - rr
         self.heatmap_styles = 4 * [
-            load_heatmap_style(
+            load_heatmap_color(
                 heatmap_name=self.wcfg["heatmap_name"],
                 default_name=HEATMAP_DEFAULT_BRAKE,
                 swap_style=not self.wcfg["swap_style"],
@@ -79,14 +77,13 @@ class Realtime(Overlay):
 
         # Brake temperature
         layout_btemp = self.set_grid_layout(gap=inner_gap)
-        bar_style_btemp = self.set_qss(
-            fg_color=self.wcfg["font_color_temperature"],
-            bg_color=self.wcfg["bkg_color_temperature"]
-        )
-        self.bars_btemp = self.set_qlabel(
+        self.bars_btemp = self.set_rawtext(
             text=TEXT_NA,
-            style=bar_style_btemp,
             width=font_m.width * text_width + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_temperature"],
+            bg_color=self.wcfg["bkg_color_temperature"],
             count=4,
             last=0,
         )
@@ -102,14 +99,13 @@ class Realtime(Overlay):
         # Average brake temperature
         if self.wcfg["show_average"]:
             layout_btavg = self.set_grid_layout(gap=inner_gap)
-            bar_style_btavg = self.set_qss(
-                fg_color=self.wcfg["font_color_average"],
-                bg_color=self.wcfg["bkg_color_average"]
-            )
-            self.bars_btavg = self.set_qlabel(
+            self.bars_btavg = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_btavg,
                 width=font_m.width * text_width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_average"],
+                bg_color=self.wcfg["bkg_color_average"],
                 count=4,
                 last=0,
             )
@@ -174,19 +170,21 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data < -100:
-                target.setText(TEXT_PLACEHOLDER)
+                target.text = TEXT_PLACEHOLDER
             else:
-                target.setText(f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}")
-            target.updateStyle(calc.select_grade(self.heatmap_styles[index], data))
+                target.text = f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}"
+            target.fg, target.bg = calc.select_grade(self.heatmap_styles[index], data)
+            target.update()
 
     def update_btavg(self, target, data):
         """Brake average temperature"""
         if target.last != data:
             target.last = data
             if data < -100:
-                target.setText(TEXT_PLACEHOLDER)
+                target.text = TEXT_PLACEHOLDER
             else:
-                target.setText(f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}")
+                target.text = f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}"
+            target.update()
 
     # Additional methods
     def update_heatmap(self, class_name: str, vehicle_name: str):
@@ -197,14 +195,14 @@ class Realtime(Overlay):
         heatmap_r = select_brake_heatmap_name(
             set_predefined_brake_name(class_name, vehicle_name, False)
         )
-        heatmap_style_f = load_heatmap_style(
+        heatmap_style_f = load_heatmap_color(
             heatmap_name=heatmap_f,
             default_name=HEATMAP_DEFAULT_BRAKE,
             swap_style=not self.wcfg["swap_style"],
             fg_color=self.wcfg["font_color_temperature"],
             bg_color=self.wcfg["bkg_color_temperature"],
         )
-        heatmap_style_r = load_heatmap_style(
+        heatmap_style_r = load_heatmap_color(
             heatmap_name=heatmap_r,
             default_name=HEATMAP_DEFAULT_BRAKE,
             swap_style=not self.wcfg["swap_style"],

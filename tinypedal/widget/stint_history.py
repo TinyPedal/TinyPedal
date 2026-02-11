@@ -40,8 +40,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         layout_reversed = self.wcfg["layout"] != 0
@@ -52,29 +57,18 @@ class Realtime(Overlay):
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Tyre compound
-        bar_style_cmpd = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_tyre"],
-                bg_color=self.wcfg["bkg_color_tyre"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_last_stint_tyre"],
-                bg_color=self.wcfg["bkg_color_last_stint_tyre"])
-        )
-        self.bars_cmpd = self.set_qlabel(
+        self.bars_cmpd = self.set_rawtext(
             text="--",
-            style=bar_style_cmpd[1],
             width=font_m.width * 2 + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_last_stint_tyre"],
+            bg_color=self.wcfg["bkg_color_last_stint_tyre"],
             count=stint_slot + 1,
         )
-        self.bars_cmpd[0].updateStyle(bar_style_cmpd[0])
+        self.bars_cmpd[0].fg = self.wcfg["font_color_tyre"]
+        self.bars_cmpd[0].bg = self.wcfg["bkg_color_tyre"]
         self.set_grid_layout_table_column(
             layout=layout,
             targets=self.bars_cmpd,
@@ -83,21 +77,17 @@ class Realtime(Overlay):
         )
 
         # Laps
-        bar_style_laps = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_laps"],
-                bg_color=self.wcfg["bkg_color_laps"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_last_stint_laps"],
-                bg_color=self.wcfg["bkg_color_last_stint_laps"])
-        )
-        self.bars_laps = self.set_qlabel(
+        self.bars_laps = self.set_rawtext(
             text="---",
-            style=bar_style_laps[1],
             width=font_m.width * 3 + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_last_stint_laps"],
+            bg_color=self.wcfg["bkg_color_last_stint_laps"],
             count=stint_slot + 1,
         )
-        self.bars_laps[0].updateStyle(bar_style_laps[0])
+        self.bars_laps[0].fg = self.wcfg["font_color_laps"]
+        self.bars_laps[0].bg = self.wcfg["bkg_color_laps"]
         self.set_grid_layout_table_column(
             layout=layout,
             targets=self.bars_laps,
@@ -106,21 +96,17 @@ class Realtime(Overlay):
         )
 
         # Time
-        bar_style_time = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_time"],
-                bg_color=self.wcfg["bkg_color_time"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_last_stint_time"],
-                bg_color=self.wcfg["bkg_color_last_stint_time"])
-        )
-        self.bars_time = self.set_qlabel(
+        self.bars_time = self.set_rawtext(
             text="--:--",
-            style=bar_style_time[1],
             width=font_m.width * 5 + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_last_stint_time"],
+            bg_color=self.wcfg["bkg_color_last_stint_time"],
             count=stint_slot + 1,
         )
-        self.bars_time[0].updateStyle(bar_style_time[0])
+        self.bars_time[0].fg = self.wcfg["font_color_time"]
+        self.bars_time[0].bg = self.wcfg["bkg_color_time"]
         self.set_grid_layout_table_column(
             layout=layout,
             targets=self.bars_time,
@@ -129,21 +115,17 @@ class Realtime(Overlay):
         )
 
         # Fuel
-        bar_style_fuel = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_fuel"],
-                bg_color=self.wcfg["bkg_color_fuel"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_last_stint_fuel"],
-                bg_color=self.wcfg["bkg_color_last_stint_fuel"])
-        )
-        self.bars_fuel = self.set_qlabel(
+        self.bars_fuel = self.set_rawtext(
             text="---.-",
-            style=bar_style_fuel[1],
             width=font_m.width * 5 + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_last_stint_fuel"],
+            bg_color=self.wcfg["bkg_color_last_stint_fuel"],
             count=stint_slot + 1,
         )
-        self.bars_fuel[0].updateStyle(bar_style_fuel[0])
+        self.bars_fuel[0].fg = self.wcfg["font_color_fuel"]
+        self.bars_fuel[0].bg = self.wcfg["bkg_color_fuel"]
         self.set_grid_layout_table_column(
             layout=layout,
             targets=self.bars_fuel,
@@ -152,21 +134,17 @@ class Realtime(Overlay):
         )
 
         # Tyre wear
-        bar_style_wear = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_wear"],
-                bg_color=self.wcfg["bkg_color_wear"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_last_stint_wear"],
-                bg_color=self.wcfg["bkg_color_last_stint_wear"])
-        )
-        self.bars_wear = self.set_qlabel(
+        self.bars_wear = self.set_rawtext(
             text="---",
-            style=bar_style_wear[1],
             width=font_m.width * 3 + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_last_stint_wear"],
+            bg_color=self.wcfg["bkg_color_last_stint_wear"],
             count=stint_slot + 1,
         )
-        self.bars_wear[0].updateStyle(bar_style_wear[0])
+        self.bars_wear[0].fg = self.wcfg["font_color_wear"]
+        self.bars_wear[0].bg = self.wcfg["bkg_color_wear"]
         self.set_grid_layout_table_column(
             layout=layout,
             targets=self.bars_wear,
@@ -258,31 +236,36 @@ class Realtime(Overlay):
         """Compound data"""
         if target.last != data:
             target.last = data
-            target.setText(data)
+            target.text = data
+            target.update()
 
     def update_laps(self, target, data):
         """Laps data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:03.0f}"[:3])
+            target.text = f"{data:03.0f}"[:3]
+            target.update()
 
     def update_time(self, target, data):
         """Time data"""
         if target.last != data:
             target.last = data
-            target.setText(calc.sec2stinttime(data)[:5])
+            target.text = calc.sec2stinttime(data)[:5]
+            target.update()
 
     def update_fuel(self, target, data):
         """Fuel data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:05.1f}"[:5])
+            target.text = f"{data:05.1f}"[:5]
+            target.update()
 
     def update_wear(self, target, data):
         """Wear data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:02.0f}%"[:3])
+            target.text = f"{data:02.0f}%"[:3]
+            target.update()
 
     def update_stint_history(self, new_stint_data=None):
         """Stint history data"""

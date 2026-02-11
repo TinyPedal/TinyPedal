@@ -35,56 +35,66 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Battery charge
         if self.wcfg["show_battery_charge"]:
             self.bar_style_charge = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_battery_cooldown"],  # 0 cooldown
-                    bg_color=self.wcfg["bkg_color_battery_cooldown"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_battery_charge"],  # 1 ready
-                    bg_color=self.wcfg["bkg_color_battery_charge"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_battery_charge"],  # 2 drain
-                    bg_color=self.wcfg["bkg_color_battery_drain"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_battery_charge"],  # 3 regen
-                    bg_color=self.wcfg["bkg_color_battery_regen"])
+                (
+                    self.wcfg["font_color_battery_cooldown"],  # 0 cooldown
+                    self.wcfg["bkg_color_battery_cooldown"],
+                ),
+                (
+                    self.wcfg["font_color_battery_charge"],  # 1 ready
+                    self.wcfg["bkg_color_battery_charge"],
+                ),
+                (
+                    self.wcfg["font_color_battery_charge"],  # 2 drain
+                    self.wcfg["bkg_color_battery_drain"],
+                ),
+                (
+                    self.wcfg["font_color_battery_charge"],  # 3 regen
+                    self.wcfg["bkg_color_battery_regen"],
+                ),
             )
-            self.bar_charge = self.set_qlabel(
+            self.bar_charge = self.set_rawtext(
                 text="P2P",
-                style=self.bar_style_charge[1],
                 width=font_m.width * 3 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_charge[1][0],
+                bg_color=self.bar_style_charge[1][1],
             )
             layout.addWidget(self.bar_charge, 0, self.wcfg["column_index_battery_charge"])
 
         # Activation timer
         if self.wcfg["show_activation_timer"]:
             self.bar_style_timer = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_activation_timer"],
-                    bg_color=self.wcfg["bkg_color_activation_timer"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_activation_cooldown"],
-                    bg_color=self.wcfg["bkg_color_activation_cooldown"])
+                (
+                    self.wcfg["font_color_activation_timer"],
+                    self.wcfg["bkg_color_activation_timer"],
+                ),
+                (
+                    self.wcfg["font_color_activation_cooldown"],
+                    self.wcfg["bkg_color_activation_cooldown"],
+                ),
             )
-            self.bar_timer = self.set_qlabel(
+            self.bar_timer = self.set_rawtext(
                 text="0.00",
-                style=self.bar_style_timer[0],
                 width=font_m.width * 4 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_timer[0][0],
+                bg_color=self.bar_style_timer[0][1],
             )
             layout.addWidget(self.bar_timer, 0, self.wcfg["column_index_activation_timer"])
 
@@ -118,12 +128,14 @@ class Realtime(Overlay):
                 format_text = f"±{data[0]:02.0f}"
             else:
                 format_text = "MAX"
-            target.setText(format_text)
-            target.updateStyle(self.bar_style_charge[data[1]])
+            target.text = format_text
+            target.fg, target.bg = self.bar_style_charge[data[1]]
+            target.update()
 
     def update_active_timer(self, target, data):
         """P2P activation timer"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data[0]:.2f}"[:4])
-            target.updateStyle(self.bar_style_timer[data[1] != 2])
+            target.text = f"{data[0]:.2f}"[:4]
+            target.fg, target.bg = self.bar_style_timer[data[1] != 2]
+            target.update()

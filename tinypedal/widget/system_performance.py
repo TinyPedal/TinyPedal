@@ -39,8 +39,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -56,24 +61,16 @@ class Realtime(Overlay):
         self.prefix_sys = self.wcfg["prefix_system"].ljust(prefix_just)
         self.prefix_app = self.wcfg["prefix_tinypedal"].ljust(prefix_just)
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # System
         if self.wcfg["show_system_performance"]:
             text_system = f"{self.prefix_sys}0.00% 0.00GB"
-            bar_style_system = self.set_qss(
-                fg_color=self.wcfg["font_color_system"],
-                bg_color=self.wcfg["bkg_color_system"]
-            )
-            self.bar_system = self.set_qlabel(
+            self.bar_system = self.set_rawtext(
                 text=text_system,
-                style=bar_style_system,
                 width=font_m.width * len(text_system) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_system"],
+                bg_color=self.wcfg["bkg_color_system"],
                 last=0,
             )
             self.set_primary_orient(
@@ -84,14 +81,13 @@ class Realtime(Overlay):
         # APP performance
         if self.wcfg["show_tinypedal_performance"]:
             text_app = f"{self.prefix_app}0.00% 0.00MB"
-            bar_style_app = self.set_qss(
-                fg_color=self.wcfg["font_color_tinypedal"],
-                bg_color=self.wcfg["bkg_color_tinypedal"]
-            )
-            self.bar_app = self.set_qlabel(
+            self.bar_app = self.set_rawtext(
                 text=text_app,
-                style=bar_style_app,
                 width=font_m.width * len(text_app) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_tinypedal"],
+                bg_color=self.wcfg["bkg_color_tinypedal"],
                 last=0,
             )
             self.set_primary_orient(
@@ -126,7 +122,8 @@ class Realtime(Overlay):
             memory_used = psutil.virtual_memory().used / 1024 / 1024 / 1024
             cpu = f"{data: >4.2f}"[:4].strip(".")
             mem = f"{memory_used: >4.2f}"[:4].strip(".")
-            target.setText(f"{prefix}{cpu: >4}%{mem: >5}GB")
+            target.text = f"{prefix}{cpu: >4}%{mem: >5}GB"
+            target.update()
 
     def update_app(self, target, data, prefix):
         """APP performance"""
@@ -135,4 +132,5 @@ class Realtime(Overlay):
             memory_used = self.app_info.memory_full_info().uss / 1024 / 1024
             cpu = f"{data: >4.2f}"[:4].strip(".")
             mem = f"{memory_used: >4.2f}"[:4].strip(".")
-            target.setText(f"{prefix}{cpu: >4}%{mem: >5}MB")
+            target.text = f"{prefix}{cpu: >4}%{mem: >5}MB"
+            target.update()

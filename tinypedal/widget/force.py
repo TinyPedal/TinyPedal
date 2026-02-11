@@ -35,44 +35,40 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 6 + bar_padx
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # G force
         if self.wcfg["show_g_force"]:
-            bar_style_gforce_lgt = self.set_qss(
-                fg_color=self.wcfg["font_color_g_force"],
-                bg_color=self.wcfg["bkg_color_g_force"]
-            )
-            self.bar_gforce_lgt = self.set_qlabel(
+            self.bar_gforce_lgt = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_gforce_lgt,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_g_force"],
+                bg_color=self.wcfg["bkg_color_g_force"],
             )
             self.set_primary_orient(
                 target=self.bar_gforce_lgt,
                 column=self.wcfg["column_index_long_gforce"],
             )
 
-            bar_style_gforce_lat = self.set_qss(
-                fg_color=self.wcfg["font_color_g_force"],
-                bg_color=self.wcfg["bkg_color_g_force"]
-            )
-            self.bar_gforce_lat = self.set_qlabel(
+            self.bar_gforce_lat = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_gforce_lat,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_g_force"],
+                bg_color=self.wcfg["bkg_color_g_force"],
             )
             self.set_primary_orient(
                 target=self.bar_gforce_lat,
@@ -81,14 +77,13 @@ class Realtime(Overlay):
 
         # Downforce ratio
         if self.wcfg["show_downforce_ratio"]:
-            bar_style_df_ratio = self.set_qss(
-                fg_color=self.wcfg["font_color_downforce_ratio"],
-                bg_color=self.wcfg["bkg_color_downforce_ratio"]
-            )
-            self.bar_df_ratio = self.set_qlabel(
+            self.bar_df_ratio = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_df_ratio,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_downforce_ratio"],
+                bg_color=self.wcfg["bkg_color_downforce_ratio"],
             )
             self.set_primary_orient(
                 target=self.bar_df_ratio,
@@ -98,17 +93,16 @@ class Realtime(Overlay):
         # Front downforce
         if self.wcfg["show_front_downforce"]:
             self.bar_style_df_front = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_front_downforce"],
-                    bg_color=self.wcfg["bkg_color_front_downforce"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_front_downforce"],
-                    bg_color=self.wcfg["warning_color_liftforce"])
+                self.wcfg["bkg_color_front_downforce"],
+                self.wcfg["warning_color_liftforce"],
             )
-            self.bar_df_front = self.set_qlabel(
+            self.bar_df_front = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_df_front[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_front_downforce"],
+                bg_color=self.bar_style_df_front[0],
             )
             self.set_primary_orient(
                 target=self.bar_df_front,
@@ -118,17 +112,16 @@ class Realtime(Overlay):
         # Rear downforce
         if self.wcfg["show_rear_downforce"]:
             self.bar_style_df_rear = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_rear_downforce"],
-                    bg_color=self.wcfg["bkg_color_rear_downforce"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_rear_downforce"],
-                    bg_color=self.wcfg["warning_color_liftforce"])
+                self.wcfg["bkg_color_rear_downforce"],
+                self.wcfg["warning_color_liftforce"],
             )
-            self.bar_df_rear = self.set_qlabel(
+            self.bar_df_rear = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_df_rear[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_rear_downforce"],
+                bg_color=self.bar_style_df_rear[0],
             )
             self.set_primary_orient(
                 target=self.bar_df_rear,
@@ -167,50 +160,48 @@ class Realtime(Overlay):
         """Longitudinal g-force"""
         if target.last != data:
             target.last = data
-            target.setText(f"{self.gforce_lgt(data)} {abs(data):.2f}")
+            if data > 0.1:
+                sign = "▼"
+            elif data < -0.1:
+                sign = "▲"
+            else:
+                sign = "●"
+            target.text = f"{sign} {abs(data):.2f}"
+            target.update()
 
     def update_gf_lat(self, target, data):
         """Lateral g-force"""
         if target.last != data:
             target.last = data
-            target.setText(f"{abs(data):.2f} {self.gforce_lat(data)}")
+            if data > 0.1:
+                sign = "◀"
+            elif data < -0.1:
+                sign = "▶"
+            else:
+                sign = "●"
+            target.text = f"{abs(data):.2f} {sign}"
+            target.update()
 
     def update_df_ratio(self, target, data):
         """Downforce ratio"""
         if target.last != data:
             target.last = data
             text = f"{data:.2f}"[:5].strip(".")
-            target.setText(f"{text}%")
+            target.text = f"{text}%"
+            target.update()
 
     def update_df_front(self, target, data):
         """Downforce front"""
         if target.last != data:
             target.last = data
-            target.setText(f"F{abs(data):5.0f}"[:6])
-            target.updateStyle(self.bar_style_df_front[data < 0])
+            target.text = f"F{abs(data):5.0f}"[:6]
+            target.bg = self.bar_style_df_front[data < 0]
+            target.update()
 
     def update_df_rear(self, target, data):
         """Downforce rear"""
         if target.last != data:
             target.last = data
-            target.setText(f"R{abs(data):5.0f}"[:6])
-            target.updateStyle(self.bar_style_df_rear[data < 0])
-
-    # Additional methods
-    @staticmethod
-    def gforce_lgt(g_force):
-        """Longitudinal g-force direction symbol"""
-        if g_force > 0.1:
-            return "▼"
-        if g_force < -0.1:
-            return "▲"
-        return "●"
-
-    @staticmethod
-    def gforce_lat(g_force):
-        """Lateral g-force direction symbol"""
-        if g_force > 0.1:
-            return "◀"
-        if g_force < -0.1:
-            return "▶"
-        return "●"
+            target.text = f"R{abs(data):5.0f}"[:6]
+            target.bg = self.bar_style_df_rear[data < 0]
+            target.update()

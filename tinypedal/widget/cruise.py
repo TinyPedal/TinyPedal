@@ -40,8 +40,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -60,24 +65,16 @@ class Realtime(Overlay):
         self.unit_odm = units.set_unit_distance(self.cfg.units["odometer_unit"])
         self.symbol_odm = units.set_symbol_distance(self.cfg.units["odometer_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Track clock
         if self.wcfg["show_track_clock"]:
             text_clock = strftime(self.wcfg["track_clock_format"], gmtime(0))
-            bar_style_track_clock = self.set_qss(
-                fg_color=self.wcfg["font_color_track_clock"],
-                bg_color=self.wcfg["bkg_color_track_clock"]
-            )
-            self.bar_track_clock = self.set_qlabel(
+            self.bar_track_clock = self.set_rawtext(
                 text=text_clock,
-                style=bar_style_track_clock,
                 width=font_m.width * len(text_clock) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_track_clock"],
+                bg_color=self.wcfg["bkg_color_track_clock"],
             )
             self.set_primary_orient(
                 target=self.bar_track_clock,
@@ -87,14 +84,13 @@ class Realtime(Overlay):
         # Track clock time scale
         if self.wcfg["show_time_scale"]:
             text_time_scale = "X1"
-            bar_style_time_scale = self.set_qss(
-                fg_color=self.wcfg["font_color_time_scale"],
-                bg_color=self.wcfg["bkg_color_time_scale"]
-            )
-            self.bar_time_scale = self.set_qlabel(
+            self.bar_time_scale = self.set_rawtext(
                 text=text_time_scale,
-                style=bar_style_time_scale,
                 width=font_m.width * 3 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_time_scale"],
+                bg_color=self.wcfg["bkg_color_time_scale"],
             )
             self.set_primary_orient(
                 target=self.bar_time_scale,
@@ -104,14 +100,13 @@ class Realtime(Overlay):
         # Compass
         if self.wcfg["show_compass"]:
             text_compass = f"{180:03.0f}°{calc.select_grade(COMPASS_BEARINGS, 180): >2}"
-            bar_style_compass = self.set_qss(
-                fg_color=self.wcfg["font_color_compass"],
-                bg_color=self.wcfg["bkg_color_compass"]
-            )
-            self.bar_compass = self.set_qlabel(
+            self.bar_compass = self.set_rawtext(
                 text=text_compass,
-                style=bar_style_compass,
                 width=font_m.width * len(text_compass) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_compass"],
+                bg_color=self.wcfg["bkg_color_compass"],
             )
             self.set_primary_orient(
                 target=self.bar_compass,
@@ -121,14 +116,13 @@ class Realtime(Overlay):
         # Elevation
         if self.wcfg["show_elevation"]:
             text_elevation = f"↑{self.unit_dist(0): >5.0f}{self.symbol_dist}"
-            bar_style_elevation = self.set_qss(
-                fg_color=self.wcfg["font_color_elevation"],
-                bg_color=self.wcfg["bkg_color_elevation"]
-            )
-            self.bar_elevation = self.set_qlabel(
+            self.bar_elevation = self.set_rawtext(
                 text=text_elevation,
-                style=bar_style_elevation,
                 width=font_m.width * len(text_elevation) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_elevation"],
+                bg_color=self.wcfg["bkg_color_elevation"],
             )
             self.set_primary_orient(
                 target=self.bar_elevation,
@@ -138,14 +132,13 @@ class Realtime(Overlay):
         # Odometer
         if self.wcfg["show_odometer"]:
             text_odometer = f"{min(self.unit_odm(0), self.odm_range):>{self.odm_digits}f}{self.symbol_odm}"
-            bar_style_odometer = self.set_qss(
-                fg_color=self.wcfg["font_color_odometer"],
-                bg_color=self.wcfg["bkg_color_odometer"]
-            )
-            self.bar_odometer = self.set_qlabel(
+            self.bar_odometer = self.set_rawtext(
                 text=text_odometer,
-                style=bar_style_odometer,
                 width=font_m.width * len(text_odometer) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_odometer"],
+                bg_color=self.wcfg["bkg_color_odometer"],
             )
             self.set_primary_orient(
                 target=self.bar_odometer,
@@ -155,14 +148,13 @@ class Realtime(Overlay):
         # Distance into lap
         if self.wcfg["show_distance_into_lap"]:
             text_lap_distance = f"{self.unit_dist(0): >6.0f}{self.symbol_dist}"
-            bar_style_lap_distance = self.set_qss(
-                fg_color=self.wcfg["font_color_distance_into_lap"],
-                bg_color=self.wcfg["bkg_color_distance_into_lap"]
-            )
-            self.bar_lap_distance = self.set_qlabel(
+            self.bar_lap_distance = self.set_rawtext(
                 text=text_lap_distance,
-                style=bar_style_lap_distance,
                 width=font_m.width * len(text_lap_distance) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_distance_into_lap"],
+                bg_color=self.wcfg["bkg_color_distance_into_lap"],
             )
             self.set_primary_orient(
                 target=self.bar_lap_distance,
@@ -172,14 +164,13 @@ class Realtime(Overlay):
         # Cornering radius
         if self.wcfg["show_cornering_radius"]:
             text_cornering_radius = f"r{self.unit_dist(0): >4.0f}{self.symbol_dist}"
-            bar_style_cornering_radius = self.set_qss(
-                fg_color=self.wcfg["font_color_cornering_radius"],
-                bg_color=self.wcfg["bkg_color_cornering_radius"]
-            )
-            self.bar_cornering_radius = self.set_qlabel(
+            self.bar_cornering_radius = self.set_rawtext(
                 text=text_cornering_radius,
-                style=bar_style_cornering_radius,
                 width=font_m.width * len(text_cornering_radius) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_cornering_radius"],
+                bg_color=self.wcfg["bkg_color_cornering_radius"],
             )
             self.set_primary_orient(
                 target=self.bar_cornering_radius,
@@ -232,7 +223,8 @@ class Realtime(Overlay):
         """Track clock"""
         if target.last != data:
             target.last = data
-            target.setText(strftime(self.wcfg["track_clock_format"], gmtime(data)))
+            target.text = strftime(self.wcfg["track_clock_format"], gmtime(data))
+            target.update()
 
     def update_time_scale(self, target, data):
         """Track clock time scale"""
@@ -242,32 +234,37 @@ class Realtime(Overlay):
                 text = f"X{data}"
             else:
                 text = TEXT_NA
-            target.setText(text)
+            target.text = text
+            target.update()
 
     def update_compass(self, target, data):
         """Compass"""
         if target.last != data:
             target.last = data
             degree = 180 - calc.rad2deg(data)
-            target.setText(f"{degree:03.0f}°{calc.select_grade(COMPASS_BEARINGS, degree): >2}")
+            target.text = f"{degree:03.0f}°{calc.select_grade(COMPASS_BEARINGS, degree): >2}"
+            target.update()
 
     def update_elevation(self, target, data):
         """Elevation"""
         if target.last != data:
             target.last = data
-            target.setText(f"↑{self.unit_dist(data): >5.0f}{self.symbol_dist}")
+            target.text = f"↑{self.unit_dist(data): >5.0f}{self.symbol_dist}"
+            target.update()
 
     def update_odometer(self, target, data):
         """Odometer"""
         if target.last != data:
             target.last = data
-            target.setText(f"{min(self.unit_odm(data), self.odm_range): >{self.odm_digits}f}{self.symbol_odm}")
+            target.text = f"{min(self.unit_odm(data), self.odm_range): >{self.odm_digits}f}{self.symbol_odm}"
+            target.update()
 
     def update_lap_distance(self, target, data):
         """Distance into lap"""
         if target.last != data:
             target.last = data
-            target.setText(f"{self.unit_dist(data): >6.0f}{self.symbol_dist}")
+            target.text = f"{self.unit_dist(data): >6.0f}{self.symbol_dist}"
+            target.update()
 
     def update_cornering_radius(self, target, data):
         """Cornering radius"""
@@ -276,4 +273,5 @@ class Realtime(Overlay):
             meter = self.unit_dist(data)
             if meter > 9999:
                 meter = 0
-            target.setText(f"r{meter: >4.0f}{self.symbol_dist}")
+            target.text = f"r{meter: >4.0f}{self.symbol_dist}"
+            target.update()

@@ -46,8 +46,20 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
+
+        font_cap = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"] * 0.8,
+            self.wcfg["font_weight"],
+        )
+        font_cap_m = self.get_font_metrics(font_cap)
 
         # Config variable
         layout_reversed = self.wcfg["layout"] != 0
@@ -71,26 +83,19 @@ class Realtime(Overlay):
             self.wcfg["leader_laptime_pace_samples"],
             max(self.wcfg["leader_laptime_pace_margin"], 0.1))
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Leader pit time row
-        bar_style_pit_time = self.set_qss(
+        self.bars_pit_leader = self.set_rawtext(
+            font=font_cap,
+            width=bar_width,
+            fixed_height=font_cap_m.height,
+            offset_y=font_cap_m.voffset,
             fg_color=self.wcfg["font_color_pit_time"],
             bg_color=self.wcfg["bkg_color_pit_time"],
-            font_size=int(self.wcfg['font_size'] * 0.8),
-        )
-        self.bars_pit_leader = self.set_qlabel(
-            style=bar_style_pit_time,
-            width=bar_width,
             count=self.total_slot,
         )
         for _pit_time, target in zip(self.leader_pit_time_set, self.bars_pit_leader):
-            target.setText(f"{_pit_time:.0f}s")
+            target.text = f"{_pit_time:.0f}s"
+        self.bars_pit_leader[0].text = "TIME"
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_pit_leader,
@@ -99,14 +104,18 @@ class Realtime(Overlay):
         )
 
         # Player pit time row
-        self.bars_pit_player = self.set_qlabel(
-            style=bar_style_pit_time,
+        self.bars_pit_player = self.set_rawtext(
+            font=font_cap,
             width=bar_width,
+            fixed_height=font_cap_m.height,
+            offset_y=font_cap_m.voffset,
+            fg_color=self.wcfg["font_color_pit_time"],
+            bg_color=self.wcfg["bkg_color_pit_time"],
             count=self.total_slot,
         )
         for _pit_time, target in zip(self.player_pit_time_set, self.bars_pit_player):
-            target.setText(f"{_pit_time:.0f}s")
-        self.bars_pit_player[0].setText("DIFF")
+            target.text = f"{_pit_time:.0f}s"
+        self.bars_pit_player[0].text = "DIFF"
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_pit_player,
@@ -116,23 +125,20 @@ class Realtime(Overlay):
 
         # Leader lap row
         self.leader_lap_color = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_leader"],
-                bg_color=self.wcfg["bkg_color_leader"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_near_start"],
-                bg_color=self.wcfg["bkg_color_leader"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_near_finish"],
-                bg_color=self.wcfg["bkg_color_leader"])
+            self.wcfg["font_color_leader"],
+            self.wcfg["font_color_near_start"],
+            self.wcfg["font_color_near_finish"],
         )
-        self.bars_lap_leader = self.set_qlabel(
+        self.bars_lap_leader = self.set_rawtext(
             text=TEXT_PLACEHOLDER,
-            style=self.leader_lap_color[0],
             width=bar_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.leader_lap_color[0],
+            bg_color=self.wcfg["bkg_color_leader"],
             count=self.total_slot,
         )
-        self.bars_lap_leader[0].setText("LDR")
+        self.bars_lap_leader[0].text = "LDR"
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_lap_leader,
@@ -142,20 +148,17 @@ class Realtime(Overlay):
 
         # Player lap row
         self.player_lap_color = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_player"],
-                bg_color=self.wcfg["bkg_color_player"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_near_start"],
-                bg_color=self.wcfg["bkg_color_player"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_near_finish"],
-                bg_color=self.wcfg["bkg_color_player"])
+            self.wcfg["font_color_player"],
+            self.wcfg["font_color_near_start"],
+            self.wcfg["font_color_near_finish"],
         )
-        self.bars_lap_player = self.set_qlabel(
+        self.bars_lap_player = self.set_rawtext(
             text=TEXT_PLACEHOLDER,
-            style=self.player_lap_color[0],
             width=bar_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.player_lap_color[0],
+            bg_color=self.wcfg["bkg_color_player"],
             count=self.total_slot,
         )
         self.set_grid_layout_table_row(
@@ -166,14 +169,13 @@ class Realtime(Overlay):
         )
 
         # Player refill row
-        bar_style_refill = self.set_qss(
-            fg_color=self.wcfg["font_color_refill"],
-            bg_color=self.wcfg["bkg_color_refill"]
-        )
-        self.bars_refill = self.set_qlabel(
+        self.bars_refill = self.set_rawtext(
             text=TEXT_PLACEHOLDER,
-            style=bar_style_refill,
             width=bar_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_refill"],
+            bg_color=self.wcfg["bkg_color_refill"],
             count=self.total_slot,
         )
         self.set_grid_layout_table_row(
@@ -185,13 +187,16 @@ class Realtime(Overlay):
 
         # Player extra lap refill row
         if self.wcfg["show_extra_refilling"]:
-            self.bars_refill_extra = self.set_qlabel(
+            self.bars_refill_extra = self.set_rawtext(
                 text=TEXT_PLACEHOLDER,
-                style=bar_style_refill,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_refill"],
+                bg_color=self.wcfg["bkg_color_refill"],
                 count=self.total_slot,
             )
-            self.bars_refill_extra[0].setText(f"EX+{self.extra_laps}")
+            self.bars_refill_extra[0].text = f"EX+{self.extra_laps}"
             self.set_grid_layout_table_row(
                 layout=layout,
                 targets=self.bars_refill_extra,
@@ -324,8 +329,9 @@ class Realtime(Overlay):
                 lap_text = f"{data:.{self.decimals_laps}f}"[:self.char_width]
             else:
                 lap_text = TEXT_PLACEHOLDER
-            target.setText(lap_text)
-            target.updateStyle(self.leader_lap_color[highlight])
+            target.text = lap_text
+            target.fg = self.leader_lap_color[highlight]
+            target.update()
 
     def update_lap_player(self, target, data, highlight):
         """Player final lap progress"""
@@ -335,8 +341,9 @@ class Realtime(Overlay):
                 lap_text = f"{data:.{self.decimals_laps}f}"[:self.char_width]
             else:
                 lap_text = TEXT_PLACEHOLDER
-            target.setText(lap_text)
-            target.updateStyle(self.player_lap_color[highlight])
+            target.text = lap_text
+            target.fg = self.player_lap_color[highlight]
+            target.update()
 
     def update_lap_int(self, target, data):
         """Lap progress difference"""
@@ -346,25 +353,29 @@ class Realtime(Overlay):
                 lap_text = f"{data:.{self.decimals_laps}f}"[:self.char_width]
             else:
                 lap_text = TEXT_PLACEHOLDER
-            target.setText(lap_text)
+            target.text = lap_text
+            target.update()
 
     def update_pit_time(self, target, data):
         """Leader or player pit time"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:.0f}s")
+            target.text = f"{data:.0f}s"
+            target.update()
 
     def update_race_type(self, target, data):
         """Race type"""
         if target.last != data:
             target.last = data
-            target.setText(RACELENGTH_TYPE_ID[data])
+            target.text = RACELENGTH_TYPE_ID[data]
+            target.update()
 
     def update_energy_type(self, target, data):
         """Energy type"""
         if target.last != data:
             target.last = data
-            target.setText(ENERGY_TYPE_ID[data > 0])
+            target.text = ENERGY_TYPE_ID[data > 0]
+            target.update()
 
     def update_refill(self, target, data, energy_type):
         """Player refill"""
@@ -376,7 +387,8 @@ class Realtime(Overlay):
                 refill_text = f"{data:{self.refill_sign}.{self.decimals_refill}f}"[:self.char_width].strip(".")
             else:
                 refill_text = TEXT_PLACEHOLDER
-            target.setText(refill_text)
+            target.text = refill_text
+            target.update()
 
     # Additional methods
     def create_pit_time_set(self, total_slot, suffix):

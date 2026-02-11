@@ -37,8 +37,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -46,27 +51,19 @@ class Realtime(Overlay):
         self.sign_text = "°" if self.wcfg["show_degree_sign"] else ""
         self.decimals = max(int(self.wcfg["decimal_places"]), 1)
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Rake angle
         self.bar_style_rake = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_rake_angle"],
-                bg_color=self.wcfg["bkg_color_rake_angle"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_rake_angle"],
-                bg_color=self.wcfg["warning_color_negative_rake"])
+            self.wcfg["bkg_color_rake_angle"],
+            self.wcfg["warning_color_negative_rake"],
         )
         text_rake = self.format_rake(0)
-        self.bar_rake = self.set_qlabel(
+        self.bar_rake = self.set_rawtext(
             text=text_rake,
-            style=self.bar_style_rake[0],
             width=font_m.width * len(text_rake) + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_rake_angle"],
+            bg_color=self.bar_style_rake[0],
             last=0,
         )
         layout.addWidget(self.bar_rake, 0, 0)
@@ -87,8 +84,9 @@ class Realtime(Overlay):
         """Rake data"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_rake(data))
-            target.updateStyle(self.bar_style_rake[data < 0])
+            target.text = self.format_rake(data)
+            target.bg = self.bar_style_rake[data < 0]
+            target.update()
 
     def format_rake(self, rake):
         """Format rake"""

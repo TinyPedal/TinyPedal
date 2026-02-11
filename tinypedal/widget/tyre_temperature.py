@@ -26,7 +26,7 @@ from ..api_control import api
 from ..const_common import TEXT_NA, TEXT_PLACEHOLDER
 from ..userfile.heatmap import (
     HEATMAP_DEFAULT_TYRE,
-    load_heatmap_style,
+    load_heatmap_color,
     select_compound_symbol,
     select_tyre_heatmap_name,
 )
@@ -46,8 +46,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -59,24 +64,9 @@ class Realtime(Overlay):
         # Config units
         self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-        bar_style_tcmpd = self.set_qss(
-            fg_color=self.wcfg["font_color_tyre_compound"],
-            bg_color=self.wcfg["bkg_color_tyre_compound"]
-        )
-        bar_style_stemp = self.set_qss(
-            fg_color=self.wcfg["font_color_surface"],
-            bg_color=self.wcfg["bkg_color_surface"]
-        )
-
         # Heatmap style list: 0 - fl, 1 - fr, 2 - rl, 3 - rr
         self.heatmap_styles = 4 * [
-            load_heatmap_style(
+            load_heatmap_color(
                 heatmap_name=self.wcfg["heatmap_name"],
                 default_name=HEATMAP_DEFAULT_TYRE,
                 swap_style=self.wcfg["swap_style"],
@@ -87,8 +77,8 @@ class Realtime(Overlay):
 
         # Tyre temperature
         self.bars_stemp = self.set_table(
+            font_m=font_m,
             text=TEXT_NA,
-            style=bar_style_stemp,
             width=font_m.width * text_width + bar_padx,
             layout=layout,
             inner_gap=inner_gap,
@@ -96,10 +86,13 @@ class Realtime(Overlay):
 
         # Tyre compound
         if self.wcfg["show_tyre_compound"]:
-            self.bars_tcmpd = self.set_qlabel(
+            self.bars_tcmpd = self.set_rawtext(
                 text=TEXT_PLACEHOLDER,
-                style=bar_style_tcmpd,
                 width=font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_tyre_compound"],
+                bg_color=self.wcfg["bkg_color_tyre_compound"],
                 count=2,
             )
             self.set_grid_layout_vert(
@@ -152,20 +145,22 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data < -100:
-                target.setText(TEXT_PLACEHOLDER)
+                target.text = TEXT_PLACEHOLDER
             else:
-                target.setText(f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}")
-            target.updateStyle(calc.select_grade(self.heatmap_styles[index], data))
+                target.text = f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}"
+            target.fg, target.bg = calc.select_grade(self.heatmap_styles[index], data)
+            target.update()
 
     def update_tcmpd(self, target, data):
         """Tyre compound"""
         if target.last != data:
             target.last = data
-            target.setText(select_compound_symbol(data))
+            target.text = select_compound_symbol(data)
+            target.update()
 
     def update_heatmap(self, compound, index):
         """Heatmap style"""
-        heatmap_style = load_heatmap_style(
+        heatmap_style = load_heatmap_color(
             heatmap_name=select_tyre_heatmap_name(compound),
             default_name=HEATMAP_DEFAULT_TYRE,
             swap_style=self.wcfg["swap_style"],
@@ -176,14 +171,17 @@ class Realtime(Overlay):
         self.heatmap_styles[index + 1] = heatmap_style
 
     # GUI generate methods
-    def set_table(self, text, style, width, layout, inner_gap):
+    def set_table(self, font_m, text, width, layout, inner_gap):
         """Set table"""
         if self.wcfg["show_inner_center_outer"]:
             layout_inner = tuple(self.set_grid_layout(gap=inner_gap) for _ in range(4))
-            bar_set = self.set_qlabel(
+            bar_set = self.set_rawtext(
                 text=text,
-                style=style,
                 width=width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_surface"],
+                bg_color=self.wcfg["bkg_color_surface"],
                 count=12,  # 3 x 4 tyres
                 last=0,
             )
@@ -191,10 +189,13 @@ class Realtime(Overlay):
                 self.set_grid_layout_table_row(inner, bar_set[idx * 3:idx * 3 + 3])
             self.set_grid_layout_quad(layout, layout_inner)
         else:
-            bar_set = self.set_qlabel(
+            bar_set = self.set_rawtext(
                 text=text,
-                style=style,
                 width=width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_surface"],
+                bg_color=self.wcfg["bkg_color_surface"],
                 count=4,
                 last=0,
             )

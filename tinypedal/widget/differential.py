@@ -35,8 +35,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -58,24 +63,16 @@ class Realtime(Overlay):
         self.prefix_power_r = self.wcfg["prefix_power_rear"].ljust(prefix_just)
         self.prefix_coast_r = self.wcfg["prefix_coast_rear"].ljust(prefix_just)
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Power locking front
         if self.wcfg["show_power_locking_front"]:
             text_power_front = f"{self.prefix_power_f}{self.format_reading(1)}"
-            bar_style_power_front = self.set_qss(
-                fg_color=self.wcfg["font_color_power_locking_front"],
-                bg_color=self.wcfg["bkg_color_power_locking_front"]
-            )
-            self.bar_power_front = self.set_qlabel(
+            self.bar_power_front = self.set_rawtext(
                 text=text_power_front,
-                style=bar_style_power_front,
                 width=font_m.width * len(text_power_front) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_power_locking_front"],
+                bg_color=self.wcfg["bkg_color_power_locking_front"],
                 last=0,
             )
             self.set_primary_orient(
@@ -86,14 +83,13 @@ class Realtime(Overlay):
         # Coast locking front
         if self.wcfg["show_coast_locking_front"]:
             text_coast_front = f"{self.prefix_coast_f}{self.format_reading(1)}"
-            bar_style_coast_front = self.set_qss(
-                fg_color=self.wcfg["font_color_coast_locking_front"],
-                bg_color=self.wcfg["bkg_color_coast_locking_front"]
-            )
-            self.bar_coast_front = self.set_qlabel(
+            self.bar_coast_front = self.set_rawtext(
                 text=text_coast_front,
-                style=bar_style_coast_front,
                 width=font_m.width * len(text_coast_front) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_coast_locking_front"],
+                bg_color=self.wcfg["bkg_color_coast_locking_front"],
                 last=0,
             )
             self.set_primary_orient(
@@ -104,14 +100,13 @@ class Realtime(Overlay):
         # Power locking rear
         if self.wcfg["show_power_locking_rear"]:
             text_power_rear = f"{self.prefix_power_r}{self.format_reading(1)}"
-            bar_style_power_rear = self.set_qss(
-                fg_color=self.wcfg["font_color_power_locking_rear"],
-                bg_color=self.wcfg["bkg_color_power_locking_rear"]
-            )
-            self.bar_power_rear = self.set_qlabel(
+            self.bar_power_rear = self.set_rawtext(
                 text=text_power_rear,
-                style=bar_style_power_rear,
                 width=font_m.width * len(text_power_rear) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_power_locking_rear"],
+                bg_color=self.wcfg["bkg_color_power_locking_rear"],
                 last=0,
             )
             self.set_primary_orient(
@@ -122,14 +117,13 @@ class Realtime(Overlay):
         # Coast locking rear
         if self.wcfg["show_coast_locking_rear"]:
             text_coast_rear = f"{self.prefix_coast_r}{self.format_reading(1)}"
-            bar_style_coast_rear = self.set_qss(
-                fg_color=self.wcfg["font_color_coast_locking_rear"],
-                bg_color=self.wcfg["bkg_color_coast_locking_rear"]
-            )
-            self.bar_coast_rear = self.set_qlabel(
+            self.bar_coast_rear = self.set_rawtext(
                 text=text_coast_rear,
-                style=bar_style_coast_rear,
                 width=font_m.width * len(text_coast_rear) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_coast_locking_rear"],
+                bg_color=self.wcfg["bkg_color_coast_locking_rear"],
                 last=0,
             )
             self.set_primary_orient(
@@ -177,7 +171,8 @@ class Realtime(Overlay):
         """Differential locking percent"""
         if target.last != data:
             target.last = data
-            target.setText(f"{prefix}{self.format_reading(data)}")
+            target.text = f"{prefix}{self.format_reading(data)}"
+            target.update()
 
     # Additional methods
     def format_reading(self, value):

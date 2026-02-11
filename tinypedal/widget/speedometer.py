@@ -35,8 +35,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -48,23 +53,15 @@ class Realtime(Overlay):
         # Config units
         self.unit_speed = units.set_unit_speed(self.cfg.units["speed_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Speed
         if self.wcfg["show_speed"]:
-            bar_style_speed_curr = self.set_qss(
-                fg_color=self.wcfg["font_color_speed"],
-                bg_color=self.wcfg["bkg_color_speed"]
-            )
-            self.bar_speed_curr = self.set_qlabel(
+            self.bar_speed_curr = self.set_rawtext(
                 text="SPD",
-                style=bar_style_speed_curr,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_speed"],
+                bg_color=self.wcfg["bkg_color_speed"],
             )
             self.set_primary_orient(
                 target=self.bar_speed_curr,
@@ -72,14 +69,13 @@ class Realtime(Overlay):
             )
 
         if self.wcfg["show_speed_minimum"]:
-            bar_style_speed_min = self.set_qss(
-                fg_color=self.wcfg["font_color_speed_minimum"],
-                bg_color=self.wcfg["bkg_color_speed_minimum"]
-            )
-            self.bar_speed_min = self.set_qlabel(
+            self.bar_speed_min = self.set_rawtext(
                 text="MIN",
-                style=bar_style_speed_min,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_speed_minimum"],
+                bg_color=self.wcfg["bkg_color_speed_minimum"],
             )
             self.set_primary_orient(
                 target=self.bar_speed_min,
@@ -87,14 +83,13 @@ class Realtime(Overlay):
             )
 
         if self.wcfg["show_speed_maximum"]:
-            bar_style_speed_max = self.set_qss(
-                fg_color=self.wcfg["font_color_speed_maximum"],
-                bg_color=self.wcfg["bkg_color_speed_maximum"]
-            )
-            self.bar_speed_max = self.set_qlabel(
+            self.bar_speed_max = self.set_rawtext(
                 text="MAX",
-                style=bar_style_speed_max,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_speed_maximum"],
+                bg_color=self.wcfg["bkg_color_speed_maximum"],
             )
             self.set_primary_orient(
                 target=self.bar_speed_max,
@@ -102,14 +97,13 @@ class Realtime(Overlay):
             )
 
         if self.wcfg["show_speed_fastest"]:
-            bar_style_speed_fast = self.set_qss(
-                fg_color=self.wcfg["font_color_speed_fastest"],
-                bg_color=self.wcfg["bkg_color_speed_fastest"]
-            )
-            self.bar_speed_fast = self.set_qlabel(
+            self.bar_speed_fast = self.set_rawtext(
                 text="TOP",
-                style=bar_style_speed_fast,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_speed_fastest"],
+                bg_color=self.wcfg["bkg_color_speed_fastest"],
             )
             self.set_primary_orient(
                 target=self.bar_speed_fast,
@@ -169,4 +163,5 @@ class Realtime(Overlay):
         """Vehicle speed"""
         if target.last != data:
             target.last = data
-            target.setText(f"{self.unit_speed(data):0{self.leading_zero}f}")
+            target.text = f"{self.unit_speed(data):0{self.leading_zero}f}"
+            target.update()

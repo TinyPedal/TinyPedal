@@ -37,8 +37,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -58,24 +63,16 @@ class Realtime(Overlay):
         self.prefix_distl = self.wcfg["prefix_left_to_right_distribution"].ljust(prefix_just)
         self.prefix_cross = self.wcfg["prefix_cross_weight"].ljust(prefix_just)
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Front to rear distribution
         if self.wcfg["show_front_to_rear_distribution"]:
-            bar_style_distf = self.set_qss(
+            text_distf = self.format_dist(0, self.prefix_distf)
+            self.bar_distf = self.set_rawtext(
+                text=text_distf,
+                width=font_m.width * len(text_distf) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_front_to_rear_distribution"],
                 bg_color=self.wcfg["bkg_color_front_to_rear_distribution"],
-            )
-            text_distf = self.format_dist(0, self.prefix_distf)
-            self.bar_distf = self.set_qlabel(
-                text=text_distf,
-                style=bar_style_distf,
-                width=font_m.width * len(text_distf) + bar_padx,
                 last=0,
             )
             self.set_primary_orient(
@@ -85,15 +82,14 @@ class Realtime(Overlay):
 
         # Left to right distribution
         if self.wcfg["show_left_to_right_distribution"]:
-            bar_style_distl = self.set_qss(
+            text_distl = self.format_dist(0, self.prefix_distl)
+            self.bar_distl = self.set_rawtext(
+                text=text_distl,
+                width=font_m.width * len(text_distl) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_left_to_right_distribution"],
                 bg_color=self.wcfg["bkg_color_left_to_right_distribution"],
-            )
-            text_distl = self.format_dist(0, self.prefix_distl)
-            self.bar_distl = self.set_qlabel(
-                text=text_distl,
-                style=bar_style_distl,
-                width=font_m.width * len(text_distl) + bar_padx,
                 last=0,
             )
             self.set_primary_orient(
@@ -103,15 +99,14 @@ class Realtime(Overlay):
 
         # Cross weight
         if self.wcfg["show_cross_weight"]:
-            bar_style_cross = self.set_qss(
+            text_cross = self.format_dist(0, self.prefix_cross)
+            self.bar_cross = self.set_rawtext(
+                text=text_cross,
+                width=font_m.width * len(text_cross) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_cross_weight"],
                 bg_color=self.wcfg["bkg_color_cross_weight"],
-            )
-            text_cross = self.format_dist(0, self.prefix_cross)
-            self.bar_cross = self.set_qlabel(
-                text=text_cross,
-                style=bar_style_cross,
-                width=font_m.width * len(text_cross) + bar_padx,
                 last=0,
             )
             self.set_primary_orient(
@@ -154,7 +149,8 @@ class Realtime(Overlay):
         """Weight distribution ratio"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_dist(data, prefix))
+            target.text = self.format_dist(data, prefix)
+            target.update()
 
     def format_dist(self, angle, prefix):
         """Format distribution ratio"""

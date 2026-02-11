@@ -37,8 +37,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -66,24 +71,16 @@ class Realtime(Overlay):
         self.prefix_stbt = self.wcfg["prefix_stint_best"].ljust(prefix_just)
         self.prefix_avpc = self.wcfg["prefix_average_pace"].ljust(prefix_just)
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Session best laptime
         if self.wcfg["show_session_best"]:
             text_sbst = f"{self.prefix_sbst}{TEXT_NOLAPTIME}"
-            bar_style_sbst = self.set_qss(
-                fg_color=self.wcfg["font_color_session_best"],
-                bg_color=self.wcfg["bkg_color_session_best"]
-            )
-            self.bar_sbst = self.set_qlabel(
+            self.bar_sbst = self.set_rawtext(
                 text=text_sbst,
-                style=bar_style_sbst,
                 width=font_m.width * len(text_sbst) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_session_best"],
+                bg_color=self.wcfg["bkg_color_session_best"],
             )
             self.set_primary_orient(
                 target=self.bar_sbst,
@@ -93,14 +90,13 @@ class Realtime(Overlay):
         # Personal best laptime
         if self.wcfg["show_best"]:
             text_best = f"{self.prefix_best}{TEXT_NOLAPTIME}"
-            bar_style_best = self.set_qss(
-                fg_color=self.wcfg["font_color_best"],
-                bg_color=self.wcfg["bkg_color_best"]
-            )
-            self.bar_best = self.set_qlabel(
+            self.bar_best = self.set_rawtext(
                 text=text_best,
-                style=bar_style_best,
                 width=font_m.width * len(text_best) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_best"],
+                bg_color=self.wcfg["bkg_color_best"],
             )
             self.set_primary_orient(
                 target=self.bar_best,
@@ -111,17 +107,16 @@ class Realtime(Overlay):
         if self.wcfg["show_last"]:
             text_last = f"{self.prefix_last}{TEXT_NOLAPTIME}"
             self.bar_style_last = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_invalid_laptime"],
-                    bg_color=self.wcfg["bkg_color_last"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_last"],
-                    bg_color=self.wcfg["bkg_color_last"])
+                self.wcfg["font_color_invalid_laptime"],
+                self.wcfg["font_color_last"],
             )
-            self.bar_last = self.set_qlabel(
+            self.bar_last = self.set_rawtext(
                 text=text_last,
-                style=self.bar_style_last[1],
                 width=font_m.width * len(text_last) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_last[1],
+                bg_color=self.wcfg["bkg_color_last"],
             )
             self.set_primary_orient(
                 target=self.bar_last,
@@ -131,14 +126,13 @@ class Realtime(Overlay):
         # Current laptime
         if self.wcfg["show_current"]:
             text_curr = f"{self.prefix_curr}{TEXT_NOLAPTIME}"
-            bar_style_curr = self.set_qss(
-                fg_color=self.wcfg["font_color_current"],
-                bg_color=self.wcfg["bkg_color_current"]
-            )
-            self.bar_curr = self.set_qlabel(
+            self.bar_curr = self.set_rawtext(
                 text=text_curr,
-                style=bar_style_curr,
                 width=font_m.width * len(text_curr) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_current"],
+                bg_color=self.wcfg["bkg_color_current"],
             )
             self.set_primary_orient(
                 target=self.bar_curr,
@@ -148,14 +142,13 @@ class Realtime(Overlay):
         # Estimated laptime
         if self.wcfg["show_estimated"]:
             text_esti = f"{self.prefix_esti}{TEXT_NOLAPTIME}"
-            bar_style_esti = self.set_qss(
-                fg_color=self.wcfg["font_color_estimated"],
-                bg_color=self.wcfg["bkg_color_estimated"]
-            )
-            self.bar_esti = self.set_qlabel(
+            self.bar_esti = self.set_rawtext(
                 text=text_esti,
-                style=bar_style_esti,
                 width=font_m.width * len(text_esti) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_estimated"],
+                bg_color=self.wcfg["bkg_color_estimated"],
             )
             self.set_primary_orient(
                 target=self.bar_esti,
@@ -165,14 +158,13 @@ class Realtime(Overlay):
         # Session personal best laptime
         if self.wcfg["show_session_personal_best"]:
             text_spbt = f"{self.prefix_spbt}{TEXT_NOLAPTIME}"
-            bar_style_spbt = self.set_qss(
-                fg_color=self.wcfg["font_color_session_personal_best"],
-                bg_color=self.wcfg["bkg_color_session_personal_best"]
-            )
-            self.bar_spbt = self.set_qlabel(
+            self.bar_spbt = self.set_rawtext(
                 text=text_spbt,
-                style=bar_style_spbt,
                 width=font_m.width * len(text_spbt) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_session_personal_best"],
+                bg_color=self.wcfg["bkg_color_session_personal_best"],
             )
             self.set_primary_orient(
                 target=self.bar_spbt,
@@ -182,14 +174,13 @@ class Realtime(Overlay):
         # Stint personal best laptime
         if self.wcfg["show_stint_best"]:
             text_stbt = f"{self.prefix_stbt}{TEXT_NOLAPTIME}"
-            bar_style_stbt = self.set_qss(
-                fg_color=self.wcfg["font_color_stint_best"],
-                bg_color=self.wcfg["bkg_color_stint_best"]
-            )
-            self.bar_stbt = self.set_qlabel(
+            self.bar_stbt = self.set_rawtext(
                 text=text_stbt,
-                style=bar_style_stbt,
                 width=font_m.width * len(text_stbt) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_stint_best"],
+                bg_color=self.wcfg["bkg_color_stint_best"],
             )
             self.set_primary_orient(
                 target=self.bar_stbt,
@@ -199,14 +190,13 @@ class Realtime(Overlay):
         # Average pace laptime
         if self.wcfg["show_average_pace"]:
             text_avpc = f"{self.prefix_avpc}{TEXT_NOLAPTIME}"
-            bar_style_avpc = self.set_qss(
-                fg_color=self.wcfg["font_color_average_pace"],
-                bg_color=self.wcfg["bkg_color_average_pace"]
-            )
-            self.bar_avpc = self.set_qlabel(
+            self.bar_avpc = self.set_rawtext(
                 text=text_avpc,
-                style=bar_style_avpc,
                 width=font_m.width * len(text_avpc) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_average_pace"],
+                bg_color=self.wcfg["bkg_color_average_pace"],
             )
             self.set_primary_orient(
                 target=self.bar_avpc,
@@ -248,7 +238,7 @@ class Realtime(Overlay):
             # Convert invalid laptime to negative for state compare
             if not minfo.delta.isValidLap:
                 laptime_last *= -1
-            self.update_laptime(self.bar_last, laptime_last, self.prefix_last, True)
+            self.update_last(self.bar_last, laptime_last, self.prefix_last)
 
         # Current laptime
         if self.wcfg["show_current"]:
@@ -276,15 +266,26 @@ class Realtime(Overlay):
             self.update_laptime(self.bar_avpc, laptime_avpc, self.prefix_avpc)
 
     # GUI update methods
-    def update_laptime(self, target, data, prefix, verify=False):
+    def update_laptime(self, target, data, prefix):
         """Update laptime"""
         if target.last != data:
             target.last = data
-            if verify:
-                target.updateStyle(self.bar_style_last[data > 0])
-                data = abs(data)
             if 0 < data < MAX_SECONDS:
                 text = f"{prefix}{calc.sec2laptime(data)[:8]: >8}"
             else:
                 text = f"{prefix}{TEXT_NOLAPTIME}"
-            target.setText(text)
+            target.text = text
+            target.update()
+
+    def update_last(self, target, data, prefix):
+        """Update last laptime"""
+        if target.last != data:
+            target.last = data
+            target.fg = self.bar_style_last[data > 0]
+            data = abs(data)
+            if 0 < data < MAX_SECONDS:
+                text = f"{prefix}{calc.sec2laptime(data)[:8]: >8}"
+            else:
+                text = f"{prefix}{TEXT_NOLAPTIME}"
+            target.text = text
+            target.update()

@@ -35,36 +35,35 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
+
+        font_cap = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+            self.wcfg["font_weight"],
+        )
+        font_cap_m = self.get_font_metrics(font_cap)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 4 + bar_padx
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-        bar_style_desc = self.set_qss(
-            fg_color=self.wcfg["font_color_caption"],
-            bg_color=self.wcfg["bkg_color_caption"],
-            font_size=int(self.wcfg['font_size'] * 0.8)
-        )
-
         # Total travel
         if self.wcfg["show_total_travel"]:
             layout_total = self.set_grid_layout()
-            bar_style_total = self.set_qss(
-                fg_color=self.wcfg["font_color_total_travel"],
-                bg_color=self.wcfg["bkg_color_total_travel"]
-            )
-            self.bars_total = self.set_qlabel(
+            self.bars_total = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_total,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_total_travel"],
+                bg_color=self.wcfg["bkg_color_total_travel"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -77,23 +76,26 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_total = self.set_qlabel(
+                cap_total = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_total_travel"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_total.addWidget(cap_total, 0, 0, 1, 0)
 
         # Bump travel
         if self.wcfg["show_bump_travel"]:
             layout_bump = self.set_grid_layout()
-            bar_style_bump = self.set_qss(
-                fg_color=self.wcfg["font_color_bump_travel"],
-                bg_color=self.wcfg["bkg_color_bump_travel"]
-            )
-            self.bars_bump = self.set_qlabel(
+            self.bars_bump = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_bump,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_bump_travel"],
+                bg_color=self.wcfg["bkg_color_bump_travel"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -106,23 +108,26 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_bump = self.set_qlabel(
+                cap_bump = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_bump_travel"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_bump.addWidget(cap_bump, 0, 0, 1, 0)
 
         # Rebound travel
         if self.wcfg["show_rebound_travel"]:
             layout_rebound = self.set_grid_layout()
-            bar_style_rebound = self.set_qss(
-                fg_color=self.wcfg["font_color_rebound_travel"],
-                bg_color=self.wcfg["bkg_color_rebound_travel"]
-            )
-            self.bars_rebound = self.set_qlabel(
+            self.bars_rebound = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_rebound,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_rebound_travel"],
+                bg_color=self.wcfg["bkg_color_rebound_travel"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -135,23 +140,26 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_rebound = self.set_qlabel(
+                cap_rebound = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_rebound_travel"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_rebound.addWidget(cap_rebound, 0, 0, 1, 0)
 
         # Travel ratio
         if self.wcfg["show_travel_ratio"]:
             layout_ratio = self.set_grid_layout()
-            bar_style_ratio = self.set_qss(
-                fg_color=self.wcfg["font_color_travel_ratio"],
-                bg_color=self.wcfg["bkg_color_travel_ratio"]
-            )
-            self.bars_ratio = self.set_qlabel(
+            self.bars_ratio = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_ratio,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_travel_ratio"],
+                bg_color=self.wcfg["bkg_color_travel_ratio"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -164,23 +172,26 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_ratio = self.set_qlabel(
+                cap_ratio = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_travel_ratio"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_ratio.addWidget(cap_ratio, 0, 0, 1, 0)
 
         # Minimum position
         if self.wcfg["show_minimum_position"]:
             layout_minpos = self.set_grid_layout()
-            bar_style_minpos = self.set_qss(
-                fg_color=self.wcfg["font_color_minimum_position"],
-                bg_color=self.wcfg["bkg_color_minimum_position"]
-            )
-            self.bars_minpos = self.set_qlabel(
+            self.bars_minpos = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_minpos,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_minimum_position"],
+                bg_color=self.wcfg["bkg_color_minimum_position"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -193,23 +204,26 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_minpos = self.set_qlabel(
+                cap_minpos = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_minimum_position"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_minpos.addWidget(cap_minpos, 0, 0, 1, 0)
 
         # Maximum position
         if self.wcfg["show_maximum_position"]:
             layout_maxpos = self.set_grid_layout()
-            bar_style_maxpos = self.set_qss(
-                fg_color=self.wcfg["font_color_maximum_position"],
-                bg_color=self.wcfg["bkg_color_maximum_position"]
-            )
-            self.bars_maxpos = self.set_qlabel(
+            self.bars_maxpos = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_maxpos,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_maximum_position"],
+                bg_color=self.wcfg["bkg_color_maximum_position"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -222,23 +236,26 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_maxpos = self.set_qlabel(
+                cap_maxpos = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_maximum_position"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_maxpos.addWidget(cap_maxpos, 0, 0, 1, 0)
 
         # Live position
         if self.wcfg["show_live_position"]:
             layout_live = self.set_grid_layout()
-            bar_style_live = self.set_qss(
-                fg_color=self.wcfg["font_color_live_position"],
-                bg_color=self.wcfg["bkg_color_live_position"]
-            )
-            self.bars_live = self.set_qlabel(
+            self.bars_live = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_live,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_live_position"],
+                bg_color=self.wcfg["bkg_color_live_position"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -251,9 +268,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_live = self.set_qlabel(
+                cap_live = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_live_position"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_live.addWidget(cap_live, 0, 0, 1, 0)
 
@@ -317,10 +338,11 @@ class Realtime(Overlay):
         """Suspension travel data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:.2f}"[:4].strip("."))
+            target.text = f"{data:.2f}"[:4].strip(".")
 
     def update_ratio(self, target, data):
         """Travel ratio"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data:.0%}")
+            target.text = f"{data:.0%}"
+            target.update()

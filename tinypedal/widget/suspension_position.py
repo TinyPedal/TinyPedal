@@ -43,7 +43,7 @@ class Realtime(Overlay):
         font = self.config_font(
             self.wcfg["font_name"],
             self.wcfg["font_size"],
-            self.wcfg["font_weight"]
+            self.wcfg["font_weight"],
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
@@ -67,17 +67,20 @@ class Realtime(Overlay):
 
         # Caption
         if self.wcfg["show_caption"]:
-            bar_style_desc = self.set_qss(
+            font_cap = self.config_font(
+                self.wcfg["font_name"],
+                self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+                self.wcfg["font_weight"],
+            )
+            font_cap_m = self.get_font_metrics(font_cap)
+
+            cap_bar = self.set_rawtext(
+                font=font_cap,
+                text=self.wcfg["caption_text"],
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
                 bg_color=self.wcfg["bkg_color_caption"],
-                font_family=self.wcfg["font_name"],
-                font_size=int(self.wcfg['font_size'] * self.wcfg['font_scale_caption']),
-                font_weight=self.wcfg["font_weight"],
-            )
-            cap_bar = self.set_qlabel(
-                text=self.wcfg["caption_text"],
-                style=bar_style_desc,
-                fixed_width=bar_width * 2 + bar_gap_hori,
             )
             self.set_primary_orient(
                 target=cap_bar,
@@ -96,7 +99,7 @@ class Realtime(Overlay):
                 padding_x=padx,
                 bar_width=bar_width,
                 bar_height=bar_height,
-                font_offset=font_m.voffset,
+                offset_y=font_m.voffset,
                 display_range=max_range,
                 input_color=self.wcfg["positive_position_color"],
                 fg_color=self.wcfg["font_color"],

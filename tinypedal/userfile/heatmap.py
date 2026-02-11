@@ -152,10 +152,10 @@ def verify_heatmap(heatmap_dict: dict | None) -> bool:
     return True
 
 
-def load_heatmap_style(
+def load_heatmap_color(
     heatmap_name: str, default_name: str, swap_style: bool = False,
-    fg_color: str = "", bg_color: str = "") -> tuple[tuple[float, str], ...]:
-    """Load heatmap preset (dictionary) & set color style sheet
+    fg_color: str = "", bg_color: str = "") -> tuple[tuple[float, tuple[str, str]], ...]:
+    """Load heatmap preset (dictionary) & set color
 
     key = temperature string, value = hex color string.
     Convert key to float, sort by key.
@@ -168,18 +168,18 @@ def load_heatmap_style(
         bg_color: assign background color if swap_style False.
 
     Returns:
-        tuple(tuple(temperature value, color style sheet string))
+        tuple(tuple(temperature value, tuple(color string, color string)))
     """
     heatmap_dict = cfg.user.heatmap.get(heatmap_name)
     if not verify_heatmap(heatmap_dict):
         heatmap_dict = cfg.default.heatmap[default_name]
     if swap_style:
         return tuple(sorted(
-            (float(temp), f"color:{fg_color};background:{heatmap_color};")
+            (float(temp), (fg_color, heatmap_color))
             for temp, heatmap_color in heatmap_dict.items()
         ))
     return tuple(sorted(
-        (float(temp), f"color:{heatmap_color};background:{bg_color};")
+        (float(temp), (heatmap_color, bg_color))
         for temp, heatmap_color in heatmap_dict.items()
     ))
 

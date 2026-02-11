@@ -37,8 +37,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -47,11 +52,6 @@ class Realtime(Overlay):
         debugging_width = max(int(self.wcfg["debugging_width"]), 1)
 
         # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
         if self.wcfg["show_background"]:
             bg_color_notes = self.wcfg["bkg_color_pace_notes"]
             bg_color_comments = self.wcfg["bkg_color_comments"]
@@ -63,15 +63,14 @@ class Realtime(Overlay):
 
         # Pace notes
         if self.wcfg["show_pace_notes"]:
-            bar_style_notes = self.set_qss(
-                fg_color=self.wcfg["font_color_pace_notes"],
-                bg_color=bg_color_notes
-            )
-            self.bar_notes = self.set_qlabel(
+            self.bar_notes = self.set_rawtext(
                 text="PACE NOTES",
-                style=bar_style_notes,
                 width=font_m.width * notes_width + bar_padx,
-                align=self.wcfg["pace_notes_text_alignment"],
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_pace_notes"],
+                bg_color=bg_color_notes,
+                alignment=self.set_text_alignment(self.wcfg["pace_notes_text_alignment"]),
             )
             self.set_primary_orient(
                 target=self.bar_notes,
@@ -80,15 +79,15 @@ class Realtime(Overlay):
 
         # Comments
         if self.wcfg["show_comments"]:
-            bar_style_comments = self.set_qss(
-                fg_color=self.wcfg["font_color_comments"],
-                bg_color=bg_color_comments
-            )
-            self.bar_comments = self.set_qlabel(
+            self.base_height = font_m.height
+            self.bar_comments = self.set_rawtext(
                 text="COMMENTS",
-                style=bar_style_comments,
                 width=font_m.width * comments_width + bar_padx,
-                align=self.wcfg["comments_text_alignment"],
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_comments"],
+                bg_color=bg_color_comments,
+                alignment=self.set_text_alignment(self.wcfg["comments_text_alignment"]),
             )
             self.set_primary_orient(
                 target=self.bar_comments,
@@ -97,15 +96,14 @@ class Realtime(Overlay):
 
         # Debugging info
         if self.wcfg["show_debugging"]:
-            bar_style_debugging = self.set_qss(
-                fg_color=self.wcfg["font_color_debugging"],
-                bg_color=bg_color_debugging
-            )
-            self.bar_debugging = self.set_qlabel(
+            self.bar_debugging = self.set_rawtext(
                 text="DEBUGGING",
-                style=bar_style_debugging,
                 width=font_m.width * debugging_width + bar_padx,
-                align=self.wcfg["debugging_text_alignment"],
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_debugging"],
+                bg_color=bg_color_debugging,
+                alignment=self.set_text_alignment(self.wcfg["debugging_text_alignment"]),
             )
             self.set_primary_orient(
                 target=self.bar_debugging,
@@ -165,15 +163,19 @@ class Realtime(Overlay):
         """Pace notes"""
         if target.last != data:
             target.last = data
-            target.setText(data)
+            target.text = data
+            target.update()
 
-    def update_comments(self, target, data):
+    def update_comments(self, target, data: str):
         """Comments"""
         if target.last != data:
             target.last = data
             if self.wcfg["enable_comments_line_break"]:
+                line_break_count = data.count("\\n") + 1
                 data = data.replace("\\n", "\n")
-            target.setText(data)
+                target.setFixedHeight(self.base_height * line_break_count)
+            target.text = data
+            target.update()
 
     def update_debugging(self, target, data):
         """Debugging info"""
@@ -184,7 +186,8 @@ class Realtime(Overlay):
                     f"IDX:{minfo.pacenotes.currentIndex + 1} "
                     f"POS:{data:.0f}>>{minfo.pacenotes.nextNote.get(COLUMN_DISTANCE, 0):.0f}m"
                 )
-            target.setText(data)
+            target.text = data
+            target.update()
 
     def update_auto_hide(self, auto_hide):
         """Auto hide"""

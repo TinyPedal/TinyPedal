@@ -98,6 +98,14 @@ class FontConfig(BaseDialog):
         self.edit_fontweight.addItems(rxp.CHOICE_COMMON[rxp.CFG_FONT_WEIGHT])
         self.edit_fontweight.setFixedWidth(UIScaler.size(9))
 
+        self.edit_autooffset = QComboBox(self)
+        self.edit_autooffset.addItems(("no change", "enable", "disable"))
+        self.edit_autooffset.setFixedWidth(UIScaler.size(9))
+
+        self.edit_fontoffset = QSpinBox(self)
+        self.edit_fontoffset.setRange(-999,999)
+        self.edit_fontoffset.setFixedWidth(UIScaler.size(9))
+
         layout_option = QGridLayout()
         layout_option.setAlignment(Qt.AlignTop)
         layout_option.addWidget(QLabel("Font Name"), 0, 0)
@@ -106,6 +114,10 @@ class FontConfig(BaseDialog):
         layout_option.addWidget(self.edit_fontsize, 1, 1)
         layout_option.addWidget(QLabel("Font Weight"), 2, 0)
         layout_option.addWidget(self.edit_fontweight, 2, 1)
+        layout_option.addWidget(QLabel("Enable Auto Font Offset"), 3, 0)
+        layout_option.addWidget(self.edit_autooffset, 3, 1)
+        layout_option.addWidget(QLabel("Font Offset Vertical Addend"), 4, 0)
+        layout_option.addWidget(self.edit_fontoffset, 4, 1)
 
         # Button
         button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
@@ -140,20 +152,37 @@ class FontConfig(BaseDialog):
         """Save setting"""
         for setting in dict_user.values():
             for key in setting:
+                # Font name
                 if re.search(rxp.CFG_FONT_NAME, key):
                     font_name = self.edit_fontname.currentText()
                     if font_name != "no change":
                         setting[key] = font_name
                     continue
+                # Font weight
                 if re.search(rxp.CFG_FONT_WEIGHT, key):
                     font_weight = self.edit_fontweight.currentText()
                     if font_weight != "no change":
                         setting[key] = font_weight
                     continue
+                # Font size addend
                 if re.search("font_size", key):
                     font_size = self.edit_fontsize.value()
                     if font_size != 0:
                         setting[key] = max(setting[key] + font_size, 1)
+                    continue
+                # Auto font offset
+                if key == "enable_auto_font_offset":
+                    auto_offset = self.edit_autooffset.currentText()
+                    if auto_offset == "disable":
+                        setting[key] = False
+                    elif auto_offset == "enable":
+                        setting[key] = True
+                    continue
+                # Font offset vertical
+                if key == "font_offset_vertical":
+                    font_offset = self.edit_fontoffset.value()
+                    if font_offset != 0:
+                        setting[key] += font_offset
                     continue
         self.edit_fontsize.setValue(0)
         cfg.save(0)

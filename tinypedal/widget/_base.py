@@ -27,14 +27,14 @@ from typing import Any
 
 from PySide2.QtCore import QBasicTimer, Qt, Slot
 from PySide2.QtGui import QFont, QFontMetrics, QPalette, QPixmap
-from PySide2.QtWidgets import QGridLayout, QLabel, QLayout, QMenu, QWidget
+from PySide2.QtWidgets import QGridLayout, QLayout, QMenu, QWidget
 
 from .. import app_signal, overlay_signal, realtime_state
-from .. import regex_pattern as rxp
 from ..const_app import APP_NAME
 from ..formatter import format_module_name
 from ..setting import Setting
-from ._common import ExLabel, FontMetrics, MousePosition
+from ._common import FontMetrics, MousePosition
+from ._painter import RawImage, RawText
 
 logger = logging.getLogger(__name__)
 mousepos = MousePosition()  # single instance shared by all widgets
@@ -241,7 +241,7 @@ class Base(QWidget):
 class Overlay(Base):
     """Inherit base window, add common GUI methods"""
 
-    def config_font(self, name: str = "", size: int = 1, weight: str = "") -> QFont:
+    def config_font(self, name: str = "", size: int | float = 1, weight: str = "") -> QFont:
         """Config font
 
         Used for draw text in widget that uses QPainter,
@@ -257,7 +257,7 @@ class Overlay(Base):
         """
         font = self.font()  # get existing widget font
         font.setFamily(name)
-        font.setPixelSize(max(size, 1))
+        font.setPixelSize(max(int(size), 1))
         if weight:
             font.setWeight(getattr(QFont, weight.capitalize()))
         return font
@@ -296,18 +296,14 @@ class Overlay(Base):
         Returns:
             Calculated font offset in pixel.
         """
-        if self.wcfg.get("enable_auto_font_offset", False):
+        if self.wcfg["enable_auto_font_offset"]:
             return (
                 metrics.capHeight()
                 + metrics.descent() * 2
                 + metrics.leading() * 2
                 - metrics.height()
             )
-        return self.wcfg.get("font_offset_vertical", 0)
-
-    def set_base_style(self, style_sheet: str):
-        """Set base style sheet"""
-        self.setStyleSheet(f"ExLabel{{{style_sheet}}}")
+        return self.wcfg["font_offset_vertical"]
 
     @staticmethod
     def set_padding(size: int, scale: float, side: int = 2) -> int:
@@ -339,140 +335,100 @@ class Overlay(Base):
             return Qt.AlignLeft | Qt.AlignVCenter
         return Qt.AlignRight | Qt.AlignVCenter
 
-    @staticmethod
-    def set_qss(
+    def set_rawtext(
+        self,
+        *,
+        font: QFont | None = None,
+        text: str = "",
+        width: int = 0,
+        height: int = 0,
+        fixed_width: int = 0,
+        fixed_height: int = 0,
+        offset_y: int = 0,
         fg_color: str = "",
         bg_color: str = "",
-        font_family: str = "",
-        font_size: int = -1,
-        font_weight: str = "",
-    ) -> str:
-        """Set qt style sheet
-
-        Args:
-            fg_color: foreground color.
-            bg_color: background color.
-            font_family: font family name string.
-            font_size: font size in pixel, minimum limit 1px.
-            font_weight: font weight string, "normal" or "bold".
-
-        Returns:
-            Qt style sheet string.
-        """
-        if fg_color:
-            fg_color = f"color:{fg_color};"
-        if bg_color:
-            bg_color = f"background:{bg_color};"
-        if font_family:
-            font_family = f"font-family:{font_family};"
-        if font_size >= 0:
-            font_size_pixel = f"font-size:{max(font_size, 1)}px;"
-        else:
-            font_size_pixel = ""
-        if font_weight in rxp.CHOICE_COMMON[rxp.CFG_FONT_WEIGHT]:
-            font_weight = f"font-weight:{font_weight};"
-        return f"{fg_color}{bg_color}{font_family}{font_size_pixel}{font_weight}"
-
-    def __add_qlabel(
-        self,
-        *,
-        text: str | None = None,
-        pixmap: QPixmap | None = None,
-        style: str | None = None,
-        width: int = 0,
-        height: int = 0,
-        fixed_width: int = 0,
-        fixed_height: int = 0,
-        align: int | str = 0,
-        last: Any | None = None,
-    ) -> QLabel:
-        """Add a single qlabel instance, keyword arguments only
-
-        Args:
-            text: label text.
-            pixmap: pixmap image.
-            style: qt style sheet.
-            width: minimum label width in pixel.
-            height: minimum label height in pixel.
-            fixed_width: fixed label width in pixel, takes priority over width.
-            fixed_height: fixed label height in pixel, takes priority over height.
-            align: 0 or "Center", 1 or "Left", 2 or "Right".
-            last: cache last data for comparison.
-
-        Returns:
-            QLabel instance.
-        """
-        bar_temp = ExLabel(self)
-        bar_temp.setTextFormat(Qt.PlainText)
-        bar_temp.setTextInteractionFlags(Qt.NoTextInteraction)
-        bar_temp.setAlignment(self.set_text_alignment(align))
-
-        if text is not None:
-            bar_temp.setText(text)
-
-        if pixmap is not None:
-            bar_temp.setPixmap(pixmap)
-
-        if style is not None:
-            bar_temp.updateStyle(style)
-
-        if fixed_width > 0:
-            bar_temp.setFixedWidth(fixed_width)
-        elif width > 0:
-            bar_temp.setMinimumWidth(width)
-
-        if fixed_height > 0:
-            bar_temp.setFixedHeight(fixed_height)
-        elif height > 0:
-            bar_temp.setMinimumHeight(height)
-
-        if last is not None:
-            bar_temp.last = last
-
-        return bar_temp
-
-    def set_qlabel(
-        self,
-        *,
-        text: str | None = None,
-        pixmap: QPixmap | None = None,
-        style: str | None = None,
-        width: int = 0,
-        height: int = 0,
-        fixed_width: int = 0,
-        fixed_height: int = 0,
-        align: int | str = 0,
+        alignment: Qt.Alignment = Qt.AlignCenter,
         last: Any | None = None,
         count: int = 1,
-    ) -> tuple[QLabel, ...] | QLabel:
-        """Set qlabel, keyword arguments only
+    ) -> tuple[RawText, ...] | RawText:
+        """Set RawText, keyword arguments only
 
         Args:
-            text: label text.
-            pixmap: pixmap image.
-            style: qt style sheet.
-            width: minimum label width in pixel.
-            height: minimum label height in pixel.
-            fixed_width: fixed label width in pixel, takes priority over width.
-            fixed_height: fixed label height in pixel, takes priority over height.
-            align: 0 or "Center", 1 or "Left", 2 or "Right".
+            font: QFont.
+            text: bar text.
+            width: fixed width in pixel.
+            height: fixed height in pixel.
+            fixed_width: fixed width in pixel, takes priority over width.
+            fixed_height: fixed height in pixel, takes priority over height.
+            offset_y: font vertical offset in pixel.
+            fg_color: foreground (font) color.
+            bg_color: background color.
+            alignment: Qt.Alignment.
             last: cache last data for comparison.
-            count: number of qlabel to set.
+            count: number of RawText to set.
 
         Returns:
-            A single or multiple(tuple) QLabel instances,
+            A single or multiple(tuple) RawText instances,
             depends on count value (default 1).
         """
         bar_set = (
-            self.__add_qlabel(
-                text=text,
-                pixmap=pixmap,
-                style=style,
+            RawText(
+                parent=self,
+                font=font,
                 width=width,
                 height=height,
                 fixed_width=fixed_width,
                 fixed_height=fixed_height,
-                align=align,
+                offset_y=offset_y,
+                fg_color=fg_color,
+                bg_color=bg_color,
+                text=text,
+                alignment=alignment,
+                last=last,
+            )
+            for _ in range(count)
+        )
+        if count > 1:
+            return tuple(bar_set)
+        return next(bar_set)
+
+    def set_rawimage(
+        self,
+        *,
+        image: QPixmap | None = None,
+        width: int = 0,
+        height: int = 0,
+        fixed_width: int = 0,
+        fixed_height: int = 0,
+        bg_color: str = "",
+        last: Any | None = None,
+        count: int = 1,
+    ) -> tuple[RawImage, ...] | RawImage:
+        """Set RawImage, keyword arguments only
+
+        Args:
+            image: QPixmap image.
+            width: fixed width in pixel.
+            height: fixed height in pixel.
+            fixed_width: fixed width in pixel, takes priority over width.
+            fixed_height: fixed height in pixel, takes priority over height.
+            bg_color: background color.
+            last: cache last data for comparison.
+            count: number of RawImage to set.
+
+        Returns:
+            A single or multiple(tuple) RawImage instances,
+            depends on count value (default 1).
+        """
+        bar_set = (
+            RawImage(
+                parent=self,
+                image=image,
+                width=width,
+                height=height,
+                fixed_width=fixed_width,
+                fixed_height=fixed_height,
+                bg_color=bg_color,
                 last=last,
             )
             for _ in range(count)

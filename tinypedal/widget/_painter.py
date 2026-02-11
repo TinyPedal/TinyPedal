@@ -22,6 +22,8 @@ Overlay base painter class.
 
 from __future__ import annotations
 
+from typing import Any
+
 from PySide2.QtCore import QRectF, Qt
 from PySide2.QtGui import QFont, QPainter, QPen, QPixmap
 from PySide2.QtWidgets import QWidget
@@ -48,7 +50,7 @@ class WheelGaugeBar(QWidget):
         padding_x: int,
         bar_width: int,
         bar_height: int,
-        font_offset: int = 0,
+        offset_y: int = 0,
         display_range: int = 100,
         input_color: str = "",
         fg_color: str = "",
@@ -70,7 +72,7 @@ class WheelGaugeBar(QWidget):
         self.maxrange_color = maxrange_color
         self.rect_bg = QRectF(0, 0, bar_width, bar_height)
         self.rect_input = self.rect_bg.adjusted(0, 0, 0, 0)
-        self.rect_text = self.rect_bg.adjusted(padding_x, font_offset, -padding_x, 0)
+        self.rect_text = self.rect_bg.adjusted(padding_x, offset_y, -padding_x, 0)
         self.right_side = right_side
 
         if self.mark_color:
@@ -224,11 +226,11 @@ class ProgressBar(QWidget):
     def __init__(
         self,
         parent,
-        width: int,
-        height: int,
-        offset_x: int,
-        offset_y: int,
-        font: QFont,
+        font: QFont | None = None,
+        width: int = 0,
+        height: int = 0,
+        offset_x: int = 0,
+        offset_y: int = 0,
         input_color: str = "",
         fg_color: str = "",
         bg_color: str = "",
@@ -240,7 +242,7 @@ class ProgressBar(QWidget):
         super().__init__(parent)
         self.last = -1
         self.input_reading = 0.0
-        if show_reading:
+        if show_reading and font is not None:
             height = max(font.pixelSize(), height)
             self.setFont(font)
         self.bar_width = width
@@ -378,33 +380,163 @@ class GearGaugeBar(QWidget):
             painter.drawText(self.rect_speed, Qt.AlignCenter, f"{self.speed:03.0f}")
 
 
-class TextBar(QWidget):
-    """Text bar"""
+class RawText(QWidget):
+    """Raw text widget for optimized drawing"""
 
     def __init__(
         self,
         parent,
-        width: int,
-        height: int,
-        font_offset: int,
-        fg_color: str,
-        bg_color: str,
+        font: QFont | None = None,
         text: str = "",
+        width: int = 0,
+        height: int = 0,
+        fixed_width: int = 0,
+        fixed_height: int = 0,
+        offset_y: int = 0,
+        fg_color: str = "",
+        bg_color: str = "",
+        alignment: Qt.Alignment = Qt.AlignCenter,
+        last: Any | None = None,
     ):
         super().__init__(parent)
-        self.last = -1
+        if font is not None:
+            self.setFont(font)
+
+        if fixed_width > 0:
+            self.setFixedWidth(fixed_width)
+        elif width > 0:
+            self.setMinimumWidth(width)
+
+        if fixed_height > 0:
+            self.setFixedHeight(fixed_height)
+        elif height > 0:
+            self.setMinimumHeight(height)
+
+        self.state = None
+        self.last = last
         self.text = text
-        self.fg_color = fg_color
-        self.bg_color = bg_color
-        self.rect_bar = QRectF(0, 0, width, height)
-        self.rect_text = self.rect_bar.adjusted(0, font_offset, 0, 0)
-        self.setFixedSize(width, height)
+        self.fg = fg_color if fg_color else Qt.transparent
+        self.bg = bg_color if bg_color else Qt.transparent
+        self._alignment = alignment
+        self._offset_y = offset_y
+        self._pen_text = QPen()
+        self._width = self.width()
+        self._height = self.height()
+
+    def clear(self):
+        """Clear display"""
+        self.text = ""
+        self.fg = Qt.transparent
+        self.bg = Qt.transparent
+
+    def resizeEvent(self, event):
+        """Update size info"""
+        self._width = self.width()
+        self._height = self.height()
 
     def paintEvent(self, event):
         """Draw"""
         painter = QPainter(self)
-        painter.fillRect(self.rect_bar, self.bg_color)
-        pen = QPen()
-        pen.setColor(self.fg_color)
-        painter.setPen(pen)
-        painter.drawText(self.rect_text, Qt.AlignCenter, self.text)
+        self._pen_text.setColor(self.fg)
+        painter.setPen(self._pen_text)
+        painter.fillRect(0, 0, self._width, self._height, self.bg)
+        painter.drawText(0, self._offset_y, self._width, self._height, self._alignment, self.text)
+
+
+class RawImage(QWidget):
+    """Raw image widget for optimized drawing"""
+
+    def __init__(
+        self,
+        parent,
+        image: QPixmap | None = None,
+        width: int = 0,
+        height: int = 0,
+        fixed_width: int = 0,
+        fixed_height: int = 0,
+        bg_color: str = "",
+        last: Any | None = None,
+    ):
+        super().__init__(parent)
+        if fixed_width > 0:
+            self.setFixedWidth(fixed_width)
+        elif width > 0:
+            self.setMinimumWidth(width)
+
+        if fixed_height > 0:
+            self.setFixedHeight(fixed_height)
+        elif height > 0:
+            self.setMinimumHeight(height)
+
+        self.state = None
+        self.last = last
+        self.image = image
+        self.bg = bg_color if bg_color else Qt.transparent
+        self._width = self.width()
+        self._height = self.height()
+
+    def clear(self):
+        """Clear display"""
+        self.image = None
+        self.bg = Qt.transparent
+
+    def resizeEvent(self, event):
+        """Update size info"""
+        self._width = self.width()
+        self._height = self.height()
+
+    def paintEvent(self, event):
+        """Draw"""
+        painter = QPainter(self)
+        painter.fillRect(0, 0, self._width, self._height, self.bg)
+        if isinstance(self.image, QPixmap):
+            painter.drawPixmap(
+                (self._width - self.image.width()) // 2,  # align center
+                (self._height - self.image.height()) // 2,
+                self.image,
+            )
+
+
+class RawFrame(QWidget):
+    """Raw frame widget for optimized drawing"""
+
+    def __init__(
+        self,
+        parent,
+        width: int = 0,
+        height: int = 0,
+        fixed_width: int = 0,
+        fixed_height: int = 0,
+        bg_color: str = "",
+        last: Any | None = None,
+    ):
+        super().__init__(parent)
+        if fixed_width > 0:
+            self.setFixedWidth(fixed_width)
+        elif width > 0:
+            self.setMinimumWidth(width)
+
+        if fixed_height > 0:
+            self.setFixedHeight(fixed_height)
+        elif height > 0:
+            self.setMinimumHeight(height)
+
+        self.state = None
+        self.last = last
+        self.bg = bg_color if bg_color else Qt.transparent
+        self._width = self.width()
+        self._height = self.height()
+
+    def clear(self):
+        """Clear display"""
+        self.bg = Qt.transparent
+
+    def resizeEvent(self, event):
+        """Update size info"""
+        self._width = self.width()
+        self._height = self.height()
+
+    def paintEvent(self, event):
+        """Draw"""
+        painter = QPainter(self)
+        painter.fillRect(0, 0, self._width, self._height, self.bg)

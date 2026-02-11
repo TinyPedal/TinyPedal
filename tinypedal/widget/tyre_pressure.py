@@ -40,8 +40,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -52,38 +57,34 @@ class Realtime(Overlay):
         # Config units
         self.unit_pres = units.set_unit_pressure(self.cfg.units["tyre_pressure_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-        bar_style_tcmpd = self.set_qss(
-            fg_color=self.wcfg["font_color_tyre_compound"],
-            bg_color=self.wcfg["bkg_color_tyre_compound"]
-        )
-        self.bar_style_tpres = (
-            self.set_qss(
-                fg_color=self.wcfg["bkg_color_pressure"],
-                bg_color=self.wcfg["font_color_pressure_cold"]),
-            self.set_qss(
-                fg_color=self.wcfg["bkg_color_pressure"],
-                bg_color=self.wcfg["font_color_pressure_hot"]),
-        ) if self.wcfg["swap_style"] else (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_pressure_cold"],
-                bg_color=self.wcfg["bkg_color_pressure"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_pressure_hot"],
-                bg_color=self.wcfg["bkg_color_pressure"]),
-        )
-
         # Tyre pressure
         layout_tpres = self.set_grid_layout(gap=inner_gap)
-        self.bars_tpres = self.set_qlabel(
+        self.bar_style_tpres = (
+            (
+                self.wcfg["bkg_color_pressure"],
+                self.wcfg["font_color_pressure_cold"],
+            ),
+            (
+                self.wcfg["bkg_color_pressure"],
+                self.wcfg["font_color_pressure_hot"],
+            ),
+        ) if self.wcfg["swap_style"] else (
+            (
+                self.wcfg["font_color_pressure_cold"],
+                self.wcfg["bkg_color_pressure"],
+            ),
+            (
+                self.wcfg["font_color_pressure_hot"],
+                self.wcfg["bkg_color_pressure"],
+            ),
+        )
+        self.bars_tpres = self.set_rawtext(
             text=TEXT_NA,
-            style=self.bar_style_tpres[0],
             width=font_m.width * self.text_width + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.bar_style_tpres[0][0],
+            bg_color=self.bar_style_tpres[0][1],
             count=4,
             last=0,
         )
@@ -97,10 +98,13 @@ class Realtime(Overlay):
         )
 
         if self.wcfg["show_tyre_compound"]:
-            self.bars_tcmpd = self.set_qlabel(
+            self.bars_tcmpd = self.set_rawtext(
                 text=TEXT_PLACEHOLDER,
-                style=bar_style_tcmpd,
                 width=font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_tyre_compound"],
+                bg_color=self.wcfg["bkg_color_tyre_compound"],
                 count=2,
             )
             self.set_grid_layout_vert(
@@ -111,14 +115,13 @@ class Realtime(Overlay):
         # Pressure deviation
         if self.wcfg["show_pressure_deviation"]:
             layout_pdiff = self.set_grid_layout(gap=inner_gap)
-            bar_style_pdiff = self.set_qss(
-                fg_color=self.wcfg["font_color_pressure_deviation"],
-                bg_color=self.wcfg["bkg_color_pressure_deviation"]
-            )
-            self.bars_pdiff = self.set_qlabel(
+            self.bars_pdiff = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_pdiff,
                 width=font_m.width * self.text_width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_pressure_deviation"],
+                bg_color=self.wcfg["bkg_color_pressure_deviation"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -139,10 +142,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_tyre_compound"]:
-                bars_blank = self.set_qlabel(
+                bars_blank = self.set_rawtext(
                     text="",
-                    style=bar_style_tcmpd,
                     width=font_m.width + bar_padx,
+                    fixed_height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.wcfg["font_color_tyre_compound"],
+                    bg_color=self.wcfg["bkg_color_tyre_compound"],
                     count=2,
                 )
                 self.set_grid_layout_vert(
@@ -187,17 +193,20 @@ class Realtime(Overlay):
         """Tyre pressure"""
         if target.last != data:
             target.last = data
-            target.setText(f"{self.unit_pres(data):.2f}"[:self.text_width].strip("."))
-            target.updateStyle(self.bar_style_tpres[is_hot])
+            target.text = f"{self.unit_pres(data):.2f}"[:self.text_width].strip(".")
+            target.fg, target.bg = self.bar_style_tpres[is_hot]
+            target.update()
 
     def update_pdiff(self, target, data):
         """Pressure deviation"""
         if target.last != data:
             target.last = data
-            target.setText(f"{self.unit_pres(abs(data)):.2f}"[:self.text_width].strip("."))
+            target.text = f"{self.unit_pres(data):.2f}"[:self.text_width].strip(".")
+            target.update()
 
     def update_tcmpd(self, target, data):
         """Tyre compound"""
         if target.last != data:
             target.last = data
-            target.setText(select_compound_symbol(data))
+            target.text = select_compound_symbol(data)
+            target.update()

@@ -35,38 +35,33 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 8 + bar_padx
         self.freeze_duration = min(max(self.wcfg["freeze_duration"], 0), 30)
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Battery charge
         if self.wcfg["show_battery_charge"]:
             self.bar_style_charge = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_battery_charge"],
-                    bg_color=self.wcfg["bkg_color_battery_charge"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_battery_charge"],
-                    bg_color=self.wcfg["warning_color_low_battery"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_battery_charge"],
-                    bg_color=self.wcfg["warning_color_high_battery"])
+                self.wcfg["bkg_color_battery_charge"],
+                self.wcfg["warning_color_low_battery"],
+                self.wcfg["warning_color_high_battery"],
             )
-            self.bar_charge = self.set_qlabel(
+            self.bar_charge = self.set_rawtext(
                 text="BATTERY",
-                style=self.bar_style_charge[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_battery_charge"],
+                bg_color=self.bar_style_charge[0],
             )
             self.set_primary_orient(
                 target=self.bar_charge,
@@ -75,14 +70,13 @@ class Realtime(Overlay):
 
         # Battery drain
         if self.wcfg["show_battery_drain"]:
-            bar_style_drain = self.set_qss(
-                fg_color=self.wcfg["font_color_battery_drain"],
-                bg_color=self.wcfg["bkg_color_battery_drain"]
-            )
-            self.bar_drain = self.set_qlabel(
+            self.bar_drain = self.set_rawtext(
                 text="B DRAIN",
-                style=bar_style_drain,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_battery_drain"],
+                bg_color=self.wcfg["bkg_color_battery_drain"],
             )
             self.set_primary_orient(
                 target=self.bar_drain,
@@ -91,14 +85,13 @@ class Realtime(Overlay):
 
         # Battery regen
         if self.wcfg["show_battery_regen"]:
-            bar_style_regen = self.set_qss(
-                fg_color=self.wcfg["font_color_battery_regen"],
-                bg_color=self.wcfg["bkg_color_battery_regen"]
-            )
-            self.bar_regen = self.set_qlabel(
+            self.bar_regen = self.set_rawtext(
                 text="B REGEN",
-                style=bar_style_regen,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_battery_regen"],
+                bg_color=self.wcfg["bkg_color_battery_regen"],
             )
             self.set_primary_orient(
                 target=self.bar_regen,
@@ -107,14 +100,13 @@ class Realtime(Overlay):
 
         # Battery charge net change
         if self.wcfg["show_estimated_net_change"]:
-            bar_style_net = self.set_qss(
-                fg_color=self.wcfg["font_color_estimated_net_change"],
-                bg_color=self.wcfg["bkg_color_estimated_net_change"]
-            )
-            self.bar_net = self.set_qlabel(
+            self.bar_net = self.set_rawtext(
                 text="B   NET",
-                style=bar_style_net,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_estimated_net_change"],
+                bg_color=self.wcfg["bkg_color_estimated_net_change"],
             )
             self.set_primary_orient(
                 target=self.bar_net,
@@ -123,14 +115,13 @@ class Realtime(Overlay):
 
         # Activation timer
         if self.wcfg["show_activation_timer"]:
-            bar_style_timer = self.set_qss(
-                fg_color=self.wcfg["font_color_activation_timer"],
-                bg_color=self.wcfg["bkg_color_activation_timer"]
-            )
-            self.bar_timer = self.set_qlabel(
+            self.bar_timer = self.set_rawtext(
                 text="B TIMER",
-                style=bar_style_timer,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_activation_timer"],
+                bg_color=self.wcfg["bkg_color_activation_timer"],
             )
             self.set_primary_orient(
                 target=self.bar_timer,
@@ -167,7 +158,7 @@ class Realtime(Overlay):
             else:
                 padding = 0
 
-            self.update_charge(self.bar_charge, battery_charge + padding, self.bar_style_charge[batt_warning])
+            self.update_charge(self.bar_charge, battery_charge + padding, batt_warning)
 
         if 0 <= minfo.delta.lapTimeCurrent < self.freeze_duration:
             battery_drain = minfo.hybrid.batteryDrainLast
@@ -192,33 +183,38 @@ class Realtime(Overlay):
             self.update_timer(self.bar_timer, active_timer)
 
     # GUI update methods
-    def update_charge(self, target, data, color):
+    def update_charge(self, target, data, color_index):
         """Battery charge"""
         if target.last != data:
             target.last = data
-            target.setText(f"B{data: >7.2f}"[:8])
-            target.updateStyle(color)
+            target.text = f"B{data: >7.2f}"[:8]
+            target.bg = self.bar_style_charge[color_index]
+            target.update()
 
     def update_drain(self, target, data):
         """Battery drain"""
         if target.last != data:
             target.last = data
-            target.setText(f"-{data: >7.2f}"[:8])
+            target.text = f"-{data: >7.2f}"[:8]
+            target.update()
 
     def update_regen(self, target, data):
         """Battery regen"""
         if target.last != data:
             target.last = data
-            target.setText(f"+{data: >7.2f}"[:8])
+            target.text = f"+{data: >7.2f}"[:8]
+            target.update()
 
     def update_net(self, target, data):
         """Battery charge net change"""
         if target.last != data:
             target.last = data
-            target.setText(f"N{data: >+7.2f}"[:8])
+            target.text = f"N{data: >+7.2f}"[:8]
+            target.update()
 
     def update_timer(self, target, data):
         """Motor activation timer"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data: >7.2f}s"[:8])
+            target.text = f"{data: >7.2f}s"[:8]
+            target.update()

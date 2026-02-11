@@ -42,11 +42,11 @@ class Realtime(Overlay):
         # Config variable
         icon_size = max(self.wcfg["icon_size"], 16) // 2 * 2
         self.warning_color = (
-            self.set_qss(bg_color=self.wcfg["bkg_color"]),                 # 0
-            self.set_qss(bg_color=self.wcfg["warning_color_stalling"]),    # 1
-            self.set_qss(bg_color=self.wcfg["warning_color_clutch"]),      # 2
-            self.set_qss(bg_color=self.wcfg["warning_color_wheel_lock"]),  # 3
-            self.set_qss(bg_color=self.wcfg["warning_color_wheel_slip"]),  # 4
+            self.wcfg["bkg_color"],  # 0
+            self.wcfg["warning_color_stalling"],  # 1
+            self.wcfg["warning_color_clutch"],  # 2
+            self.wcfg["warning_color_wheel_lock"],  # 3
+            self.wcfg["warning_color_wheel_slip"],  # 4
         )
 
         # Config canvas
@@ -61,68 +61,68 @@ class Realtime(Overlay):
 
         # Headlights
         if self.wcfg["show_headlights"]:
-            self.bar_headlights = self.set_qlabel(
+            self.bar_headlights = self.set_rawimage(
+                image=self.pixmap_headlights[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
+                bg_color=self.warning_color[0],
             )
             self.set_primary_orient(
                 target=self.bar_headlights,
                 column=self.wcfg["column_index_headlights"],
             )
-            self.bar_headlights.setPixmap(self.pixmap_headlights[1])
-            self.bar_headlights.updateStyle(self.warning_color[0])
 
         # Ignition
         if self.wcfg["show_ignition"]:
-            self.bar_ignition = self.set_qlabel(
+            self.bar_ignition = self.set_rawimage(
+                image=self.pixmap_ignition[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
+                bg_color=self.warning_color[0],
             )
             self.set_primary_orient(
                 target=self.bar_ignition,
                 column=self.wcfg["column_index_ignition"],
             )
-            self.bar_ignition.setPixmap(self.pixmap_ignition[1])
-            self.bar_ignition.updateStyle(self.warning_color[0])
 
         # Clutch
         if self.wcfg["show_clutch"]:
-            self.bar_clutch = self.set_qlabel(
+            self.bar_clutch = self.set_rawimage(
+                image=self.pixmap_clutch[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
+                bg_color=self.warning_color[0],
             )
             self.set_primary_orient(
                 target=self.bar_clutch,
                 column=self.wcfg["column_index_clutch"],
             )
-            self.bar_clutch.setPixmap(self.pixmap_clutch[1])
-            self.bar_clutch.updateStyle(self.warning_color[0])
 
         # Lock
         if self.wcfg["show_wheel_lock"]:
-            self.bar_wlock = self.set_qlabel(
+            self.bar_wlock = self.set_rawimage(
+                image=self.pixmap_wlock[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
+                bg_color=self.warning_color[0],
             )
             self.set_primary_orient(
                 target=self.bar_wlock,
                 column=self.wcfg["column_index_wheel_lock"],
             )
-            self.bar_wlock.setPixmap(self.pixmap_wlock[1])
-            self.bar_wlock.updateStyle(self.warning_color[0])
 
         # Slip
         if self.wcfg["show_wheel_slip"]:
-            self.bar_wslip = self.set_qlabel(
+            self.bar_wslip = self.set_rawimage(
+                image=self.pixmap_wslip[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
+                bg_color=self.warning_color[0],
             )
             self.set_primary_orient(
                 target=self.bar_wslip,
                 column=self.wcfg["column_index_wheel_slip"],
             )
-            self.bar_wslip.setPixmap(self.pixmap_wslip[1])
-            self.bar_wslip.updateStyle(self.warning_color[0])
 
         # Last data
         self.flicker = False
@@ -172,35 +172,40 @@ class Realtime(Overlay):
         """Headlights update"""
         if target.last != data:
             target.last = data
-            target.setPixmap(self.pixmap_headlights[data == 0])
+            target.image = self.pixmap_headlights[data == 0]
+            target.update()
 
     def update_ignition(self, target, data):
         """Ignition update"""
         if target.last != data:
             target.last = data
-            target.setPixmap(self.pixmap_ignition[data == 0])
-            target.updateStyle(self.warning_color[data == 1])
+            target.image = self.pixmap_ignition[data == 0]
+            target.bg = self.warning_color[data == 1]
+            target.update()
 
     def update_clutch(self, target, data):
         """Clutch update"""
         if target.last != data:
             target.last = data
-            target.setPixmap(self.pixmap_clutch[data < 2])
-            target.updateStyle(self.warning_color[data % 2 * 2])
+            target.image = self.pixmap_clutch[data < 2]
+            target.bg = self.warning_color[data % 2 * 2]
+            target.update()
 
     def update_wlock(self, target, data):
         """Wheel lock update"""
         if target.last != data:
             target.last = data
-            target.setPixmap(self.pixmap_wlock[data == 0])
-            target.updateStyle(self.warning_color[data * 3])
+            target.image = self.pixmap_wlock[data == 0]
+            target.bg = self.warning_color[data * 3]
+            target.update()
 
     def update_wslip(self, target, data):
         """Wheel slip update"""
         if target.last != data:
             target.last = data
-            target.setPixmap(self.pixmap_wslip[data == 0])
-            target.updateStyle(self.warning_color[data * 4])
+            target.image = self.pixmap_wslip[data == 0]
+            target.bg = self.warning_color[data * 4]
+            target.update()
 
 
 def create_icon_set(pixmap_icon: QPixmap, icon_size: int, v_offset: int):

@@ -38,7 +38,7 @@ class Realtime(Overlay):
         font = self.config_font(
             self.wcfg["font_name"],
             self.wcfg["font_size"],
-            self.wcfg["font_weight"]
+            self.wcfg["font_weight"],
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)

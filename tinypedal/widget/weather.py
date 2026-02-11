@@ -37,8 +37,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -71,46 +76,36 @@ class Realtime(Overlay):
         self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
         self.symbol_temp = units.set_symbol_temperature(self.cfg.units["temperature_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
+        # Track temperature
+        self.bar_style_trend = (
+            self.wcfg["font_color_trend_constant"],
+            self.wcfg["font_color_trend_increasing"],
+            self.wcfg["font_color_trend_decreasing"],
         )
 
-        # Track temperature
         if self.wcfg["show_temperature"]:
             layout_temp = self.set_grid_layout()
             track_temp = f"{self.unit_temp(0):{self.temp_digits}}"[:self.temp_cut]
             air_temp = f"{self.unit_temp(0):{self.temp_digits}}"[:self.temp_cut]
             text_temp = f"{track_temp}({air_temp}){self.symbol_temp}"
-            bar_style_temp = self.set_qss(
-                fg_color=self.wcfg["font_color_temperature"],
-                bg_color=self.wcfg["bkg_color_temperature"]
-            )
-            self.bar_temp = self.set_qlabel(
+            self.bar_temp = self.set_rawtext(
                 text=text_temp,
-                style=bar_style_temp,
                 width=font_m.width * len(text_temp) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_temperature"],
+                bg_color=self.wcfg["bkg_color_temperature"],
                 last=0,
             )
             layout_temp.addWidget(self.bar_temp, 0, 0)
 
-            self.bar_style_temp_trend = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_constant"],
-                    bg_color=self.wcfg["bkg_color_temperature"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_increasing"],
-                    bg_color=self.wcfg["bkg_color_temperature"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_decreasing"],
-                    bg_color=self.wcfg["bkg_color_temperature"]),
-            )
-            self.bar_temp_trend = self.set_qlabel(
+            self.bar_temp_trend = self.set_rawtext(
                 text=TEXT_TREND_SIGN[0],
-                style=self.bar_style_temp_trend[0],
                 width=font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_trend[0],
+                bg_color=self.wcfg["bkg_color_temperature"],
                 last=0,
             )
             layout_temp.addWidget(self.bar_temp_trend, 0, 1)
@@ -125,33 +120,24 @@ class Realtime(Overlay):
         if self.wcfg["show_rain"]:
             layout_rain = self.set_grid_layout()
             text_rain = f"{self.prefix_rain}  0%"
-            bar_style_rain = self.set_qss(
-                fg_color=self.wcfg["font_color_rain"],
-                bg_color=self.wcfg["bkg_color_rain"]
-            )
-            self.bar_rain = self.set_qlabel(
+            self.bar_rain = self.set_rawtext(
                 text=text_rain,
-                style=bar_style_rain,
                 width=font_m.width * len(text_rain) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_rain"],
+                bg_color=self.wcfg["bkg_color_rain"],
                 last=0,
             )
             layout_rain.addWidget(self.bar_rain, 0, 0)
 
-            self.bar_style_raininess_trend = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_constant"],
-                    bg_color=self.wcfg["bkg_color_rain"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_increasing"],
-                    bg_color=self.wcfg["bkg_color_rain"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_decreasing"],
-                    bg_color=self.wcfg["bkg_color_rain"]),
-            )
-            self.bar_raininess_trend = self.set_qlabel(
+            self.bar_raininess_trend = self.set_rawtext(
                 text=TEXT_TREND_SIGN[0],
-                style=self.bar_style_raininess_trend[0],
                 width=font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_trend[0],
+                bg_color=self.wcfg["bkg_color_rain"],
                 last=0,
             )
             layout_rain.addWidget(self.bar_raininess_trend, 0, 1)
@@ -166,33 +152,24 @@ class Realtime(Overlay):
         if self.wcfg["show_wetness"]:
             layout_wetness = self.set_grid_layout()
             text_wetness = f"{self.prefix_dry}  0%"
-            bar_style_wetness = self.set_qss(
-                fg_color=self.wcfg["font_color_wetness"],
-                bg_color=self.wcfg["bkg_color_wetness"]
-            )
-            self.bar_wetness = self.set_qlabel(
+            self.bar_wetness = self.set_rawtext(
                 text=text_wetness,
-                style=bar_style_wetness,
                 width=font_m.width * len(text_wetness) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_wetness"],
+                bg_color=self.wcfg["bkg_color_wetness"],
                 last=0,
             )
             layout_wetness.addWidget(self.bar_wetness, 0, 0)
 
-            self.bar_style_wetness_trend = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_constant"],
-                    bg_color=self.wcfg["bkg_color_wetness"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_increasing"],
-                    bg_color=self.wcfg["bkg_color_wetness"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_trend_decreasing"],
-                    bg_color=self.wcfg["bkg_color_wetness"]),
-            )
-            self.bar_wetness_trend = self.set_qlabel(
+            self.bar_wetness_trend = self.set_rawtext(
                 text=TEXT_TREND_SIGN[0],
-                style=self.bar_style_wetness_trend[0],
                 width=font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_trend[0],
+                bg_color=self.wcfg["bkg_color_wetness"],
                 last=0,
             )
             layout_wetness.addWidget(self.bar_wetness_trend, 0, 1)
@@ -258,49 +235,56 @@ class Realtime(Overlay):
             target.last = data
             track_temp = f"{self.unit_temp(track):{self.temp_digits}}"[:self.temp_cut]
             air_temp = f"{self.unit_temp(air):{self.temp_digits}}"[:self.temp_cut]
-            target.setText(f"{track_temp}({air_temp}){self.symbol_temp}")
+            target.text = f"{track_temp}({air_temp}){self.symbol_temp}"
+            target.update()
 
     def update_temperature_trend(self, target, data):
         """Temperature trend"""
         if target.last != data:
             target.last = data
-            target.setText(TEXT_TREND_SIGN[data])
-            target.updateStyle(self.bar_style_temp_trend[data])
+            target.text = TEXT_TREND_SIGN[data]
+            target.fg = self.bar_style_trend[data]
+            target.update()
 
     def update_raininess(self, target, data):
         """Rain percentage"""
         if target.last != data:
             target.last = data
             percent_rain = f"{data: >3.0%}"[:3]
-            target.setText(f"{self.prefix_rain} {percent_rain}")
+            target.text = f"{self.prefix_rain} {percent_rain}"
+            target.update()
 
     def update_raininess_trend(self, target, data):
         """Raininess trend"""
         if target.last != data:
             target.last = data
-            target.setText(TEXT_TREND_SIGN[data])
-            target.updateStyle(self.bar_style_raininess_trend[data])
+            target.text = TEXT_TREND_SIGN[data]
+            target.fg = self.bar_style_trend[data]
+            target.update()
 
     def update_wetness(self, target, data):
         """Surface wetness percentage"""
         if target.last != data:
             target.last = data
             percent_wet = f"{data: >3.0%}"[:3]
-            target.setText(f"{self.prefix_wet} {percent_wet}")
+            target.text = f"{self.prefix_wet} {percent_wet}"
+            target.update()
 
     def update_rubber(self, target, data):
         """Surface rubber coverage percentage"""
         if target.last != data:
             target.last = data
             percent_rubber = f"{laps_to_rubber(data, self.rubber_median_laps): >3.0%}"[:3]
-            target.setText(f"{self.prefix_dry} {percent_rubber}")
+            target.text = f"{self.prefix_dry} {percent_rubber}"
+            target.update()
 
     def update_wetness_trend(self, target, data):
         """Surface wetness trend"""
         if target.last != data:
             target.last = data
-            target.setText(TEXT_TREND_SIGN[data])
-            target.updateStyle(self.bar_style_wetness_trend[data])
+            target.text = TEXT_TREND_SIGN[data]
+            target.fg = self.bar_style_trend[data]
+            target.update()
 
 
 def laps_to_rubber(value: float, median_laps: int = 2000) -> float:

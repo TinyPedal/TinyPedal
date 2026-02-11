@@ -37,8 +37,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         text_def = "-.--"
@@ -49,13 +54,6 @@ class Realtime(Overlay):
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Create layout
         layout_upper = self.set_grid_layout()
         layout_lower = self.set_grid_layout()
@@ -64,185 +62,203 @@ class Realtime(Overlay):
 
         # Caption style
         if self.wcfg["show_caption"]:
-            bar_style_desc = self.set_qss(
-                fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["bkg_color_caption"],
-                font_size=int(self.wcfg['font_size'] * 0.8)
+            font_cap = self.config_font(
+                self.wcfg["font_name"],
+                self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+                self.wcfg["font_weight"],
             )
+            font_cap_m = self.get_font_metrics(font_cap)
+
             row_idx_upper = 2 * self.wcfg["swap_upper_caption"]
             row_idx_lower = 2 - 2 * self.wcfg["swap_lower_caption"]
 
         # Estimated pit pass through time
-        bar_style_pass = self.set_qss(
-            fg_color=self.wcfg["font_color_pass_duration"],
-            bg_color=self.wcfg["bkg_color_pass_duration"]
-        )
-        self.bar_pass = self.set_qlabel(
+        self.bar_pass = self.set_rawtext(
             text=text_def,
-            style=bar_style_pass,
             fixed_width=style_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_pass_duration"],
+            bg_color=self.wcfg["bkg_color_pass_duration"],
         )
         self.bar_pass.decimals = max(self.wcfg["decimal_places_pass_duration"], 0)
         layout_upper.addWidget(self.bar_pass, 1, 0)
 
         if self.wcfg["show_caption"]:
-            cap_temp = self.set_qlabel(
+            cap_temp = self.set_rawtext(
+                font=font_cap,
                 text=self.wcfg["caption_text_pass_duration"],
-                style=bar_style_desc,
-                fixed_width=style_width,
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
+                fg_color=self.wcfg["font_color_caption"],
+                bg_color=self.wcfg["bkg_color_caption"],
             )
             layout_upper.addWidget(cap_temp, row_idx_upper, 0)
 
         # Pit timer
-        bar_style_timer = self.set_qss(
-            fg_color=self.wcfg["font_color_pit_timer"],
-            bg_color=self.wcfg["bkg_color_pit_timer"]
-        )
-        self.bar_timer = self.set_qlabel(
+        self.bar_timer = self.set_rawtext(
             text=text_def,
-            style=bar_style_timer,
             fixed_width=style_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_pit_timer"],
+            bg_color=self.wcfg["bkg_color_pit_timer"],
         )
         self.bar_timer.decimals = max(self.wcfg["decimal_places_pit_timer"], 0)
         layout_lower.addWidget(self.bar_timer, 1, 0)
 
         if self.wcfg["show_caption"]:
-            cap_temp = self.set_qlabel(
+            cap_temp = self.set_rawtext(
+                font=font_cap,
                 text=self.wcfg["caption_text_pit_timer"],
-                style=bar_style_desc,
-                fixed_width=style_width,
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
+                fg_color=self.wcfg["font_color_caption"],
+                bg_color=self.wcfg["bkg_color_caption"],
             )
             layout_lower.addWidget(cap_temp, row_idx_lower, 0)
 
         # Estimated pit stop time
         self.bar_style_stop = (
-            self.set_qss(
-                fg_color=self.wcfg["font_color_stop_duration"],
-                bg_color=self.wcfg["bkg_color_stop_duration"]),
-            self.set_qss(
-                fg_color=self.wcfg["font_color_stop_duration"],
-                bg_color=self.wcfg["warning_color_lengthy_stop"])
+            self.wcfg["bkg_color_stop_duration"],
+            self.wcfg["warning_color_lengthy_stop"],
         )
-        self.bar_stop = self.set_qlabel(
+        self.bar_stop = self.set_rawtext(
             text=text_def,
-            style=self.bar_style_stop[0],
             fixed_width=style_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_stop_duration"],
+            bg_color=self.bar_style_stop[0],
         )
         self.bar_stop.decimals = max(self.wcfg["decimal_places_stop_duration"], 0)
         layout_upper.addWidget(self.bar_stop, 1, 1)
 
         if self.wcfg["show_caption"]:
-            cap_temp = self.set_qlabel(
+            cap_temp = self.set_rawtext(
+                font=font_cap,
                 text=self.wcfg["caption_text_stop_duration"],
-                style=bar_style_desc,
-                fixed_width=style_width,
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
+                fg_color=self.wcfg["font_color_caption"],
+                bg_color=self.wcfg["bkg_color_caption"],
             )
             layout_upper.addWidget(cap_temp, row_idx_upper, 1)
 
         # Estimated min total pit time
-        bar_style_minpit = self.set_qss(
-            fg_color=self.wcfg["font_color_minimum_total_duration"],
-            bg_color=self.wcfg["bkg_color_minimum_total_duration"]
-        )
-        self.bar_minpit = self.set_qlabel(
+        self.bar_minpit = self.set_rawtext(
             text=text_def,
-            style=bar_style_minpit,
             fixed_width=style_width,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_minimum_total_duration"],
+            bg_color=self.wcfg["bkg_color_minimum_total_duration"],
             last=-1,
         )
         self.bar_minpit.decimals = max(self.wcfg["decimal_places_minimum_total_duration"], 0)
         layout_lower.addWidget(self.bar_minpit, 1, 1)
 
         if self.wcfg["show_caption"]:
-            cap_temp = self.set_qlabel(
+            cap_temp = self.set_rawtext(
+                font=font_cap,
                 text=self.wcfg["caption_text_minimum_total_duration"],
-                style=bar_style_desc,
-                fixed_width=style_width,
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
+                fg_color=self.wcfg["font_color_caption"],
+                bg_color=self.wcfg["bkg_color_caption"],
             )
             layout_lower.addWidget(cap_temp, row_idx_lower, 1)
 
         if self.wcfg["show_relative_refilling"]:
             # Relative refilling
-            bar_style_refill = self.set_qss(
-                fg_color=self.wcfg["font_color_actual_relative_refill"],
-                bg_color=self.wcfg["bkg_color_actual_relative_refill"]
-            )
-            self.bar_refill = self.set_qlabel(
+            self.bar_refill = self.set_rawtext(
                 text=text_def,
-                style=bar_style_refill,
                 fixed_width=style_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_actual_relative_refill"],
+                bg_color=self.wcfg["bkg_color_actual_relative_refill"],
             )
             self.bar_refill.decimals = max(self.wcfg["decimal_places_actual_relative_refill"], 0)
             layout_upper.addWidget(self.bar_refill, 1, 2)
 
             if self.wcfg["show_caption"]:
-                cap_temp = self.set_qlabel(
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_actual_relative_refill"],
-                    style=bar_style_desc,
-                    fixed_width=style_width,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_upper.addWidget(cap_temp, row_idx_upper, 2)
 
             # Estimated total needed refill
-            bar_style_needed = self.set_qss(
-                fg_color=self.wcfg["font_color_total_relative_refill"],
-                bg_color=self.wcfg["bkg_color_total_relative_refill"]
-            )
-            self.bar_needed = self.set_qlabel(
+            self.bar_needed = self.set_rawtext(
                 text=text_def,
-                style=bar_style_needed,
                 fixed_width=style_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_total_relative_refill"],
+                bg_color=self.wcfg["bkg_color_total_relative_refill"],
             )
             self.bar_needed.decimals = max(self.wcfg["decimal_places_total_relative_refill"], 0)
             layout_lower.addWidget(self.bar_needed, 1, 2)
 
             if self.wcfg["show_caption"]:
-                cap_temp = self.set_qlabel(
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_total_relative_refill"],
-                    style=bar_style_desc,
-                    fixed_width=style_width,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_lower.addWidget(cap_temp, row_idx_lower, 2)
 
         if self.wcfg["show_pit_occupancy"]:
             # Pit occupancy
-            bar_style_inpit = self.set_qss(
-                fg_color=self.wcfg["font_color_pit_occupancy"],
-                bg_color=self.wcfg["bkg_color_pit_occupancy"]
-            )
-            self.bar_inpit = self.set_qlabel(
+            self.bar_inpit = self.set_rawtext(
                 text="-/-",
-                style=bar_style_inpit,
                 fixed_width=style_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_pit_occupancy"],
+                bg_color=self.wcfg["bkg_color_pit_occupancy"],
             )
             layout_upper.addWidget(self.bar_inpit, 1, 3)
 
             if self.wcfg["show_caption"]:
-                cap_temp = self.set_qlabel(
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_pit_occupancy"],
-                    style=bar_style_desc,
-                    fixed_width=style_width,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_upper.addWidget(cap_temp, row_idx_upper, 3)
 
             # Number of pit requests
-            bar_style_request = self.set_qss(
-                fg_color=self.wcfg["font_color_pit_requests"],
-                bg_color=self.wcfg["bkg_color_pit_requests"]
-            )
-            self.bar_request = self.set_qlabel(
+            self.bar_request = self.set_rawtext(
                 text="-/-",
-                style=bar_style_request,
                 fixed_width=style_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_pit_requests"],
+                bg_color=self.wcfg["bkg_color_pit_requests"],
                 last=-1,
             )
             layout_lower.addWidget(self.bar_request, 1, 3)
 
             if self.wcfg["show_caption"]:
-                cap_temp = self.set_qlabel(
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_pit_requests"],
-                    style=bar_style_desc,
-                    fixed_width=style_width,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_lower.addWidget(cap_temp, row_idx_lower, 3)
 
@@ -303,20 +319,21 @@ class Realtime(Overlay):
         """Update estimate pit data"""
         if target.last != data:
             target.last = data
-            text = f"{data:.{target.decimals}f}"[:self.bar_width].strip(".")
-            target.setText(text)
+            target.text = f"{data:.{target.decimals}f}"[:self.bar_width].strip(".")
             if color:  # lengthy stop warning
-                target.updateStyle(color)
+                target.bg = color
+            target.update()
 
     def update_refill(self, target, data):
         """Update refilling"""
         if target.last != data:
             target.last = data
-            text = f"{data:+.{target.decimals}f}"[:self.bar_width].strip(".")
-            target.setText(text)
+            target.text = f"{data:+.{target.decimals}f}"[:self.bar_width].strip(".")
+            target.update()
 
     def update_occupancy(self, target, *data):
         """Update pit occupancy"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data[0]}/{data[1]}")
+            target.text = f"{data[0]}/{data[1]}"
+            target.update()

@@ -38,28 +38,32 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         if self.wcfg["show_caption"]:
-            bar_style_desc = self.set_qss(
+            font_cap = self.config_font(
+                self.wcfg["font_name"],
+                self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+                self.wcfg["font_weight"],
+            )
+            font_cap_m = self.get_font_metrics(font_cap)
+
+            cap_camber = self.set_rawtext(
+                font=font_cap,
+                text=self.wcfg["caption_text"],
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
                 bg_color=self.wcfg["bkg_color_caption"],
-                font_size=int(self.wcfg['font_size'] * 0.8)
-            )
-            cap_camber = self.set_qlabel(
-                text=self.wcfg["caption_text"],
-                style=bar_style_desc,
             )
             self.set_primary_orient(
                 target=cap_camber,
@@ -71,15 +75,14 @@ class Realtime(Overlay):
             gap_hori=self.wcfg["horizontal_gap"],
             gap_vert=self.wcfg["vertical_gap"],
         )
-        bar_style_camber = self.set_qss(
-            fg_color=self.wcfg["font_color_camber"],
-            bg_color=self.wcfg["bkg_color_camber"]
-        )
         self.decimals_camber = max(self.wcfg["decimal_places_camber"], 1)
-        self.bars_camber = self.set_qlabel(
+        self.bars_camber = self.set_rawtext(
             text=TEXT_NA,
-            style=bar_style_camber,
             width=font_m.width * (3 + self.decimals_camber) + bar_padx,
+            fixed_height=font_m.height,
+            offset_y=font_m.voffset,
+            fg_color=self.wcfg["font_color_camber"],
+            bg_color=self.wcfg["bkg_color_camber"],
             count=4,
             last=0,
         )
@@ -98,15 +101,14 @@ class Realtime(Overlay):
 
         # Camber difference
         if self.wcfg["show_camber_difference"]:
-            bar_style_cdiff = self.set_qss(
-                fg_color=self.wcfg["font_color_camber_difference"],
-                bg_color=self.wcfg["bkg_color_camber_difference"]
-            )
             self.decimals_cdiff = max(self.wcfg["decimal_places_camber_difference"], 1)
-            self.bars_cdiff = self.set_qlabel(
+            self.bars_cdiff = self.set_rawtext(
                 text=TEXT_NA,
-                style=bar_style_cdiff,
                 width=font_m.width * (3 + self.decimals_cdiff) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_camber_difference"],
+                bg_color=self.wcfg["bkg_color_camber_difference"],
                 count=2,
                 last=0,
             )
@@ -136,10 +138,12 @@ class Realtime(Overlay):
         """Camber data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{calc.rad2deg(data):+.{self.decimals_camber}f}"[:3 + self.decimals_camber])
+            target.text = f"{calc.rad2deg(data):+.{self.decimals_camber}f}"[:3 + self.decimals_camber]
+            target.update()
 
     def update_cdiff(self, target, data):
         """Camber difference data"""
         if target.last != data:
             target.last = data
-            target.setText(f"{calc.rad2deg(data):+.{self.decimals_cdiff}f}"[:3 + self.decimals_cdiff])
+            target.text = f"{calc.rad2deg(data):+.{self.decimals_cdiff}f}"[:3 + self.decimals_cdiff]
+            target.update()

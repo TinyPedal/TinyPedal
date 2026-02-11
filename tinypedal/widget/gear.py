@@ -24,7 +24,7 @@ from .. import units
 from ..api_control import api
 from ..module_info import minfo
 from ._base import Overlay
-from ._painter import GearGaugeBar, ProgressBar, TextBar
+from ._painter import GearGaugeBar, ProgressBar
 
 
 class Realtime(Overlay):
@@ -40,7 +40,7 @@ class Realtime(Overlay):
         font = self.config_font(
             self.wcfg["font_name"],
             self.wcfg["font_size"],
-            self.wcfg["font_weight_gear"]
+            self.wcfg["font_weight_gear"],
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
@@ -99,11 +99,11 @@ class Realtime(Overlay):
             font_rpm_m = self.get_font_metrics(font_rpm)
             self.bar_rpmbar = ProgressBar(
                 self,
+                font=font_rpm,
                 width=gauge_width,
                 height=max(self.wcfg["rpm_bar_height"], 1),
                 offset_x=self.wcfg["rpm_reading_offset_x"],
                 offset_y=font_rpm_m.voffset,
-                font=font_rpm,
                 input_color=self.wcfg["rpm_bar_color"],
                 fg_color=self.wcfg["font_color_rpm"],
                 bg_color=self.wcfg["rpm_bar_bkg_color"],
@@ -128,11 +128,11 @@ class Realtime(Overlay):
             )
             self.bar_battbar = ProgressBar(
                 self,
+                font=font_batt,
                 width=gauge_width,
                 height=max(self.wcfg["battery_bar_height"], 1),
                 offset_x=self.wcfg["battery_reading_offset_x"],
                 offset_y=font_batt_m.voffset,
-                font=font_batt,
                 input_color=self.battbar_color[0],
                 fg_color=self.wcfg["font_color_battery"],
                 bg_color=self.wcfg["battery_bar_bkg_color"],
@@ -149,14 +149,13 @@ class Realtime(Overlay):
 
         # Speed limiter
         if self.wcfg["show_speed_limiter"]:
-            self.bar_limiter = TextBar(
-                self,
+            self.bar_limiter = self.set_rawtext(
+                text=self.wcfg["speed_limiter_text"],
                 width=limiter_width,
-                height=gauge_height,
-                font_offset=font_m.voffset,
+                fixed_height=gauge_height,
+                offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_speed_limiter"],
                 bg_color=self.wcfg["bkg_color_speed_limiter"],
-                text=self.wcfg["speed_limiter_text"],
             )
             self.set_primary_orient(
                 target=self.bar_limiter,

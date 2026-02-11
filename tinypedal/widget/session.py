@@ -38,8 +38,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -52,24 +57,16 @@ class Realtime(Overlay):
         )
         self.prefix_estimated_laps = self.wcfg["prefix_estimated_laps"]
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Session name
         if self.wcfg["show_session_name"]:
             text_session_name = self.session_name_list[0]
-            bar_style_session_name = self.set_qss(
-                fg_color=self.wcfg["font_color_session_name"],
-                bg_color=self.wcfg["bkg_color_session_name"]
-            )
-            self.bar_session_name = self.set_qlabel(
+            self.bar_session_name = self.set_rawtext(
                 text=text_session_name,
-                style=bar_style_session_name,
                 width=font_m.width * max(map(len, self.session_name_list)) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_session_name"],
+                bg_color=self.wcfg["bkg_color_session_name"],
             )
             self.set_primary_orient(
                 target=self.bar_session_name,
@@ -79,14 +76,13 @@ class Realtime(Overlay):
         # System clock
         if self.wcfg["show_system_clock"]:
             text_system_clock = strftime(self.wcfg["system_clock_format"])
-            bar_style_system_clock = self.set_qss(
-                fg_color=self.wcfg["font_color_system_clock"],
-                bg_color=self.wcfg["bkg_color_system_clock"]
-            )
-            self.bar_system_clock = self.set_qlabel(
+            self.bar_system_clock = self.set_rawtext(
                 text=text_system_clock,
-                style=bar_style_system_clock,
                 width=font_m.width * len(text_system_clock) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_system_clock"],
+                bg_color=self.wcfg["bkg_color_system_clock"],
             )
             self.set_primary_orient(
                 target=self.bar_system_clock,
@@ -96,14 +92,13 @@ class Realtime(Overlay):
         # Session time
         if self.wcfg["show_session_time"]:
             text_session_time = calc.sec2sessiontime(0)
-            bar_style_session_time = self.set_qss(
-                fg_color=self.wcfg["font_color_session_time"],
-                bg_color=self.wcfg["bkg_color_session_time"]
-            )
-            self.bar_session_time = self.set_qlabel(
+            self.bar_session_time = self.set_rawtext(
                 text=text_session_time,
-                style=bar_style_session_time,
                 width=font_m.width * len(text_session_time) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_session_time"],
+                bg_color=self.wcfg["bkg_color_session_time"],
             )
             self.set_primary_orient(
                 target=self.bar_session_time,
@@ -113,14 +108,13 @@ class Realtime(Overlay):
         # Estimated laps
         if self.wcfg["show_estimated_laps"]:
             text_estimated_laps = f"{self.prefix_estimated_laps}-.---"
-            bar_style_estimated_laps = self.set_qss(
-                fg_color=self.wcfg["font_color_estimated_laps"],
-                bg_color=self.wcfg["bkg_color_estimated_laps"]
-            )
-            self.bar_estimated_laps = self.set_qlabel(
+            self.bar_estimated_laps = self.set_rawtext(
                 text=text_estimated_laps,
-                style=bar_style_estimated_laps,
                 width=font_m.width * len(text_estimated_laps) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_estimated_laps"],
+                bg_color=self.wcfg["bkg_color_estimated_laps"],
             )
             self.set_primary_orient(
                 target=self.bar_estimated_laps,
@@ -162,13 +156,15 @@ class Realtime(Overlay):
         """Session name"""
         if target.last != data:
             target.last = data
-            target.setText(self.session_name_list[data])
+            target.text = self.session_name_list[data]
+            target.update()
 
     def update_system_clock(self, target, data):
         """System Clock"""
         if target.last != data:
             target.last = data
-            target.setText(data)
+            target.text = data
+            target.update()
 
     def update_session_time(self, target, data):
         """Session time"""
@@ -176,10 +172,12 @@ class Realtime(Overlay):
             target.last = data
             if data < 0:
                 data = 0
-            target.setText(calc.sec2sessiontime(data))
+            target.text = calc.sec2sessiontime(data)
+            target.update()
 
     def update_estimated_laps(self, target, data):
         """Estimated laps"""
         if target.last != data:
             target.last = data
-            target.setText(f"{self.prefix_estimated_laps}{data}")
+            target.text = f"{self.prefix_estimated_laps}{data}"
+            target.update()

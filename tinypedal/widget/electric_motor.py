@@ -36,8 +36,13 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
@@ -48,27 +53,19 @@ class Realtime(Overlay):
         self.unit_power = units.set_unit_power(self.cfg.units["power_unit"])
         self.symbol_power = units.set_symbol_power(self.cfg.units["power_unit"])
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Motor temperature
         if self.wcfg["show_motor_temperature"]:
             self.bar_style_motor = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_motor_temperature"],
-                    bg_color=self.wcfg["bkg_color_motor_temperature"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_motor_temperature"],
-                    bg_color=self.wcfg["warning_color_overheat"])
+                self.wcfg["bkg_color_motor_temperature"],
+                self.wcfg["warning_color_overheat"],
             )
-            self.bar_motor = self.set_qlabel(
+            self.bar_motor = self.set_rawtext(
                 text="M TEMP",
-                style=self.bar_style_motor[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_motor_temperature"],
+                bg_color=self.bar_style_motor[0],
             )
             self.set_primary_orient(
                 target=self.bar_motor,
@@ -78,17 +75,16 @@ class Realtime(Overlay):
         # Motor water temperature
         if self.wcfg["show_water_temperature"]:
             self.bar_style_water = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_water_temperature"],
-                    bg_color=self.wcfg["bkg_color_water_temperature"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_water_temperature"],
-                    bg_color=self.wcfg["warning_color_overheat"])
+                self.wcfg["bkg_color_water_temperature"],
+                self.wcfg["warning_color_overheat"],
             )
-            self.bar_water = self.set_qlabel(
+            self.bar_water = self.set_rawtext(
                 text="W TEMP",
-                style=self.bar_style_water[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_water_temperature"],
+                bg_color=self.bar_style_water[0],
             )
             self.set_primary_orient(
                 target=self.bar_water,
@@ -97,14 +93,13 @@ class Realtime(Overlay):
 
         # Motor rpm
         if self.wcfg["show_rpm"]:
-            bar_style_rpm = self.set_qss(
-                fg_color=self.wcfg["font_color_rpm"],
-                bg_color=self.wcfg["bkg_color_rpm"]
-            )
-            self.bar_rpm = self.set_qlabel(
+            self.bar_rpm = self.set_rawtext(
                 text="RPM",
-                style=bar_style_rpm,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_rpm"],
+                bg_color=self.wcfg["bkg_color_rpm"],
             )
             self.set_primary_orient(
                 target=self.bar_rpm,
@@ -113,14 +108,13 @@ class Realtime(Overlay):
 
         # Motor torque
         if self.wcfg["show_torque"]:
-            bar_style_torque = self.set_qss(
-                fg_color=self.wcfg["font_color_torque"],
-                bg_color=self.wcfg["bkg_color_torque"]
-            )
-            self.bar_torque = self.set_qlabel(
+            self.bar_torque = self.set_rawtext(
                 text="TORQUE",
-                style=bar_style_torque,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_torque"],
+                bg_color=self.wcfg["bkg_color_torque"],
             )
             self.set_primary_orient(
                 target=self.bar_torque,
@@ -129,14 +123,13 @@ class Realtime(Overlay):
 
         # Motor power
         if self.wcfg["show_power"]:
-            bar_style_power = self.set_qss(
-                fg_color=self.wcfg["font_color_power"],
-                bg_color=self.wcfg["bkg_color_power"]
-            )
-            self.bar_power = self.set_qlabel(
+            self.bar_power = self.set_rawtext(
                 text="POWER",
-                style=bar_style_power,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_power"],
+                bg_color=self.wcfg["bkg_color_power"],
             )
             self.set_primary_orient(
                 target=self.bar_power,
@@ -176,32 +169,37 @@ class Realtime(Overlay):
         """Motor temperature"""
         if target.last != data:
             target.last = data
-            target.setText(f"M{self.unit_temp(data): >6.1f}°")
-            target.updateStyle(self.bar_style_motor[data >= self.wcfg["overheat_threshold_motor"]])
+            target.text = f"M{self.unit_temp(data): >6.1f}°"
+            target.bg = self.bar_style_motor[data >= self.wcfg["overheat_threshold_motor"]]
+            target.update()
 
     def update_water(self, target, data):
         """Water temperature"""
         if target.last != data:
             target.last = data
-            target.setText(f"W{self.unit_temp(data): >6.1f}°")
-            target.updateStyle(self.bar_style_water[data >= self.wcfg["overheat_threshold_water"]])
+            target.text = f"W{self.unit_temp(data): >6.1f}°"
+            target.bg = self.bar_style_water[data >= self.wcfg["overheat_threshold_water"]]
+            target.update()
 
     def update_rpm(self, target, data):
         """Motor rpm"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data: >5}rpm")
+            target.text = f"{data: >5}rpm"
+            target.update()
 
     def update_torque(self, target, data):
         """Motor torque"""
         if target.last != data:
             target.last = data
             text = f"{data: >6.2f}"[:6]
-            target.setText(f"{text}Nm")
+            target.text = f"{text}Nm"
+            target.update()
 
     def update_power(self, target, data):
         """Motor power"""
         if target.last != data:
             target.last = data
             text = f"{self.unit_power(data): >6.2f}"[:6]
-            target.setText(f"{text}{self.symbol_power}")
+            target.text = f"{text}{self.symbol_power}"
+            target.update()

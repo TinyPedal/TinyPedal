@@ -1,16 +1,19 @@
 WIP
 -----------------------------
+* General
+  - Further optimization and efficiency improvements to widget rendering methods, reduced overall memory usage (roughly 10MB less with all widgets enabled).
+  - Added "Enable Auto Font Offset" and "Font Offset Vertical" options to all widgets, and can be batch-toggled via "Global Font Override" Dialog.
+  - Added "Config" & "Reload" options to right-click context menu on each widget for quick access.
+  - Added "font_scale_caption" option to all widgets that have "show_caption" option.
+  - Fixed an issue that would prevent TinyPedal from restarting if attempted to restart while driving.
+  - Installer script (install.sh) now installs only the necessary files and documents for running TinyPedal on Linux.
+
 * Lap time history Widget
   - Added "show_delta" option, which shows lap time delta between two consecutive laps. This option can be useful to quickly check stint pace.
   - Added options to show or hide individual column.
 
 * Relative, Rivals, Standings Widget
   - Invalid lap time is now displayed and preceded by asterisk mark (requested by user "KnaniOussama"), such as *1:23.54.
-
-* Misc
-  - Fixed an issue that would prevent TinyPedal from restarting if attempted to restart while driving.
-  - Added "Config" & "Reload" options to right-click context menu on each widget for quick access.
-  - Installer script (install.sh) now installs only the necessary files and documents for running TinyPedal on Linux.
 
 2.40.1 (2026-01-30)
 -----------------------------

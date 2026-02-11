@@ -35,30 +35,27 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 5 + bar_padx
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-
         # Transient max braking rate
         if self.wcfg["show_transient_max_braking_rate"]:
-            bar_style_trans_rate = self.set_qss(
-                fg_color=self.wcfg["font_color_transient_max_braking_rate"],
-                bg_color=self.wcfg["bkg_color_transient_max_braking_rate"]
-            )
-            self.bar_trans_rate = self.set_qlabel(
+            self.bar_trans_rate = self.set_rawtext(
                 text="0.00g",
-                style=bar_style_trans_rate,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_transient_max_braking_rate"],
+                bg_color=self.wcfg["bkg_color_transient_max_braking_rate"],
                 last=0,
             )
             self.set_primary_orient(
@@ -68,14 +65,13 @@ class Realtime(Overlay):
 
         # Max braking rate
         if self.wcfg["show_max_braking_rate"]:
-            bar_style_max_rate = self.set_qss(
-                fg_color=self.wcfg["font_color_max_braking_rate"],
-                bg_color=self.wcfg["bkg_color_max_braking_rate"]
-            )
-            self.bar_max_rate = self.set_qlabel(
+            self.bar_max_rate = self.set_rawtext(
                 text="0.00g",
-                style=bar_style_max_rate,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_max_braking_rate"],
+                bg_color=self.wcfg["bkg_color_max_braking_rate"],
                 last=0,
             )
             self.set_primary_orient(
@@ -86,20 +82,17 @@ class Realtime(Overlay):
         # Delta braking rate
         if self.wcfg["show_delta_braking_rate"]:
             self.bar_style_delta_rate = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_delta_braking_rate"],
-                    bg_color=self.wcfg["bkg_color_braking_rate_loss"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_delta_braking_rate"],
-                    bg_color=self.wcfg["bkg_color_braking_rate_gain"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_delta_braking_rate"],
-                    bg_color=self.wcfg["bkg_color_delta_braking_rate"])
+                self.wcfg["bkg_color_braking_rate_loss"],
+                self.wcfg["bkg_color_braking_rate_gain"],
+                self.wcfg["bkg_color_delta_braking_rate"],
             )
-            self.bar_delta_rate = self.set_qlabel(
+            self.bar_delta_rate = self.set_rawtext(
                 text="+0.00",
-                style=self.bar_style_delta_rate[2],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_delta_braking_rate"],
+                bg_color=self.bar_style_delta_rate[2],
                 last=0,
             )
             self.set_primary_orient(
@@ -109,14 +102,13 @@ class Realtime(Overlay):
 
         # Front wheel lock duration
         if self.wcfg["show_front_wheel_lock_duration"]:
-            bar_style_lock_f = self.set_qss(
-                fg_color=self.wcfg["font_color_front_wheel_lock_duration"],
-                bg_color=self.wcfg["bkg_color_front_wheel_lock_duration"]
-            )
-            self.bar_lock_f = self.set_qlabel(
+            self.bar_lock_f = self.set_rawtext(
                 text="F 0.0",
-                style=bar_style_lock_f,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_front_wheel_lock_duration"],
+                bg_color=self.wcfg["bkg_color_front_wheel_lock_duration"],
                 last=0,
             )
             self.set_primary_orient(
@@ -126,14 +118,13 @@ class Realtime(Overlay):
 
         # Front wheel lock duration
         if self.wcfg["show_rear_wheel_lock_duration"]:
-            bar_style_lock_r = self.set_qss(
-                fg_color=self.wcfg["font_color_rear_wheel_lock_duration"],
-                bg_color=self.wcfg["bkg_color_rear_wheel_lock_duration"]
-            )
-            self.bar_lock_r = self.set_qlabel(
+            self.bar_lock_r = self.set_rawtext(
                 text="R 0.0",
-                style=bar_style_lock_r,
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_rear_wheel_lock_duration"],
+                bg_color=self.wcfg["bkg_color_rear_wheel_lock_duration"],
                 last=0,
             )
             self.set_primary_orient(
@@ -184,7 +175,8 @@ class Realtime(Overlay):
         """Braking rate (g force)"""
         if target.last != data:
             target.last = data
-            target.setText(f"{data: >4.2f}g"[:5])
+            target.text = f"{data: >4.2f}g"[:5]
+            target.update()
 
     def update_delta_rate(self, target, data):
         """Delta braking rate"""
@@ -199,20 +191,23 @@ class Realtime(Overlay):
                 text = f"{data:+.0%}"
             else:
                 text = f"{data:+.2f}"
-            target.setText(text[:5])
-            target.updateStyle(self.bar_style_delta_rate[data > 0])
+            target.text = text[:5]
+            target.bg = self.bar_style_delta_rate[data > 0]
+            target.update()
 
     def update_lock_time_f(self, target, data):
         """Front wheel lock duration"""
         if target.last != data:
             target.last = data
-            target.setText(f"F{data: >4.1f}"[:5])
+            target.text = f"F{data: >4.1f}"[:5]
+            target.update()
 
     def update_lock_time_r(self, target, data):
         """Rear wheel lock duration"""
         if target.last != data:
             target.last = data
-            target.setText(f"R{data: >4.1f}"[:5])
+            target.text = f"R{data: >4.1f}"[:5]
+            target.update()
 
 
 class WheelLockTimer:

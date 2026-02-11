@@ -37,40 +37,39 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config font
-        font_m = self.get_font_metrics(
-            self.config_font(self.wcfg["font_name"], self.wcfg["font_size"]))
+        font = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"],
+            self.wcfg["font_weight"],
+        )
+        self.setFont(font)
+        font_m = self.get_font_metrics(font)
+
+        font_cap = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+            self.wcfg["font_weight"],
+        )
+        font_cap_m = self.get_font_metrics(font_cap)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 4 + bar_padx
 
-        # Base style
-        self.set_base_style(self.set_qss(
-            font_family=self.wcfg["font_name"],
-            font_size=self.wcfg["font_size"],
-            font_weight=self.wcfg["font_weight"])
-        )
-        bar_style_desc = self.set_qss(
-            fg_color=self.wcfg["font_color_caption"],
-            bg_color=self.wcfg["bkg_color_caption"],
-            font_size=int(self.wcfg['font_size'] * 0.8)
-        )
-
         # Remaining tyre tread
         if self.wcfg["show_remaining"]:
             layout_remain = self.set_grid_layout()
             self.bar_style_remain = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_remaining"],
-                    bg_color=self.wcfg["bkg_color_remaining"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_warning"],
-                    bg_color=self.wcfg["bkg_color_remaining"])
+                self.wcfg["font_color_remaining"],
+                self.wcfg["font_color_warning"],
             )
-            self.bars_remain = self.set_qlabel(
+            self.bars_remain = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_remain[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_remain[0],
+                bg_color=self.wcfg["bkg_color_remaining"],
                 count=4,
                 last=0,
             )
@@ -84,9 +83,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_remain = self.set_qlabel(
+                cap_remain = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_remaining"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_remain.addWidget(cap_remain, 0, 0, 1, 0)
 
@@ -94,17 +97,16 @@ class Realtime(Overlay):
         if self.wcfg["show_wear_difference"]:
             layout_diff = self.set_grid_layout()
             self.bar_style_diff = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_wear_difference"],
-                    bg_color=self.wcfg["bkg_color_wear_difference"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_warning"],
-                    bg_color=self.wcfg["bkg_color_wear_difference"])
+                self.wcfg["font_color_wear_difference"],
+                self.wcfg["font_color_warning"],
             )
-            self.bars_diff = self.set_qlabel(
+            self.bars_diff = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_diff[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_diff[0],
+                bg_color=self.wcfg["bkg_color_wear_difference"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -117,9 +119,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_diff = self.set_qlabel(
+                cap_diff = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_wear_difference"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_diff.addWidget(cap_diff, 0, 0, 1, 0)
 
@@ -127,17 +133,16 @@ class Realtime(Overlay):
         if self.wcfg["show_live_wear_difference"]:
             layout_live = self.set_grid_layout()
             self.bar_style_live = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_live_wear_difference"],
-                    bg_color=self.wcfg["bkg_color_live_wear_difference"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_warning"],
-                    bg_color=self.wcfg["bkg_color_live_wear_difference"])
+                self.wcfg["font_color_live_wear_difference"],
+                self.wcfg["font_color_warning"],
             )
-            self.bars_live = self.set_qlabel(
+            self.bars_live = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_live[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_live[0],
+                bg_color=self.wcfg["bkg_color_live_wear_difference"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -150,9 +155,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_live = self.set_qlabel(
+                cap_live = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_live_wear_difference"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_live.addWidget(cap_live, 0, 0, 1, 0)
 
@@ -160,17 +169,16 @@ class Realtime(Overlay):
         if self.wcfg["show_lifespan_laps"]:
             layout_laps = self.set_grid_layout()
             self.bar_style_laps = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_lifespan_laps"],
-                    bg_color=self.wcfg["bkg_color_lifespan_laps"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_warning"],
-                    bg_color=self.wcfg["bkg_color_lifespan_laps"])
+                self.wcfg["font_color_lifespan_laps"],
+                self.wcfg["font_color_warning"],
             )
-            self.bars_laps = self.set_qlabel(
+            self.bars_laps = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_laps[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_laps[0],
+                bg_color=self.wcfg["bkg_color_lifespan_laps"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -183,9 +191,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_laps = self.set_qlabel(
+                cap_laps = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_lifespan_laps"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_laps.addWidget(cap_laps, 0, 0, 1, 0)
 
@@ -193,17 +205,16 @@ class Realtime(Overlay):
         if self.wcfg["show_lifespan_minutes"]:
             layout_mins = self.set_grid_layout()
             self.bar_style_mins = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_lifespan_minutes"],
-                    bg_color=self.wcfg["bkg_color_lifespan_minutes"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_warning"],
-                    bg_color=self.wcfg["bkg_color_lifespan_minutes"])
+                self.wcfg["font_color_lifespan_minutes"],
+                self.wcfg["font_color_warning"],
             )
-            self.bars_mins = self.set_qlabel(
+            self.bars_mins = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_mins[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_mins[0],
+                bg_color=self.wcfg["bkg_color_lifespan_minutes"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -216,9 +227,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_mins = self.set_qlabel(
+                cap_mins = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_lifespan_minutes"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_mins.addWidget(cap_mins, 0, 0, 1, 0)
 
@@ -226,17 +241,16 @@ class Realtime(Overlay):
         if self.wcfg["show_end_stint_remaining"]:
             layout_end = self.set_grid_layout()
             self.bar_style_end = (
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_end_stint_remaining"],
-                    bg_color=self.wcfg["bkg_color_end_stint_remaining"]),
-                self.set_qss(
-                    fg_color=self.wcfg["font_color_warning"],
-                    bg_color=self.wcfg["bkg_color_end_stint_remaining"])
+                self.wcfg["font_color_end_stint_remaining"],
+                self.wcfg["font_color_warning"],
             )
-            self.bars_end = self.set_qlabel(
+            self.bars_end = self.set_rawtext(
                 text=TEXT_NA,
-                style=self.bar_style_end[0],
                 width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_end[0],
+                bg_color=self.wcfg["bkg_color_end_stint_remaining"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -249,9 +263,13 @@ class Realtime(Overlay):
             )
 
             if self.wcfg["show_caption"]:
-                cap_end = self.set_qlabel(
+                cap_end = self.set_rawtext(
+                    font=font_cap,
                     text=self.wcfg["caption_text_end_stint_remaining"],
-                    style=bar_style_desc,
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["bkg_color_caption"],
                 )
                 layout_end.addWidget(cap_end, 0, 0, 1, 0)
 
@@ -301,55 +319,49 @@ class Realtime(Overlay):
         """Remaining tyre tread"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_num(data))
-            target.updateStyle(
-                self.bar_style_remain[data <= self.wcfg["warning_threshold_remaining"]]
-            )
+            target.text = self.format_num(data)
+            target.fg = self.bar_style_remain[data <= self.wcfg["warning_threshold_remaining"]]
+            target.update()
 
     def update_diff(self, target, data):
         """Wear differences"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_num(data))
-            target.updateStyle(
-                self.bar_style_diff[data > self.wcfg["warning_threshold_wear"]]
-            )
+            target.text = self.format_num(data)
+            target.fg = self.bar_style_diff[data > self.wcfg["warning_threshold_wear"]]
+            target.update()
 
     def update_live(self, target, data):
         """Live wear differences"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_num(data))
-            target.updateStyle(
-                self.bar_style_live[data > self.wcfg["warning_threshold_wear"]]
-            )
+            target.text = self.format_num(data)
+            target.fg = self.bar_style_live[data > self.wcfg["warning_threshold_wear"]]
+            target.update()
 
     def update_laps(self, target, data):
         """Estimated lifespan in laps"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_num(data))
-            target.updateStyle(
-                self.bar_style_laps[data <= self.wcfg["warning_threshold_laps"]]
-            )
+            target.text = self.format_num(data)
+            target.fg = self.bar_style_laps[data <= self.wcfg["warning_threshold_laps"]]
+            target.update()
 
     def update_mins(self, target, data):
         """Estimated lifespan in minutes"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_num(data))
-            target.updateStyle(
-                self.bar_style_mins[data <= self.wcfg["warning_threshold_minutes"]]
-            )
+            target.text = self.format_num(data)
+            target.fg = self.bar_style_mins[data <= self.wcfg["warning_threshold_minutes"]]
+            target.update()
 
     def update_end(self, target, data):
         """End stint remaining tyre tread"""
         if target.last != data:
             target.last = data
-            target.setText(self.format_num(data))
-            target.updateStyle(
-                self.bar_style_end[data <= self.wcfg["warning_threshold_remaining"]]
-            )
+            target.text = self.format_num(data)
+            target.fg = self.bar_style_end[data <= self.wcfg["warning_threshold_remaining"]]
+            target.update()
 
     # Additional methods
     @staticmethod
