@@ -3603,6 +3603,12 @@ Show tyre compound used in the stint.
     show_wear
 Show total average tyre wear (percent) in the stint.
 
+    show_delta
+Show lap time delta between stint best and stint average non-best lap time.
+
+    show_consistency
+Show lap time consistency (percent) between stint best and stint average non-best lap time.
+
 [**`Back to Top`**](#)
 
 

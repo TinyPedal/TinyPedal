@@ -25,6 +25,7 @@ from collections import deque
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
+from ..const_common import FLOAT_INF, MAX_SECONDS
 from ..module_info import minfo
 from ..userfile.heatmap import select_compound_symbol
 from ._base import Overlay
@@ -101,7 +102,7 @@ class Realtime(Overlay):
         # Fuel
         if self.wcfg["show_fuel"]:
             self.bars_fuel = self.set_rawtext(
-                text="---.-",
+                text="-.---",
                 width=font_m.width * 5 + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -158,6 +159,46 @@ class Realtime(Overlay):
                 bottom_to_top=layout_reversed,
             )
 
+        # Stint delta
+        if self.wcfg["show_delta"]:
+            self.bars_delta = self.set_rawtext(
+                text="--.--",
+                width=font_m.width * 5 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_last_stint_delta"],
+                bg_color=self.wcfg["bkg_color_last_stint_delta"],
+                count=stint_slot + 1,
+            )
+            self.bars_delta[0].fg = self.wcfg["font_color_delta"]
+            self.bars_delta[0].bg = self.wcfg["bkg_color_delta"]
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_delta,
+                column_index=self.wcfg["column_index_delta"],
+                bottom_to_top=layout_reversed,
+            )
+
+        # Stint consistency
+        if self.wcfg["show_consistency"]:
+            self.bars_consist = self.set_rawtext(
+                text="--.---",
+                width=font_m.width * 6 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_last_stint_consistency"],
+                bg_color=self.wcfg["bkg_color_last_stint_consistency"],
+                count=stint_slot + 1,
+            )
+            self.bars_consist[0].fg = self.wcfg["font_color_consistency"]
+            self.bars_consist[0].bg = self.wcfg["bkg_color_consistency"]
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_consist,
+                column_index=self.wcfg["column_index_consistency"],
+                bottom_to_top=layout_reversed,
+            )
+
         # Last data
         self.last_time = 0
         self.stint_running = False
@@ -169,8 +210,9 @@ class Realtime(Overlay):
         self.last_wear_avg = 0
         self.last_fuel_curr = 0
         self.last_time_stop = 0
-        # 0 - total laps, 1 - total time, 2 - total fuel, 3 - tyre compound, 4 - total tyre wear
-        self.stint_data = [0,0,0,"--",0]
+        self.stint_consistency = StintConsistency()
+        # 0=total laps, 1=total time, 2=total fuel, 3=tyre compound, 4=total tyre wear, 5=delta, 6=consistency
+        self.stint_data = [0,0,0,"--",0,0,0]
         self.empty_data = tuple(self.stint_data)
         self.history_data = deque([self.empty_data for _ in range(stint_slot)], stint_slot)
         self.update_stint_history()
@@ -221,6 +263,7 @@ class Realtime(Overlay):
             self.start_wear = wear_avg
             self.reset_stint = False
             self.stint_running = False
+            self.stint_consistency.reset()
             # Update compound info once per stint
             class_name = api.read.vehicle.class_name()
             self.stint_data[3] = "".join(
@@ -232,10 +275,13 @@ class Realtime(Overlay):
             self.start_fuel = fuel_curr
 
         # Current stint data
+        self.stint_consistency.update(in_pits, api.read.timing.start())
         self.stint_data[0] = max(lap_num - self.start_laps, 0)
         self.stint_data[1] = max(time_curr - self.start_time, 0)
         self.stint_data[2] = max(self.start_fuel - fuel_curr, 0)
         self.stint_data[4] = max(wear_avg - self.start_wear, 0)
+        self.stint_data[5] = self.stint_consistency.delta
+        self.stint_data[6] = self.stint_consistency.consistency * 100
 
         if self.wcfg["show_laps"]:
             self.update_laps(self.bars_laps[0], self.stint_data[0])
@@ -247,6 +293,10 @@ class Realtime(Overlay):
             self.update_cmpd(self.bars_cmpd[0], self.stint_data[3])
         if self.wcfg["show_wear"]:
             self.update_wear(self.bars_wear[0], self.stint_data[4])
+        if self.wcfg["show_delta"]:
+            self.update_delta(self.bars_delta[0], self.stint_data[5])
+        if self.wcfg["show_consistency"]:
+            self.update_consist(self.bars_consist[0], self.stint_data[6])
 
     # GUI update methods
     def update_cmpd(self, target, data):
@@ -274,7 +324,7 @@ class Realtime(Overlay):
         """Fuel data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:05.1f}"[:5]
+            target.text = f"{data:.3f}"[:5]
             target.update()
 
     def update_wear(self, target, data):
@@ -282,6 +332,20 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = f"{data:02.0f}%"[:3]
+            target.update()
+
+    def update_delta(self, target, data):
+        """Delta data"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{data:+05.2f}"[:5].strip(".")
+            target.update()
+
+    def update_consist(self, target, data):
+        """Consistency data"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{f'{data:.3f}':.5}%"
             target.update()
 
     def update_stint_history(self, new_stint_data=None):
@@ -317,3 +381,54 @@ class Realtime(Overlay):
             if self.wcfg["show_wear"]:
                 self.update_wear(self.bars_wear[index], data[4])
                 self.bars_wear[index].setHidden(hidden)
+
+            if self.wcfg["show_delta"]:
+                self.update_delta(self.bars_delta[index], data[5])
+                self.bars_delta[index].setHidden(hidden)
+
+            if self.wcfg["show_consistency"]:
+                self.update_consist(self.bars_consist[index], data[6])
+                self.bars_consist[index].setHidden(hidden)
+
+
+class StintConsistency:
+    """Stint consistency data"""
+
+    def __init__(self):
+        self.reset()
+
+    def update(self, in_pits: bool, lap_stime: float):
+        """Calculate stint delta & consistency"""
+        self._pitting |= in_pits
+
+        if self._last_lap_stime != lap_stime:
+            last_laptime = lap_stime - self._last_lap_stime
+
+            if last_laptime <= 0:
+                self._last_lap_stime = lap_stime
+                self._pitting = 1
+                return
+
+            if not self._pitting:
+                self._stint_laps += 1
+                self._stint_time += last_laptime
+                if self._stint_fastest > last_laptime:
+                    self._stint_fastest = last_laptime
+                if self._stint_laps > 1:
+                    stint_average = (self._stint_time - self._stint_fastest) / (self._stint_laps - 1)
+                    if stint_average > 0:
+                        self.consistency = self._stint_fastest / stint_average
+                        self.delta = stint_average - self._stint_fastest
+            # Reset
+            self._pitting = 0
+            self._last_lap_stime = lap_stime
+
+    def reset(self):
+        """Reset"""
+        self._pitting = 1
+        self._last_lap_stime = FLOAT_INF
+        self._stint_laps = 0
+        self._stint_time = 0.0
+        self._stint_fastest = MAX_SECONDS
+        self.consistency = 1.0
+        self.delta = 0.0

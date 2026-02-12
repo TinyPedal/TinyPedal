@@ -13,6 +13,8 @@ WIP
   - Added options to show or hide individual column.
 
 * Stint history Widget
+  - Added "show_delta" option, which shows lap time delta between stint best and stint average non-best lap time.
+  - Added "show_consistency" option, which shows lap time consistency (percent) between stint best and stint average non-best lap time.
   - Added "minimum_pitstop_threshold_seconds" option, which sets the minimum pit stop time threshold for concluding current stint. Default is "3" seconds.
     This option is useful for detecting pit stop that does not refuel or change tyres. It also allows to detect pit stop while spectating other player with Spectate Mode.
   - Added options to show or hide individual column.
