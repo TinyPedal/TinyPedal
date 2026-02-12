@@ -285,14 +285,6 @@ class Session(ABC):
         """Is private qualifying"""
 
     @abstractmethod
-    def in_countdown(self) -> bool:
-        """Is in countdown phase before race"""
-
-    @abstractmethod
-    def in_formation(self) -> bool:
-        """Is in formation phase before race"""
-
-    @abstractmethod
     def pit_open(self) -> bool:
         """Is pit lane open"""
 
@@ -314,7 +306,7 @@ class Session(ABC):
 
     @abstractmethod
     def start_lights(self) -> int:
-        """Start lights countdown sequence"""
+        """Start lights countdown sequence, 0=green flag"""
 
     @abstractmethod
     def track_temperature(self) -> float:

@@ -372,14 +372,6 @@ class Session(_reader.Session, DataAdapter):
         """Is private qualifying"""
         return self.rest.telemetry().privateQualifying == 1
 
-    def in_countdown(self) -> bool:
-        """Is in countdown phase before race"""
-        return self.shmm.rf2ScorInfo.mGamePhase == 4
-
-    def in_formation(self) -> bool:
-        """Is in formation phase before race"""
-        return self.shmm.rf2ScorInfo.mGamePhase == 3
-
     def pit_open(self) -> bool:
         """Is pit lane open"""
         return self.shmm.rf2ScorInfo.mGamePhase > 0
@@ -403,8 +395,16 @@ class Session(_reader.Session, DataAdapter):
         return any(data == 1 for data in sec_flag)
 
     def start_lights(self) -> int:
-        """Start lights countdown sequence"""
+        """Start lights countdown sequence, 0=green flag"""
         scor = self.shmm.rf2ScorInfo
+        # Green flag check
+        if scor.mGamePhase >= 5:  # inaccurate (5fps refresh rate from API)
+            return 0
+        # Workaround for accurate green flag moment (standing-start type only)
+        tele_data = self.shmm.rf2TeleVeh()
+        if tele_data.mElapsedTime - tele_data.mLapStartET >= 0:
+            return 0
+        # Start lights sequence
         return scor.mNumRedLights - scor.mStartLight + 1
 
     def track_temperature(self) -> float:

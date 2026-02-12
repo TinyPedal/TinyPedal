@@ -210,7 +210,7 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         is_lap_type_session = api.read.session.lap_type()
-        in_formation = api.read.session.in_formation()
+        pre_race = api.read.session.pre_race()
         energy_type = api.read.vehicle.max_virtual_energy()
 
         leader_index = minfo.vehicles.leaderIndex
@@ -277,7 +277,7 @@ class Realtime(Overlay):
 
             # Player refill
             if (is_lap_type_session and index != 1
-                or in_formation or not leader_valid or not player_valid):
+                or pre_race or not leader_valid or not player_valid):
                 refill_player = -MAX_SECONDS
             else:
                 refill_player = calc.total_fuel_needed(

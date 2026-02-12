@@ -339,6 +339,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = f"{data:.2f}"[:4].strip(".")
+            target.update()
 
     def update_ratio(self, target, data):
         """Travel ratio"""

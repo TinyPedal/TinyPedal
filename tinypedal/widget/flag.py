@@ -504,19 +504,17 @@ class GreenFlagTimer:
 
     def update(self, elapsed_time: float) -> int:
         """Check start lights and green flag state"""
-        if api.read.session.in_countdown():
-            self._last_lap_stime = api.read.timing.start()
+        start_lights = api.read.session.start_lights()
+        if start_lights > 0:
+            self._last_lap_stime = elapsed_time
 
         if self._last_lap_stime == -1:
             return -1  # bypass checking after green flag
 
-        start_timer = elapsed_time - self._last_lap_stime
-        if start_timer > self._green_flag_duration:
+        if elapsed_time - self._last_lap_stime > self._green_flag_duration:
             self._last_lap_stime = -1
             return -1 # disable green flag
-        if start_timer < 0:
-            return api.read.session.start_lights()  # enable red lights
-        return 0  # enable green flag
+        return start_lights  # enable red lights
 
     def reset(self):
         """Reset"""

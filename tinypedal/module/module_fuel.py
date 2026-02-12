@@ -151,8 +151,8 @@ def detect_consumption_type() -> Callable:
     # Pure electric based vehicle
     if (
         api.name == API_RF2_NAME
-        and api.read.vehicle.tank_capacity() == 1
         and api.read.emotor.battery_charge() > 0
+        and (api.read.vehicle.tank_capacity() == 1 or api.read.vehicle.tank_capacity() == 0)
     ):
         return telemetry_battery
     # Fuel based vehicle
