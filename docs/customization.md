@@ -3566,8 +3566,6 @@ Show rotation line only while vehicle is stationary (less than 1m/s).
 ## Stint history
 **This widget displays stint history info.**
 
-This widget consists of five columns from left to right (default order): `Total completed laps`, `Total driving time`, `Total fuel or virtual energy consumption`, `Tyre compound`, `Total average tyre wear (percent)`.
-
 Note, stint history is not recorded while in garage or during formation lap.
 
     layout
@@ -3583,7 +3581,27 @@ Show virtual energy consumption instead of fuel consumption if available. This o
 Show empty stint history. Default is `false`, which hides empty rows.
 
     minimum_stint_threshold_minutes
-Set the minimum stint time threshold in minutes for updating stint history. This only affects ESC.
+Set the minimum stint time threshold in minutes for concluding current stint. This only affects ESC.
+
+    minimum_pitstop_threshold_seconds
+Set the minimum pit stop time threshold in seconds for concluding current stint. Default is `3` seconds.
+
+This option is useful for detecting pit stop that does not refuel or change tyres. It also allows to detect pit stop while spectating other player with [Spectate Mode](#spectate-mode).
+
+    show_laps
+Show number of completed laps in the stint.
+
+    show_time
+Show total driving time in the stint.
+
+    show_fuel
+Show total fuel (or virtual energy) consumption in the stint.
+
+    show_tyre
+Show tyre compound used in the stint.
+
+    show_wear
+Show total average tyre wear (percent) in the stint.
 
 [**`Back to Top`**](#)
 
