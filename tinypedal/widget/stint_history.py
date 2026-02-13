@@ -243,17 +243,12 @@ class Realtime(Overlay):
             self.update_consist(self.bars_consist[0], self.stint_data[7])
 
     # GUI update methods
-    def update_cmpd(self, target, data):
-        """Compound data"""
-        if target.last != data:
-            target.last = data
-            target.text = data
-            target.update()
-
     def update_laps(self, target, data):
         """Laps data"""
         if target.last != data:
             target.last = data
+            if data < 0:
+                data = 0
             target.text = f"{data:03.0f}"[:3]
             target.update()
 
@@ -261,6 +256,8 @@ class Realtime(Overlay):
         """Time data"""
         if target.last != data:
             target.last = data
+            if data < 0:
+                data = 0
             target.text = calc.sec2stinttime(data)[:5]
             target.update()
 
@@ -268,13 +265,24 @@ class Realtime(Overlay):
         """Fuel data"""
         if target.last != data:
             target.last = data
+            if data < 0:
+                data = 0
             target.text = f"{data:.3f}"[:5]
+            target.update()
+
+    def update_cmpd(self, target, data):
+        """Compound data"""
+        if target.last != data:
+            target.last = data
+            target.text = data
             target.update()
 
     def update_wear(self, target, data):
         """Wear data"""
         if target.last != data:
             target.last = data
+            if data < 0:
+                data = 0
             target.text = f"{data:02.0f}%"[:3]
             target.update()
 
@@ -461,10 +469,10 @@ def stint_history_stats(
             last_lap_stime = lap_stime
 
         # Current stint data
-        stint_data[0] = max(lap_number - start_laps, 0)
-        stint_data[1] = max(elapsed_time - start_time, 0)
-        stint_data[2] = max(start_fuel - fuel_curr, 0)
-        stint_data[3] = max(start_energy - energy_curr, 0)
-        stint_data[5] = max(wear_avg - start_wear, 0)
+        stint_data[0] = lap_number - start_laps
+        stint_data[1] = elapsed_time - start_time
+        stint_data[2] = start_fuel - fuel_curr
+        stint_data[3] = start_energy - energy_curr
+        stint_data[5] = wear_avg - start_wear
         stint_data[6] = delta
         stint_data[7] = consistency * 100

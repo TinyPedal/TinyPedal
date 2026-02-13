@@ -1545,7 +1545,7 @@ Show percentage battery charge regenerated in current lap.
     show_estimated_net_change
 Show estimated battery charge net change from current lap. Positive value indicates net gain (regen higher than drain); negative indicates net loss (drain higher than regen).
 
-Total net change reading is more accurate for vehicles that constantly consume battery charge, such as `FE` or `Hypercar` class. It is less useful for vehicles that only utilize electric motor for a short duration, such as `P2P`.
+Total net change reading is more accurate for vehicles that constantly consume battery charge, such as `FE` or `Hypercar` class. It is less useful for vehicles that only utilize electric motor for a short duration, such as `Push to pass`.
 
 Note, at least one full lap (excludes pit-out or first lap) is required to generate estimated net change data.
 
@@ -2663,8 +2663,8 @@ Set vehicle outline width.
 [**`Back to Top`**](#)
 
 
-## P2P
-**This widget displays push to pass usage info.**
+## Push to pass
+**This widget displays push to pass (P2P) usage info.**
 
     show_battery_charge
 Show percentage available battery charge.

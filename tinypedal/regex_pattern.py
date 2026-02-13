@@ -172,7 +172,6 @@ ABBR_PATTERN = (
     "drs|"
     "ffb|"
     "lmu|"
-    "p2p|"
     "rpm|"
     "rf2|"
     "url"

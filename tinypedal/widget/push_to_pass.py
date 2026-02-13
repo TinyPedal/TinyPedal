@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-P2P Widget
+Push to pass Widget
 """
 
 from ..api_control import api
@@ -74,7 +74,10 @@ class Realtime(Overlay):
                 fg_color=self.bar_style_charge[1][0],
                 bg_color=self.bar_style_charge[1][1],
             )
-            layout.addWidget(self.bar_charge, 0, self.wcfg["column_index_battery_charge"])
+            self.set_primary_orient(
+                target=self.bar_charge,
+                column=self.wcfg["column_index_battery_charge"],
+            )
 
         # Activation timer
         if self.wcfg["show_activation_timer"]:
@@ -96,7 +99,10 @@ class Realtime(Overlay):
                 fg_color=self.bar_style_timer[0][0],
                 bg_color=self.bar_style_timer[0][1],
             )
-            layout.addWidget(self.bar_timer, 0, self.wcfg["column_index_activation_timer"])
+            self.set_primary_orient(
+                target=self.bar_timer,
+                column=self.wcfg["column_index_activation_timer"],
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -111,31 +117,29 @@ class Realtime(Overlay):
                     minfo.hybrid.motorInactiveTimer >= self.wcfg["minimum_activation_time_delay"] and
                     minfo.hybrid.motorActiveTimer < self.wcfg["maximum_activation_time_per_lap"] - 0.05
                 )
-            battery_charge = minfo.hybrid.batteryCharge, state
-            self.update_battery_charge(self.bar_charge, battery_charge)
+            self.update_battery_charge(self.bar_charge, minfo.hybrid.batteryCharge, state)
 
         # Activation timer
         if self.wcfg["show_activation_timer"]:
-            active_timer = minfo.hybrid.motorActiveTimer, minfo.hybrid.motorState
-            self.update_active_timer(self.bar_timer, active_timer)
+            self.update_active_timer(self.bar_timer, minfo.hybrid.motorActiveTimer, minfo.hybrid.motorState)
 
     # GUI update methods
-    def update_battery_charge(self, target, data):
+    def update_battery_charge(self, target, *data):
         """Battery charge"""
         if target.last != data:
             target.last = data
-            if data[0] < 99.5:
-                format_text = f"±{data[0]:02.0f}"
+            if data[0] < 100:
+                format_text = f"±{data[0]:02.6f}"[:3]
             else:
                 format_text = "MAX"
             target.text = format_text
             target.fg, target.bg = self.bar_style_charge[data[1]]
             target.update()
 
-    def update_active_timer(self, target, data):
-        """P2P activation timer"""
+    def update_active_timer(self, target, *data):
+        """Activation timer"""
         if target.last != data:
             target.last = data
-            target.text = f"{data[0]:.2f}"[:4]
+            target.text = f"{data[0]:.2f}"[:4].strip(".")
             target.fg, target.bg = self.bar_style_timer[data[1] != 2]
             target.update()
