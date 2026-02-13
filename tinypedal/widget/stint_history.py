@@ -20,6 +20,8 @@
 Stint history Widget
 """
 
+from __future__ import annotations
+
 from collections import deque
 
 from .. import calculation as calc
@@ -28,6 +30,7 @@ from ..api_control import api
 from ..const_common import FLOAT_INF, MAX_SECONDS
 from ..module_info import minfo
 from ..userfile.heatmap import select_compound_symbol
+from ..validator import generator_init
 from ._base import Overlay
 
 
@@ -53,8 +56,6 @@ class Realtime(Overlay):
         layout_reversed = self.wcfg["layout"] != 0
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         stint_slot = max(self.wcfg["stint_history_count"], 1)
-        self.minimum_stint_seconds = self.wcfg["minimum_stint_threshold_minutes"] * 60
-        self.minimum_pitstop_seconds = max(self.wcfg["minimum_pitstop_threshold_seconds"], 0.0)
 
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
@@ -200,103 +201,46 @@ class Realtime(Overlay):
             )
 
         # Last data
-        self.last_time = 0
-        self.stint_running = False
-        self.reset_stint = True
-        self.start_laps = 0
-        self.start_time = 0
-        self.start_fuel = 0
-        self.start_wear = 0
-        self.last_wear_avg = 0
-        self.last_fuel_curr = 0
-        self.last_time_stop = 0
-        self.stint_consistency = StintConsistency()
-        # 0=total laps, 1=total time, 2=total fuel, 3=tyre compound, 4=total tyre wear, 5=delta, 6=consistency
-        self.stint_data = [0,0,0,"--",0,0,0]
+        # 0=total laps, 1=total time, 2=total fuel, 3=total energy,
+        # 4=tyre compound, 5=total tyre wear, 6=delta, 7=consistency
+        self.stint_data = [0, 0.0, 0.0, 0.0, "--", 0.0, 0.0, 0.0]
         self.empty_data = tuple(self.stint_data)
         self.history_data = deque([self.empty_data for _ in range(stint_slot)], stint_slot)
-        self.update_stint_history()
+        self.stint_stats = stint_history_stats(
+            self.stint_data,
+            self.history_data,
+            self.wcfg["minimum_stint_threshold_minutes"] * 60,
+            max(self.wcfg["minimum_pitstop_threshold_seconds"], 0.0),
+            max(self.wcfg["minimum_tyre_temperature_threshold"], 0.0),
+        )
+        self.update_stint_history(False)
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        # Read stint data
-        lap_num = api.read.lap.number()
-        time_curr = api.read.session.elapsed()
-        in_pits = api.read.vehicle.in_pits()
-        in_garage = api.read.vehicle.in_garage()
-        wear_avg = 100 - sum(api.read.tyre.wear()) * 25
+        show_energy = self.wcfg["show_virtual_energy_if_available"] and api.read.vehicle.max_virtual_energy()
 
-        # Check if virtual energy available
-        if self.wcfg["show_virtual_energy_if_available"] and api.read.vehicle.max_virtual_energy():
-            fuel_curr = minfo.energy.amountCurrent
-        else:
-            fuel_curr = self.unit_fuel(minfo.fuel.amountCurrent)
-
-        # Ignore stint
-        if (
-            in_garage  # ignore while in garage
-            or api.read.session.pre_race()  # ignore before race starts
-            or abs(self.last_time - time_curr) > 4  # ignore game pause
-        ):
-            self.reset_stint = True
-            if self.stint_running and self.stint_data[1] >= self.minimum_stint_seconds:
-                self.update_stint_history(self.stint_data)
-        elif not in_pits:
-            self.last_fuel_curr = fuel_curr
-            self.last_wear_avg = wear_avg
-            self.stint_running = True
-        elif self.stint_running:
-            if api.read.vehicle.speed() > 1:
-                self.last_time_stop = time_curr
-            if (self.last_wear_avg > wear_avg
-                or self.last_fuel_curr < fuel_curr
-                or time_curr - self.last_time_stop > self.minimum_pitstop_seconds):
-                self.reset_stint = True
-                self.update_stint_history(self.stint_data)
-
-        self.last_time = time_curr
-
-        if self.reset_stint:
-            self.start_laps = lap_num
-            self.start_time = time_curr
-            self.start_fuel = fuel_curr
-            self.start_wear = wear_avg
-            self.reset_stint = False
-            self.stint_running = False
-            self.stint_consistency.reset()
-            # Update compound info once per stint
-            class_name = api.read.vehicle.class_name()
-            self.stint_data[3] = "".join(
-                select_compound_symbol(f"{class_name} - {tcmpd_name}")
-                for tcmpd_name in api.read.tyre.compound_name()
-            )
-
-        if self.start_fuel < fuel_curr:
-            self.start_fuel = fuel_curr
+        if next(self.stint_stats):
+            self.update_stint_history(show_energy)
 
         # Current stint data
-        self.stint_consistency.update(in_pits, api.read.timing.start())
-        self.stint_data[0] = max(lap_num - self.start_laps, 0)
-        self.stint_data[1] = max(time_curr - self.start_time, 0)
-        self.stint_data[2] = max(self.start_fuel - fuel_curr, 0)
-        self.stint_data[4] = max(wear_avg - self.start_wear, 0)
-        self.stint_data[5] = self.stint_consistency.delta
-        self.stint_data[6] = self.stint_consistency.consistency * 100
-
         if self.wcfg["show_laps"]:
             self.update_laps(self.bars_laps[0], self.stint_data[0])
         if self.wcfg["show_time"]:
             self.update_time(self.bars_time[0], self.stint_data[1])
         if self.wcfg["show_fuel"]:
-            self.update_fuel(self.bars_fuel[0], self.stint_data[2])
+            if show_energy:
+                fuel = self.stint_data[3]
+            else:
+                fuel = self.unit_fuel(self.stint_data[2])
+            self.update_fuel(self.bars_fuel[0], fuel)
         if self.wcfg["show_tyre"]:
-            self.update_cmpd(self.bars_cmpd[0], self.stint_data[3])
+            self.update_cmpd(self.bars_cmpd[0], self.stint_data[4])
         if self.wcfg["show_wear"]:
-            self.update_wear(self.bars_wear[0], self.stint_data[4])
+            self.update_wear(self.bars_wear[0], self.stint_data[5])
         if self.wcfg["show_delta"]:
-            self.update_delta(self.bars_delta[0], self.stint_data[5])
+            self.update_delta(self.bars_delta[0], self.stint_data[6])
         if self.wcfg["show_consistency"]:
-            self.update_consist(self.bars_consist[0], self.stint_data[6])
+            self.update_consist(self.bars_consist[0], self.stint_data[7])
 
     # GUI update methods
     def update_cmpd(self, target, data):
@@ -348,14 +292,9 @@ class Realtime(Overlay):
             target.text = f"{f'{data:.3f}':.5}%"
             target.update()
 
-    def update_stint_history(self, new_stint_data=None):
+    def update_stint_history(self, show_energy: bool):
         """Stint history data"""
-        if new_stint_data:
-            self.history_data.appendleft(tuple(new_stint_data))
-
-        for index, data in enumerate(self.history_data):
-            index += 1
-
+        for index, data in enumerate(self.history_data, 1):
             if data[1]:
                 hidden = False
             else:
@@ -371,64 +310,161 @@ class Realtime(Overlay):
                 self.bars_time[index].setHidden(hidden)
 
             if self.wcfg["show_fuel"]:
-                self.update_fuel(self.bars_fuel[index], data[2])
+                if show_energy:
+                    fuel = data[3]
+                else:
+                    fuel = self.unit_fuel(data[2])
+                self.update_fuel(self.bars_fuel[index], fuel)
                 self.bars_fuel[index].setHidden(hidden)
 
             if self.wcfg["show_tyre"]:
-                self.update_cmpd(self.bars_cmpd[index], data[3])
+                self.update_cmpd(self.bars_cmpd[index], data[4])
                 self.bars_cmpd[index].setHidden(hidden)
 
             if self.wcfg["show_wear"]:
-                self.update_wear(self.bars_wear[index], data[4])
+                self.update_wear(self.bars_wear[index], data[5])
                 self.bars_wear[index].setHidden(hidden)
 
             if self.wcfg["show_delta"]:
-                self.update_delta(self.bars_delta[index], data[5])
+                self.update_delta(self.bars_delta[index], data[6])
                 self.bars_delta[index].setHidden(hidden)
 
             if self.wcfg["show_consistency"]:
-                self.update_consist(self.bars_consist[index], data[6])
+                self.update_consist(self.bars_consist[index], data[7])
                 self.bars_consist[index].setHidden(hidden)
 
 
-class StintConsistency:
-    """Stint consistency data"""
+@generator_init
+def stint_history_stats(
+    stint_data: list,
+    history_data: deque[tuple],
+    minimum_stint_seconds: float,
+    minimum_pitstop_seconds: float,
+    minimum_tyre_temperature: float,
+):
+    """Stint history stats"""
+    # Stint stats
+    reset_stint = True
+    stint_running = False
 
-    def __init__(self):
-        self.reset()
+    start_laps = 0
+    start_time = 0
+    start_fuel = 0
+    start_energy = 0
+    start_wear = 0
 
-    def update(self, in_pits: bool, lap_stime: float):
-        """Calculate stint delta & consistency"""
-        self._pitting |= in_pits
+    last_time = 0
+    last_wear_avg = 0
+    last_fuel_curr = 0
+    last_energy_curr = 0
+    last_time_stop = 0
 
-        if self._last_lap_stime != lap_stime:
-            last_laptime = lap_stime - self._last_lap_stime
+    # Stint consistency
+    pitting = 1
+    last_lap_stime = FLOAT_INF
+    stint_laps = 0
+    stint_time = 0.0
+    stint_fastest = MAX_SECONDS
+    consistency = 1.0
+    delta = 0.0
 
-            if last_laptime <= 0:
-                self._last_lap_stime = lap_stime
-                self._pitting = 1
-                return
+    while True:
+        yield False
+        # Read stint data
+        lap_stime = api.read.timing.start()
+        lap_number = api.read.lap.number()
+        elapsed_time = api.read.session.elapsed()
+        in_pits = api.read.vehicle.in_pits()
+        in_garage = api.read.vehicle.in_garage()
+        wear_avg = 100 - sum(api.read.tyre.wear()) * 25
+        fuel_curr = minfo.fuel.amountCurrent
+        energy_curr = minfo.energy.amountCurrent
 
-            if not self._pitting:
-                self._stint_laps += 1
-                self._stint_time += last_laptime
-                if self._stint_fastest > last_laptime:
-                    self._stint_fastest = last_laptime
-                if self._stint_laps > 1:
-                    stint_average = (self._stint_time - self._stint_fastest) / (self._stint_laps - 1)
+        # Ignore stint
+        if (
+            in_garage  # ignore while in garage
+            or api.read.session.pre_race()  # ignore before race starts
+            or abs(last_time - elapsed_time) > 4  # ignore game pause
+        ):
+            reset_stint = True
+            if stint_running and stint_data[1] >= minimum_stint_seconds:
+                history_data.appendleft(tuple(stint_data))
+                yield True
+        elif not in_pits:
+            last_fuel_curr = fuel_curr
+            last_energy_curr = energy_curr
+            last_wear_avg = wear_avg
+            stint_running = True
+        elif stint_running:
+            if api.read.vehicle.speed() > 1:
+                last_time_stop = elapsed_time
+            if (last_wear_avg > wear_avg
+                or last_fuel_curr < fuel_curr
+                or last_energy_curr < energy_curr
+                or elapsed_time - last_time_stop > minimum_pitstop_seconds):
+                reset_stint = True
+                history_data.appendleft(tuple(stint_data))
+                yield True
+
+        last_time = elapsed_time
+
+        if reset_stint:
+            reset_stint = False
+            stint_running = False
+            # Reset stats
+            start_laps = lap_number
+            start_time = elapsed_time
+            start_fuel = fuel_curr
+            start_energy = energy_curr
+            start_wear = wear_avg
+            # Reset consistency
+            pitting = 1
+            last_lap_stime = FLOAT_INF
+            stint_laps = 0
+            stint_time = 0.0
+            stint_fastest = MAX_SECONDS
+            consistency = 1.0
+            delta = 0.0
+            # Update compound info once per stint
+            class_name = api.read.vehicle.class_name()
+            stint_data[4] = "".join(
+                select_compound_symbol(f"{class_name} - {tcmpd_name}")
+                for tcmpd_name in api.read.tyre.compound_name()
+            )
+
+        if start_fuel < fuel_curr:
+            start_fuel = fuel_curr
+        if start_energy < energy_curr:
+            start_energy = energy_curr
+
+        # Stint delta & consistency
+        pitting |= in_pits
+
+        if last_lap_stime != lap_stime:
+            last_laptime = lap_stime - last_lap_stime
+            if (
+                not pitting
+                and last_laptime > 0
+                and max(api.read.tyre.carcass_temperature()) > minimum_tyre_temperature
+            ):
+                stint_laps += 1
+                stint_time += last_laptime
+                if stint_fastest > last_laptime:
+                    stint_fastest = last_laptime
+                if stint_laps > 1:
+                    stint_average = (stint_time - stint_fastest) / (stint_laps - 1)
                     if stint_average > 0:
-                        self.consistency = self._stint_fastest / stint_average
-                        self.delta = stint_average - self._stint_fastest
+                        consistency = stint_fastest / stint_average
+                        delta = stint_average - stint_fastest
             # Reset
-            self._pitting = 0
-            self._last_lap_stime = lap_stime
+            pitting = (last_laptime <= 0)
+            last_lap_stime = lap_stime
 
-    def reset(self):
-        """Reset"""
-        self._pitting = 1
-        self._last_lap_stime = FLOAT_INF
-        self._stint_laps = 0
-        self._stint_time = 0.0
-        self._stint_fastest = MAX_SECONDS
-        self.consistency = 1.0
-        self.delta = 0.0
+        # Current stint data
+        stint_data[0] = max(lap_number - start_laps, 0)
+        stint_data[1] = max(elapsed_time - start_time, 0)
+        stint_data[2] = max(start_fuel - fuel_curr, 0)
+        stint_data[3] = max(start_energy - energy_curr, 0)
+        stint_data[5] = max(wear_avg - start_wear, 0)
+        stint_data[6] = delta
+        stint_data[7] = consistency * 100

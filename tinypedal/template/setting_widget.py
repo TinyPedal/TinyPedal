@@ -2315,6 +2315,7 @@ WIDGET_DEFAULT = {
         "show_virtual_energy_if_available": True,
         "minimum_stint_threshold_minutes": 10,
         "minimum_pitstop_threshold_seconds": 3,
+        "minimum_tyre_temperature_threshold": 55,
         "show_laps": True,
         "font_color_laps": "#222222",
         "bkg_color_laps": "#CCCCCC",

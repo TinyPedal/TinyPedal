@@ -247,7 +247,7 @@ class Realtime(Overlay):
         """Wear data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:03.1f}"[:3]
+            target.text = f"{data:03.1f}"[:3].strip(".")
             target.update()
 
     def update_laps_history(self, dataset):

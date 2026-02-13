@@ -3588,6 +3588,11 @@ Set the minimum pit stop time threshold in seconds for concluding current stint.
 
 This option is useful for detecting pit stop that does not refuel or change tyres. It also allows to detect pit stop while spectating other player with [Spectate Mode](#spectate-mode).
 
+    minimum_tyre_temperature_threshold
+Set the minimum tyre carcass temperature (Celsius) threshold for calculating lap time delta and consistency. Default is `55` degrees.
+
+This option helps to exclude slow lap time due to cold tyres from calculation.
+
     show_laps
 Show number of completed laps in the stint.
 
@@ -3604,10 +3609,10 @@ Show tyre compound used in the stint.
 Show total average tyre wear (percent) in the stint.
 
     show_delta
-Show lap time delta between stint best and stint average non-best lap time.
+Show lap time delta between stint best and stint average non-best lap time. Note, pit-in and pit-out laps are excluded from calculation.
 
     show_consistency
-Show lap time consistency (percent) between stint best and stint average non-best lap time.
+Show lap time consistency (percent) between stint best and stint average non-best lap time. Note, pit-in and pit-out laps are excluded from calculation.
 
 [**`Back to Top`**](#)
 
