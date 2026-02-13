@@ -205,14 +205,14 @@ def lap_difference(
     opt_laps: float, plr_laps: float, lap_ahead: float = 1, lap_behind: float = 1) -> float:
     """Calculate lap difference between target opponent and player
 
-    Positive: lap(s) ahead.
-    Negative: lap(s) behind.
-    Zero: on same lap.
+    Positive: opponent is lap(s) ahead.
+    Negative: opponent is lap(s) behind.
+    Zero: opponent is on same lap.
     """
     lap_diff = opt_laps - plr_laps
-    if lap_diff > lap_ahead or lap_diff < -lap_behind:
-        return lap_diff
-    return 0
+    if lap_ahead > lap_diff > -lap_behind:
+        return 0
+    return lap_diff
 
 
 def relative_time_gap(rel_dist: float, plr_speed: float, opt_speed: float) -> float:

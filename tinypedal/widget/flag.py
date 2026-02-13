@@ -341,7 +341,10 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data != MAX_SECONDS:
-                target.text = f"BLUE{data:3.0f}"[:7]
+                class_name = minfo.vehicles.nearestBlueClass
+                if not class_name:
+                    class_name = "BLUE"
+                target.text = f"{class_name:<4.4}{data:3.0f}"[:7]
                 target.update()
                 hidden = False
             else:

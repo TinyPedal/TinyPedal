@@ -604,6 +604,7 @@ class VehiclesInfo:
         "nearestTraffic",
         "nearestYellowAhead",
         "nearestYellowBehind",
+        "nearestBlueClass",
         "leaderBestLapTime",
     )
 
@@ -624,6 +625,7 @@ class VehiclesInfo:
         self.nearestTraffic: float = MAX_SECONDS
         self.nearestYellowAhead: float = MAX_METERS
         self.nearestYellowBehind: float = -MAX_METERS
+        self.nearestBlueClass: str = ""
         self.leaderBestLapTime: float = MAX_SECONDS
 
 

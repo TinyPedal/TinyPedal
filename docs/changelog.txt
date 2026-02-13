@@ -8,6 +8,9 @@ WIP
   - Fixed an issue that would prevent TinyPedal from restarting if attempted to restart while driving.
   - Installer script (install.sh) now installs only the necessary files and documents for running TinyPedal on Linux.
 
+* Flag Widget
+  - Show nearest leading vehicle class name on blue flag indicator, which helps to quickly spot the class that is about to lap you.
+
 * Lap time history Widget
   - Added "show_delta" option, which shows lap time delta between two consecutive laps. This option can be useful to quickly check stint pace.
   - Added options to show or hide individual column.

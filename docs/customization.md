@@ -2094,7 +2094,7 @@ Set maximum range (meters) for displaying yellow flags that ahead of or behind d
 Note, yellow flags that ahead of driver take priority over those from behind.
 
     show_blue_flag
-Show blue flag indicator with timer.
+Show blue flag indicator with nearest leading vehicle class name displayed on the left, and total duration (seconds) under blue flag on the right. Note, the class name is limited and trimmed to 4 characters.
 
     show_blue_flag_for_race_only
 Only show blue flag indicator during race session.

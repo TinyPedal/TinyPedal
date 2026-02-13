@@ -129,7 +129,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data[0] < 100:
-                format_text = f"±{data[0]:02.6f}"[:3]
+                format_text = f"±{data[0]:09.6f}"[:3]
             else:
                 format_text = "MAX"
             target.text = format_text

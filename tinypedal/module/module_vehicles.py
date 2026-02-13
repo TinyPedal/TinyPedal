@@ -91,6 +91,7 @@ def update_vehicle_data(
     nearest_time_behind = -MAX_SECONDS
     nearest_yellow_ahead = MAX_METERS
     nearest_yellow_behind = -MAX_METERS
+    nearest_blue_class = ""
 
     # Counter
     total_completed_laps = 0
@@ -102,6 +103,7 @@ def update_vehicle_data(
     # General data
     track_length = api.read.lap.track_length()
     in_race = api.read.session.in_race()
+    under_blue = api.read.session.blue_flag()
     speedtrap_distance = minfo.mapping.speedTrapPosition
 
     # Local player data
@@ -191,6 +193,8 @@ def update_vehicle_data(
                 )
                 if 0 > opt_time_behind > nearest_time_behind:
                     nearest_time_behind = opt_time_behind
+                    if under_blue and (not in_race or data.isLapped > 0):
+                        nearest_blue_class = data.vehicleClass
             # Nearest yellow flag distance
             if data.isYellow:
                 opt_rel_distance = calc.circular_relative_distance(
@@ -251,6 +255,7 @@ def update_vehicle_data(
     output.nearestTraffic = -nearest_time_behind
     output.nearestYellowAhead = nearest_yellow_ahead
     output.nearestYellowBehind = nearest_yellow_behind
+    output.nearestBlueClass = nearest_blue_class
     output.dataSetVersion += 1
 
     if update_low_priority:
