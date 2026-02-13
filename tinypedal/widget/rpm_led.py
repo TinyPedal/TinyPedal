@@ -180,30 +180,37 @@ class Realtime(Overlay):
     def draw_rpm_led(self, painter, rpm, rpm_scale, x_offset, y_offset, led_offset):
         """Draw RPM LED"""
         rpm_scaled = rpm * rpm_scale
+        full_light = True
 
+        if self.limiter:
+            painter.setBrush(self.brush_led[6 if self.flicker else 0])
+        elif rpm >= self.rpm_overrev:
+            painter.setBrush(self.brush_led[0 if self.flicker else 5])
+        elif rpm >= self.rpm_critical:
+            painter.setBrush(self.brush_led[0 if self.flicker else 4])
+        elif rpm < 0:
+            painter.setBrush(self.brush_led[0])
+        else:
+            full_light = False
+
+        painter.translate(x_offset, y_offset)
         for index in range(self.max_led):
-            # Full
-            if self.limiter:
-                painter.setBrush(self.brush_led[6 if self.flicker else 0])
-            elif rpm >= self.rpm_overrev:
-                painter.setBrush(self.brush_led[0 if self.flicker else 5])  # over rev
-            elif rpm >= self.rpm_critical:
-                painter.setBrush(self.brush_led[0 if self.flicker else 4])  # critical
-            # Progressive
-            elif index < rpm_scaled:
-                painter.setBrush(self.color_rpm_led(index / rpm_scale))
-            # Off
-            else:
-                painter.setBrush(self.brush_led[0])
-
-            painter.translate(x_offset, y_offset)
+            if not full_light:
+                # Progressive
+                if index < rpm_scaled:
+                    painter.setBrush(self.color_rpm_led(index / rpm_scale))
+                # Off
+                else:
+                    painter.setBrush(self.brush_led[0])
+            # Draw led
             if self.led_radius:
                 painter.drawRoundedRect(self.rect_led, self.led_radius, self.led_radius)
             else:
                 painter.drawRect(self.rect_led)
-            painter.resetTransform()
-
-            x_offset += led_offset
+            # Set next offset
+            painter.translate(led_offset, 0)
+        # Reset
+        painter.resetTransform()
 
     def color_rpm_led(self, rpm: float):
         """Set RPM LED color"""
