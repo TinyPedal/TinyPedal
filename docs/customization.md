@@ -386,7 +386,7 @@ This option overrides local player on-track status check, and updates or stops o
 Set `true` to enable `player index` manual override.
 
     player_index
-Set `player index` override for displaying data from specific player. Valid player index range starts from `0` to max number players minus one, and must not exceed `127`. Set value to `-1` for unspecified player, which can be useful for display general standings and trackmap data (ex. broadcasting). This option works only when `enable_player_index_override` enabled.
+Set `player index` override for displaying data from specific player. Valid player index range starts from `0` to maximum number players minus one, and must not exceed `127`. Set value to `-1` for unspecified player, which can be useful for display general standings and trackmap data (ex. broadcasting). This option works only when `enable_player_index_override` enabled.
 
     character_encoding
 Set character encoding for displaying text in correct encoding. Available encoding: `UTF-8`, `ISO-8859-1`. Default encoding is `UTF-8`.
@@ -453,7 +453,7 @@ This option overrides local player on-track status check, and updates or stops o
 Set `true` to enable `player index` manual override.
 
     player_index
-Set `player index` override for displaying data from specific player. Valid player index range starts from `0` to max number players minus one, and must not exceed `127`. Set value to `-1` for unspecified player, which can be useful for display general standings and trackmap data (ex. broadcasting). This option works only when `enable_player_index_override` enabled.
+Set `player index` override for displaying data from specific player. Valid player index range starts from `0` to maximum number players minus one, and must not exceed `127`. Set value to `-1` for unspecified player, which can be useful for display general standings and trackmap data (ex. broadcasting). This option works only when `enable_player_index_override` enabled.
 
     character_encoding
 Set character encoding for displaying text in correct encoding. Available encoding: `UTF-8`, `ISO-8859-1`. Default encoding is `UTF-8`. Note, `UTF-8` may not work well for some Latin characters in `RF2`, try use `ISO-8859-1` instead.
@@ -924,7 +924,7 @@ Select one or more `Time`, `Fuel`, `Energy`, `Tyre`, `Tank` values from history 
 Select multiple values from history table and click `Add selected data` button to calculate average reading of selected values and send to calculator.
 
     Lap time
-Set lap time in `minutes` : `seconds` : `milliseconds` format. Values are automatically carried over between spin boxes when exceeded min or max value range. This value can be retrieved from `Time` column.
+Set lap time in `minutes` : `seconds` : `milliseconds` format. Values are automatically carried over between spin boxes when exceeded minimum or maximum value range. This value can be retrieved from `Time` column.
 
     Tank capacity
 Set vehicle fuel tank capacity. This value can be retrieved from `Tank` column.
@@ -1370,19 +1370,19 @@ Enable force module.
 Set gravitational acceleration value on earth.
 
     max_g_force_reset_delay
-Set time delay in seconds for resetting max g force reading.
+Set time delay in seconds for resetting maximum g force reading.
 
     max_average_g_force_samples
-Set amount samples for calculating max average g force. Minimum value is limited to `3`.
+Set amount samples for calculating maximum average g force. Minimum value is limited to `3`.
 
     max_average_g_force_difference
-Set max average g force difference threshold which compares with the standard deviation calculated from max average g force samples. Default is `0.2` g.
+Set maximum average g force difference threshold which compares with the standard deviation calculated from maximum average g force samples. Default is `0.2` g.
 
     max_average_g_force_reset_delay
-Set time delay in seconds for resetting max average g force. Default is `30` seconds.
+Set time delay in seconds for resetting maximum average g force. Default is `30` seconds.
 
     max_braking_rate_reset_delay
-Set time delay in seconds for resetting max braking rate. Default is `60` seconds.
+Set time delay in seconds for resetting maximum braking rate. Default is `60` seconds.
 
 [**`Back to Top`**](#)
 
@@ -1497,6 +1497,9 @@ Set minimum axle rotation (radians per second) for calculating wheel radius and 
     maximum_rotation_difference_front, maximum_rotation_difference_rear
 Set maximum rotation difference between left or right wheel rotation and same axle rotation for limiting wheel radius calculation. Default value is `0.002` (0.2%). Setting higher difference value may result inaccurate wheel radius reading.
 
+    wheel_lock_threshold
+Set percentage threshold for counting wheel lock duration under braking. `0.3` means 30% of tyre slip ratio.
+
     cornering_radius_sampling_interval
 Set position sampling interval for cornering radius calculation. Value range in `5` to `100`. Default sampling interval is `10`, which is roughly 200ms interval between each recorded position. Higher value may result inaccuracy. Note, this option does not affect position recording interval.
 
@@ -1608,22 +1611,19 @@ Set value to `1` to manual override and use rear allocation, which is commonly s
 **This widget displays brake performance info.**
 
     show_transient_max_braking_rate
-Show transient max braking rate (g) from last braking input, and resets after 3 seconds.
+Show transient maximum braking rate (g) from last braking input, and resets after 3 seconds.
 
     show_max_braking_rate
-Show max braking rate (g), and resets after a set period of time that defined by `max_braking_rate_reset_delay` value in Force Module.
+Show maximum braking rate (g), and resets after a set period of time that defined by `max_braking_rate_reset_delay` value in Force Module.
 
     show_delta_braking_rate
-Show max braking rate difference (g) against transient max braking rate, and resets on the next braking.
+Show maximum braking rate difference (g) against transient maximum braking rate, and resets on the next braking.
 
     show_delta_braking_rate_in_percentage
-Show max braking rate difference (g) in percentage (%) instead.
+Show maximum braking rate difference (g) in percentage (%) instead.
 
     show_front_wheel_lock_duration, show_rear_wheel_lock_duration
-Show front and rear wheel lock duration (seconds) per lap under braking. Duration increases when tyre slip ratio has exceeded `wheel_lock_threshold` value, and resets on first braking input of a new lap.
-
-    wheel_lock_threshold
-Set percentage threshold for counting wheel lock duration under braking. `0.3` means 30% of tyre slip ratio.
+Show maximum front and rear wheel lock duration (seconds) per lap under braking. Duration increases when tyre slip ratio has exceeded `wheel_lock_threshold` value that set in [Wheels Module](#wheels-module), and resets on first braking input of a new lap.
 
 [**`Back to Top`**](#)
 
@@ -1859,10 +1859,10 @@ Show visualized delta bar.
 Set delta bar length and height in pixels.
 
     bar_display_range
-Set max display range (gain or loss) in seconds for delta bar, accepts decimal place. Default is `2` seconds.
+Set maximum display range (gain or loss) in seconds for delta bar, accepts decimal place. Default is `2` seconds.
 
     delta_display_range
-Set max display range (gain or loss) in seconds for delta reading, accepts decimal place. Default is `99.999` seconds.
+Set maximum display range (gain or loss) in seconds for delta reading, accepts decimal place. Default is `99.999` seconds.
 
     freeze_duration
 Set freeze duration (seconds) for displaying previous lap time difference against best lap time source after crossing finish line. Value range in `0` to `30` seconds. Default is `3` seconds. Set to `0` to disable.
@@ -2166,7 +2166,7 @@ Set viewable g force range by radius(g).
 Set `true` to invert display orientation for longitudinal and lateral g force axis. Default is `false`, which shows brake at top, acceleration at bottom, right-turn at left, left-turn at right.
 
     show_readings
-Show values from g force reading. Value at top is current longitudinal g force, and value at bottom is max longitudinal g force. Value at left is max lateral g force, and value at right is current lateral g force.
+Show values from g force reading. Value at top is current longitudinal g force, and value at bottom is maximum longitudinal g force. Value at left is maximum lateral g force, and value at right is current lateral g force.
 
     show_background
 Show background color that covers entire widget.
@@ -2181,7 +2181,7 @@ Fade out circle background edge.
 Set fade in/out radius, value range in `0.0` to `1.0`.
 
     show_max_average_lateral_g_circle
-Show max average lateral g force reference circle.
+Show maximum average lateral g force reference circle.
 
     max_average_lateral_g_circle_style
 Set circle line style. `0` for dashed line, `1` for solid line.
@@ -2199,7 +2199,7 @@ Set g force dot size in pixels.
 Show g force trace.
 
     trace_max_samples
-Set max amount g force trace samples.
+Set maximum amount g force trace samples.
 
     trace_style
 Set g force trace style. `0` for line style. `1` for point style.
@@ -2432,7 +2432,7 @@ Set percentage threshold for displaying low or high battery charge warning indic
 Show battery charge (in percentage) reading text on battery bar.
 
     show_rpm_bar
-Show a RPM bar at bottom of gear widget, which moves when RPM reaches range between safe and max RPM.
+Show a RPM bar at bottom of gear widget, which moves when RPM reaches range between safe and maximum RPM.
 
     show_inverted_rpm
 Invert RPM bar progression.
@@ -2444,16 +2444,16 @@ RPM bar height, in pixel.
 Show RPM reading text on RPM bar.
 
     rpm_multiplier_safe
-This value multiplies max RPM value, which sets relative safe RPM range for RPM color indicator (changes gear widget background color upon reaching this RPM value).
+This value multiplies maximum RPM value, which sets relative safe RPM range for RPM color indicator (changes gear widget background color upon reaching this RPM value).
 
     rpm_multiplier_redline
-This value multiplies max RPM value, which sets relative redline RPM range for RPM color indicator.
+This value multiplies maximum RPM value, which sets relative redline RPM range for RPM color indicator.
 
     rpm_multiplier_critical
-This value multiplies max RPM value, which sets critical RPM range for RPM color indicator.
+This value multiplies maximum RPM value, which sets critical RPM range for RPM color indicator.
 
     show_rpm_flickering_above_critical
-Show flickering effects when RPM is above critical range and gear is lower than max gear.
+Show flickering effects when RPM is above critical range and gear is lower than maximum gear.
 
     neutral_warning_speed_threshold, neutral_warning_time_threshold
 Set speed/time threshold value for neutral gear color warning, which activates color warning when speed and time-in-neutral is higher than threshold. Speed unit in meters per second, Default is `28`. Time unit in seconds, Default is `0.3` seconds.
@@ -2598,7 +2598,7 @@ Show your current lap number (lap progression) and total race laps. If total rac
 Note, estimated total laps reading is calculated based on local player's lap time pace data from Delta Module, which can be different from in-game HUD reading. This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it.
 
     bkg_color_maxlap_warn
-Set warning color that shows 1 lap before exceeding max-lap in qualify (or indicates the last lap of a lap-type race).
+Set warning color that shows 1 lap before exceeding maximum-lap in qualify (or indicates the last lap of a lap-type race).
 
     show_position_overall
 Show your current overall position against all drivers in a session.
@@ -2742,13 +2742,13 @@ Show pedal bar in horizontal style.
 Set pedal bar length and width in pixels.
 
     inner_gap
-Set gap between pedal and max indicator.
+Set gap between pedal and maximum indicator.
 
     max_indicator_height
-This is the indicator height when pedal reaches 100% travel, value in pixel.
+This is the indicator height when pedal reaches maximum travel (100%), value in pixel.
 
     show_brake_pressure
-Show brake pressure changes applied on all wheels, which auto scales with max brake pressure and indicates amount brake released by ABS on all wheels. This option is enabled by default, which replaces game's filtered brake input that cannot show ABS.
+Show brake pressure changes applied on all wheels, which auto scales with maximum brake pressure and indicates amount brake released by ABS on all wheels. This option is enabled by default, which replaces game's filtered brake input that cannot show ABS.
 
     show_throttle
 Show throttle bar.
@@ -3279,22 +3279,22 @@ Enable `Outside to Center` LED layout (as opposite to `Left to Right` layout). W
 Set LED width, height, radius in pixels. To achieve circle LED, set a higher radius value.
 
     rpm_multiplier_low
-This value multiplies max RPM value, which sets starting range of RPM LED.
+This value multiplies maximum RPM value, which sets starting range of RPM LED.
 
     rpm_multiplier_safe
-This value multiplies max RPM value, which sets safe range of RPM LED.
+This value multiplies maximum RPM value, which sets safe range of RPM LED.
 
     rpm_multiplier_redline
-This value multiplies max RPM value, which sets redline range of RPM LED.
+This value multiplies maximum RPM value, which sets redline range of RPM LED.
 
     rpm_multiplier_critical
-This value multiplies max RPM value, which sets critical range of RPM LED.
+This value multiplies maximum RPM value, which sets critical range of RPM LED.
 
     rpm_multiplier_over_rev
-This value multiplies max RPM value, which sets over rev range of RPM LED.
+This value multiplies maximum RPM value, which sets over rev range of RPM LED.
 
     show_rpm_flickering_above_critical
-Show flickering effects when RPM is above critical range and gear is lower than max gear.
+Show flickering effects when RPM is above critical range and gear is lower than maximum gear.
 
     show_speed_limiter_flash
 Show RPM LED flash effect when speed limiter is activated.

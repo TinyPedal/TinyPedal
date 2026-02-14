@@ -31,6 +31,9 @@ WIP
   - Renamed "P2P" widget to "Push to pass" for clarity.
   - Add "layout" option, which sets display orientation. Default is horizontal. Set "0" to show vertically.
 
+* Wheels Module
+  - Now handles wheel lock duration calculation, added "wheel_lock_threshold" option (removed from Brake performance Widget).
+
 2.40.1 (2026-01-30)
 -----------------------------
 * Hotkey Tab

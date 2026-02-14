@@ -633,9 +633,10 @@ class WheelsInfo:
     """Wheels module output data"""
 
     __slots__ = (
+        "corneringRadius",
         "lockingPercentFront",
         "lockingPercentRear",
-        "corneringRadius",
+        "lockingTime",
         "slipRatio",
         "currentTreadDepth",
         "currentLapTreadWear",
@@ -656,9 +657,10 @@ class WheelsInfo:
     )
 
     def __init__(self):
+        self.corneringRadius: float = 0.0
         self.lockingPercentFront: float = 0.0
         self.lockingPercentRear: float = 0.0
-        self.corneringRadius: float = 0.0
+        self.lockingTime: list[float] = list(WHEELS_ZERO)
         self.slipRatio: list[float] = list(WHEELS_ZERO)
         self.currentTreadDepth: list[float] = list(WHEELS_ZERO)
         self.currentLapTreadWear: list[float] = list(WHEELS_ZERO)

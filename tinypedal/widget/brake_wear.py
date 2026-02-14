@@ -297,7 +297,7 @@ class Realtime(Overlay):
             if is_failed:
                 text = "FAIL"
             else:
-                text = self.format_num(data)
+                text = f"{data:.2f}"[:4].strip(".")
             target.text = text
             target.fg = self.bar_style_remain[data <= threshold_remaining]
             target.update()
@@ -306,7 +306,7 @@ class Realtime(Overlay):
         """Wear differences"""
         if target.last != data:
             target.last = data
-            target.text = self.format_num(data)
+            target.text = f"{data:.2f}"[:4].strip(".")
             target.fg = self.bar_style_diff[percent > self.wcfg["warning_threshold_wear"]]
             target.update()
 
@@ -314,7 +314,7 @@ class Realtime(Overlay):
         """Live wear differences"""
         if target.last != data:
             target.last = data
-            target.text = self.format_num(data)
+            target.text = f"{data:.2f}"[:4].strip(".")
             target.fg = self.bar_style_live[percent > self.wcfg["warning_threshold_wear"]]
             target.update()
 
@@ -322,7 +322,7 @@ class Realtime(Overlay):
         """Estimated lifespan in laps"""
         if target.last != data:
             target.last = data
-            target.text = self.format_num(data)
+            target.text = f"{data:.2f}"[:4].strip(".")
             target.fg = self.bar_style_laps[data <= self.wcfg["warning_threshold_laps"]]
             target.update()
 
@@ -330,12 +330,6 @@ class Realtime(Overlay):
         """Estimated lifespan in minutes"""
         if target.last != data:
             target.last = data
-            target.text = self.format_num(data)
+            target.text = f"{data:.2f}"[:4].strip(".")
             target.fg = self.bar_style_mins[data <= self.wcfg["warning_threshold_minutes"]]
             target.update()
-
-    # Additional methods
-    @staticmethod
-    def format_num(value):
-        """Format number"""
-        return f"{value:.2f}"[:4].strip(".")

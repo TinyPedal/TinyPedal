@@ -20,7 +20,6 @@
 Brake performance Widget
 """
 
-from ..api_control import api
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -116,7 +115,7 @@ class Realtime(Overlay):
                 column=self.wcfg["column_index_front_wheel_lock_duration"],
             )
 
-        # Front wheel lock duration
+        # Rear wheel lock duration
         if self.wcfg["show_rear_wheel_lock_duration"]:
             self.bar_lock_r = self.set_rawtext(
                 text="R 0.0",
@@ -131,12 +130,6 @@ class Realtime(Overlay):
                 target=self.bar_lock_r,
                 column=self.wcfg["column_index_rear_wheel_lock_duration"],
             )
-
-        # Last data
-        self.lock_timer = WheelLockTimer(
-            self.wcfg["show_front_wheel_lock_duration"] or self.wcfg["show_rear_wheel_lock_duration"],
-            self.wcfg["wheel_lock_threshold"]
-        )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -155,20 +148,13 @@ class Realtime(Overlay):
             delta_rate = minfo.force.deltaBrakingRate
             self.update_delta_rate(self.bar_delta_rate, delta_rate)
 
-        # Wheel lock duration
-        if self.lock_timer.enabled:
-            self.lock_timer.calc(
-                api.read.inputs.brake_raw(),
-                api.read.timing.start(),
-                api.read.timing.elapsed(),
-                minfo.wheels.slipRatio,
-            )
-
+        # Front wheel lock duration
         if self.wcfg["show_front_wheel_lock_duration"]:
-            self.update_lock_time_f(self.bar_lock_f, self.lock_timer.front)
+            self.update_lock_time_f(self.bar_lock_f, max(minfo.wheels.lockingTime[:2]))
 
+        # Rear wheel lock duration
         if self.wcfg["show_rear_wheel_lock_duration"]:
-            self.update_lock_time_r(self.bar_lock_r, self.lock_timer.rear)
+            self.update_lock_time_r(self.bar_lock_r, max(minfo.wheels.lockingTime[2:]))
 
     # GUI update methods
     def update_braking_rate(self, target, data):
@@ -208,51 +194,3 @@ class Realtime(Overlay):
             target.last = data
             target.text = f"R{data: >4.1f}"[:5]
             target.update()
-
-
-class WheelLockTimer:
-    """Wheel lock timer"""
-
-    __slots__ = (
-        "enabled",
-        "front",
-        "rear",
-        "_last_elapsed_time",
-        "_last_start_time",
-        "_lock_threshold",
-    )
-
-    def __init__(self, enabled: bool, lock_threshold: float) -> None:
-        """
-        Args:
-            enabled: whether lock timer enabled.
-            lock_threshold: wheel lock (slip ratio) detection threshold.
-        """
-        self.enabled = enabled
-        self.front = 0.0
-        self.rear = 0.0
-        self._last_elapsed_time = 0.0
-        self._last_start_time = 0.0
-        self._lock_threshold = lock_threshold
-
-    def calc(self, brake_raw: float, start_time: float, elapsed_time: float, slip_ratio: list):
-        """Calculate wheel lock duration
-
-        Args:
-            brake_raw: raw brake input.
-            start_time: current lap start time.
-            elapsed_time: current lap elapsed time.
-            slip_ratio: slip ratio (4 tyres).
-        """
-        if brake_raw > 0.03:
-            if start_time != self._last_start_time:
-                self._last_start_time = start_time
-                self.front = 0  # reset on new lap
-                self.rear = 0
-            delta_etime = elapsed_time - self._last_elapsed_time
-            if delta_etime > 0:
-                if min(slip_ratio[:2]) < -self._lock_threshold:
-                    self.front += delta_etime
-                if min(slip_ratio[2:]) < -self._lock_threshold:
-                    self.rear += delta_etime
-        self._last_elapsed_time = elapsed_time

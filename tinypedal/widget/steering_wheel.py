@@ -135,20 +135,14 @@ class Realtime(Overlay):
                 painter.drawArc(self.rect_rotation, 1440, -self.steering_angle * 16)
         # Draw text
         if self.wcfg["show_steering_angle"]:
+            if self.wcfg["show_degree_sign"]:
+                text_angle = f" {abs(self.steering_angle):.{self.decimals}f}°"
+            else:
+                text_angle = f"{abs(self.steering_angle):.{self.decimals}f}"
             painter.setPen(self.pen_text)
-            painter.drawText(
-                self.rect_text,
-                Qt.AlignCenter,
-                self.format_angle(self.steering_angle)
-            )
+            painter.drawText(self.rect_text, Qt.AlignCenter, text_angle)
 
     # Additional methods
-    def format_angle(self, angle):
-        """Format angle text"""
-        if self.wcfg["show_degree_sign"]:
-            return f" {abs(angle):.{self.decimals}f}°"
-        return f"{abs(angle):.{self.decimals}f}"
-
     @staticmethod
     def load_image(filename: str, userfile: str, size: int, show_custom: bool):
         """Load steering wheel image"""

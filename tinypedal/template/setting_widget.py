@@ -137,7 +137,6 @@ WIDGET_DEFAULT = {
         "show_rear_wheel_lock_duration": True,
         "font_color_rear_wheel_lock_duration": "#FFFFFF",
         "bkg_color_rear_wheel_lock_duration": "#222222",
-        "wheel_lock_threshold": 0.3,
         "column_index_transient_max_braking_rate": 1,
         "column_index_max_braking_rate": 2,
         "column_index_delta_braking_rate": 3,
