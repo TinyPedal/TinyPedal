@@ -57,13 +57,13 @@ class Realtime(Overlay):
             self.display_width * self.wcfg["elevation_reading_offset_x"] - font_m.width * 5,
             self.display_height * self.wcfg["elevation_reading_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             font_m.width * 10,
-            font_m.height
+            font_m.height,
         )
         self.rect_text_scale = QRectF(
             self.display_width * self.wcfg["elevation_scale_offset_x"] - font_m.width * 5,
             self.display_height * self.wcfg["elevation_scale_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             font_m.width * 10,
-            font_m.height
+            font_m.height,
         )
         self.elevation_text_alignment = self.set_text_alignment(self.wcfg["elevation_reading_text_alignment"])
         self.scale_text_alignment = self.set_text_alignment(self.wcfg["elevation_scale_text_alignment"])

@@ -50,6 +50,7 @@ class Realtime(Overlay):
         self.area_center = self.area_size * 0.5
         self.decimals = max(int(self.wcfg["decimal_places"]), 0)
         text_width = font_m.width * (5 + self.decimals)
+        self.dot_size = max(self.wcfg["dot_size"], 1)
 
         self.dir_line = (
             QPointF(0, -self.area_center * self.wcfg["direction_line_head_scale"]),
@@ -67,19 +68,19 @@ class Realtime(Overlay):
             self.area_size * self.wcfg["yaw_angle_offset_x"] - text_width * 0.5,
             self.area_size * self.wcfg["yaw_angle_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             text_width,
-            font_m.height
+            font_m.height,
         )
         self.rect_text_slip = QRectF(
             self.area_size * self.wcfg["slip_angle_offset_x"] - text_width * 0.5,
             self.area_size * self.wcfg["slip_angle_offset_y"] - font_m.height * 0.5 + font_m.voffset,
             text_width,
-            font_m.height
+            font_m.height,
         )
 
         # Config canvas
         self.resize(self.area_size, self.area_size)
         self.pixmap_background = QPixmap(self.area_size, self.area_size)
-        self.pixmap_dot = QPixmap(self.area_size, self.area_size)
+        self.pixmap_dot = QPixmap(self.dot_size * 2, self.dot_size * 2)
         self.pixmap_icon = QPixmap(ImageFile.COMPASS).scaledToWidth(
             int(self.area_size * 1.5),
             mode=Qt.SmoothTransformation
@@ -103,7 +104,7 @@ class Realtime(Overlay):
         self.pen_text_slip.setColor(self.wcfg["font_color_slip_angle"])
 
         self.draw_background(self.area_center)
-        self.draw_dot(max(self.wcfg["dot_size"], 1))
+        self.draw_dot()
 
         # Last data
         self.veh_ori_yaw = 0
@@ -179,7 +180,7 @@ class Realtime(Overlay):
             painter.resetTransform()
         # Draw dot
         if self.wcfg["show_dot"]:
-            painter.drawPixmap(0, 0, self.pixmap_dot)
+            painter.drawPixmap(self.area_center - self.dot_size, self.area_center - self.dot_size, self.pixmap_dot)
         # Draw text
         if self.wcfg["show_yaw_angle_reading"]:
             painter.setPen(self.pen_text_yaw)
@@ -229,8 +230,8 @@ class Realtime(Overlay):
             painter.drawLine(center, center, center, center - mark_scale)
             painter.drawLine(center, center, center + mark_scale, center)
 
-    def draw_dot(self, dot_size):
-        """Draw dot image"""
+    def draw_dot(self):
+        """Draw dot image (one time)"""
         self.pixmap_dot.fill(Qt.transparent)
         painter = QPainter(self.pixmap_dot)
         painter.setRenderHint(QPainter.Antialiasing, True)
@@ -244,8 +245,7 @@ class Realtime(Overlay):
         brush = QBrush(Qt.SolidPattern)
         brush.setColor(self.wcfg["dot_color"])
         painter.setBrush(brush)
-        pos_offset = (self.area_size - dot_size) * 0.5
-        painter.drawEllipse(pos_offset, pos_offset, dot_size, dot_size)
+        painter.drawEllipse(self.dot_size * 0.5, self.dot_size * 0.5, self.dot_size, self.dot_size)
 
     # Additional methods
     @staticmethod

@@ -676,7 +676,7 @@ WIDGET_DEFAULT = {
         "bkg_color_pit_request": "#44AA00",
         "show_finish_state": True,
         "finish_text": "FINISH",
-        "disqualify_text": "DQ",
+        "disqualify_text": "DSQ",
         "font_color_finish": "#000000",
         "bkg_color_finish": "#FFFFFF",
         "font_color_disqualify": "#FFFFFF",

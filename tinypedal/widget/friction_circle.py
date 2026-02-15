@@ -59,25 +59,25 @@ class Realtime(Overlay):
             self.area_center - text_width * 0.5,
             font_m.voffset,
             text_width,
-            font_m.height
+            font_m.height,
         )
         self.rect_text_bottom = QRectF(
             self.area_center - text_width * 0.5,
             self.area_size - font_m.height + font_m.voffset,
             text_width,
-            font_m.height
+            font_m.height,
         )
         self.rect_text_left = QRectF(
             0,
             self.area_center - font_m.height + font_m.voffset,
             text_width,
-            font_m.height
+            font_m.height,
         )
         self.rect_text_right = QRectF(
             self.area_size - text_width,
             self.area_center - font_m.height + font_m.voffset,
             text_width,
-            font_m.height
+            font_m.height,
         )
 
         # Config canvas

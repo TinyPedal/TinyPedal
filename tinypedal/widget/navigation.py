@@ -58,7 +58,7 @@ class Realtime(Overlay):
                 self.veh_size * 0.5,
                 self.veh_size * 0.5,
                 self.veh_size,
-                self.veh_size
+                self.veh_size,
             )
         else:
             self.veh_shape = (
@@ -71,7 +71,7 @@ class Realtime(Overlay):
             -self.veh_size * 0.5,
             -self.veh_size * 0.5 + font_m.voffset,
             self.veh_size,
-            self.veh_size
+            self.veh_size,
         )
 
         self.map_path = None
