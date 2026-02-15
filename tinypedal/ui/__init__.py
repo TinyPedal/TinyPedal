@@ -200,25 +200,26 @@ def set_style_window(base_font_pt: int) -> str:
         }}
 
         /* Module list (tab) */
-        ModuleList QListView {{
+        ModuleList > QListView {{
             font-size: {font_pt_item_name}pt;
             outline: none;
         }}
-        ModuleList QListView::item {{
+        ModuleList > QListView::item {{
             border: none;
-            min-height: 1.75em;
             color: {color_active_window_text};
+            min-height: 1.25em;
+            padding: 0.25em 0.25em 0.25em 0;
         }}
-        ModuleList QListView::item:selected {{
+        ModuleList > QListView::item:selected {{
             background: transparent;
         }}
-        ModuleList QListView::item:hover {{
+        ModuleList > QListView::item:hover {{
             background: {color_disabled_highlight};
         }}
         ModuleControlItem QPushButton {{
             border-radius: {border_radius_button}em;
             height: none;
-            margin: 0.25em 0.25em 0.25em 0;
+            margin-left: 0.2em;
         }}
         ModuleControlItem #buttonConfig {{
             font-size: {font_pt_item_button}pt;
@@ -246,41 +247,42 @@ def set_style_window(base_font_pt: int) -> str:
         }}
 
         /* Preset list (tab) */
-        PresetList QListView {{
+        PresetList > QListView {{
             font-size: {font_pt_item_name}pt;
             outline: none;
         }}
-        PresetList QListView::item {{
+        PresetList > QListView::item {{
             border: none;
-            min-height: 1.75em;
+            min-height: 1.25em;
+            padding: 0.25em 0.25em 0.25em 0;
         }}
-        PresetList QListView::item:selected {{
+        PresetList > QListView::item:selected {{
             selection-color: {color_active_highlighted_text};
             background: {color_active_highlight};
         }}
         PresetTagItem QLabel {{
             font-size: {font_pt_item_button}pt;
             color: {color_active_highlighted_text};
-            margin: 0.25em 0.25em 0.25em 0;
             border-radius: {border_radius_button}em;
+            margin-left: 0.2em;
         }}
 
         /* Preset transfer (dialog) */
-        PresetTransfer QListView {{
+        PresetTransfer > QListView {{
             outline: none;
             background: {color_active_window};
         }}
-        PresetTransfer QListView::item {{
+        PresetTransfer > QListView::item {{
             border: none;
             min-height: 1.75em;
         }}
-        PresetTransfer QListView::item:selected {{
+        PresetTransfer > QListView::item:selected {{
             selection-color: {color_active_highlighted_text};
             background: {color_disabled_highlight};
         }}
-        PresetTransfer QListView QCheckBox {{
+        PresetTransfer > QListView QCheckBox {{
             font-size: {font_pt_item_name}pt;
-            margin: 0.25em 0.25em 0.25em 0.25em;
+            margin: 0.25em;
             border-radius: {border_radius_button}em;
         }}
         PresetTransfer ListHeader {{
@@ -307,46 +309,46 @@ def set_style_window(base_font_pt: int) -> str:
         }}
 
         /* Spectate list (tab) */
-        SpectateList QListView {{
+        SpectateList > QListView {{
             font-size: {font_pt_item_button}pt;
             outline: none;
         }}
-        SpectateList QListView::item {{
+        SpectateList > QListView::item {{
             min-height: 1.75em;
             border: none;
         }}
-        SpectateList QListView::item:selected {{
+        SpectateList > QListView::item:selected {{
             selection-color: {color_active_highlighted_text};
             background: {color_active_highlight};
         }}
 
         /* Hotkey list (tab) */
-        HotkeyList QListView {{
+        HotkeyList > QListView {{
             font-size: {font_pt_item_name}pt;
             outline: none;
         }}
-        HotkeyList QListView QLabel {{
+        HotkeyList > QListView QLabel {{
             font-size: {font_pt_item_name}pt;
             font-weight: bold;
             color: {color_inactive_highlighted_text};
             background: {color_inactive_highlight};
         }}
-        HotkeyList QListView QLabel:disabled {{
+        HotkeyList > QListView QLabel:disabled {{
             color: {color_disabled_window_text};
             background: {color_disabled_highlight};
         }}
-        HotkeyList QListView::item {{
+        HotkeyList > QListView::item {{
             border: none;
             min-height: 1.75em;
             color: {color_active_window_text};
         }}
-        HotkeyList QListView::item:selected {{
+        HotkeyList > QListView::item:selected {{
             background: transparent;
         }}
-        HotkeyList QListView::item:hover {{
+        HotkeyList > QListView::item:hover {{
             background: {color_disabled_highlight};
         }}
-        HotkeyList QListView::item:disabled {{
+        HotkeyList > QListView::item:disabled {{
             color: {color_disabled_window_text};
         }}
         HotkeyConfigItem QPushButton {{
