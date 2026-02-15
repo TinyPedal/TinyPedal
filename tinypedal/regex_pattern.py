@@ -23,6 +23,8 @@ Regular expression, pattern, string constants
 import re
 from types import MappingProxyType
 
+from PySide2.QtGui import QFont
+
 from .const_api import API_MAP_ALIAS
 
 # Compiled regex function
@@ -177,12 +179,25 @@ ABBR_PATTERN = (
     "url"
 )
 
+# Font weight
+FONT_WEIGHT_MAP = MappingProxyType({
+    "Thin": QFont.Thin,
+    "Extra Light": QFont.ExtraLight,
+    "Light": QFont.Light,
+    "Normal": QFont.Normal,
+    "Medium": QFont.Medium,
+    "Semi Bold": QFont.DemiBold,
+    "Bold": QFont.Bold,
+    "Extra Bold": QFont.ExtraBold,
+    "Black": QFont.Black,
+})
+
 # Choice dictionary
 CHOICE_COMMON = MappingProxyType({
     CFG_API_NAME: tuple(API_MAP_ALIAS),
     CFG_CHARACTER_ENCODING: ("UTF-8", "ISO-8859-1"),
     CFG_DELTABEST_SOURCE: ("Best", "Session", "Stint", "Last"),
-    CFG_FONT_WEIGHT: ("normal", "bold"),
+    CFG_FONT_WEIGHT: tuple(FONT_WEIGHT_MAP),
     CFG_TARGET_LAPTIME: ("Theoretical", "Personal"),
     CFG_TEXT_ALIGNMENT: ("Left", "Center", "Right"),
     CFG_MULTIMEDIA_PLUGIN: ("WMF", "DirectShow"),

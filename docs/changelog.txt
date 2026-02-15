@@ -5,6 +5,7 @@ WIP
   - Added "Enable Auto Font Offset" and "Font Offset Vertical" options to all widgets, and can be batch-toggled via "Global Font Override" Dialog.
   - Added "Config" & "Reload" options to right-click context menu on each widget for quick access.
   - Added "font_scale_caption" option to all widgets that have "show_caption" option.
+  - Added more font weight options. Note, not every weight may be available for selected font.
   - Fixed an issue that would prevent TinyPedal from restarting if attempted to restart while driving.
   - Installer script (install.sh) now installs only the necessary files and documents for running TinyPedal on Linux.
 

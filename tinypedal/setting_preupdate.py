@@ -32,7 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 40, 3), _user_prior_2_40_3),  # 2026-02-13
+        ((2, 40, 4), _user_prior_2_40_4),  # 2026-02-15
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
         ((2, 37, 0), _user_prior_2_37_0),  # 2025-12-24
@@ -45,11 +45,17 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
-def _user_prior_2_40_3(dict_user: dict):
-    """Update user setting prior to 2.40.3"""
+def _user_prior_2_40_4(dict_user: dict):
+    """Update user setting prior to 2.40.4"""
+    # Rename "p2p" to "push to pass"
     p2p = dict_user.get("p2p")
     if isinstance(p2p, dict):
         dict_user["push_to_pass"] = p2p.copy()
+    # Convert font weight name to title case
+    for sub_dict in dict_user.values():
+        for option, value in sub_dict.items():
+            if "font_weight" in option:
+                sub_dict[option] = value.title()
 
 
 def _user_prior_2_40_0(dict_user: dict):

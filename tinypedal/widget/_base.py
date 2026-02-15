@@ -32,6 +32,7 @@ from PySide2.QtWidgets import QGridLayout, QLayout, QMenu, QWidget
 from .. import app_signal, overlay_signal, realtime_state
 from ..const_app import APP_NAME
 from ..formatter import format_module_name
+from ..regex_pattern import FONT_WEIGHT_MAP
 from ..setting import Setting
 from ._common import FontMetrics, MousePosition
 from ._painter import RawImage, RawText
@@ -259,7 +260,7 @@ class Overlay(Base):
         font.setFamily(name)
         font.setPixelSize(max(int(size), 1))
         if weight:
-            font.setWeight(getattr(QFont, weight.capitalize()))
+            font.setWeight(FONT_WEIGHT_MAP[weight])
         return font
 
     def get_font_metrics(self, font: QFont) -> FontMetrics:

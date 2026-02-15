@@ -529,7 +529,9 @@ Mono type font is highly recommended. To set custom font, write `full font name`
 Set font size in pixel, increase or decrease font size will also apply to widget size.
 
     font_weight
-Acceptable value: `normal` or `bold`.
+Acceptable values: `Thin`, `Extra Light`, `Light`, `Normal`, `Medium`, `Semi Bold`, `Bold`, `Extra Bold`, `Black`.
+
+Note, not every weight may be available for selected font.
 
     enable_auto_font_offset
 Automatically adjust font vertical offset based on font geometry for better vertical alignment, and should give good result in most case. This option is enabled by default, and only available to certain widgets. Set `false` to disable.
