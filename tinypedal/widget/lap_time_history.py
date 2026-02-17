@@ -120,9 +120,11 @@ class Realtime(Overlay):
                     self.wcfg["bkg_color_last_delta"],
                 ),
             )
+            decimals_delta = max(self.wcfg["delta_decimal_places"], 1)
+            self.width_delta = 3 + decimals_delta
             self.bars_delta = self.set_rawtext(
-                text="--.--",
-                width=font_m.width * 5 + bar_padx,
+                text=f"--.{'-' * decimals_delta}",
+                width=font_m.width * self.width_delta + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_delta[1][0],
@@ -140,9 +142,11 @@ class Realtime(Overlay):
 
         # Fuel
         if self.wcfg["show_fuel"]:
+            decimals_fuel = max(self.wcfg["fuel_decimal_places"], 1)
+            self.width_fuel = 2 + decimals_fuel
             self.bars_fuel = self.set_rawtext(
-                text="-.--",
-                width=font_m.width * 4 + bar_padx,
+                text=f"-.{'-' * decimals_fuel}",
+                width=font_m.width * self.width_fuel + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_fuel"],
@@ -160,9 +164,11 @@ class Realtime(Overlay):
 
         # Tyre wear
         if self.wcfg["show_wear"]:
+            decimals_wear = max(self.wcfg["wear_decimal_places"], 1)
+            self.width_wear = 2 + decimals_wear
             self.bars_wear = self.set_rawtext(
-                text="---",
-                width=font_m.width * 3 + bar_padx,
+                text=f"-.{'-' * decimals_wear}",
+                width=font_m.width * self.width_wear + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_wear"],
@@ -233,21 +239,21 @@ class Realtime(Overlay):
         """Delta data"""
         if target.last != data:
             target.last = data
-            target.text = f"{calc.sym_max(data, 99.9):+.3f}"[:5]
+            target.text = f"{calc.sym_max(data, 99.9):+.{self.width_delta}f}"[:self.width_delta].strip(".")
             target.update()
 
     def update_fuel(self, target, data):
         """Fuel data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:04.2f}"[:4]
+            target.text = f"{data:.{self.width_fuel}f}"[:self.width_fuel].strip(".")
             target.update()
 
     def update_wear(self, target, data):
         """Wear data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:03.1f}"[:3].strip(".")
+            target.text = f"{data:.{self.width_wear}f}"[:self.width_wear].strip(".")
             target.update()
 
     def update_laps_history(self, dataset):
