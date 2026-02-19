@@ -2702,6 +2702,7 @@ WIDGET_DEFAULT = {
         "display_height": 60,
         "display_margin": 2,
         "display_scale": 2,
+        "time_scale": 1,
         "show_inverted_pedal": False,
         "show_inverted_trailing": True,
         "show_throttle": True,

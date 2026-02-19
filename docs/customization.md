@@ -3900,6 +3900,11 @@ Set plot display scale. Default scale is `2`. Minimum scale is limited to `1`.
 
 Note, when `high DPI scaling` mode is enabled on high resolution (2k or 4k) screen, the widget base size will also be scaled up according to system's DPI setting, which may result larger plot even when `display_scale` is set to `1`. If smaller plot size is preferred, manually disable `high DPI scaling` mode via `Scale` button on main window status bar.
 
+    time_scale
+Set plot time scale. When time scale is `1` (default), plot will be synchronized with `update_interval`.
+
+Note, value less than `1` draws plot slower; higher than `1` draws plot faster. Setting this value too high or too low may result plot stuttering.
+
     show_inverted_pedal
 Invert pedal range display.
 

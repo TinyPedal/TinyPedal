@@ -36,6 +36,10 @@ WIP
   - Renamed "P2P" widget to "Push to pass" for clarity.
   - Add "layout" option, which sets display orientation. Default is horizontal. Set "0" to show vertically.
 
+* Trailing Widget
+  - Added "time_scale" option (requested by user "MONSTERSPIN"), which sets plot time scale. When time scale is "1" (default), plot will be synchronized with "update_interval".
+    Note, value less than "1" draws plot slower; higher than "1" draws plot faster. Setting this value too high or too low may result plot stuttering.
+
 * Fuel Module
   - Now handles virtual energy calculation.
   - Removed "Energy Module".

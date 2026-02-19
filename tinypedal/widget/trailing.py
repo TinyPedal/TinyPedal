@@ -40,8 +40,17 @@ class Realtime(Overlay):
         self.display_height = max(int(self.wcfg["display_height"]), 2)
         self.area_width = max(int(self.wcfg["display_width"]), 2)
         self.area_height = self.display_height + self.margin * 2
-        self.display_scale = max(int(
-            self.wcfg["update_interval"] / 20 * self.wcfg["display_scale"]), 1)
+
+        time_scale = max(self.wcfg["time_scale"], 0.01)
+        if time_scale == 1:
+            time_factor = self.wcfg["update_interval"] / 20
+        else:
+            time_factor = 1
+            self._update_interval = max(
+                self.wcfg["update_interval"] / time_scale,
+                self.cfg.application["minimum_update_interval"],
+            )
+        self.display_scale = max(int(time_factor * self.wcfg["display_scale"]), 1)
 
         max_line_width = int(max(
             1,
