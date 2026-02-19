@@ -102,9 +102,15 @@ class Realtime(Overlay):
 
         # Fuel
         if self.wcfg["show_fuel"]:
+            if self.wcfg["show_fuel_sign"]:
+                self.sign_fuel = units.set_symbol_fuel(self.cfg.units["fuel_unit"])[0].upper()
+            else:
+                self.sign_fuel = ""
+            decimals_fuel = max(self.wcfg["fuel_decimal_places"], 1)
+            self.width_fuel = 2 + decimals_fuel
             self.bars_fuel = self.set_rawtext(
-                text="-.---",
-                width=font_m.width * 5 + bar_padx,
+                text=f"-.{'-' * decimals_fuel}{self.sign_fuel}",
+                width=font_m.width * (self.width_fuel + len(self.sign_fuel)) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_stint_fuel"],
@@ -142,9 +148,15 @@ class Realtime(Overlay):
 
         # Tyre wear
         if self.wcfg["show_wear"]:
+            if self.wcfg["show_wear_sign"]:
+                self.sign_wear = "%"
+            else:
+                self.sign_wear = ""
+            decimals_wear = max(self.wcfg["wear_decimal_places"], 1)
+            self.width_wear = 2 + decimals_wear
             self.bars_wear = self.set_rawtext(
-                text="---",
-                width=font_m.width * 3 + bar_padx,
+                text=f"-.{'-' * decimals_wear}{self.sign_wear}",
+                width=font_m.width * (self.width_wear + len(self.sign_wear)) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_stint_wear"],
@@ -162,9 +174,11 @@ class Realtime(Overlay):
 
         # Stint delta
         if self.wcfg["show_delta"]:
+            decimals_delta = max(self.wcfg["delta_decimal_places"], 1)
+            self.width_delta = 3 + decimals_delta
             self.bars_delta = self.set_rawtext(
-                text="--.--",
-                width=font_m.width * 5 + bar_padx,
+                text=f"--.{'-' * decimals_delta}",
+                width=font_m.width * self.width_delta + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_stint_delta"],
@@ -182,9 +196,15 @@ class Realtime(Overlay):
 
         # Stint consistency
         if self.wcfg["show_consistency"]:
+            if self.wcfg["show_consistency_sign"]:
+                self.sign_consist = "%"
+            else:
+                self.sign_consist = ""
+            decimals_consist = max(self.wcfg["consistency_decimal_places"], 1)
+            self.width_consist = 3 + decimals_consist
             self.bars_consist = self.set_rawtext(
-                text="--.---",
-                width=font_m.width * 6 + bar_padx,
+                text=f"--.{'-' * decimals_consist}{self.sign_consist}",
+                width=font_m.width * (self.width_consist + len(self.sign_consist)) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_stint_consistency"],
@@ -213,14 +233,14 @@ class Realtime(Overlay):
             max(self.wcfg["minimum_pitstop_threshold_seconds"], 0.0),
             max(self.wcfg["minimum_tyre_temperature_threshold"], 0.0),
         )
-        self.update_stint_history(False)
+        self.update_stint_history()
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
         show_energy = self.wcfg["show_virtual_energy_if_available"] and api.read.vehicle.max_virtual_energy()
 
         if next(self.stint_stats):
-            self.update_stint_history(show_energy)
+            self.update_stint_history()
 
         # Current stint data
         if self.wcfg["show_laps"]:
@@ -230,9 +250,11 @@ class Realtime(Overlay):
         if self.wcfg["show_fuel"]:
             if show_energy:
                 fuel = self.stint_data[3]
+                sign_fuel = "E" if self.sign_fuel else ""
             else:
                 fuel = self.unit_fuel(self.stint_data[2])
-            self.update_fuel(self.bars_fuel[0], fuel)
+                sign_fuel = self.sign_fuel
+            self.update_fuel(self.bars_fuel[0], fuel, sign_fuel)
         if self.wcfg["show_tyre"]:
             self.update_cmpd(self.bars_cmpd[0], self.stint_data[4])
         if self.wcfg["show_wear"]:
@@ -261,13 +283,14 @@ class Realtime(Overlay):
             target.text = calc.sec2stinttime(data)[:5]
             target.update()
 
-    def update_fuel(self, target, data):
+    def update_fuel(self, target, data, sign):
         """Fuel data"""
         if target.last != data:
             target.last = data
             if data < 0:
                 data = 0
-            target.text = f"{data:.3f}"[:5]
+            text_fuel = f"{data:.{self.width_fuel}f}"[:self.width_fuel].strip(".")
+            target.text = f"{text_fuel}{sign}"
             target.update()
 
     def update_cmpd(self, target, data):
@@ -283,25 +306,28 @@ class Realtime(Overlay):
             target.last = data
             if data < 0:
                 data = 0
-            target.text = f"{data:02.0f}%"[:3]
+            text_wear = f"{data:.{self.width_wear}f}"[:self.width_wear].strip(".")
+            target.text = f"{text_wear}{self.sign_wear}"
             target.update()
 
     def update_delta(self, target, data):
         """Delta data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:+05.2f}"[:5].strip(".")
+            target.text = f"{data:+.{self.width_delta}f}"[:self.width_delta].strip(".")
             target.update()
 
     def update_consist(self, target, data):
         """Consistency data"""
         if target.last != data:
             target.last = data
-            target.text = f"{f'{data:.3f}':.5}%"
+            text_consist = f"{data:.{self.width_consist}f}"[:self.width_consist].strip(".")
+            target.text = f"{text_consist}{self.sign_consist}"
             target.update()
 
-    def update_stint_history(self, show_energy: bool):
+    def update_stint_history(self):
         """Stint history data"""
+        show_energy = self.wcfg["show_virtual_energy_if_available"]
         for index, data in enumerate(self.history_data, 1):
             if data[1]:
                 hidden = False
@@ -318,11 +344,13 @@ class Realtime(Overlay):
                 self.bars_time[index].setHidden(hidden)
 
             if self.wcfg["show_fuel"]:
-                if show_energy:
+                if show_energy and data[3]:
                     fuel = data[3]
+                    sign_fuel = "E" if self.sign_fuel else ""
                 else:
                     fuel = self.unit_fuel(data[2])
-                self.update_fuel(self.bars_fuel[index], fuel)
+                    sign_fuel = self.sign_fuel
+                self.update_fuel(self.bars_fuel[index], fuel, sign_fuel)
                 self.bars_fuel[index].setHidden(hidden)
 
             if self.wcfg["show_tyre"]:

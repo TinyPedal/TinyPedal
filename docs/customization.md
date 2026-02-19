@@ -2585,8 +2585,14 @@ Show fuel consumption per lap.
     show_virtual_energy_if_available
 Show virtual energy consumption instead of fuel consumption if available. This option is enabled by default.
 
+    show_fuel_sign
+Show fuel (or virtual energy) unit sign. `L` for liter, `G` for Gallon, `E` for virtual energy.
+
     show_wear
 Show average tyre wear (percent) per lap.
+
+    show_wear_sign
+Show tyre wear percentage sign.
 
 [**`Back to Top`**](#)
 
@@ -3576,9 +3582,6 @@ Note, stint history is not recorded while in garage or during formation lap.
     stint_history_count
 Set the number of stint history display. Default is to show `2` most recent stints.
 
-    show_virtual_energy_if_available
-Show virtual energy consumption instead of fuel consumption if available. This option is enabled by default.
-
     show_empty_history
 Show empty stint history. Default is `false`, which hides empty rows.
 
@@ -3604,17 +3607,29 @@ Show total driving time in the stint.
     show_fuel
 Show total fuel (or virtual energy) consumption in the stint.
 
+    show_virtual_energy_if_available
+Show virtual energy consumption instead of fuel consumption if available. This option is enabled by default.
+
+    show_fuel_sign
+Show fuel (or virtual energy) unit sign. `L` for liter, `G` for Gallon, `E` for virtual energy.
+
     show_tyre
 Show tyre compound used in the stint.
 
     show_wear
 Show total average tyre wear (percent) in the stint.
 
+    show_wear_sign
+Show tyre wear percentage sign.
+
     show_delta
 Show lap time delta between stint best and stint average non-best lap time. Note, pit-in and pit-out laps are excluded from calculation.
 
     show_consistency
 Show lap time consistency (percent) between stint best and stint average non-best lap time. Note, pit-in and pit-out laps are excluded from calculation.
+
+    show_consistency_sign
+Show consistency percentage sign.
 
 [**`Back to Top`**](#)
 

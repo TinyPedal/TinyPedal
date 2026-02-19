@@ -142,11 +142,15 @@ class Realtime(Overlay):
 
         # Fuel
         if self.wcfg["show_fuel"]:
+            if self.wcfg["show_fuel_sign"]:
+                self.sign_fuel = units.set_symbol_fuel(self.cfg.units["fuel_unit"])[0].upper()
+            else:
+                self.sign_fuel = ""
             decimals_fuel = max(self.wcfg["fuel_decimal_places"], 1)
             self.width_fuel = 2 + decimals_fuel
             self.bars_fuel = self.set_rawtext(
-                text=f"-.{'-' * decimals_fuel}",
-                width=font_m.width * self.width_fuel + bar_padx,
+                text=f"-.{'-' * decimals_fuel}{self.sign_fuel}",
+                width=font_m.width * (self.width_fuel + len(self.sign_fuel)) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_fuel"],
@@ -164,11 +168,15 @@ class Realtime(Overlay):
 
         # Tyre wear
         if self.wcfg["show_wear"]:
+            if self.wcfg["show_wear_sign"]:
+                self.sign_wear = "%"
+            else:
+                self.sign_wear = ""
             decimals_wear = max(self.wcfg["wear_decimal_places"], 1)
             self.width_wear = 2 + decimals_wear
             self.bars_wear = self.set_rawtext(
-                text=f"-.{'-' * decimals_wear}",
-                width=font_m.width * self.width_wear + bar_padx,
+                text=f"-.{'-' * decimals_wear}{self.sign_wear}",
+                width=font_m.width * (self.width_wear + len(self.sign_wear)) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_wear"],
@@ -193,11 +201,6 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         max_energy = api.read.vehicle.max_virtual_energy()
-        # Check if virtual energy available
-        if self.wcfg["show_virtual_energy_if_available"] and max_energy:
-            temp_fuel_est = minfo.energy.estimatedConsumption
-        else:
-            temp_fuel_est = self.unit_fuel(minfo.fuel.estimatedConsumption)
 
         # Current laps data
         if self.wcfg["show_laps"]:
@@ -207,7 +210,13 @@ class Realtime(Overlay):
         if self.wcfg["show_delta"]:
             self.update_delta(self.bars_delta[0], minfo.delta.deltaLast)
         if self.wcfg["show_fuel"]:
-            self.update_fuel(self.bars_fuel[0], temp_fuel_est)
+            if self.wcfg["show_virtual_energy_if_available"] and max_energy:
+                fuel = minfo.energy.estimatedConsumption
+                sign_fuel = "E" if self.sign_fuel else ""
+            else:
+                fuel = self.unit_fuel(minfo.fuel.estimatedConsumption)
+                sign_fuel = self.sign_fuel
+            self.update_fuel(self.bars_fuel[0], fuel, sign_fuel)
         if self.wcfg["show_wear"]:
             self.update_wear(self.bars_wear[0], calc.mean(minfo.wheels.estimatedTreadWear))
 
@@ -242,23 +251,25 @@ class Realtime(Overlay):
             target.text = f"{calc.sym_max(data, 99.9):+.{self.width_delta}f}"[:self.width_delta].strip(".")
             target.update()
 
-    def update_fuel(self, target, data):
+    def update_fuel(self, target, data, sign):
         """Fuel data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:.{self.width_fuel}f}"[:self.width_fuel].strip(".")
+            text_fuel = f"{data:.{self.width_fuel}f}"[:self.width_fuel].strip(".")
+            target.text = f"{text_fuel}{sign}"
             target.update()
 
     def update_wear(self, target, data):
         """Wear data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:.{self.width_wear}f}"[:self.width_wear].strip(".")
+            text_wear = f"{data:.{self.width_wear}f}"[:self.width_wear].strip(".")
+            target.text = f"{text_wear}{self.sign_wear}"
             target.update()
 
     def update_laps_history(self, dataset):
         """Laps history data"""
-        is_energy = bool(self.wcfg["show_virtual_energy_if_available"] and api.read.vehicle.max_virtual_energy())
+        show_energy = self.wcfg["show_virtual_energy_if_available"]
         for index in range(self.history_slot):
             if index < len(dataset):
                 data = dataset[index]
@@ -285,7 +296,13 @@ class Realtime(Overlay):
                 self.bars_delta[index].setHidden(hidden)
 
             if self.wcfg["show_fuel"]:
-                self.update_fuel(self.bars_fuel[index], data.lastLapUsedEnergy if is_energy else data.lastLapUsedFuel)
+                if show_energy and data.lastLapUsedEnergy:
+                    fuel = data.lastLapUsedEnergy
+                    sign_fuel = "E" if self.sign_fuel else ""
+                else:
+                    fuel = self.unit_fuel(data.lastLapUsedFuel)
+                    sign_fuel = self.sign_fuel
+                self.update_fuel(self.bars_fuel[index], fuel, sign_fuel)
                 self.bars_fuel[index].setHidden(hidden)
 
             if self.wcfg["show_wear"]:

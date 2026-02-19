@@ -45,12 +45,13 @@ class Realtime(Overlay):
         self.setFont(font)
         font_m = self.get_font_metrics(font)
 
-        font_cap = self.config_font(
-            self.wcfg["font_name"],
-            self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
-            self.wcfg["font_weight"],
-        )
-        font_cap_m = self.get_font_metrics(font_cap)
+        if self.wcfg["show_caption"]:
+            font_cap = self.config_font(
+                self.wcfg["font_name"],
+                self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+                self.wcfg["font_weight"],
+            )
+            font_cap_m = self.get_font_metrics(font_cap)
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])

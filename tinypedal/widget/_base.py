@@ -476,15 +476,16 @@ class Overlay(Base):
     def set_grid_layout_table_row(
         layout: QGridLayout,
         targets: tuple[QWidget, ...],
+        column_start: int = 0,
         row_index: int = 0,
         right_to_left: bool = False,
         hide_start: int = 99999,
     ):
         """Set grid layout - table by keys of each row"""
         if right_to_left:
-            enum_target = enumerate(reversed(targets))
+            enum_target = enumerate(reversed(targets), column_start)
         else:
-            enum_target = enumerate(targets)
+            enum_target = enumerate(targets, column_start)
         for column_index, target in enum_target:
             layout.addWidget(target, row_index, column_index)
             if hide_start <= column_index:
@@ -494,15 +495,16 @@ class Overlay(Base):
     def set_grid_layout_table_column(
         layout: QGridLayout,
         targets: tuple[QWidget, ...],
+        row_start: int = 0,
         column_index: int = 0,
         bottom_to_top: bool = False,
         hide_start: int = 99999,
     ):
         """Set grid layout - table by keys of each column"""
         if bottom_to_top:
-            enum_target = enumerate(reversed(targets))
+            enum_target = enumerate(reversed(targets), row_start)
         else:
-            enum_target = enumerate(targets)
+            enum_target = enumerate(targets, row_start)
         for row_index, target in enum_target:
             layout.addWidget(target, row_index, column_index)
             if hide_start <= row_index:

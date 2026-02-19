@@ -14,8 +14,10 @@ WIP
 
 * Lap time history Widget
   - Added "show_delta" option, which shows lap time delta between two consecutive laps. This option can be useful to quickly check stint pace.
-  - Added options to show or hide individual column.
+  - Added "show_fuel_sign" option, which shows fuel (or virtual energy) unit sign. "L" for liter, "G" for Gallon, "E" for virtual energy.
+  - Added "show_wear_sign" option, which shows tyre wear percentage sign.
   - Added "decimal_places" options for "delta", "fuel", "wear" columns. Minimum decimal place is limited to "1".
+  - Added options to show or hide individual column.
 
 * Stint history Widget
   - Added "show_delta" & "show_consistency" options, which show lap time delta and consistency between stint best and stint average non-best lap time.
@@ -24,6 +26,10 @@ WIP
     This option helps to exclude slow lap time due to cold tyres from calculation. Default is "55" degrees.
   - Added "minimum_pitstop_threshold_seconds" option, which sets the minimum pit stop time threshold for concluding current stint. Default is "3" seconds.
     This option is useful for detecting pit stop that does not refuel or change tyres. It also allows to detect pit stop while spectating other player with Spectate Mode.
+  - Added "show_fuel_sign" option, which shows fuel (or virtual energy) unit sign. "L" for liter, "G" for Gallon, "E" for virtual energy.
+  - Added "show_wear_sign" option, which shows tyre wear percentage sign.
+  - Added "show_consistency_sign" option, which shows consistency percentage sign.
+  - Added "decimal_places" options for "fuel", "wear", "delta", "consistency" columns. Minimum decimal place is limited to "1".
   - Added options to show or hide individual column.
 
 * Relative, Rivals, Standings Widget
