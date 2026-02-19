@@ -147,6 +147,7 @@ def stint_ve_usage(dataset: dict) -> Mapping[str, tuple[float, float, float, flo
                     diff = ve_curr - ve_prev
                     if ve_used_min > diff > 0:
                         ve_used_min = diff
+                    min_count += 1
                 ve_prev = ve_curr
                 stint_laps_done += 1
             if 0 < ve_used_min < 1:  # round up 0.9 or higher

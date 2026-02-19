@@ -210,7 +210,7 @@ class PaceNotesControl(QWidget):
         self.spinbox_offset.setSuffix("m")
 
         # Max playback duration per sound
-        label_max_duration = QLabel("Max Duration:")
+        label_max_duration = QLabel("Maximum Duration:")
         self.spinbox_max_duration = QDoubleSpinBox()
         self.spinbox_max_duration.setRange(0.2, 60)
         self.spinbox_max_duration.setSingleStep(1)
@@ -218,7 +218,7 @@ class PaceNotesControl(QWidget):
         self.spinbox_max_duration.setSuffix("s")
 
         # Max playback queue
-        label_max_queue = QLabel("Max Queue:")
+        label_max_queue = QLabel("Maximum Queue:")
         self.spinbox_max_queue = QDoubleSpinBox()
         self.spinbox_max_queue.setRange(1, 50)
         self.spinbox_max_queue.setSingleStep(1)

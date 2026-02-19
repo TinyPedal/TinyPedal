@@ -1,16 +1,17 @@
 WIP
 -----------------------------
 * General
-  - Further optimization and efficiency improvements to widget rendering methods, reduced overall memory usage (roughly 10MB less with all widgets enabled).
+  - Further optimization and improvements to widget rendering methods, reduced overall memory usage by roughly 10MB (with all widgets enabled).
   - Added "Enable Auto Font Offset" and "Font Offset Vertical" options to all widgets, and can be batch-toggled via "Global Font Override" Dialog.
   - Added "Config" & "Reload" options to right-click context menu on each widget for quick access.
   - Added "font_scale_caption" option to all widgets that have "show_caption" option.
   - Added more font weight options. Note, not every weight may be available for selected font.
+  - Preset name in tray icon menu is now clickable which brings up "Preset" tab in main window.
   - Fixed an issue that would prevent TinyPedal from restarting if attempted to restart while driving.
   - Installer script (install.sh) now installs only the necessary files and documents for running TinyPedal on Linux.
 
 * Flag Widget
-  - Show nearest leading vehicle class name on blue flag indicator, which helps to quickly spot the class that is about to lap you.
+  - Show incoming leading vehicle class name on blue flag indicator, which helps to quickly spot the class that is about to lap you.
 
 * Lap time history Widget
   - Added "show_delta" option, which shows lap time delta between two consecutive laps. This option can be useful to quickly check stint pace.
@@ -18,6 +19,7 @@ WIP
   - Added "show_wear_sign" option, which shows tyre wear percentage sign.
   - Added "decimal_places" options for "delta", "fuel", "wear" columns. Minimum decimal place is limited to "1".
   - Added options to show or hide individual column.
+  - Fixed an issue where gallon conversion was not applied to fuel history data when using gallon unit.
 
 * Stint history Widget
   - Added "show_delta" & "show_consistency" options, which show lap time delta and consistency between stint best and stint average non-best lap time.
