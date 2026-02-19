@@ -53,6 +53,48 @@ class ConsumptionDataSet(NamedTuple):
     capacityFuel: float = 0.0
 
 
+class StintData:
+    """Stint data"""
+
+    __slots__ = (
+        "totalLaps",
+        "totalTime",
+        "totalFuel",
+        "totalEnergy",
+        "totalTyreWear",
+        "lapTimeDelta",
+        "lapTimeConsistency",
+        "tyreCompound",
+    )
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        """Reset"""
+        self.totalLaps: int = 0
+        self.totalTime: float = 0
+        self.totalFuel: float = 0.0
+        self.totalEnergy: float = 0.0
+        self.totalTyreWear: float = 0.0
+        self.lapTimeDelta: float = 0.0
+        self.lapTimeConsistency: float = 0.0
+        self.tyreCompound: str = "??"
+
+
+class StintDataSet(NamedTuple):
+    """Stint history data set"""
+
+    totalLaps: int = 0
+    totalTime: float = 0
+    totalFuel: float = 0.0
+    totalEnergy: float = 0.0
+    totalTyreWear: float = 0.0
+    lapTimeDelta: float = 0.0
+    lapTimeConsistency: float = 0.0
+    tyreCompound: str = "??"
+
+
 class DeltaLapTime(array):
     """Delta lap time history data
 
@@ -314,7 +356,7 @@ class VehicleDataSet:
 
 
 class DeltaInfo:
-    """Delta module output data"""
+    """Delta output data"""
 
     __slots__ = (
         "deltaBestData",
@@ -351,7 +393,7 @@ class DeltaInfo:
 
 
 class ForceInfo:
-    """Force module output data"""
+    """Force output data"""
 
     __slots__ = (
         "lgtGForceRaw",
@@ -384,7 +426,7 @@ class ForceInfo:
 
 
 class FuelInfo:
-    """Fuel module output data"""
+    """Fuel output data"""
 
     __slots__ = (
         "capacity",
@@ -435,12 +477,18 @@ class HistoryInfo:
         "consumptionDataName",
         "consumptionDataVersion",
         "consumptionDataSet",
+        "stintDataVersion",
+        "stintData",
+        "stintDataSet",
     )
 
     def __init__(self):
         self.consumptionDataName: str = ""
         self.consumptionDataVersion: int = 0
         self.consumptionDataSet: deque[ConsumptionDataSet] = deque([ConsumptionDataSet()], 100)
+        self.stintDataVersion: int = 0
+        self.stintData: StintData = StintData()
+        self.stintDataSet: deque[StintDataSet] = deque([StintDataSet()], 100)
 
     def reset_consumption(self):
         """Reset consumption data"""
@@ -449,9 +497,16 @@ class HistoryInfo:
         self.consumptionDataSet.clear()
         self.consumptionDataSet.appendleft(ConsumptionDataSet())
 
+    def reset_stint(self):
+        """Reset stint data"""
+        self.stintDataVersion = 0
+        self.stintData.reset()
+        self.stintDataSet.clear()
+        self.stintDataSet.appendleft(StintDataSet())
+
 
 class HybridInfo:
-    """Hybrid module output data"""
+    """Hybrid output data"""
 
     __slots__ = (
         "batteryCharge",
@@ -482,7 +537,7 @@ class HybridInfo:
 
 
 class MappingInfo:
-    """Mapping module output data"""
+    """Mapping output data"""
 
     __slots__ = (
         "coordinates",
@@ -515,7 +570,7 @@ class MappingInfo:
 
 
 class NotesInfo:
-    """Notes module output data"""
+    """Notes output data"""
 
     __slots__ = (
         "currentIndex",
@@ -536,7 +591,7 @@ class NotesInfo:
 
 
 class RelativeInfo:
-    """Relative module output data"""
+    """Relative output data"""
 
     __slots__ = (
         "relative",
@@ -553,7 +608,7 @@ class RelativeInfo:
 
 
 class SectorsInfo:
-    """Sectors module output data"""
+    """Sectors output data"""
 
     __slots__ = (
         "noDeltaSector",
@@ -576,7 +631,7 @@ class SectorsInfo:
 
 
 class StatsInfo:
-    """Stats module output data"""
+    """Stats output data"""
 
     __slots__ = (
         "metersDriven",
@@ -587,7 +642,7 @@ class StatsInfo:
 
 
 class VehiclesInfo:
-    """Vehicles module output data"""
+    """Vehicles output data"""
 
     __slots__ = (
         "dataSet",
@@ -630,7 +685,7 @@ class VehiclesInfo:
 
 
 class WheelsInfo:
-    """Wheels module output data"""
+    """Wheels output data"""
 
     __slots__ = (
         "corneringRadius",

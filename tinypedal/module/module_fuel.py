@@ -31,15 +31,8 @@ from ..api_control import api
 from ..const_api import API_RF2_NAME
 from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, POS_XYZ_ZERO
 from ..const_file import FileExt
-from ..module_info import ConsumptionDataSet, FuelInfo, minfo
-from ..userfile.consumption_history import (
-    load_consumption_history_file,
-    save_consumption_history_file,
-)
-from ..userfile.fuel_delta import (
-    load_fuel_delta_file,
-    save_fuel_delta_file,
-)
+from ..module_info import FuelInfo, minfo
+from ..userfile.fuel_delta import load_fuel_delta_file, save_fuel_delta_file
 from ..validator import generator_init, valid_delta_raw
 from ._base import DataModule, round6
 
@@ -59,6 +52,7 @@ class Realtime(DataModule):
         update_interval = self.idle_interval
 
         userpath_fuel_delta = self.cfg.path.fuel_delta
+        userpath_energy_delta = self.cfg.path.energy_delta
 
         while not _event_wait(update_interval):
             if realtime_state.active:
@@ -68,7 +62,7 @@ class Realtime(DataModule):
                     update_interval = self.active_interval
 
                     combo_name = api.read.session.combo_name()
-                    gen_calc_fuel = calc_consumption(
+                    gen_fuel_usage = calc_consumption(
                         output=minfo.fuel,
                         telemetry_func=detect_consumption_type(),
                         filepath=userpath_fuel_delta,
@@ -76,74 +70,42 @@ class Realtime(DataModule):
                         extension=FileExt.FUEL,
                         min_delta_distance=self.mcfg["minimum_delta_distance"],
                     )
+                    gen_energy_usage = calc_consumption(
+                        output=minfo.energy,
+                        telemetry_func=telemetry_energy,
+                        filepath=userpath_energy_delta,
+                        filename=combo_name,
+                        extension=FileExt.ENERGY,
+                        min_delta_distance=self.mcfg["minimum_delta_distance"],
+                    )
+                    # Reset module output
+                    minfo.energy.reset()
                     # Reset module output
                     minfo.fuel.reset()
-                    load_consumption_history(userpath_fuel_delta, combo_name)
 
-                # Run calculation
-                gen_calc_fuel.send(True)
+                # Calculate fuel
+                gen_fuel_usage.send(True)
 
-                # Update consumption history
-                if (minfo.delta.lapTimeCurrent < 10
-                    and minfo.delta.lapTimeCurrent > 2
-                    and minfo.delta.lapTimeLast > 0):
-                    update_consumption_history()
+                # Calculate virtual energy if available
+                if api.read.vehicle.max_virtual_energy():
+                    gen_energy_usage.send(True)
+
+                    # Update hybrid info
+                    minfo.hybrid.fuelEnergyRatio = calc.fuel_to_energy_ratio(
+                        minfo.fuel.estimatedConsumption,
+                        minfo.energy.estimatedConsumption,
+                    )
+                    minfo.hybrid.fuelEnergyBias = (
+                        minfo.fuel.estimatedLaps - minfo.energy.estimatedLaps
+                    )
 
             else:
                 if reset:
                     reset = False
                     update_interval = self.idle_interval
                     # Trigger save check
-                    gen_calc_fuel.send(False)
-                    save_consumption_history(userpath_fuel_delta, combo_name)
-
-
-def update_consumption_history():
-    """Update consumption history"""
-    lap_number = api.read.lap.completed_laps() - 1
-    if (
-        minfo.history.consumptionDataSet[0].lapTimeLast != minfo.delta.lapTimeLast
-        or minfo.history.consumptionDataSet[0].lapNumber != lap_number
-    ):
-        minfo.history.consumptionDataSet.appendleft(
-            ConsumptionDataSet(
-                lapNumber=lap_number,
-                isValidLap=int(minfo.delta.isValidLap),
-                lapTimeLast=minfo.delta.lapTimeLast,
-                lastLapUsedFuel=minfo.fuel.lastLapConsumption,
-                lastLapUsedEnergy=minfo.energy.lastLapConsumption,
-                batteryDrainLast=minfo.hybrid.batteryDrainLast,
-                batteryRegenLast=minfo.hybrid.batteryRegenLast,
-                tyreAvgWearLast=calc.mean(minfo.wheels.lastLapTreadWear),
-                capacityFuel=minfo.fuel.capacity,
-            )
-        )
-        minfo.history.consumptionDataVersion += 1
-
-
-def load_consumption_history(filepath: str, combo_name: str):
-    """Load consumption history"""
-    if minfo.history.consumptionDataName != combo_name:
-        dataset = load_consumption_history_file(
-            filepath=filepath,
-            filename=combo_name,
-        )
-        minfo.history.consumptionDataSet.clear()
-        minfo.history.consumptionDataSet.extend(dataset)
-        # Update combo info
-        minfo.history.consumptionDataName = combo_name
-        minfo.history.consumptionDataVersion = hash(combo_name)  # unique start id
-
-
-def save_consumption_history(filepath: str, combo_name: str):
-    """Save consumption history"""
-    if minfo.history.consumptionDataVersion != hash(combo_name):
-        save_consumption_history_file(
-            dataset=minfo.history.consumptionDataSet,
-            filepath=filepath,
-            filename=combo_name,
-        )
-        minfo.history.consumptionDataVersion = hash(combo_name)  # reset
+                    gen_fuel_usage.send(False)
+                    gen_energy_usage.send(False)
 
 
 def detect_consumption_type() -> Callable:
@@ -167,6 +129,14 @@ def telemetry_fuel() -> tuple[float, float]:
 def telemetry_battery() -> tuple[float, float]:
     """Telemetry battery, capacity is always 100%"""
     return 100, api.read.emotor.battery_charge() * 100
+
+
+def telemetry_energy() -> tuple[float, float]:
+    """Telemetry energy, output in percentage"""
+    max_energy = api.read.vehicle.max_virtual_energy()
+    if max_energy:
+        return 100.0, api.read.vehicle.virtual_energy() / max_energy * 100
+    return 100.0, 0.0
 
 
 @generator_init

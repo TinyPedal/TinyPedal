@@ -33,12 +33,6 @@ MODULE_DEFAULT = {
         "laptime_pace_samples": 6,
         "laptime_pace_margin": 5,
     },
-    "module_energy": {
-        "enable": True,
-        "update_interval": 10,
-        "idle_update_interval": 400,
-        "minimum_delta_distance": 5,
-    },
     "module_force": {
         "enable": True,
         "update_interval": 10,
@@ -89,6 +83,14 @@ MODULE_DEFAULT = {
         "idle_update_interval": 400,
         "vehicle_classification": "Class - Brand",
         "enable_podium_by_class": True,
+    },
+    "module_stint": {
+        "enable": True,
+        "update_interval": 100,
+        "idle_update_interval": 400,
+        "minimum_stint_threshold_minutes": 10,
+        "minimum_pitstop_threshold_seconds": 3,
+        "minimum_tyre_temperature_threshold": 55,
     },
     "module_vehicles": {
         "enable": True,

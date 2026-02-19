@@ -225,7 +225,7 @@ Data recording is handled by [Delta Module](#delta-module).
 ## Energy delta
 Energy delta data is stored as `CSV` format (.energy extension) under `TinyPedal\deltabest` folder (default). Those files can be opened in spreadsheet or notepad programs.
 
-Data recording is handled by [Energy Module](#energy-module).
+Data recording is handled by [Fuel Module](#fuel-module).
 
 [**`Back to Top`**](#)
 
@@ -1350,18 +1350,6 @@ Set additional margin for laptime pace that cannot exceed the sum of previous `l
 [**`Back to Top`**](#)
 
 
-## Energy module
-**This module provides vehicle virtual energy usage data.**
-
-    module_energy
-Enable energy module.
-
-    minimum_delta_distance
-Set minimum recording distance (in meters) between each virtual energy usage sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
-
-[**`Back to Top`**](#)
-
-
 ## Force module
 **This module provides vehicle g force, downforce, braking rate data.**
 
@@ -1390,7 +1378,7 @@ Set time delay in seconds for resetting maximum braking rate. Default is `60` se
 
 
 ## Fuel module
-**This module provides vehicle fuel usage data.**
+**This module provides vehicle fuel and virtual energy usage data.**
 
     module_fuel
 Enable fuel module.
@@ -1471,6 +1459,28 @@ Set one of the three vehicle classifications where stats will be saved.
 
     enable_podium_by_class
 Enable to count race finish position by class instead of overall position.
+
+[**`Back to Top`**](#)
+
+
+## Stint module
+**This module provides lap and stint history data.**
+
+    module_stint
+Enable stint module.
+
+    minimum_stint_threshold_minutes
+Set the minimum stint time threshold in minutes for concluding current stint. This only affects ESC.
+
+    minimum_pitstop_threshold_seconds
+Set the minimum pit stop time threshold in seconds for concluding current stint. Default is `3` seconds.
+
+This option is useful for detecting pit stop that does not refuel or change tyres. It also allows to detect pit stop while spectating other player with [Spectate Mode](#spectate-mode).
+
+    minimum_tyre_temperature_threshold
+Set the minimum tyre carcass temperature (Celsius) threshold for calculating lap time delta and consistency. Default is `55` degrees.
+
+This option helps to exclude slow lap time due to cold tyres from calculation.
 
 [**`Back to Top`**](#)
 
@@ -3584,19 +3594,6 @@ Set the number of stint history display. Default is to show `2` most recent stin
 
     show_empty_history
 Show empty stint history. Default is `false`, which hides empty rows.
-
-    minimum_stint_threshold_minutes
-Set the minimum stint time threshold in minutes for concluding current stint. This only affects ESC.
-
-    minimum_pitstop_threshold_seconds
-Set the minimum pit stop time threshold in seconds for concluding current stint. Default is `3` seconds.
-
-This option is useful for detecting pit stop that does not refuel or change tyres. It also allows to detect pit stop while spectating other player with [Spectate Mode](#spectate-mode).
-
-    minimum_tyre_temperature_threshold
-Set the minimum tyre carcass temperature (Celsius) threshold for calculating lap time delta and consistency. Default is `55` degrees.
-
-This option helps to exclude slow lap time due to cold tyres from calculation.
 
     show_laps
 Show number of completed laps in the stint.
