@@ -40,6 +40,7 @@ from ..setting import cfg, copy_setting
 from ..template.setting_tracks import TRACKINFO_DEFAULT
 from ._common import (
     BaseEditor,
+    ClockTableItem,
     CompactButton,
     FloatTableItem,
     UIScaler,
@@ -51,6 +52,8 @@ HEADER_TRACKS = (
     "Pit exit (m)",
     "Pit speed (m/s)",
     "Speed trap (m)",
+    "Sunrise",
+    "Sunset",
 )
 
 logger = logging.getLogger(__name__)
@@ -62,7 +65,7 @@ class TrackInfoEditor(BaseEditor):
     def __init__(self, parent):
         super().__init__(parent)
         self.set_utility_title("Track Info Editor")
-        self.setMinimumSize(UIScaler.size(60), UIScaler.size(38))
+        self.setMinimumSize(UIScaler.size(64), UIScaler.size(35))
 
         self.tracks_temp = copy_setting(cfg.user.tracks)
 
@@ -74,7 +77,7 @@ class TrackInfoEditor(BaseEditor):
         self.table_tracks.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         for idx in range(1, len(HEADER_TRACKS)):
             self.table_tracks.horizontalHeader().setSectionResizeMode(idx, QHeaderView.Fixed)
-            self.table_tracks.setColumnWidth(idx, UIScaler.size(8))
+            self.table_tracks.setColumnWidth(idx, UIScaler.size(8 if idx <= 4 else 5))
         self.table_tracks.cellChanged.connect(self.verify_input)
 
         self.table_tracks.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -156,11 +159,11 @@ class TrackInfoEditor(BaseEditor):
         self.table_tracks.setItem(row_index, 0, QTableWidgetItem(track_name))
         column_index = 1
         for key, value in TRACKINFO_DEFAULT.items():
-            self.table_tracks.setItem(
-                row_index,
-                column_index,
-                FloatTableItem(track_data.get(key, value)),
-            )
+            if isinstance(value, float):
+                item = FloatTableItem(track_data.get(key, value))
+            else:
+                item = ClockTableItem(track_data.get(key, value))
+            self.table_tracks.setItem(row_index, column_index, item)
             column_index += 1
 
     def sort_track(self):

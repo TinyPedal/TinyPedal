@@ -580,3 +580,45 @@ class NumericTableItem(QTableWidgetItem):
     def __lt__(self, other):
         """Sort by value"""
         return self.value < other.value
+
+
+class ClockTableItem(QTableWidgetItem):
+    """QTable item - clock type with validation"""
+
+    def __init__(self, value: str):
+        super().__init__()
+        self._value = ""
+        self.setText(value)
+
+    def value(self) -> str:
+        """Get value"""
+        return self._value
+
+    def validate(self):
+        """Validate value, replace invalid value with old value if invalid"""
+        value = self.__verify(self.text())
+        if value:
+            self._value = value
+        self.setText(self._value)
+
+    def __lt__(self, other):
+        """Sort by value"""
+        return self.value() < other.value()
+
+    def __verify(self, clock_time: str) -> str:
+        """Validate clock time (Hour:Minute) string"""
+        try:
+            data = clock_time.split(":")
+            if len(data) != 2:
+                raise ValueError
+            hours = min(max(int(data[0]), 0), 24)
+            minutes = min(max(int(data[1]), 0), 60)
+            if minutes >= 60:
+                hours += 1
+                minutes = 0
+            if hours >= 24:
+                hours = 24
+                minutes = 0
+            return f"{hours:02d}:{minutes:02d}"
+        except (AttributeError, IndexError, ValueError, TypeError):
+            return ""

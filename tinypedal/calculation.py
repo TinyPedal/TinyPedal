@@ -341,6 +341,11 @@ def sec2sessiontime(seconds: float) -> str:
     return f"{seconds // 3600:02.0f}:{seconds // 60 % 60:02.0f}:{round(seconds) % 60:02.0f}"
 
 
+def sec2countdown(seconds: float) -> str:
+    """Countdown time (hour:min:sec)"""
+    return f"{seconds // 3600:01.0f}:{seconds // 60 % 60:02.0f}:{round(seconds) % 60:02.0f}"
+
+
 def sec2laptime(seconds: float) -> str:
     """Lap time (min:sec.ms)"""
     if seconds > 60:
@@ -378,19 +383,13 @@ def delta_telemetry(
     return 0
 
 
-def clock_time_scale_sync(scaled_sec: float, elapsed_sec: float, start_sec: float) -> int:
-    """Synchronize clock time scale multiplier
-
-    Args:
-        scaled_sec: scaled track clock time (seconds)
-        elapsed_sec: current non-scaled session elapsed time (seconds)
-        start_sec: current session start time stamp (seconds)
-    """
-    if elapsed_sec:
-        if scaled_sec < start_sec:
-            scaled_sec += 86400
-        return round((scaled_sec - start_sec) / elapsed_sec)
-    return 1
+def clock_time_to_seconds(clock_time: str) -> float:
+    """Convert clock time (Hour:Minute) string to seconds"""
+    try:
+        data = clock_time.split(":")
+        return min(max(float(data[0]) * 3600 + float(data[1]) * 60, 0), 86400)
+    except (AttributeError, IndexError, ValueError, TypeError):
+        return 0.0
 
 
 def exp_mov_avg(factor: float, ema_last: float, source: float) -> float:

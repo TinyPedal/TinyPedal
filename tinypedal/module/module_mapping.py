@@ -86,14 +86,31 @@ class Realtime(DataModule):
                     gen_track_info.send(False)
 
 
+def set_sunlight_phase(sunrise: str, sunset: str):
+    """Set sunlight phase time"""
+    sec_sunrise = calc.clock_time_to_seconds(sunrise)
+    sec_sunset = calc.clock_time_to_seconds(sunset)
+    sec_midday = sec_sunrise + abs(sec_sunset - sec_sunrise) / 2
+    sec_midnight = sec_sunrise - (86400 - sec_sunset + sec_sunrise) / 2
+    if sec_midnight < 0:
+        sec_midnight += 86400
+    return tuple(sorted((
+        (sec_sunrise, 0),
+        (sec_midday, 1),
+        (sec_sunset, 2),
+        (sec_midnight, 3),
+    )))
+
+
 @generator_init
 def update_track_info(output: MappingInfo, track_name: str):
     """Update track info"""
     # Load track info
-    pit_entry = load_track_info(track_name).get("pit_entry", 0.0)
-    pit_exit = load_track_info(track_name).get("pit_exit", 0.0)
-    pit_speed = load_track_info(track_name).get("pit_speed", 0.0)
-    output.speedTrapPosition = load_track_info(track_name).get("speed_trap", 0.0)
+    pit_entry = load_track_info(track_name, "pit_entry")
+    pit_exit = load_track_info(track_name, "pit_exit")
+    pit_speed = load_track_info(track_name, "pit_speed")
+    output.speedTrapPosition = load_track_info(track_name, "speed_trap")
+    output.sunlightPhases = set_sunlight_phase(load_track_info(track_name, "sunrise"), load_track_info(track_name, "sunset"))
     # Set default
     pos_last = 0.0
     last_speed = 0.0

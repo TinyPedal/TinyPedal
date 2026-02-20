@@ -1,17 +1,29 @@
-WIP
+2.41.0 (2026-02-20)
 -----------------------------
 * General
-  - Further optimization and improvements to widget rendering methods, reduced overall memory usage by roughly 10MB (with all widgets enabled).
+  - Further optimization and improvements to widget drawing methods, reduced overall memory usage by roughly 10MB (with all widgets enabled).
   - Added "Enable Auto Font Offset" and "Font Offset Vertical" options to all widgets, and can be batch-toggled via "Global Font Override" Dialog.
   - Added "Config" & "Reload" options to right-click context menu on each widget for quick access.
   - Added "font_scale_caption" option to all widgets that have "show_caption" option.
   - Added more font weight options. Note, not every weight may be available for selected font.
   - Preset name in tray icon menu is now clickable which brings up "Preset" tab in main window.
   - Fixed an issue that would prevent TinyPedal from restarting if attempted to restart while driving.
-  - Installer script (install.sh) now installs only the necessary files and documents for running TinyPedal on Linux.
+  - Fixed a calculation error with track time scale that sometimes showed wrong track time in Cruise Widget.
+  - "install.sh" script now installs only the necessary files and documents for running TinyPedal on Linux.
+
+* Track Info Editor
+  - Added "sunrise" and "sunset" columns for configuring "sunrise" and "sunset" hours. Acceptable time format is "Hour:Minute".
+
+* [New]Track clock Widget
+  - Show track clock and time scale readings (removed from Cruise Widget). Old settings from Cruise Widget will be automatically transferred to this new widget.
+  - Show sunlight phase countdown timer and indicator. The timer counts down towards each of four primary sunlight phases: sunrise, midday, sunset, midnight. An arrow indicator is displayed alongside with day/night color.
+    This countdown timer can be used to check how long until sunrise or sunset for planning strategy.
+  - Note, game does not provide "sunrise" and "sunset" data. Sunrise and sunset hours must be manually defined in Track Info Editor to get correct readings.
+    See Wiki Appendix page for sunrise and sunset reference table for some common tracks.
 
 * Flag Widget
   - Show incoming leading vehicle class name on blue flag indicator, which helps to quickly spot the class that is about to lap you.
+  - Improved start lights & green flag detection for RF2.
 
 * Lap time history Widget
   - Added "show_delta" option, which shows lap time delta between two consecutive laps. This option can be useful to quickly check stint pace.
@@ -43,6 +55,7 @@ WIP
 * Fuel Module
   - Now handles virtual energy calculation.
   - Removed "Energy Module".
+  - Fixed an issue where battery charge was not detected on "FE Gen3" during fast-rolling in RF2.
 
 * [New]Stint Module
   - Now handles lap and stint history data calculation, which is used by Lap time history and Stint history Widget.

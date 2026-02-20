@@ -35,9 +35,13 @@ def add_missing_track(track_name: str) -> dict:
     return new_data
 
 
-def load_track_info(track_name: str) -> dict:
+def load_track_info(track_name: str, info_name: str):
     """Load track info from tracks preset"""
-    return cfg.user.tracks.get(track_name, TRACKINFO_DEFAULT)
+    data = cfg.user.tracks.get(track_name, TRACKINFO_DEFAULT)
+    value = data.get(info_name)
+    if value is None:
+        return TRACKINFO_DEFAULT[info_name]
+    return value
 
 
 def save_track_info(track_name: str, **track_info: dict) -> None:

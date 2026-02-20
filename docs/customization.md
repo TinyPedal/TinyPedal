@@ -1156,6 +1156,10 @@ Track info editor is used for editing [Tracks Preset](#tracks-preset). Note, any
 
 `Speed trap (m)` column is speed trap position (in meters) relative to track length. To manually set speed trap position at your current on-track position, `Right-Click` on corresponding track's speed trap column and select `Set from Telemetry`.
 
+`Sunrise` column is sunrise hour in `Hour:Minute` format. This value has to be manually defined.
+
+`Sunset` column is sunset hour in `Hour:Minute` format. This value has to be manually defined.
+
 To add new track, click `Add` button. Note, the editor can auto-detect and fill-in missing track found from current active session, existing data will not be changed.
 
 To sort track name in orders, click `Sort` button.
@@ -1744,24 +1748,7 @@ Set warning threshold for estimated brake lifespan in minutes. Default is `5` la
 
 
 ## Cruise
-**This widget displays track clock, compass, elevation, odometer info.**
-
-    show_track_clock
-Show current in-game clock time of the circuit.
-
-    enable_track_clock_synchronization
-Enable auto track clock and time scale synchronization. `enable_restapi_access` must be enabled to synchronize track clock from Rest API.
-
-Note, for `RF2`, synchronization only works in singleplayer; for `LMU`, synchronization works in both singleplayer and multiplayer.
-
-    track_clock_time_scale
-Manually set time multiplier for time-scaled session. Default is `1`, which matches `Time Scale: Normal` setting in-game. Note, this option will only be used if `enable_track_clock_synchronization` option is disabled.
-
-    track_clock_format
-Set track clock format string. To show seconds, add `%S`, such as `%H:%M:%S %p`. See [link](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) for full list of format codes.
-
-    show_time_scale
-Show current session track clock time scale multiplier.
+**This widget displays compass, elevation, odometer info.**
 
     show_compass
 Show compass directions with three-figure bearings that matches game's cardinal directions.
@@ -3740,6 +3727,41 @@ Show personal current stint best lap time.
 
     show_average_pace
 Show personal current average lap time pace, this reading is also used in real-time fuel calculation. Note, additional `average lap time pace` calculation setting can be found in [Delta Module](#delta-module) config. After ESC or session ended, lap time pace reading will be reset, and aligned to `all time personal best lap time` if available.
+
+[**`Back to Top`**](#)
+
+
+## Track clock
+**This widget displays track clock, time scale, sunlight phase info.**
+
+    show_track_clock
+Show current in-game clock time of the circuit.
+
+    enable_track_clock_synchronization
+Enable auto track clock and time scale synchronization. `enable_restapi_access` must be enabled to synchronize track clock from Rest API.
+
+Note, synchronization may not work in multiplayer.
+
+    track_clock_time_scale
+Manually set time multiplier for time-scaled session. Default is `1`, which matches `Time Scale: Normal` setting in-game. Note, this option will only be used if `enable_track_clock_synchronization` option is disabled.
+
+    track_clock_format
+Set track clock format string. To show seconds, add `%S`, such as `%H:%M:%S %p`. See [link](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) for full list of format codes.
+
+    show_time_scale
+Show current session track clock time scale multiplier.
+
+    show_sunlight_phase_countdown
+Show sunlight phase countdown timer and indicator. The timer counts down towards each of four primary sunlight phases: sunrise, midday, sunset, midnight. An arrow indicator is displayed alongside with day/night color.
+
+This countdown timer can be used to check how long until sunrise or sunset for planning strategy.
+
+Note, game does not provide `sunrise` and `sunset` data. Sunrise and sunset hours must be manually defined in [Track Info Editor](#track-info-editor) to get correct readings.
+
+See Wiki Appendix page for sunrise and sunset reference table for some common tracks.
+
+    enable_time_scaled_countdown
+Enable time scaled countdown, which scales with session track clock time scale multiplier. This option is disabled by default.
 
 [**`Back to Top`**](#)
 

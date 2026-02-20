@@ -550,6 +550,7 @@ class MappingInfo:
         "pitLaneLength",
         "pitSpeedLimit",
         "pitPassTime",
+        "sunlightPhases",
     )
 
     def __init__(self):
@@ -567,6 +568,7 @@ class MappingInfo:
         self.pitLaneLength: float = 0.0
         self.pitSpeedLimit: float = 0.0
         self.pitPassTime: float = 0.0
+        self.sunlightPhases: tuple[tuple[float, int], ...] | None = None
 
 
 class NotesInfo:

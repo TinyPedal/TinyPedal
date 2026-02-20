@@ -20,12 +20,10 @@
 Cruise Widget
 """
 
-from time import gmtime, strftime
-
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import COMPASS_BEARINGS, TEXT_NA
+from ..const_common import COMPASS_BEARINGS
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -51,7 +49,6 @@ class Realtime(Overlay):
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.odm_digits = max(int(self.wcfg["odometer_maximum_digits"]), 1)
-        self.time_scale_override = max(int(self.wcfg["track_clock_time_scale"]), 0)
         if self.cfg.units["odometer_unit"] == "Meter":
             self.odm_digits += 0.0
             self.odm_range = int(int(self.odm_digits) * "9")
@@ -64,38 +61,6 @@ class Realtime(Overlay):
         self.symbol_dist = units.set_symbol_distance(self.cfg.units["distance_unit"])
         self.unit_odm = units.set_unit_distance(self.cfg.units["odometer_unit"])
         self.symbol_odm = units.set_symbol_distance(self.cfg.units["odometer_unit"])
-
-        # Track clock
-        if self.wcfg["show_track_clock"]:
-            text_clock = strftime(self.wcfg["track_clock_format"], gmtime(0))
-            self.bar_track_clock = self.set_rawtext(
-                text=text_clock,
-                width=font_m.width * len(text_clock) + bar_padx,
-                fixed_height=font_m.height,
-                offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_track_clock"],
-                bg_color=self.wcfg["bkg_color_track_clock"],
-            )
-            self.set_primary_orient(
-                target=self.bar_track_clock,
-                column=self.wcfg["column_index_track_clock"],
-            )
-
-        # Track clock time scale
-        if self.wcfg["show_time_scale"]:
-            text_time_scale = "X1"
-            self.bar_time_scale = self.set_rawtext(
-                text=text_time_scale,
-                width=font_m.width * 3 + bar_padx,
-                fixed_height=font_m.height,
-                offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_time_scale"],
-                bg_color=self.wcfg["bkg_color_time_scale"],
-            )
-            self.set_primary_orient(
-                target=self.bar_time_scale,
-                column=self.wcfg["column_index_time_scale"],
-            )
 
         # Compass
         if self.wcfg["show_compass"]:
@@ -179,24 +144,6 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        track_time = api.read.session.track_time()
-
-        if self.wcfg["enable_track_clock_synchronization"]:
-            time_scale = api.read.session.time_scale()
-        else:
-            time_scale = self.time_scale_override
-
-        if track_time == -1:
-            track_time = calc.clock_time(api.read.session.elapsed(), api.read.session.start(), time_scale)
-
-        # Track clock
-        if self.wcfg["show_track_clock"]:
-            self.update_track_clock(self.bar_track_clock, track_time)
-
-        # Track clock time scale
-        if self.wcfg["show_time_scale"]:
-            self.update_time_scale(self.bar_time_scale, time_scale)
-
         # Compass
         if self.wcfg["show_compass"]:
             orientation = api.read.vehicle.orientation_yaw_radians()
@@ -223,24 +170,6 @@ class Realtime(Overlay):
             self.update_cornering_radius(self.bar_cornering_radius, cornering_radius)
 
     # GUI update methods
-    def update_track_clock(self, target, data):
-        """Track clock"""
-        if target.last != data:
-            target.last = data
-            target.text = strftime(self.wcfg["track_clock_format"], gmtime(data))
-            target.update()
-
-    def update_time_scale(self, target, data):
-        """Track clock time scale"""
-        if target.last != data:
-            target.last = data
-            if 0 <= data <= 60:
-                text = f"X{data}"
-            else:
-                text = TEXT_NA
-            target.text = text
-            target.update()
-
     def update_compass(self, target, data):
         """Compass"""
         if target.last != data:
