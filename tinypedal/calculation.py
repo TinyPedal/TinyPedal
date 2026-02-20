@@ -387,7 +387,8 @@ def clock_time_scale_sync(scaled_sec: float, elapsed_sec: float, start_sec: floa
         start_sec: current session start time stamp (seconds)
     """
     if elapsed_sec:
-        return round((scaled_sec // 86400 * 86400 + scaled_sec - start_sec) / elapsed_sec)
+        offset = 86400 if scaled_sec <= start_sec else 0
+        return round((offset + scaled_sec - start_sec) / elapsed_sec)
     return 1
 
 
