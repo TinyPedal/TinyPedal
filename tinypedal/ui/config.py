@@ -184,9 +184,12 @@ class FontConfig(BaseDialog):
                     if font_offset != 0:
                         setting[key] += font_offset
                     continue
+        # Reset after applied
         self.edit_fontsize.setValue(0)
+        self.edit_fontoffset.setValue(0)
+        # Wait saving finish
         cfg.save(0)
-        while cfg.is_saving:  # wait saving finish
+        while cfg.is_saving:
             time.sleep(0.01)
         self.reloading()
 

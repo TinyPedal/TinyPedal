@@ -233,7 +233,7 @@ class PresetTransfer(BaseEditor):
                     if "color" in options_selection:
                         dest_setting_dict[option_name] = option_value
                     continue
-                if re.search("font_name|font_weight|font_size", option_name):
+                if re.search("font_name|font_weight|font_size|font_offset", option_name):
                     if "font" in options_selection:
                         dest_setting_dict[option_name] = option_value
                     continue
