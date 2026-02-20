@@ -179,11 +179,15 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
+        track_time = api.read.session.track_time()
+
         if self.wcfg["enable_track_clock_synchronization"]:
             time_scale = api.read.session.time_scale()
         else:
             time_scale = self.time_scale_override
-        track_time = calc.clock_time(api.read.session.elapsed(), api.read.session.start(), time_scale)
+
+        if track_time == -1:
+            track_time = calc.clock_time(api.read.session.elapsed(), api.read.session.start(), time_scale)
 
         # Track clock
         if self.wcfg["show_track_clock"]:

@@ -341,6 +341,10 @@ class Session(ABC):
         """Weather forecast nodes"""
 
     @abstractmethod
+    def track_time(self) -> float:
+        """Track time"""
+
+    @abstractmethod
     def time_scale(self) -> int:
         """Time scale"""
 

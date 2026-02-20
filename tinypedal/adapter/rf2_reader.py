@@ -26,7 +26,6 @@ Notes:
 from __future__ import annotations
 
 from ..calculation import (
-    clock_time_scale_sync,
     lap_progress_distance,
     mean,
     min_nonzero,
@@ -447,14 +446,13 @@ class Session(_reader.Session, DataAdapter):
             return self.rest.telemetry().forecastQualify
         return self.rest.telemetry().forecastRace  # race session
 
+    def track_time(self) -> float:
+        """Track time"""
+        return self.rest.telemetry().trackClockTime
+
     def time_scale(self) -> int:
         """Time scale"""
-        track_time = self.rest.telemetry().trackClockTime
-        if track_time == -1:  # trackClockTime unavailable
-            time_scale = max(self.rest.telemetry().timeScale, 0)
-        else:  # sync time scale
-            time_scale = clock_time_scale_sync(track_time, self.elapsed(), self.start())
-        return time_scale
+        return max(self.rest.telemetry().timeScale, 0)
 
 
 class Switch(_reader.Switch, DataAdapter):
