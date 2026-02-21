@@ -144,10 +144,13 @@ class Realtime(Overlay):
                 countdown = 0
                 next_phase_index = 0
             else:
-                phase_index = calc.binary_search_lower_column(sun_phases, track_time, 0, 3) + 1
-                if phase_index > 3:
-                    phase_index = 0
-                next_phase_time, next_phase_index = sun_phases[phase_index]
+                # Select upcoming phase
+                for next_phase_time, next_phase_index in sun_phases:
+                    if next_phase_time > track_time:
+                        break
+                else:
+                    next_phase_time, next_phase_index = sun_phases[0]
+                # Calculate countdown
                 if track_time > next_phase_time:
                     next_phase_time += 86400
                 countdown = next_phase_time - track_time

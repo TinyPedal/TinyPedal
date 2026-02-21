@@ -342,6 +342,9 @@ class Realtime(Overlay):
             target.last = data
             if data != MAX_SECONDS:
                 class_name = minfo.vehicles.nearestBlueClass
+                class_style = self.cfg.user.classes.get(class_name)
+                if class_style is not None:
+                    class_name = class_style["alias"]
                 if not class_name:
                     class_name = "BLUE"
                 target.text = f"{class_name:<4.4}{data:3.0f}"[:7]
@@ -502,7 +505,7 @@ class GreenFlagTimer:
     )
 
     def __init__(self, green_flag_duration: bool):
-        self._last_lap_stime = -1
+        self._last_lap_stime = -1.0
         self._green_flag_duration = green_flag_duration
 
     def update(self, elapsed_time: float) -> int:
