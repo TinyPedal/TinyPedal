@@ -1,0 +1,53 @@
+name: Publish AUR Package
+
+on:
+  workflow_run:
+    workflows: ["Build and Release"]
+    types: [completed]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  aur-publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: "true"
+
+    - name: Set up SSH for AUR
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.AUR_SSH_KEY }}
+
+    - name: Add AUR host key
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -t rsa aur.archlinux.org >> ~/.ssh/known_hosts
+
+    - name: Render AUR files
+      run: |
+        ./packaging/aur/render.sh
+
+    - name: Update sha256sums
+      run: |
+        pkgver=$(awk -F= '/^pkgver=/{print $2}' packaging/aur/out/PKGBUILD | head -n1)
+        tarball="tinypedal-${pkgver}.tar.gz"
+        url="https://github.com/TinyPedal/TinyPedal/archive/refs/tags/v${pkgver}.tar.gz"
+        curl -L -o "${tarball}" "${url}"
+        sha=$(sha256sum "${tarball}" | awk '{print $1}')
+        sed -i "s/^sha256sums=.*/sha256sums=('${sha}')/" packaging/aur/out/PKGBUILD
+        sed -i "s/^    sha256sums = .*/    sha256sums = ${sha}/" packaging/aur/out/.SRCINFO
+
+    - name: Push to AUR
+      env:
+        AUR_SSH_USER: ${{ secrets.AUR_SSH_USER }}
+        AUR_AUTO_COMMIT: "1"
+      run: |
+        ./packaging/aur/push.sh

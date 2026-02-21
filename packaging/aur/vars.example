@@ -1,0 +1,3 @@
+# AUR push settings
+AUR_SSH_USER=aur
+# AUR_GIT_URL=ssh://${AUR_SSH_USER}@aur.archlinux.org/tinypedal.git
