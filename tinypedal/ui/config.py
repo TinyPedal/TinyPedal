@@ -27,8 +27,8 @@ import re
 import time
 from typing import Callable
 
-from PySide2.QtCore import QPoint, Qt
-from PySide2.QtGui import QFontDatabase
+from PySide2.QtCore import QPoint, Qt, QTimer
+from PySide2.QtGui import QFontDatabase, QKeySequence
 from PySide2.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -280,7 +280,7 @@ class FontConfig(BaseDialog):
 
 @singleton_dialog(ConfigType.CONFIG)
 class UserConfig(BaseDialog):
-    """User configuration dialog with sectioned layout."""
+    """User configuration dialog with sectioned layout and search bar."""
 
     def __init__(
         self,
@@ -315,7 +315,13 @@ class UserConfig(BaseDialog):
         self.option_width = UIScaler.size(option_width)
         self.section_grouper = section_grouper or SectionGrouper()
 
-        # Option dict (key: option editor)
+        # Cache for current editor values (unsaved changes)
+        self.original_keys = list(self.user_setting[self.key_name])
+        self._current_values = {
+            key: self.user_setting[self.key_name][key] for key in self.original_keys
+        }
+
+        # Option dicts (key: option editor)
         self.option_bool: dict = {}
         self.option_color: dict = {}
         self.option_path: dict = {}
@@ -330,7 +336,21 @@ class UserConfig(BaseDialog):
         self._num_columns = 0
         self._widest_section = 0
 
-        # Button
+        # Search bar
+        search_layout = QHBoxLayout()
+        search_layout.addWidget(QLabel("Search:"))
+        self.search_edit = QLineEdit()
+        self.search_edit.setPlaceholderText("Type to filter options (Ctrl+F)")
+        self.search_edit.setClearButtonEnabled(True)
+        self.search_edit.textChanged.connect(self._on_search_text_changed)
+        search_layout.addWidget(self.search_edit)
+
+        # Debounce timer
+        self.filter_timer = QTimer()
+        self.filter_timer.setSingleShot(True)
+        self.filter_timer.timeout.connect(self._apply_filter)
+
+        # Buttons
         button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
         button_reset.clicked.connect(self.reset_setting)
 
@@ -341,18 +361,19 @@ class UserConfig(BaseDialog):
         button_save.accepted.connect(self.saving)
         button_save.rejected.connect(self.reject)
 
-        # Create options
-        option_box = self._build_sectioned_layout()
+        # Create options (initial unfiltered view)
+        option_box = self._build_sectioned_layout(self.original_keys)
 
         # Create scroll box
         scroll_box = QScrollArea(self)
         scroll_box.setWidget(option_box)
         scroll_box.setWidgetResizable(True)
-        self._scroll_box = scroll_box  # keep reference for dynamic column reflow
+        self._scroll_box = scroll_box
 
-        # Set layout
+        # Set main layout
         layout_main = QVBoxLayout()
         layout_button = QHBoxLayout()
+        layout_main.addLayout(search_layout)
         layout_main.addWidget(scroll_box)
         layout_button.addWidget(button_reset)
         layout_button.addStretch(1)
@@ -377,50 +398,110 @@ class UserConfig(BaseDialog):
         if new_w != self.width() or new_h != self.height():
             self.resize(new_w, new_h)
 
+    # -------------------- Search / Filter --------------------
+    def _on_search_text_changed(self):
+        """Restart the debounce timer when text changes."""
+        self.filter_timer.start(200)  # milliseconds
+
+    def _apply_filter(self):
+        """Rebuild layout with keys that match the current filter text."""
+        text = self.search_edit.text().strip().lower()
+        if not text:
+            filtered_keys = self.original_keys
+        else:
+            filtered_keys = [key for key in self.original_keys if text in key.lower()]
+        self.rebuild_filtered_layout(filtered_keys)
+
+    def rebuild_filtered_layout(self, keys: list[str]):
+        """Rebuild the sectioned layout using only the given keys."""
+        # Clear old option dictionaries
+        self.option_bool.clear()
+        self.option_color.clear()
+        self.option_path.clear()
+        self.option_image.clear()
+        self.option_droplist.clear()
+        self.option_string.clear()
+        self.option_integer.clear()
+        self.option_float.clear()
+
+        # Group the filtered keys and create new section frames
+        sections = self.section_grouper.group_keys(keys)
+        self._section_widgets = [
+            self._create_section_frame(title, sec_keys)
+            for title, sec_keys in sections
+        ]
+
+        # Recalculate widest section for column layout
+        self._widest_section = max(
+            (w.sizeHint().width() for w in self._section_widgets), default=1
+        )
+
+        # Rearrange columns using the current column count
+        new_container = self._arrange_columns(self._num_columns)
+        self._scroll_box.setWidget(new_container)
+
+    # -------------------- Value cache --------------------
+    def _update_current_value(self, key, value):
+        """Update the central value cache when an editor changes."""
+        self._current_values[key] = value
+
+    # -------------------- Editor creation --------------------
     def _create_editor_for_key(self, key: str) -> QWidget:
-        """Create and register an editor widget for the given key."""
-        user_val = self.user_setting[self.key_name][key]
+        """Create and register an editor widget for the given key, using cached value."""
+        current_val = self._current_values[key]
         default_val = self.default_setting[self.key_name][key]
 
         # Bool
         if re.search(rxp.CFG_BOOL, key):
             editor = QCheckBox(self)
             editor.setFixedWidth(self.option_width)
-            editor.setChecked(user_val)
+            editor.setChecked(current_val)
             editor.defaults = default_val
+            editor.stateChanged.connect(
+                lambda state, k=key: self._update_current_value(k, state == Qt.Checked)
+            )
             add_context_menu(editor)
             self.option_bool[key] = editor
             return editor
 
         # Color string
         if re.search(rxp.CFG_COLOR, key):
-            editor = DoubleClickEdit(self, mode="color", init=user_val)
+            editor = DoubleClickEdit(self, mode="color", init=current_val)
             editor.setFixedWidth(self.option_width)
             editor.setMaxLength(9)
             editor.setValidator(QVAL_COLOR)
             editor.textChanged.connect(editor.preview_color)
-            editor.setText(user_val)
+            editor.setText(current_val)
             editor.defaults = default_val
+            editor.textChanged.connect(
+                lambda text, k=key: self._update_current_value(k, text)
+            )
             add_context_menu(editor)
             self.option_color[key] = editor
             return editor
 
         # User path string
         if re.search(rxp.CFG_USER_PATH, key):
-            editor = DoubleClickEdit(self, mode="path", init=user_val)
+            editor = DoubleClickEdit(self, mode="path", init=current_val)
             editor.setFixedWidth(self.option_width)
-            editor.setText(user_val)
+            editor.setText(current_val)
             editor.defaults = default_val
+            editor.textChanged.connect(
+                lambda text, k=key: self._update_current_value(k, text)
+            )
             add_context_menu(editor)
             self.option_path[key] = editor
             return editor
 
         # User image file path string
         if re.search(rxp.CFG_USER_IMAGE, key):
-            editor = DoubleClickEdit(self, mode="image", init=user_val)
+            editor = DoubleClickEdit(self, mode="image", init=current_val)
             editor.setFixedWidth(self.option_width)
-            editor.setText(user_val)
+            editor.setText(current_val)
             editor.defaults = default_val
+            editor.textChanged.connect(
+                lambda text, k=key: self._update_current_value(k, text)
+            )
             add_context_menu(editor)
             self.option_image[key] = editor
             return editor
@@ -430,8 +511,11 @@ class UserConfig(BaseDialog):
             editor = QComboBox(self)
             editor.setFixedWidth(self.option_width)
             editor.addItems(get_font_list())
-            editor.setCurrentText(str(user_val))
+            editor.setCurrentText(str(current_val))
             editor.defaults = default_val
+            editor.currentTextChanged.connect(
+                lambda text, k=key: self._update_current_value(k, text)
+            )
             add_context_menu(editor)
             self.option_droplist[key] = editor
             return editor
@@ -441,8 +525,11 @@ class UserConfig(BaseDialog):
             editor = QComboBox(self)
             editor.setFixedWidth(self.option_width)
             editor.addItems(cfg.user.heatmap.keys())
-            editor.setCurrentText(str(user_val))
+            editor.setCurrentText(str(current_val))
             editor.defaults = default_val
+            editor.currentTextChanged.connect(
+                lambda text, k=key: self._update_current_value(k, text)
+            )
             add_context_menu(editor)
             self.option_droplist[key] = editor
             return editor
@@ -453,8 +540,11 @@ class UserConfig(BaseDialog):
                 editor = QComboBox(self)
                 editor.setFixedWidth(self.option_width)
                 editor.addItems(choice_list)
-                editor.setCurrentText(str(user_val))
+                editor.setCurrentText(str(current_val))
                 editor.defaults = default_val
+                editor.currentTextChanged.connect(
+                    lambda text, k=key: self._update_current_value(k, text)
+                )
                 add_context_menu(editor)
                 self.option_droplist[key] = editor
                 return editor
@@ -464,8 +554,11 @@ class UserConfig(BaseDialog):
                 editor = QComboBox(self)
                 editor.setFixedWidth(self.option_width)
                 editor.addItems(choice_list)
-                editor.setCurrentText(str(user_val))
+                editor.setCurrentText(str(current_val))
                 editor.defaults = default_val
+                editor.currentTextChanged.connect(
+                    lambda text, k=key: self._update_current_value(k, text)
+                )
                 add_context_menu(editor)
                 self.option_droplist[key] = editor
                 return editor
@@ -474,8 +567,11 @@ class UserConfig(BaseDialog):
         if re.search(rxp.CFG_CLOCK_FORMAT, key) or re.search(rxp.CFG_STRING, key):
             editor = QLineEdit(self)
             editor.setFixedWidth(self.option_width)
-            editor.setText(user_val)
+            editor.setText(current_val)
             editor.defaults = default_val
+            editor.textChanged.connect(
+                lambda text, k=key: self._update_current_value(k, text)
+            )
             add_context_menu(editor)
             self.option_string[key] = editor
             return editor
@@ -485,8 +581,11 @@ class UserConfig(BaseDialog):
             editor = QLineEdit(self)
             editor.setFixedWidth(self.option_width)
             editor.setValidator(QVAL_INTEGER)
-            editor.setText(str(user_val))
+            editor.setText(str(current_val))
             editor.defaults = default_val
+            editor.textChanged.connect(
+                lambda text, k=key: self._update_current_value(k, text)
+            )
             add_context_menu(editor)
             self.option_integer[key] = editor
             return editor
@@ -495,12 +594,16 @@ class UserConfig(BaseDialog):
         editor = QLineEdit(self)
         editor.setFixedWidth(self.option_width)
         editor.setValidator(QVAL_FLOAT)
-        editor.setText(str(user_val))
+        editor.setText(str(current_val))
         editor.defaults = default_val
+        editor.textChanged.connect(
+            lambda text, k=key: self._update_current_value(k, text)
+        )
         add_context_menu(editor)
         self.option_float[key] = editor
         return editor
 
+    # -------------------- Layout building --------------------
     def _create_section_frame(self, title: str | None, keys: list) -> QFrame:
         """Create a frame containing one section with title bar and alternating rows."""
         layout = QGridLayout()
@@ -560,9 +663,8 @@ class UserConfig(BaseDialog):
         frame.setProperty("estimated_rows", len(keys) + (1 if title is not None else 0))
         return frame
 
-    def _build_sectioned_layout(self) -> QWidget:
+    def _build_sectioned_layout(self, keys: list[str]) -> QWidget:
         """Create section frames and arrange them for initial display."""
-        keys = list(self.user_setting[self.key_name])
         sections = self.section_grouper.group_keys(keys)
 
         self._section_widgets = [
@@ -622,6 +724,7 @@ class UserConfig(BaseDialog):
         container.setLayout(main_layout)
         return container
 
+    # -------------------- Resize event --------------------
     def resizeEvent(self, event):
         """Reflow columns when the window becomes wide or narrow enough."""
         super().resizeEvent(event)
@@ -632,6 +735,17 @@ class UserConfig(BaseDialog):
         if new_num != self._num_columns:
             self._scroll_box.setWidget(self._arrange_columns(new_num))
 
+    # -------------------- Focus searchbar --------------------
+    def keyPressEvent(self, event):
+        """Vang Ctrl+F af om focus naar de zoekbalk te verplaatsen."""
+        if event.matches(QKeySequence.Find):
+            self.search_edit.setFocus()
+            self.search_edit.selectAll()
+            event.accept()
+        else:
+            super().keyPressEvent(event)
+
+    # -------------------- Apply / Save / Reset --------------------
     def applying(self):
         """Save & apply"""
         self.save_setting(is_apply=True)
@@ -641,39 +755,56 @@ class UserConfig(BaseDialog):
         self.save_setting(is_apply=False)
 
     def reset_setting(self):
-        """Reset setting"""
+        """Reset setting to default values (and update cache)."""
         msg_text = (
             f"Reset all <b>{format_option_name(self.key_name)}</b> options to default?<br><br>"
             "Changes are only saved after clicking Apply or Save Button."
         )
         if self.confirm_operation(title="Reset Options", message=msg_text):
-            for editor in self.option_bool.values():
-                editor.setChecked(editor.defaults)
-            for editor in self.option_color.values():
-                editor.setText(editor.defaults)
-            for editor in self.option_path.values():
-                editor.setText(editor.defaults)
-            for editor in self.option_image.values():
-                editor.setText(editor.defaults)
-            for editor in self.option_droplist.values():
-                editor.setCurrentText(str(editor.defaults))
-            for editor in self.option_string.values():
-                editor.setText(editor.defaults)
-            for editor in self.option_integer.values():
-                editor.setText(str(editor.defaults))
-            for editor in self.option_float.values():
-                editor.setText(str(editor.defaults))
+            for key, editor in self.option_bool.items():
+                default = editor.defaults
+                editor.setChecked(default)
+                self._current_values[key] = default
+            for key, editor in self.option_color.items():
+                default = editor.defaults
+                editor.setText(default)
+                self._current_values[key] = default
+            for key, editor in self.option_path.items():
+                default = editor.defaults
+                editor.setText(default)
+                self._current_values[key] = default
+            for key, editor in self.option_image.items():
+                default = editor.defaults
+                editor.setText(default)
+                self._current_values[key] = default
+            for key, editor in self.option_droplist.items():
+                default = str(editor.defaults)
+                editor.setCurrentText(default)
+                self._current_values[key] = default
+            for key, editor in self.option_string.items():
+                default = editor.defaults
+                editor.setText(default)
+                self._current_values[key] = default
+            for key, editor in self.option_integer.items():
+                default = str(editor.defaults)
+                editor.setText(default)
+                self._current_values[key] = int(default) if default.isdigit() else default
+            for key, editor in self.option_float.items():
+                default = str(editor.defaults)
+                editor.setText(default)
+                self._current_values[key] = float(default) if '.' in default else int(default)
 
     def save_setting(self, is_apply: bool):
-        """Save setting"""
+        """Save setting from current cache, validate, and write to config."""
         user_setting = self.user_setting[self.key_name]
         error_found = False
 
+        # Validate and copy cached values into user_setting
         for key, editor in self.option_bool.items():
-            user_setting[key] = editor.isChecked()
+            user_setting[key] = self._current_values[key]
 
         for key, editor in self.option_color.items():
-            value = editor.text()
+            value = self._current_values[key]
             if is_hex_color(value):
                 user_setting[key] = value
             else:
@@ -681,23 +812,26 @@ class UserConfig(BaseDialog):
                 error_found = True
 
         for key, editor in self.option_path.items():
+            value = self._current_values[key]
             # Try convert to relative path again, in case user manually sets path
-            value = set_relative_path(editor.text())
+            value = set_relative_path(value)
             if set_user_data_path(value):
                 user_setting[key] = value
-                editor.setText(value)  # update reformatted path
+                # Update editor and cache to the reformatted path
+                editor.setText(value)
+                self._current_values[key] = value
             else:
                 self.value_error_message("path", key)
                 error_found = True
 
         for key, editor in self.option_image.items():
-            user_setting[key] = editor.text()
+            user_setting[key] = self._current_values[key]
 
         for key, editor in self.option_droplist.items():
-            user_setting[key] = editor.currentText()
+            user_setting[key] = self._current_values[key]
 
         for key, editor in self.option_string.items():
-            value = editor.text()
+            value = self._current_values[key]
             if re.search(rxp.CFG_CLOCK_FORMAT, key) and not is_clock_format(value):
                 self.value_error_message("clock format", key)
                 error_found = True
@@ -705,20 +839,23 @@ class UserConfig(BaseDialog):
             user_setting[key] = value
 
         for key, editor in self.option_integer.items():
-            value = editor.text()
-            if is_string_number(value):
-                user_setting[key] = int(value)
+            value = self._current_values[key]
+            # Ensure it's a string for validation, then convert back
+            str_val = str(value)
+            if is_string_number(str_val):
+                user_setting[key] = int(str_val)
             else:
                 self.value_error_message("number", key)
                 error_found = True
 
         for key, editor in self.option_float.items():
-            value = editor.text()
-            if is_string_number(value):
-                value = float(value)
-                if value % 1 == 0:  # remove unnecessary decimal points
-                    value = int(value)
-                user_setting[key] = value
+            value = self._current_values[key]
+            str_val = str(value)
+            if is_string_number(str_val):
+                num_val = float(str_val)
+                if num_val % 1 == 0:  # remove unnecessary decimal points
+                    num_val = int(num_val)
+                user_setting[key] = num_val
             else:
                 self.value_error_message("number", key)
                 error_found = True
