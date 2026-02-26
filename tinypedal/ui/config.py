@@ -30,6 +30,7 @@ from typing import Callable
 from PySide2.QtCore import QPoint, Qt
 from PySide2.QtGui import QFontDatabase
 from PySide2.QtWidgets import (
+    QApplication,
     QCheckBox,
     QComboBox,
     QDialogButtonBox,
@@ -63,7 +64,6 @@ from ._common import (
 )
 
 COLUMN_LABEL = 0  # grid layout column index
-COLUMN_OPTION = 1
 
 
 def get_font_list() -> list[str]:
@@ -325,6 +325,11 @@ class UserConfig(BaseDialog):
         self.option_integer: dict = {}
         self.option_float: dict = {}
 
+        # Section widgets and current column count (used for dynamic reflow)
+        self._section_widgets: list[QFrame] = []
+        self._num_columns = 0
+        self._widest_section = 0
+
         # Button
         button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
         button_reset.clicked.connect(self.reset_setting)
@@ -343,6 +348,7 @@ class UserConfig(BaseDialog):
         scroll_box = QScrollArea(self)
         scroll_box.setWidget(option_box)
         scroll_box.setWidgetResizable(True)
+        self._scroll_box = scroll_box  # keep reference for dynamic column reflow
 
         # Set layout
         layout_main = QVBoxLayout()
@@ -358,16 +364,18 @@ class UserConfig(BaseDialog):
 
         # Window sizing
         self.setMinimumWidth(self.sizeHint().width() + UIScaler.size(2))
-        hint = option_box.sizeHint()
-        scroll_box.setMinimumWidth(hint.width() + UIScaler.size(4))
         self.adjustSize()
         try:
-            avail_h = self.screen().availableGeometry().height()
+            avail = self.screen().availableGeometry()
+            max_w = int(avail.width() * 0.9)
+            max_h = int(avail.height() * 0.9)
         except AttributeError:
-            avail_h = 900
-        max_h = int(avail_h * 0.9)
-        if self.height() > max_h:
-            self.resize(self.width(), max_h)
+            max_w = 1600
+            max_h = 900
+        new_w = min(self.width(), max_w)
+        new_h = min(self.height(), max_h)
+        if new_w != self.width() or new_h != self.height():
+            self.resize(new_w, new_h)
 
     def _create_editor_for_key(self, key: str) -> QWidget:
         """Create and register an editor widget for the given key."""
@@ -498,8 +506,6 @@ class UserConfig(BaseDialog):
         layout = QGridLayout()
         layout.setAlignment(Qt.AlignTop)
         layout.setSpacing(0)
-        layout.setColumnStretch(COLUMN_LABEL, 0)
-        layout.setColumnStretch(COLUMN_OPTION, 1)
         layout.setContentsMargins(0, 0, 0, 0)
 
         row_offset = 0
@@ -555,23 +561,34 @@ class UserConfig(BaseDialog):
         return frame
 
     def _build_sectioned_layout(self) -> QWidget:
-        """Build the complete layout with sections distributed across columns."""
+        """Create section frames and arrange them for initial display."""
         keys = list(self.user_setting[self.key_name])
         sections = self.section_grouper.group_keys(keys)
 
-        section_widgets = [
+        self._section_widgets = [
             self._create_section_frame(title, sec_keys)
             for title, sec_keys in sections
         ]
 
-        # Distribute sections across columns, max 24 rows per column
-        num_columns = 3
+        self._widest_section = max(
+            (w.sizeHint().width() for w in self._section_widgets), default=1
+        )
+        try:
+            avail_w = QApplication.primaryScreen().availableGeometry().width()
+        except AttributeError:
+            avail_w = 1920
+        num_columns = min(3, max(1, int(avail_w * 0.9) // max(self._widest_section, 1)))
+        return self._arrange_columns(num_columns)
+
+    def _arrange_columns(self, num_columns: int) -> QWidget:
+        """Distribute section widgets into num_columns columns and return a container."""
+        self._num_columns = num_columns
         max_rows = 24
 
         columns: list[list[QFrame]] = [[] for _ in range(num_columns)]
         col_rows = [0] * num_columns
 
-        for widget in section_widgets:
+        for widget in self._section_widgets:
             est = widget.property("estimated_rows") or 10
             # Place in the first column with enough room
             for col in range(num_columns):
@@ -585,7 +602,6 @@ class UserConfig(BaseDialog):
                 columns[min_col].append(widget)
                 col_rows[min_col] += est
 
-        # Build horizontal layout
         main_layout = QHBoxLayout()
         main_layout.setAlignment(Qt.AlignTop)
         main_layout.setSpacing(UIScaler.size(2))
@@ -594,17 +610,27 @@ class UserConfig(BaseDialog):
             if not col_widgets:
                 continue
             col_layout = QVBoxLayout()
-            col_layout.setAlignment(Qt.AlignTop)
             col_layout.setSpacing(UIScaler.size(1))
             for w in col_widgets:
                 col_layout.addWidget(w)
+            col_layout.addStretch(1)
             col_container = QWidget()
             col_container.setLayout(col_layout)
-            main_layout.addWidget(col_container, alignment=Qt.AlignTop)
+            main_layout.addWidget(col_container, 1)
 
         container = QWidget()
         container.setLayout(main_layout)
         return container
+
+    def resizeEvent(self, event):
+        """Reflow columns when the window becomes wide or narrow enough."""
+        super().resizeEvent(event)
+        if not self._section_widgets:
+            return
+        usable_w = event.size().width() - self.MARGIN * 2
+        new_num = min(3, max(1, usable_w // max(self._widest_section, 1)))
+        if new_num != self._num_columns:
+            self._scroll_box.setWidget(self._arrange_columns(new_num))
 
     def applying(self):
         """Save & apply"""
