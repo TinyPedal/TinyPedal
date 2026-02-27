@@ -43,7 +43,6 @@ from PySide2.QtWidgets import (
     QMessageBox,
     QScrollArea,
     QSpinBox,
-    QSplitter,
     QVBoxLayout,
     QWidget,
 )
@@ -372,19 +371,13 @@ class UserConfig(BaseDialog):
         else:
             self._preview = None
 
-        # Set main layout
+        # Set main layout: Preview (top) → Search → Editor → Buttons
         layout_main = QVBoxLayout()
         layout_button = QHBoxLayout()
-        layout_main.addLayout(search_layout)
         if self._preview is not None and self._preview.available:
-            splitter = QSplitter(Qt.Horizontal)
-            splitter.addWidget(scroll_box)
-            splitter.addWidget(self._preview)
-            splitter.setStretchFactor(0, 2)
-            splitter.setStretchFactor(1, 1)
-            layout_main.addWidget(splitter)
-        else:
-            layout_main.addWidget(scroll_box)
+            layout_main.addWidget(self._preview)
+        layout_main.addLayout(search_layout)
+        layout_main.addWidget(scroll_box, 1)
         layout_button.addWidget(button_reset)
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
