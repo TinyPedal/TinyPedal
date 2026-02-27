@@ -317,6 +317,12 @@ class UserConfig(BaseDialog):
         self.option_column_order: dict = {}  # key -> ColumnIndexList widget
         self._preview: WidgetPreview | None = None
 
+        # Row tracking for search dimming
+        self._row_widgets: dict[str, QWidget] = {}   # key -> row container
+        self._row_labels: dict[str, QLabel] = {}      # key -> label widget
+        self._section_title_widgets: list[tuple[QLabel, list[str]]] = []  # (title_label, keys)
+        self._column_order_widgets: dict[str, DragDropOrderList] = {}  # key -> list widget
+
         # Section widgets and current column count (used for dynamic reflow)
         self._section_widgets: list[QFrame] = []
         self._num_columns = 0
@@ -407,42 +413,95 @@ class UserConfig(BaseDialog):
         self.filter_timer.start(200)  # milliseconds
 
     def _apply_filter(self):
-        """Rebuild layout with keys that match the current filter text."""
+        """Dim non-matching rows based on the current filter text."""
         text = self.search_edit.text().strip().lower()
         if not text:
-            filtered_keys = self.original_keys
-        else:
-            filtered_keys = [key for key in self.original_keys if text in key.lower()]
-        self.rebuild_filtered_layout(filtered_keys)
+            # Restore all rows
+            for key in self._row_widgets:
+                self._undim_row(key)
+            # Restore all drag-drop rows
+            seen: set[int] = set()
+            for lw in self._column_order_widgets.values():
+                if id(lw) not in seen:
+                    seen.add(id(lw))
+                    lw.set_dimmed_keys(set(), 1.0)
+            # Restore all section titles
+            for title_label, _ in self._section_title_widgets:
+                title_label.setStyleSheet("""
+                    background-color: palette(dark);
+                    color: palette(bright-text);
+                    border-bottom: 2px solid palette(mid);
+                    padding: 4px;
+                """)
+            return
 
-    def rebuild_filtered_layout(self, keys: list[str]):
-        """Rebuild the sectioned layout using only the given keys."""
-        # Clear old option dictionaries
-        self.option_bool.clear()
-        self.option_color.clear()
-        self.option_path.clear()
-        self.option_image.clear()
-        self.option_droplist.clear()
-        self.option_string.clear()
-        self.option_integer.clear()
-        self.option_float.clear()
-        self.option_column_order.clear()
+        opacity = self._calc_dim_opacity(len(text))
 
-        # Group the filtered keys and create new section frames
-        sections = self.section_grouper.group_keys(keys)
-        self._section_widgets = [
-            self._create_section_frame(title, sec_keys)
-            for title, sec_keys in sections
-        ]
+        # Dim/undim regular rows
+        for key in self._row_widgets:
+            if text in key.lower():
+                self._undim_row(key)
+            else:
+                self._dim_row(key, opacity)
 
-        # Recalculate widest section for column layout
-        self._widest_section = max(
-            (w.sizeHint().width() for w in self._section_widgets), default=1
+        # Dim/undim drag-drop rows
+        seen_lw: set[int] = set()
+        for lw in self._column_order_widgets.values():
+            if id(lw) not in seen_lw:
+                seen_lw.add(id(lw))
+                dimmed = set()
+                for k, w in self._column_order_widgets.items():
+                    if w is lw and text not in k.lower():
+                        dimmed.add(k)
+                lw.set_dimmed_keys(dimmed, opacity)
+
+        # Dim section titles when all their rows are dimmed
+        for title_label, keys in self._section_title_widgets:
+            all_dimmed = all(
+                text not in k.lower() for k in keys
+            )
+            if all_dimmed:
+                title_label.setStyleSheet(f"""
+                    background-color: rgba(128, 128, 128, {opacity});
+                    color: rgba(128, 128, 128, {opacity});
+                    border-bottom: 2px solid palette(mid);
+                    padding: 4px;
+                """)
+            else:
+                title_label.setStyleSheet("""
+                    background-color: palette(dark);
+                    color: palette(bright-text);
+                    border-bottom: 2px solid palette(mid);
+                    padding: 4px;
+                """)
+
+    @staticmethod
+    def _calc_dim_opacity(search_len: int) -> float:
+        """Return opacity for dimmed rows: 0.6 at 1 char, down to 0.2 at 5+ chars."""
+        return max(0.2, 0.7 - 0.1 * search_len)
+
+    def _dim_row(self, key: str, opacity: float):
+        """Apply dim styling to a row widget and its label."""
+        row_widget = self._row_widgets.get(key)
+        label = self._row_labels.get(key)
+        if row_widget is None:
+            return
+        row_widget.setStyleSheet(
+            f"background-color: rgba(128, 128, 128, {opacity});"
         )
+        if label is not None:
+            label.setStyleSheet(f"color: rgba(128, 128, 128, {opacity});")
 
-        # Rearrange columns using the current column count
-        new_container = self._arrange_columns(self._num_columns)
-        self._scroll_box.setWidget(new_container)
+    def _undim_row(self, key: str):
+        """Restore original styling to a row widget and its label."""
+        row_widget = self._row_widgets.get(key)
+        label = self._row_labels.get(key)
+        if row_widget is None:
+            return
+        bg = row_widget.property("_base_bg") or "palette(base)"
+        row_widget.setStyleSheet(f"background-color: {bg};")
+        if label is not None:
+            label.setStyleSheet("")
 
     def _update_current_value(self, key, value):
         """Update value cache"""
@@ -628,21 +687,22 @@ class UserConfig(BaseDialog):
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
 
+        col_title_label = None
         if title is not None:
             header_text = (
                 format_option_name(self.key_name) if title == "" else "Display Order"
             )
-            title_label = QLabel(f"<b>{header_text}</b>")
-            font = title_label.font()
+            col_title_label = QLabel(f"<b>{header_text}</b>")
+            font = col_title_label.font()
             font.setPointSize(font.pointSize() + 1)
-            title_label.setFont(font)
-            title_label.setStyleSheet("""
+            col_title_label.setFont(font)
+            col_title_label.setStyleSheet("""
                 background-color: palette(dark);
                 color: palette(bright-text);
                 border-bottom: 2px solid palette(mid);
                 padding: 4px;
             """)
-            layout.addWidget(title_label)
+            layout.addWidget(col_title_label)
 
         sorted_keys = sorted(
             keys,
@@ -666,8 +726,12 @@ class UserConfig(BaseDialog):
         )
         for key in keys:
             self.option_column_order[key] = list_widget
+            self._column_order_widgets[key] = list_widget
 
         layout.addWidget(list_widget)
+
+        if col_title_label is not None:
+            self._section_title_widgets.append((col_title_label, keys))
 
         frame = QFrame()
         frame.setObjectName("sectionFrame")
@@ -706,16 +770,16 @@ class UserConfig(BaseDialog):
             """)
             layout.addWidget(title_label, 0, COLUMN_LABEL, 1, 2)
             row_offset = 1
+            self._section_title_widgets.append((title_label, keys))
 
         # Option rows with alternating background
         for idx, key in enumerate(keys):
             row = idx + row_offset
 
             row_widget = QWidget()
-            if idx % 2 == 0:
-                row_widget.setStyleSheet("background-color: palette(alternate-base);")
-            else:
-                row_widget.setStyleSheet("background-color: palette(base);")
+            bg = "palette(alternate-base)" if idx % 2 == 0 else "palette(base)"
+            row_widget.setStyleSheet(f"background-color: {bg};")
+            row_widget.setProperty("_base_bg", bg)
 
             row_layout = QHBoxLayout()
             row_layout.setContentsMargins(
@@ -726,11 +790,15 @@ class UserConfig(BaseDialog):
             )
             row_layout.setSpacing(UIScaler.size(0.4))
 
-            row_layout.addWidget(QLabel(format_option_name(key)))
+            label = QLabel(format_option_name(key))
+            row_layout.addWidget(label)
             row_layout.addWidget(self._create_editor_for_key(key))
 
             row_widget.setLayout(row_layout)
             layout.addWidget(row_widget, row, COLUMN_LABEL, 1, 2)
+
+            self._row_widgets[key] = row_widget
+            self._row_labels[key] = label
 
         frame = QFrame()
         frame.setObjectName("sectionFrame")
