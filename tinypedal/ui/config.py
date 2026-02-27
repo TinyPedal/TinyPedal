@@ -45,6 +45,7 @@ from PySide2.QtWidgets import (
     QMenu,
     QMessageBox,
     QScrollArea,
+    QShortcut,
     QSpinBox,
     QSplitter,
     QVBoxLayout,
@@ -405,8 +406,12 @@ class UserConfig(BaseDialog):
         self.search_edit.textChanged.connect(self._on_search_text_changed)
         search_layout.addWidget(self.search_edit)
 
+        # Ctrl+F shortcut: fires regardless of which child widget has focus
+        shortcut_find = QShortcut(QKeySequence.Find, self)
+        shortcut_find.activated.connect(self._focus_search)
+
         # Debounce timer
-        self.filter_timer = QTimer()
+        self.filter_timer = QTimer(self)
         self.filter_timer.setSingleShot(True)
         self.filter_timer.timeout.connect(self._apply_filter)
 
@@ -833,6 +838,13 @@ class UserConfig(BaseDialog):
         container.setLayout(main_layout)
         return container
 
+    def closeEvent(self, event):
+        """Stop all timers before Qt tears down child widgets"""
+        self.filter_timer.stop()
+        if self._preview is not None:
+            self._preview.cleanup()
+        super().closeEvent(event)
+
     def resizeEvent(self, event):
         """Reflow columns on window resize"""
         super().resizeEvent(event)
@@ -843,14 +855,10 @@ class UserConfig(BaseDialog):
         if new_num != self._num_columns:
             self._scroll_box.setWidget(self._arrange_columns(new_num))
 
-    def keyPressEvent(self, event):
-        """Focus search bar on Ctrl+F"""
-        if event.matches(QKeySequence.Find):
-            self.search_edit.setFocus()
-            self.search_edit.selectAll()
-            event.accept()
-        else:
-            super().keyPressEvent(event)
+    def _focus_search(self):
+        """Focus and select all text in the search bar"""
+        self.search_edit.setFocus()
+        self.search_edit.selectAll()
 
     def applying(self):
         """Save & apply"""
