@@ -424,7 +424,7 @@ class UserConfig(BaseDialog):
             for lw in self._column_order_widgets.values():
                 if id(lw) not in seen:
                     seen.add(id(lw))
-                    lw.set_dimmed_keys(set(), 1.0)
+                    lw.set_dimmed_keys(set())
             # Restore all section titles
             for title_label, _ in self._section_title_widgets:
                 title_label.setStyleSheet("""
@@ -435,14 +435,12 @@ class UserConfig(BaseDialog):
                 """)
             return
 
-        opacity = self._calc_dim_opacity(len(text))
-
         # Dim/undim regular rows
         for key in self._row_widgets:
             if text in key.lower():
                 self._undim_row(key)
             else:
-                self._dim_row(key, opacity)
+                self._dim_row(key)
 
         # Dim/undim drag-drop rows
         seen_lw: set[int] = set()
@@ -453,7 +451,7 @@ class UserConfig(BaseDialog):
                 for k, w in self._column_order_widgets.items():
                     if w is lw and text not in k.lower():
                         dimmed.add(k)
-                lw.set_dimmed_keys(dimmed, opacity)
+                lw.set_dimmed_keys(dimmed)
 
         # Dim section titles when all their rows are dimmed
         for title_label, keys in self._section_title_widgets:
@@ -461,9 +459,9 @@ class UserConfig(BaseDialog):
                 text not in k.lower() for k in keys
             )
             if all_dimmed:
-                title_label.setStyleSheet(f"""
-                    background-color: rgba(128, 128, 128, {opacity});
-                    color: rgba(128, 128, 128, {opacity});
+                title_label.setStyleSheet("""
+                    background-color: palette(mid);
+                    color: palette(window);
                     border-bottom: 2px solid palette(mid);
                     padding: 4px;
                 """)
@@ -475,22 +473,15 @@ class UserConfig(BaseDialog):
                     padding: 4px;
                 """)
 
-    @staticmethod
-    def _calc_dim_opacity(search_len: int) -> float:
-        """Return opacity for dimmed rows: 0.6 at 1 char, down to 0.2 at 5+ chars."""
-        return max(0.2, 0.7 - 0.1 * search_len)
-
-    def _dim_row(self, key: str, opacity: float):
+    def _dim_row(self, key: str):
         """Apply dim styling to a row widget and its label."""
         row_widget = self._row_widgets.get(key)
         label = self._row_labels.get(key)
         if row_widget is None:
             return
-        row_widget.setStyleSheet(
-            f"background-color: rgba(128, 128, 128, {opacity});"
-        )
+        row_widget.setStyleSheet("background-color: palette(window);")
         if label is not None:
-            label.setStyleSheet(f"color: rgba(128, 128, 128, {opacity});")
+            label.setStyleSheet("color: palette(mid);")
 
     def _undim_row(self, key: str):
         """Restore original styling to a row widget and its label."""
