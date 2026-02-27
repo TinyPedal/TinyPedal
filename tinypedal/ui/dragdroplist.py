@@ -78,6 +78,8 @@ class DragDropOrderList(QWidget):
 
         self._callback = on_reorder_callback
         self._row_height = row_height
+        self._dimmed_keys: set[str] = set()
+        self._dim_opacity: float = 1.0
         self.setAcceptDrops(True)
 
         # Drop indicator line (shown between rows during drag)
@@ -85,6 +87,9 @@ class DragDropOrderList(QWidget):
         self._drop_indicator.setFixedHeight(2)
         self._drop_indicator.setStyleSheet("background-color: palette(highlight);")
         self._drop_indicator.hide()
+
+        # Rows whose number labels are currently highlighted during drag
+        self._highlighted_rows: list[OrderRow] = []
 
         # Main layout
         box = QVBoxLayout()
@@ -142,9 +147,23 @@ class DragDropOrderList(QWidget):
         n = self._find_insert_index(e.pos())
         box.insertWidget(n, self._drop_indicator)
         self._drop_indicator.show()
+
+        # Highlight number labels on adjacent rows
+        self._clear_highlight()
+        for offset in (n - 1, n + 1):
+            if 0 <= offset < box.count():
+                row = box.itemAt(offset).widget()
+                if isinstance(row, OrderRow):
+                    row.number_label.setStyleSheet(
+                        "background-color: palette(highlight);"
+                        "color: palette(highlighted-text);"
+                    )
+                    self._highlighted_rows.append(row)
+
         e.accept()
 
     def dragLeaveEvent(self, e):
+        self._clear_highlight()
         if self._drop_indicator.parent() == self:
             self.layout().removeWidget(self._drop_indicator)
             self._drop_indicator.hide()
@@ -154,6 +173,8 @@ class DragDropOrderList(QWidget):
         source_label = e.source()
         if not isinstance(source_label, DraggableLabel):
             return
+
+        self._clear_highlight()
 
         box = self.layout()
 
@@ -180,6 +201,12 @@ class DragDropOrderList(QWidget):
     #  Visual updates
     # ------------------------------------------------------------------
 
+    def _clear_highlight(self):
+        """Remove highlight styling from any previously highlighted number labels"""
+        for row in self._highlighted_rows:
+            row.number_label.setStyleSheet("")
+        self._highlighted_rows.clear()
+
     def _update_row_numbers(self):
         """Set row numbers (1-based) according to current order"""
         num = 1
@@ -191,16 +218,30 @@ class DragDropOrderList(QWidget):
                 num += 1
 
     def _update_row_colors(self):
-        """Apply alternating row background colors"""
+        """Apply alternating row background colors, with dimming for filtered rows"""
         num = 0
         box = self.layout()
         for i in range(box.count()):
             row = box.itemAt(i).widget()
             if isinstance(row, OrderRow):
-                if num % 2 == 0:
-                    row.setStyleSheet("background-color: palette(alternate-base);")
+                if row.key in self._dimmed_keys:
+                    op = self._dim_opacity
+                    row.setStyleSheet(
+                        f"background-color: rgba(128, 128, 128, {op});"
+                    )
+                    row.drag_label.setStyleSheet(
+                        f"color: rgba(128, 128, 128, {op});"
+                    )
+                    row.number_label.setStyleSheet(
+                        f"color: rgba(128, 128, 128, {op});"
+                    )
                 else:
-                    row.setStyleSheet("background-color: palette(base);")
+                    if num % 2 == 0:
+                        row.setStyleSheet("background-color: palette(alternate-base);")
+                    else:
+                        row.setStyleSheet("background-color: palette(base);")
+                    row.drag_label.setStyleSheet("")
+                    row.number_label.setStyleSheet("")
                 num += 1
 
     def _emit_reorder(self):
@@ -227,6 +268,12 @@ class DragDropOrderList(QWidget):
             if isinstance(row, OrderRow):
                 keys.append(row.key)
         return keys
+
+    def set_dimmed_keys(self, keys: set[str], opacity: float):
+        """Update which keys are dimmed and refresh row colors"""
+        self._dimmed_keys = keys
+        self._dim_opacity = opacity
+        self._update_row_colors()
 
     def reset_to_defaults(self, default_values: dict):
         """Re-sort rows to match *default_values* ordering"""
