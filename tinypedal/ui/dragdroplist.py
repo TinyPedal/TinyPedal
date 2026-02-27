@@ -79,7 +79,6 @@ class DragDropOrderList(QWidget):
         self._callback = on_reorder_callback
         self._row_height = row_height
         self._dimmed_keys: set[str] = set()
-        self._dim_opacity: float = 1.0
         self.setAcceptDrops(True)
 
         # Drop indicator line (shown between rows during drag)
@@ -225,16 +224,9 @@ class DragDropOrderList(QWidget):
             row = box.itemAt(i).widget()
             if isinstance(row, OrderRow):
                 if row.key in self._dimmed_keys:
-                    op = self._dim_opacity
-                    row.setStyleSheet(
-                        f"background-color: rgba(128, 128, 128, {op});"
-                    )
-                    row.drag_label.setStyleSheet(
-                        f"color: rgba(128, 128, 128, {op});"
-                    )
-                    row.number_label.setStyleSheet(
-                        f"color: rgba(128, 128, 128, {op});"
-                    )
+                    row.setStyleSheet("background-color: palette(window);")
+                    row.drag_label.setStyleSheet("color: palette(mid);")
+                    row.number_label.setStyleSheet("color: palette(mid);")
                 else:
                     if num % 2 == 0:
                         row.setStyleSheet("background-color: palette(alternate-base);")
@@ -269,10 +261,9 @@ class DragDropOrderList(QWidget):
                 keys.append(row.key)
         return keys
 
-    def set_dimmed_keys(self, keys: set[str], opacity: float):
+    def set_dimmed_keys(self, keys: set[str]):
         """Update which keys are dimmed and refresh row colors"""
         self._dimmed_keys = keys
-        self._dim_opacity = opacity
         self._update_row_colors()
 
     def reset_to_defaults(self, default_values: dict):
