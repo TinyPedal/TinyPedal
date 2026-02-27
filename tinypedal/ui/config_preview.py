@@ -22,6 +22,9 @@ Widget preview panel for config dialog
 
 import copy
 import importlib
+import logging
+
+logger = logging.getLogger(__name__)
 
 from PySide2.QtCore import Qt, QTimer
 from PySide2.QtWidgets import (
@@ -103,6 +106,7 @@ class WidgetPreview(QFrame):
         if self._active_widget is None:
             return
         self._active_widget._update_timer.stop()
+        self._active_widget.hide()  # hide immediately so it doesn't linger behind the new widget
         self._inner_layout.removeWidget(self._active_widget)
         self._active_widget.deleteLater()
         self._active_widget = None
@@ -125,6 +129,7 @@ class WidgetPreview(QFrame):
         try:
             widget = self._module.Realtime(cfg, self._key_name)
         except Exception:
+            logger.error("Preview rebuild failed for %s", self._key_name, exc_info=True)
             cfg.user.setting[self._key_name] = original
             return
         cfg.user.setting[self._key_name] = original
