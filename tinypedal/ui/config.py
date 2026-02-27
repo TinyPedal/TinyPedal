@@ -30,7 +30,6 @@ from typing import Callable
 from PySide2.QtCore import QPoint, Qt, QTimer
 from PySide2.QtGui import QFontDatabase, QKeySequence, QShortcut
 from PySide2.QtWidgets import (
-    QAbstractItemView,
     QApplication,
     QCheckBox,
     QComboBox,
@@ -40,8 +39,6 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QListWidget,
-    QListWidgetItem,
     QMenu,
     QMessageBox,
     QScrollArea,
@@ -58,6 +55,7 @@ from ..setting import cfg
 from ..userfile import set_relative_path, set_user_data_path
 from ..validator import is_clock_format, is_hex_color, is_string_number
 from .config_preview import WidgetPreview
+from .dragdroplist import DragDropOrderList
 from ._common import (
     QVAL_COLOR,
     QVAL_FLOAT,
@@ -69,6 +67,7 @@ from ._common import (
 )
 
 COLUMN_LABEL = 0  # grid layout column index
+EDITOR_HEIGHT = UIScaler.size(2.2)
 
 
 def get_font_list() -> list[str]:
@@ -150,79 +149,6 @@ class SectionGrouper:
             sections.append((title, fkeys))
 
         return sections
-
-
-class ColumnIndexList(QListWidget):
-    """Drag-and-drop list for setting display order of columns"""
-
-    def __init__(self, keys: list, current_values: dict, update_callback, parent=None):
-        super().__init__(parent)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
-        self.setDefaultDropAction(Qt.MoveAction)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setUniformItemSizes(True)
-        self.setAlternatingRowColors(True)
-        self.setSizeAdjustPolicy(QAbstractItemView.AdjustToContents)  # no nested scrollbar
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        h_pad = UIScaler.size(0.4)
-        v_pad = UIScaler.size(0.2)
-        self.setStyleSheet(f"""
-            QListWidget {{
-                border: none;
-                outline: none;
-            }}
-            QListWidget::item {{
-                padding: {v_pad}px {h_pad}px;
-            }}
-            QListWidget::item:selected {{
-                background-color: palette(highlight);
-                color: palette(highlighted-text);
-            }}
-        """)
-        self._update_callback = update_callback
-
-        sorted_keys = sorted(keys, key=lambda k: current_values.get(k, 999))
-        for key in sorted_keys:
-            label = format_option_name(key[len("column_index_"):])
-            item = QListWidgetItem()
-            item.setData(Qt.UserRole, key)
-            item.setData(Qt.UserRole + 1, label)
-            self.addItem(item)
-
-        self.model().rowsMoved.connect(self._sync_values)
-        self._sync_values()
-        self._fix_height()
-
-    def _fix_height(self):
-        """Set fixed height to show all items"""
-        v_pad = UIScaler.size(0.2)
-        row_h = self.fontMetrics().height() + v_pad * 2
-        self.setFixedHeight(row_h * self.count() + self.frameWidth() * 2)
-
-    def _sync_values(self):
-        """Update item text and value cache to reflect current order"""
-        for i in range(self.count()):
-            item = self.item(i)
-            label = item.data(Qt.UserRole + 1)
-            item.setText(f"{i + 1}. {label}")
-            self._update_callback(item.data(Qt.UserRole), i + 1)
-
-    def reset_to_defaults(self, default_values: dict):
-        """Re-sort items to default order"""
-        items = []
-        for i in range(self.count()):
-            item = self.item(i)
-            items.append((item.data(Qt.UserRole), item.data(Qt.UserRole + 1)))
-        items.sort(key=lambda t: default_values.get(t[0], 999))
-        self.clear()
-        for key, label in items:
-            new_item = QListWidgetItem()
-            new_item.setData(Qt.UserRole, key)
-            new_item.setData(Qt.UserRole + 1, label)
-            self.addItem(new_item)
-        self._sync_values()
-
 
 @singleton_dialog(ConfigType.CONFIG)
 class FontConfig(BaseDialog):
@@ -529,9 +455,12 @@ class UserConfig(BaseDialog):
         current_val = self._current_values[key]
         default_val = self.default_setting[self.key_name][key]
 
+        editor_height = EDITOR_HEIGHT
+
         # Bool
         if re.search(rxp.CFG_BOOL, key):
             editor = QCheckBox(self)
+            editor.setFixedHeight(editor_height)
             editor.setFixedWidth(self.option_width)
             editor.setChecked(current_val)
             editor.defaults = default_val
@@ -545,6 +474,7 @@ class UserConfig(BaseDialog):
         # Color string
         if re.search(rxp.CFG_COLOR, key):
             editor = DoubleClickEdit(self, mode="color", init=current_val)
+            editor.setFixedHeight(editor_height)
             editor.setFixedWidth(self.option_width)
             editor.setMaxLength(9)
             editor.setValidator(QVAL_COLOR)
@@ -561,6 +491,7 @@ class UserConfig(BaseDialog):
         # User path string
         if re.search(rxp.CFG_USER_PATH, key):
             editor = DoubleClickEdit(self, mode="path", init=current_val)
+            editor.setFixedHeight(editor_height)
             editor.setFixedWidth(self.option_width)
             editor.setText(current_val)
             editor.defaults = default_val
@@ -574,6 +505,7 @@ class UserConfig(BaseDialog):
         # User image file path string
         if re.search(rxp.CFG_USER_IMAGE, key):
             editor = DoubleClickEdit(self, mode="image", init=current_val)
+            editor.setFixedHeight(editor_height)
             editor.setFixedWidth(self.option_width)
             editor.setText(current_val)
             editor.defaults = default_val
@@ -587,6 +519,7 @@ class UserConfig(BaseDialog):
         # Font name string
         if re.search(rxp.CFG_FONT_NAME, key):
             editor = QComboBox(self)
+            editor.setFixedHeight(editor_height)
             editor.setFixedWidth(self.option_width)
             editor.addItems(get_font_list())
             editor.setCurrentText(str(current_val))
@@ -601,6 +534,7 @@ class UserConfig(BaseDialog):
         # Heatmap string
         if re.search(rxp.CFG_HEATMAP, key):
             editor = QComboBox(self)
+            editor.setFixedHeight(editor_height)
             editor.setFixedWidth(self.option_width)
             editor.addItems(cfg.user.heatmap.keys())
             editor.setCurrentText(str(current_val))
@@ -616,6 +550,7 @@ class UserConfig(BaseDialog):
         for ref_key, choice_list in rxp.CHOICE_UNITS.items():
             if re.search(ref_key, key):
                 editor = QComboBox(self)
+                editor.setFixedHeight(editor_height)
                 editor.setFixedWidth(self.option_width)
                 editor.addItems(choice_list)
                 editor.setCurrentText(str(current_val))
@@ -630,6 +565,7 @@ class UserConfig(BaseDialog):
         for ref_key, choice_list in rxp.CHOICE_COMMON.items():
             if re.search(ref_key, key):
                 editor = QComboBox(self)
+                editor.setFixedHeight(editor_height)
                 editor.setFixedWidth(self.option_width)
                 editor.addItems(choice_list)
                 editor.setCurrentText(str(current_val))
@@ -644,6 +580,7 @@ class UserConfig(BaseDialog):
         # Clock format string
         if re.search(rxp.CFG_CLOCK_FORMAT, key) or re.search(rxp.CFG_STRING, key):
             editor = QLineEdit(self)
+            editor.setFixedHeight(editor_height)
             editor.setFixedWidth(self.option_width)
             editor.setText(current_val)
             editor.defaults = default_val
@@ -657,6 +594,7 @@ class UserConfig(BaseDialog):
         # Integer
         if re.search(rxp.CFG_INTEGER, key):
             editor = QLineEdit(self)
+            editor.setFixedHeight(editor_height)
             editor.setFixedWidth(self.option_width)
             editor.setValidator(QVAL_INTEGER)
             editor.setText(str(current_val))
@@ -670,6 +608,7 @@ class UserConfig(BaseDialog):
 
         # Float or int (fallback)
         editor = QLineEdit(self)
+        editor.setFixedHeight(editor_height)
         editor.setFixedWidth(self.option_width)
         editor.setValidator(QVAL_FLOAT)
         editor.setText(str(current_val))
@@ -683,6 +622,7 @@ class UserConfig(BaseDialog):
 
     def _create_column_index_frame(self, title: str | None, keys: list) -> QFrame:
         """Create drag-and-drop frame for display order settings"""
+
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop)
         layout.setSpacing(0)
@@ -704,17 +644,36 @@ class UserConfig(BaseDialog):
             """)
             layout.addWidget(title_label)
 
-        list_widget = ColumnIndexList(
-            keys, self._current_values, self._update_current_value, parent=self
+        sorted_keys = sorted(
+            keys,
+            key=lambda k: self._current_values.get(k, 999)
+        )
+        items = [
+            (key, format_option_name(key[len("column_index_"):]))
+            for key in sorted_keys
+        ]
+
+        def on_reorder(new_order):
+            for index, key in enumerate(new_order, start=1):
+                self._update_current_value(key, index)
+
+        row_height = EDITOR_HEIGHT + 2 * UIScaler.size(0.2)
+        list_widget = DragDropOrderList(
+            items=items,
+            on_reorder_callback=on_reorder,
+            row_height=row_height,
+            parent=self
         )
         for key in keys:
             self.option_column_order[key] = list_widget
+
         layout.addWidget(list_widget)
 
         frame = QFrame()
         frame.setObjectName("sectionFrame")
         frame.setLayout(layout)
         frame.setProperty("estimated_rows", len(keys) + (2 if title is not None else 1))
+
         return frame
 
     def _create_section_frame(self, title: str | None, keys: list) -> QFrame:
@@ -843,11 +802,20 @@ class UserConfig(BaseDialog):
         container.setLayout(main_layout)
         return container
 
-    def closeEvent(self, event):
-        """Stop all timers before Qt tears down child widgets"""
+    def _cleanup(self):
+        """Stop timers and release preview resources"""
         self.filter_timer.stop()
         if self._preview is not None:
             self._preview.cleanup()
+
+    def reject(self):
+        """Cancel / ESC"""
+        self._cleanup()
+        super().reject()
+
+    def closeEvent(self, event):
+        """Stop all timers before Qt tears down child widgets"""
+        self._cleanup()
         super().closeEvent(event)
 
     def resizeEvent(self, event):
