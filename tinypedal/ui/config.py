@@ -28,7 +28,7 @@ import time
 from typing import Callable
 
 from PySide2.QtCore import QPoint, Qt, QTimer
-from PySide2.QtGui import QFontDatabase, QKeySequence
+from PySide2.QtGui import QFontDatabase, QKeySequence, QShortcut
 from PySide2.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -45,7 +45,6 @@ from PySide2.QtWidgets import (
     QMenu,
     QMessageBox,
     QScrollArea,
-    QShortcut,
     QSpinBox,
     QSplitter,
     QVBoxLayout,
