@@ -820,15 +820,18 @@ class UserConfig(BaseDialog):
                 columns[min_col].append(widget)
                 col_rows[min_col] += est
 
+        col_gap = UIScaler.size(1) if num_columns > 1 else 0
         main_layout = QHBoxLayout()
         main_layout.setAlignment(Qt.AlignTop)
-        main_layout.setSpacing(UIScaler.size(2))
+        main_layout.setSpacing(col_gap)
+        main_layout.setContentsMargins(0, 0, 0, 0)
 
         for col_widgets in columns:
             if not col_widgets:
                 continue
             col_layout = QVBoxLayout()
-            col_layout.setSpacing(UIScaler.size(1))
+            col_layout.setSpacing(0)
+            col_layout.setContentsMargins(0, 0, 0, 0)
             for w in col_widgets:
                 col_layout.addWidget(w)
             col_layout.addStretch(1)
