@@ -533,7 +533,7 @@ class UserConfig(BaseDialog):
             editor.setChecked(current_val)
             editor.defaults = default_val
             editor.stateChanged.connect(
-                lambda state, k=key: self._update_current_value(k, state == Qt.Checked)
+                lambda state, k=key: self._update_current_value(k, bool(state))
             )
             add_context_menu(editor)
             self.option_bool[key] = editor
