@@ -142,7 +142,12 @@ class WidgetPreview(QFrame):
         self._active_widget = widget
         widget.show()
 
-    def closeEvent(self, event):
-        """Clean up on close"""
+    def cleanup(self):
+        """Stop all timers and remove active widget; call before parent dialog closes"""
+        self._debounce.stop()
         self._remove_active()
+
+    def closeEvent(self, event):
+        """Clean up on close (only fires when used as a top-level window)"""
+        self.cleanup()
         super().closeEvent(event)
