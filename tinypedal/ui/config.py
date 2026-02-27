@@ -30,6 +30,7 @@ from typing import Callable
 from PySide2.QtCore import QPoint, Qt, QTimer
 from PySide2.QtGui import QFontDatabase, QKeySequence
 from PySide2.QtWidgets import (
+    QAbstractItemView,
     QApplication,
     QCheckBox,
     QComboBox,
@@ -39,6 +40,8 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QListWidget,
+    QListWidgetItem,
     QMenu,
     QMessageBox,
     QScrollArea,
@@ -74,24 +77,18 @@ def get_font_list() -> list[str]:
 
 
 class SectionGrouper:
-    """Groups configuration keys based on JSON order and word overlap.
-
-    Consecutive show_* keys that share enough common words (or one is a
-    substring of the other) are merged into one section, keeping the title
-    of the first show_* key.  All non-show keys are appended to the current
-    section.  Fixed groups (column_index_*) are collected separately.
-    """
+    """Groups configuration keys into labelled sections by word overlap"""
 
     def __init__(self, min_match: int = 2):
         self.min_match = min_match
 
     @staticmethod
     def _word_set(phrase: str) -> set[str]:
-        """Split an underscore-delimited name into a set of words."""
+        """Split underscore-delimited name into word set"""
         return set(phrase.split("_"))
 
     def _similar(self, topic1: str, topic2: str) -> bool:
-        """Check whether two topics (without 'show_') belong together."""
+        """Check if two topics share enough words to belong in one section"""
         # Direct match if one is a substring of the other
         if topic1 in topic2 or topic2 in topic1:
             return True
@@ -100,11 +97,8 @@ class SectionGrouper:
         return len(words1 & words2) >= self.min_match
 
     def group_keys(self, keys: list[str]) -> list[tuple[str | None, list[str]]]:
-        """Group keys into labelled sections.
-
-        Returns a list of (title, key_list) tuples.
-        """
-        # 1. Separate fixed groups (e.g. column_index_*)
+        """Group keys into labelled sections, returns list of (title, key_list) tuples"""
+        # Separate column_index_* into its own group
         fixed_groups: dict[str, list[str]] = {}
         remaining: list[str] = []
         for key in keys:
@@ -113,7 +107,7 @@ class SectionGrouper:
             else:
                 remaining.append(key)
 
-        # 2. Iterate remaining keys and build sections
+        # Build sections from remaining keys
         sections: list[tuple[str | None, list[str]]] = []
         current_title: str | None = None
         current_keys: list[str] = []
@@ -141,7 +135,7 @@ class SectionGrouper:
         if current_keys:
             sections.append((current_title, current_keys))
 
-        # 3. Collect keys that appeared before the first show_* key
+        # Collect keys that appeared before the first show_* key
         all_assigned: set[str] = set()
         for _, key_list in sections:
             all_assigned.update(key_list)
@@ -149,11 +143,83 @@ class SectionGrouper:
         if unassigned:
             sections.insert(0, ("", unassigned))
 
-        # 4. Append fixed groups
+        # Append fixed groups
         for title, fkeys in fixed_groups.items():
             sections.append((title, fkeys))
 
         return sections
+
+
+class ColumnIndexList(QListWidget):
+    """Drag-and-drop list for setting display order of columns"""
+
+    def __init__(self, keys: list, current_values: dict, update_callback, parent=None):
+        super().__init__(parent)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setDefaultDropAction(Qt.MoveAction)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setUniformItemSizes(True)
+        self.setAlternatingRowColors(True)
+        self.setSizeAdjustPolicy(QAbstractItemView.AdjustToContents)  # no nested scrollbar
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        h_pad = UIScaler.size(0.4)
+        v_pad = UIScaler.size(0.2)
+        self.setStyleSheet(f"""
+            QListWidget {{
+                border: none;
+                outline: none;
+            }}
+            QListWidget::item {{
+                padding: {v_pad}px {h_pad}px;
+            }}
+            QListWidget::item:selected {{
+                background-color: palette(highlight);
+                color: palette(highlighted-text);
+            }}
+        """)
+        self._update_callback = update_callback
+
+        sorted_keys = sorted(keys, key=lambda k: current_values.get(k, 999))
+        for key in sorted_keys:
+            label = format_option_name(key[len("column_index_"):])
+            item = QListWidgetItem()
+            item.setData(Qt.UserRole, key)
+            item.setData(Qt.UserRole + 1, label)
+            self.addItem(item)
+
+        self.model().rowsMoved.connect(self._sync_values)
+        self._sync_values()
+        self._fix_height()
+
+    def _fix_height(self):
+        """Set fixed height to show all items"""
+        v_pad = UIScaler.size(0.2)
+        row_h = self.fontMetrics().height() + v_pad * 2
+        self.setFixedHeight(row_h * self.count() + self.frameWidth() * 2)
+
+    def _sync_values(self):
+        """Update item text and value cache to reflect current order"""
+        for i in range(self.count()):
+            item = self.item(i)
+            label = item.data(Qt.UserRole + 1)
+            item.setText(f"{i + 1}. {label}")
+            self._update_callback(item.data(Qt.UserRole), i + 1)
+
+    def reset_to_defaults(self, default_values: dict):
+        """Re-sort items to default order"""
+        items = []
+        for i in range(self.count()):
+            item = self.item(i)
+            items.append((item.data(Qt.UserRole), item.data(Qt.UserRole + 1)))
+        items.sort(key=lambda t: default_values.get(t[0], 999))
+        self.clear()
+        for key, label in items:
+            new_item = QListWidgetItem()
+            new_item.setData(Qt.UserRole, key)
+            new_item.setData(Qt.UserRole + 1, label)
+            self.addItem(new_item)
+        self._sync_values()
 
 
 @singleton_dialog(ConfigType.CONFIG)
@@ -293,18 +359,8 @@ class UserConfig(BaseDialog):
         option_width: int = 9,
         section_grouper: SectionGrouper | None = None,
     ):
-        """
-        Args:
-            key_name: config key name.
-            cfg_type: config type name from "ConfigType".
-            user_setting: user setting dictionary, ex. cfg.user.setting.
-            default_setting: default setting dictionary, ex. cfg.default.setting.
-            reload_func: config reload (callback) function.
-            option_width: option column width in pixels.
-            section_grouper: grouper instance that determines the section layout.
-                             Defaults to SectionGrouper() if not provided.
-        """
         super().__init__(parent)
+        self.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.set_config_title(format_option_name(key_name), set_preset_name(cfg_type))
 
         self.reloading = reload_func
@@ -330,6 +386,7 @@ class UserConfig(BaseDialog):
         self.option_string: dict = {}
         self.option_integer: dict = {}
         self.option_float: dict = {}
+        self.option_column_order: dict = {}  # key -> ColumnIndexList widget
 
         # Section widgets and current column count (used for dynamic reflow)
         self._section_widgets: list[QFrame] = []
@@ -398,9 +455,8 @@ class UserConfig(BaseDialog):
         if new_w != self.width() or new_h != self.height():
             self.resize(new_w, new_h)
 
-    # -------------------- Search / Filter --------------------
     def _on_search_text_changed(self):
-        """Restart the debounce timer when text changes."""
+        """Restart debounce timer"""
         self.filter_timer.start(200)  # milliseconds
 
     def _apply_filter(self):
@@ -423,6 +479,7 @@ class UserConfig(BaseDialog):
         self.option_string.clear()
         self.option_integer.clear()
         self.option_float.clear()
+        self.option_column_order.clear()
 
         # Group the filtered keys and create new section frames
         sections = self.section_grouper.group_keys(keys)
@@ -440,14 +497,12 @@ class UserConfig(BaseDialog):
         new_container = self._arrange_columns(self._num_columns)
         self._scroll_box.setWidget(new_container)
 
-    # -------------------- Value cache --------------------
     def _update_current_value(self, key, value):
-        """Update the central value cache when an editor changes."""
+        """Update value cache"""
         self._current_values[key] = value
 
-    # -------------------- Editor creation --------------------
     def _create_editor_for_key(self, key: str) -> QWidget:
-        """Create and register an editor widget for the given key, using cached value."""
+        """Create editor widget for key"""
         current_val = self._current_values[key]
         default_val = self.default_setting[self.key_name][key]
 
@@ -603,9 +658,47 @@ class UserConfig(BaseDialog):
         self.option_float[key] = editor
         return editor
 
-    # -------------------- Layout building --------------------
+    def _create_column_index_frame(self, title: str | None, keys: list) -> QFrame:
+        """Create drag-and-drop frame for display order settings"""
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        if title is not None:
+            header_text = (
+                format_option_name(self.key_name) if title == "" else "Display Order"
+            )
+            title_label = QLabel(f"<b>{header_text}</b>")
+            font = title_label.font()
+            font.setPointSize(font.pointSize() + 1)
+            title_label.setFont(font)
+            title_label.setStyleSheet("""
+                background-color: palette(dark);
+                color: palette(bright-text);
+                border-bottom: 2px solid palette(mid);
+                padding: 4px;
+            """)
+            layout.addWidget(title_label)
+
+        list_widget = ColumnIndexList(
+            keys, self._current_values, self._update_current_value, parent=self
+        )
+        for key in keys:
+            self.option_column_order[key] = list_widget
+        layout.addWidget(list_widget)
+
+        frame = QFrame()
+        frame.setObjectName("sectionFrame")
+        frame.setLayout(layout)
+        frame.setProperty("estimated_rows", len(keys) + (2 if title is not None else 1))
+        return frame
+
     def _create_section_frame(self, title: str | None, keys: list) -> QFrame:
-        """Create a frame containing one section with title bar and alternating rows."""
+        """Create section frame with title bar and alternating rows"""
+        # column_index_* keys get a drag-and-drop list instead of integer editors
+        if keys and all(k.startswith("column_index_") for k in keys):
+            return self._create_column_index_frame(title, keys)
         layout = QGridLayout()
         layout.setAlignment(Qt.AlignTop)
         layout.setSpacing(0)
@@ -724,9 +817,8 @@ class UserConfig(BaseDialog):
         container.setLayout(main_layout)
         return container
 
-    # -------------------- Resize event --------------------
     def resizeEvent(self, event):
-        """Reflow columns when the window becomes wide or narrow enough."""
+        """Reflow columns on window resize"""
         super().resizeEvent(event)
         if not self._section_widgets:
             return
@@ -735,9 +827,8 @@ class UserConfig(BaseDialog):
         if new_num != self._num_columns:
             self._scroll_box.setWidget(self._arrange_columns(new_num))
 
-    # -------------------- Focus searchbar --------------------
     def keyPressEvent(self, event):
-        """Vang Ctrl+F af om focus naar de zoekbalk te verplaatsen."""
+        """Focus search bar on Ctrl+F"""
         if event.matches(QKeySequence.Find):
             self.search_edit.setFocus()
             self.search_edit.selectAll()
@@ -745,7 +836,6 @@ class UserConfig(BaseDialog):
         else:
             super().keyPressEvent(event)
 
-    # -------------------- Apply / Save / Reset --------------------
     def applying(self):
         """Save & apply"""
         self.save_setting(is_apply=True)
@@ -793,6 +883,15 @@ class UserConfig(BaseDialog):
                 default = str(editor.defaults)
                 editor.setText(default)
                 self._current_values[key] = float(default) if '.' in default else int(default)
+            seen_column_lists: set = set()
+            for key, lw in self.option_column_order.items():
+                if id(lw) not in seen_column_lists:
+                    seen_column_lists.add(id(lw))
+                    all_keys = [k for k, w in self.option_column_order.items() if w is lw]
+                    default_vals = {
+                        k: self.default_setting[self.key_name][k] for k in all_keys
+                    }
+                    lw.reset_to_defaults(default_vals)
 
     def save_setting(self, is_apply: bool):
         """Save setting from current cache, validate, and write to config."""
@@ -859,6 +958,9 @@ class UserConfig(BaseDialog):
             else:
                 self.value_error_message("number", key)
                 error_found = True
+
+        for key in self.option_column_order:
+            user_setting[key] = self._current_values[key]
 
         # Abort saving if error found
         if error_found:
