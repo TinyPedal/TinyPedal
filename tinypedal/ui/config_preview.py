@@ -99,6 +99,7 @@ class WidgetPreview(QFrame):
         """True if a widget module exists for this key"""
         return self._available
 
+
     def schedule_refresh(self, current_values: dict):
         """Schedule a preview rebuild, or fast-toggle visibility for show_* changes"""
         self._pending_values = current_values.copy()
