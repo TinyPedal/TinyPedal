@@ -46,6 +46,7 @@ from PySide2.QtWidgets import (
     QMessageBox,
     QScrollArea,
     QSpinBox,
+    QSplitter,
     QVBoxLayout,
     QWidget,
 )
@@ -56,6 +57,7 @@ from ..formatter import format_option_name
 from ..setting import cfg
 from ..userfile import set_relative_path, set_user_data_path
 from ..validator import is_clock_format, is_hex_color, is_string_number
+from .config_preview import WidgetPreview
 from ._common import (
     QVAL_COLOR,
     QVAL_FLOAT,
@@ -387,6 +389,7 @@ class UserConfig(BaseDialog):
         self.option_integer: dict = {}
         self.option_float: dict = {}
         self.option_column_order: dict = {}  # key -> ColumnIndexList widget
+        self._preview: WidgetPreview | None = None
 
         # Section widgets and current column count (used for dynamic reflow)
         self._section_widgets: list[QFrame] = []
@@ -427,11 +430,22 @@ class UserConfig(BaseDialog):
         scroll_box.setWidgetResizable(True)
         self._scroll_box = scroll_box
 
+        # Preview panel
+        self._preview = WidgetPreview(key_name, parent=self)
+
         # Set main layout
         layout_main = QVBoxLayout()
         layout_button = QHBoxLayout()
         layout_main.addLayout(search_layout)
-        layout_main.addWidget(scroll_box)
+        if self._preview.available:
+            splitter = QSplitter(Qt.Horizontal)
+            splitter.addWidget(scroll_box)
+            splitter.addWidget(self._preview)
+            splitter.setStretchFactor(0, 2)
+            splitter.setStretchFactor(1, 1)
+            layout_main.addWidget(splitter)
+        else:
+            layout_main.addWidget(scroll_box)
         layout_button.addWidget(button_reset)
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
@@ -500,6 +514,8 @@ class UserConfig(BaseDialog):
     def _update_current_value(self, key, value):
         """Update value cache"""
         self._current_values[key] = value
+        if self._preview is not None:
+            self._preview.schedule_refresh(self._current_values)
 
     def _create_editor_for_key(self, key: str) -> QWidget:
         """Create editor widget for key"""
