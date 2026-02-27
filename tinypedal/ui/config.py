@@ -434,14 +434,17 @@ class UserConfig(BaseDialog):
         scroll_box.setWidgetResizable(True)
         self._scroll_box = scroll_box
 
-        # Preview panel
-        self._preview = WidgetPreview(key_name, parent=self)
+        # Preview panel (only for widget configs)
+        if cfg_type == ConfigType.WIDGET:
+            self._preview = WidgetPreview(key_name, parent=self)
+        else:
+            self._preview = None
 
         # Set main layout
         layout_main = QVBoxLayout()
         layout_button = QHBoxLayout()
         layout_main.addLayout(search_layout)
-        if self._preview.available:
+        if self._preview is not None and self._preview.available:
             splitter = QSplitter(Qt.Horizontal)
             splitter.addWidget(scroll_box)
             splitter.addWidget(self._preview)
