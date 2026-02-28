@@ -1,3 +1,8 @@
+WIP
+-----------------------------
+* Auto Backup Car Setup
+  - Added auto backup car setup support for RF2.
+
 2.42.0 (2026-02-25)
 -----------------------------
 * Important Fix

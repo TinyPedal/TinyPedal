@@ -376,7 +376,7 @@ Set `true` to remember and load API selection from preset; set `false` to select
 Enable legacy API selection. This option is disabled on Windows by default, and enabled on Linux.
 
     enable_auto_backup_car_setup
-Enable `Auto Backup Car Setup` function, currently support `LMU`.
+Enable `Auto Backup Car Setup` function, currently support `LMU` and `RF2`.
 
 This option allows to auto backup [Car Setup](#car-setup) file whenever exits pit lane with new adjustment to setup, which can be handy in various situations, especially in the event such as unexpectedly disconnected from server.
 
@@ -389,7 +389,7 @@ Additional notes:
 - Backup file is only generated after leaving pit lane. Stint best lap time (if available) will be auto-appended to backup file name after back to garage.
 - Only one backup file of the most recent setup will be generated if no changes were made.
 - Backup file name format:\
-    `[game name]` - `[date]` - `[time]` - `[track name]` - `[class name]` - `[brand name]` - `[stint best lap time]`\
+    `[game name]` - `[date & time]` - `[track name]` - `[class name]` - `[brand name]` - `[stint best lap time]`\
     **If brand name is not available, vehicle name will be used instead.*
 
 [**`Back to Top`**](#)

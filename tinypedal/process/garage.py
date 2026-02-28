@@ -25,6 +25,8 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Mapping
 
+from ..validator import generator_init
+
 # Note: CompoundSetting value can desync, so ignored from output
 LMU_CARSETUP_MAP = MappingProxyType({
     "GENERAL": {
@@ -258,3 +260,42 @@ def lmu_car_setup_json_to_svm(source: dict, reference: Mapping):
 def export_lmu_car_setup(source: dict) -> tuple[str, ...]:
     """Export lmu car setup"""
     return tuple(lmu_car_setup_json_to_svm(source, LMU_CARSETUP_MAP))
+
+
+@generator_init
+def _process_rf2_car_setup():
+    """Process rf2 car setup"""
+    data = {}
+    count = 0
+    unique_key = (
+        "VM_OIL_RADIATOR", # aerodynamics
+        "VM_BRAKE_PRESSURE", # brakes
+        "VM_STEER_LOCK", # chassis
+        "VM_DIFF_PRELOAD", # drivetrain
+        "VM_TRACTION_CONTROL", # electronics
+        "VM_FUEL_LEVEL", # fuel
+        "VM_ENGINE_MIXTURE", # gears
+        "VM_FRONT_ANTISWAY", # suspension
+        "WM_CAMBER-W_FL", # tires
+    )
+    while True:
+
+        if count < len(unique_key):
+            source = yield ()
+        else:
+            source = yield tuple(lmu_car_setup_json_to_svm(data, LMU_CARSETUP_MAP))
+            data.clear()
+            count = 0
+
+        if isinstance(source, dict):
+            # Check if any old data and reset
+            for key in unique_key:
+                if key in source and key in data:
+                    data.clear()
+                    count = 0
+                    break
+            data.update(source)
+            count += 1
+
+
+export_rf2_car_setup = _process_rf2_car_setup().send

@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import Any, Callable, Mapping, NamedTuple
 
 from ..const_common import EMPTY_DICT, WHEELS_NA
-from ..process.garage import export_lmu_car_setup
+from ..process.garage import export_lmu_car_setup, export_rf2_car_setup
 from ..process.vehicle import (
     absolute_refilling,
     expected_usage,
@@ -144,6 +144,7 @@ COMMON_WEATHERFORECAST = (
     ResParOutput("forecastQualify", FORECAST_DEFAULT, forecast_rf2, ("QUALIFY",)),
     ResParOutput("forecastRace", FORECAST_DEFAULT, forecast_rf2, ("RACE",)),
 )
+
 # RF2
 RF2_TIMESCALE = (
     ResRawOutput("timeScale", 1, ("currentValue",)),
@@ -151,9 +152,35 @@ RF2_TIMESCALE = (
 RF2_PRIVATEQUALIFY = (
     ResRawOutput("privateQualifying", 0, ("currentValue",)),
 )
-RF2_GARAGESETUP = (
-    ResParOutput("expectedFuelConsumption", 0.0, expected_usage, ("VM_FUEL_LEVEL", "stringValue")),
+RF2_GARAGESETUP_AERODYNAMICS = (
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
 )
+RF2_GARAGESETUP_BRAKES = (
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
+)
+RF2_GARAGESETUP_CHASSIS = (
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
+)
+RF2_GARAGESETUP_DRIVETRAIN = (
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
+)
+RF2_GARAGESETUP_ELECTRONICS = (
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
+)
+RF2_GARAGESETUP_FUEL = (
+    ResParOutput("expectedFuelConsumption", 0.0, expected_usage, ("VM_FUEL_LEVEL", "stringValue")),
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
+)
+RF2_GARAGESETUP_GEARS = (
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
+)
+RF2_GARAGESETUP_SUSPENSION = (
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
+)
+RF2_GARAGESETUP_TIRES = (
+    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
+)
+
 # LMU
 LMU_CURRENTSTINT = (
     ResRawOutput("currentVirtualEnergy", 0.0, ("fuelInfo", "currentVirtualEnergy")),
@@ -187,7 +214,15 @@ TASKSET_RF2 = (
     ("/rest/sessions/weather", COMMON_WEATHERFORECAST, "enable_weather_info", False, 0.1),
     ("/rest/sessions/setting/SESSSET_race_timescale", RF2_TIMESCALE, "enable_session_info", False, 0.1),
     ("/rest/sessions/setting/SESSSET_private_qual", RF2_PRIVATEQUALIFY, "enable_session_info", False, 0.1),
-    ("/rest/garage/fuel", RF2_GARAGESETUP, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/aerodynamics", RF2_GARAGESETUP_AERODYNAMICS, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/brakes", RF2_GARAGESETUP_BRAKES, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/chassis", RF2_GARAGESETUP_CHASSIS, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/drivetrain", RF2_GARAGESETUP_DRIVETRAIN, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/electronics", RF2_GARAGESETUP_ELECTRONICS, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/fuel", RF2_GARAGESETUP_FUEL, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/gears", RF2_GARAGESETUP_GEARS, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/suspension", RF2_GARAGESETUP_SUSPENSION, "enable_garage_setup_info", False, 0.1),
+    ("/rest/garage/tires", RF2_GARAGESETUP_TIRES, "enable_garage_setup_info", False, 0.1),
 )
 TASKSET_LMU = (
     ("/rest/sessions/weather", COMMON_WEATHERFORECAST, "enable_weather_info", False, 0.1),
