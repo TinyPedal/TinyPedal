@@ -22,27 +22,23 @@ Config dialog
 
 from __future__ import annotations
 
-import os
+import logging
 import re
 import time
 from typing import Callable
 
-from PySide2.QtCore import QPoint, Qt, QTimer
-from PySide2.QtGui import QFontDatabase, QKeySequence, QShortcut
+from PySide2.QtCore import Qt, QTimer
+from PySide2.QtGui import QKeySequence, QShortcut
 from PySide2.QtWidgets import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QDialogButtonBox,
     QFrame,
-    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QMenu,
     QMessageBox,
     QScrollArea,
-    QSpinBox,
     QVBoxLayout,
     QWidget,
 )
@@ -53,222 +49,23 @@ from ..formatter import format_option_name
 from ..setting import cfg
 from ..userfile import set_relative_path, set_user_data_path
 from ..validator import is_clock_format, is_hex_color, is_string_number
+from ._common import BaseDialog, UIScaler, singleton_dialog
 from .config_preview import WidgetPreview
 from .dragdroplist import DragDropOrderList
-from ._common import (
-    QVAL_COLOR,
-    QVAL_FLOAT,
-    QVAL_INTEGER,
-    BaseDialog,
-    DoubleClickEdit,
-    UIScaler,
-    singleton_dialog,
-)
+from .section_grouper import SectionGrouper
+from .section_builder import SectionBuilder
 
-COLUMN_LABEL = 0  # grid layout column index
+logger = logging.getLogger(__name__)
+
+COLUMN_LABEL = 0
 EDITOR_HEIGHT = UIScaler.size(2.2)
 
 
-def get_font_list() -> list[str]:
-    """Get all available font families list"""
-    if os.getenv("PYSIDE_OVERRIDE") == "6":  # no instance in qt6
-        return QFontDatabase.families()  # type: ignore[call-arg]
-    return QFontDatabase().families()
-
-
-class SectionGrouper:
-    """Groups configuration keys into labelled sections by word overlap"""
-
-    def __init__(self, min_match: int = 2):
-        self.min_match = min_match
-
-    @staticmethod
-    def _word_set(phrase: str) -> set[str]:
-        """Split underscore-delimited name into word set"""
-        return set(phrase.split("_"))
-
-    def _similar(self, topic1: str, topic2: str) -> bool:
-        """Check if two topics share enough words to belong in one section"""
-        # Direct match if one is a substring of the other
-        if topic1 in topic2 or topic2 in topic1:
-            return True
-        words1 = self._word_set(topic1)
-        words2 = self._word_set(topic2)
-        return len(words1 & words2) >= self.min_match
-
-    def group_keys(self, keys: list[str]) -> list[tuple[str | None, list[str]]]:
-        """Group keys into labelled sections, returns list of (title, key_list) tuples"""
-        # Separate column_index_* into its own group
-        fixed_groups: dict[str, list[str]] = {}
-        remaining: list[str] = []
-        for key in keys:
-            if key.startswith("column_index_"):
-                fixed_groups.setdefault("Column Index", []).append(key)
-            else:
-                remaining.append(key)
-
-        # Build sections from remaining keys
-        sections: list[tuple[str | None, list[str]]] = []
-        current_title: str | None = None
-        current_keys: list[str] = []
-        last_show: str | None = None
-
-        for key in remaining:
-            if key.startswith("show_"):
-                topic = key[5:]  # strip 'show_' prefix
-                if last_show is None:
-                    current_title = topic
-                    current_keys = [key]
-                    last_show = topic
-                elif self._similar(last_show, topic):
-                    current_keys.append(key)
-                    last_show = topic
-                else:
-                    sections.append((current_title, current_keys))
-                    current_title = topic
-                    current_keys = [key]
-                    last_show = topic
-            elif current_title is not None:
-                current_keys.append(key)
-
-        # Add last open section
-        if current_keys:
-            sections.append((current_title, current_keys))
-
-        # Collect keys that appeared before the first show_* key
-        all_assigned: set[str] = set()
-        for _, key_list in sections:
-            all_assigned.update(key_list)
-        unassigned = [k for k in remaining if k not in all_assigned]
-        if unassigned:
-            sections.insert(0, ("", unassigned))
-
-        # Append fixed groups
-        for title, fkeys in fixed_groups.items():
-            sections.append((title, fkeys))
-
-        return sections
-
-@singleton_dialog(ConfigType.CONFIG)
-class FontConfig(BaseDialog):
-    """Config global font setting"""
-
-    def __init__(self, parent, user_setting: dict, reload_func: Callable):
-        super().__init__(parent)
-        self.set_config_title("Global Font Override", cfg.filename.setting)
-
-        self.reloading = reload_func
-        self.user_setting = user_setting
-
-        # Combobox
-        self.edit_fontname = QComboBox(self)
-        self.edit_fontname.addItem("no change")
-        self.edit_fontname.addItems(get_font_list())
-        self.edit_fontname.setFixedWidth(UIScaler.size(9))
-
-        self.edit_fontsize = QSpinBox(self)
-        self.edit_fontsize.setRange(-999, 999)
-        self.edit_fontsize.setFixedWidth(UIScaler.size(9))
-
-        self.edit_fontweight = QComboBox(self)
-        self.edit_fontweight.addItem("no change")
-        self.edit_fontweight.addItems(rxp.CHOICE_COMMON[rxp.CFG_FONT_WEIGHT])
-        self.edit_fontweight.setFixedWidth(UIScaler.size(9))
-
-        self.edit_autooffset = QComboBox(self)
-        self.edit_autooffset.addItems(("no change", "enable", "disable"))
-        self.edit_autooffset.setFixedWidth(UIScaler.size(9))
-
-        self.edit_fontoffset = QSpinBox(self)
-        self.edit_fontoffset.setRange(-999, 999)
-        self.edit_fontoffset.setFixedWidth(UIScaler.size(9))
-
-        layout_option = QGridLayout()
-        layout_option.setAlignment(Qt.AlignTop)
-        layout_option.addWidget(QLabel("Font Name"), 0, 0)
-        layout_option.addWidget(self.edit_fontname, 0, 1)
-        layout_option.addWidget(QLabel("Font Size Addend"), 1, 0)
-        layout_option.addWidget(self.edit_fontsize, 1, 1)
-        layout_option.addWidget(QLabel("Font Weight"), 2, 0)
-        layout_option.addWidget(self.edit_fontweight, 2, 1)
-        layout_option.addWidget(QLabel("Enable Auto Font Offset"), 3, 0)
-        layout_option.addWidget(self.edit_autooffset, 3, 1)
-        layout_option.addWidget(QLabel("Font Offset Vertical Addend"), 4, 0)
-        layout_option.addWidget(self.edit_fontoffset, 4, 1)
-
-        # Button
-        button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
-        button_apply.clicked.connect(self.applying)
-
-        button_save = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        button_save.accepted.connect(self.saving)
-        button_save.rejected.connect(self.reject)
-
-        layout_button = QHBoxLayout()
-        layout_button.addStretch(1)
-        layout_button.addWidget(button_apply)
-        layout_button.addWidget(button_save)
-
-        # Set layout
-        layout_main = QVBoxLayout()
-        layout_main.addLayout(layout_option)
-        layout_main.addLayout(layout_button)
-        layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
-        self.setLayout(layout_main)
-
-    def applying(self):
-        """Save & apply"""
-        self.save_setting(self.user_setting)
-
-    def saving(self):
-        """Save & close"""
-        self.applying()
-        self.accept()  # close
-
-    def save_setting(self, dict_user: dict[str, dict]):
-        """Save setting"""
-        for setting in dict_user.values():
-            for key in setting:
-                # Font name
-                if re.search(rxp.CFG_FONT_NAME, key):
-                    font_name = self.edit_fontname.currentText()
-                    if font_name != "no change":
-                        setting[key] = font_name
-                    continue
-                # Font weight
-                if re.search(rxp.CFG_FONT_WEIGHT, key):
-                    font_weight = self.edit_fontweight.currentText()
-                    if font_weight != "no change":
-                        setting[key] = font_weight
-                    continue
-                # Font size addend
-                if re.search("font_size", key):
-                    font_size = self.edit_fontsize.value()
-                    if font_size != 0:
-                        setting[key] = max(setting[key] + font_size, 1)
-                    continue
-                # Auto font offset
-                if key == "enable_auto_font_offset":
-                    auto_offset = self.edit_autooffset.currentText()
-                    if auto_offset == "disable":
-                        setting[key] = False
-                    elif auto_offset == "enable":
-                        setting[key] = True
-                    continue
-                # Font offset vertical
-                if key == "font_offset_vertical":
-                    font_offset = self.edit_fontoffset.value()
-                    if font_offset != 0:
-                        setting[key] += font_offset
-                    continue
-        # Reset after applied
-        self.edit_fontsize.setValue(0)
-        self.edit_fontoffset.setValue(0)
-        cfg.save(0)
-        # Wait saving finish
-        while cfg.is_saving:
-            time.sleep(0.01)
-        self.reloading()
+def set_preset_name(cfg_type: str):
+    """Set preset name"""
+    if cfg_type == ConfigType.CONFIG:
+        return f"{cfg.filename.config} (global)"
+    return cfg.filename.setting
 
 
 @singleton_dialog(ConfigType.CONFIG)
@@ -304,28 +101,25 @@ class UserConfig(BaseDialog):
             key: self.user_setting[self.key_name][key] for key in self.original_keys
         }
 
-        # Option dicts (key: option editor)
-        self.option_bool: dict = {}
-        self.option_color: dict = {}
-        self.option_path: dict = {}
-        self.option_image: dict = {}
-        self.option_droplist: dict = {}
-        self.option_string: dict = {}
-        self.option_integer: dict = {}
-        self.option_float: dict = {}
-        self.option_column_order: dict = {}  # key -> ColumnIndexList widget
+        # Preview widget
         self._preview: WidgetPreview | None = None
 
-        # Row tracking for search dimming
-        self._row_widgets: dict[str, QWidget] = {}   # key -> row container
-        self._row_labels: dict[str, QLabel] = {}      # key -> label widget
-        self._section_title_widgets: list[tuple[QLabel, list[str]]] = []  # (title_label, keys)
-        self._column_order_widgets: dict[str, DragDropOrderList] = {}  # key -> list widget
+        # Row tracking for search dimming – will be populated by builder
+        self._row_widgets: dict[str, QWidget] = {}
+        self._row_labels: dict[str, QLabel] = {}
+        self._section_title_widgets: list[tuple[QLabel, list[str]]] = []
+        self._column_order_widgets: dict[str, DragDropOrderList] = {}
 
-        # Section widgets and current column count (used for dynamic reflow)
+        # Section widgets and current column count
+        self._general_frame: QFrame | None = None
         self._section_widgets: list[QFrame] = []
+        self._column_index_frames: list[QFrame] = []
         self._num_columns = 0
         self._widest_section = 0
+
+        # Voor sectie‑highlight en herordening
+        self._sections: list[tuple[str | None, list[str]]] = []   # opgeslagen gegroepeerde secties
+        self._highlighted_keys: set[str] = set()                  # momenteel gehighlighte keys
 
         # Search bar
         search_layout = QHBoxLayout()
@@ -336,11 +130,9 @@ class UserConfig(BaseDialog):
         self.search_edit.textChanged.connect(self._on_search_text_changed)
         search_layout.addWidget(self.search_edit)
 
-        # Ctrl+F shortcut: fires regardless of which child widget has focus
         shortcut_find = QShortcut(QKeySequence.Find, self)
         shortcut_find.activated.connect(self._focus_search)
 
-        # Debounce timer
         self.filter_timer = QTimer(self)
         self.filter_timer.setSingleShot(True)
         self.filter_timer.timeout.connect(self._apply_filter)
@@ -356,7 +148,14 @@ class UserConfig(BaseDialog):
         button_save.accepted.connect(self.saving)
         button_save.rejected.connect(self.reject)
 
-        # Create options (initial unfiltered view)
+        # Create builder and build sections
+        self.builder = SectionBuilder(
+            parent_dialog=self,
+            current_values=self._current_values,
+            update_callback=self._update_current_value,
+            option_width=self.option_width,
+            highlight_callback=self.highlight_section  # nieuwe callback voor klik op sectie
+        )
         option_box = self._build_sectioned_layout(self.original_keys)
 
         # Create scroll box
@@ -368,15 +167,32 @@ class UserConfig(BaseDialog):
         # Preview panel (only for widget configs)
         if cfg_type == ConfigType.WIDGET:
             self._preview = WidgetPreview(key_name, parent=self)
-        else:
-            self._preview = None
 
-        # Set main layout: Preview (top) → Search → Editor → Buttons
+        # Set main layout
         layout_main = QVBoxLayout()
         layout_button = QHBoxLayout()
-        if self._preview is not None and self._preview.available:
+
+        has_preview = self._preview is not None and self._preview.available
+        if has_preview:
             layout_main.addWidget(self._preview)
+
         layout_main.addLayout(search_layout)
+
+        if has_preview and (self._general_frame or self._column_index_frames):
+            controls_row = QHBoxLayout()
+            controls_row.setSpacing(self.MARGIN)
+            if self._general_frame is not None:
+                general_scroll = QScrollArea()
+                general_scroll.setWidget(self._general_frame)
+                general_scroll.setWidgetResizable(True)
+                controls_row.addWidget(general_scroll)
+            for frame in self._column_index_frames:
+                col_scroll = QScrollArea()
+                col_scroll.setWidget(frame)
+                col_scroll.setWidgetResizable(True)
+                controls_row.addWidget(col_scroll)
+            layout_main.addLayout(controls_row)
+
         layout_main.addWidget(scroll_box, 1)
         layout_button.addWidget(button_reset)
         layout_button.addStretch(1)
@@ -401,91 +217,8 @@ class UserConfig(BaseDialog):
         if new_w != self.width() or new_h != self.height():
             self.resize(new_w, new_h)
 
-    def _on_search_text_changed(self):
-        """Restart debounce timer"""
-        self.filter_timer.start(200)  # milliseconds
-
-    def _apply_filter(self):
-        """Dim non-matching rows based on the current filter text."""
-        text = self.search_edit.text().strip().lower()
-        if not text:
-            # Restore all rows
-            for key in self._row_widgets:
-                self._undim_row(key)
-            # Restore all drag-drop rows
-            seen: set[int] = set()
-            for lw in self._column_order_widgets.values():
-                if id(lw) not in seen:
-                    seen.add(id(lw))
-                    lw.set_dimmed_keys(set())
-            # Restore all section titles
-            for title_label, _ in self._section_title_widgets:
-                title_label.setStyleSheet("""
-                    background-color: palette(dark);
-                    color: palette(bright-text);
-                    border-bottom: 2px solid palette(mid);
-                    padding: 4px;
-                """)
-            return
-
-        # Dim/undim regular rows
-        for key in self._row_widgets:
-            if text in key.lower():
-                self._undim_row(key)
-            else:
-                self._dim_row(key)
-
-        # Dim/undim drag-drop rows
-        seen_lw: set[int] = set()
-        for lw in self._column_order_widgets.values():
-            if id(lw) not in seen_lw:
-                seen_lw.add(id(lw))
-                dimmed = set()
-                for k, w in self._column_order_widgets.items():
-                    if w is lw and text not in k.lower():
-                        dimmed.add(k)
-                lw.set_dimmed_keys(dimmed)
-
-        # Dim section titles when all their rows are dimmed
-        for title_label, keys in self._section_title_widgets:
-            all_dimmed = all(
-                text not in k.lower() for k in keys
-            )
-            if all_dimmed:
-                title_label.setStyleSheet("""
-                    background-color: palette(mid);
-                    color: palette(window);
-                    border-bottom: 2px solid palette(mid);
-                    padding: 4px;
-                """)
-            else:
-                title_label.setStyleSheet("""
-                    background-color: palette(dark);
-                    color: palette(bright-text);
-                    border-bottom: 2px solid palette(mid);
-                    padding: 4px;
-                """)
-
-    def _dim_row(self, key: str):
-        """Apply dim styling to a row widget and its label."""
-        row_widget = self._row_widgets.get(key)
-        label = self._row_labels.get(key)
-        if row_widget is None:
-            return
-        row_widget.setStyleSheet("background-color: palette(window);")
-        if label is not None:
-            label.setStyleSheet("color: palette(mid);")
-
-    def _undim_row(self, key: str):
-        """Restore original styling to a row widget and its label."""
-        row_widget = self._row_widgets.get(key)
-        label = self._row_labels.get(key)
-        if row_widget is None:
-            return
-        bg = row_widget.property("_base_bg") or "palette(base)"
-        row_widget.setStyleSheet(f"background-color: {bg};")
-        if label is not None:
-            label.setStyleSheet("")
+        # Initieel de secties sorteren volgens opgeslagen column_index_* waarden
+        self.reorder_sections()
 
     def _update_current_value(self, key, value):
         """Update value cache"""
@@ -493,326 +226,43 @@ class UserConfig(BaseDialog):
         if self._preview is not None:
             self._preview.schedule_refresh(self._current_values)
 
-    def _create_editor_for_key(self, key: str) -> QWidget:
-        """Create editor widget for key"""
-        current_val = self._current_values[key]
-        default_val = self.default_setting[self.key_name][key]
-
-        editor_height = EDITOR_HEIGHT
-
-        # Bool
-        if re.search(rxp.CFG_BOOL, key):
-            editor = QCheckBox(self)
-            editor.setFixedHeight(editor_height)
-            editor.setFixedWidth(self.option_width)
-            editor.setChecked(current_val)
-            editor.defaults = default_val
-            editor.stateChanged.connect(
-                lambda state, k=key: self._update_current_value(k, bool(state))
-            )
-            add_context_menu(editor)
-            self.option_bool[key] = editor
-            return editor
-
-        # Color string
-        if re.search(rxp.CFG_COLOR, key):
-            editor = DoubleClickEdit(self, mode="color", init=current_val)
-            editor.setFixedHeight(editor_height)
-            editor.setFixedWidth(self.option_width)
-            editor.setMaxLength(9)
-            editor.setValidator(QVAL_COLOR)
-            editor.textChanged.connect(editor.preview_color)
-            editor.setText(current_val)
-            editor.defaults = default_val
-            editor.textChanged.connect(
-                lambda text, k=key: self._update_current_value(k, text)
-            )
-            add_context_menu(editor)
-            self.option_color[key] = editor
-            return editor
-
-        # User path string
-        if re.search(rxp.CFG_USER_PATH, key):
-            editor = DoubleClickEdit(self, mode="path", init=current_val)
-            editor.setFixedHeight(editor_height)
-            editor.setFixedWidth(self.option_width)
-            editor.setText(current_val)
-            editor.defaults = default_val
-            editor.textChanged.connect(
-                lambda text, k=key: self._update_current_value(k, text)
-            )
-            add_context_menu(editor)
-            self.option_path[key] = editor
-            return editor
-
-        # User image file path string
-        if re.search(rxp.CFG_USER_IMAGE, key):
-            editor = DoubleClickEdit(self, mode="image", init=current_val)
-            editor.setFixedHeight(editor_height)
-            editor.setFixedWidth(self.option_width)
-            editor.setText(current_val)
-            editor.defaults = default_val
-            editor.textChanged.connect(
-                lambda text, k=key: self._update_current_value(k, text)
-            )
-            add_context_menu(editor)
-            self.option_image[key] = editor
-            return editor
-
-        # Font name string
-        if re.search(rxp.CFG_FONT_NAME, key):
-            editor = QComboBox(self)
-            editor.setFixedHeight(editor_height)
-            editor.setFixedWidth(self.option_width)
-            editor.addItems(get_font_list())
-            editor.setCurrentText(str(current_val))
-            editor.defaults = default_val
-            editor.currentTextChanged.connect(
-                lambda text, k=key: self._update_current_value(k, text)
-            )
-            add_context_menu(editor)
-            self.option_droplist[key] = editor
-            return editor
-
-        # Heatmap string
-        if re.search(rxp.CFG_HEATMAP, key):
-            editor = QComboBox(self)
-            editor.setFixedHeight(editor_height)
-            editor.setFixedWidth(self.option_width)
-            editor.addItems(cfg.user.heatmap.keys())
-            editor.setCurrentText(str(current_val))
-            editor.defaults = default_val
-            editor.currentTextChanged.connect(
-                lambda text, k=key: self._update_current_value(k, text)
-            )
-            add_context_menu(editor)
-            self.option_droplist[key] = editor
-            return editor
-
-        # Units choice list string
-        for ref_key, choice_list in rxp.CHOICE_UNITS.items():
-            if re.search(ref_key, key):
-                editor = QComboBox(self)
-                editor.setFixedHeight(editor_height)
-                editor.setFixedWidth(self.option_width)
-                editor.addItems(choice_list)
-                editor.setCurrentText(str(current_val))
-                editor.defaults = default_val
-                editor.currentTextChanged.connect(
-                    lambda text, k=key: self._update_current_value(k, text)
-                )
-                add_context_menu(editor)
-                self.option_droplist[key] = editor
-                return editor
-        # Common choice list string
-        for ref_key, choice_list in rxp.CHOICE_COMMON.items():
-            if re.search(ref_key, key):
-                editor = QComboBox(self)
-                editor.setFixedHeight(editor_height)
-                editor.setFixedWidth(self.option_width)
-                editor.addItems(choice_list)
-                editor.setCurrentText(str(current_val))
-                editor.defaults = default_val
-                editor.currentTextChanged.connect(
-                    lambda text, k=key: self._update_current_value(k, text)
-                )
-                add_context_menu(editor)
-                self.option_droplist[key] = editor
-                return editor
-
-        # Clock format string
-        if re.search(rxp.CFG_CLOCK_FORMAT, key) or re.search(rxp.CFG_STRING, key):
-            editor = QLineEdit(self)
-            editor.setFixedHeight(editor_height)
-            editor.setFixedWidth(self.option_width)
-            editor.setText(current_val)
-            editor.defaults = default_val
-            editor.textChanged.connect(
-                lambda text, k=key: self._update_current_value(k, text)
-            )
-            add_context_menu(editor)
-            self.option_string[key] = editor
-            return editor
-
-        # Integer
-        if re.search(rxp.CFG_INTEGER, key):
-            editor = QLineEdit(self)
-            editor.setFixedHeight(editor_height)
-            editor.setFixedWidth(self.option_width)
-            editor.setValidator(QVAL_INTEGER)
-            editor.setText(str(current_val))
-            editor.defaults = default_val
-            editor.textChanged.connect(
-                lambda text, k=key: self._update_current_value(k, text)
-            )
-            add_context_menu(editor)
-            self.option_integer[key] = editor
-            return editor
-
-        # Float or int (fallback)
-        editor = QLineEdit(self)
-        editor.setFixedHeight(editor_height)
-        editor.setFixedWidth(self.option_width)
-        editor.setValidator(QVAL_FLOAT)
-        editor.setText(str(current_val))
-        editor.defaults = default_val
-        editor.textChanged.connect(
-            lambda text, k=key: self._update_current_value(k, text)
-        )
-        add_context_menu(editor)
-        self.option_float[key] = editor
-        return editor
-
-    def _create_column_index_frame(self, title: str | None, keys: list) -> QFrame:
-        """Create drag-and-drop frame for display order settings"""
-
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignTop)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-
-        col_title_label = None
-        if title is not None:
-            header_text = (
-                format_option_name(self.key_name) if title == "" else "Display Order"
-            )
-            col_title_label = QLabel(f"<b>{header_text}</b>")
-            font = col_title_label.font()
-            font.setPointSize(font.pointSize() + 1)
-            col_title_label.setFont(font)
-            col_title_label.setStyleSheet("""
-                background-color: palette(dark);
-                color: palette(bright-text);
-                border-bottom: 2px solid palette(mid);
-                padding: 4px;
-            """)
-            layout.addWidget(col_title_label)
-
-        sorted_keys = sorted(
-            keys,
-            key=lambda k: self._current_values.get(k, 999)
-        )
-        items = [
-            (key, format_option_name(key[len("column_index_"):]))
-            for key in sorted_keys
-        ]
-
-        def on_reorder(new_order):
-            for index, key in enumerate(new_order, start=1):
-                self._update_current_value(key, index)
-
-        row_height = EDITOR_HEIGHT + 2 * UIScaler.size(0.2)
-        list_widget = DragDropOrderList(
-            items=items,
-            on_reorder_callback=on_reorder,
-            row_height=row_height,
-            parent=self
-        )
-        for key in keys:
-            self.option_column_order[key] = list_widget
-            self._column_order_widgets[key] = list_widget
-
-        layout.addWidget(list_widget)
-
-        if col_title_label is not None:
-            self._section_title_widgets.append((col_title_label, keys))
-
-        frame = QFrame()
-        frame.setObjectName("sectionFrame")
-        frame.setLayout(layout)
-        frame.setProperty("estimated_rows", len(keys) + (2 if title is not None else 1))
-
-        return frame
-
-    def _create_section_frame(self, title: str | None, keys: list) -> QFrame:
-        """Create section frame with title bar and alternating rows"""
-        # column_index_* keys get a drag-and-drop list instead of integer editors
-        if keys and all(k.startswith("column_index_") for k in keys):
-            return self._create_column_index_frame(title, keys)
-        layout = QGridLayout()
-        layout.setAlignment(Qt.AlignTop)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-
-        row_offset = 0
-        if title is not None:
-            # Title bar
-            header_text = (
-                format_option_name(self.key_name)
-                if title == ""
-                else format_option_name(title)
-            )
-            title_label = QLabel(f"<b>{header_text}</b>")
-            font = title_label.font()
-            font.setPointSize(font.pointSize() + 1)
-            title_label.setFont(font)
-            title_label.setStyleSheet("""
-                background-color: palette(dark);
-                color: palette(bright-text);
-                border-bottom: 2px solid palette(mid);
-                padding: 4px;
-            """)
-            layout.addWidget(title_label, 0, COLUMN_LABEL, 1, 2)
-            row_offset = 1
-            self._section_title_widgets.append((title_label, keys))
-
-        # Option rows with alternating background
-        for idx, key in enumerate(keys):
-            row = idx + row_offset
-
-            row_widget = QWidget()
-            bg = "palette(alternate-base)" if idx % 2 == 0 else "palette(base)"
-            row_widget.setStyleSheet(f"background-color: {bg};")
-            row_widget.setProperty("_base_bg", bg)
-
-            row_layout = QHBoxLayout()
-            row_layout.setContentsMargins(
-                UIScaler.size(0.4),
-                UIScaler.size(0.2),
-                UIScaler.size(0.4),
-                UIScaler.size(0.2),
-            )
-            row_layout.setSpacing(UIScaler.size(0.4))
-
-            label = QLabel(format_option_name(key))
-            row_layout.addWidget(label)
-            row_layout.addWidget(self._create_editor_for_key(key))
-
-            row_widget.setLayout(row_layout)
-            layout.addWidget(row_widget, row, COLUMN_LABEL, 1, 2)
-
-            self._row_widgets[key] = row_widget
-            self._row_labels[key] = label
-
-        frame = QFrame()
-        frame.setObjectName("sectionFrame")
-        frame.setLayout(layout)
-        frame.setProperty("estimated_rows", len(keys) + (1 if title is not None else 0))
-        return frame
-
     def _build_sectioned_layout(self, keys: list[str]) -> QWidget:
         """Create section frames and arrange them for initial display."""
         sections = self.section_grouper.group_keys(keys)
+        self._sections = sections  # bewaar voor highlight
 
-        self._section_widgets = [
-            self._create_section_frame(title, sec_keys)
-            for title, sec_keys in sections
-        ]
+        for title, sec_keys in sections:
+            if all(k.startswith("column_index_") for k in sec_keys):
+                frame = self.builder._build_column_index_frame(title, sec_keys)
+                self._column_index_frames.append(frame)
+            elif title == "" and self._general_frame is None:
+                self._general_frame = self.builder.build_compact_frame(title, sec_keys)
+            else:
+                frame = self.builder._build_regular_section(title, sec_keys)
+                self._section_widgets.append(frame)
+
+        # Retrieve references from builder
+        self._row_widgets = self.builder.row_widgets
+        self._row_labels = self.builder.row_labels
+        self._section_title_widgets = self.builder.section_title_widgets
+        self._column_order_widgets = self.builder.column_order_widgets
 
         self._widest_section = max(
             (w.sizeHint().width() for w in self._section_widgets), default=1
         )
-        try:
-            avail_w = QApplication.primaryScreen().availableGeometry().width()
-        except AttributeError:
-            avail_w = 1920
-        num_columns = min(3, max(1, int(avail_w * 0.9) // max(self._widest_section, 1)))
-        return self._arrange_columns(num_columns)
+        return self._arrange_columns(1)
 
     def _arrange_columns(self, num_columns: int) -> QWidget:
         """Distribute section widgets into num_columns columns and return a container."""
         self._num_columns = num_columns
-        max_rows = 24
+        total_rows = sum(
+            (w.property("estimated_rows") or 10) for w in self._section_widgets
+        )
+        max_rows = max(24, -(-total_rows // num_columns))  # ceiling division
+
+        # Detach sections from old parent before re-parenting
+        for w in self._section_widgets:
+            w.setParent(None)
 
         columns: list[list[QFrame]] = [[] for _ in range(num_columns)]
         col_rows = [0] * num_columns
@@ -854,176 +304,263 @@ class UserConfig(BaseDialog):
         container.setLayout(main_layout)
         return container
 
-    def _cleanup(self):
-        """Stop timers and release preview resources"""
-        self.filter_timer.stop()
-        if self._preview is not None:
-            self._preview.cleanup()
+    # ------------------------------------------------------------------
+    # Search / filter methods (unchanged)
+    # ------------------------------------------------------------------
+    def _on_search_text_changed(self):
+        self.filter_timer.start(200)
 
-    def reject(self):
-        """Cancel / ESC"""
-        self._cleanup()
-        super().reject()
-
-    def closeEvent(self, event):
-        """Stop all timers before Qt tears down child widgets"""
-        self._cleanup()
-        super().closeEvent(event)
-
-    def resizeEvent(self, event):
-        """Reflow columns on window resize"""
-        super().resizeEvent(event)
-        if not self._section_widgets:
+    def _apply_filter(self):
+        text = self.search_edit.text().strip().lower()
+        if not text:
+            for key in self._row_widgets:
+                self._undim_row(key)
+            seen: set[int] = set()
+            for lw in self._column_order_widgets.values():
+                if id(lw) not in seen:
+                    seen.add(id(lw))
+                    lw.set_dimmed_keys(set())
+            for title_label, _ in self._section_title_widgets:
+                title_label.setStyleSheet("""
+                    background-color: palette(dark);
+                    color: palette(bright-text);
+                    border-bottom: 2px solid palette(mid);
+                    padding: 4px;
+                """)
             return
-        usable_w = event.size().width() - self.MARGIN * 2
-        new_num = min(3, max(1, usable_w // max(self._widest_section, 1)))
-        if new_num != self._num_columns:
-            self._scroll_box.setWidget(self._arrange_columns(new_num))
+
+        for key in self._row_widgets:
+            if text in key.lower():
+                self._undim_row(key)
+            else:
+                self._dim_row(key)
+
+        seen_lw: set[int] = set()
+        for lw in self._column_order_widgets.values():
+            if id(lw) not in seen_lw:
+                seen_lw.add(id(lw))
+                dimmed = set()
+                for k, w in self._column_order_widgets.items():
+                    if w is lw and text not in k.lower():
+                        dimmed.add(k)
+                lw.set_dimmed_keys(dimmed)
+
+        for title_label, keys in self._section_title_widgets:
+            all_dimmed = all(text not in k.lower() for k in keys)
+            if all_dimmed:
+                title_label.setStyleSheet("""
+                    background-color: palette(mid);
+                    color: palette(window);
+                    border-bottom: 2px solid palette(mid);
+                    padding: 4px;
+                """)
+            else:
+                title_label.setStyleSheet("""
+                    background-color: palette(dark);
+                    color: palette(bright-text);
+                    border-bottom: 2px solid palette(mid);
+                    padding: 4px;
+                """)
+
+    def _dim_row(self, key: str):
+        row_widget = self._row_widgets.get(key)
+        label = self._row_labels.get(key)
+        if row_widget is None:
+            return
+        row_widget.setStyleSheet("background-color: palette(window);")
+        if label is not None:
+            label.setStyleSheet("color: palette(mid);")
+
+    def _undim_row(self, key: str):
+        row_widget = self._row_widgets.get(key)
+        label = self._row_labels.get(key)
+        if row_widget is None:
+            return
+        bg = row_widget.property("_base_bg") or "palette(base)"
+        row_widget.setStyleSheet(f"background-color: {bg};")
+        if label is not None:
+            label.setStyleSheet("")
 
     def _focus_search(self):
-        """Focus and select all text in the search bar"""
         self.search_edit.setFocus()
         self.search_edit.selectAll()
 
+    # ------------------------------------------------------------------
+    # Sectie‑highlight
+    # ------------------------------------------------------------------
+    def highlight_section(self, column_key):
+        """Markeer alle opties van de sectie waartoe column_key behoort."""
+        # Zoek de sectie die deze column_key bevat
+        for title, keys in self._sections:
+            if column_key in keys:
+                # reset vorige highlight
+                self._reset_highlight()
+                # highlight de nieuwe sectie
+                for k in keys:
+                    row = self._row_widgets.get(k)
+                    if row:
+                        row.setStyleSheet("background-color: lightblue;")
+                        self._highlighted_keys.add(k)
+                break
+
+    def _reset_highlight(self):
+        """Zet alle gehighlighte rijen terug naar hun normale achtergrond."""
+        for k in self._highlighted_keys:
+            row = self._row_widgets.get(k)
+            if row:
+                bg = row.property("_base_bg") or "palette(base)"
+                row.setStyleSheet(f"background-color: {bg};")
+        self._highlighted_keys.clear()
+
+    # ------------------------------------------------------------------
+    # Herordenen van sectieframes
+    # ------------------------------------------------------------------
+    def reorder_sections(self):
+        """Sorteer de sectieframes op basis van minimale column_index van de bijbehorende keys."""
+        if not self._section_widgets:
+            return
+
+        # Bouw een lijst van (frame, min_column_index)
+        frame_index = []
+        for frame in self._section_widgets:
+            keys = frame.property("section_keys")
+            if not keys:
+                continue
+            min_idx = 999999
+            for k in keys:
+                if k.startswith("column_index_"):
+                    val = self._current_values.get(k, 999999)
+                    if isinstance(val, (int, float)):
+                        min_idx = min(min_idx, val)
+            frame_index.append((frame, min_idx))
+
+        # Sorteer op minimale index
+        frame_index.sort(key=lambda x: x[1])
+
+        # Werk de lijst van widgets bij
+        self._section_widgets = [f for f, _ in frame_index]
+
+        # Vernieuw de layout met het huidige aantal kolommen
+        new_container = self._arrange_columns(self._num_columns)
+        self._scroll_box.setWidget(new_container)
+
+    def on_column_order_changed(self):
+        """Wordt aangeroepen nadat de volgorde in de lijst is gewijzigd."""
+        self.reorder_sections()
+
+    # ------------------------------------------------------------------
+    # Actions
+    # ------------------------------------------------------------------
     def applying(self):
-        """Save & apply"""
         self.save_setting(is_apply=True)
 
     def saving(self):
-        """Save & close"""
         self.save_setting(is_apply=False)
 
     def reset_setting(self):
-        """Reset setting to default values (and update cache)."""
         msg_text = (
             f"Reset all <b>{format_option_name(self.key_name)}</b> options to default?<br><br>"
             "Changes are only saved after clicking Apply or Save Button."
         )
         if self.confirm_operation(title="Reset Options", message=msg_text):
-            for key, editor in self.option_bool.items():
+            for key, editor in self.builder.editors.items():
                 default = editor.defaults
-                editor.setChecked(default)
-                self._current_values[key] = default
-            for key, editor in self.option_color.items():
-                default = editor.defaults
-                editor.setText(default)
-                self._current_values[key] = default
-            for key, editor in self.option_path.items():
-                default = editor.defaults
-                editor.setText(default)
-                self._current_values[key] = default
-            for key, editor in self.option_image.items():
-                default = editor.defaults
-                editor.setText(default)
-                self._current_values[key] = default
-            for key, editor in self.option_droplist.items():
-                default = str(editor.defaults)
-                editor.setCurrentText(default)
-                self._current_values[key] = default
-            for key, editor in self.option_string.items():
-                default = editor.defaults
-                editor.setText(default)
-                self._current_values[key] = default
-            for key, editor in self.option_integer.items():
-                default = str(editor.defaults)
-                editor.setText(default)
-                self._current_values[key] = int(default) if default.isdigit() else default
-            for key, editor in self.option_float.items():
-                default = str(editor.defaults)
-                editor.setText(default)
-                self._current_values[key] = float(default) if '.' in default else int(default)
+                if isinstance(editor, QCheckBox):
+                    editor.setChecked(default)
+                    self._current_values[key] = default
+                elif isinstance(editor, QLineEdit):
+                    editor.setText(str(default))
+                    self._current_values[key] = default
+                elif isinstance(editor, QComboBox):
+                    editor.setCurrentText(str(default))
+                    self._current_values[key] = default
+
             seen_column_lists: set = set()
-            for key, lw in self.option_column_order.items():
+            for key, lw in self._column_order_widgets.items():
                 if id(lw) not in seen_column_lists:
                     seen_column_lists.add(id(lw))
-                    all_keys = [k for k, w in self.option_column_order.items() if w is lw]
+                    all_keys = [k for k, w in self._column_order_widgets.items() if w is lw]
                     default_vals = {
                         k: self.default_setting[self.key_name][k] for k in all_keys
                     }
                     lw.reset_to_defaults(default_vals)
 
     def save_setting(self, is_apply: bool):
-        """Save setting from current cache, validate, and write to config."""
         user_setting = self.user_setting[self.key_name]
         error_found = False
 
-        # Validate and copy cached values into user_setting
-        for key, editor in self.option_bool.items():
-            user_setting[key] = self._current_values[key]
-
-        for key, editor in self.option_color.items():
+        for key in self.original_keys:
             value = self._current_values[key]
-            if is_hex_color(value):
+
+            if re.search(rxp.CFG_BOOL, key):
                 user_setting[key] = value
-            else:
-                self.value_error_message("color", key)
-                error_found = True
 
-        for key, editor in self.option_path.items():
-            value = self._current_values[key]
-            # Try convert to relative path again, in case user manually sets path
-            value = set_relative_path(value)
-            if set_user_data_path(value):
+            elif re.search(rxp.CFG_COLOR, key):
+                if is_hex_color(value):
+                    user_setting[key] = value
+                else:
+                    self.value_error_message("color", key)
+                    error_found = True
+
+            elif re.search(rxp.CFG_USER_PATH, key):
+                value = set_relative_path(value)
+                if set_user_data_path(value):
+                    user_setting[key] = value
+                    editor = self.builder.editors.get(key)
+                    if editor:
+                        editor.setText(value)
+                        self._current_values[key] = value
+                else:
+                    self.value_error_message("path", key)
+                    error_found = True
+
+            elif re.search(rxp.CFG_USER_IMAGE, key):
                 user_setting[key] = value
-                # Update editor and cache to the reformatted path
-                editor.setText(value)
-                self._current_values[key] = value
-            else:
-                self.value_error_message("path", key)
-                error_found = True
 
-        for key, editor in self.option_image.items():
-            user_setting[key] = self._current_values[key]
+            elif re.search(rxp.CFG_FONT_NAME, key) or re.search(rxp.CFG_HEATMAP, key) or \
+                 any(re.search(ref, key) for ref in rxp.CHOICE_UNITS) or \
+                 any(re.search(ref, key) for ref in rxp.CHOICE_COMMON):
+                user_setting[key] = value
 
-        for key, editor in self.option_droplist.items():
-            user_setting[key] = self._current_values[key]
+            elif re.search(rxp.CFG_CLOCK_FORMAT, key) or re.search(rxp.CFG_STRING, key):
+                if re.search(rxp.CFG_CLOCK_FORMAT, key) and not is_clock_format(value):
+                    self.value_error_message("clock format", key)
+                    error_found = True
+                else:
+                    user_setting[key] = value
 
-        for key, editor in self.option_string.items():
-            value = self._current_values[key]
-            if re.search(rxp.CFG_CLOCK_FORMAT, key) and not is_clock_format(value):
-                self.value_error_message("clock format", key)
-                error_found = True
-                continue
-            user_setting[key] = value
+            elif re.search(rxp.CFG_INTEGER, key):
+                str_val = str(value)
+                if is_string_number(str_val):
+                    user_setting[key] = int(str_val)
+                else:
+                    self.value_error_message("number", key)
+                    error_found = True
 
-        for key, editor in self.option_integer.items():
-            value = self._current_values[key]
-            # Ensure it's a string for validation, then convert back
-            str_val = str(value)
-            if is_string_number(str_val):
-                user_setting[key] = int(str_val)
-            else:
-                self.value_error_message("number", key)
-                error_found = True
+            else:  # float fallback
+                str_val = str(value)
+                if is_string_number(str_val):
+                    num_val = float(str_val)
+                    if num_val % 1 == 0:
+                        num_val = int(num_val)
+                    user_setting[key] = num_val
+                else:
+                    self.value_error_message("number", key)
+                    error_found = True
 
-        for key, editor in self.option_float.items():
-            value = self._current_values[key]
-            str_val = str(value)
-            if is_string_number(str_val):
-                num_val = float(str_val)
-                if num_val % 1 == 0:  # remove unnecessary decimal points
-                    num_val = int(num_val)
-                user_setting[key] = num_val
-            else:
-                self.value_error_message("number", key)
-                error_found = True
+        for key in self.original_keys:
+            if key.startswith("column_index_"):
+                user_setting[key] = self._current_values[key]
 
-        for key in self.option_column_order:
-            user_setting[key] = self._current_values[key]
-
-        # Abort saving if error found
         if error_found:
             return
 
-        # Save global settings
         if self.cfg_type == ConfigType.CONFIG:
             cfg.update_path()
             cfg.save(0, cfg_type=ConfigType.CONFIG)
-        # Save user preset settings
         else:
             cfg.save(0)
 
-        # Wait saving finish
         while cfg.is_saving:
             time.sleep(0.01)
 
@@ -1032,41 +569,33 @@ class UserConfig(BaseDialog):
             self.accept()
 
     def value_error_message(self, value_type: str, option_name: str):
-        """Value error message"""
         msg_text = (
             f"Invalid {value_type} for <b>{format_option_name(option_name)}</b> option."
             "<br><br>Changes are not saved."
         )
         QMessageBox.warning(self, "Error", msg_text)
 
+    # ------------------------------------------------------------------
+    # Cleanup
+    # ------------------------------------------------------------------
+    def _cleanup(self):
+        self.filter_timer.stop()
+        if self._preview is not None:
+            self._preview.cleanup()
 
-def set_preset_name(cfg_type: str):
-    """Set preset name"""
-    if cfg_type == ConfigType.CONFIG:
-        return f"{cfg.filename.config} (global)"
-    return cfg.filename.setting
+    def reject(self):
+        self._cleanup()
+        super().reject()
 
+    def closeEvent(self, event):
+        self._cleanup()
+        super().closeEvent(event)
 
-def add_context_menu(parent: QWidget):
-    """Add context menu"""
-    parent.setContextMenuPolicy(Qt.CustomContextMenu)
-    parent.customContextMenuRequested.connect(
-        lambda position, parent=parent: context_menu_reset_option(position, parent)
-    )
-
-
-def context_menu_reset_option(position: QPoint, parent: QWidget):
-    """Context menu reset option"""
-    menu = QMenu()  # no parent for temp menu
-    option_reset = menu.addAction("Reset to Default")
-    action = menu.exec_(parent.mapToGlobal(position))
-    if action == option_reset:
-        if isinstance(parent, QCheckBox):
-            parent.setChecked(parent.defaults)
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if not self._section_widgets:
             return
-        if isinstance(parent, QLineEdit):
-            parent.setText(str(parent.defaults))
-            return
-        if isinstance(parent, QComboBox):
-            parent.setCurrentText(str(parent.defaults))
-            return
+        usable_w = self._scroll_box.viewport().width()
+        new_num = min(5, max(1, usable_w // max(self._widest_section, 1)))
+        if new_num != self._num_columns:
+            self._scroll_box.setWidget(self._arrange_columns(new_num))
