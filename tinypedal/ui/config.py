@@ -22,33 +22,26 @@ Config dialog
 
 from __future__ import annotations
 
-import logging
 from typing import Callable
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QDialogButtonBox,
     QHBoxLayout,
-    QLabel,
     QScrollArea,
     QVBoxLayout,
-    QWidget,
 )
 
 from ..const_file import ConfigType
 from ..formatter import format_option_name
 from ..setting import cfg
 from ._common import BaseDialog, UIScaler, singleton_dialog
-from .components.drag_drop_list import DragDropOrderList
 from .components.preview import WidgetPreview
 from .components.search_bar import SearchBar
 from .components.section_frame import SectionBuilder
 from .config_layout import ConfigLayout
 from .helpers import config_actions
 from .helpers.section_grouper import SectionGrouper
-
-logger = logging.getLogger(__name__)
-
 
 def set_preset_name(cfg_type: str):
     """Set preset name"""
