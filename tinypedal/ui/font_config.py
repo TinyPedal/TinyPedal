@@ -38,7 +38,7 @@ from .. import regex_pattern as rxp
 from ..const_file import ConfigType
 from ..setting import cfg
 from ._common import BaseDialog, UIScaler, singleton_dialog
-from .option_editors import get_font_list
+from .components.option_editors import get_font_list
 
 
 @singleton_dialog(ConfigType.CONFIG)

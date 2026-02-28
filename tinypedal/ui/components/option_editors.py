@@ -33,8 +33,8 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import regex_pattern as rxp
-from ._common import (
+from ... import regex_pattern as rxp
+from .._common import (
     DoubleClickEdit,
     QVAL_COLOR,
     QVAL_FLOAT,

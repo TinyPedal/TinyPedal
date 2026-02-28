@@ -50,10 +50,10 @@ from ..setting import cfg
 from ..userfile import set_relative_path, set_user_data_path
 from ..validator import is_clock_format, is_hex_color, is_string_number
 from ._common import BaseDialog, UIScaler, singleton_dialog
-from .config_preview import WidgetPreview
-from .dragdroplist import DragDropOrderList
-from .section_grouper import SectionGrouper
-from .section_builder import SectionBuilder
+from .components.preview import WidgetPreview
+from .components.drag_drop_list import DragDropOrderList
+from .helpers.section_grouper import SectionGrouper
+from .components.section_frame import SectionBuilder
 
 logger = logging.getLogger(__name__)
 

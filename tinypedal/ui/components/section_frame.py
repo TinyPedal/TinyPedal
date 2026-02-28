@@ -30,8 +30,8 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from ..formatter import format_option_name
-from .dragdroplist import DragDropOrderList
+from ...formatter import format_option_name
+from .drag_drop_list import DragDropOrderList
 from .option_editors import create_editor
 
 
