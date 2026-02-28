@@ -16,59 +16,55 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""
-Search bar widget with debounce timer and Ctrl+F shortcut.
-"""
+"""Search bar widget with debounce and Ctrl+F shortcut"""
 
 from PySide2.QtCore import Signal, QTimer
 from PySide2.QtGui import QKeySequence, QShortcut
-from PySide2.QtWidgets import (
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QWidget,
-)
+from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit
+
+from .base import BaseComponent
 
 
-class SearchBar(QWidget):
-    """Search bar with debounce timer and Ctrl+F shortcut."""
+class SearchBar(BaseComponent):
+    """Search bar with debounce timer"""
 
     filterRequested = Signal(str)
+    DEBOUNCE_MS = 200
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, debounce_ms=None):
         super().__init__(parent)
-
-        layout = QHBoxLayout()
+        self._debounce_ms = debounce_ms or self.DEBOUNCE_MS
+        # Layout
+        layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-
         layout.addWidget(QLabel("Search:"))
-
         self._edit = QLineEdit()
         self._edit.setPlaceholderText("Type to filter options (Ctrl+F)")
         self._edit.setClearButtonEnabled(True)
         self._edit.textChanged.connect(self._on_text_changed)
         layout.addWidget(self._edit)
-
-        self.setLayout(layout)
-
-        shortcut = QShortcut(QKeySequence.Find, parent or self)
+        # Shortcut
+        shortcut = QShortcut(QKeySequence.Find, self)
         shortcut.activated.connect(self.focus)
-
+        # Debounce timer
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
         self._timer.timeout.connect(self._emit_filter)
 
     def focus(self):
-        """Focus and select all text."""
+        """Focus and select all text"""
         self._edit.setFocus()
         self._edit.selectAll()
 
+    def clear(self):
+        self._edit.clear()
+
     def cleanup(self):
-        """Stop timer."""
+        """Stop timer before closing"""
         self._timer.stop()
 
     def _on_text_changed(self):
-        self._timer.start(200)
+        self._timer.start(self._debounce_ms)
 
     def _emit_filter(self):
         self.filterRequested.emit(self._edit.text().strip().lower())

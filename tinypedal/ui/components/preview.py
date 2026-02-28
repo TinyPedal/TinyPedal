@@ -16,209 +16,191 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""
-Widget preview panel for config dialog
-"""
+"""Widget preview panel for config dialog"""
 
 import copy
 import importlib
 import logging
 
-logger = logging.getLogger(__name__)
-
 from PySide2.QtCore import Qt, QTimer
-from PySide2.QtWidgets import (
-    QFrame,
-    QGridLayout,
-    QLabel,
-    QScrollArea,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide2.QtWidgets import QGridLayout, QLabel, QScrollArea, QVBoxLayout, QWidget
 
 from ...setting import cfg
+from .base import BaseComponent
+
+logger = logging.getLogger(__name__)
 
 
-class WidgetPreview(QFrame):
-    """Embedded live preview of the widget being configured"""
+class WidgetPreview(BaseComponent):
+    """Live preview of the widget being configured"""
 
     _DEBOUNCE_MS = 500
 
-    def __init__(self, key_name: str, parent=None):
+    def __init__(self, key_name, parent=None):
         super().__init__(parent)
         self._key_name = key_name
         self._active_widget = None
-        self._pending_values: dict = {}
-        self._element_map: dict = {}
-        self._last_applied_values: dict = {}
-
-        try:
-            self._module = importlib.import_module(f"tinypedal.widget.{key_name}")
-            self._available = True
-        except ImportError:
-            self._module = None
-            self._available = False
-
-        self._debounce = QTimer(self)
-        self._debounce.setSingleShot(True)
-        self._debounce.timeout.connect(self._rebuild)
-
-        title = QLabel("Preview")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("""
-            background-color: palette(dark);
-            color: palette(bright-text);
-            border-bottom: 2px solid palette(mid);
-            padding: 4px;
-            font-weight: bold;
-        """)
-
-        self._inner = QWidget()
-        inner_layout = QVBoxLayout()
-        inner_layout.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
-        inner_layout.setContentsMargins(8, 8, 8, 8)
-        self._inner.setLayout(inner_layout)
-        self._inner_layout = inner_layout
-
-        scroll = QScrollArea()
-        scroll.setWidget(self._inner)
-        scroll.setWidgetResizable(True)
-
-        layout = QVBoxLayout()
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(title)
-        layout.addWidget(scroll)
-        self.setLayout(layout)
-
+        self._pending_values = {}
+        self._element_map = {}
+        self._last_applied_values = {}
+        self._module = self._load_module(key_name)
+        self._available = self._module is not None
+        # Debounce timer
+        self._debounce_timer = QTimer(self)
+        self._debounce_timer.setSingleShot(True)
+        self._debounce_timer.timeout.connect(self._rebuild)
+        self._setup_ui()
         if self._available:
             self._rebuild()
 
     @property
-    def available(self) -> bool:
-        """True if a widget module exists for this key"""
+    def available(self):
         return self._available
 
+    def _load_module(self, key_name):
+        try:
+            return importlib.import_module(f"tinypedal.widget.{key_name}")
+        except ImportError:
+            logger.debug("No preview for %s (module not found)", key_name)
+            return None
 
-    def schedule_refresh(self, current_values: dict):
-        """Schedule a preview rebuild, or fast-toggle visibility for show_* changes"""
+    def _setup_ui(self):
+        title = QLabel("Preview")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet(
+            "background-color: palette(dark);"
+            "color: palette(bright-text);"
+            "border-bottom: 2px solid palette(mid);"
+            "padding: 4px;"
+            "font-weight: bold;"
+        )
+        self._inner_widget = QWidget()
+        self._inner_layout = QVBoxLayout(self._inner_widget)
+        self._inner_layout.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        self._inner_layout.setContentsMargins(8, 8, 8, 8)
+        scroll = QScrollArea()
+        scroll.setWidget(self._inner_widget)
+        scroll.setWidgetResizable(True)
+        layout = QVBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(title)
+        layout.addWidget(scroll)
+
+    def schedule_refresh(self, current_values):
+        """Schedule preview refresh, fast-path for show_* changes only"""
         self._pending_values = current_values.copy()
+        if not self._active_widget or not self._element_map or not self._last_applied_values:
+            self._debounce_timer.start(self._DEBOUNCE_MS)
+            return
+        changed_keys = {
+            k for k, v in current_values.items()
+            if self._last_applied_values.get(k) != v
+        }
+        if not changed_keys:
+            return
+        # Fast path: only show_* keys changed
+        if all(k in self._element_map for k in changed_keys):
+            self._apply_show_hide(current_values)
+            self._last_applied_values = current_values.copy()
+        else:
+            self._debounce_timer.start(self._DEBOUNCE_MS)
 
-        if self._active_widget and self._element_map and self._last_applied_values:
-            changed = {
-                k: v for k, v in current_values.items()
-                if self._last_applied_values.get(k) != v
-            }
-            if not changed:
-                return
-            if all(k in self._element_map for k in changed):
-                self._apply_show_hide(current_values)
-                self._last_applied_values = current_values.copy()
-                return
+    def cleanup(self):
+        """Stop timers and remove active widget"""
+        self._debounce_timer.stop()
+        self._remove_active_widget()
 
-        self._debounce.start(self._DEBOUNCE_MS)
-
-    def _remove_active(self):
-        """Stop and remove the currently active preview widget"""
+    def _remove_active_widget(self):
         if self._active_widget is None:
             return
-        self._active_widget._update_timer.stop()
+        if hasattr(self._active_widget, "_update_timer"):
+            self._active_widget._update_timer.stop()
         self._active_widget.hide()
         self._inner_layout.removeWidget(self._active_widget)
         self._active_widget.deleteLater()
         self._active_widget = None
-        self._element_map = {}
-        self._last_applied_values = {}
+        self._element_map.clear()
+        self._last_applied_values.clear()
 
-    def _rebuild(self):
-        """Rebuild preview widget with current pending values"""
-        self._remove_active()
-        if not self._available:
-            return
-
-        # Apply pending (unsaved) values to a deep copy of the settings
-        original = cfg.user.setting[self._key_name]
-        patched = copy.deepcopy(original)
-        for key, value in self._pending_values.items():
-            if key in patched:
-                patched[key] = value
-
-        # Force all show_* settings to True (where they have a matching
-        # column_index_*) so every element is created.  We hide the ones
-        # the user toggled off *after* widget construction.
-        forced_show = {}
-        for key in patched:
-            if key.startswith("show_"):
-                col_key = f"column_index_{key[5:]}"
-                if col_key in patched and not patched[key]:
-                    forced_show[key] = False
-                    patched[key] = True
-
-        # Temporarily swap in patched settings so the widget reads them at init
-        cfg.user.setting[self._key_name] = patched
+    def _create_widget_instance(self, config):
         try:
-            widget = self._module.Realtime(cfg, self._key_name)
+            return self._module.Realtime(cfg, self._key_name)
         except Exception:
-            logger.error("Preview rebuild failed for %s", self._key_name, exc_info=True)
-            cfg.user.setting[self._key_name] = original
-            return
-        cfg.user.setting[self._key_name] = original
+            logger.error("Preview creation failed for %s", self._key_name, exc_info=True)
+            return None
 
-        # Embed as plain child widget, strip overlay window flags.
-        # move(0, 0) resets the screen-coordinate position stored by Base.__init__
-        # so the widget starts at a visible location before the layout repositions it.
-        widget.setParent(self._inner)
+    def _prepare_widget(self, widget, config):
+        """Set up widget for embedded preview display"""
+        widget.setParent(self._inner_widget)
         widget.setWindowFlags(Qt.Widget)
         widget.setAttribute(Qt.WA_TranslucentBackground, False)
         widget.move(0, 0)
-
-        # Start timer directly - bypassing start() which would connect global
-        # overlay signals and briefly show the widget as a floating overlay
-        widget._update_timer.start(widget._update_interval, widget)
-
-        # Populate elements with real data before showing so placeholders
-        # like "BATTERY" are replaced immediately.
+        if hasattr(widget, "_update_timer") and hasattr(widget, "_update_interval"):
+            widget._update_timer.start(widget._update_interval, widget)
         try:
             widget.timerEvent(None)
         except Exception:
-            pass
+            logger.debug("timerEvent failed in preview for %s", self._key_name, exc_info=True)
 
-        # Build the element map and apply visibility BEFORE showing
-        # to prevent a flash of hidden elements.
-        self._active_widget = widget
+    def _rebuild(self):
+        """Rebuild preview with current pending values"""
+        self._remove_active_widget()
+        if not self._available:
+            return
+        original = cfg.user.setting.get(self._key_name, {})
+        patched = self._patch_config(original, self._pending_values)
+        forced_show, patched = self._force_show_settings(patched)
+        # Temporarily replace config for widget init
+        cfg.user.setting[self._key_name] = patched
+        try:
+            widget = self._create_widget_instance(patched)
+        finally:
+            cfg.user.setting[self._key_name] = original
+        if widget is None:
+            return
+        self._prepare_widget(widget, patched)
         self._element_map = self._build_element_map(widget, patched)
-        # Use pending_values if available, otherwise fall back to the original
-        # config so the very first schedule_refresh can detect real changes.
-        if self._pending_values:
-            self._last_applied_values = self._pending_values.copy()
-        else:
-            self._last_applied_values = dict(original)
-        if self._element_map and forced_show:
+        self._last_applied_values = (
+            self._pending_values.copy() if self._pending_values else original.copy()
+        )
+        if forced_show and self._element_map:
             self._apply_show_hide(self._pending_values)
-
         self._inner_layout.insertWidget(0, widget)
         widget.show()
+        self._active_widget = widget
+
+    def _patch_config(self, original, pending):
+        patched = copy.deepcopy(original)
+        for key, value in pending.items():
+            if key in patched:
+                patched[key] = value
+        return patched
+
+    def _force_show_settings(self, config):
+        """Force all show_* to True, return dict of originally-False ones"""
+        forced = {}
+        modified = config.copy()
+        for key in config:
+            if key.startswith("show_"):
+                col_key = f"column_index_{key[5:]}"
+                if col_key in config and not config[key]:
+                    forced[key] = False
+                    modified[key] = True
+        return forced, modified
 
     def _build_element_map(self, widget, config):
-        """Map show_* keys to their QWidget elements in the grid layout.
-
-        Returns a dict of {show_key: (QWidget, original_column_index)}.
-        Returns empty dict if the widget doesn't use a simple QGridLayout.
-        """
+        """Map show_* keys to (widget, column_index) for fast show/hide"""
         layout = widget.layout()
         if not isinstance(layout, QGridLayout):
             return {}
-
         is_vertical = config.get("layout", 0) == 0
-
-        # Map grid positions to widgets
         pos_to_widget = {}
         for i in range(layout.count()):
             item = layout.itemAt(i)
             if item and item.widget():
                 row, col, _, _ = layout.getItemPosition(i)
                 pos_to_widget[(row, col)] = item.widget()
-
         element_map = {}
         for key in config:
             if not key.startswith("show_"):
@@ -231,25 +213,20 @@ class WidgetPreview(QFrame):
             w = pos_to_widget.get(pos)
             if w:
                 element_map[key] = (w, col_idx)
-
         return element_map
 
     def _apply_show_hide(self, values):
-        """Toggle visibility of mapped elements and relayout to avoid gaps"""
+        """Update element visibility without full rebuild"""
         if not self._element_map or not self._active_widget:
             return
-
         layout = self._active_widget.layout()
         if not isinstance(layout, QGridLayout):
             return
-
         is_vertical = self._active_widget.wcfg.get("layout", 0) == 0
-
-        # Remove all mapped elements from the grid
-        for _show_key, (widget, _col_idx) in self._element_map.items():
+        # Remove all mapped elements
+        for _, (widget, _) in self._element_map.items():
             layout.removeWidget(widget)
-
-        # Separate into visible / hidden, each sorted by column_index
+        # Sort into visible and hidden
         visible = []
         hidden = []
         for show_key, (widget, col_idx) in self._element_map.items():
@@ -257,34 +234,21 @@ class WidgetPreview(QFrame):
                 visible.append((col_idx, widget))
             else:
                 hidden.append((col_idx, widget))
-
         visible.sort(key=lambda x: x[0])
         hidden.sort(key=lambda x: x[0])
-
-        # Re-add: visible elements first (in order), hidden elements at the end
+        # Re-add in order
         idx = 0
-        for _col_idx, widget in visible:
+        for _, widget in visible:
             widget.setVisible(True)
             if is_vertical:
                 layout.addWidget(widget, idx, 0)
             else:
                 layout.addWidget(widget, 0, idx)
             idx += 1
-
-        for _col_idx, widget in hidden:
+        for _, widget in hidden:
             widget.setVisible(False)
             if is_vertical:
                 layout.addWidget(widget, idx, 0)
             else:
                 layout.addWidget(widget, 0, idx)
             idx += 1
-
-    def cleanup(self):
-        """Stop all timers and remove active widget; call before parent dialog closes"""
-        self._debounce.stop()
-        self._remove_active()
-
-    def closeEvent(self, event):
-        """Clean up on close (only fires when used as a top-level window)"""
-        self.cleanup()
-        super().closeEvent(event)
