@@ -121,6 +121,7 @@ class LayoutBuilder:
         layout = QHBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(2)
+        layout.addStretch(1)
         for w in widgets:
             layout.addWidget(w)
         layout.addStretch(1)

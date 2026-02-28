@@ -1,6 +1,8 @@
 from PySide2.QtCore import Qt, Signal
 from PySide2.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QWidget
 
+DEFAULT_ROW_HEIGHT = 24
+
 
 class OptionTable(QWidget):
     """
@@ -11,13 +13,17 @@ class OptionTable(QWidget):
 
     rowClicked = Signal(str)  # emits the key of the clicked row
 
-    def __init__(self, parent=None, columns=1):
+    def __init__(self, parent=None, columns=1, row_height=DEFAULT_ROW_HEIGHT):
         super().__init__(parent)
         self._columns = columns
+        self._row_height = row_height
         self._keys = []  # keys in order of addition
         self._row_widgets = {}  # key -> row widget
         self._row_labels = {}   # key -> label widget
         self._title_label = None
+
+        self._extra_rows = 0  # non-key rows (section headers)
+        self._section_headers = []  # section header labels
 
         self._layout = QGridLayout(self)
         self._layout.setAlignment(Qt.AlignTop)
@@ -41,6 +47,23 @@ class OptionTable(QWidget):
         else:
             self._title_label.setText(f"<b>{title}</b>")
 
+    def add_section_header(self, title: str):
+        """Add a section sub-header spanning all columns."""
+        row_index = len(self._keys) + self._extra_rows
+        if self._title_label is not None:
+            row_index += 1
+        grid_row = row_index // self._columns
+
+        label = QLabel(f"<b>{title}</b>")
+        font = label.font()
+        font.setPointSize(font.pointSize() + 1)
+        label.setFont(font)
+        label.setStyleSheet(self._TITLE_STYLE_NORMAL)
+
+        self._layout.addWidget(label, grid_row, 0, 1, self._columns * 2)
+        self._section_headers.append(label)
+        self._extra_rows += 1
+
     def add_row(self, key: str, label_text: str, editor: QWidget):
         """
         Add a new row to the table.
@@ -48,7 +71,7 @@ class OptionTable(QWidget):
         - label_text: text for the label
         - editor: the editor widget (QCheckBox, QComboBox, QLineEdit, etc.)
         """
-        row_index = len(self._keys)
+        row_index = len(self._keys) + self._extra_rows
         if self._title_label is not None:
             row_index += 1  # title occupies row 0
 
@@ -56,6 +79,7 @@ class OptionTable(QWidget):
         grid_row = row_index // self._columns
 
         row_widget = QWidget()
+        row_widget.setFixedHeight(self._row_height)
         bg = "palette(alternate-base)" if (grid_row % 2 == 0) else "palette(base)"
         row_widget.setStyleSheet(f"background-color: {bg};")
         row_widget.setProperty("_base_bg", bg)
@@ -110,12 +134,15 @@ class OptionTable(QWidget):
         self._keys.clear()
         self._row_widgets.clear()
         self._row_labels.clear()
+        self._section_headers.clear()
+        self._extra_rows = 0
         if self._title_label is not None:
             self._layout.addWidget(self._title_label, 0, 0, 1, self._columns * 2)
 
     def estimated_rows(self) -> int:
-        """Estimated number of rows (including title) for layout distribution."""
-        rows = len(self._keys) // self._columns + (1 if len(self._keys) % self._columns else 0)
+        """Estimated number of rows (including title and section headers) for layout distribution."""
+        total = len(self._keys) + self._extra_rows
+        rows = total // self._columns + (1 if total % self._columns else 0)
         if self._title_label is not None:
             rows += 1
         return rows

@@ -55,6 +55,9 @@ from .helpers.config_grouper import ConfigGrouper
 from .helpers.layout_builder import LayoutBuilder
 
 
+ROW_HEIGHT = UIScaler.size(1.8)
+
+
 def set_preset_name(cfg_type: str):
     """Set preset name"""
     if cfg_type == ConfigType.CONFIG:
@@ -115,6 +118,7 @@ class UserConfig(BaseDialog):
             general_table = None
             column_index_widgets = []
             self.section_widgets = []
+            sections_to_merge = []
 
             for title, sec_keys in sections:
                 if all(k.startswith("column_index_") for k in sec_keys):
@@ -123,9 +127,10 @@ class UserConfig(BaseDialog):
                 elif title == "" and general_table is None:
                     general_table = self._build_table(title, sec_keys, columns=2)
                 else:
-                    table = self._build_table(title, sec_keys, columns=1)
-                    table.setProperty("section_keys", sec_keys)
-                    self.section_widgets.append(table)
+                    sections_to_merge.append((title, sec_keys))
+
+            # Bin-pack sections into merged tables (max 24 rows each)
+            self._pack_sections(sections_to_merge)
 
             self._sort_section_widgets()
 
@@ -169,7 +174,7 @@ class UserConfig(BaseDialog):
             # Row 4: option tables (scrollable, columns or compact stack)
             builder.add_columns_zone(
                 self.section_widgets, max_columns=5,
-                compact_threshold=5, scrollable=True, name='content',
+                compact_threshold=1, scrollable=True, name='content',
             )
             self._columns_zone = builder.named_zones.get('content')
 
@@ -185,10 +190,11 @@ class UserConfig(BaseDialog):
 
             outer = QVBoxLayout()
             outer.setContentsMargins(0, 0, 0, 0)
+            outer.setAlignment(Qt.AlignHCenter)
             outer.addWidget(main_widget)
             self.setLayout(outer)
 
-            # Window sizing: max 85% of screen
+            # Window sizing: max 85% of screen width for content
             try:
                 avail = self.screen().availableGeometry()
                 max_w = int(avail.width() * 0.85)
@@ -196,6 +202,7 @@ class UserConfig(BaseDialog):
             except AttributeError:
                 max_w = 1400
                 max_h = 800
+            main_widget.setMaximumWidth(max_w)
             self.setMinimumWidth(min(self.sizeHint().width() + UIScaler.size(2), max_w))
             self.adjustSize()
             new_w = min(self.width(), max_w)
@@ -212,7 +219,7 @@ class UserConfig(BaseDialog):
     # ------------------------------------------------------------------
     def _build_table(self, title, keys, columns=1):
         """Build an OptionTable from config keys."""
-        table = OptionTable(parent=self, columns=columns)
+        table = OptionTable(parent=self, columns=columns, row_height=ROW_HEIGHT)
         if title is not None:
             display = format_option_name(self.key_name) if title == "" else format_option_name(title)
             table.set_title(display)
@@ -223,7 +230,7 @@ class UserConfig(BaseDialog):
                 self.default_setting[self.key_name][key],
                 self._update_current_value,
             )
-            editor.setFixedHeight(22)
+            editor.setFixedHeight(ROW_HEIGHT)
             editor.setFixedWidth(self._option_width)
             table.add_row(key, format_option_name(key), editor)
             self._editors[key] = editor
@@ -270,7 +277,7 @@ class UserConfig(BaseDialog):
         list_widget = DragDropOrderList(
             items=items,
             on_reorder_callback=on_reorder,
-            row_height=26,
+            row_height=ROW_HEIGHT,
             parent=self,
         )
         list_widget.sectionClicked.connect(self.highlight_section)
@@ -284,6 +291,62 @@ class UserConfig(BaseDialog):
         container = QWidget()
         container.setLayout(layout)
         return container
+
+    # ------------------------------------------------------------------
+    # Section packing
+    # ------------------------------------------------------------------
+    MAX_TABLE_ROWS = 12
+    MIN_REMAINING = 4
+
+    def _pack_sections(self, sections_data):
+        """Bin-pack sections into merged tables."""
+        current_rows = 0
+        current_sections = []
+
+        for title, sec_keys in sections_data:
+            section_size = len(sec_keys) + 1  # keys + header
+            remaining = self.MAX_TABLE_ROWS - current_rows
+
+            if current_sections and (
+                remaining < self.MIN_REMAINING
+                or current_rows + section_size > self.MAX_TABLE_ROWS
+            ):
+                self.section_widgets.append(
+                    self._build_merged_table(current_sections)
+                )
+                current_sections = []
+                current_rows = 0
+
+            current_sections.append((title, sec_keys))
+            current_rows += section_size
+
+        if current_sections:
+            self.section_widgets.append(
+                self._build_merged_table(current_sections)
+            )
+
+    def _build_merged_table(self, sections_data):
+        """Build an OptionTable containing one or more sections."""
+        table = OptionTable(parent=self, columns=1, row_height=ROW_HEIGHT)
+        all_keys = []
+
+        for title, sec_keys in sections_data:
+            table.add_section_header(format_option_name(title))
+            for key in sec_keys:
+                editor = create_editor(
+                    self, key, self._current_values[key],
+                    self.default_setting[self.key_name][key],
+                    self._update_current_value,
+                )
+                editor.setFixedHeight(ROW_HEIGHT)
+                editor.setFixedWidth(self._option_width)
+                table.add_row(key, format_option_name(key), editor)
+                self._editors[key] = editor
+            all_keys.extend(sec_keys)
+
+        table.setProperty("section_keys", all_keys)
+        self._all_tables.append(table)
+        return table
 
     # ------------------------------------------------------------------
     # Section sorting by column_index
