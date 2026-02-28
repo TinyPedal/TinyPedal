@@ -6,9 +6,9 @@ DEFAULT_ROW_HEIGHT = 24
 
 
 class DragHandle(QLabel):
-    """Hendel waarmee de rij versleept kan worden."""
+    """Handle used to drag a row."""
     def __init__(self, parent=None):
-        super().__init__(" ⋮⋮ ", parent)  # unicode grijper symbool
+        super().__init__(" ⋮⋮ ", parent)
         self.setAlignment(Qt.AlignCenter)
         self.setFixedWidth(20)
         self.setStyleSheet("background-color: palette(mid); color: palette(text);")
@@ -28,7 +28,7 @@ class DragHandle(QLabel):
 
 
 class OrderRow(QWidget):
-    """Eén rij in de lijst: nummer (statisch), tekst (klikbaar voor highlight), hendel (sleepbaar)."""
+    """Single row: number (static), text (clickable for highlight), handle (draggable)."""
     def __init__(self, key: str, label: str, row_height: int, parent=None):
         super().__init__(parent)
         self.key = key
@@ -40,32 +40,31 @@ class OrderRow(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        # Nummerlabel – klikbaar
+        # Number label
         self.number_label = QLabel()
         self.number_label.setAlignment(Qt.AlignCenter)
         self.number_label.setFixedWidth(row_height)
         self.number_label.setContentsMargins(0, 0, 0, 0)
-        self.number_label.setCursor(Qt.PointingHandCursor)  # handje
+        self.number_label.setCursor(Qt.PointingHandCursor)
         self.number_label.setStyleSheet("""
             QLabel:hover {
-                background-color: rgba(0, 120, 215, 0.2);  /* lichte blauwe hover */
+                background-color: rgba(0, 120, 215, 0.2);
             }
         """)
 
-        # Tekstlabel – klikbaar
+        # Text label
         self.text_label = QLabel(label)
         self.text_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.text_label.setIndent(5)
         self.text_label.setFixedHeight(row_height)
         self.text_label.setContentsMargins(0, 0, 0, 0)
-        self.text_label.setCursor(Qt.PointingHandCursor)   # handje
+        self.text_label.setCursor(Qt.PointingHandCursor)
         self.text_label.setStyleSheet("""
             QLabel:hover {
                 background-color: rgba(0, 120, 215, 0.2);
             }
         """)
 
-        # Hendel – sleepbaar
         self.drag_handle = DragHandle(self)
         self.drag_handle.setFixedHeight(row_height)
 
@@ -78,15 +77,15 @@ class OrderRow(QWidget):
         self.number_label.setText(str(number))
 
 class DragDropOrderList(QWidget):
-    """Container met drag & drop lijst. Emit sectionClicked(key) bij klik op tekst/nummer."""
-    sectionClicked = Signal(str)  # geeft de key van de aangeklikte rij
+    """Container with drag & drop list. Emits sectionClicked(key) on text/number click."""
+    sectionClicked = Signal(str)  # emits the key of the clicked row
 
     def __init__(self, items: list[tuple[str, str]], on_reorder_callback,
                  row_height: int = DEFAULT_ROW_HEIGHT, parent=None):
         super().__init__(parent)
         self._callback = on_reorder_callback
         self._row_height = row_height
-        self._all_items = items[:]  # bewaar voor reset
+        self._all_items = items[:]  # keep for reset
         self.setAcceptDrops(True)
 
         self.drop_indicator = QFrame()
@@ -207,32 +206,29 @@ class DragDropOrderList(QWidget):
                     keys.append(w.key)
             self._callback(keys)
 
-    def set_dimmed_keys(self, keys_to_dim: set):
-        """Dim de rijen waarvan de key in keys_to_dim zit."""
+    def apply_filter(self, text: str):
+        """Dim rows that don't match the filter text."""
         for i in range(self.layout.count()):
             w = self.layout.itemAt(i).widget()
             if isinstance(w, OrderRow):
-                if w.key in keys_to_dim:
-                    w.setStyleSheet("background-color: palette(window);")
-                    w.number_label.setStyleSheet("color: palette(mid);")
-                    w.text_label.setStyleSheet("color: palette(mid);")
-                else:
+                if not text or text in w.key.lower():
                     bg = "palette(alternate-base)" if i % 2 == 0 else "palette(base)"
                     w.setStyleSheet(f"background-color: {bg};")
                     w.number_label.setStyleSheet("")
                     w.text_label.setStyleSheet("")
+                else:
+                    w.setStyleSheet("background-color: palette(window);")
+                    w.number_label.setStyleSheet("color: palette(mid);")
+                    w.text_label.setStyleSheet("color: palette(mid);")
 
     def reset_to_defaults(self, default_values: dict):
-        """Reset de volgorde naar de standaardwaarden."""
-        # Sorteer de opgeslagen items op basis van default_values
+        """Reset the order to default values."""
         sorted_items = sorted(self._all_items, key=lambda item: default_values.get(item[0], 999))
-        # Verwijder alle bestaande rijen
         for i in reversed(range(self.layout.count())):
             w = self.layout.itemAt(i).widget()
             if isinstance(w, OrderRow):
                 w.setParent(None)
                 w.deleteLater()
-        # Voeg opnieuw toe in de juiste volgorde
         for key, label in sorted_items:
             self._add_row(key, label)
         self._update_row_numbers()
