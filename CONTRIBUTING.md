@@ -2,19 +2,17 @@
 
 Thank you for your interests on **TinyPedal** project, any contribution is welcome and appreciated.
 
+Before requesting features or reporting issues, make sure to read [Frequently Asked Questions](https://github.com/TinyPedal/TinyPedal/wiki/Frequently-Asked-Questions) and [User Guide](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide) for existing issues to avoid duplicates. You can also use [github search](https://github.com/search?q=repo%3ATinyPedal%2FTinyPedal&type=issues) to quickly search for related issue.
+
 ## Requesting Features
 
 For requesting features, please open [Issues](/TinyPedal/TinyPedal/issues).
 
-Before opening new issue, make sure to read [[Frequently Asked Questions]] and [[User Guide]] for existing issues to avoid duplicates. You can also use [github search](https://github.com/search?q=repo%3ATinyPedal%2FTinyPedal&type=issues).
-
-Please note that, we work on this project purely as a hobby and labour of love. We'd love to bring more features whenever possible, but this is not a job and there is no promise or obligation to fulfill every request.
+Please note that, we work on this project purely as a hobby and labour of love. We'd love to bring more features whenever possible, but there is no promise or obligation to fulfill every request.
 
 ## Reporting Issues
 
 For reporting issues, please open [Issues](/TinyPedal/TinyPedal/issues).
-
-Before opening new issue, make sure to read [[Frequently Asked Questions]] and [[User Guide]] for existing issues to avoid duplicates. You can also use [github search](https://github.com/search?q=repo%3ATinyPedal%2FTinyPedal&type=issues).
 
 When reporting issues, please be specific and provide as much detail as possible.
 
@@ -26,7 +24,7 @@ For implementing features or fixing bugs, please open [Pull Requests](/TinyPedal
 
 Please note that, not every Pull Requests may be accepted, as we will see what fits the best for the project.
 
-**Notes about AI code and usage:**
+### Notes about AI code and usage
 
 The primary focus of TinyPedal project is simplicity and efficiency. We write and review every line of code by hands without any direct AI intervention. This helps to keep the code base simple, efficient, comprehensible and maintainable.
 

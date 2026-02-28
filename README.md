@@ -215,6 +215,10 @@ The installed launcher and desktop entry will read this file automatically. This
 - Widgets don't appear over the game window in KDE. Workaround: enable `Bypass Window Manager` option in `Compatibility` dialog from `Config` menu in main window.
 - Transparency of widgets doesn't work when desktop compositing is disabled. Workaround: enable `window manager compositing` in your Desktop Environment.
 
+## Contributing
+
+Please follow [Contributing Guidelines](CONTRIBUTING.md) for how to report issue, request feature, or contribute code.
+
 ## License
 
 Copyright (C) 2022-2026 TinyPedal developers
