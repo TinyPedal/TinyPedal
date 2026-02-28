@@ -1,20 +1,18 @@
-"""Drag-and-drop reorderable list widget for display order settings"""
-
-from PySide2.QtCore import Qt, QMimeData
-from PySide2.QtGui import QDrag, QPixmap
+from PySide2.QtCore import Qt, QMimeData, QEvent, Signal
+from PySide2.QtGui import QDrag, QPixmap, QMouseEvent
 from PySide2.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame
 
 DEFAULT_ROW_HEIGHT = 24
 
 
-class DraggableLabel(QLabel):
-    """Label that initiates a drag operation on mouse move"""
-
-    def __init__(self, key: str, text: str, parent=None):
-        super().__init__(text, parent)
-        self.key = key
-        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.setIndent(5)
+class DragHandle(QLabel):
+    """Hendel waarmee de rij versleept kan worden."""
+    def __init__(self, parent=None):
+        super().__init__(" ⋮⋮ ", parent)  # unicode grijper symbool
+        self.setAlignment(Qt.AlignCenter)
+        self.setFixedWidth(20)
+        self.setStyleSheet("background-color: palette(mid); color: palette(text);")
+        self.setCursor(Qt.OpenHandCursor)
 
     def mouseMoveEvent(self, e):
         if e.buttons() == Qt.LeftButton:
@@ -30,11 +28,11 @@ class DraggableLabel(QLabel):
 
 
 class OrderRow(QWidget):
-    """Single row: static number label + draggable text label"""
-
+    """Eén rij in de lijst: nummer (statisch), tekst (klikbaar voor highlight), hendel (sleepbaar)."""
     def __init__(self, key: str, label: str, row_height: int, parent=None):
         super().__init__(parent)
         self.key = key
+        self.label = label
         self.setFixedHeight(row_height)
         self.setContentsMargins(0, 0, 0, 0)
 
@@ -42,59 +40,64 @@ class OrderRow(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        # Number (static, square)
+        # Nummerlabel – klikbaar
         self.number_label = QLabel()
         self.number_label.setAlignment(Qt.AlignCenter)
         self.number_label.setFixedWidth(row_height)
         self.number_label.setContentsMargins(0, 0, 0, 0)
+        self.number_label.setCursor(Qt.PointingHandCursor)  # handje
+        self.number_label.setStyleSheet("""
+            QLabel:hover {
+                background-color: rgba(0, 120, 215, 0.2);  /* lichte blauwe hover */
+            }
+        """)
 
-        # Draggable label (shows the text)
-        self.drag_label = DraggableLabel(key, label, self)
-        self.drag_label.setFixedHeight(row_height)
-        self.drag_label.setContentsMargins(0, 0, 0, 0)
+        # Tekstlabel – klikbaar
+        self.text_label = QLabel(label)
+        self.text_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.text_label.setIndent(5)
+        self.text_label.setFixedHeight(row_height)
+        self.text_label.setContentsMargins(0, 0, 0, 0)
+        self.text_label.setCursor(Qt.PointingHandCursor)   # handje
+        self.text_label.setStyleSheet("""
+            QLabel:hover {
+                background-color: rgba(0, 120, 215, 0.2);
+            }
+        """)
+
+        # Hendel – sleepbaar
+        self.drag_handle = DragHandle(self)
+        self.drag_handle.setFixedHeight(row_height)
 
         layout.addWidget(self.number_label)
-        layout.addWidget(self.drag_label, 1)
+        layout.addWidget(self.text_label, 1)
+        layout.addWidget(self.drag_handle)
         self.setLayout(layout)
 
     def set_number(self, number: int):
-        """Set the row number displayed on the left"""
         self.number_label.setText(str(number))
 
-
 class DragDropOrderList(QWidget):
-    """Container that handles drag-and-drop reordering and fires a callback"""
+    """Container met drag & drop lijst. Emit sectionClicked(key) bij klik op tekst/nummer."""
+    sectionClicked = Signal(str)  # geeft de key van de aangeklikte rij
 
     def __init__(self, items: list[tuple[str, str]], on_reorder_callback,
                  row_height: int = DEFAULT_ROW_HEIGHT, parent=None):
-        """
-        Parameters
-        ----------
-        items : list of (key, label) tuples
-        on_reorder_callback : callable receiving a list of keys
-        row_height : fixed height per row (pixels)
-        """
         super().__init__(parent)
-
         self._callback = on_reorder_callback
         self._row_height = row_height
-        self._dimmed_keys: set[str] = set()
+        self._all_items = items[:]  # bewaar voor reset
         self.setAcceptDrops(True)
 
-        # Drop indicator line (shown between rows during drag)
-        self._drop_indicator = QFrame(self)
-        self._drop_indicator.setFixedHeight(2)
-        self._drop_indicator.setStyleSheet("background-color: palette(highlight);")
-        self._drop_indicator.hide()
+        self.drop_indicator = QFrame()
+        self.drop_indicator.setFixedHeight(2)
+        self.drop_indicator.setStyleSheet("background-color: blue;")
+        self.drop_indicator.hide()
 
-        # Rows whose number labels are currently highlighted during drag
-        self._highlighted_rows: list[OrderRow] = []
-
-        # Main layout
-        box = QVBoxLayout()
-        box.setSpacing(0)
-        box.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(box)
+        self.layout = QVBoxLayout()
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.layout)
 
         for key, label in items:
             self._add_row(key, label)
@@ -102,190 +105,135 @@ class DragDropOrderList(QWidget):
         self._update_row_numbers()
         self._update_row_colors()
 
-    # ------------------------------------------------------------------
-    #  Row helpers
-    # ------------------------------------------------------------------
-
     def _add_row(self, key: str, label: str):
-        """Append a new row at the end"""
         row = OrderRow(key, label, self._row_height, self)
-        self.layout().addWidget(row)
+        self.layout.addWidget(row)
+        row.number_label.installEventFilter(self)
+        row.text_label.installEventFilter(self)
 
-    def _find_insert_index(self, pos):
-        """Return layout index where a row should be inserted for *pos*"""
-        box = self.layout()
-        n = 0
-        while n < box.count():
-            w = box.itemAt(n).widget()
-            if w is not None and pos.y() < w.y() + w.height() // 2:
-                break
-            n += 1
-        return n
-
-    # ------------------------------------------------------------------
-    #  Drag-and-drop events
-    # ------------------------------------------------------------------
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.MouseButtonPress:
+            mouse_event = QMouseEvent(event)
+            if mouse_event.button() == Qt.LeftButton:
+                parent_row = obj.parent()
+                if isinstance(parent_row, OrderRow):
+                    self.sectionClicked.emit(parent_row.key)
+        return super().eventFilter(obj, event)
 
     def dragEnterEvent(self, e):
-        e.accept()
+        if isinstance(e.source(), DragHandle):
+            e.accept()
+        else:
+            e.ignore()
 
     def dragMoveEvent(self, e):
-        source_label = e.source()
-        if not isinstance(source_label, DraggableLabel):
+        if not isinstance(e.source(), DragHandle):
             e.ignore()
             return
 
-        box = self.layout()
+        if self.drop_indicator.parent() == self:
+            self.layout.removeWidget(self.drop_indicator)
+            self.drop_indicator.hide()
 
-        # Remove indicator if still in the layout
-        if self._drop_indicator.parent() == self:
-            box.removeWidget(self._drop_indicator)
-            self._drop_indicator.hide()
+        pos = e.pos()
+        n = 0
+        while n < self.layout.count():
+            w = self.layout.itemAt(n).widget()
+            if pos.y() < w.y() + w.height() // 2:
+                break
+            n += 1
 
-        # Insert indicator at calculated position
-        n = self._find_insert_index(e.pos())
-        box.insertWidget(n, self._drop_indicator)
-        self._drop_indicator.show()
-
-        # Highlight number labels on adjacent rows
-        self._clear_highlight()
-        for offset in (n - 1, n + 1):
-            if 0 <= offset < box.count():
-                row = box.itemAt(offset).widget()
-                if isinstance(row, OrderRow):
-                    row.number_label.setStyleSheet(
-                        "background-color: palette(highlight);"
-                        "color: palette(highlighted-text);"
-                    )
-                    self._highlighted_rows.append(row)
-
+        self.layout.insertWidget(n, self.drop_indicator)
+        self.drop_indicator.show()
         e.accept()
 
     def dragLeaveEvent(self, e):
-        self._clear_highlight()
-        if self._drop_indicator.parent() == self:
-            self.layout().removeWidget(self._drop_indicator)
-            self._drop_indicator.hide()
+        if self.drop_indicator.parent() == self:
+            self.layout.removeWidget(self.drop_indicator)
+            self.drop_indicator.hide()
         e.accept()
 
     def dropEvent(self, e):
-        source_label = e.source()
-        if not isinstance(source_label, DraggableLabel):
+        source_handle = e.source()
+        if not isinstance(source_handle, DragHandle):
             return
 
-        self._clear_highlight()
+        if self.drop_indicator.parent() == self:
+            self.layout.removeWidget(self.drop_indicator)
+            self.drop_indicator.hide()
 
-        box = self.layout()
-
-        # Remove the drop indicator
-        if self._drop_indicator.parent() == self:
-            box.removeWidget(self._drop_indicator)
-            self._drop_indicator.hide()
-
-        source_row = source_label.parent()
+        source_row = source_handle.parent()
         if not isinstance(source_row, OrderRow):
             return
 
-        # Remove row, calculate new position, re-insert
-        box.removeWidget(source_row)
-        n = self._find_insert_index(e.pos())
-        box.insertWidget(n, source_row)
+        self.layout.removeWidget(source_row)
+
+        pos = e.pos()
+        n = 0
+        while n < self.layout.count():
+            w = self.layout.itemAt(n).widget()
+            if pos.y() < w.y() + w.height() // 2:
+                break
+            n += 1
+
+        self.layout.insertWidget(n, source_row)
         e.accept()
 
         self._update_row_numbers()
         self._update_row_colors()
         self._emit_reorder()
 
-    # ------------------------------------------------------------------
-    #  Visual updates
-    # ------------------------------------------------------------------
-
-    def _clear_highlight(self):
-        """Remove highlight styling from any previously highlighted number labels"""
-        for row in self._highlighted_rows:
-            row.number_label.setStyleSheet("")
-        self._highlighted_rows.clear()
-
     def _update_row_numbers(self):
-        """Set row numbers (1-based) according to current order"""
-        num = 1
-        box = self.layout()
-        for i in range(box.count()):
-            row = box.itemAt(i).widget()
-            if isinstance(row, OrderRow):
-                row.set_number(num)
-                num += 1
+        for i in range(self.layout.count()):
+            w = self.layout.itemAt(i).widget()
+            if isinstance(w, OrderRow):
+                w.set_number(i + 1)
 
     def _update_row_colors(self):
-        """Apply alternating row background colors, with dimming for filtered rows"""
-        num = 0
-        box = self.layout()
-        for i in range(box.count()):
-            row = box.itemAt(i).widget()
-            if isinstance(row, OrderRow):
-                if row.key in self._dimmed_keys:
-                    row.setStyleSheet("background-color: palette(window);")
-                    row.drag_label.setStyleSheet("color: palette(mid);")
-                    row.number_label.setStyleSheet("color: palette(mid);")
+        for i in range(self.layout.count()):
+            w = self.layout.itemAt(i).widget()
+            if isinstance(w, OrderRow):
+                if i % 2 == 0:
+                    w.setStyleSheet("background-color: palette(alternate-base);")
                 else:
-                    if num % 2 == 0:
-                        row.setStyleSheet("background-color: palette(alternate-base);")
-                    else:
-                        row.setStyleSheet("background-color: palette(base);")
-                    row.drag_label.setStyleSheet("")
-                    row.number_label.setStyleSheet("")
-                num += 1
+                    w.setStyleSheet("background-color: palette(base);")
 
     def _emit_reorder(self):
-        """Collect current key order and invoke the callback"""
         if self._callback:
             keys = []
-            box = self.layout()
-            for i in range(box.count()):
-                row = box.itemAt(i).widget()
-                if isinstance(row, OrderRow):
-                    keys.append(row.key)
+            for i in range(self.layout.count()):
+                w = self.layout.itemAt(i).widget()
+                if isinstance(w, OrderRow):
+                    keys.append(w.key)
             self._callback(keys)
 
-    # ------------------------------------------------------------------
-    #  Public API
-    # ------------------------------------------------------------------
-
-    def get_key_order(self):
-        """Return the current list of keys in display order"""
-        keys = []
-        box = self.layout()
-        for i in range(box.count()):
-            row = box.itemAt(i).widget()
-            if isinstance(row, OrderRow):
-                keys.append(row.key)
-        return keys
-
-    def set_dimmed_keys(self, keys: set[str]):
-        """Update which keys are dimmed and refresh row colors"""
-        self._dimmed_keys = keys
-        self._update_row_colors()
+    def set_dimmed_keys(self, keys_to_dim: set):
+        """Dim de rijen waarvan de key in keys_to_dim zit."""
+        for i in range(self.layout.count()):
+            w = self.layout.itemAt(i).widget()
+            if isinstance(w, OrderRow):
+                if w.key in keys_to_dim:
+                    w.setStyleSheet("background-color: palette(window);")
+                    w.number_label.setStyleSheet("color: palette(mid);")
+                    w.text_label.setStyleSheet("color: palette(mid);")
+                else:
+                    bg = "palette(alternate-base)" if i % 2 == 0 else "palette(base)"
+                    w.setStyleSheet(f"background-color: {bg};")
+                    w.number_label.setStyleSheet("")
+                    w.text_label.setStyleSheet("")
 
     def reset_to_defaults(self, default_values: dict):
-        """Re-sort rows to match *default_values* ordering"""
-        box = self.layout()
-
-        # Collect all OrderRow widgets
-        rows = []
-        for i in range(box.count()):
-            row = box.itemAt(i).widget()
-            if isinstance(row, OrderRow):
-                rows.append(row)
-
-        # Remove from layout (without deleting)
-        for row in rows:
-            box.removeWidget(row)
-
-        # Re-insert sorted by default value
-        rows.sort(key=lambda r: default_values.get(r.key, 999))
-        for row in rows:
-            box.addWidget(row)
-
+        """Reset de volgorde naar de standaardwaarden."""
+        # Sorteer de opgeslagen items op basis van default_values
+        sorted_items = sorted(self._all_items, key=lambda item: default_values.get(item[0], 999))
+        # Verwijder alle bestaande rijen
+        for i in reversed(range(self.layout.count())):
+            w = self.layout.itemAt(i).widget()
+            if isinstance(w, OrderRow):
+                w.setParent(None)
+                w.deleteLater()
+        # Voeg opnieuw toe in de juiste volgorde
+        for key, label in sorted_items:
+            self._add_row(key, label)
         self._update_row_numbers()
         self._update_row_colors()
-        self._emit_reorder()
