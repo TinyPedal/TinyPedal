@@ -16,79 +16,64 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""
-Group configuration keys into labelled sections by word overlap.
-"""
+"""Group config keys into labelled sections by word overlap"""
+
 
 class ConfigGrouper:
-    """Groups configuration keys into labelled sections by word overlap"""
+    """Group keys into sections based on show_* prefixes and word similarity"""
 
-    def __init__(self, min_match: int = 2):
+    def __init__(self, min_match=2):
         self.min_match = min_match
 
-    @staticmethod
-    def _word_set(phrase: str) -> set[str]:
-        """Split underscore-delimited name into word set"""
-        return set(phrase.split("_"))
-
-    def _similar(self, topic1: str, topic2: str) -> bool:
-        """Check if two topics share enough words to belong in one section"""
-        # Direct match if one is a substring of the other
-        if topic1 in topic2 or topic2 in topic1:
+    def _are_topics_similar(self, topic_a, topic_b):
+        """Check if two topics share enough words or are substrings"""
+        if topic_a in topic_b or topic_b in topic_a:
             return True
-        words1 = self._word_set(topic1)
-        words2 = self._word_set(topic2)
-        return len(words1 & words2) >= self.min_match
+        words_a = set(topic_a.split("_"))
+        words_b = set(topic_b.split("_"))
+        return len(words_a & words_b) >= self.min_match
 
-    def group_keys(self, keys: list[str]) -> list[tuple[str | None, list[str]]]:
-        """Group keys into labelled sections, returns list of (title, key_list) tuples"""
-        # Separate column_index_* into its own group
-        fixed_groups: dict[str, list[str]] = {}
-        remaining: list[str] = []
+    def group_keys(self, keys):
+        """Group keys into (title, key_list) sections"""
+        fixed_groups = {}
         for key in keys:
             if key.startswith("column_index_"):
                 fixed_groups.setdefault("Column Index", []).append(key)
-            else:
-                remaining.append(key)
-
-        # Build sections from remaining keys
-        sections: list[tuple[str | None, list[str]]] = []
-        current_title: str | None = None
-        current_keys: list[str] = []
-        last_show: str | None = None
-
+        fixed_set = {k for group in fixed_groups.values() for k in group}
+        remaining = [k for k in keys if k not in fixed_set]
+        # Build dynamic sections from show_* keys
+        sections = []
+        current_title = None
+        current_keys = []
+        last_show_topic = None
         for key in remaining:
             if key.startswith("show_"):
-                topic = key[5:]  # strip 'show_' prefix
-                if last_show is None:
+                topic = key[5:]
+                if current_title is None:
                     current_title = topic
                     current_keys = [key]
-                    last_show = topic
-                elif self._similar(last_show, topic):
+                    last_show_topic = topic
+                elif self._are_topics_similar(last_show_topic, topic):
                     current_keys.append(key)
-                    last_show = topic
+                    last_show_topic = topic
                 else:
                     sections.append((current_title, current_keys))
                     current_title = topic
                     current_keys = [key]
-                    last_show = topic
-            elif current_title is not None:
-                current_keys.append(key)
-
-        # Add last open section
+                    last_show_topic = topic
+            else:
+                if current_title is not None:
+                    current_keys.append(key)
         if current_keys:
             sections.append((current_title, current_keys))
-
-        # Collect keys that appeared before the first show_* key
-        all_assigned: set[str] = set()
+        # Keys before first show_* go into untitled section
+        assigned = set()
         for _, key_list in sections:
-            all_assigned.update(key_list)
-        unassigned = [k for k in remaining if k not in all_assigned]
+            assigned.update(key_list)
+        unassigned = [k for k in remaining if k not in assigned]
         if unassigned:
-            sections.insert(0, ("", unassigned))
-
-        # Append fixed groups
+            sections = [("", unassigned)] + sections
+        # Add fixed groups
         for title, fkeys in fixed_groups.items():
             sections.append((title, fkeys))
-
         return sections
