@@ -105,6 +105,7 @@ class DragDropOrderList(BaseComponent):
         self._original_items = items[:]
         self._items = items[:]
         self._filter_text = ""
+        self._title_widget = None
         self.setAcceptDrops(True)
         # Drop indicator
         self._drop_indicator = QFrame()
@@ -117,11 +118,34 @@ class DragDropOrderList(BaseComponent):
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._rebuild_rows()
 
+    def set_title(self, title):
+        """Add a styled header above the list"""
+        if self._title_widget:
+            self._title_widget.deleteLater()
+        header = QLabel(f"<b>{title}</b>")
+        font = header.font()
+        font.setPointSize(font.pointSize() + 1)
+        header.setFont(font)
+        header.setStyleSheet(
+            "background-color: palette(dark);"
+            "color: palette(bright-text);"
+            "border-bottom: 2px solid palette(mid);"
+            "padding: 4px;"
+        )
+        self._layout.insertWidget(0, header)
+        self._title_widget = header
+
     def _rebuild_rows(self):
+        # Preserve title if any
+        title = self._title_widget
+        if title:
+            self._layout.removeWidget(title)
         while self._layout.count():
             item = self._layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
+        if title:
+            self._layout.addWidget(title)
         for key, label in self._items:
             row = OrderRow(key, label, self._row_height, self)
             row.clicked.connect(lambda k=key: self.itemClicked.emit(k))

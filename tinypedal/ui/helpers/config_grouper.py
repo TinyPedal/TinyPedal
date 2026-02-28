@@ -22,6 +22,10 @@
 class ConfigGrouper:
     """Group keys into sections based on show_* prefixes and word similarity"""
 
+    # Constants for packing
+    MAX_TABLE_ROWS = 12
+    MIN_REMAINING_ROWS = 4
+
     def __init__(self, min_match=2):
         self.min_match = min_match
 
@@ -77,3 +81,83 @@ class ConfigGrouper:
         for title, fkeys in fixed_groups.items():
             sections.append((title, fkeys))
         return sections
+
+    def pack_sections(self, sections_data, max_rows=None, min_remaining=None):
+        """Pack sections into batches that fit in tables of max_rows rows.
+
+        Parameters
+        ----------
+        sections_data : list of (title, keys)
+            Sections to pack.
+        max_rows : int, optional
+            Maximum rows per table. Defaults to class constant.
+        min_remaining : int, optional
+            Minimum remaining rows to start a new table. Defaults to class constant.
+
+        Returns
+        -------
+        list of list of (title, keys)
+            Batches, each suitable for one merged table.
+        """
+        if max_rows is None:
+            max_rows = self.MAX_TABLE_ROWS
+        if min_remaining is None:
+            min_remaining = self.MIN_REMAINING_ROWS
+
+        batches = []
+        current_batch = []
+        current_rows = 0
+
+        for title, sec_keys in sections_data:
+            section_size = len(sec_keys) + 1  # keys + header
+            remaining = max_rows - current_rows
+            if current_batch and (
+                remaining < min_remaining
+                or current_rows + section_size > max_rows
+            ):
+                batches.append(current_batch)
+                current_batch = []
+                current_rows = 0
+            current_batch.append((title, sec_keys))
+            current_rows += section_size
+
+        if current_batch:
+            batches.append(current_batch)
+
+        return batches
+
+    def get_min_column_index(self, widget, current_values):
+        """Return the minimum column_index value among keys in the widget's section_keys property.
+
+        Parameters
+        ----------
+        widget : QWidget
+            Widget that has a property "section_keys" (list of keys).
+        current_values : dict
+            Current values mapping key -> value.
+
+        Returns
+        -------
+        int
+            Minimum index, or a large number if none.
+        """
+        keys = widget.property("section_keys") or []
+        min_idx = 999999
+        for key in keys:
+            if key.startswith("column_index_"):
+                val = current_values.get(key, 999999)
+                if isinstance(val, (int, float)):
+                    min_idx = min(min_idx, val)
+        return min_idx
+
+    def sort_widgets_by_column_index(self, widgets, current_values):
+        """Sort a list of widgets in-place by their minimum column index.
+
+        Parameters
+        ----------
+        widgets : list of QWidget
+            Widgets to sort (must have "section_keys" property).
+        current_values : dict
+            Current values mapping key -> value.
+        """
+        widgets.sort(key=lambda w: self.get_min_column_index(w, current_values))

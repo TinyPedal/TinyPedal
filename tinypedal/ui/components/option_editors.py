@@ -30,12 +30,7 @@ def _context_menu_reset(position, parent):
     reset_action = menu.addAction("Reset to Default")
     action = menu.exec_(parent.mapToGlobal(position))
     if action == reset_action:
-        if isinstance(parent, QCheckBox):
-            parent.setChecked(parent.defaults)
-        elif isinstance(parent, QLineEdit):
-            parent.setText(str(parent.defaults))
-        elif isinstance(parent, QComboBox):
-            parent.setCurrentText(str(parent.defaults))
+        parent.reset_to_default()
 
 
 # Editor factory functions
@@ -45,6 +40,7 @@ def _create_checkbox(parent, key, current_val, default_val, update_cb, choices):
     editor.setChecked(bool(current_val))
     editor.stateChanged.connect(lambda state: update_cb(key, bool(state)))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setChecked(editor.defaults)
     add_context_menu(editor)
     return editor
 
@@ -56,6 +52,7 @@ def _create_color_editor(parent, key, current_val, default_val, update_cb, choic
     editor.setText(str(current_val))
     editor.textChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -65,6 +62,7 @@ def _create_path_editor(parent, key, current_val, default_val, update_cb, choice
     editor.setText(str(current_val))
     editor.textChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -74,6 +72,7 @@ def _create_image_editor(parent, key, current_val, default_val, update_cb, choic
     editor.setText(str(current_val))
     editor.textChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -84,6 +83,7 @@ def _create_font_combo(parent, key, current_val, default_val, update_cb, choices
     editor.setCurrentText(str(current_val))
     editor.currentTextChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setCurrentText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -95,6 +95,7 @@ def _create_heatmap_combo(parent, key, current_val, default_val, update_cb, choi
     editor.setCurrentText(str(current_val))
     editor.currentTextChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setCurrentText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -111,6 +112,7 @@ def _create_units_combo(parent, key, current_val, default_val, update_cb, choice
     editor.setCurrentText(str(current_val))
     editor.currentTextChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setCurrentText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -127,6 +129,7 @@ def _create_common_combo(parent, key, current_val, default_val, update_cb, choic
     editor.setCurrentText(str(current_val))
     editor.currentTextChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setCurrentText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -136,6 +139,7 @@ def _create_string_editor(parent, key, current_val, default_val, update_cb, choi
     editor.setText(str(current_val))
     editor.textChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -146,6 +150,7 @@ def _create_integer_editor(parent, key, current_val, default_val, update_cb, cho
     editor.setText(str(current_val))
     editor.textChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
@@ -156,6 +161,7 @@ def _create_float_editor(parent, key, current_val, default_val, update_cb, choic
     editor.setText(str(current_val))
     editor.textChanged.connect(partial(update_cb, key))
     editor.defaults = default_val
+    editor.reset_to_default = lambda: editor.setText(str(editor.defaults))
     add_context_menu(editor)
     return editor
 
