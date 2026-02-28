@@ -23,36 +23,28 @@ Config dialog
 from __future__ import annotations
 
 import logging
-import re
-import time
 from typing import Callable
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
-    QCheckBox,
-    QComboBox,
     QDialogButtonBox,
     QFrame,
     QHBoxLayout,
     QLabel,
-    QLineEdit,
-    QMessageBox,
     QScrollArea,
     QVBoxLayout,
     QWidget,
 )
 
-from .. import regex_pattern as rxp
 from ..const_file import ConfigType
 from ..formatter import format_option_name
 from ..setting import cfg
-from ..userfile import set_relative_path, set_user_data_path
-from ..validator import is_clock_format, is_hex_color, is_string_number
 from ._common import BaseDialog, UIScaler, singleton_dialog
 from .components.drag_drop_list import DragDropOrderList
 from .components.preview import WidgetPreview
 from .components.search_bar import SearchBar
 from .components.section_frame import SectionBuilder
+from .helpers import config_actions
 from .helpers.section_grouper import SectionGrouper
 
 logger = logging.getLogger(__name__)
@@ -432,128 +424,25 @@ class UserConfig(BaseDialog):
     # Actions
     # ------------------------------------------------------------------
     def applying(self):
-        self.save_setting(is_apply=True)
+        config_actions.save_setting(
+            self.original_keys, self._current_values, self.user_setting,
+            self.key_name, self.cfg_type, self.builder.editors,
+            self.reloading, self,
+        )
 
     def saving(self):
-        self.save_setting(is_apply=False)
-
-    def reset_setting(self):
-        msg_text = (
-            f"Reset all <b>{format_option_name(self.key_name)}</b> options to default?<br><br>"
-            "Changes are only saved after clicking Apply or Save Button."
-        )
-        if self.confirm_operation(title="Reset Options", message=msg_text):
-            for key, editor in self.builder.editors.items():
-                default = editor.defaults
-                if isinstance(editor, QCheckBox):
-                    editor.setChecked(default)
-                    self._current_values[key] = default
-                elif isinstance(editor, QLineEdit):
-                    editor.setText(str(default))
-                    self._current_values[key] = default
-                elif isinstance(editor, QComboBox):
-                    editor.setCurrentText(str(default))
-                    self._current_values[key] = default
-
-            seen_column_lists: set = set()
-            for key, lw in self._column_order_widgets.items():
-                if id(lw) not in seen_column_lists:
-                    seen_column_lists.add(id(lw))
-                    all_keys = [k for k, w in self._column_order_widgets.items() if w is lw]
-                    default_vals = {
-                        k: self.default_setting[self.key_name][k] for k in all_keys
-                    }
-                    lw.reset_to_defaults(default_vals)
-
-    def save_setting(self, is_apply: bool):
-        user_setting = self.user_setting[self.key_name]
-        error_found = False
-
-        for key in self.original_keys:
-            value = self._current_values[key]
-
-            if re.search(rxp.CFG_BOOL, key):
-                user_setting[key] = value
-
-            elif re.search(rxp.CFG_COLOR, key):
-                if is_hex_color(value):
-                    user_setting[key] = value
-                else:
-                    self.value_error_message("color", key)
-                    error_found = True
-
-            elif re.search(rxp.CFG_USER_PATH, key):
-                value = set_relative_path(value)
-                if set_user_data_path(value):
-                    user_setting[key] = value
-                    editor = self.builder.editors.get(key)
-                    if editor:
-                        editor.setText(value)
-                        self._current_values[key] = value
-                else:
-                    self.value_error_message("path", key)
-                    error_found = True
-
-            elif re.search(rxp.CFG_USER_IMAGE, key):
-                user_setting[key] = value
-
-            elif re.search(rxp.CFG_FONT_NAME, key) or re.search(rxp.CFG_HEATMAP, key) or \
-                 any(re.search(ref, key) for ref in rxp.CHOICE_UNITS) or \
-                 any(re.search(ref, key) for ref in rxp.CHOICE_COMMON):
-                user_setting[key] = value
-
-            elif re.search(rxp.CFG_CLOCK_FORMAT, key) or re.search(rxp.CFG_STRING, key):
-                if re.search(rxp.CFG_CLOCK_FORMAT, key) and not is_clock_format(value):
-                    self.value_error_message("clock format", key)
-                    error_found = True
-                else:
-                    user_setting[key] = value
-
-            elif re.search(rxp.CFG_INTEGER, key):
-                str_val = str(value)
-                if is_string_number(str_val):
-                    user_setting[key] = int(str_val)
-                else:
-                    self.value_error_message("number", key)
-                    error_found = True
-
-            else:  # float fallback
-                str_val = str(value)
-                if is_string_number(str_val):
-                    num_val = float(str_val)
-                    if num_val % 1 == 0:
-                        num_val = int(num_val)
-                    user_setting[key] = num_val
-                else:
-                    self.value_error_message("number", key)
-                    error_found = True
-
-        for key in self.original_keys:
-            if key.startswith("column_index_"):
-                user_setting[key] = self._current_values[key]
-
-        if error_found:
-            return
-
-        if self.cfg_type == ConfigType.CONFIG:
-            cfg.update_path()
-            cfg.save(0, cfg_type=ConfigType.CONFIG)
-        else:
-            cfg.save(0)
-
-        while cfg.is_saving:
-            time.sleep(0.01)
-
-        self.reloading()
-        if not is_apply:
+        if config_actions.save_setting(
+            self.original_keys, self._current_values, self.user_setting,
+            self.key_name, self.cfg_type, self.builder.editors,
+            self.reloading, self,
+        ):
             self.accept()
 
-    def value_error_message(self, value_type: str, option_name: str):
-        msg_text = (
-            f"Invalid {value_type} for <b>{format_option_name(option_name)}</b> option."
-            "<br><br>Changes are not saved."
+    def reset_setting(self):
+        config_actions.reset_setting(
+            self.builder.editors, self._current_values, self.default_setting,
+            self.key_name, self._column_order_widgets, self,
         )
-        QMessageBox.warning(self, "Error", msg_text)
 
     # ------------------------------------------------------------------
     # Cleanup
