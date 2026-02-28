@@ -28,7 +28,6 @@ from typing import Callable
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QDialogButtonBox,
-    QFrame,
     QHBoxLayout,
     QLabel,
     QScrollArea,
@@ -44,13 +43,11 @@ from .components.drag_drop_list import DragDropOrderList
 from .components.preview import WidgetPreview
 from .components.search_bar import SearchBar
 from .components.section_frame import SectionBuilder
+from .config_layout import ConfigLayout
 from .helpers import config_actions
 from .helpers.section_grouper import SectionGrouper
 
 logger = logging.getLogger(__name__)
-
-COLUMN_LABEL = 0
-EDITOR_HEIGHT = UIScaler.size(2.2)
 
 
 def set_preset_name(cfg_type: str):
@@ -84,8 +81,6 @@ class UserConfig(BaseDialog):
         self.cfg_type = cfg_type
         self.user_setting = user_setting
         self.default_setting = default_setting
-        self.option_width = UIScaler.size(option_width)
-        self.section_grouper = section_grouper or SectionGrouper()
 
         # Cache for current editor values (unsaved changes)
         self.original_keys = list(self.user_setting[self.key_name])
@@ -93,25 +88,38 @@ class UserConfig(BaseDialog):
             key: self.user_setting[self.key_name][key] for key in self.original_keys
         }
 
+        # Row tracking for search dimming and section highlight
+        self._highlighted_keys: set[str] = set()
+
         # Preview widget
         self._preview: WidgetPreview | None = None
+        if cfg_type == ConfigType.WIDGET:
+            self._preview = WidgetPreview(key_name, parent=self)
+        has_preview = self._preview is not None and self._preview.available
 
-        # Row tracking for search dimming – will be populated by builder
-        self._row_widgets: dict[str, QWidget] = {}
-        self._row_labels: dict[str, QLabel] = {}
-        self._section_title_widgets: list[tuple[QLabel, list[str]]] = []
-        self._column_order_widgets: dict[str, DragDropOrderList] = {}
+        # Create builder
+        self.builder = SectionBuilder(
+            parent_dialog=self,
+            current_values=self._current_values,
+            update_callback=self._update_current_value,
+            option_width=UIScaler.size(option_width),
+            highlight_callback=self.highlight_section,
+        )
 
-        # Section widgets and current column count
-        self._general_frame: QFrame | None = None
-        self._section_widgets: list[QFrame] = []
-        self._column_index_frames: list[QFrame] = []
-        self._num_columns = 0
-        self._widest_section = 0
+        # Create layout manager and build sections
+        self._layout = ConfigLayout(
+            builder=self.builder,
+            grouper=section_grouper or SectionGrouper(),
+            keys=self.original_keys,
+            key_name=key_name,
+            current_values=self._current_values,
+            has_preview=has_preview,
+            margin=self.MARGIN,
+        )
+        scroll_content = self._layout.build()
 
-        # Voor sectie‑highlight en herordening
-        self._sections: list[tuple[str | None, list[str]]] = []   # opgeslagen gegroepeerde secties
-        self._highlighted_keys: set[str] = set()                  # momenteel gehighlighte keys
+        # Shortcut references from builder
+        self._column_order_widgets = self.builder.column_order_widgets
 
         # Search bar
         self._search = SearchBar(parent=self)
@@ -128,52 +136,26 @@ class UserConfig(BaseDialog):
         button_save.accepted.connect(self.saving)
         button_save.rejected.connect(self.reject)
 
-        # Create builder and build sections
-        self.builder = SectionBuilder(
-            parent_dialog=self,
-            current_values=self._current_values,
-            update_callback=self._update_current_value,
-            option_width=self.option_width,
-            highlight_callback=self.highlight_section  # nieuwe callback voor klik op sectie
-        )
-        option_box = self._build_sectioned_layout(self.original_keys)
+        # Scroll area
+        self._scroll_box = QScrollArea(self)
+        self._scroll_box.setWidget(scroll_content)
+        self._scroll_box.setWidgetResizable(True)
 
-        # Create scroll box
-        scroll_box = QScrollArea(self)
-        scroll_box.setWidget(option_box)
-        scroll_box.setWidgetResizable(True)
-        self._scroll_box = scroll_box
-
-        # Preview panel (only for widget configs)
-        if cfg_type == ConfigType.WIDGET:
-            self._preview = WidgetPreview(key_name, parent=self)
-
-        # Set main layout
+        # Assemble main layout
         layout_main = QVBoxLayout()
-        layout_button = QHBoxLayout()
 
-        has_preview = self._preview is not None and self._preview.available
         if has_preview:
             layout_main.addWidget(self._preview)
 
         layout_main.addWidget(self._search)
 
-        if has_preview and (self._general_frame or self._column_index_frames):
-            controls_row = QHBoxLayout()
-            controls_row.setSpacing(self.MARGIN)
-            if self._general_frame is not None:
-                general_scroll = QScrollArea()
-                general_scroll.setWidget(self._general_frame)
-                general_scroll.setWidgetResizable(True)
-                controls_row.addWidget(general_scroll)
-            for frame in self._column_index_frames:
-                col_scroll = QScrollArea()
-                col_scroll.setWidget(frame)
-                col_scroll.setWidgetResizable(True)
-                controls_row.addWidget(col_scroll)
+        controls_row = self._layout.build_controls_row()
+        if controls_row is not None:
             layout_main.addLayout(controls_row)
 
-        layout_main.addWidget(scroll_box, 1)
+        layout_main.addWidget(self._scroll_box, 1)
+
+        layout_button = QHBoxLayout()
         layout_button.addWidget(button_reset)
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
@@ -197,106 +179,38 @@ class UserConfig(BaseDialog):
         if new_w != self.width() or new_h != self.height():
             self.resize(new_w, new_h)
 
-        # Initieel de secties sorteren volgens opgeslagen column_index_* waarden
-        self.reorder_sections()
+        # Initial section reordering
+        new = self._layout.reorder_sections()
+        if new:
+            self._scroll_box.setWidget(new)
 
+    # ------------------------------------------------------------------
+    # Value updates
+    # ------------------------------------------------------------------
     def _update_current_value(self, key, value):
         """Update value cache"""
         self._current_values[key] = value
         if self._preview is not None:
             self._preview.schedule_refresh(self._current_values)
 
-    def _build_sectioned_layout(self, keys: list[str]) -> QWidget:
-        """Create section frames and arrange them for initial display."""
-        sections = self.section_grouper.group_keys(keys)
-        self._sections = sections  # bewaar voor highlight
-
-        for title, sec_keys in sections:
-            if all(k.startswith("column_index_") for k in sec_keys):
-                frame = self.builder._build_column_index_frame(title, sec_keys)
-                self._column_index_frames.append(frame)
-            elif title == "" and self._general_frame is None:
-                self._general_frame = self.builder.build_compact_frame(title, sec_keys)
-            else:
-                frame = self.builder._build_regular_section(title, sec_keys)
-                self._section_widgets.append(frame)
-
-        # Retrieve references from builder
-        self._row_widgets = self.builder.row_widgets
-        self._row_labels = self.builder.row_labels
-        self._section_title_widgets = self.builder.section_title_widgets
-        self._column_order_widgets = self.builder.column_order_widgets
-
-        self._widest_section = max(
-            (w.sizeHint().width() for w in self._section_widgets), default=1
-        )
-        return self._arrange_columns(1)
-
-    def _arrange_columns(self, num_columns: int) -> QWidget:
-        """Distribute section widgets into num_columns columns and return a container."""
-        self._num_columns = num_columns
-        total_rows = sum(
-            (w.property("estimated_rows") or 10) for w in self._section_widgets
-        )
-        max_rows = max(24, -(-total_rows // num_columns))  # ceiling division
-
-        # Detach sections from old parent before re-parenting
-        for w in self._section_widgets:
-            w.setParent(None)
-
-        columns: list[list[QFrame]] = [[] for _ in range(num_columns)]
-        col_rows = [0] * num_columns
-
-        for widget in self._section_widgets:
-            est = widget.property("estimated_rows") or 10
-            # Place in the first column with enough room
-            for col in range(num_columns):
-                if col_rows[col] + est <= max_rows:
-                    columns[col].append(widget)
-                    col_rows[col] += est
-                    break
-            else:
-                # All columns full: place in least-loaded column
-                min_col = min(range(num_columns), key=lambda i: col_rows[i])
-                columns[min_col].append(widget)
-                col_rows[min_col] += est
-
-        col_gap = UIScaler.size(1) if num_columns > 1 else 0
-        main_layout = QHBoxLayout()
-        main_layout.setAlignment(Qt.AlignTop)
-        main_layout.setSpacing(col_gap)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-
-        for col_widgets in columns:
-            if not col_widgets:
-                continue
-            col_layout = QVBoxLayout()
-            col_layout.setSpacing(0)
-            col_layout.setContentsMargins(0, 0, 0, 0)
-            for w in col_widgets:
-                col_layout.addWidget(w)
-            col_layout.addStretch(1)
-            col_container = QWidget()
-            col_container.setLayout(col_layout)
-            main_layout.addWidget(col_container, 1)
-
-        container = QWidget()
-        container.setLayout(main_layout)
-        return container
-
     # ------------------------------------------------------------------
     # Search / filter
     # ------------------------------------------------------------------
     def _on_filter(self, text: str):
+        row_widgets = self.builder.row_widgets
+        row_labels = self.builder.row_labels
+        section_title_widgets = self.builder.section_title_widgets
+        column_order_widgets = self._column_order_widgets
+
         if not text:
-            for key in self._row_widgets:
+            for key in row_widgets:
                 self._undim_row(key)
             seen: set[int] = set()
-            for lw in self._column_order_widgets.values():
+            for lw in column_order_widgets.values():
                 if id(lw) not in seen:
                     seen.add(id(lw))
                     lw.set_dimmed_keys(set())
-            for title_label, _ in self._section_title_widgets:
+            for title_label, _ in section_title_widgets:
                 title_label.setStyleSheet("""
                     background-color: palette(dark);
                     color: palette(bright-text);
@@ -305,23 +219,23 @@ class UserConfig(BaseDialog):
                 """)
             return
 
-        for key in self._row_widgets:
+        for key in row_widgets:
             if text in key.lower():
                 self._undim_row(key)
             else:
                 self._dim_row(key)
 
         seen_lw: set[int] = set()
-        for lw in self._column_order_widgets.values():
+        for lw in column_order_widgets.values():
             if id(lw) not in seen_lw:
                 seen_lw.add(id(lw))
                 dimmed = set()
-                for k, w in self._column_order_widgets.items():
+                for k, w in column_order_widgets.items():
                     if w is lw and text not in k.lower():
                         dimmed.add(k)
                 lw.set_dimmed_keys(dimmed)
 
-        for title_label, keys in self._section_title_widgets:
+        for title_label, keys in section_title_widgets:
             all_dimmed = all(text not in k.lower() for k in keys)
             if all_dimmed:
                 title_label.setStyleSheet("""
@@ -339,8 +253,8 @@ class UserConfig(BaseDialog):
                 """)
 
     def _dim_row(self, key: str):
-        row_widget = self._row_widgets.get(key)
-        label = self._row_labels.get(key)
+        row_widget = self.builder.row_widgets.get(key)
+        label = self.builder.row_labels.get(key)
         if row_widget is None:
             return
         row_widget.setStyleSheet("background-color: palette(window);")
@@ -348,8 +262,8 @@ class UserConfig(BaseDialog):
             label.setStyleSheet("color: palette(mid);")
 
     def _undim_row(self, key: str):
-        row_widget = self._row_widgets.get(key)
-        label = self._row_labels.get(key)
+        row_widget = self.builder.row_widgets.get(key)
+        label = self.builder.row_labels.get(key)
         if row_widget is None:
             return
         bg = row_widget.property("_base_bg") or "palette(base)"
@@ -358,67 +272,35 @@ class UserConfig(BaseDialog):
             label.setStyleSheet("")
 
     # ------------------------------------------------------------------
-    # Sectie‑highlight
+    # Section highlight
     # ------------------------------------------------------------------
     def highlight_section(self, column_key):
-        """Markeer alle opties van de sectie waartoe column_key behoort."""
-        # Zoek de sectie die deze column_key bevat
-        for title, keys in self._sections:
+        """Highlight all options belonging to the section of column_key."""
+        for title, keys in self._layout.sections:
             if column_key in keys:
-                # reset vorige highlight
                 self._reset_highlight()
-                # highlight de nieuwe sectie
                 for k in keys:
-                    row = self._row_widgets.get(k)
+                    row = self.builder.row_widgets.get(k)
                     if row:
                         row.setStyleSheet("background-color: lightblue;")
                         self._highlighted_keys.add(k)
                 break
 
     def _reset_highlight(self):
-        """Zet alle gehighlighte rijen terug naar hun normale achtergrond."""
         for k in self._highlighted_keys:
-            row = self._row_widgets.get(k)
+            row = self.builder.row_widgets.get(k)
             if row:
                 bg = row.property("_base_bg") or "palette(base)"
                 row.setStyleSheet(f"background-color: {bg};")
         self._highlighted_keys.clear()
 
     # ------------------------------------------------------------------
-    # Herordenen van sectieframes
+    # Section reordering
     # ------------------------------------------------------------------
-    def reorder_sections(self):
-        """Sorteer de sectieframes op basis van minimale column_index van de bijbehorende keys."""
-        if not self._section_widgets:
-            return
-
-        # Bouw een lijst van (frame, min_column_index)
-        frame_index = []
-        for frame in self._section_widgets:
-            keys = frame.property("section_keys")
-            if not keys:
-                continue
-            min_idx = 999999
-            for k in keys:
-                if k.startswith("column_index_"):
-                    val = self._current_values.get(k, 999999)
-                    if isinstance(val, (int, float)):
-                        min_idx = min(min_idx, val)
-            frame_index.append((frame, min_idx))
-
-        # Sorteer op minimale index
-        frame_index.sort(key=lambda x: x[1])
-
-        # Werk de lijst van widgets bij
-        self._section_widgets = [f for f, _ in frame_index]
-
-        # Vernieuw de layout met het huidige aantal kolommen
-        new_container = self._arrange_columns(self._num_columns)
-        self._scroll_box.setWidget(new_container)
-
     def on_column_order_changed(self):
-        """Wordt aangeroepen nadat de volgorde in de lijst is gewijzigd."""
-        self.reorder_sections()
+        new = self._layout.reorder_sections()
+        if new:
+            self._scroll_box.setWidget(new)
 
     # ------------------------------------------------------------------
     # Actions
@@ -462,9 +344,6 @@ class UserConfig(BaseDialog):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if not self._section_widgets:
-            return
-        usable_w = self._scroll_box.viewport().width()
-        new_num = min(5, max(1, usable_w // max(self._widest_section, 1)))
-        if new_num != self._num_columns:
-            self._scroll_box.setWidget(self._arrange_columns(new_num))
+        new = self._layout.reflow(self._scroll_box.viewport().width())
+        if new:
+            self._scroll_box.setWidget(new)
