@@ -6,13 +6,13 @@ Before requesting features or reporting issues, make sure to read [Frequently As
 
 ## Requesting Features
 
-For requesting features, please open [Issues](/TinyPedal/TinyPedal/issues).
+For requesting features, please open [Issues](https://github.com/TinyPedal/TinyPedal/issues).
 
 Please note that, we work on this project purely as a hobby and labour of love. We'd love to bring more features whenever possible, but there is no promise or obligation to fulfill every request.
 
 ## Reporting Issues
 
-For reporting issues, please open [Issues](/TinyPedal/TinyPedal/issues).
+For reporting issues, please open [Issues](https://github.com/TinyPedal/TinyPedal/issues).
 
 When reporting issues, please be specific and provide as much detail as possible.
 
@@ -20,7 +20,7 @@ There are often bug reports which turned out to be issues caused by other third 
 
 ## Contributing Code
 
-For implementing features or fixing bugs, please open [Pull Requests](/TinyPedal/TinyPedal/pulls).
+For implementing features or fixing bugs, please open [Pull Requests](https://github.com/TinyPedal/TinyPedal/pulls).
 
 Please note that, not every Pull Requests may be accepted, as we will see what fits the best for the project.
 
