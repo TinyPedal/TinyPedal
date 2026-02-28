@@ -27,8 +27,7 @@ import re
 import time
 from typing import Callable
 
-from PySide2.QtCore import Qt, QTimer
-from PySide2.QtGui import QKeySequence, QShortcut
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -50,10 +49,11 @@ from ..setting import cfg
 from ..userfile import set_relative_path, set_user_data_path
 from ..validator import is_clock_format, is_hex_color, is_string_number
 from ._common import BaseDialog, UIScaler, singleton_dialog
-from .components.preview import WidgetPreview
 from .components.drag_drop_list import DragDropOrderList
-from .helpers.section_grouper import SectionGrouper
+from .components.preview import WidgetPreview
+from .components.search_bar import SearchBar
 from .components.section_frame import SectionBuilder
+from .helpers.section_grouper import SectionGrouper
 
 logger = logging.getLogger(__name__)
 
@@ -122,20 +122,8 @@ class UserConfig(BaseDialog):
         self._highlighted_keys: set[str] = set()                  # momenteel gehighlighte keys
 
         # Search bar
-        search_layout = QHBoxLayout()
-        search_layout.addWidget(QLabel("Search:"))
-        self.search_edit = QLineEdit()
-        self.search_edit.setPlaceholderText("Type to filter options (Ctrl+F)")
-        self.search_edit.setClearButtonEnabled(True)
-        self.search_edit.textChanged.connect(self._on_search_text_changed)
-        search_layout.addWidget(self.search_edit)
-
-        shortcut_find = QShortcut(QKeySequence.Find, self)
-        shortcut_find.activated.connect(self._focus_search)
-
-        self.filter_timer = QTimer(self)
-        self.filter_timer.setSingleShot(True)
-        self.filter_timer.timeout.connect(self._apply_filter)
+        self._search = SearchBar(parent=self)
+        self._search.filterRequested.connect(self._on_filter)
 
         # Buttons
         button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
@@ -176,7 +164,7 @@ class UserConfig(BaseDialog):
         if has_preview:
             layout_main.addWidget(self._preview)
 
-        layout_main.addLayout(search_layout)
+        layout_main.addWidget(self._search)
 
         if has_preview and (self._general_frame or self._column_index_frames):
             controls_row = QHBoxLayout()
@@ -305,13 +293,9 @@ class UserConfig(BaseDialog):
         return container
 
     # ------------------------------------------------------------------
-    # Search / filter methods (unchanged)
+    # Search / filter
     # ------------------------------------------------------------------
-    def _on_search_text_changed(self):
-        self.filter_timer.start(200)
-
-    def _apply_filter(self):
-        text = self.search_edit.text().strip().lower()
+    def _on_filter(self, text: str):
         if not text:
             for key in self._row_widgets:
                 self._undim_row(key)
@@ -380,10 +364,6 @@ class UserConfig(BaseDialog):
         row_widget.setStyleSheet(f"background-color: {bg};")
         if label is not None:
             label.setStyleSheet("")
-
-    def _focus_search(self):
-        self.search_edit.setFocus()
-        self.search_edit.selectAll()
 
     # ------------------------------------------------------------------
     # Sectie‑highlight
@@ -579,7 +559,7 @@ class UserConfig(BaseDialog):
     # Cleanup
     # ------------------------------------------------------------------
     def _cleanup(self):
-        self.filter_timer.stop()
+        self._search.cleanup()
         if self._preview is not None:
             self._preview.cleanup()
 
