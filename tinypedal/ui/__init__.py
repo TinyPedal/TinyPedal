@@ -417,17 +417,17 @@ def set_style_window(base_font_pt: int) -> str:
             border-bottom: 2px solid palette(mid);
             padding: 4px;
         }}
-        DragHandle {{
+        _DragHandle {{
             background: palette(mid);
             color: palette(text);
         }}
-        DragDropOrderList > QFrame {{
+        _DragDropOrderList > QFrame {{
             background: blue;
         }}
-        OptionTable QLabel::hover {{
+        _OptionTable QLabel::hover {{
             background: rgba(0, 120, 215, 0.2);
         }}
-        OrderRow ClickableLabel::hover {{
+        _OrderRow _ClickableLabel::hover {{
             background: rgba(0, 120, 215, 0.2);
         }}
     """)
