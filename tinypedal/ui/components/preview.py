@@ -65,15 +65,9 @@ class WidgetPreview(BaseComponent):
             return None
 
     def _setup_ui(self):
-        title = QLabel("Preview")
+        title = QLabel("<b>Preview</b>")
+        title.setObjectName("sectionTitle")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet(
-            "background-color: palette(dark);"
-            "color: palette(bright-text);"
-            "border-bottom: 2px solid palette(mid);"
-            "padding: 4px;"
-            "font-weight: bold;"
-        )
         self._inner_widget = QWidget()
         self._inner_layout = QVBoxLayout(self._inner_widget)
         self._inner_layout.setAlignment(Qt.AlignHCenter | Qt.AlignTop)

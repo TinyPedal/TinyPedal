@@ -409,4 +409,25 @@ def set_style_window(base_font_pt: int) -> str:
         About #labelAppName {{
             font-size: {font_pt_app_name}pt;
         }}
+
+        /* Config dialog components */
+        #sectionTitle {{
+            background: palette(dark);
+            color: palette(bright-text);
+            border-bottom: 2px solid palette(mid);
+            padding: 4px;
+        }}
+        DragHandle {{
+            background: palette(mid);
+            color: palette(text);
+        }}
+        DragDropOrderList > QFrame {{
+            background: blue;
+        }}
+        OptionTable QLabel::hover {{
+            background: rgba(0, 120, 215, 0.2);
+        }}
+        OrderRow ClickableLabel::hover {{
+            background: rgba(0, 120, 215, 0.2);
+        }}
     """)
