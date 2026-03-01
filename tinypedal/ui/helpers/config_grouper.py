@@ -126,7 +126,7 @@ class ConfigGrouper:
 
         return batches
 
-    def get_min_column_index(self, widget, current_values):
+    def _get_min_column_index(self, widget, current_values):
         """Return the minimum column_index value among keys in the widget's section_keys property.
 
         Parameters
@@ -160,4 +160,4 @@ class ConfigGrouper:
         current_values : dict
             Current values mapping key -> value.
         """
-        widgets.sort(key=lambda w: self.get_min_column_index(w, current_values))
+        widgets.sort(key=lambda w: self._get_min_column_index(w, current_values))

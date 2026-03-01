@@ -45,13 +45,13 @@ class SearchBar(BaseComponent):
         layout.addWidget(self._edit)
         # Shortcut
         shortcut = QShortcut(QKeySequence.Find, self)
-        shortcut.activated.connect(self.focus)
+        shortcut.activated.connect(self._focus)
         # Debounce timer
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
         self._timer.timeout.connect(self._emit_filter)
 
-    def focus(self):
+    def _focus(self):
         """Focus and select all text"""
         self._edit.setFocus()
         self._edit.selectAll()

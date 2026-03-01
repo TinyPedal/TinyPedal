@@ -26,14 +26,6 @@ class ColumnsRow(QWidget):
         self._widgets = list(widgets)
         self._reflow()
 
-    def widgets(self):
-        return self._widgets[:]
-
-    def setMaxColumns(self, max_cols):
-        if max_cols != self._max_columns:
-            self._max_columns = max_cols
-            self._reflow()
-
     def _reflow(self):
         """Recompute columns and rearrange widgets"""
         # Filter deleted widgets
@@ -73,9 +65,6 @@ class ColumnsRow(QWidget):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._resize_timer.start(50)
-
-    def shutdown(self):
-        self._resize_timer.stop()
 
 
 class LayoutBuilder:

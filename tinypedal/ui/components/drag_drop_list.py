@@ -6,7 +6,6 @@ from PySide2.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame
 
 from .base import BaseComponent
 
-
 class ClickableLabel(QLabel):
     """Label that emits clicked on left mouse press"""
     clicked = Signal()
@@ -25,7 +24,6 @@ class DragHandle(QLabel):
         self.setAlignment(Qt.AlignCenter)
         self.setFixedWidth(width)
         self.setCursor(Qt.OpenHandCursor)
-        self.setStyleSheet("background-color: palette(mid); color: palette(text);")
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
@@ -56,8 +54,6 @@ class OrderRow(QWidget):
         self.number_label.setAlignment(Qt.AlignCenter)
         self.number_label.setFixedWidth(row_height)
         self.number_label.setCursor(Qt.PointingHandCursor)
-        self.number_label.setStyleSheet(
-            "ClickableLabel:hover { background-color: rgba(0, 120, 215, 0.2); }")
         self.number_label.clicked.connect(self.clicked)
         # Text
         self.text_label = ClickableLabel(label)
@@ -65,8 +61,6 @@ class OrderRow(QWidget):
         self.text_label.setIndent(5)
         self.text_label.setFixedHeight(row_height)
         self.text_label.setCursor(Qt.PointingHandCursor)
-        self.text_label.setStyleSheet(
-            "ClickableLabel:hover { background-color: rgba(0, 120, 215, 0.2); }")
         self.text_label.clicked.connect(self.clicked)
         # Drag handle
         self.drag_handle = DragHandle(parent=self)
@@ -110,7 +104,6 @@ class DragDropOrderList(BaseComponent):
         # Drop indicator
         self._drop_indicator = QFrame()
         self._drop_indicator.setFixedHeight(2)
-        self._drop_indicator.setStyleSheet("background-color: blue;")
         self._drop_indicator.hide()
         # Layout
         self._layout = QVBoxLayout(self)
@@ -123,15 +116,10 @@ class DragDropOrderList(BaseComponent):
         if self._title_widget:
             self._title_widget.deleteLater()
         header = QLabel(f"<b>{title}</b>")
+        header.setObjectName("sectionTitle")
         font = header.font()
         font.setPointSize(font.pointSize() + 1)
         header.setFont(font)
-        header.setStyleSheet(
-            "background-color: palette(dark);"
-            "color: palette(bright-text);"
-            "border-bottom: 2px solid palette(mid);"
-            "padding: 4px;"
-        )
         self._layout.insertWidget(0, header)
         self._title_widget = header
 
@@ -222,9 +210,9 @@ class DragDropOrderList(BaseComponent):
     def _update_model_from_layout(self):
         self._items = [(row.key, row.label_text) for row in self._rows()]
 
-    # Filter
     def apply_filter(self, text):
-        self._filter_text = text.strip().lower()
+        """Apply filter text to dim non-matching rows"""
+        self._filter_text = text
         self._apply_filter_to_rows()
 
     def _apply_filter_to_rows(self):
