@@ -180,6 +180,18 @@ class BaseDialog(QDialog):
         """Set utility dialog title"""
         self.setWindowTitle(f"{name} - {APP_NAME}")
 
+    def adjust_to_screen(self, max_ratio=0.85):
+        """Size window to content, capped at ratio of screen"""
+        self.adjustSize()
+        try:
+            avail = self.screen().availableGeometry()
+            max_w = int(avail.width() * max_ratio)
+            max_h = int(avail.height() * max_ratio)
+        except AttributeError:
+            max_w = 1400
+            max_h = 800
+        self.resize(min(self.width(), max_w), min(self.height(), max_h))
+
     def confirm_operation(self, title: str = "Confirm", message: str = "") -> bool:
         """Confirm operation"""
         confirm = QMessageBox.question(
