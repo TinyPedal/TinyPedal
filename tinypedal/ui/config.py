@@ -289,12 +289,12 @@ class UserConfig(BaseDialog):
 
     def search_options(self, text: str):
         """Search for options"""
-        text = text.title()
+        text = text.lower()
         layout_option = self.layout_option
         for row_index in range(layout_option.rowCount()):
             label = layout_option.itemAtPosition(row_index, 0).widget()
             option = layout_option.itemAtPosition(row_index, 1).widget()
-            hidden = text not in label.text()
+            hidden = text not in label.text().lower()
             label.setHidden(hidden)
             option.setHidden(hidden)
 
