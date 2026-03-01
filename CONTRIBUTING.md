@@ -24,7 +24,13 @@ For implementing features or fixing bugs, please open [Pull Requests](https://gi
 
 Please note that, the primary focus of TinyPedal project is simplicity and efficiency. Every feature should be carefully thought out before implementation. Not every Pull Requests may be accepted, as we will see what fits the best for the project.
 
-It is recommended to open an [Issues](https://github.com/TinyPedal/TinyPedal/issues) to discuss about the feature beforehand, to avoid wasting time on feature that will not be considered.
+It is recommended to open [Issues](https://github.com/TinyPedal/TinyPedal/issues) to discuss about the feature beforehand, to avoid wasting time on feature that will not be considered.
+
+### Notes about game API accessing
+
+Game API accessing must be restricted to READ-ONLY.
+
+Any feature that involves modifying game API data or controlling game behavior will not be accepted.
 
 ### Notes about PySide library version
 
