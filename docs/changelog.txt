@@ -3,6 +3,9 @@ WIP
 * Auto Backup Car Setup
   - Added auto backup car setup support for RF2.
 
+* Config Dialog
+  - Added "Option Search Box" on the top of config dialog (requested by user "Oost-hash"), which allows to quickly filter and find specific options.
+
 2.42.0 (2026-02-25)
 -----------------------------
 * Important Fix

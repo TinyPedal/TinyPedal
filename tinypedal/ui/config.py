@@ -32,6 +32,7 @@ from PySide2.QtGui import QFontDatabase
 from PySide2.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QCompleter,
     QDialogButtonBox,
     QGridLayout,
     QHBoxLayout,
@@ -56,6 +57,7 @@ from ._common import (
     QVAL_FLOAT,
     QVAL_INTEGER,
     BaseDialog,
+    CompactButton,
     DoubleClickEdit,
     UIScaler,
     singleton_dialog,
@@ -83,7 +85,7 @@ class FontConfig(BaseDialog):
         self.reloading = reload_func
         self.user_setting = user_setting
 
-        # Combobox
+        # Create options
         self.edit_fontname = QComboBox(self)
         self.edit_fontname.addItem("no change")
         self.edit_fontname.addItems(get_font_list())
@@ -243,21 +245,38 @@ class UserConfig(BaseDialog):
         button_save.rejected.connect(self.reject)
 
         # Create options
-        layout_option = QGridLayout()
-        layout_option.setAlignment(Qt.AlignTop)
-        self.create_options(layout_option)
+        self.layout_option = QGridLayout()
+        self.layout_option.setAlignment(Qt.AlignTop)
+        option_word_set = self.create_options(self.layout_option)
         option_box = QWidget(self)
-        option_box.setLayout(layout_option)
+        option_box.setLayout(self.layout_option)
 
         # Create scroll box
         scroll_box = QScrollArea(self)
         scroll_box.setWidget(option_box)
         scroll_box.setWidgetResizable(True)
 
+        # Search box
+        search_auto_complete = QCompleter(option_word_set)
+        search_auto_complete.setCaseSensitivity(Qt.CaseInsensitive)
+
+        self.edit_search = QLineEdit(self)
+        self.edit_search.setPlaceholderText(" Type here to search for option")
+        self.edit_search.setCompleter(search_auto_complete)
+        self.edit_search.textChanged.connect(self.search_options)
+
+        button_clearsearch = CompactButton("Clear")
+        button_clearsearch.clicked.connect(self.clear_search)
+
+        layout_search = QHBoxLayout()
+        layout_search.addWidget(self.edit_search, stretch=1)
+        layout_search.addWidget(button_clearsearch)
+
         # Set layout
         layout_main = QVBoxLayout()
         layout_button = QHBoxLayout()
 
+        layout_main.addLayout(layout_search)
         layout_main.addWidget(scroll_box)
         layout_button.addWidget(button_reset)
         layout_button.addStretch(1)
@@ -267,6 +286,21 @@ class UserConfig(BaseDialog):
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(layout_main)
         self.setMinimumWidth(self.sizeHint().width() + UIScaler.size(2))
+
+    def search_options(self, text: str):
+        """Search for options"""
+        text = text.title()
+        layout_option = self.layout_option
+        for row_index in range(layout_option.rowCount()):
+            label = layout_option.itemAtPosition(row_index, 0).widget()
+            option = layout_option.itemAtPosition(row_index, 1).widget()
+            hidden = text not in label.text()
+            label.setHidden(hidden)
+            option.setHidden(hidden)
+
+    def clear_search(self):
+        """Clear search"""
+        self.edit_search.setText("")
 
     def applying(self):
         """Save & apply"""
@@ -398,10 +432,13 @@ class UserConfig(BaseDialog):
         )
         QMessageBox.warning(self, "Error", msg_text)
 
-    def create_options(self, layout):
+    def create_options(self, layout) -> set:
         """Create options"""
+        option_word_set = set()
         for idx, key in enumerate(self.user_setting[self.key_name]):
-            self.__add_option_label(idx, key, layout)
+            option_name = format_option_name(key)
+            option_word_set.update(option_name.split())
+            self.__add_option_label(idx, option_name, layout)
             # Bool
             if re.search(rxp.CFG_BOOL, key):
                 self.__add_option_bool(idx, key, layout)
@@ -447,6 +484,8 @@ class UserConfig(BaseDialog):
             # Float or int
             self.__add_option_float(idx, key, layout)
 
+        return option_word_set
+
     def __choice_match(self, choice_dict, idx, key, layout):
         """Choice match"""
         for ref_key, choice_list in choice_dict.items():
@@ -456,9 +495,9 @@ class UserConfig(BaseDialog):
                 return True
         return False
 
-    def __add_option_label(self, idx, key, layout):
+    def __add_option_label(self, idx, option_name, layout):
         """Option label"""
-        label = QLabel(format_option_name(key))
+        label = QLabel(option_name)
         layout.addWidget(label, idx, COLUMN_LABEL)
 
     def __add_option_bool(self, idx, key, layout):
