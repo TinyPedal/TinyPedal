@@ -279,9 +279,9 @@ def export_rf2_car_setup(source: dict, _shared_data: dict = {}) -> tuple[str, ..
         _shared_data.clear()
         return ()
 
-    # RF2 setup data splits amount different API access point
+    # RF2 setup data splits amount different API access points
     # Store temp data in '_shared_data' and share amount calls
-    # Check & reset data in case of imcomplete data due to inaccessible point
+    # Check & reset data in case of incomplete data due to inaccessible point
     for key in RF2_CARSETUP_REFERENCE_KEY:
         if key in source and key in _shared_data:
             _shared_data.clear()
