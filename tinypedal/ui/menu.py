@@ -36,7 +36,7 @@ from ..setting import cfg
 from ..update import update_checker
 from .about import About
 from .brake_editor import BrakeEditor
-from .config import UserConfig, FontConfig
+from .config import FontConfig, UserConfig
 from .driver_stats_viewer import DriverStatsViewer
 from .fuel_calculator import FuelCalculator
 from .heatmap_editor import HeatmapEditor
