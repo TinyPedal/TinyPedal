@@ -43,6 +43,7 @@ from PySide2.QtWidgets import (
     QSpinBox,
     QVBoxLayout,
     QWidget,
+    QPushButton,
 )
 
 from .. import regex_pattern as rxp
@@ -60,6 +61,7 @@ from ._common import (
     UIScaler,
     singleton_dialog,
 )
+from .display_order import DisplayOrderDialog
 
 COLUMN_LABEL = 0  # grid layout column index
 COLUMN_OPTION = 1
@@ -231,9 +233,15 @@ class UserConfig(BaseDialog):
         self.option_integer: dict = {}
         self.option_float: dict = {}
 
+         # key = "column_index_*", value = QLineEdit
+        self.option_column: dict = {}
+
         # Button
         button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
         button_reset.clicked.connect(self.reset_setting)
+
+        self.button_display_order = QPushButton("Display Order")
+        self.button_display_order.clicked.connect(self.on_display_order_clicked)
 
         button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
         button_apply.clicked.connect(self.applying)
@@ -260,6 +268,7 @@ class UserConfig(BaseDialog):
 
         layout_main.addWidget(scroll_box)
         layout_button.addWidget(button_reset)
+        layout_button.addWidget(self.button_display_order)
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
         layout_button.addWidget(button_save)
@@ -442,7 +451,9 @@ class UserConfig(BaseDialog):
                 continue
             # Int
             if re.search(rxp.CFG_INTEGER, key):
-                self.__add_option_integer(idx, key, layout)
+                editor = self.__add_option_integer(idx, key, layout)
+                if key.startswith("column_index_"):
+                    self.option_column[key] = editor
                 continue
             # Float or int
             self.__add_option_float(idx, key, layout)
@@ -585,6 +596,41 @@ class UserConfig(BaseDialog):
         # Add layout
         layout.addWidget(editor, idx, COLUMN_OPTION)
         self.option_float[key] = editor
+
+    #Display order functions
+    def update_column_index(self):
+        """Update displayed index values from the user setting dictionary."""
+        options_dict = self.user_setting[self.key_name]
+        for key, line_edit in self.option_column.items():
+            line_edit.setText(str(options_dict[key]))
+
+    def on_display_order_clicked(self):
+        # Gather current and default values for the column keys
+        column_keys = list(self.option_column.keys())
+        current_values = {
+            key: self.user_setting[self.key_name][key]
+            for key in column_keys
+        }
+        default_values = {
+            key: self.default_setting[self.key_name][key]
+            for key in column_keys
+        }
+
+        dialog = DisplayOrderDialog(
+            self,
+            column_keys=column_keys,
+            current_values=current_values,
+            default_values=default_values
+        )
+
+        if dialog.exec_():          # user clicked Apply
+            new_order = dialog.get_order()
+            # Update the in‑memory user setting
+            for key, index in new_order.items():
+                self.user_setting[self.key_name][key] = index
+            # Refresh the line edits to show the new indices
+            self.update_column_index()
+
 
 
 def set_preset_name(cfg_type: str):
