@@ -38,12 +38,12 @@ class WeatherNode(NamedTuple):
 
 
 FORECAST_DEFAULT = (WeatherNode(),)
-FORECAST_NODES_RF2 = ("START", "NODE_25", "NODE_50", "NODE_75", "FINISH")
 
 
-def forecast_rf2(data: dict) -> tuple[WeatherNode, ...]:
+def forecast_rf2(data: dict, default: tuple[WeatherNode, ...]) -> tuple[WeatherNode, ...]:
     """Get value from weather forecast dictionary, output 5 api data"""
     try:
+        forecast_nodes = ("START", "NODE_25", "NODE_50", "NODE_75", "FINISH")
         output = tuple(
             WeatherNode(
                 start_percent=round(index * 0.2, 1),
@@ -51,10 +51,10 @@ def forecast_rf2(data: dict) -> tuple[WeatherNode, ...]:
                 temperature=data[node]["WNV_TEMPERATURE"]["currentValue"],
                 rain_chance=data[node]["WNV_RAIN_CHANCE"]["currentValue"] * 0.01,
             )
-            for index, node in enumerate(FORECAST_NODES_RF2)
+            for index, node in enumerate(forecast_nodes)
         )
     except (KeyError, TypeError):
-        output = FORECAST_DEFAULT
+        output = default
     return output
 
 

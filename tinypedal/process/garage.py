@@ -268,16 +268,18 @@ def lmu_car_setup_json_to_svm(source: dict, reference: Mapping):
         yield ""
 
 
-def export_lmu_car_setup(source: dict) -> tuple[str, ...]:
+def export_lmu_car_setup(source: dict, default: tuple) -> tuple[str, ...]:
     """Export lmu car setup"""
+    if not isinstance(source, dict) or not source:
+        return default
     return tuple(lmu_car_setup_json_to_svm(source, LMU_CARSETUP_MAP))
 
 
-def export_rf2_car_setup(source: dict, _shared_data: dict = {}) -> tuple[str, ...]:
+def export_rf2_car_setup(source: dict, default: tuple, _shared_data: dict = {}) -> tuple[str, ...]:
     """Export rf2 car setup"""
     if not isinstance(source, dict) or not source:
         _shared_data.clear()
-        return ()
+        return default
 
     # RF2 setup data splits amount different API access points
     # Store temp data in '_shared_data' and share amount calls
@@ -292,7 +294,7 @@ def export_rf2_car_setup(source: dict, _shared_data: dict = {}) -> tuple[str, ..
     # Export only if all unique reference keys exist
     for key in RF2_CARSETUP_REFERENCE_KEY:
         if key not in _shared_data:
-            return ()
+            return default
 
     export_data = tuple(lmu_car_setup_json_to_svm(_shared_data, LMU_CARSETUP_MAP))
     _shared_data.clear()
