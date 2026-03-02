@@ -25,8 +25,6 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Mapping
 
-from ..validator import generator_init
-
 # Note: CompoundSetting value can desync, so ignored from output
 LMU_CARSETUP_MAP = MappingProxyType({
     "GENERAL": {
@@ -124,6 +122,7 @@ LMU_CARSETUP_MAP = MappingProxyType({
         "EngineBoostSetting": "VM_ENGINE_BOOST",
         "RegenerationMapSetting": "VM_REGEN_LEVEL",
         "ElectricMotorMapSetting": "VM_ELECTRIC_MOTOR_MAP",
+        "Push2PassMapSetting": "VM_P2P_MAP",
         "EngineMixtureSetting": "VM_ENGINE_MIXTURE",
         "EngineBrakingMapSetting": "VM_ENGINE_BRAKEMAP",
     },
@@ -222,6 +221,18 @@ LMU_CARSETUP_MAP = MappingProxyType({
     },
 })
 
+RF2_CARSETUP_REFERENCE_KEY = (
+    "VM_OIL_RADIATOR", # aerodynamics
+    "VM_BRAKE_PRESSURE", # brakes
+    "VM_STEER_LOCK", # chassis
+    "VM_DIFF_PRELOAD", # drivetrain
+    "VM_TRACTION_CONTROL", # electronics
+    "VM_FUEL_LEVEL", # fuel
+    "VM_ENGINE_MIXTURE", # gears
+    "VM_FRONT_ANTISWAY", # suspension
+    "WM_CAMBER-W_FL", # tires
+)
+
 
 def lmu_car_setup_json_to_svm(source: dict, reference: Mapping):
     """Parse car setup JSON to SVM (LMU format)"""
@@ -262,40 +273,27 @@ def export_lmu_car_setup(source: dict) -> tuple[str, ...]:
     return tuple(lmu_car_setup_json_to_svm(source, LMU_CARSETUP_MAP))
 
 
-@generator_init
-def _process_rf2_car_setup():
-    """Process rf2 car setup"""
-    data = {}
-    count = 0
-    unique_key = (
-        "VM_OIL_RADIATOR", # aerodynamics
-        "VM_BRAKE_PRESSURE", # brakes
-        "VM_STEER_LOCK", # chassis
-        "VM_DIFF_PRELOAD", # drivetrain
-        "VM_TRACTION_CONTROL", # electronics
-        "VM_FUEL_LEVEL", # fuel
-        "VM_ENGINE_MIXTURE", # gears
-        "VM_FRONT_ANTISWAY", # suspension
-        "WM_CAMBER-W_FL", # tires
-    )
-    while True:
+def export_rf2_car_setup(source: dict, _shared_data: dict = {}) -> tuple[str, ...]:
+    """Export rf2 car setup"""
+    if not isinstance(source, dict) or not source:
+        _shared_data.clear()
+        return ()
 
-        if count < len(unique_key):
-            source = yield ()
-        else:
-            source = yield tuple(lmu_car_setup_json_to_svm(data, LMU_CARSETUP_MAP))
-            data.clear()
-            count = 0
+    # RF2 setup data splits amount different API access point
+    # Store temp data in '_shared_data' and share amount calls
+    # Check & reset data in case of imcomplete data due to inaccessible point
+    for key in RF2_CARSETUP_REFERENCE_KEY:
+        if key in source and key in _shared_data:
+            _shared_data.clear()
 
-        if isinstance(source, dict):
-            # Check if any old data and reset
-            for key in unique_key:
-                if key in source and key in data:
-                    data.clear()
-                    count = 0
-                    break
-            data.update(source)
-            count += 1
+    # Update temp data
+    _shared_data.update(source)
 
+    # Export only if all unique reference keys exist
+    for key in RF2_CARSETUP_REFERENCE_KEY:
+        if key not in _shared_data:
+            return ()
 
-export_rf2_car_setup = _process_rf2_car_setup().send
+    export_data = tuple(lmu_car_setup_json_to_svm(_shared_data, LMU_CARSETUP_MAP))
+    _shared_data.clear()
+    return export_data
