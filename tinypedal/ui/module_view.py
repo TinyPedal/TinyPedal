@@ -189,8 +189,7 @@ class ModuleControlItem(QWidget):
 
     def open_config_dialog(self):
         """Config dialog — WidgetConfig for widgets, UserConfig for modules"""
-        dialog_class = (WidgetConfig if self.module_control.type_id == ConfigType.WIDGET
-                        else UserConfig)
+        dialog_class = UserConfig
         _dialog = dialog_class(
             parent=self._parent,
             key_name=self.module_name,
