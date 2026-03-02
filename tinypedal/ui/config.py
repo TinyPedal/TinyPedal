@@ -44,6 +44,7 @@ from PySide2.QtWidgets import (
     QSpinBox,
     QVBoxLayout,
     QWidget,
+    QPushButton,
 )
 
 from .. import regex_pattern as rxp
@@ -62,6 +63,7 @@ from ._common import (
     UIScaler,
     singleton_dialog,
 )
+from .display_order import DisplayOrderDialog
 
 COLUMN_LABEL = 0  # grid layout column index
 COLUMN_OPTION = 1
@@ -215,6 +217,7 @@ class UserConfig(BaseDialog):
         super().__init__(parent)
         self.set_config_title(format_option_name(key_name), set_preset_name(cfg_type))
 
+        self.setWindowFlags(self.windowFlags() | Qt.Window)
         self.reloading = reload_func
         self.key_name = key_name
         self.cfg_type = cfg_type
@@ -233,9 +236,15 @@ class UserConfig(BaseDialog):
         self.option_integer: dict = {}
         self.option_float: dict = {}
 
+        # key = "column_index_*", value = QLineEdit
+        self.option_column: dict = {}
+
         # Button
         button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
         button_reset.clicked.connect(self.reset_setting)
+
+        self.button_display_order = QPushButton("Display Order")
+        self.button_display_order.clicked.connect(self.on_display_order_clicked)
 
         button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
         button_apply.clicked.connect(self.applying)
@@ -279,6 +288,7 @@ class UserConfig(BaseDialog):
         layout_main.addLayout(layout_search)
         layout_main.addWidget(scroll_box)
         layout_button.addWidget(button_reset)
+        layout_button.addWidget(self.button_display_order)
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
         layout_button.addWidget(button_save)
@@ -475,7 +485,9 @@ class UserConfig(BaseDialog):
                 continue
             # Int
             if re.search(rxp.CFG_INTEGER, key):
-                self.__add_option_integer(idx, key, layout)
+                editor = self.__add_option_integer(idx, key, layout)
+                if key.startswith("column_index_"):
+                    self.option_column[key] = editor
                 continue
             # Float or int
             self.__add_option_float(idx, key, layout)
@@ -607,6 +619,7 @@ class UserConfig(BaseDialog):
         # Add layout
         layout.addWidget(editor, idx, COLUMN_OPTION)
         self.option_integer[key] = editor
+        return editor
 
     def __add_option_float(self, idx, key, layout):
         """Float"""
@@ -621,6 +634,30 @@ class UserConfig(BaseDialog):
         # Add layout
         layout.addWidget(editor, idx, COLUMN_OPTION)
         self.option_float[key] = editor
+
+    #Display order functions
+    def update_column_index(self):
+        """Update displayed index values from the user setting dictionary."""
+        options_dict = self.user_setting[self.key_name]
+        for key, line_edit in self.option_column.items():
+            line_edit.setText(str(options_dict[key]))
+
+    def on_display_order_clicked(self):
+        # Get options and generate column keys
+        options = self.user_setting[self.key_name]
+        column_keys = [k for k in options.keys() if k.startswith("column_index_")]
+
+        # Get default values
+        default_values = {k: self.default_setting[self.key_name][k] for k in column_keys}
+
+        # Create and open dialog (non-blocking)
+        dialog = DisplayOrderDialog(
+            self,
+            options=options,
+            default_values=default_values,
+            update_callback=self.update_column_index
+        )
+        dialog.open()
 
 
 def set_preset_name(cfg_type: str):
