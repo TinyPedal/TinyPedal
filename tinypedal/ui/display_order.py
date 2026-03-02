@@ -25,6 +25,7 @@ Sized to fit all items — no scrollbar needed.
 """
 
 from __future__ import annotations
+from typing import Callable
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
@@ -39,7 +40,6 @@ from PySide2.QtWidgets import (
 from ..formatter import format_option_name
 from ._common import BaseDialog, UIScaler
 
-
 class DisplayOrderDialog(BaseDialog):
     """Popup dialog to reorder column_index_* settings.
 
@@ -47,20 +47,24 @@ class DisplayOrderDialog(BaseDialog):
     Window sized to show all items without scrollbar.
     """
 
-    def __init__(self, parent, column_keys, current_values, default_values):
+    def __init__(self, parent, options: dict, default_values: dict, update_callback: Callable):
         """
         Args:
             parent: WidgetConfig instance.
-            column_keys: list of "column_index_*" keys.
-            current_values: dict key -> current int value.
-            default_values: dict key -> default int value.
+            options: the user_setting[self.key_name] dict containing column_index_* keys.
+            default_values: dict of default values for column_index_* keys.
+            update_callback: function to call when Apply is clicked.
         """
         super().__init__(parent)
         self.setWindowTitle("Display Order")
 
-        self.column_keys = column_keys
-        self.current_values = current_values
+        self._parent = parent
+        self.options = options
         self.default_values = default_values
+        self.update_callback = update_callback
+
+        # Generate column_keys from options dict
+        self.column_keys = [k for k in options.keys() if k.startswith("column_index_")]
 
         # ---------- List widget ----------
         self.list_widget = QListWidget()
@@ -97,10 +101,10 @@ class DisplayOrderDialog(BaseDialog):
         self.reset_btn.clicked.connect(self._reset_order)
 
         self.apply_btn = QPushButton("Apply")
-        self.apply_btn.clicked.connect(self.accept)   # close with accepted
+        self.apply_btn.clicked.connect(self._on_apply)  # Don't close dialog
 
         self.close_btn = QPushButton("Close")
-        self.close_btn.clicked.connect(self.reject)   # close with rejected
+        self.close_btn.clicked.connect(self.reject)  # Close dialog
 
         bottom_layout = QHBoxLayout()
         bottom_layout.addWidget(self.reset_btn)
@@ -119,17 +123,40 @@ class DisplayOrderDialog(BaseDialog):
         self.adjustSize()
         self.setFixedSize(self.size())
 
+
+
+    def _on_apply(self):
+        """Apply changes but keep dialog open."""
+        new_order = self.get_order()
+        # Update in-memory options
+        for key, index in new_order.items():
+            self.options[key] = index
+        # Trigger parent update via callback
+        self.update_callback()
+
     # ------------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------------
     def _populate_list(self):
         """Fill list with keys sorted by current index."""
-        sorted_keys = sorted(self.column_keys, key=lambda k: self.current_values[k])
+        # Build current_values from self.options
+        current_values = {k: self.options[k] for k in self.column_keys}
+
+        sorted_keys = sorted(self.column_keys, key=lambda k: current_values[k])
         for key in sorted_keys:
             display_name = format_option_name(key)
             item = QListWidgetItem(display_name)
             item.setData(Qt.UserRole, key)
             self.list_widget.addItem(item)
+
+    def _on_apply(self):
+        """Apply changes but keep dialog open."""
+        new_order = self.get_order()
+        # Update in-memory options
+        for key, index in new_order.items():
+            self.options[key] = index
+        # Trigger parent update via callback
+        self.update_callback()
 
     # ------------------------------------------------------------------------
     # Slot methods
@@ -159,7 +186,6 @@ class DisplayOrderDialog(BaseDialog):
             item = QListWidgetItem(display_name)
             item.setData(Qt.UserRole, key)
             self.list_widget.addItem(item)
-        # Optionally select first item
         self.list_widget.setCurrentRow(0)
 
     # ------------------------------------------------------------------------
