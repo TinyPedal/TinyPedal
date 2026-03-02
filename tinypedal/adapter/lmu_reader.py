@@ -38,7 +38,7 @@ from ..formatter import strip_invalid_char
 from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
-from . import _reader, lmu_connector, restapi_connector
+from . import _reader, lmu_connector, lmu_restapi
 
 
 class DataAdapter:
@@ -49,7 +49,7 @@ class DataAdapter:
         "rest",
     )
 
-    def __init__(self, shmm: lmu_connector.LMUInfo, rest: restapi_connector.RestAPIInfo) -> None:
+    def __init__(self, shmm: lmu_connector.LMUInfo, rest: lmu_restapi.RestAPIData) -> None:
         """Initialize API setting
 
         Args:
@@ -120,7 +120,7 @@ class Brake(_reader.Brake, DataAdapter):
 
     def wear(self, index: int | None = None) -> tuple[float, ...]:
         """Brake remaining thickness (meters)"""
-        return self.rest.telemetry().brakeWear
+        return self.rest.brakeWear
 
 
 class ElectricMotor(_reader.ElectricMotor, DataAdapter):
@@ -245,7 +245,7 @@ class Inputs(_reader.Inputs, DataAdapter):
         """Steering physical rotation range (degrees)"""
         rot_range = rmnan(self.shmm.lmuTeleVeh(index).mPhysicalSteeringWheelRange)
         if rot_range <= 0:
-            rot_range = self.rest.telemetry().steeringWheelRange
+            rot_range = self.rest.steeringWheelRange
         return rot_range
 
     def steering_range_visual(self, index: int | None = None) -> float:
@@ -371,7 +371,7 @@ class Session(_reader.Session, DataAdapter):
 
     def private_qualifying(self) -> bool:
         """Is private qualifying"""
-        return self.rest.telemetry().privateQualifying == 1
+        return self.rest.privateQualifying == 1
 
     def pit_open(self) -> bool:
         """Is pit lane open"""
@@ -443,18 +443,18 @@ class Session(_reader.Session, DataAdapter):
         """Weather forecast nodes"""
         session_type = self.session_type()
         if session_type <= 1:  # practice session
-            return self.rest.telemetry().forecastPractice
+            return self.rest.forecastPractice
         if session_type == 2:  # qualify session
-            return self.rest.telemetry().forecastQualify
-        return self.rest.telemetry().forecastRace  # race session
+            return self.rest.forecastQualify
+        return self.rest.forecastRace  # race session
 
     def track_time(self) -> float:
         """Track time"""
-        return self.rest.telemetry().trackClockTime
+        return self.rest.trackClockTime
 
     def time_scale(self) -> int:
         """Time scale"""
-        return max(self.rest.telemetry().timeScale, 0)
+        return max(self.rest.timeScale, 0)
 
 
 class Switch(_reader.Switch, DataAdapter):
@@ -788,15 +788,15 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def pit_stop_time(self) -> float:
         """Estimated pit stop time (seconds)"""
-        return self.rest.telemetry().pitStopTime
+        return self.rest.pitStopTime
 
     def absolute_refill(self) -> float:
         """Absolute refill fuel (liter) or virtual energy (percent)"""
-        return self.rest.telemetry().absoluteRefill
+        return self.rest.absoluteRefill
 
     def stint_usage(self, driver_name: str) -> tuple[float, float, float, float, int]:
         """Stint usage data"""
-        return self.rest.telemetry().stintUsage.get(driver_name, STINT_USAGE_DEFAULT)
+        return self.rest.stintUsage.get(driver_name, STINT_USAGE_DEFAULT)
 
     def finish_state(self, index: int | None = None) -> int:
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""
@@ -821,11 +821,11 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def virtual_energy(self, index: int | None = None) -> float:
         """Remaining virtual energy (joule)"""
-        return self.rest.telemetry().currentVirtualEnergy
+        return self.rest.currentVirtualEnergy
 
     def max_virtual_energy(self, index: int | None = None) -> float:
         """Max virtual energy (joule)"""
-        return self.rest.telemetry().maxVirtualEnergy
+        return self.rest.maxVirtualEnergy
 
     def orientation_yaw_radians(self, index: int | None = None) -> float:
         """Orientation yaw (radians)"""
@@ -895,7 +895,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def aero_damage(self, index: int | None = None) -> float:
         """Aerodynamic damage (fraction), 0.0 no damage, 1.0 totaled"""
-        return self.rest.telemetry().aeroDamage
+        return self.rest.aeroDamage
 
     def integrity(self, index: int | None = None) -> float:
         """Vehicle integrity"""
@@ -929,7 +929,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def setup(self) -> tuple[str, ...]:
         """Car setup data"""
-        return self.rest.telemetry().lastCarSetup
+        return self.rest.lastCarSetup
 
 
 class Wheel(_reader.Wheel, DataAdapter):
@@ -1064,7 +1064,7 @@ class Wheel(_reader.Wheel, DataAdapter):
 
     def suspension_damage(self, index: int | None = None) -> tuple[float, ...]:
         """Suspension damage (fraction), 0.0 no damage, 1.0 totaled"""
-        return self.rest.telemetry().suspensionDamage
+        return self.rest.suspensionDamage
 
     def position_vertical(self, index: int | None = None) -> tuple[float, ...]:
         """Vertical wheel position (convert meters to millimeters) related to vehicle"""

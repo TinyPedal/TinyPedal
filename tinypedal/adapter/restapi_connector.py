@@ -27,19 +27,26 @@ import json
 import logging
 import threading
 from itertools import chain
-from typing import Any, NamedTuple
+from typing import Any, Callable, NamedTuple
 
 from .. import realtime_state
 from ..async_request import http_get, set_header_get
 from ..const_common import TYPE_JSON
-from .rf2_restapi import ResRawOutput, RestAPIData
 
 logger = logging.getLogger(__name__)
 json_decoder = json.JSONDecoder()
 
 
 class HttpSetup(NamedTuple):
-    """Http connection setup"""
+    """Http connection setup
+
+    Attributes:
+        host: url host.
+        port: url port.
+        timeout: timeout seconds.
+        retry: number of retries.
+        retry_delay: delay retry in seconds.
+    """
 
     host: str
     port: int
@@ -48,8 +55,61 @@ class HttpSetup(NamedTuple):
     retry_delay: float
 
 
-class RestAPIInfo:
-    """Rest API data output"""
+class RestAPITask(NamedTuple):
+    """RestAPI task
+
+    Attributes:
+        path: resource url path.
+        outputs: resource data output set.
+        condition: enable condition check.
+        repeated: is repeated or one time task.
+        interval: minimum update interval.
+    """
+
+    path: str
+    outputs: tuple[ResOutput, ...]
+    condition: str
+    repeated: bool
+    interval: float
+
+
+class ResOutput(NamedTuple):
+    """Resource data output
+
+    Attributes:
+        name: output data name.
+        default: default value.
+        parser: data parser function.
+        keys: key sequence for fetch data from resource.
+    """
+
+    name: str
+    default: Any
+    parser: Callable[[Any, Any], Any]
+    keys: tuple[str, ...] = ()
+
+    def reset(self, output: object):
+        """Reset data"""
+        setattr(output, self.name, self.default)
+
+    def update(self, output: object, data: Any) -> bool:
+        """Update data"""
+        for key in self.keys:  # get data from dict
+            if not isinstance(data, dict):  # not exist, set to default
+                setattr(output, self.name, self.default)
+                return False
+            data = data.get(key)
+        # Not exist, set to default
+        if data is None:
+            setattr(output, self.name, self.default)
+            return False
+        # Parse and output
+        setattr(output, self.name, self.parser(data, self.default))
+        return True
+
+
+class RestAPIConnector:
+    """Rest API connector"""
 
     __slots__ = (
         "_taskset",
@@ -62,7 +122,7 @@ class RestAPIInfo:
         "_event",
     )
 
-    def __init__(self, taskset: tuple, dataset: RestAPIData):
+    def __init__(self, taskset: tuple, dataset: object):
         self._taskset = taskset
         self._dataset = dataset
 
@@ -73,12 +133,8 @@ class RestAPIInfo:
         self._active_interval = 0.2
         self._event = threading.Event()
 
-    def telemetry(self) -> RestAPIData:
-        """Rest API telemetry data"""
-        return self._dataset
-
     def __del__(self):
-        logger.info("RestAPI: GC: RestAPIInfo")
+        logger.info("RestAPI: GC: RestAPIConnector")
 
     def setConnection(self, config: dict):
         """Update connection config"""
@@ -147,14 +203,14 @@ class RestAPIInfo:
         # Reset when finished
         reset_to_default(self._dataset, active_task_sim)
 
-    def sort_taskset(self, http: HttpSetup, active_task: dict, taskset: tuple):
+    def sort_taskset(self, http: HttpSetup, active_task: dict, taskset: tuple[RestAPITask, ...]):
         """Sort task set into dictionary, key - uri_path, value - output_set"""
-        for uri_path, output_set, condition, is_repeat, min_interval in taskset:
-            if self._cfg.get(condition, True):
-                active_task[uri_path] = output_set
-                update_interval = max(min_interval, self._active_interval)
+        for task in taskset:
+            if self._cfg.get(task.condition, True):
+                active_task[task.path] = task.outputs
+                update_interval = max(task.interval, self._active_interval)
                 yield asyncio.create_task(
-                    self.fetch(http, uri_path, output_set, is_repeat, update_interval)
+                    self.fetch(http, task.path, task.outputs, task.repeated, update_interval)
                 )
 
     async def task_init(self, *task_generator):
@@ -181,7 +237,7 @@ class RestAPIInfo:
             task.cancel()
 
     async def fetch(
-        self, http: HttpSetup, uri_path: str, output_set: tuple[ResRawOutput, ...],
+        self, http: HttpSetup, uri_path: str, output_set: tuple[ResOutput, ...],
         repeat: bool = False, min_interval: float = 0.01):
         """Fetch data and verify"""
         data_available = await self.update_once(http, uri_path, output_set)
@@ -194,7 +250,7 @@ class RestAPIInfo:
             await self.update_repeat(http, uri_path, output_set, min_interval)
 
     async def update_once(
-        self, http: HttpSetup, uri_path: str, output_set: tuple[ResRawOutput, ...]) -> bool:
+        self, http: HttpSetup, uri_path: str, output_set: tuple[ResOutput, ...]) -> bool:
         """Update once and verify"""
         request_header = set_header_get(uri_path, http.host)
         data_available = False
@@ -219,7 +275,7 @@ class RestAPIInfo:
         return data_available
 
     async def update_repeat(
-        self, http: HttpSetup, uri_path: str, output_set: tuple[ResRawOutput, ...], min_interval: float):
+        self, http: HttpSetup, uri_path: str, output_set: tuple[ResOutput, ...], min_interval: float):
         """Update repeat"""
         request_header = set_header_get(uri_path, http.host)
         interval = min_interval
@@ -236,7 +292,7 @@ class RestAPIInfo:
             await asyncio.sleep(interval)
 
 
-def reset_to_default(dataset: RestAPIData, active_task: dict[str, tuple[ResRawOutput, ...]]):
+def reset_to_default(dataset: object, active_task: dict[str, tuple[ResOutput, ...]]):
     """Reset active task data to default"""
     if active_task:
         for uri_path, output_set in active_task.items():
@@ -257,7 +313,7 @@ async def get_resource(request: bytes, http: HttpSetup) -> Any | str:
 
 
 async def output_resource(
-    dataset: RestAPIData, request: bytes, http: HttpSetup, output_set: tuple[ResRawOutput, ...], last_hash: int) -> int:
+    dataset: object, request: bytes, http: HttpSetup, output_set: tuple[ResOutput, ...], last_hash: int) -> int:
     """Get resource from REST API and output data, skip unnecessary checking"""
     try:
         async with http_get(request, http.host, http.port, http.timeout) as raw_bytes:

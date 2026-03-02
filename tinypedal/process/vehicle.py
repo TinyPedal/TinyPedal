@@ -25,41 +25,40 @@ from __future__ import annotations
 from itertools import islice
 from typing import Mapping
 
-from ..const_common import EMPTY_DICT, WHEELS_NA
 from ..regex_pattern import rex_number_extract
 
 
-def export_wheels(data: list) -> tuple[float, float, float, float]:
+def export_wheels(data: list, default: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
     """Export wheel data"""
     try:
         return data[0], data[1], data[2], data[3]
     except (IndexError, TypeError, ValueError):
-        return WHEELS_NA
+        return default
 
 
-def expected_usage(value: str) -> float:
+def expected_usage(value: str, default: float) -> float:
     """Extract expected fuel or energy usage from car setup"""
     try:
         match_obj = rex_number_extract.findall(value)
         assert match_obj is not None
         return float(match_obj[0]) / float(match_obj[1])
     except (ZeroDivisionError, AttributeError, IndexError, TypeError, ValueError):
-        return 0.0
+        return default
 
 
-def steerlock_to_number(value: str) -> float:
+def steerlock_to_number(value: str, default: float) -> float:
     """Convert steerlock (degree) string to float value from car setup"""
     try:
         match_obj = rex_number_extract.search(value)
         assert match_obj is not None
         return float(match_obj.group())
     except (AttributeError, TypeError, ValueError):
-        return 0.0
+        return default
 
 
-def absolute_refilling(dataset: list[dict]) -> float:
+def absolute_refilling(dataset: list[dict], default: float) -> float:
     """Get absolute refilling of fuel or virtual energy from next pit"""
-    abs_refill = 0.0
+    abs_refill = default
     try:
         for data in dataset:
             # Get absolute refilling energy (percent) from raw value
@@ -74,14 +73,14 @@ def absolute_refilling(dataset: list[dict]) -> float:
                     abs_refill *= 3.7854118
                 break
     except (AttributeError, TypeError, IndexError, ValueError):
-        pass
+        abs_refill = default
     return abs_refill
 
 
-def stint_ve_usage(dataset: dict) -> Mapping[str, tuple[float, float, float, float, int]]:
+def stint_ve_usage(dataset: dict, default: Mapping) -> Mapping[str, tuple[float, float, float, float, int]]:
     """Stint virtual energy usage"""
     if not isinstance(dataset, dict) or not dataset:
-        return EMPTY_DICT
+        return default
     output = {}
     for player_name, player_dataset in dataset.items():
         # Set default

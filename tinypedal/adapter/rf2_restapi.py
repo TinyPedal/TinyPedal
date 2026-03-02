@@ -17,218 +17,51 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Rest API task
+rF2 Rest API task
 """
 
 from __future__ import annotations
 
-from typing import Any, Callable, Mapping, NamedTuple
+import logging
 
-from ..const_common import EMPTY_DICT, WHEELS_NA
-from ..process.garage import export_lmu_car_setup, export_rf2_car_setup
-from ..process.vehicle import (
-    absolute_refilling,
-    expected_usage,
-    export_wheels,
-    steerlock_to_number,
-    stint_ve_usage,
-)
-from ..process.weather import FORECAST_DEFAULT, WeatherNode, forecast_rf2
+from ..process.garage import export_rf2_car_setup
+from ..process.weather import FORECAST_DEFAULT, forecast_rf2
+from ..validator import valid_value_type
+from .lmu_restapi import RestAPIData as RestAPIData
+from .restapi_connector import ResOutput, RestAPITask
+
+logger = logging.getLogger(__name__)
 
 
-class RestAPIData:
-    """Rest API data"""
-
-    __slots__ = (
-        "timeScale",
-        "trackClockTime",
-        "privateQualifying",
-        "steeringWheelRange",
-        "currentVirtualEnergy",
-        "maxVirtualEnergy",
-        "expectedFuelConsumption",
-        "expectedVirtualEnergyConsumption",
-        "aeroDamage",
-        "pitStopTime",
-        "absoluteRefill",
-        "forecastPractice",
-        "forecastQualify",
-        "forecastRace",
-        "brakeWear",
-        "suspensionDamage",
-        "stintUsage",
-        "lastCarSetup",
+def rf2_restapi_tasks() -> tuple[RestAPITask, ...]:
+    """Define RestAPI task set - RF2"""
+    # Define resources output set
+    res_weatherforecast = (
+        ResOutput("forecastPractice", FORECAST_DEFAULT, forecast_rf2, ("PRACTICE",)),
+        ResOutput("forecastQualify", FORECAST_DEFAULT, forecast_rf2, ("QUALIFY",)),
+        ResOutput("forecastRace", FORECAST_DEFAULT, forecast_rf2, ("RACE",)),
     )
-
-    def __init__(self):
-        self.timeScale: int = 1
-        self.trackClockTime: float = -1.0
-        self.privateQualifying: int = 0
-        self.steeringWheelRange: float = 0.0
-        self.currentVirtualEnergy: float = 0.0
-        self.maxVirtualEnergy: float = 0.0
-        self.expectedFuelConsumption: float = 0.0
-        self.expectedVirtualEnergyConsumption: float = 0.0
-        self.aeroDamage: float = -1.0
-        self.pitStopTime: float = 0.0
-        self.absoluteRefill: float = 0.0
-        self.forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-        self.forecastQualify: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-        self.forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-        self.brakeWear: tuple[float, float, float, float] = WHEELS_NA
-        self.suspensionDamage: tuple[float, float, float, float] = WHEELS_NA
-        self.stintUsage: Mapping[str, tuple[float, float, float, float, int]] = EMPTY_DICT
-        self.lastCarSetup: tuple[str, ...] = ()
-
-
-class ResRawOutput(NamedTuple):
-    """URI resource raw output"""
-
-    name: str
-    default: Any
-    keys: tuple[str, ...] = ()
-
-    def reset(self, output: RestAPIData):
-        """Reset data"""
-        setattr(output, self.name, self.default)
-
-    def update(self, output: RestAPIData, data: Any) -> bool:
-        """Update data"""
-        for key in self.keys:  # get data from dict
-            if not isinstance(data, dict):  # not exist, set to default
-                setattr(output, self.name, self.default)
-                return False
-            data = data.get(key)
-        # Not exist, set to default
-        if data is None:
-            setattr(output, self.name, self.default)
-            return False
-        # Reset to default if value is not same type as default
-        if not isinstance(data, type(self.default)):
-            data = self.default
-        setattr(output, self.name, data)
-        return True
-
-
-class ResParOutput(NamedTuple):
-    """URI resource parsed output"""
-
-    name: str
-    default: Any
-    parser: Callable
-    keys: tuple[str, ...] = ()
-
-    def reset(self, output: RestAPIData):
-        """Reset data"""
-        setattr(output, self.name, self.default)
-
-    def update(self, output: RestAPIData, data: Any) -> bool:
-        """Update data"""
-        for key in self.keys:  # get data from dict
-            if not isinstance(data, dict):  # not exist, set to default
-                setattr(output, self.name, self.default)
-                return False
-            data = data.get(key)
-        # Not exist, set to default
-        if data is None:
-            setattr(output, self.name, self.default)
-            return False
-        # Parse and output
-        setattr(output, self.name, self.parser(data))
-        return True
-
-
-# Common
-COMMON_WEATHERFORECAST = (
-    ResParOutput("forecastPractice", FORECAST_DEFAULT, forecast_rf2, ("PRACTICE",)),
-    ResParOutput("forecastQualify", FORECAST_DEFAULT, forecast_rf2, ("QUALIFY",)),
-    ResParOutput("forecastRace", FORECAST_DEFAULT, forecast_rf2, ("RACE",)),
-)
-
-# RF2
-RF2_TIMESCALE = (
-    ResRawOutput("timeScale", 1, ("currentValue",)),
-)
-RF2_PRIVATEQUALIFY = (
-    ResRawOutput("privateQualifying", 0, ("currentValue",)),
-)
-RF2_GARAGESETUP_AERODYNAMICS = (
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-RF2_GARAGESETUP_BRAKES = (
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-RF2_GARAGESETUP_CHASSIS = (
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-RF2_GARAGESETUP_DRIVETRAIN = (
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-RF2_GARAGESETUP_ELECTRONICS = (
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-RF2_GARAGESETUP_FUEL = (
-    ResParOutput("expectedFuelConsumption", 0.0, expected_usage, ("VM_FUEL_LEVEL", "stringValue")),
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-RF2_GARAGESETUP_GEARS = (
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-RF2_GARAGESETUP_SUSPENSION = (
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-RF2_GARAGESETUP_TIRES = (
-    ResParOutput("lastCarSetup", (), export_rf2_car_setup),
-)
-
-# LMU
-LMU_CURRENTSTINT = (
-    ResRawOutput("currentVirtualEnergy", 0.0, ("fuelInfo", "currentVirtualEnergy")),
-    ResRawOutput("maxVirtualEnergy", 0.0, ("fuelInfo", "maxVirtualEnergy")),
-    ResRawOutput("aeroDamage", -1.0, ("wearables", "body", "aero")),
-    ResParOutput("brakeWear", WHEELS_NA, export_wheels, ("wearables", "brakes")),
-    ResParOutput("suspensionDamage", WHEELS_NA, export_wheels, ("wearables", "suspension")),
-    ResRawOutput("trackClockTime", -1.0, ("sessionTime", "timeOfDay")),
-    ResParOutput("absoluteRefill", 0.0, absolute_refilling, ("pitMenu", "pitMenu")),
-)
-LMU_GARAGESETUP = (
-    ResParOutput("steeringWheelRange", 0.0, steerlock_to_number, ("VM_STEER_LOCK", "stringValue")),
-    ResParOutput("expectedFuelConsumption", 0.0, expected_usage, ("VM_FUEL_CAPACITY", "stringValue")),
-    ResParOutput("expectedVirtualEnergyConsumption", 0.0, expected_usage, ("VM_VIRTUAL_ENERGY", "stringValue")),
-    ResParOutput("lastCarSetup", (), export_lmu_car_setup),
-)
-LMU_SESSIONSINFO = (
-    ResRawOutput("timeScale", 1, ("SESSSET_race_timescale", "currentValue")),
-    ResRawOutput("privateQualifying", 0, ("SESSSET_private_qual", "currentValue")),
-)
-LMU_PITSTOPTIME = (
-    ResRawOutput("pitStopTime", 0.0, ("total",)),
-)
-LMU_STINTUSAGE = (
-    ResParOutput("stintUsage", EMPTY_DICT, stint_ve_usage),
-)
-
-# Define task set
-# 0 - uri path, 1 - output set, 2 - enabling condition, 3 is repeating task, 4 minimum update interval
-TASKSET_RF2 = (
-    ("/rest/sessions/weather", COMMON_WEATHERFORECAST, "enable_weather_info", False, 0.1),
-    ("/rest/sessions/setting/SESSSET_race_timescale", RF2_TIMESCALE, "enable_session_info", False, 0.1),
-    ("/rest/sessions/setting/SESSSET_private_qual", RF2_PRIVATEQUALIFY, "enable_session_info", False, 0.1),
-    ("/rest/garage/aerodynamics", RF2_GARAGESETUP_AERODYNAMICS, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/brakes", RF2_GARAGESETUP_BRAKES, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/chassis", RF2_GARAGESETUP_CHASSIS, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/drivetrain", RF2_GARAGESETUP_DRIVETRAIN, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/electronics", RF2_GARAGESETUP_ELECTRONICS, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/fuel", RF2_GARAGESETUP_FUEL, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/gears", RF2_GARAGESETUP_GEARS, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/suspension", RF2_GARAGESETUP_SUSPENSION, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/tires", RF2_GARAGESETUP_TIRES, "enable_garage_setup_info", False, 0.1),
-)
-TASKSET_LMU = (
-    ("/rest/sessions/weather", COMMON_WEATHERFORECAST, "enable_weather_info", False, 0.1),
-    ("/rest/sessions", LMU_SESSIONSINFO, "enable_session_info", False, 0.1),
-    ("/rest/garage/getPlayerGarageData", LMU_GARAGESETUP, "enable_garage_setup_info", False, 0.1),
-    ("/rest/garage/UIScreen/RepairAndRefuel", LMU_CURRENTSTINT, "enable_vehicle_info", True, 0.2),
-    ("/rest/strategy/pitstop-estimate", LMU_PITSTOPTIME, "enable_vehicle_info", True, 1.0),
-    ("/rest/strategy/usage", LMU_STINTUSAGE, "enable_energy_remaining", True, 1.0),
-)
+    res_timescale = (
+        ResOutput("timeScale", 1, valid_value_type, ("currentValue",)),
+    )
+    res_privatequalify = (
+        ResOutput("privateQualifying", 0, valid_value_type, ("currentValue",)),
+    )
+    res_garagesetup = (
+        ResOutput("lastCarSetup", (), export_rf2_car_setup),
+    )
+    # Define task set
+    return (
+        RestAPITask("/rest/sessions/weather", res_weatherforecast, "enable_weather_info", False, 0.1),
+        RestAPITask("/rest/sessions/setting/SESSSET_race_timescale", res_timescale, "enable_session_info", False, 0.1),
+        RestAPITask("/rest/sessions/setting/SESSSET_private_qual", res_privatequalify, "enable_session_info", False, 0.1),
+        RestAPITask("/rest/garage/aerodynamics", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+        RestAPITask("/rest/garage/brakes", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+        RestAPITask("/rest/garage/chassis", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+        RestAPITask("/rest/garage/drivetrain", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+        RestAPITask("/rest/garage/electronics", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+        RestAPITask("/rest/garage/fuel", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+        RestAPITask("/rest/garage/gears", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+        RestAPITask("/rest/garage/suspension", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+        RestAPITask("/rest/garage/tires", res_garagesetup, "enable_garage_setup_info", False, 0.1),
+    )

@@ -28,6 +28,7 @@ from .adapter import (
     APIDataReader,
     lmu_connector,
     lmu_reader,
+    lmu_restapi,
     restapi_connector,
     rf2_connector,
     rf2_reader,
@@ -67,12 +68,14 @@ class SimLMU(Connector):
         "shmmapi",
         # Secondary API
         "restapi",
+        "_restapi_dataset",
     )
     NAME = API_LMU_NAME
 
     def __init__(self):
         self.shmmapi = lmu_connector.LMUInfo()
-        self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_LMU, rf2_restapi.RestAPIData())
+        self._restapi_dataset = lmu_restapi.RestAPIData()
+        self.restapi = restapi_connector.RestAPIConnector(lmu_restapi.lmu_restapi_tasks(), self._restapi_dataset)
 
     def start(self):
         self.shmmapi.start()  # 1 load first
@@ -84,7 +87,7 @@ class SimLMU(Connector):
 
     def reader(self) -> APIDataReader:
         shmm = self.shmmapi
-        rest = self.restapi
+        rest = self._restapi_dataset
         return APIDataReader(
             lmu_reader.State(shmm, rest),
             lmu_reader.Brake(shmm, rest),
@@ -118,12 +121,14 @@ class SimRF2(Connector):
         "shmmapi",
         # Secondary API
         "restapi",
+        "_restapi_dataset",
     )
     NAME = API_RF2_NAME
 
     def __init__(self):
         self.shmmapi = rf2_connector.RF2Info()
-        self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_RF2, rf2_restapi.RestAPIData())
+        self._restapi_dataset = rf2_restapi.RestAPIData()
+        self.restapi = restapi_connector.RestAPIConnector(rf2_restapi.rf2_restapi_tasks(), self._restapi_dataset)
 
     def start(self):
         self.shmmapi.start()  # 1 load first
@@ -135,7 +140,7 @@ class SimRF2(Connector):
 
     def reader(self) -> APIDataReader:
         shmm = self.shmmapi
-        rest = self.restapi
+        rest = self._restapi_dataset
         return APIDataReader(
             rf2_reader.State(shmm, rest),
             rf2_reader.Brake(shmm, rest),
@@ -171,9 +176,11 @@ class SimLMULegacy(SimRF2):
         "shmmapi",
         # Secondary API
         "restapi",
+        "_restapi_dataset",
     )
     NAME = API_LMULEGACY_NAME
 
     def __init__(self):
         self.shmmapi = rf2_connector.RF2Info()
-        self.restapi = restapi_connector.RestAPIInfo(rf2_restapi.TASKSET_LMU, rf2_restapi.RestAPIData())
+        self._restapi_dataset = lmu_restapi.RestAPIData()
+        self.restapi = restapi_connector.RestAPIConnector(lmu_restapi.lmu_restapi_tasks(), self._restapi_dataset)

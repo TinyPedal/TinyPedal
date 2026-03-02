@@ -266,19 +266,19 @@ class UserConfig(BaseDialog):
         scroll_box.setWidgetResizable(True)
 
         # Search box
-        search_auto_complete = QCompleter(option_word_set)
+        search_auto_complete = QCompleter(option_word_set, self)
         search_auto_complete.setCaseSensitivity(Qt.CaseInsensitive)
 
-        self.edit_search = QLineEdit(self)
-        self.edit_search.setPlaceholderText(" Type here to search for option")
-        self.edit_search.setCompleter(search_auto_complete)
-        self.edit_search.textChanged.connect(self.search_options)
+        edit_search = QLineEdit(self)
+        edit_search.setPlaceholderText(" Type here to search for option")
+        edit_search.setCompleter(search_auto_complete)
+        edit_search.textChanged.connect(self.search_options)
 
         button_clearsearch = CompactButton("Clear")
-        button_clearsearch.clicked.connect(self.clear_search)
+        button_clearsearch.clicked.connect(edit_search.clear)
 
         layout_search = QHBoxLayout()
-        layout_search.addWidget(self.edit_search, stretch=1)
+        layout_search.addWidget(edit_search, stretch=1)
         layout_search.addWidget(button_clearsearch)
 
         # Set layout
@@ -299,18 +299,14 @@ class UserConfig(BaseDialog):
 
     def search_options(self, text: str):
         """Search for options"""
-        text = text.title()
+        text = text.strip().lower()
         layout_option = self.layout_option
         for row_index in range(layout_option.rowCount()):
             label = layout_option.itemAtPosition(row_index, 0).widget()
             option = layout_option.itemAtPosition(row_index, 1).widget()
-            hidden = text not in label.text()
+            hidden = text not in label.text().lower()
             label.setHidden(hidden)
             option.setHidden(hidden)
-
-    def clear_search(self):
-        """Clear search"""
-        self.edit_search.setText("")
 
     def applying(self):
         """Save & apply"""
@@ -510,6 +506,7 @@ class UserConfig(BaseDialog):
     def __add_option_label(self, idx, option_name, layout):
         """Option label"""
         label = QLabel(option_name)
+        label.setMinimumHeight(UIScaler.size(1.8))
         layout.addWidget(label, idx, COLUMN_LABEL)
 
     def __add_option_bool(self, idx, key, layout):
