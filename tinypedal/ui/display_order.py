@@ -30,6 +30,7 @@ from PySide2.QtWidgets import (
     QPushButton,
     QSizePolicy,
     QVBoxLayout,
+    QAbstractItemView
 )
 
 from ..formatter import format_option_name
@@ -51,46 +52,28 @@ class DisplayOrderDialog(BaseDialog):
         # List
         self.list_widget = QListWidget()
         self.list_widget.setSelectionMode(QListWidget.SingleSelection)
+        self.list_widget.setDragDropMode(QAbstractItemView.InternalMove)
+        self.list_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         self._populate_list(self.options)
-
-        self.list_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        row_height = self.list_widget.sizeHintForRow(0)
-        total_height = row_height * self.list_widget.count() + 2 * self.list_widget.frameWidth()
-        self.list_widget.setFixedHeight(total_height)
-
-        # Up/Down button
-        self.up_btn = QPushButton("▲")
-        self.up_btn.setFixedWidth(UIScaler.size(4))
-        self.up_btn.clicked.connect(self._move_up)
-
-        self.down_btn = QPushButton("▼")
-        self.down_btn.setFixedWidth(UIScaler.size(4))
-        self.down_btn.clicked.connect(self._move_down)
-
-        button_layout = QVBoxLayout()
-        button_layout.addWidget(self.up_btn)
-        button_layout.addWidget(self.down_btn)
-        button_layout.addStretch()
 
         top_layout = QHBoxLayout()
         top_layout.addWidget(self.list_widget)
-        top_layout.addLayout(button_layout)
 
         # Button
-        self.reset_btn = QPushButton("Reset")
-        self.reset_btn.clicked.connect(self._reset_order)
+        reset_btn = QPushButton("Reset")
+        reset_btn.clicked.connect(self._reset_order)
 
-        self.apply_btn = QPushButton("Apply")
-        self.apply_btn.clicked.connect(self.update_order)
+        apply_btn = QPushButton("Apply")
+        apply_btn.clicked.connect(self.update_order)
 
-        self.close_btn = QPushButton("Close")
-        self.close_btn.clicked.connect(self.reject)
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.reject)
 
         bottom_layout = QHBoxLayout()
-        bottom_layout.addWidget(self.reset_btn)
+        bottom_layout.addWidget(reset_btn)
         bottom_layout.addStretch()
-        bottom_layout.addWidget(self.apply_btn)
-        bottom_layout.addWidget(self.close_btn)
+        bottom_layout.addWidget(apply_btn)
+        bottom_layout.addWidget(close_btn)
 
         # Layout
         main_layout = QVBoxLayout()
@@ -99,8 +82,8 @@ class DisplayOrderDialog(BaseDialog):
         main_layout.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(main_layout)
 
-        self.adjustSize()
-        self.setFixedSize(self.size())
+        # Calculate size based on content after populating
+        self._fit_to_content()
 
     def update_order(self):
         """Update display order"""
@@ -123,7 +106,9 @@ class DisplayOrderDialog(BaseDialog):
         """Populate list"""
         self.list_widget.clear()
         for key in sorted(self.column_keys, key=lambda k: values[k]):
-            item = QListWidgetItem(format_option_name(key))
+            # Strip prefix, then format
+            short_key = key.replace("column_index_", "")
+            item = QListWidgetItem(format_option_name(short_key))
             item.setData(Qt.UserRole, key)
             self.list_widget.addItem(item)
 
@@ -132,18 +117,32 @@ class DisplayOrderDialog(BaseDialog):
         self._populate_list(self.default_values)
         self.list_widget.setCurrentRow(0)
 
-    def _move_up(self):
-        """Move selected item up"""
-        row = self.list_widget.currentRow()
-        if row > 0:
-            item = self.list_widget.takeItem(row)
-            self.list_widget.insertItem(row - 1, item)
-            self.list_widget.setCurrentRow(row - 1)
 
-    def _move_down(self):
-        """Move selected item down"""
-        row = self.list_widget.currentRow()
-        if row < self.list_widget.count() - 1:
-            item = self.list_widget.takeItem(row)
-            self.list_widget.insertItem(row + 1, item)
-            self.list_widget.setCurrentRow(row + 1)
+    def _fit_to_content(self):
+        """Fit dialog size to content"""
+        self.layout().activate()
+
+        # Get width needed for longest item
+        width = 0
+        for row in range(self.list_widget.count()):
+            item = self.list_widget.item(row)
+            item_width = self.list_widget.fontMetrics().horizontalAdvance(item.text())
+            width = max(width, item_width)
+
+        # Add scrollbar width if needed, plus margins
+        scrollbar_width = self.style().pixelMetric(self.style().PM_ScrollBarExtent)
+        margins = self.layout().contentsMargins()
+
+        total_width = (width + scrollbar_width + margins.left() + margins.right() +
+                    UIScaler.size(6))
+
+        # Height based on item count (with max limit)
+        item_height = self.list_widget.sizeHintForRow(0)
+        max_visible_items = 15  # Limit height for long lists
+        visible_items = min(self.list_widget.count(), max_visible_items)
+
+        total_height = (item_height * visible_items + margins.top() + margins.bottom() +
+                        UIScaler.size(10))  # button row
+
+        self.resize(total_width, total_height)
+        self.setMinimumSize(total_width, total_height)
