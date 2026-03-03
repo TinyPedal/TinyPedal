@@ -217,7 +217,6 @@ class UserConfig(BaseDialog):
         super().__init__(parent)
         self.set_config_title(format_option_name(key_name), set_preset_name(cfg_type))
 
-        self.setWindowFlags(self.windowFlags() | Qt.Window)
         self.reloading = reload_func
         self.key_name = key_name
         self.cfg_type = cfg_type
