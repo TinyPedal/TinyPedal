@@ -243,8 +243,9 @@ class UserConfig(BaseDialog):
         button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
         button_reset.clicked.connect(self.reset_setting)
 
-        self.button_display_order = QPushButton("Display Order")
-        self.button_display_order.clicked.connect(self.on_display_order_clicked)
+        if cfg_type == ConfigType.WIDGET:
+            button_display_order = QPushButton("Display Order")
+            button_display_order.clicked.connect(self.open_display_order)
 
         button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
         button_apply.clicked.connect(self.applying)
@@ -288,7 +289,8 @@ class UserConfig(BaseDialog):
         layout_main.addLayout(layout_search)
         layout_main.addWidget(scroll_box)
         layout_button.addWidget(button_reset)
-        layout_button.addWidget(self.button_display_order)
+        if cfg_type == ConfigType.WIDGET:
+            layout_button.addWidget(button_display_order)
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
         layout_button.addWidget(button_save)
@@ -315,6 +317,20 @@ class UserConfig(BaseDialog):
     def saving(self):
         """Save & close"""
         self.save_setting(is_apply=False)
+
+    def open_display_order(self):
+        """Open display order dialog"""
+        options = self.user_setting[self.key_name]
+        column_keys = [k for k in options if k.startswith("column_index_")]
+        default_values = {k: self.default_setting[self.key_name][k] for k in column_keys}
+        dialog = DisplayOrderDialog(self, options=options, default_values=default_values)
+        dialog.open()
+
+    def update_column_index(self):
+        """Update column index editor"""
+        options = self.user_setting[self.key_name]
+        for key, editor in self.option_column.items():
+            editor.setText(str(options[key]))
 
     def reset_setting(self):
         """Reset setting"""
@@ -634,30 +650,6 @@ class UserConfig(BaseDialog):
         # Add layout
         layout.addWidget(editor, idx, COLUMN_OPTION)
         self.option_float[key] = editor
-
-    #Display order functions
-    def update_column_index(self):
-        """Update displayed index values from the user setting dictionary."""
-        options_dict = self.user_setting[self.key_name]
-        for key, line_edit in self.option_column.items():
-            line_edit.setText(str(options_dict[key]))
-
-    def on_display_order_clicked(self):
-        # Get options and generate column keys
-        options = self.user_setting[self.key_name]
-        column_keys = [k for k in options.keys() if k.startswith("column_index_")]
-
-        # Get default values
-        default_values = {k: self.default_setting[self.key_name][k] for k in column_keys}
-
-        # Create and open dialog (non-blocking)
-        dialog = DisplayOrderDialog(
-            self,
-            options=options,
-            default_values=default_values,
-            update_callback=self.update_column_index
-        )
-        dialog.open()
 
 
 def set_preset_name(cfg_type: str):
