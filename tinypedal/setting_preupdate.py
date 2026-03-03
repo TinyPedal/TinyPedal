@@ -32,6 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
+        ((2, 42, 2), _user_prior_2_42_2),  # 2026-03-03
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -43,6 +44,15 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
         if preset_version < _version:
             _update(dict_user)
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
+
+
+def _user_prior_2_42_2(dict_user: dict):
+    """Update user setting prior to 2.42.2"""
+    # Copy old setting from sectors module to sectors widget
+    module_sectors = dict_user.get("module_sectors")
+    sectors = dict_user.get("sectors")
+    if isinstance(module_sectors, dict) and isinstance(sectors, dict):
+        sectors["enable_all_time_best_sectors"] = module_sectors["enable_all_time_best_sectors"]
 
 
 def _user_prior_2_41_0(dict_user: dict):

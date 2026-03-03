@@ -1929,6 +1929,7 @@ WIDGET_DEFAULT = {
         "font_offset_vertical": 0,
         "bar_padding": 0.2,
         "bar_gap": 2,
+        "enable_all_time_best_sectors": True,
         "target_laptime": "Theoretical",
         "freeze_duration": 5,
         "font_color_target_time": "#AAAAAA",
