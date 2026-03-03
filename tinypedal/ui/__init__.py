@@ -409,4 +409,18 @@ def set_style_window(base_font_pt: int) -> str:
         About #labelAppName {{
             font-size: {font_pt_app_name}pt;
         }}
+        /* Display order dialog */
+        DisplayOrderDialog > QListView {{
+            font-size: {font_pt_item_name}pt;
+            outline: none;
+        }}
+        DisplayOrderDialog > QListView::item {{
+            border: none;
+            min-height: 1.25em;
+            padding: 0.25em 0.25em 0.25em 0;
+        }}
+        DisplayOrderDialog > QListView::item:selected {{
+            selection-color: {color_active_highlighted_text};
+            background: {color_active_highlight};
+        }}
     """)
