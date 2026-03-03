@@ -1465,9 +1465,6 @@ Enable relative module.
     module_sectors
 Enable sectors module.
 
-    enable_all_time_best_sectors
-Calculate sectors timing based on all time best sectors and affects [Sectors](#sectors) widget display. This option is enabled by default. Set `false` to calculate sectors timing from current session only. Note, both session best and all time best sectors data are saved no matter the setting.
-
 [**`Back to Top`**](#)
 
 
@@ -3342,6 +3339,9 @@ Set minimum time interval between each LED flash. Default is `0.25` seconds. Min
 
     layout
 2 layouts are available: `0` = target and current sectors above deltabest sectors, `1` = deltabest sectors above target and current sectors.
+
+    enable_all_time_best_sectors
+Show sectors timing based on all time best sectors instead of current session. This option is enabled by default. Set `false` to show sectors timing from current session only.
 
     target_laptime
 Set target laptime for display target reference lap and sector time. Set `Theoretical` to show theoretical best sector time. Set `Personal` to show sector time from personal best lap time. Note, if `enable_all_time_best_sectors` option is enabled in `Sectors Module`, all time best sectors data will be displayed instead, otherwise only current session best sectors data will be displayed.
