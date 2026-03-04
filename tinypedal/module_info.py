@@ -609,8 +609,8 @@ class RelativeInfo:
         self.drawOrder: list = [0]
 
 
-class SectorsInfo:
-    """Sectors output data"""
+class SectorData:
+    """Sector data set"""
 
     __slots__ = (
         "noDeltaSector",
@@ -630,6 +630,19 @@ class SectorsInfo:
         self.sectorBestPB: list[float] = [MAX_SECONDS] * 3
         self.deltaSectorBestPB: list[float] = [MAX_SECONDS] * 3
         self.deltaSectorBestTB: list[float] = [MAX_SECONDS] * 3
+
+
+class SectorsInfo:
+    """Sectors output data"""
+
+    __slots__ = (
+        "allTimeBest",
+        "sessionBest",
+    )
+
+    def __init__(self):
+        self.allTimeBest: SectorData = SectorData()
+        self.sessionBest: SectorData = SectorData()
 
 
 class StatsInfo:

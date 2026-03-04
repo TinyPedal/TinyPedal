@@ -75,7 +75,6 @@ MODULE_DEFAULT = {
         "enable": True,
         "update_interval": 10,
         "idle_update_interval": 400,
-        "enable_all_time_best_sectors": True,
     },
     "module_stats": {
         "enable": True,

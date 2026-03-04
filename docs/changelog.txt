@@ -6,6 +6,9 @@ WIP
 * Config Dialog
   - Added "Option Search Box" on the top of config dialog (requested by user "Oost-hash"), which allows to quickly filter and find specific options.
 
+* Sectors Widget
+  - Moved "enable_all_time_best_sectors" option from "Sectors Module" to "Sectors Widget" for easy access. Old setting will be automatically transferred over.
+
 2.42.0 (2026-02-25)
 -----------------------------
 * Important Fix

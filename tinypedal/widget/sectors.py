@@ -139,7 +139,11 @@ class Realtime(Overlay):
         lap_stime = api.read.timing.start()
         lap_etime = api.read.timing.elapsed()
         laptime_curr = max(lap_etime - lap_stime, 0)
-        data = minfo.sectors
+
+        if self.wcfg["enable_all_time_best_sectors"]:
+            data = minfo.sectors.allTimeBest
+        else:
+            data = minfo.sectors.sessionBest
 
         # Triggered when sector changed
         if self.last_sector_idx != data.sectorIndex:
