@@ -258,7 +258,7 @@ class Realtime(Overlay):
                 continue
             # Seconds away = next node start percent * session length - elapsed time
             _time = self.estimated_time[index] = round(
-                (forecast.start_percent * session_length - elapsed_time) / 60)
+                (forecast.start * session_length - elapsed_time) / 60)
             if _time <= 0:
                 index_offset += 1
         return index_offset

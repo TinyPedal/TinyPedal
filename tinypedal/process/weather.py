@@ -25,16 +25,23 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import NamedTuple
 
-from ..const_common import ABS_ZERO_CELSIUS, MAX_SECONDS
+from ..const_common import ABS_ZERO_CELSIUS
 
 
 class WeatherNode(NamedTuple):
-    """Weather forecast node info"""
+    """Weather forecast node info
 
-    start_percent: float = MAX_SECONDS
+    Attributes:
+        start: fraction of forecast start time relative to session length, range 0.0 - 1.0.
+        sky_type: sky type index, range 0 - 10.
+        temperature: degrees in Celsius.
+        rain_chance: fraction of rain chance, range 0.0 - 1.0.
+    """
+
+    start: float = 1.0
     sky_type: int = -1
     temperature: float = ABS_ZERO_CELSIUS
-    rain_chance: float = -1.0  # fraction
+    rain_chance: float = 0.0
 
 
 FORECAST_DEFAULT = (WeatherNode(),)
@@ -46,14 +53,14 @@ def forecast_rf2(data: dict, default: tuple[WeatherNode, ...]) -> tuple[WeatherN
         forecast_nodes = ("START", "NODE_25", "NODE_50", "NODE_75", "FINISH")
         output = tuple(
             WeatherNode(
-                start_percent=round(index * 0.2, 1),
-                sky_type=data[node]["WNV_SKY"]["currentValue"],
-                temperature=data[node]["WNV_TEMPERATURE"]["currentValue"],
-                rain_chance=data[node]["WNV_RAIN_CHANCE"]["currentValue"] * 0.01,
+                start=round(index * 0.2, 1),
+                sky_type=int(data[node]["WNV_SKY"]["currentValue"]),
+                temperature=float(data[node]["WNV_TEMPERATURE"]["currentValue"]),
+                rain_chance=min(max(float(data[node]["WNV_RAIN_CHANCE"]["currentValue"]) * 0.01, 0.0), 1.0),
             )
             for index, node in enumerate(forecast_nodes)
         )
-    except (KeyError, TypeError):
+    except (KeyError, TypeError, ValueError):
         output = default
     return output
 
