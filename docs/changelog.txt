@@ -5,9 +5,14 @@ WIP
 
 * Config Dialog
   - Added "Option Search Box" on the top of config dialog (requested by user "Oost-hash"), which allows to quickly filter and find specific options.
+  - Added "Configure Display Order" button, which opens "Display Order" dialog for configuring info display order in widget (implemented by @Oost-hash). This feature is only available for widget with "column_index" option.
+    To quickly rearranging display order, select a row and drag to reorder.
 
 * Sectors Widget
   - Moved "enable_all_time_best_sectors" option from "Sectors Module" to "Sectors Widget" for easy access. Old setting will be automatically transferred over.
+
+* Misc
+  - Added new contributor "Oost-hash" to contributors.md in "Implementation" section.
 
 2.42.0 (2026-02-25)
 -----------------------------

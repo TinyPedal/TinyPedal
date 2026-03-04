@@ -385,6 +385,8 @@ def set_style_window(base_font_pt: int) -> str:
         BaseEditor QTableWidget DoubleClickEdit {{
             border: none;
         }}
+
+        /* Fuel calculator dialog */
         FuelCalculator QLineEdit[readOnly="true"]{{
             background: {color_active_window};
         }}
@@ -400,6 +402,8 @@ def set_style_window(base_font_pt: int) -> str:
             background: {color_inactive_highlight};
             font-weight:bold;
         }}
+
+        /* About dialog */
         About QLabel {{
             font-size: {font_pt_text_browser}pt;
         }}
@@ -409,18 +413,23 @@ def set_style_window(base_font_pt: int) -> str:
         About #labelAppName {{
             font-size: {font_pt_app_name}pt;
         }}
+
         /* Display order dialog */
-        DisplayOrderDialog > QListView {{
+        DisplayOrder > QListView {{
             font-size: {font_pt_item_name}pt;
             outline: none;
         }}
-        DisplayOrderDialog > QListView::item {{
+        DisplayOrder > QListView::item {{
             border: none;
-            min-height: 1.25em;
-            padding: 0.25em 0.25em 0.25em 0;
+            padding: 0.1em;
+            border: 2px solid {color_disabled_highlight};
         }}
-        DisplayOrderDialog > QListView::item:selected {{
+        DisplayOrder > QListView::item:selected {{
             selection-color: {color_active_highlighted_text};
             background: {color_active_highlight};
+            border: 2px solid {color_active_highlight};
+        }}
+        DisplayOrder > QListView::item:hover {{
+            border: 2px solid {color_active_highlight};
         }}
     """)

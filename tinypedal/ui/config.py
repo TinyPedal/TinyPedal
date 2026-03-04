@@ -40,11 +40,11 @@ from PySide2.QtWidgets import (
     QLineEdit,
     QMenu,
     QMessageBox,
+    QPushButton,
     QScrollArea,
     QSpinBox,
     QVBoxLayout,
     QWidget,
-    QPushButton,
 )
 
 from .. import regex_pattern as rxp
@@ -63,7 +63,7 @@ from ._common import (
     UIScaler,
     singleton_dialog,
 )
-from .display_order import DisplayOrderDialog
+from .display_order import DisplayOrder
 
 COLUMN_LABEL = 0  # grid layout column index
 COLUMN_OPTION = 1
@@ -235,24 +235,6 @@ class UserConfig(BaseDialog):
         self.option_integer: dict = {}
         self.option_float: dict = {}
 
-        # key = "column_index_*", value = QLineEdit
-        self.option_column: dict = {}
-
-        # Button
-        button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
-        button_reset.clicked.connect(self.reset_setting)
-
-        if cfg_type == ConfigType.WIDGET:
-            button_display_order = QPushButton("Display Order")
-            button_display_order.clicked.connect(self.open_display_order)
-
-        button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
-        button_apply.clicked.connect(self.applying)
-
-        button_save = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        button_save.accepted.connect(self.saving)
-        button_save.rejected.connect(self.reject)
-
         # Create options
         self.layout_option = QGridLayout()
         self.layout_option.setAlignment(Qt.AlignTop)
@@ -270,7 +252,7 @@ class UserConfig(BaseDialog):
         search_auto_complete.setCaseSensitivity(Qt.CaseInsensitive)
 
         edit_search = QLineEdit(self)
-        edit_search.setPlaceholderText(" Type here to search for option")
+        edit_search.setPlaceholderText(" Type here to search options")
         edit_search.setCompleter(search_auto_complete)
         edit_search.textChanged.connect(self.search_options)
 
@@ -281,18 +263,34 @@ class UserConfig(BaseDialog):
         layout_search.addWidget(edit_search, stretch=1)
         layout_search.addWidget(button_clearsearch)
 
-        # Set layout
-        layout_main = QVBoxLayout()
-        layout_button = QHBoxLayout()
+        # Button
+        has_display_order = (cfg_type == ConfigType.WIDGET and "Column" in option_word_set)
+        if has_display_order:
+            button_display_order = QPushButton("Configure Display Order")
+            button_display_order.clicked.connect(self.open_display_order)
 
-        layout_main.addLayout(layout_search)
-        layout_main.addWidget(scroll_box)
+        button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
+        button_reset.clicked.connect(self.reset_setting)
+
+        button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
+        button_apply.clicked.connect(self.applying)
+
+        button_save = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        button_save.accepted.connect(self.saving)
+        button_save.rejected.connect(self.reject)
+
+        layout_button = QHBoxLayout()
         layout_button.addWidget(button_reset)
-        if cfg_type == ConfigType.WIDGET:
-            layout_button.addWidget(button_display_order)
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
         layout_button.addWidget(button_save)
+
+        # Set layout
+        layout_main = QVBoxLayout()
+        layout_main.addLayout(layout_search)
+        layout_main.addWidget(scroll_box)
+        if has_display_order:
+            layout_main.addWidget(button_display_order)
         layout_main.addLayout(layout_button)
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(layout_main)
@@ -309,6 +307,21 @@ class UserConfig(BaseDialog):
             label.setHidden(hidden)
             option.setHidden(hidden)
 
+    def open_display_order(self):
+        """Open display order dialog"""
+        # Extract column index setting
+        user_orders = {k: v for k, v in self.user_setting[self.key_name].items() if k.startswith("column_index_")}
+        default_orders = {k: v for k, v in self.default_setting[self.key_name].items() if k.startswith("column_index_")}
+        dialog = DisplayOrder(self, user_orders=user_orders, default_orders=default_orders)
+        dialog.open()
+
+    def update_column_index(self, new_orders: dict):
+        """Update column index to user setting & editor"""
+        self.user_setting[self.key_name].update(new_orders)
+        for key, value in new_orders.items():
+            if key in self.option_integer:
+                self.option_integer[key].setText(str(value))
+
     def applying(self):
         """Save & apply"""
         self.save_setting(is_apply=True)
@@ -316,20 +329,6 @@ class UserConfig(BaseDialog):
     def saving(self):
         """Save & close"""
         self.save_setting(is_apply=False)
-
-    def open_display_order(self):
-        """Open display order dialog"""
-        options = self.user_setting[self.key_name]
-        column_keys = [k for k in options if k.startswith("column_index_")]
-        default_values = {k: self.default_setting[self.key_name][k] for k in column_keys}
-        dialog = DisplayOrderDialog(self, options=options, default_values=default_values)
-        dialog.open()
-
-    def update_column_index(self):
-        """Update column index editor"""
-        options = self.user_setting[self.key_name]
-        for key, editor in self.option_column.items():
-            editor.setText(str(options[key]))
 
     def reset_setting(self):
         """Reset setting"""
@@ -500,9 +499,7 @@ class UserConfig(BaseDialog):
                 continue
             # Int
             if re.search(rxp.CFG_INTEGER, key):
-                editor = self.__add_option_integer(idx, key, layout)
-                if key.startswith("column_index_"):
-                    self.option_column[key] = editor
+                self.__add_option_integer(idx, key, layout)
                 continue
             # Float or int
             self.__add_option_float(idx, key, layout)
@@ -634,7 +631,6 @@ class UserConfig(BaseDialog):
         # Add layout
         layout.addWidget(editor, idx, COLUMN_OPTION)
         self.option_integer[key] = editor
-        return editor
 
     def __add_option_float(self, idx, key, layout):
         """Float"""

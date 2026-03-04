@@ -24,60 +24,56 @@ from __future__ import annotations
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
+    QAbstractItemView,
+    QDialogButtonBox,
     QHBoxLayout,
     QListWidget,
     QListWidgetItem,
-    QPushButton,
-    QSizePolicy,
     QVBoxLayout,
-    QAbstractItemView
 )
 
 from ..formatter import format_option_name
 from ._common import BaseDialog, UIScaler
 
 
-class DisplayOrderDialog(BaseDialog):
-    """Display order dialog"""
+class DisplayOrder(BaseDialog):
+    """Adjust display order for widget column or row"""
 
-    def __init__(self, parent, options: dict, default_values: dict):
+    def __init__(self, parent, user_orders: dict, default_orders: dict):
         super().__init__(parent)
         self.setWindowTitle("Display Order")
 
         self._parent = parent
-        self.options = options
-        self.default_values = default_values
-        self.column_keys = [k for k in options if k.startswith("column_index_")]
+        self.temp_orders = user_orders
+        self.default_orders = default_orders
 
         # List
         self.list_widget = QListWidget()
         self.list_widget.setSelectionMode(QListWidget.SingleSelection)
         self.list_widget.setDragDropMode(QAbstractItemView.InternalMove)
-        self.list_widget.setMinimumHeight(UIScaler.size(10))
-        self._populate_list(self.options)
-
-        top_layout = QHBoxLayout()
-        top_layout.addWidget(self.list_widget)
+        self.list_widget.setMinimumHeight(UIScaler.size(20))
+        self.list_widget.setSpacing(1)
+        self._populate_list(self.temp_orders)
 
         # Button
-        reset_btn = QPushButton("Reset")
-        reset_btn.clicked.connect(self._reset_order)
+        button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
+        button_reset.clicked.connect(self._reset_order)
 
-        apply_btn = QPushButton("Apply")
-        apply_btn.clicked.connect(self.update_order)
+        button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
+        button_apply.clicked.connect(self._apply_order)
 
-        close_btn = QPushButton("Close")
-        close_btn.clicked.connect(self.reject)
+        button_close = QDialogButtonBox(QDialogButtonBox.Close)
+        button_close.clicked.connect(self.reject)
 
         bottom_layout = QHBoxLayout()
-        bottom_layout.addWidget(reset_btn)
+        bottom_layout.addWidget(button_reset)
         bottom_layout.addStretch()
-        bottom_layout.addWidget(apply_btn)
-        bottom_layout.addWidget(close_btn)
+        bottom_layout.addWidget(button_apply)
+        bottom_layout.addWidget(button_close)
 
         # Layout
         main_layout = QVBoxLayout()
-        main_layout.addLayout(top_layout)
+        main_layout.addWidget(self.list_widget)
         main_layout.addLayout(bottom_layout)
         main_layout.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(main_layout)
@@ -85,38 +81,34 @@ class DisplayOrderDialog(BaseDialog):
         # Calculate size based on content after populating
         # self._fit_to_content()
 
-    def update_order(self):
-        """Update display order"""
-        new_order = self.get_order()
-        for key, index in new_order.items():
-            self.options[key] = index
-        self._parent.update_column_index()
-        self._parent.applying()
-
-    def get_order(self) -> dict:
-        """Get display order"""
-        order = {}
+    def _apply_order(self):
+        """Apply display order"""
         for row in range(self.list_widget.count()):
             item = self.list_widget.item(row)
             key = item.data(Qt.UserRole)
-            order[key] = row + 1
-        return order
+            if key in self.temp_orders:
+                self.temp_orders[key] = row + 1
 
-    def _populate_list(self, values: dict):
+        self._parent.update_column_index(self.temp_orders)
+        self._parent.applying()
+
+    def _populate_list(self, target_orders: dict):
         """Populate list"""
         self.list_widget.clear()
-        for key in sorted(self.column_keys, key=lambda k: values[k]):
+
+        for key in sorted(target_orders, key=lambda k: target_orders[k]):
             # Strip prefix, then format
             short_key = key.replace("column_index_", "")
             item = QListWidgetItem(format_option_name(short_key))
+            item.setTextAlignment(Qt.AlignCenter)
+            item.setToolTip("Click & Drag to Reorder Display")
             item.setData(Qt.UserRole, key)
             self.list_widget.addItem(item)
 
     def _reset_order(self):
         """Reset display order"""
-        self._populate_list(self.default_values)
+        self._populate_list(self.default_orders)
         self.list_widget.setCurrentRow(0)
-
 
     # def _fit_to_content(self):
     #     """Fit dialog size to content"""
