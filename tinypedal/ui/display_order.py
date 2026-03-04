@@ -53,7 +53,7 @@ class DisplayOrderDialog(BaseDialog):
         self.list_widget = QListWidget()
         self.list_widget.setSelectionMode(QListWidget.SingleSelection)
         self.list_widget.setDragDropMode(QAbstractItemView.InternalMove)
-        self.list_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        self.list_widget.setMinimumHeight(UIScaler.size(10))
         self._populate_list(self.options)
 
         top_layout = QHBoxLayout()
@@ -83,7 +83,7 @@ class DisplayOrderDialog(BaseDialog):
         self.setLayout(main_layout)
 
         # Calculate size based on content after populating
-        self._fit_to_content()
+        # self._fit_to_content()
 
     def update_order(self):
         """Update display order"""
@@ -118,31 +118,31 @@ class DisplayOrderDialog(BaseDialog):
         self.list_widget.setCurrentRow(0)
 
 
-    def _fit_to_content(self):
-        """Fit dialog size to content"""
-        self.layout().activate()
+    # def _fit_to_content(self):
+    #     """Fit dialog size to content"""
+    #     self.layout().activate()
 
-        # Get width needed for longest item
-        width = 0
-        for row in range(self.list_widget.count()):
-            item = self.list_widget.item(row)
-            item_width = self.list_widget.fontMetrics().horizontalAdvance(item.text())
-            width = max(width, item_width)
+    #     # Get width needed for longest item
+    #     width = 0
+    #     for row in range(self.list_widget.count()):
+    #         item = self.list_widget.item(row)
+    #         item_width = self.list_widget.fontMetrics().horizontalAdvance(item.text())
+    #         width = max(width, item_width)
 
-        # Add scrollbar width if needed, plus margins
-        scrollbar_width = self.style().pixelMetric(self.style().PM_ScrollBarExtent)
-        margins = self.layout().contentsMargins()
+    #     # Add scrollbar width if needed, plus margins
+    #     scrollbar_width = self.style().pixelMetric(self.style().PM_ScrollBarExtent)
+    #     margins = self.layout().contentsMargins()
 
-        total_width = (width + scrollbar_width + margins.left() + margins.right() +
-                    UIScaler.size(6))
+    #     total_width = (width + scrollbar_width + margins.left() + margins.right() +
+    #                 UIScaler.size(6))
 
-        # Height based on item count (with max limit)
-        item_height = self.list_widget.sizeHintForRow(0)
-        max_visible_items = 15  # Limit height for long lists
-        visible_items = min(self.list_widget.count(), max_visible_items)
+    #     # Height based on item count (with max limit)
+    #     item_height = self.list_widget.sizeHintForRow(0)
+    #     max_visible_items = 15  # Limit height for long lists
+    #     visible_items = min(self.list_widget.count(), max_visible_items)
 
-        total_height = (item_height * visible_items + margins.top() + margins.bottom() +
-                        UIScaler.size(10))  # button row
+    #     total_height = (item_height * visible_items + margins.top() + margins.bottom() +
+    #                     UIScaler.size(10))  # button row
 
-        self.resize(total_width, total_height)
-        self.setMinimumSize(total_width, total_height)
+    #     self.resize(total_width, total_height)
+    #     self.setMinimumSize(total_width, total_height)
