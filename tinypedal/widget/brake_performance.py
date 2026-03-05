@@ -59,7 +59,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_trans_rate,
-                column=self.wcfg["column_index_transient_max_braking_rate"],
+                column=self.wcfg["display_order_transient_max_braking_rate"],
             )
 
         # Max braking rate
@@ -75,7 +75,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_max_rate,
-                column=self.wcfg["column_index_max_braking_rate"],
+                column=self.wcfg["display_order_max_braking_rate"],
             )
 
         # Delta braking rate
@@ -96,7 +96,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_delta_rate,
-                column=self.wcfg["column_index_delta_braking_rate"],
+                column=self.wcfg["display_order_delta_braking_rate"],
             )
 
         # Front wheel lock duration
@@ -112,7 +112,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_lock_f,
-                column=self.wcfg["column_index_front_wheel_lock_duration"],
+                column=self.wcfg["display_order_front_wheel_lock_duration"],
             )
 
         # Rear wheel lock duration
@@ -128,7 +128,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_lock_r,
-                column=self.wcfg["column_index_rear_wheel_lock_duration"],
+                column=self.wcfg["display_order_rear_wheel_lock_duration"],
             )
 
     def timerEvent(self, event):

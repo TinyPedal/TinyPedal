@@ -89,7 +89,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pos,
-                column_index=self.wcfg["column_index_position"],
+                column=self.wcfg["display_order_position"],
             )
         # Driver position change
         if self.wcfg["show_position_change"]:
@@ -122,7 +122,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pgl,
-                column_index=self.wcfg["column_index_position_change"],
+                column=self.wcfg["display_order_position_change"],
             )
         # Driver name
         if self.wcfg["show_driver_name"]:
@@ -143,7 +143,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_drv,
-                column_index=self.wcfg["column_index_driver"],
+                column=self.wcfg["display_order_driver"],
             )
         # Vehicle name
         if self.wcfg["show_vehicle_name"]:
@@ -164,7 +164,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_veh,
-                column_index=self.wcfg["column_index_vehicle"],
+                column=self.wcfg["display_order_vehicle"],
             )
         # Brand logo
         if self.wcfg["show_brand_logo"]:
@@ -181,7 +181,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_brd,
-                column_index=self.wcfg["column_index_brand_logo"],
+                column=self.wcfg["display_order_brand_logo"],
             )
         # Time gap
         if self.wcfg["show_time_gap"]:
@@ -214,7 +214,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_gap,
-                column_index=self.wcfg["column_index_timegap"],
+                column=self.wcfg["display_order_timegap"],
             )
         # Vehicle laptime
         if self.wcfg["show_laptime"]:
@@ -247,7 +247,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_lpt,
-                column_index=self.wcfg["column_index_laptime"],
+                column=self.wcfg["display_order_laptime"],
             )
         # Vehicle best laptime
         if self.wcfg["show_best_laptime"]:
@@ -272,7 +272,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_blp,
-                column_index=self.wcfg["column_index_best_laptime"],
+                column=self.wcfg["display_order_best_laptime"],
             )
         # Position in class
         if self.wcfg["show_position_in_class"]:
@@ -297,7 +297,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pic,
-                column_index=self.wcfg["column_index_position_in_class"],
+                column=self.wcfg["display_order_position_in_class"],
             )
         # Vehicle class
         if self.wcfg["show_class"]:
@@ -312,7 +312,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_cls,
-                column_index=self.wcfg["column_index_class"],
+                column=self.wcfg["display_order_class"],
             )
         # Vehicle in pit
         if self.wcfg["show_pit_status"]:
@@ -348,7 +348,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pit,
-                column_index=self.wcfg["column_index_pitstatus"],
+                column=self.wcfg["display_order_pitstatus"],
             )
         # Tyre compound index
         if self.wcfg["show_tyre_compound"]:
@@ -373,7 +373,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_tcp,
-                column_index=self.wcfg["column_index_tyre_compound"],
+                column=self.wcfg["display_order_tyre_compound"],
             )
         # Pitstop count
         if self.wcfg["show_pitstop_count"]:
@@ -406,7 +406,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_psc,
-                column_index=self.wcfg["column_index_pitstop_count"],
+                column=self.wcfg["display_order_pitstop_count"],
             )
         # Remaining energy
         if self.wcfg["show_energy_remaining"]:
@@ -443,7 +443,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_nrg,
-                column_index=self.wcfg["column_index_energy_remaining"],
+                column=self.wcfg["display_order_energy_remaining"],
             )
         # Vehicle integrity
         if self.wcfg["show_vehicle_integrity"]:
@@ -476,7 +476,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_dmg,
-                column_index=self.wcfg["column_index_vehicle_integrity"],
+                column=self.wcfg["display_order_vehicle_integrity"],
             )
         # Stint laps
         if self.wcfg["show_stint_laps"]:
@@ -501,7 +501,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_stl,
-                column_index=self.wcfg["column_index_stint_laps"],
+                column=self.wcfg["display_order_stint_laps"],
             )
         # Speed trap
         if self.wcfg["show_speed_trap"]:
@@ -527,7 +527,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_spd,
-                column_index=self.wcfg["column_index_speed_trap"],
+                column=self.wcfg["display_order_speed_trap"],
             )
 
     def timerEvent(self, event):

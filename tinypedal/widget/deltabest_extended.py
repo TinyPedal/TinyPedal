@@ -80,7 +80,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_atbest,
-                column=self.wcfg["column_index_all_time_deltabest"],
+                column=self.wcfg["display_order_all_time_deltabest"],
             )
 
         # Session deltabest
@@ -97,7 +97,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_ssbest,
-                column=self.wcfg["column_index_session_deltabest"],
+                column=self.wcfg["display_order_session_deltabest"],
             )
 
         # Stint deltabest
@@ -114,7 +114,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_stbest,
-                column=self.wcfg["column_index_stint_deltabest"],
+                column=self.wcfg["display_order_stint_deltabest"],
             )
 
         # Deltalast
@@ -131,7 +131,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_labest,
-                column=self.wcfg["column_index_deltalast"],
+                column=self.wcfg["display_order_deltalast"],
             )
 
         # Last data

@@ -74,7 +74,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_notes,
-                column=self.wcfg["column_index_pace_notes"],
+                column=self.wcfg["display_order_pace_notes"],
             )
 
         # Comments
@@ -91,7 +91,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_comments,
-                column=self.wcfg["column_index_comments"],
+                column=self.wcfg["display_order_comments"],
             )
 
         # Debugging info
@@ -107,7 +107,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_debugging,
-                column=self.wcfg["column_index_debugging"],
+                column=self.wcfg["display_order_debugging"],
             )
 
         # Last data

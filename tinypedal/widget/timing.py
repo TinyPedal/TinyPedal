@@ -84,7 +84,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_sbst,
-                column=self.wcfg["column_index_session_best"],
+                column=self.wcfg["display_order_session_best"],
             )
 
         # Personal best laptime
@@ -100,7 +100,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_best,
-                column=self.wcfg["column_index_best"],
+                column=self.wcfg["display_order_best"],
             )
 
         # Last laptime
@@ -120,7 +120,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_last,
-                column=self.wcfg["column_index_last"],
+                column=self.wcfg["display_order_last"],
             )
 
         # Current laptime
@@ -136,7 +136,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_curr,
-                column=self.wcfg["column_index_current"],
+                column=self.wcfg["display_order_current"],
             )
 
         # Estimated laptime
@@ -152,7 +152,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_esti,
-                column=self.wcfg["column_index_estimated"],
+                column=self.wcfg["display_order_estimated"],
             )
 
         # Session personal best laptime
@@ -168,7 +168,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_spbt,
-                column=self.wcfg["column_index_session_personal_best"],
+                column=self.wcfg["display_order_session_personal_best"],
             )
 
         # Stint personal best laptime
@@ -184,7 +184,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_stbt,
-                column=self.wcfg["column_index_stint_best"],
+                column=self.wcfg["display_order_stint_best"],
             )
 
         # Average pace laptime
@@ -200,7 +200,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_avpc,
-                column=self.wcfg["column_index_average_pace"],
+                column=self.wcfg["display_order_average_pace"],
             )
 
         # Last data

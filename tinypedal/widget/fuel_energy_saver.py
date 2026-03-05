@@ -93,7 +93,7 @@ class Realtime(Overlay):
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_target_lap,
-            row_index=0,
+            row=0,
             right_to_left=layout_reversed,
         )
 
@@ -111,7 +111,7 @@ class Realtime(Overlay):
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_target_use,
-            row_index=1,
+            row=1,
             right_to_left=layout_reversed,
         )
 
@@ -134,7 +134,7 @@ class Realtime(Overlay):
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_delta,
-            row_index=2,
+            row=2,
             right_to_left=layout_reversed,
         )
 

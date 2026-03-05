@@ -67,7 +67,7 @@ class Realtime(Overlay):
         )
         self.set_primary_orient(
             target=self.bar_bbias,
-            column=self.wcfg["column_index_brake_bias"],
+            column=self.wcfg["display_order_brake_bias"],
         )
 
         # Baseline bias delta
@@ -83,7 +83,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_delta,
-                column=self.wcfg["column_index_baseline_bias_delta"],
+                column=self.wcfg["display_order_baseline_bias_delta"],
             )
 
         # Brake migration
@@ -99,7 +99,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_bmigt,
-                column=self.wcfg["column_index_brake_migration"],
+                column=self.wcfg["display_order_brake_migration"],
             )
 
         # Last data

@@ -65,7 +65,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_charge,
-                column=self.wcfg["column_index_battery_charge"],
+                column=self.wcfg["display_order_battery_charge"],
             )
 
         # Battery drain
@@ -80,7 +80,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_drain,
-                column=self.wcfg["column_index_battery_drain"],
+                column=self.wcfg["display_order_battery_drain"],
             )
 
         # Battery regen
@@ -95,7 +95,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_regen,
-                column=self.wcfg["column_index_battery_regen"],
+                column=self.wcfg["display_order_battery_regen"],
             )
 
         # Battery charge net change
@@ -110,7 +110,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_net,
-                column=self.wcfg["column_index_estimated_net_change"],
+                column=self.wcfg["display_order_estimated_net_change"],
             )
 
         # Activation timer
@@ -125,7 +125,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_timer,
-                column=self.wcfg["column_index_activation_timer"],
+                column=self.wcfg["display_order_activation_timer"],
             )
 
         if self.wcfg["show_battery_charge_warning_flash"]:

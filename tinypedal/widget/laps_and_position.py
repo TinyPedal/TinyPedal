@@ -80,7 +80,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_lap_number,
-                column=self.wcfg["column_index_lap_number"],
+                column=self.wcfg["display_order_lap_number"],
             )
 
         # Position overall
@@ -96,7 +96,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_pos_overall,
-                column=self.wcfg["column_index_position_overall"],
+                column=self.wcfg["display_order_position_overall"],
             )
 
         # Position in class
@@ -112,7 +112,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_pos_inclass,
-                column=self.wcfg["column_index_position_in_class"],
+                column=self.wcfg["display_order_position_in_class"],
             )
 
         # Last data

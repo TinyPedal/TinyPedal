@@ -75,7 +75,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_system,
-                column=self.wcfg["column_index_system"],
+                column=self.wcfg["display_order_system"],
             )
 
         # APP performance
@@ -92,7 +92,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_app,
-                column=self.wcfg["column_index_tinypedal"],
+                column=self.wcfg["display_order_tinypedal"],
             )
 
         self.calc_ema = partial(

@@ -465,19 +465,19 @@ class Overlay(Base):
         Default row index start from 1; reserve row index 0 for caption.
         """
         for index, target in enumerate(targets):
-            row_index = row_start + (index // 2)
-            column_index = column_left + (index % 2) * column_right
+            row = row_start + (index // 2)
+            column = column_left + (index % 2) * column_right
             if isinstance(target, QWidget):
-                layout.addWidget(target, row_index, column_index)
+                layout.addWidget(target, row, column)
             else:
-                layout.addLayout(target, row_index, column_index)
+                layout.addLayout(target, row, column)
 
     @staticmethod
     def set_grid_layout_table_row(
         layout: QGridLayout,
         targets: tuple[QWidget, ...],
         column_start: int = 0,
-        row_index: int = 0,
+        row: int = 0,
         right_to_left: bool = False,
         hide_start: int = 99999,
     ):
@@ -486,9 +486,9 @@ class Overlay(Base):
             enum_target = enumerate(reversed(targets), column_start)
         else:
             enum_target = enumerate(targets, column_start)
-        for column_index, target in enum_target:
-            layout.addWidget(target, row_index, column_index)
-            if hide_start <= column_index:
+        for column, target in enum_target:
+            layout.addWidget(target, row, column)
+            if hide_start <= column:
                 target.hide()
 
     @staticmethod
@@ -496,7 +496,7 @@ class Overlay(Base):
         layout: QGridLayout,
         targets: tuple[QWidget, ...],
         row_start: int = 0,
-        column_index: int = 0,
+        column: int = 0,
         bottom_to_top: bool = False,
         hide_start: int = 99999,
     ):
@@ -505,9 +505,9 @@ class Overlay(Base):
             enum_target = enumerate(reversed(targets), row_start)
         else:
             enum_target = enumerate(targets, row_start)
-        for row_index, target in enum_target:
-            layout.addWidget(target, row_index, column_index)
-            if hide_start <= row_index:
+        for row, target in enum_target:
+            layout.addWidget(target, row, column)
+            if hide_start <= row:
                 target.hide()
 
     @staticmethod
@@ -580,7 +580,7 @@ def validate_option(config: dict) -> dict:
     # Check column/row index order, correct any overlapping indexes
     column_set = []
     for key in config:
-        if key.startswith("column_index"):
+        if key.startswith("display_order"):
             while config[key] in column_set:
                 config[key] += 1
             column_set.append(config[key])

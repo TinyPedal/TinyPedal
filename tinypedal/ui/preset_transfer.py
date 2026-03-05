@@ -83,8 +83,8 @@ class PresetTransfer(BaseEditor):
             "font",
             "prefix_and_suffix",
             "caption_text",
-            "column_index",
             "decimal_places",
+            "display_order",
             "other_options",
         )
         self.set_setting_list(self.listbox_options, option_types)
@@ -245,8 +245,8 @@ class PresetTransfer(BaseEditor):
                     if "caption_text" in options_selection:
                         dest_setting_dict[option_name] = option_value
                     continue
-                if re.search("column_index", option_name):
-                    if "column_index" in options_selection:
+                if re.search("display_order", option_name):
+                    if "display_order" in options_selection:
                         dest_setting_dict[option_name] = option_value
                     continue
                 if re.search("decimal_places", option_name):

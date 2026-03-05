@@ -58,7 +58,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_throttle,
-                column=self.wcfg["column_index_throttle"],
+                column=self.wcfg["display_order_throttle"],
                 option="enable_horizontal_style",
                 default=1,
             )
@@ -76,7 +76,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_brake,
-                column=self.wcfg["column_index_brake"],
+                column=self.wcfg["display_order_brake"],
                 option="enable_horizontal_style",
                 default=1,
             )
@@ -94,7 +94,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_clutch,
-                column=self.wcfg["column_index_clutch"],
+                column=self.wcfg["display_order_clutch"],
                 option="enable_horizontal_style",
                 default=1,
             )
@@ -113,7 +113,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_ffb,
-                column=self.wcfg["column_index_ffb"],
+                column=self.wcfg["display_order_ffb"],
                 option="enable_horizontal_style",
                 default=1,
             )

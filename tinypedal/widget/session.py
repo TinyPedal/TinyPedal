@@ -70,7 +70,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_session_name,
-                column=self.wcfg["column_index_session_name"],
+                column=self.wcfg["display_order_session_name"],
             )
 
         # System clock
@@ -86,7 +86,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_system_clock,
-                column=self.wcfg["column_index_system_clock"],
+                column=self.wcfg["display_order_system_clock"],
             )
 
         # Session time
@@ -102,7 +102,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_session_time,
-                column=self.wcfg["column_index_session_time"],
+                column=self.wcfg["display_order_session_time"],
             )
 
         # Estimated laps
@@ -118,7 +118,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_estimated_laps,
-                column=self.wcfg["column_index_estimated_laps"],
+                column=self.wcfg["display_order_estimated_laps"],
             )
 
     def timerEvent(self, event):

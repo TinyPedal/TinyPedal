@@ -111,7 +111,7 @@ class Realtime(Overlay):
             layout_temp.addWidget(self.bar_temp_trend, 0, 1)
             self.set_primary_orient(
                 target=layout_temp,
-                column=self.wcfg["column_index_temperature"],
+                column=self.wcfg["display_order_temperature"],
                 option=None,
                 default=1,
             )
@@ -143,7 +143,7 @@ class Realtime(Overlay):
             layout_rain.addWidget(self.bar_raininess_trend, 0, 1)
             self.set_primary_orient(
                 target=layout_rain,
-                column=self.wcfg["column_index_rain"],
+                column=self.wcfg["display_order_rain"],
                 option=None,
                 default=1,
             )
@@ -175,7 +175,7 @@ class Realtime(Overlay):
             layout_wetness.addWidget(self.bar_wetness_trend, 0, 1)
             self.set_primary_orient(
                 target=layout_wetness,
-                column=self.wcfg["column_index_wetness"],
+                column=self.wcfg["display_order_wetness"],
                 option=None,
                 default=1,
             )

@@ -73,7 +73,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_total,
-                column=self.wcfg["column_index_total_travel"],
+                column=self.wcfg["display_order_total_travel"],
             )
 
             if self.wcfg["show_caption"]:
@@ -105,7 +105,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_bump,
-                column=self.wcfg["column_index_bump_travel"],
+                column=self.wcfg["display_order_bump_travel"],
             )
 
             if self.wcfg["show_caption"]:
@@ -137,7 +137,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_rebound,
-                column=self.wcfg["column_index_rebound_travel"],
+                column=self.wcfg["display_order_rebound_travel"],
             )
 
             if self.wcfg["show_caption"]:
@@ -169,7 +169,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_ratio,
-                column=self.wcfg["column_index_travel_ratio"],
+                column=self.wcfg["display_order_travel_ratio"],
             )
 
             if self.wcfg["show_caption"]:
@@ -201,7 +201,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_minpos,
-                column=self.wcfg["column_index_minimum_position"],
+                column=self.wcfg["display_order_minimum_position"],
             )
 
             if self.wcfg["show_caption"]:
@@ -233,7 +233,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_maxpos,
-                column=self.wcfg["column_index_maximum_position"],
+                column=self.wcfg["display_order_maximum_position"],
             )
 
             if self.wcfg["show_caption"]:
@@ -265,7 +265,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_live,
-                column=self.wcfg["column_index_live_position"],
+                column=self.wcfg["display_order_live_position"],
             )
 
             if self.wcfg["show_caption"]:

@@ -69,7 +69,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_headlights,
-                column=self.wcfg["column_index_headlights"],
+                column=self.wcfg["display_order_headlights"],
             )
 
         # Ignition
@@ -82,7 +82,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_ignition,
-                column=self.wcfg["column_index_ignition"],
+                column=self.wcfg["display_order_ignition"],
             )
 
         # Clutch
@@ -95,7 +95,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_clutch,
-                column=self.wcfg["column_index_clutch"],
+                column=self.wcfg["display_order_clutch"],
             )
 
         # Lock
@@ -108,7 +108,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_wlock,
-                column=self.wcfg["column_index_wheel_lock"],
+                column=self.wcfg["display_order_wheel_lock"],
             )
 
         # Slip
@@ -121,7 +121,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_wslip,
-                column=self.wcfg["column_index_wheel_slip"],
+                column=self.wcfg["display_order_wheel_slip"],
             )
 
         # Last data

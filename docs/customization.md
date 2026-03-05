@@ -582,8 +582,8 @@ Set prefix text that displayed beside corresponding data. Set to `""` to hide pr
     show_caption
 Show short caption description on widget.
 
-    column_index
-Set order of each info column(or row). Must keep index number unique to each column, otherwise columns may overlap.
+    display_order
+Set display order of each info column or row.
 
     decimal_places
 Set amount decimal places to keep.
@@ -4010,8 +4010,8 @@ Set reference line style. `0` for solid line, `1` for dashed line.
     reference_line_*_width
 Set reference line width in pixels. Set value to `0` to hide line.
 
-    draw_order_index_*
-Set draw order of plot lines.
+    display_order_*
+Set display order of plot lines.
 
 [**`Back to Top`**](#)
 

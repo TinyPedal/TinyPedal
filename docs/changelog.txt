@@ -12,6 +12,7 @@ WIP
   - Moved "enable_all_time_best_sectors" option from "Sectors Module" to "Sectors Widget" for easy access. Old setting will be automatically transferred over.
 
 * Misc
+  - Renamed rename all "column_index" & "draw_order" options to "display_order". Old setting will be automatically transferred over.
   - Added new contributor "Oost-hash" to contributors.md in "Implementation" section.
 
 2.42.0 (2026-02-25)

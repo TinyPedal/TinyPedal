@@ -91,7 +91,7 @@ class Realtime(Overlay):
         )
         self.set_primary_orient(
             target=self.bar_gauge,
-            column=self.wcfg["column_index_gauge"],
+            column=self.wcfg["display_order_gauge"],
         )
 
         # RPM bar
@@ -114,7 +114,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_rpmbar,
-                column=self.wcfg["column_index_rpm"],
+                column=self.wcfg["display_order_rpm"],
             )
 
         # Battery bar
@@ -144,7 +144,7 @@ class Realtime(Overlay):
             self.bar_battbar.state = None
             self.set_primary_orient(
                 target=self.bar_battbar,
-                column=self.wcfg["column_index_battery"],
+                column=self.wcfg["display_order_battery"],
             )
 
         # Speed limiter
@@ -159,7 +159,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_limiter,
-                column=self.wcfg["column_index_gauge"],
+                column=self.wcfg["display_order_gauge"],
                 row=1,
             )
 

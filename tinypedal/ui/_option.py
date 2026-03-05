@@ -189,7 +189,10 @@ class FloatEdit(BaseLineEdit):
         value = self.text()
         if not is_string_number(value):
             return None
-        return float(value)
+        value = float(value)
+        if value % 1 == 0:  # remove unnecessary decimal points
+            value = int(value)
+        return value
 
 
 class DropDownListEdit(BaseComboBox):

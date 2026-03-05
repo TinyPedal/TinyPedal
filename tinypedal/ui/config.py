@@ -261,7 +261,7 @@ class UserConfig(BaseDialog):
         layout_search.addWidget(button_clearsearch)
 
         # Button
-        has_display_order = (cfg_type == ConfigType.WIDGET and "Column" in option_word_set)
+        has_display_order = (cfg_type == ConfigType.WIDGET and "Display" in option_word_set)
         if has_display_order:
             button_display_order = QPushButton("Configure Display Order")
             button_display_order.clicked.connect(self.open_display_order)
@@ -307,13 +307,13 @@ class UserConfig(BaseDialog):
     def open_display_order(self):
         """Open display order dialog"""
         # Extract column index setting
-        user_orders = {k: v for k, v in self.user_setting[self.key_name].items() if k.startswith("column_index_")}
-        default_orders = {k: v for k, v in self.default_setting[self.key_name].items() if k.startswith("column_index_")}
+        user_orders = {k: v for k, v in self.user_setting[self.key_name].items() if k.startswith("display_order_")}
+        default_orders = {k: v for k, v in self.default_setting[self.key_name].items() if k.startswith("display_order_")}
         dialog = DisplayOrder(self, user_orders=user_orders, default_orders=default_orders)
         dialog.open()
 
-    def update_column_index(self, new_orders: dict):
-        """Update column index to user setting & editor"""
+    def update_display_order(self, new_orders: dict):
+        """Update display order index to user setting & editor"""
         self.user_setting[self.key_name].update(new_orders)
         for key, value in new_orders.items():
             if key in self.option_edit:

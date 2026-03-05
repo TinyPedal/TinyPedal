@@ -89,7 +89,7 @@ class DisplayOrder(BaseDialog):
             if key in self.temp_orders:
                 self.temp_orders[key] = row + 1
 
-        self._parent.update_column_index(self.temp_orders)
+        self._parent.update_display_order(self.temp_orders)
         self._parent.applying()
 
     def _populate_list(self, target_orders: dict):
@@ -98,7 +98,7 @@ class DisplayOrder(BaseDialog):
 
         for key in sorted(target_orders, key=lambda k: target_orders[k]):
             # Strip prefix, then format
-            short_key = key.replace("column_index_", "")
+            short_key = key.replace("display_order_", "")
             item = QListWidgetItem(format_option_name(short_key))
             item.setTextAlignment(Qt.AlignCenter)
             item.setToolTip("Click & Drag to Reorder Display")

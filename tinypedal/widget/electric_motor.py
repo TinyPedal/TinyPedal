@@ -69,7 +69,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_motor,
-                column=self.wcfg["column_index_motor_temperature"],
+                column=self.wcfg["display_order_motor_temperature"],
             )
 
         # Motor water temperature
@@ -88,7 +88,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_water,
-                column=self.wcfg["column_index_water_temperature"],
+                column=self.wcfg["display_order_water_temperature"],
             )
 
         # Motor rpm
@@ -103,7 +103,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_rpm,
-                column=self.wcfg["column_index_rpm"],
+                column=self.wcfg["display_order_rpm"],
             )
 
         # Motor torque
@@ -118,7 +118,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_torque,
-                column=self.wcfg["column_index_torque"],
+                column=self.wcfg["display_order_torque"],
             )
 
         # Motor power
@@ -133,7 +133,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_power,
-                column=self.wcfg["column_index_power"],
+                column=self.wcfg["display_order_power"],
             )
 
     def timerEvent(self, event):

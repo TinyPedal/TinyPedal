@@ -64,7 +64,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_track_clock,
-                column=self.wcfg["column_index_track_clock"],
+                column=self.wcfg["display_order_track_clock"],
             )
 
         # Track clock time scale
@@ -81,7 +81,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_time_scale,
-                column=self.wcfg["column_index_time_scale"],
+                column=self.wcfg["display_order_time_scale"],
             )
 
         # Sunlight phase countdown
@@ -113,7 +113,7 @@ class Realtime(Overlay):
             layout_phase.addWidget(self.bar_phase_sign, 0, 1)
             self.set_primary_orient(
                 target=layout_phase,
-                column=self.wcfg["column_index_sunlight_phase_countdown"],
+                column=self.wcfg["display_order_sunlight_phase_countdown"],
             )
 
     def timerEvent(self, event):

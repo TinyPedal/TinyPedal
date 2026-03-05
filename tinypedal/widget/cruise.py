@@ -75,7 +75,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_compass,
-                column=self.wcfg["column_index_compass"],
+                column=self.wcfg["display_order_compass"],
             )
 
         # Elevation
@@ -91,7 +91,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_elevation,
-                column=self.wcfg["column_index_elevation"],
+                column=self.wcfg["display_order_elevation"],
             )
 
         # Odometer
@@ -107,7 +107,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_odometer,
-                column=self.wcfg["column_index_odometer"],
+                column=self.wcfg["display_order_odometer"],
             )
 
         # Distance into lap
@@ -123,7 +123,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_lap_distance,
-                column=self.wcfg["column_index_distance_into_lap"],
+                column=self.wcfg["display_order_distance_into_lap"],
             )
 
         # Cornering radius
@@ -139,7 +139,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_cornering_radius,
-                column=self.wcfg["column_index_cornering_radius"],
+                column=self.wcfg["display_order_cornering_radius"],
             )
 
     def timerEvent(self, event):

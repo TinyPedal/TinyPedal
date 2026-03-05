@@ -87,7 +87,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_row(
                 layout=layout,
                 targets=self.bars_time,
-                row_index=self.wcfg["column_index_estimated_time"],
+                row=self.wcfg["display_order_estimated_time"],
                 right_to_left=layout_reversed,
             )
 
@@ -105,7 +105,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_row(
                 layout=layout,
                 targets=self.bars_temp,
-                row_index=self.wcfg["column_index_ambient_temperature"],
+                row=self.wcfg["display_order_ambient_temperature"],
                 right_to_left=layout_reversed,
             )
 
@@ -123,7 +123,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_row(
                 layout=layout,
                 targets=self.bars_rain,
-                row_index=self.wcfg["column_index_rain_chance_bar"],
+                row=self.wcfg["display_order_rain_chance_bar"],
                 right_to_left=layout_reversed,
             )
 
@@ -138,7 +138,7 @@ class Realtime(Overlay):
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_icon,
-            row_index=self.wcfg["column_index_weather_icon"],
+            row=self.wcfg["display_order_weather_icon"],
             right_to_left=layout_reversed,
         )
 

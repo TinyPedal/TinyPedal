@@ -92,7 +92,7 @@ class Realtime(Overlay):
         if self.wcfg["show_wheel_slip"]:
             self.data_wheel_slip = self.create_data_samples(max_samples)
 
-        self.draw_queue = tuple(d[1:] for d in sorted(self.config_draw_order(), reverse=True))
+        self.draw_queue = tuple(d[1:] for d in sorted(self.config_display_order(), reverse=True))
         self.draw_background()
 
         # Last data
@@ -265,8 +265,8 @@ class Realtime(Overlay):
             width = self.area_width
         return QRect(x_pos, y_pos, width, height)
 
-    def config_draw_order(self):
-        """Config plot draw order"""
+    def config_display_order(self):
+        """Config plot display order"""
         plot_names = (
             "throttle",
             "brake",
@@ -285,7 +285,7 @@ class Realtime(Overlay):
             pen.setWidth(self.wcfg[f"{plot_name}_line_width"])
             pen.setColor(self.wcfg[f"{plot_name}_color"])
             yield (
-                self.wcfg[f"draw_order_index_{plot_name}"],  # index
+                self.wcfg[f"display_order_{plot_name}"],  # index
                 getattr(self, f"data_{plot_name}"),  # data
                 pen,  # pen style
                 self.wcfg[f"{plot_name}_line_style"],  # line style

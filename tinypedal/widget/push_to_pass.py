@@ -76,7 +76,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_charge,
-                column=self.wcfg["column_index_battery_charge"],
+                column=self.wcfg["display_order_battery_charge"],
             )
 
         # Activation timer
@@ -101,7 +101,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_timer,
-                column=self.wcfg["column_index_activation_timer"],
+                column=self.wcfg["display_order_activation_timer"],
             )
 
     def timerEvent(self, event):

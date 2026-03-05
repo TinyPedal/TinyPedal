@@ -77,7 +77,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_distf,
-                column=self.wcfg["column_index_front_to_rear_distribution"],
+                column=self.wcfg["display_order_front_to_rear_distribution"],
             )
 
         # Left to right distribution
@@ -94,7 +94,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_distl,
-                column=self.wcfg["column_index_left_to_right_distribution"],
+                column=self.wcfg["display_order_left_to_right_distribution"],
             )
 
         # Cross weight
@@ -111,7 +111,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_cross,
-                column=self.wcfg["column_index_cross_weight"],
+                column=self.wcfg["display_order_cross_weight"],
             )
 
         self.calc_ema_ratio = partial(

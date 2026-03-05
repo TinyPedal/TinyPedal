@@ -57,8 +57,8 @@ class Realtime(Overlay):
         # Create layout
         layout_upper = self.set_grid_layout()
         layout_lower = self.set_grid_layout()
-        layout.addLayout(layout_upper, self.wcfg["column_index_upper"], 0)
-        layout.addLayout(layout_lower, self.wcfg["column_index_lower"], 0)
+        layout.addLayout(layout_upper, self.wcfg["display_order_upper"], 0)
+        layout.addLayout(layout_lower, self.wcfg["display_order_lower"], 0)
 
         # Caption style
         if self.wcfg["show_caption"]:

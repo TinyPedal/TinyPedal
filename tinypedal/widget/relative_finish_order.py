@@ -99,27 +99,7 @@ class Realtime(Overlay):
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_pit_leader,
-            row_index=0,
-            right_to_left=layout_reversed,
-        )
-
-        # Player pit time row
-        self.bars_pit_player = self.set_rawtext(
-            font=font_cap,
-            width=bar_width,
-            fixed_height=font_cap_m.height,
-            offset_y=font_cap_m.voffset,
-            fg_color=self.wcfg["font_color_pit_time"],
-            bg_color=self.wcfg["bkg_color_pit_time"],
-            count=self.total_slot,
-        )
-        for _pit_time, target in zip(self.player_pit_time_set, self.bars_pit_player):
-            target.text = f"{_pit_time:.0f}s"
-        self.bars_pit_player[0].text = "DIFF"
-        self.set_grid_layout_table_row(
-            layout=layout,
-            targets=self.bars_pit_player,
-            row_index=3,
+            row=0,
             right_to_left=layout_reversed,
         )
 
@@ -142,7 +122,7 @@ class Realtime(Overlay):
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_lap_leader,
-            row_index=1,
+            row=1,
             right_to_left=layout_reversed,
         )
 
@@ -164,7 +144,27 @@ class Realtime(Overlay):
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_lap_player,
-            row_index=2,
+            row=2,
+            right_to_left=layout_reversed,
+        )
+
+        # Player pit time row
+        self.bars_pit_player = self.set_rawtext(
+            font=font_cap,
+            width=bar_width,
+            fixed_height=font_cap_m.height,
+            offset_y=font_cap_m.voffset,
+            fg_color=self.wcfg["font_color_pit_time"],
+            bg_color=self.wcfg["bkg_color_pit_time"],
+            count=self.total_slot,
+        )
+        for _pit_time, target in zip(self.player_pit_time_set, self.bars_pit_player):
+            target.text = f"{_pit_time:.0f}s"
+        self.bars_pit_player[0].text = "DIFF"
+        self.set_grid_layout_table_row(
+            layout=layout,
+            targets=self.bars_pit_player,
+            row=3,
             right_to_left=layout_reversed,
         )
 
@@ -181,7 +181,7 @@ class Realtime(Overlay):
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_refill,
-            row_index=4,
+            row=4,
             right_to_left=layout_reversed,
         )
 
@@ -200,7 +200,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_row(
                 layout=layout,
                 targets=self.bars_refill_extra,
-                row_index=5,
+                row=5,
                 right_to_left=layout_reversed,
             )
 

@@ -93,7 +93,7 @@ class Realtime(Overlay):
         )
         self.set_primary_orient(
             target=layout_btemp,
-            column=self.wcfg["column_index_temperature"],
+            column=self.wcfg["display_order_temperature"],
         )
 
         # Average brake temperature
@@ -115,7 +115,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_btavg,
-                column=self.wcfg["column_index_average"],
+                column=self.wcfg["display_order_average"],
             )
             update_interval = max(self.wcfg["update_interval"], 0.01)
             average_samples = int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (update_interval * 0.001))

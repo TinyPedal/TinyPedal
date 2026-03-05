@@ -77,7 +77,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_power_front,
-                column=self.wcfg["column_index_power_locking_front"],
+                column=self.wcfg["display_order_power_locking_front"],
             )
 
         # Coast locking front
@@ -94,7 +94,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_coast_front,
-                column=self.wcfg["column_index_coast_locking_front"],
+                column=self.wcfg["display_order_coast_locking_front"],
             )
 
         # Power locking rear
@@ -111,7 +111,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_power_rear,
-                column=self.wcfg["column_index_power_locking_rear"],
+                column=self.wcfg["display_order_power_locking_rear"],
             )
 
         # Coast locking rear
@@ -128,7 +128,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_coast_rear,
-                column=self.wcfg["column_index_coast_locking_rear"],
+                column=self.wcfg["display_order_coast_locking_rear"],
             )
 
         # Last data

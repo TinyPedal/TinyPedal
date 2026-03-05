@@ -80,7 +80,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_remain,
-                column=self.wcfg["column_index_remaining"],
+                column=self.wcfg["display_order_remaining"],
             )
 
             if self.wcfg["show_caption"]:
@@ -116,7 +116,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_diff,
-                column=self.wcfg["column_index_wear_difference"],
+                column=self.wcfg["display_order_wear_difference"],
             )
 
             if self.wcfg["show_caption"]:
@@ -152,7 +152,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_live,
-                column=self.wcfg["column_index_live_wear_difference"],
+                column=self.wcfg["display_order_live_wear_difference"],
             )
 
             if self.wcfg["show_caption"]:
@@ -188,7 +188,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_laps,
-                column=self.wcfg["column_index_lifespan_laps"],
+                column=self.wcfg["display_order_lifespan_laps"],
             )
 
             if self.wcfg["show_caption"]:
@@ -224,7 +224,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_mins,
-                column=self.wcfg["column_index_lifespan_minutes"],
+                column=self.wcfg["display_order_lifespan_minutes"],
             )
 
             if self.wcfg["show_caption"]:

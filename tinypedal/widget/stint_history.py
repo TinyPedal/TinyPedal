@@ -73,7 +73,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_laps,
-                column_index=self.wcfg["column_index_laps"],
+                column=self.wcfg["display_order_laps"],
                 bottom_to_top=layout_reversed,
             )
 
@@ -93,7 +93,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_time,
-                column_index=self.wcfg["column_index_time"],
+                column=self.wcfg["display_order_time"],
                 bottom_to_top=layout_reversed,
             )
 
@@ -119,7 +119,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_fuel,
-                column_index=self.wcfg["column_index_fuel"],
+                column=self.wcfg["display_order_fuel"],
                 bottom_to_top=layout_reversed,
             )
 
@@ -139,7 +139,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_cmpd,
-                column_index=self.wcfg["column_index_tyre"],
+                column=self.wcfg["display_order_tyre"],
                 bottom_to_top=layout_reversed,
             )
 
@@ -165,7 +165,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_wear,
-                column_index=self.wcfg["column_index_wear"],
+                column=self.wcfg["display_order_wear"],
                 bottom_to_top=layout_reversed,
             )
 
@@ -187,7 +187,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_delta,
-                column_index=self.wcfg["column_index_delta"],
+                column=self.wcfg["display_order_delta"],
                 bottom_to_top=layout_reversed,
             )
 
@@ -213,7 +213,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_consist,
-                column_index=self.wcfg["column_index_consistency"],
+                column=self.wcfg["display_order_consistency"],
                 bottom_to_top=layout_reversed,
             )
 

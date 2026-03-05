@@ -71,7 +71,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_oil,
-                column=self.wcfg["column_index_oil"],
+                column=self.wcfg["display_order_oil"],
             )
 
         # Water temperature
@@ -90,7 +90,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_water,
-                column=self.wcfg["column_index_water"],
+                column=self.wcfg["display_order_water"],
             )
 
         # Turbo pressure
@@ -105,7 +105,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_turbo,
-                column=self.wcfg["column_index_turbo"],
+                column=self.wcfg["display_order_turbo"],
             )
 
         # Engine RPM
@@ -120,7 +120,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_rpm,
-                column=self.wcfg["column_index_rpm"],
+                column=self.wcfg["display_order_rpm"],
             )
 
         # Engine RPM maximum
@@ -135,7 +135,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_rpm_max,
-                column=self.wcfg["column_index_rpm_maximum"],
+                column=self.wcfg["display_order_rpm_maximum"],
             )
 
         # Engine torque
@@ -150,7 +150,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_torque,
-                column=self.wcfg["column_index_torque"],
+                column=self.wcfg["display_order_torque"],
             )
 
         # Engine power
@@ -165,7 +165,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_power,
-                column=self.wcfg["column_index_power"],
+                column=self.wcfg["display_order_power"],
             )
 
     def timerEvent(self, event):

@@ -94,7 +94,7 @@ class Realtime(Overlay):
         )
         self.set_primary_orient(
             target=layout_tpres,
-            column=self.wcfg["column_index_pressure"],
+            column=self.wcfg["display_order_pressure"],
         )
 
         if self.wcfg["show_tyre_compound"]:
@@ -130,7 +130,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_pdiff,
-                column=self.wcfg["column_index_pressure_deviation"],
+                column=self.wcfg["display_order_pressure_deviation"],
             )
 
             self.tpavg = list(WHEELS_ZERO)

@@ -93,7 +93,7 @@ class Realtime(Overlay):
         )
         self.set_primary_orient(
             target=layout_ctemp,
-            column=self.wcfg["column_index_carcass"],
+            column=self.wcfg["display_order_carcass"],
         )
 
         if self.wcfg["show_tyre_compound"]:
@@ -161,7 +161,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=layout_rtemp,
-                column=self.wcfg["column_index_rate_of_change"],
+                column=self.wcfg["display_order_rate_of_change"],
             )
             self.calc_ema_rdiff = partial(
                 calc.exp_mov_avg,

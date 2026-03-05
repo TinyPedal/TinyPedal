@@ -79,7 +79,7 @@ class Realtime(Overlay):
         )
         self.set_primary_orient(
             target=self.bar_rollf,
-            column=self.wcfg["column_index_roll_angle_front"],
+            column=self.wcfg["display_order_roll_angle_front"],
         )
 
         # Roll angle rear
@@ -95,7 +95,7 @@ class Realtime(Overlay):
         )
         self.set_primary_orient(
             target=self.bar_rollr,
-            column=self.wcfg["column_index_roll_angle_rear"],
+            column=self.wcfg["display_order_roll_angle_rear"],
         )
 
         self.calc_ema_roll = partial(
@@ -116,7 +116,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_rolld,
-                column=self.wcfg["column_index_roll_angle_difference"],
+                column=self.wcfg["display_order_roll_angle_difference"],
             )
 
         # Roll angle ratio
@@ -133,7 +133,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_ratio,
-                column=self.wcfg["column_index_roll_angle_ratio"],
+                column=self.wcfg["display_order_roll_angle_ratio"],
             )
             self.calc_ema_ratio = partial(
                 calc.exp_mov_avg,

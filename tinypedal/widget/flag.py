@@ -81,7 +81,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_pit_timer,
-                column=self.wcfg["column_index_pit_timer"],
+                column=self.wcfg["display_order_pit_timer"],
             )
 
         # Low fuel warning
@@ -96,7 +96,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_lowfuel,
-                column=self.wcfg["column_index_low_fuel"],
+                column=self.wcfg["display_order_low_fuel"],
             )
 
         # Speed limiter
@@ -111,7 +111,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_limiter,
-                column=self.wcfg["column_index_speed_limiter"],
+                column=self.wcfg["display_order_speed_limiter"],
             )
 
         # Yellow flag
@@ -126,7 +126,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_yellowflag,
-                column=self.wcfg["column_index_yellow_flag"],
+                column=self.wcfg["display_order_yellow_flag"],
             )
 
         # Blue flag
@@ -141,7 +141,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_blueflag,
-                column=self.wcfg["column_index_blue_flag"],
+                column=self.wcfg["display_order_blue_flag"],
             )
 
         # Start lights
@@ -160,7 +160,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_startlights,
-                column=self.wcfg["column_index_startlights"],
+                column=self.wcfg["display_order_startlights"],
             )
 
         # Incoming traffic
@@ -175,7 +175,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_traffic,
-                column=self.wcfg["column_index_traffic"],
+                column=self.wcfg["display_order_traffic"],
             )
 
         # Pit request
@@ -190,7 +190,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_pit_request,
-                column=self.wcfg["column_index_pit_request"],
+                column=self.wcfg["display_order_pit_request"],
             )
 
         # Finish state
@@ -215,7 +215,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_finish_state,
-                column=self.wcfg["column_index_finish_state"],
+                column=self.wcfg["display_order_finish_state"],
             )
 
         # Last data

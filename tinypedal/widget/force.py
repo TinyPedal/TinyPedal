@@ -59,7 +59,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_gforce_lgt,
-                column=self.wcfg["column_index_long_gforce"],
+                column=self.wcfg["display_order_long_gforce"],
             )
 
             self.bar_gforce_lat = self.set_rawtext(
@@ -72,7 +72,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_gforce_lat,
-                column=self.wcfg["column_index_lat_gforce"],
+                column=self.wcfg["display_order_lat_gforce"],
             )
 
         # Downforce ratio
@@ -87,7 +87,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_df_ratio,
-                column=self.wcfg["column_index_downforce_ratio"],
+                column=self.wcfg["display_order_downforce_ratio"],
             )
 
         # Front downforce
@@ -106,7 +106,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_df_front,
-                column=self.wcfg["column_index_front_downforce"],
+                column=self.wcfg["display_order_front_downforce"],
             )
 
         # Rear downforce
@@ -125,7 +125,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_df_rear,
-                column=self.wcfg["column_index_rear_downforce"],
+                column=self.wcfg["display_order_rear_downforce"],
             )
 
     def timerEvent(self, event):

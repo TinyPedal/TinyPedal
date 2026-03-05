@@ -123,7 +123,7 @@ CFG_INTEGER = (
     "bar_height|"
     "bar_length|"
     "bar_width|"
-    "column_index|"
+    "display_order|"
     "decimal_places|"
     "display_detail_level|"
     "display_height|"

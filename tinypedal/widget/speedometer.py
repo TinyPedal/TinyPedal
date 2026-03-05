@@ -65,7 +65,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_speed_curr,
-                column=self.wcfg["column_index_speed"],
+                column=self.wcfg["display_order_speed"],
             )
 
         if self.wcfg["show_speed_minimum"]:
@@ -79,7 +79,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_speed_min,
-                column=self.wcfg["column_index_speed_minimum"],
+                column=self.wcfg["display_order_speed_minimum"],
             )
 
         if self.wcfg["show_speed_maximum"]:
@@ -93,7 +93,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_speed_max,
-                column=self.wcfg["column_index_speed_maximum"],
+                column=self.wcfg["display_order_speed_maximum"],
             )
 
         if self.wcfg["show_speed_fastest"]:
@@ -107,7 +107,7 @@ class Realtime(Overlay):
             )
             self.set_primary_orient(
                 target=self.bar_speed_fast,
-                column=self.wcfg["column_index_speed_fastest"],
+                column=self.wcfg["display_order_speed_fastest"],
             )
 
         # Last data
