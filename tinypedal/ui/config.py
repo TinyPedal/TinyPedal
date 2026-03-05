@@ -25,7 +25,7 @@ from __future__ import annotations
 import os
 import re
 import time
-from typing import Callable
+from typing import Callable, Mapping, Sequence
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QFontDatabase
@@ -245,12 +245,12 @@ class UserConfig(BaseDialog):
         scroll_box.setWidgetResizable(True)
 
         # Search box
-        search_auto_complete = QCompleter(option_word_set, self)
-        search_auto_complete.setCaseSensitivity(Qt.CaseInsensitive)
+        auto_complete_search = QCompleter(option_word_set, self)
+        auto_complete_search.setCaseSensitivity(Qt.CaseInsensitive)
 
         edit_search = QLineEdit(self)
         edit_search.setPlaceholderText(" Type here to search options")
-        edit_search.setCompleter(search_auto_complete)
+        edit_search.setCompleter(auto_complete_search)
         edit_search.textChanged.connect(self.search_options)
 
         button_clearsearch = CompactButton("Clear")
@@ -321,11 +321,11 @@ class UserConfig(BaseDialog):
 
     def applying(self):
         """Save & apply"""
-        self.save_setting(is_apply=True)
+        self.save_setting(close=False)
 
     def saving(self):
         """Save & close"""
-        self.save_setting(is_apply=False)
+        self.save_setting(close=True)
 
     def reset_setting(self):
         """Reset setting"""
@@ -337,7 +337,7 @@ class UserConfig(BaseDialog):
             for editor in self.option_edit.values():
                 editor.reset_to_default()
 
-    def save_setting(self, is_apply: bool):
+    def save_setting(self, close: bool):
         """Save setting"""
         user_setting = self.user_setting[self.key_name]
         for key, editor in self.option_edit.items():
@@ -359,7 +359,7 @@ class UserConfig(BaseDialog):
         # Reload
         self.reloading()
         # Close
-        if not is_apply:
+        if close:
             self.accept()
 
     def value_error_message(self, option_name: str):
@@ -373,72 +373,72 @@ class UserConfig(BaseDialog):
     def create_options(self, layout: QGridLayout) -> set[str]:
         """Create options"""
         option_word_set = set()
-        for idx, key in enumerate(self.user_setting[self.key_name]):
+        for row_index, key in enumerate(self.user_setting[self.key_name]):
             option_name = format_option_name(key)
             option_word_set.update(option_name.split())
-            self._add_option_label(idx, option_name, layout)
+            self._add_option_label(row_index, option_name, layout)
             # Bool
             if re.search(rxp.CFG_BOOL, key):
-                self._add_option_bool(idx, key, layout)
+                self._add_option_bool(row_index, key, layout)
                 continue
             # Units choice list string
-            if self._choice_match(rxp.CHOICE_UNITS, idx, key, layout):
+            if self._choice_match(rxp.CHOICE_UNITS, row_index, key, layout):
                 continue
             # Common choice list string
-            if self._choice_match(rxp.CHOICE_COMMON, idx, key, layout):
+            if self._choice_match(rxp.CHOICE_COMMON, row_index, key, layout):
                 continue
             # Color string
             if re.search(rxp.CFG_COLOR, key):
-                self._add_option_color(idx, key, layout)
+                self._add_option_color(row_index, key, layout)
                 continue
             # User path string
             if re.search(rxp.CFG_USER_PATH, key):
-                self._add_option_path(idx, key, layout)
+                self._add_option_path(row_index, key, layout)
                 continue
             # User image file path string
             if re.search(rxp.CFG_USER_IMAGE, key):
-                self._add_option_image(idx, key, layout)
+                self._add_option_image(row_index, key, layout)
                 continue
             # Font name string
             if re.search(rxp.CFG_FONT_NAME, key):
-                self._add_option_combolist(idx, key, layout, get_font_list())
+                self._add_option_combolist(row_index, key, layout, get_font_list())
                 continue
             # Heatmap string
             if re.search(rxp.CFG_HEATMAP, key):
-                self._add_option_combolist(idx, key, layout, cfg.user.heatmap.keys())
+                self._add_option_combolist(row_index, key, layout, cfg.user.heatmap.keys())
                 continue
             # Clock format string
             if re.search(rxp.CFG_CLOCK_FORMAT, key):
-                self._add_option_clock(idx, key, layout)
+                self._add_option_clock(row_index, key, layout)
                 continue
             # String
             if re.search(rxp.CFG_STRING, key):
-                self._add_option_string(idx, key, layout)
+                self._add_option_string(row_index, key, layout)
                 continue
             # Int
             if re.search(rxp.CFG_INTEGER, key):
-                self._add_option_integer(idx, key, layout)
+                self._add_option_integer(row_index, key, layout)
                 continue
             # Float or int
-            self._add_option_float(idx, key, layout)
+            self._add_option_float(row_index, key, layout)
 
         return option_word_set
 
-    def _choice_match(self, choice_dict, idx, key, layout):
+    def _choice_match(self, choice_dict: Mapping, row_index: int, key: str, layout: QGridLayout) -> bool:
         """Choice match"""
         for ref_key, choice_list in choice_dict.items():
             if re.search(ref_key, key):
-                self._add_option_combolist(idx, key, layout, choice_list)
+                self._add_option_combolist(row_index, key, layout, choice_list)
                 return True
         return False
 
-    def _add_option_label(self, idx, option_name, layout):
+    def _add_option_label(self, row_index: int, option_name: str, layout: QGridLayout):
         """Option label"""
         label = QLabel(option_name)
         label.setMinimumHeight(UIScaler.size(1.8))
-        layout.addWidget(label, idx, COLUMN_LABEL)
+        layout.addWidget(label, row_index, COLUMN_LABEL)
 
-    def _add_option_bool(self, idx, key, layout):
+    def _add_option_bool(self, row_index: int, key: str, layout: QGridLayout):
         """Bool"""
         editor = BooleanEdit(self)
         editor.setFixedWidth(self.option_width)
@@ -446,10 +446,10 @@ class UserConfig(BaseDialog):
         editor.setChecked(self.user_setting[self.key_name][key])
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_color(self, idx, key, layout):
+    def _add_option_color(self, row_index: int, key: str, layout: QGridLayout):
         """Color string"""
         editor = ColorEdit(self, self.user_setting[self.key_name][key])
         editor.setFixedWidth(self.option_width)
@@ -459,10 +459,10 @@ class UserConfig(BaseDialog):
         editor.setText(self.user_setting[self.key_name][key])
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_path(self, idx, key, layout):
+    def _add_option_path(self, row_index: int, key: str, layout: QGridLayout):
         """Path string"""
         editor = FilePathEdit(self, self.user_setting[self.key_name][key])
         editor.setFixedWidth(self.option_width)
@@ -470,10 +470,10 @@ class UserConfig(BaseDialog):
         editor.setText(self.user_setting[self.key_name][key])
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_image(self, idx, key, layout):
+    def _add_option_image(self, row_index: int, key: str, layout: QGridLayout):
         """Image file path string"""
         editor = ImagePathEdit(self, self.user_setting[self.key_name][key])
         editor.setFixedWidth(self.option_width)
@@ -481,10 +481,10 @@ class UserConfig(BaseDialog):
         editor.setText(self.user_setting[self.key_name][key])
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_combolist(self, idx, key, layout, item_list):
+    def _add_option_combolist(self, row_index: int, key: str, layout: QGridLayout, item_list: Sequence[str]):
         """Combo droplist string"""
         editor = DropDownListEdit(self)
         editor.setFixedWidth(self.option_width)
@@ -493,10 +493,10 @@ class UserConfig(BaseDialog):
         editor.setCurrentText(str(self.user_setting[self.key_name][key]))
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_clock(self, idx, key, layout):
+    def _add_option_clock(self, row_index: int, key: str, layout: QGridLayout):
         """Clock string"""
         editor = ClockFormatEdit(self)
         editor.setFixedWidth(self.option_width)
@@ -504,10 +504,10 @@ class UserConfig(BaseDialog):
         editor.setText(self.user_setting[self.key_name][key])
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_string(self, idx, key, layout):
+    def _add_option_string(self, row_index: int, key: str, layout: QGridLayout):
         """String"""
         editor = StringEdit(self)
         editor.setFixedWidth(self.option_width)
@@ -515,10 +515,10 @@ class UserConfig(BaseDialog):
         editor.setText(self.user_setting[self.key_name][key])
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_integer(self, idx, key, layout):
+    def _add_option_integer(self, row_index: int, key: str, layout: QGridLayout):
         """Integer"""
         editor = IntegerEdit(self)
         editor.setFixedWidth(self.option_width)
@@ -527,10 +527,10 @@ class UserConfig(BaseDialog):
         editor.setText(str(self.user_setting[self.key_name][key]))
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_float(self, idx, key, layout):
+    def _add_option_float(self, row_index: int, key: str, layout: QGridLayout):
         """Float"""
         editor = FloatEdit(self)
         editor.setFixedWidth(self.option_width)
@@ -539,11 +539,11 @@ class UserConfig(BaseDialog):
         editor.setText(str(self.user_setting[self.key_name][key]))
         editor.set_default(self.default_setting[self.key_name][key])
         # Add layout
-        layout.addWidget(editor, idx, COLUMN_OPTION)
+        layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
 
-def set_preset_name(cfg_type: str):
+def set_preset_name(cfg_type: str) -> str:
     """Set preset name"""
     if cfg_type == ConfigType.CONFIG:
         return f"{cfg.filename.config} (global)"

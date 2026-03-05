@@ -351,7 +351,7 @@ class TrackNotesEditor(BaseEditor):
 
     def open_replace_dialog(self):
         """Open replace dialog"""
-        selector = {name:idx for idx, name in enumerate(self.notes_header) if idx > 0}
+        selector = {name: index for index, name in enumerate(self.notes_header) if index > 0}
         _dialog = TableBatchReplace(self, selector, self.table_notes)
         _dialog.open()
 
@@ -624,12 +624,12 @@ class MetaDataEditor(BaseDialog):
         layout_option = QGridLayout()
         layout_option.setAlignment(Qt.AlignTop)
 
-        for idx, fieldname in enumerate(metadata):
+        for index, fieldname in enumerate(metadata):
             desc_label = QLabel(f"{fieldname.capitalize()}:")
             edit_entry = QLineEdit()
             edit_entry.setText(metadata[fieldname])
-            layout_option.addWidget(desc_label, idx, 0)
-            layout_option.addWidget(edit_entry, idx, 1)
+            layout_option.addWidget(desc_label, index, 0)
+            layout_option.addWidget(edit_entry, index, 1)
             self.option_metadata[fieldname] = edit_entry
 
         # Button

@@ -75,9 +75,9 @@ class TrackInfoEditor(BaseEditor):
         self.table_tracks.setHorizontalHeaderLabels(HEADER_TRACKS)
         self.table_tracks.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table_tracks.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        for idx in range(1, len(HEADER_TRACKS)):
-            self.table_tracks.horizontalHeader().setSectionResizeMode(idx, QHeaderView.Fixed)
-            self.table_tracks.setColumnWidth(idx, UIScaler.size(8 if idx <= 4 else 5))
+        for column_index in range(1, len(HEADER_TRACKS)):
+            self.table_tracks.horizontalHeader().setSectionResizeMode(column_index, QHeaderView.Fixed)
+            self.table_tracks.setColumnWidth(column_index, UIScaler.size(8 if column_index <= 4 else 5))
         self.table_tracks.cellChanged.connect(self.verify_input)
 
         self.table_tracks.setContextMenuPolicy(Qt.CustomContextMenu)

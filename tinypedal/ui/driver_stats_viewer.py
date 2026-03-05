@@ -128,9 +128,9 @@ class DriverStatsViewer(BaseEditor):
         self.table_stats.verticalHeader().setVisible(False)
         self.table_stats.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table_stats.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        for idx in range(1, len(self.table_header_key)):
-            self.table_stats.horizontalHeader().setSectionResizeMode(idx, QHeaderView.Fixed)
-            self.table_stats.setColumnWidth(idx, UIScaler.size(5 + (idx <= 6)))
+        for column_index in range(1, len(self.table_header_key)):
+            self.table_stats.horizontalHeader().setSectionResizeMode(column_index, QHeaderView.Fixed)
+            self.table_stats.setColumnWidth(column_index, UIScaler.size(5 + (column_index <= 6)))
 
         self.table_stats.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table_stats.customContextMenuRequested.connect(self.open_context_menu)
