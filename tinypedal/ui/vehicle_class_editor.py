@@ -41,9 +41,9 @@ from ._common import (
     QVAL_COLOR,
     BaseEditor,
     CompactButton,
-    DoubleClickEdit,
     UIScaler,
 )
+from ._option import ColorEdit
 
 HEADER_CLASSES = "Class name","Alias name","Color"
 
@@ -126,11 +126,10 @@ class VehicleClassEditor(BaseEditor):
 
     def __add_option_color(self, key):
         """Color string"""
-        color_edit = DoubleClickEdit(self, mode="color", init=key)
+        color_edit = ColorEdit(self, key)
         color_edit.setMaxLength(9)
         color_edit.setValidator(QVAL_COLOR)
         color_edit.textChanged.connect(self.set_modified)
-        color_edit.textChanged.connect(color_edit.preview_color)
         color_edit.setText(key)  # load selected option
         return color_edit
 

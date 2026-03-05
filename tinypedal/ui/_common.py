@@ -22,28 +22,22 @@ Common
 
 from __future__ import annotations
 
-import os
 import re
-from collections import deque
 from typing import Callable
 
 from PySide2.QtCore import QRegularExpression, Qt
 from PySide2.QtGui import (
-    QColor,
     QDoubleValidator,
     QIntValidator,
     QRegularExpressionValidator,
-    qGray,
 )
 from PySide2.QtWidgets import (
     QCheckBox,
-    QColorDialog,
     QComboBox,
     QCompleter,
     QDialog,
     QDialogButtonBox,
     QDoubleSpinBox,
-    QFileDialog,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -56,9 +50,7 @@ from PySide2.QtWidgets import (
 )
 
 from ..const_app import APP_NAME
-from ..const_file import FileFilter
-from ..userfile import set_relative_path
-from ..validator import image_exists, is_hex_color, is_string_number
+from ..validator import is_string_number
 from . import UIScaler
 
 # Validator
@@ -67,12 +59,6 @@ QVAL_FLOAT = QDoubleValidator(-999999.9999, 999999.9999, 6)
 QVAL_COLOR = QRegularExpressionValidator(QRegularExpression('^#[0-9a-fA-F]*'))
 QVAL_HEATMAP = QRegularExpressionValidator(QRegularExpression('[0-9a-zA-Z_]*'))
 QVAL_FILENAME = QRegularExpressionValidator(QRegularExpression('[^\\\\/:*?"<>|]*'))
-
-# Misc
-color_pick_history = deque(
-    ["#FFF"] * QColorDialog.customCount(),
-    maxlen=QColorDialog.customCount()
-)
 
 
 def singleton_dialog(dialog_type: str, show_error: bool = True):
@@ -163,6 +149,7 @@ class CompactButton(QPushButton):
         )
 
 
+# Dialog class
 class BaseDialog(QDialog):
     """Base dialog class"""
     MARGIN = UIScaler.pixel(6)
@@ -458,87 +445,9 @@ class TableBatchReplace(BaseDialog):
         self.update_selector(column_index, search)
 
 
-class DoubleClickEdit(QLineEdit):
-    """Line edit with double click dialog trigger"""
-
-    def __init__(self, parent, mode: str, init: str):
-        """Set dialog mode and initial value
-
-        Args:
-            mode: "color", "path", "image".
-            init: initial value.
-        """
-        super().__init__(parent)
-        self.open_mode = mode
-        self.init_value = init
-
-    def mouseDoubleClickEvent(self, event):
-        """Double click to open dialog"""
-        if event.buttons() == Qt.LeftButton:
-            if self.open_mode == "color":
-                self.open_dialog_color()
-            elif self.open_mode == "path":
-                self.open_dialog_path()
-            elif self.open_mode == "image":
-                self.open_dialog_image()
-
-    def open_dialog_color(self):
-        """Open color dialog"""
-        color_dialog = QColorDialog()
-        # Load color history to custom color slot
-        for index, old_color in enumerate(color_pick_history):
-            color_dialog.setCustomColor(index, QColor(old_color))
-        # Open color selector dialog
-        color_get = color_dialog.getColor(
-            initial=QColor(self.init_value),
-            options=QColorDialog.ShowAlphaChannel
-        )
-        if color_get.isValid():
-            # Add new color to color history
-            if color_pick_history[0] != color_get:
-                color_pick_history.appendleft(color_get)
-            # Set output format
-            if color_get.alpha() == 255:  # without alpha value
-                color = color_get.name(QColor.HexRgb).upper()
-            else:  # with alpha value
-                color = color_get.name(QColor.HexArgb).upper()
-            # Update edit box and init value
-            self.setText(color)
-            self.init_value = color
-
-    def open_dialog_path(self):
-        """Open file path dialog"""
-        path_selected = QFileDialog.getExistingDirectory(self, dir=self.init_value)
-        if os.path.exists(path_selected):
-            # Convert to relative path if in APP root folder
-            path_valid = set_relative_path(path_selected)
-            # Update edit box and init value
-            self.setText(path_valid)
-            self.init_value = path_valid
-
-    def open_dialog_image(self):
-        """Open image file name dialog"""
-        path_selected = QFileDialog.getOpenFileName(self, dir=self.init_value, filter=FileFilter.PNG)[0]
-        if image_exists(path_selected):
-            self.setText(path_selected)
-            self.init_value = path_selected
-
-    def preview_color(self):
-        """Update edit preview color"""
-        color_str = self.text()
-        if is_hex_color(color_str):
-            # Set foreground color based on background color lightness
-            qcolor = QColor(color_str)
-            if qcolor.alpha() > 128 > qGray(qcolor.rgb()):
-                fg_color = "#FFF"
-            else:
-                fg_color = "#000"
-            # Apply style
-            self.setStyleSheet(f"QLineEdit {{color:{fg_color};background:{color_str};}}")
-
-
+# Table item class
 class FloatTableItem(QTableWidgetItem):
-    """QTable item - float type with validation"""
+    """Float type QTableWidgetItem with validation"""
 
     def __init__(self, value: float):
         """Convert & set float value to string"""
@@ -569,7 +478,7 @@ class FloatTableItem(QTableWidgetItem):
 
 
 class NumericTableItem(QTableWidgetItem):
-    """QTable item - sortable numeric text"""
+    """Numeric QTableWidgetItem with sortable text"""
 
     def __init__(self, value: float, text: str):
         """Set numeric value & string text"""
@@ -583,7 +492,7 @@ class NumericTableItem(QTableWidgetItem):
 
 
 class ClockTableItem(QTableWidgetItem):
-    """QTable item - clock type with validation"""
+    """Clock type QTableWidgetItem with validation"""
 
     def __init__(self, value: str):
         super().__init__()

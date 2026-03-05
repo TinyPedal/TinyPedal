@@ -206,7 +206,7 @@ class Realtime(Overlay):
                 ),
             )
             self.bar_finish_state = self.set_rawtext(
-                text="FINISH",
+                text=self.wcfg["finish_text"],
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

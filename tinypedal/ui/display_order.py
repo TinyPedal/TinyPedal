@@ -42,16 +42,16 @@ class DisplayOrder(BaseDialog):
     def __init__(self, parent, user_orders: dict, default_orders: dict):
         super().__init__(parent)
         self.setWindowTitle("Display Order")
+        self.setMinimumSize(UIScaler.size(20), UIScaler.size(25))
 
         self._parent = parent
         self.temp_orders = user_orders
         self.default_orders = default_orders
 
         # List
-        self.list_widget = QListWidget()
+        self.list_widget = QListWidget(self)
         self.list_widget.setSelectionMode(QListWidget.SingleSelection)
         self.list_widget.setDragDropMode(QAbstractItemView.InternalMove)
-        self.list_widget.setMinimumHeight(UIScaler.size(20))
         self.list_widget.setSpacing(1)
         self._populate_list(self.temp_orders)
 
@@ -107,8 +107,13 @@ class DisplayOrder(BaseDialog):
 
     def _reset_order(self):
         """Reset display order"""
-        self._populate_list(self.default_orders)
-        self.list_widget.setCurrentRow(0)
+        msg_text = (
+            "Reset <b>Display Order</b> to default?<br><br>"
+            "Changes are only saved after clicking Apply Button."
+        )
+        if self.confirm_operation(title="Reset Options", message=msg_text):
+            self._populate_list(self.default_orders)
+            self.list_widget.setCurrentRow(0)
 
     # def _fit_to_content(self):
     #     """Fit dialog size to content"""

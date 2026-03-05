@@ -382,7 +382,7 @@ def set_style_window(base_font_pt: int) -> str:
         BaseDialog QTextBrowser {{
             font-size: {font_pt_text_browser}pt;
         }}
-        BaseEditor QTableWidget DoubleClickEdit {{
+        BaseEditor QTableWidget ColorEdit {{
             border: none;
         }}
 
@@ -422,14 +422,14 @@ def set_style_window(base_font_pt: int) -> str:
         DisplayOrder > QListView::item {{
             border: none;
             padding: 0.1em;
-            border: 2px solid {color_disabled_highlight};
+            border: 0.1em solid {color_disabled_highlight};
         }}
         DisplayOrder > QListView::item:selected {{
             selection-color: {color_active_highlighted_text};
             background: {color_active_highlight};
-            border: 2px solid {color_active_highlight};
+            border: 0.1em solid {color_active_highlight};
         }}
         DisplayOrder > QListView::item:hover {{
-            border: 2px solid {color_active_highlight};
+            border: 0.1em solid {color_active_highlight};
         }}
     """)
