@@ -56,19 +56,20 @@ class Realtime(Overlay):
         self.sign_text = "%" if self.wcfg["show_percentage_sign"] else ""
 
         # Brake bias
-        text_bbias = self.format_brake_bias(0.5)
-        self.bar_bbias = self.set_rawtext(
-            text=text_bbias,
-            width=font_m.width * len(text_bbias) + bar_padx,
-            fixed_height=font_m.height,
-            offset_y=font_m.voffset,
-            fg_color=self.wcfg["font_color_brake_bias"],
-            bg_color=self.wcfg["bkg_color_brake_bias"],
-        )
-        self.set_primary_orient(
-            target=self.bar_bbias,
-            column=self.wcfg["display_order_brake_bias"],
-        )
+        if self.wcfg["show_brake_bias"]:
+            text_bbias = self.format_brake_bias(0.5)
+            self.bar_bbias = self.set_rawtext(
+                text=text_bbias,
+                width=font_m.width * len(text_bbias) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_brake_bias"],
+                bg_color=self.wcfg["bkg_color_brake_bias"],
+            )
+            self.set_primary_orient(
+                target=self.bar_bbias,
+                column=self.wcfg["display_order_brake_bias"],
+            )
 
         # Baseline bias delta
         if self.wcfg["show_baseline_bias_delta"]:
@@ -111,9 +112,11 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        # Brake bias
         bbias = api.read.brake.bias_front()
-        self.update_bbias(self.bar_bbias, bbias)
+
+        # Brake bias
+        if self.wcfg["show_brake_bias"]:
+            self.update_bbias(self.bar_bbias, bbias)
 
         # Baseline bias delta
         if self.wcfg["show_baseline_bias_delta"]:
