@@ -32,7 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 6), _user_prior_2_42_6),  # 2026-03-06
+        ((2, 42, 7), _user_prior_2_42_7),  # 2026-03-06
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -46,8 +46,8 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
-def _user_prior_2_42_6(dict_user: dict):
-    """Update user setting prior to 2.42.6"""
+def _user_prior_2_42_7(dict_user: dict):
+    """Update user setting prior to 2.42.7"""
     # Copy old setting from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
@@ -111,14 +111,18 @@ def _user_prior_2_42_6(dict_user: dict):
     if isinstance(track_notes, dict):
         if "auto_hide_if_not_available" in track_notes:
             track_notes["enable_auto_hide_if_not_available"] = track_notes["auto_hide_if_not_available"]
-    # Rename "draw_order" options to "display_order"
+    # Rename "draw_order" to "display_order"
     trailing = dict_user.get("trailing")
     if isinstance(trailing, dict):
         _rename_key(trailing, "draw_order_index", "display_order")
-    # Rename all "column_index" options to "display_order"
+    # Rename all "column_index" to "display_order"
     for option in dict_user.values():
         if isinstance(option, dict):
             _rename_key(option, "column_index", "display_order")
+    # Swap all suffix "_decimal_places" with prefix "decimal_places_"
+    for option in dict_user.values():
+        if isinstance(option, dict):
+            _swap_suffix_with_prefix(option, "_decimal_places", "decimal_places_")
 
 
 def _user_prior_2_41_0(dict_user: dict):
@@ -201,3 +205,10 @@ def _rename_key(data: dict, old: str, new: str):
     for key in tuple(data):
         if old in key:
             data[key.replace(old, new)] = data[key]
+
+
+def _swap_suffix_with_prefix(data: dict, suffix: str, prefix: str):
+    """Rename key name by swap suffix with prefix"""
+    for key in tuple(data):
+        if suffix in key:
+            data[f"{prefix}{key.split(suffix)[0]}"] = data[key]

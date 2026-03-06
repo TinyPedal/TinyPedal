@@ -120,7 +120,7 @@ class Realtime(Overlay):
                     self.wcfg["bkg_color_last_delta"],
                 ),
             )
-            decimals_delta = max(self.wcfg["delta_decimal_places"], 1)
+            decimals_delta = max(self.wcfg["decimal_places_delta"], 1)
             self.width_delta = 3 + decimals_delta
             self.bars_delta = self.set_rawtext(
                 text=f"--.{'-' * decimals_delta}",
@@ -146,7 +146,7 @@ class Realtime(Overlay):
                 self.sign_fuel = units.set_symbol_fuel(self.cfg.units["fuel_unit"])[0].upper()
             else:
                 self.sign_fuel = ""
-            decimals_fuel = max(self.wcfg["fuel_decimal_places"], 1)
+            decimals_fuel = max(self.wcfg["decimal_places_fuel"], 1)
             self.width_fuel = 2 + decimals_fuel
             self.bars_fuel = self.set_rawtext(
                 text=f"-.{'-' * decimals_fuel}{self.sign_fuel}",
@@ -172,7 +172,7 @@ class Realtime(Overlay):
                 self.sign_wear = "%"
             else:
                 self.sign_wear = ""
-            decimals_wear = max(self.wcfg["wear_decimal_places"], 1)
+            decimals_wear = max(self.wcfg["decimal_places_wear"], 1)
             self.width_wear = 2 + decimals_wear
             self.bars_wear = self.set_rawtext(
                 text=f"-.{'-' * decimals_wear}{self.sign_wear}",

@@ -59,15 +59,15 @@ class Realtime(Overlay):
         self.cls_width = max(int(self.wcfg["class_width"]), 0)
         self.gap_width = max(int(self.wcfg["time_gap_width"]), 1)
         self.int_width = max(int(self.wcfg["time_interval_width"]), 1)
-        self.gap_decimals = max(int(self.wcfg["time_gap_decimal_places"]), 0)
-        self.int_decimals = max(int(self.wcfg["time_interval_decimal_places"]), 0)
+        self.gap_decimals = max(int(self.wcfg["decimal_places_time_gap"]), 0)
+        self.int_decimals = max(int(self.wcfg["decimal_places_time_interval"]), 0)
         self.show_class_separator = self.wcfg["split_gap"] > 0
         self.show_class_timegap = (self.wcfg["enable_multi_class_split_mode"]
             and self.wcfg["show_time_gap_from_same_class"])
         self.show_class_interval = (self.wcfg["enable_multi_class_split_mode"]
             and self.wcfg["show_time_interval_from_same_class"])
         self.max_delta = calc.asym_max(int(self.wcfg["number_of_delta_laptime"]), 2, 5)
-        self.nrg_decimals = max(int(self.wcfg["energy_remaining_decimal_places"]), 0)
+        self.nrg_decimals = max(int(self.wcfg["decimal_places_energy_remaining"]), 0)
         self.nrg_width = 3 + self.nrg_decimals + (self.nrg_decimals > 0)
 
         self.height_def = font_m.height

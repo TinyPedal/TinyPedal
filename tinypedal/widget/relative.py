@@ -57,8 +57,8 @@ class Realtime(Overlay):
         self.brd_height = max(self.wcfg["font_size"], 1)
         self.cls_width = max(int(self.wcfg["class_width"]), 0)
         self.gap_width = max(int(self.wcfg["time_gap_width"]), 1)
-        self.gap_decimals = max(int(self.wcfg["time_gap_decimal_places"]), 0)
-        self.nrg_decimals = max(int(self.wcfg["energy_remaining_decimal_places"]), 0)
+        self.gap_decimals = max(int(self.wcfg["decimal_places_time_gap"]), 0)
+        self.nrg_decimals = max(int(self.wcfg["decimal_places_energy_remaining"]), 0)
         self.nrg_width = 3 + self.nrg_decimals + (self.nrg_decimals > 0)
 
         # Max display players
