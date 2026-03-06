@@ -32,7 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 3), _user_prior_2_42_3),  # 2026-03-05
+        ((2, 42, 4), _user_prior_2_42_4),  # 2026-03-06
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -46,14 +46,30 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
-def _user_prior_2_42_3(dict_user: dict):
-    """Update user setting prior to 2.42.3"""
+def _user_prior_2_42_4(dict_user: dict):
+    """Update user setting prior to 2.42.4"""
     # Copy old setting from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
     if isinstance(module_sectors, dict) and isinstance(sectors, dict):
         if "enable_all_time_best_sectors" in module_sectors:
             sectors["enable_all_time_best_sectors"] = module_sectors["enable_all_time_best_sectors"]
+    # Rename "auto_hide" to "enable_auto_hide"
+    radar = dict_user.get("radar")
+    if isinstance(radar, dict):
+        if "auto_hide" in radar:
+            radar["enable_auto_hide"] = radar["auto_hide"]
+        if "auto_hide_in_private_qualifying" in radar:
+            radar["enable_auto_hide_in_private_qualifying"] = radar["auto_hide_in_private_qualifying"]
+    # Rename "auto_hide_if_not_available" to "enable_auto_hide_if_not_available"
+    pace_notes = dict_user.get("pace_notes")
+    if isinstance(pace_notes, dict):
+        if "auto_hide_if_not_available" in pace_notes:
+            pace_notes["enable_auto_hide_if_not_available"] = pace_notes["auto_hide_if_not_available"]
+    track_notes = dict_user.get("track_notes")
+    if isinstance(track_notes, dict):
+        if "auto_hide_if_not_available" in track_notes:
+            track_notes["enable_auto_hide_if_not_available"] = track_notes["auto_hide_if_not_available"]
     # Rename "draw_order" options to "display_order"
     trailing = dict_user.get("trailing")
     if isinstance(trailing, dict):

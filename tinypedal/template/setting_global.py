@@ -27,7 +27,6 @@ from ..userfile import set_default_config_path, set_default_data_path
 GLOBAL_DEFAULT = {
     "application": {
         "show_at_startup": True,
-        "check_for_updates_on_startup": True,
         "minimize_to_tray": PLATFORM.WINDOWS,
         "remember_position": True,
         "remember_size": True,
@@ -35,6 +34,7 @@ GLOBAL_DEFAULT = {
         "enable_auto_load_preset": False,
         "enable_global_hotkey": False,
         "show_confirmation_for_batch_toggle": True,
+        "check_for_updates_on_startup": True,
         'snap_distance': 10,
         "snap_gap": 0,
         "grid_move_size": 8,

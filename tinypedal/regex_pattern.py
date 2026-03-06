@@ -38,8 +38,6 @@ CFG_BOOL = (
     # Exact match
     "^active_state$|"
     "^auto_hide$|"
-    "^auto_hide_if_not_available$|"
-    "^auto_hide_in_private_qualifying$|"
     "^check_for_updates_on_startup$|"
     "^fixed_position$|"
     "^global$|"

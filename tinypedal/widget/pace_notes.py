@@ -134,7 +134,7 @@ class Realtime(Overlay):
                     self.last_etime = etime
                 self.update_auto_hide(
                     etime - self.last_etime > self.wcfg["maximum_display_duration"])
-        elif self.wcfg["auto_hide_if_not_available"]:
+        elif self.wcfg["enable_auto_hide_if_not_available"]:
             self.update_auto_hide(True)
 
         if self.wcfg["show_pace_notes"]:

@@ -393,11 +393,11 @@ class Realtime(Overlay):
 
     def is_radar_visible(self) -> bool:
         """Set radar visibility"""
-        self.always_show = not self.wcfg["auto_hide"] or api.read.vehicle.in_garage()
+        self.always_show = not self.wcfg["enable_auto_hide"] or api.read.vehicle.in_garage()
         if self.always_show:
             return True
         # Hide in private qualifying
-        if (self.wcfg["auto_hide_in_private_qualifying"] and
+        if (self.wcfg["enable_auto_hide_in_private_qualifying"] and
             api.read.session.private_qualifying() == 1 and
             api.read.session.session_type() == 2):
             return False
