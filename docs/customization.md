@@ -2286,43 +2286,43 @@ Show absolute refueling value instead of relative refueling when enabled. Note, 
     show_estimated_pitstop_count
 Show estimated number of pit stop counts column.
 
-    show_delta_and_end_remaining
+    show_delta_consumption_and_end_remaining
 Show delta consumption and estimated end stint remaining fuel column.
 
-    *remain
+    *remaining
 Remaining fuel in tank.
 
-    *refuel
+    *refueling
 Estimated refueling reading, which is the total amount additional fuel required to finish race.
 
 Note, for `relative refueling` (`show_absolute_refueling` disabled), positive value indicates additional refueling and pit stop would be required, while negative value indicates total remaining fuel at the end of race, and no extra pit stop required. For example, a `-1.5` value indicates `1.5` remaining fuel after crossed finish line.
 
 For `absolute refueling` (`show_absolute_refueling` enabled), total remaining fuel at the end of race can be found by subtracting `refuel` value from `remain` value. For example, `6` (remain column) - `4.5` (refuel column) = `1.5` remaining fuel after crossed finish line.
 
-    *laps
+    *estimated_laps
 Estimated laps reading that current fuel can last.
 
-    *minutes
+    *estimated_minutes
 Estimated minutes reading that current fuel can last.
 
-    *used
+    *estimated_consumption
 Estimated fuel consumption reading, which is calculated from last-valid-lap fuel consumption and delta fuel consumption. Note, when vehicle is in garage stall, this reading only shows last-valid-lap fuel consumption without delta calculation.
 
-    *save
+    *saving_target
 Estimated fuel saving target consumption reading for making one less pit stop.
 
-    *delta
+    *delta_consumption
 Estimated delta fuel consumption reading. Positive value indicates an increase in consumption, while negative indicates a decrease in consumption.
 
-    *end
+    *end_remaining
 Estimated remaining fuel reading at the end of current stint before next pit stop, which reflects fuel usage efficiency.
 
 Note, this value does not count towards the end of race; instead, this value always counts towards the end of last completeable lap. To find out total remaining fuel at the end of race, see `refuel` column and explanation.
 
-    *pits
+    *pitstop_count
 Estimate number of pit stop counts when making a pit stop at end of current stint. Any non-zero decimal places would be considered for an additional pit stop.
 
-    *early
+    *early_pitstop_count
 Estimate number of pit stop counts when making an early pit stop at end of current lap. This value can be used to determine whether an early pit stop is worth performing comparing to `pits` value.
 
 Example 1: When this value is just below `1.0` (such as `0.97`), it indicates an early pit stop can be made right at the end of current lap with enough empty capacity to refuel according to `refuel` reading which would last to the end of race.
@@ -4194,10 +4194,10 @@ Show absolute refilling value instead of relative refilling when enabled. Note, 
     show_fuel_ratio_and_bias
 Show fuel ratio and fuel bias column.
 
-    *ratio
+    *fuel_ratio
 Show fuel ratio between estimated fuel and energy consumption, which can help balance fuel and energy usage, as well as providing refueling reference for adjusting pit stop `Fuel ratio` during race.
 
-    *bias
+    *fuel_bias
 Show fuel bias (unit in laps) that calculated from estimated laps difference between fuel and virtual energy.
 
 Positive value indicates more laps can be run on fuel than virtual energy; in other words, virtual energy will deplete sooner than fuel. For example, a value of `+1.5` indicates that there will be `1.5 laps` of extra fuel remaining after virtual energy depleted.

@@ -32,7 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 5), _user_prior_2_42_5),  # 2026-03-06
+        ((2, 42, 6), _user_prior_2_42_6),  # 2026-03-06
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -46,14 +46,42 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
-def _user_prior_2_42_5(dict_user: dict):
-    """Update user setting prior to 2.42.5"""
+def _user_prior_2_42_6(dict_user: dict):
+    """Update user setting prior to 2.42.6"""
     # Copy old setting from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
     if isinstance(module_sectors, dict) and isinstance(sectors, dict):
         if "enable_all_time_best_sectors" in module_sectors:
             sectors["enable_all_time_best_sectors"] = module_sectors["enable_all_time_best_sectors"]
+    # Rename options in fuel widget
+    fuel = dict_user.get("fuel")
+    if isinstance(fuel, dict):
+        _rename_key(fuel, "_laps", "_estimated_laps")
+        _rename_key(fuel, "_minutes", "_estimated_minutes")
+        _rename_key(fuel, "_used", "_estimated_consumption")
+        _rename_key(fuel, "_save", "_saving_target")
+        _rename_key(fuel, "_pits", "_pitstop_count")
+        _rename_key(fuel, "_early", "_early_pitstop_count")
+        _rename_key(fuel, "_delta", "_delta_consumption")
+        _rename_key(fuel, "_end", "_end_remaining")
+        _rename_key(fuel, "_refuel", "_refueling")
+        _rename_key(fuel, "_remain", "_remaining")
+    # Rename options in virtual energy widget
+    virtual_energy = dict_user.get("virtual_energy")
+    if isinstance(virtual_energy, dict):
+        _rename_key(virtual_energy, "_laps", "_estimated_laps")
+        _rename_key(virtual_energy, "_minutes", "_estimated_minutes")
+        _rename_key(virtual_energy, "_used", "_estimated_consumption")
+        _rename_key(virtual_energy, "_save", "_saving_target")
+        _rename_key(virtual_energy, "_pits", "_pitstop_count")
+        _rename_key(virtual_energy, "_early", "_early_pitstop_count")
+        _rename_key(virtual_energy, "_delta", "_delta_consumption")
+        _rename_key(virtual_energy, "_end", "_end_remaining")
+        _rename_key(virtual_energy, "_ratio", "_fuel_ratio")
+        _rename_key(virtual_energy, "_bias", "_fuel_bias")
+        _rename_key(virtual_energy, "_refill", "_refilling")
+        _rename_key(virtual_energy, "_remain", "_remaining")
     # Rename "bar" to "delta_bar" in deltabest widget
     deltabest = dict_user.get("deltabest")
     if isinstance(deltabest, dict):
@@ -172,4 +200,4 @@ def _rename_key(data: dict, old: str, new: str):
     """Rename key name"""
     for key in tuple(data):
         if old in key:
-            data[key.replace(old, new)] = data.pop(key)
+            data[key.replace(old, new)] = data[key]

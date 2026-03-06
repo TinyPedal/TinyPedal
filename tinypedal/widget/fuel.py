@@ -76,7 +76,7 @@ class Realtime(Overlay):
 
         # Remaining
         self.bar_style_curr = (
-            self.wcfg["bkg_color_remain"],
+            self.wcfg["bkg_color_remaining"],
             self.wcfg["warning_color_low_fuel"],
         )
         self.bar_curr = self.set_rawtext(
@@ -84,17 +84,17 @@ class Realtime(Overlay):
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
-            fg_color=self.wcfg["font_color_remain"],
+            fg_color=self.wcfg["font_color_remaining"],
             bg_color=self.bar_style_curr[0],
         )
-        self.bar_curr.decimals = max(self.wcfg["decimal_places_remain"], 0)
+        self.bar_curr.decimals = max(self.wcfg["decimal_places_remaining"], 0)
         layout_upper.addWidget(self.bar_curr, 1, 1)
         column_count += 1
 
         if self.wcfg["show_caption"]:
             cap_temp = self.set_rawtext(
                 font=font_cap,
-                text=self.wcfg["caption_text_remain"],
+                text=self.wcfg["caption_text_remaining"],
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
@@ -104,7 +104,7 @@ class Realtime(Overlay):
 
         # Total needed
         self.bar_style_need = (
-            self.wcfg["bkg_color_refuel"],
+            self.wcfg["bkg_color_refueling"],
             self.wcfg["warning_color_low_fuel"],
         )
         self.bar_need = self.set_rawtext(
@@ -112,10 +112,10 @@ class Realtime(Overlay):
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
-            fg_color=self.wcfg["font_color_refuel"],
+            fg_color=self.wcfg["font_color_refueling"],
             bg_color=self.bar_style_need[0],
         )
-        self.bar_need.decimals = max(self.wcfg["decimal_places_refuel"], 0)
+        self.bar_need.decimals = max(self.wcfg["decimal_places_refueling"], 0)
         layout_upper.addWidget(self.bar_need, 1, 2)
         column_count += 1
 
@@ -123,9 +123,9 @@ class Realtime(Overlay):
             cap_temp = self.set_rawtext(
                 font=font_cap,
                 text=(
-                    self.wcfg["caption_text_absolute_refuel"]
+                    self.wcfg["caption_text_absolute_refueling"]
                     if self.wcfg["show_absolute_refueling"]
-                    else self.wcfg["caption_text_refuel"]
+                    else self.wcfg["caption_text_refueling"]
                 ),
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
@@ -140,16 +140,16 @@ class Realtime(Overlay):
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
-            fg_color=self.wcfg["font_color_laps"],
-            bg_color=self.wcfg["bkg_color_laps"],
+            fg_color=self.wcfg["font_color_estimated_laps"],
+            bg_color=self.wcfg["bkg_color_estimated_laps"],
         )
-        self.bar_laps.decimals = max(self.wcfg["decimal_places_laps"], 0)
+        self.bar_laps.decimals = max(self.wcfg["decimal_places_estimated_laps"], 0)
         layout_lower.addWidget(self.bar_laps, 1, 1)
 
         if self.wcfg["show_caption"]:
             cap_temp = self.set_rawtext(
                 font=font_cap,
-                text=self.wcfg["caption_text_laps"],
+                text=self.wcfg["caption_text_estimated_laps"],
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
@@ -163,16 +163,16 @@ class Realtime(Overlay):
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
-            fg_color=self.wcfg["font_color_minutes"],
-            bg_color=self.wcfg["bkg_color_minutes"],
+            fg_color=self.wcfg["font_color_estimated_minutes"],
+            bg_color=self.wcfg["bkg_color_estimated_minutes"],
         )
-        self.bar_mins.decimals = max(self.wcfg["decimal_places_minutes"], 0)
+        self.bar_mins.decimals = max(self.wcfg["decimal_places_estimated_minutes"], 0)
         layout_lower.addWidget(self.bar_mins, 1, 2)
 
         if self.wcfg["show_caption"]:
             cap_temp = self.set_rawtext(
                 font=font_cap,
-                text=self.wcfg["caption_text_minutes"],
+                text=self.wcfg["caption_text_estimated_minutes"],
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
@@ -186,17 +186,17 @@ class Realtime(Overlay):
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
-            fg_color=self.wcfg["font_color_used"],
-            bg_color=self.wcfg["bkg_color_used"],
+            fg_color=self.wcfg["font_color_estimated_consumption"],
+            bg_color=self.wcfg["bkg_color_estimated_consumption"],
         )
-        self.bar_used.decimals = max(self.wcfg["decimal_places_used"], 0)
+        self.bar_used.decimals = max(self.wcfg["decimal_places_estimated_consumption"], 0)
         layout_upper.addWidget(self.bar_used, 1, 3)
         column_count += 1
 
         if self.wcfg["show_caption"]:
             cap_temp = self.set_rawtext(
                 font=font_cap,
-                text=self.wcfg["caption_text_used"],
+                text=self.wcfg["caption_text_estimated_consumption"],
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
@@ -210,16 +210,16 @@ class Realtime(Overlay):
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
-            fg_color=self.wcfg["font_color_save"],
-            bg_color=self.wcfg["bkg_color_save"],
+            fg_color=self.wcfg["font_color_saving_target"],
+            bg_color=self.wcfg["bkg_color_saving_target"],
         )
-        self.bar_save.decimals = max(self.wcfg["decimal_places_save"], 0)
+        self.bar_save.decimals = max(self.wcfg["decimal_places_saving_target"], 0)
         layout_lower.addWidget(self.bar_save, 1, 3)
 
         if self.wcfg["show_caption"]:
             cap_temp = self.set_rawtext(
                 font=font_cap,
-                text=self.wcfg["caption_text_save"],
+                text=self.wcfg["caption_text_saving_target"],
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
@@ -234,17 +234,17 @@ class Realtime(Overlay):
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_pits"],
-                bg_color=self.wcfg["bkg_color_pits"],
+                fg_color=self.wcfg["font_color_pitstop_count"],
+                bg_color=self.wcfg["bkg_color_pitstop_count"],
             )
-            self.bar_pits.decimals = max(self.wcfg["decimal_places_pits"], 0)
+            self.bar_pits.decimals = max(self.wcfg["decimal_places_pitstop_count"], 0)
             layout_upper.addWidget(self.bar_pits, 1, 0)
             column_count += 1
 
             if self.wcfg["show_caption"]:
                 cap_temp = self.set_rawtext(
                     font=font_cap,
-                    text=self.wcfg["caption_text_pits"],
+                    text=self.wcfg["caption_text_pitstop_count"],
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
@@ -258,16 +258,16 @@ class Realtime(Overlay):
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_early"],
-                bg_color=self.wcfg["bkg_color_early"],
+                fg_color=self.wcfg["font_color_early_pitstop_count"],
+                bg_color=self.wcfg["bkg_color_early_pitstop_count"],
             )
-            self.bar_early.decimals = max(self.wcfg["decimal_places_early"], 0)
+            self.bar_early.decimals = max(self.wcfg["decimal_places_early_pitstop_count"], 0)
             layout_lower.addWidget(self.bar_early, 1, 0)
 
             if self.wcfg["show_caption"]:
                 cap_temp = self.set_rawtext(
                     font=font_cap,
-                    text=self.wcfg["caption_text_early"],
+                    text=self.wcfg["caption_text_early_pitstop_count"],
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
@@ -275,24 +275,24 @@ class Realtime(Overlay):
                 )
                 layout_lower.addWidget(cap_temp, row_idx_lower, 0)
 
-        if self.wcfg["show_delta_and_end_remaining"]:
+        if self.wcfg["show_delta_consumption_and_end_remaining"]:
             # Delta consumption
             self.bar_delta = self.set_rawtext(
                 text=text_def,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_delta"],
-                bg_color=self.wcfg["bkg_color_delta"],
+                fg_color=self.wcfg["font_color_delta_consumption"],
+                bg_color=self.wcfg["bkg_color_delta_consumption"],
             )
-            self.bar_delta.decimals = max(self.wcfg["decimal_places_delta"], 0)
+            self.bar_delta.decimals = max(self.wcfg["decimal_places_delta_consumption"], 0)
             layout_upper.addWidget(self.bar_delta, 1, 4)
             column_count += 1
 
             if self.wcfg["show_caption"]:
                 cap_temp = self.set_rawtext(
                     font=font_cap,
-                    text=self.wcfg["caption_text_delta"],
+                    text=self.wcfg["caption_text_delta_consumption"],
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
@@ -306,16 +306,16 @@ class Realtime(Overlay):
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_end"],
-                bg_color=self.wcfg["bkg_color_end"],
+                fg_color=self.wcfg["font_color_end_remaining"],
+                bg_color=self.wcfg["bkg_color_end_remaining"],
             )
-            self.bar_end.decimals = max(self.wcfg["decimal_places_end"], 0)
+            self.bar_end.decimals = max(self.wcfg["decimal_places_end_remaining"], 0)
             layout_lower.addWidget(self.bar_end, 1, 4)
 
             if self.wcfg["show_caption"]:
                 cap_temp = self.set_rawtext(
                     font=font_cap,
-                    text=self.wcfg["caption_text_end"],
+                    text=self.wcfg["caption_text_end_remaining"],
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
@@ -396,7 +396,7 @@ class Realtime(Overlay):
             est_pits_early = calc.zero_max(minfo.fuel.estimatedNumPitStopsEarly, 99.99)
             self.update_fuel(self.bar_early, est_pits_early)
 
-        if self.wcfg["show_delta_and_end_remaining"]:
+        if self.wcfg["show_delta_consumption_and_end_remaining"]:
             # Delta consumption
             delta_fuel = self.unit_fuel(minfo.fuel.deltaConsumption)
             self.update_fuel(self.bar_delta, delta_fuel, None, "+")
