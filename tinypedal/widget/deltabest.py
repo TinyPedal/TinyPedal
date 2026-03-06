@@ -50,8 +50,8 @@ class Realtime(Overlay):
         bar_gap = self.wcfg["bar_gap"]
         padx = round(font_m.width * self.wcfg["bar_padding_horizontal"])
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
-        self.dbar_length = int(self.wcfg["bar_length"] * 0.5)
-        dbar_height = int(self.wcfg["bar_height"])
+        self.dbar_length = int(self.wcfg["delta_bar_length"] * 0.5)
+        dbar_height = int(self.wcfg["delta_bar_height"])
 
         self.decimals = max(self.wcfg["decimal_places"], 1)
         self.delta_display_range = calc.decimal_strip(self.wcfg["delta_display_range"], self.decimals)
@@ -116,7 +116,7 @@ class Realtime(Overlay):
         """Draw"""
         painter = QPainter(self)
         delta_pos = self.delta_position(
-            self.wcfg["bar_display_range"],
+            self.wcfg["delta_bar_display_range"],
             self.delta_best,
             self.dbar_length)
         highlight_color = self.delta_color[self.delta_best > 0]
@@ -124,10 +124,10 @@ class Realtime(Overlay):
         # Draw deltabar
         if self.wcfg["show_delta_bar"]:
             self.rect_deltapos.setLeft(delta_pos)
-            painter.fillRect(self.rect_deltabar, self.wcfg["bkg_color_deltabar"])
+            painter.fillRect(self.rect_deltabar, self.wcfg["bkg_color_delta_bar"])
             painter.fillRect(self.rect_deltapos, highlight_color)
 
-            if self.wcfg["show_animated_deltabest"]:
+            if self.wcfg["enable_animated_deltabest"]:
                 pos_x = calc.zero_max(
                     delta_pos - self.delta_width * 0.5,
                     self.dbar_length * 2 - self.delta_width,

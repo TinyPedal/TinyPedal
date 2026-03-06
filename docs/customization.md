@@ -1878,10 +1878,10 @@ Set lap time source for deltabest display. Available values are: `Best` = all ti
     show_delta_bar
 Show visualized delta bar.
 
-    bar_length, bar_height
+    delta_bar_length, delta_bar_height
 Set delta bar length and height in pixels.
 
-    bar_display_range
+    delta_bar_display_range
 Set maximum display range (gain or loss) in seconds for delta bar, accepts decimal place. Default is `2` seconds.
 
     delta_display_range
@@ -1890,7 +1890,7 @@ Set maximum display range (gain or loss) in seconds for delta reading, accepts d
     freeze_duration
 Set freeze duration (seconds) for displaying previous lap time difference against best lap time source after crossing finish line. Value range in `0` to `30` seconds. Default is `3` seconds. Set to `0` to disable.
 
-    show_animated_deltabest
+    enable_animated_deltabest
 Deltabest display follows delta bar progress.
 
 [**`Back to Top`**](#)
@@ -2746,7 +2746,7 @@ Show nearest pace notes index number behind current vehicle position, and distan
     pace_notes_width, comments_width, debugging_width
 Set maximum display width, value in chars, such as 10 = 10 chars.
 
-    auto_hide_if_not_available
+    enable_auto_hide_if_not_available
 Auto hide this widget if pace notes data is not available for current track.
 
     maximum_display_duration
@@ -2935,11 +2935,11 @@ Set distance circle size by radius(unit meter). Circle will not be displayed if 
     distance_circle_*_width
 Set distance circle line width in pixels.
 
-    auto_hide
+    enable_auto_hide
 Auto hides radar display when no nearby vehicles.
 
-    auto_hide_in_private_qualifying
-Auto hides radar in private qualifying session, requires both `auto_hide` and `enable_restapi_access` enabled.
+    enable_auto_hide_in_private_qualifying
+Auto hides radar in private qualifying session, requires both `enable_auto_hide` and `enable_restapi_access` enabled.
 
     auto_hide_time_threshold
 Set amount time(unit second) before triggering auto hide. Default is `1` second. Note, this option has no effect while `enable_radar_fade` is enabled.
@@ -3923,7 +3923,7 @@ Show nearest track notes index number behind current vehicle position, and dista
     track_notes_width, comments_width, debugging_width
 Set maximum display width, value in chars, such as 10 = 10 chars.
 
-    auto_hide_if_not_available
+    enable_auto_hide_if_not_available
 Auto hide this widget if track notes data is not available for current track.
 
     maximum_display_duration

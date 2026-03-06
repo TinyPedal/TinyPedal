@@ -32,7 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 4), _user_prior_2_42_4),  # 2026-03-06
+        ((2, 42, 5), _user_prior_2_42_5),  # 2026-03-06
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -46,14 +46,27 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
-def _user_prior_2_42_4(dict_user: dict):
-    """Update user setting prior to 2.42.4"""
+def _user_prior_2_42_5(dict_user: dict):
+    """Update user setting prior to 2.42.5"""
     # Copy old setting from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
     if isinstance(module_sectors, dict) and isinstance(sectors, dict):
         if "enable_all_time_best_sectors" in module_sectors:
             sectors["enable_all_time_best_sectors"] = module_sectors["enable_all_time_best_sectors"]
+    # Rename "bar" to "delta_bar" in deltabest widget
+    deltabest = dict_user.get("deltabest")
+    if isinstance(deltabest, dict):
+        if "bkg_color_deltabar" in deltabest:
+            deltabest["bkg_color_delta_bar"] = deltabest["bkg_color_deltabar"]
+        if "bar_length" in deltabest:
+            deltabest["delta_bar_length"] = deltabest["bar_length"]
+        if "bar_height" in deltabest:
+            deltabest["delta_bar_height"] = deltabest["bar_height"]
+        if "bar_display_range" in deltabest:
+            deltabest["delta_bar_display_range"] = deltabest["bar_display_range"]
+        if "show_animated_deltabest" in deltabest:
+            deltabest["enable_animated_deltabest"] = deltabest["show_animated_deltabest"]
     # Rename "auto_hide" to "enable_auto_hide"
     radar = dict_user.get("radar")
     if isinstance(radar, dict):
