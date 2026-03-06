@@ -267,7 +267,7 @@ class Realtime(Overlay):
     def draw_vehicle(self, painter, veh_info, veh_draw_order):
         """Draw vehicles"""
         painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
-        if self.wcfg["show_vehicle_standings"]:
+        if self.wcfg["show_vehicle_class_standings"]:
             painter.setPen(self.pen_text)
 
         # Draw vehicle within view range
@@ -278,7 +278,7 @@ class Realtime(Overlay):
                 painter.translate(self.area_center, self.veh_offset_y)
                 painter.drawPixmap(-self.veh_size, -self.veh_size, self.pixmap_veh_player)
 
-                if self.wcfg["show_vehicle_standings"]:
+                if self.wcfg["show_vehicle_class_standings"]:
                     painter.drawText(
                         self.veh_text_shape, Qt.AlignCenter,
                         f"{data.positionOverall}")
@@ -298,7 +298,7 @@ class Realtime(Overlay):
                     -self.veh_size, -self.veh_size,
                     self.color_veh_pixmap(data))
 
-                if self.wcfg["show_vehicle_standings"]:
+                if self.wcfg["show_vehicle_class_standings"]:
                     painter.resetTransform()
                     painter.translate(pos_x, pos_y)
                     painter.drawText(

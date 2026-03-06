@@ -5,6 +5,8 @@ WIP
     Important note, due to large amount changes to option name, it is recommended to manually backup all your presets before upgrading to this version.
   - Renamed options in Fuel & Virtual Energy Widget for better clarity.
   - Renamed rename all "column_index" & "draw_order" options to "display_order".
+  - Added "background color" option for each instrument icon in Instrument Widget.
+  - Added "show_trend" option in Weather Widget.
 
 * Auto Backup Car Setup
   - Added auto backup car setup support for RF2.

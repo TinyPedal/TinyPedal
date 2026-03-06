@@ -98,7 +98,7 @@ class Realtime(Overlay):
         self.pen_trace.setStyle(Qt.SolidLine)
         self.pen_trace.setCapStyle(Qt.RoundCap)
         self.pen_text_raw = QPen()
-        self.pen_text_raw.setColor(self.wcfg["font_color"])
+        self.pen_text_raw.setColor(self.wcfg["font_color_readings"])
         self.pen_text_max = QPen()
         self.pen_text_max.setColor(self.wcfg["font_color_highlight"])
 

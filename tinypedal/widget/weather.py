@@ -98,23 +98,24 @@ class Realtime(Overlay):
                 last=0,
             )
             layout_temp.addWidget(self.bar_temp, 0, 0)
-
-            self.bar_temp_trend = self.set_rawtext(
-                text=TEXT_TREND_SIGN[0],
-                width=font_m.width + bar_padx,
-                fixed_height=font_m.height,
-                offset_y=font_m.voffset,
-                fg_color=self.bar_style_trend[0],
-                bg_color=self.wcfg["bkg_color_temperature"],
-                last=0,
-            )
-            layout_temp.addWidget(self.bar_temp_trend, 0, 1)
             self.set_primary_orient(
                 target=layout_temp,
                 column=self.wcfg["display_order_temperature"],
                 option=None,
                 default=1,
             )
+
+            if self.wcfg["show_trend"]:
+                self.bar_temp_trend = self.set_rawtext(
+                    text=TEXT_TREND_SIGN[0],
+                    width=font_m.width + bar_padx,
+                    fixed_height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.bar_style_trend[0],
+                    bg_color=self.wcfg["bkg_color_temperature"],
+                    last=0,
+                )
+                layout_temp.addWidget(self.bar_temp_trend, 0, 1)
 
         # Rain precipitation
         if self.wcfg["show_rain"]:
@@ -130,23 +131,24 @@ class Realtime(Overlay):
                 last=0,
             )
             layout_rain.addWidget(self.bar_rain, 0, 0)
-
-            self.bar_raininess_trend = self.set_rawtext(
-                text=TEXT_TREND_SIGN[0],
-                width=font_m.width + bar_padx,
-                fixed_height=font_m.height,
-                offset_y=font_m.voffset,
-                fg_color=self.bar_style_trend[0],
-                bg_color=self.wcfg["bkg_color_rain"],
-                last=0,
-            )
-            layout_rain.addWidget(self.bar_raininess_trend, 0, 1)
             self.set_primary_orient(
                 target=layout_rain,
                 column=self.wcfg["display_order_rain"],
                 option=None,
                 default=1,
             )
+
+            if self.wcfg["show_trend"]:
+                self.bar_raininess_trend = self.set_rawtext(
+                    text=TEXT_TREND_SIGN[0],
+                    width=font_m.width + bar_padx,
+                    fixed_height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.bar_style_trend[0],
+                    bg_color=self.wcfg["bkg_color_rain"],
+                    last=0,
+                )
+                layout_rain.addWidget(self.bar_raininess_trend, 0, 1)
 
         # Surface wetness
         if self.wcfg["show_wetness"]:
@@ -162,23 +164,24 @@ class Realtime(Overlay):
                 last=0,
             )
             layout_wetness.addWidget(self.bar_wetness, 0, 0)
-
-            self.bar_wetness_trend = self.set_rawtext(
-                text=TEXT_TREND_SIGN[0],
-                width=font_m.width + bar_padx,
-                fixed_height=font_m.height,
-                offset_y=font_m.voffset,
-                fg_color=self.bar_style_trend[0],
-                bg_color=self.wcfg["bkg_color_wetness"],
-                last=0,
-            )
-            layout_wetness.addWidget(self.bar_wetness_trend, 0, 1)
             self.set_primary_orient(
                 target=layout_wetness,
                 column=self.wcfg["display_order_wetness"],
                 option=None,
                 default=1,
             )
+
+            if self.wcfg["show_trend"]:
+                self.bar_wetness_trend = self.set_rawtext(
+                    text=TEXT_TREND_SIGN[0],
+                    width=font_m.width + bar_padx,
+                    fixed_height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.bar_style_trend[0],
+                    bg_color=self.wcfg["bkg_color_wetness"],
+                    last=0,
+                )
+                layout_wetness.addWidget(self.bar_wetness_trend, 0, 1)
 
         # Last data
         self.temp_trend = TrendTimer(self.wcfg["temperature_trend_interval"])
@@ -197,8 +200,9 @@ class Realtime(Overlay):
             # Temperature
             self.update_temperature(self.bar_temp, temperature, temp_track, temp_air)
             # Temperature trend
-            temp_trend = self.temp_trend.update(round(temperature, 1), lap_etime)
-            self.update_temperature_trend(self.bar_temp_trend, temp_trend)
+            if self.wcfg["show_trend"]:
+                temp_trend = self.temp_trend.update(round(temperature, 1), lap_etime)
+                self.update_temperature_trend(self.bar_temp_trend, temp_trend)
 
         # Rain precipitation
         if self.wcfg["show_rain"]:
@@ -206,8 +210,9 @@ class Realtime(Overlay):
             # Rain percentage
             self.update_raininess(self.bar_rain, raininess)
             # Rain trend
-            rain_trend = self.rain_trend.update(raininess, lap_etime)
-            self.update_raininess_trend(self.bar_raininess_trend, rain_trend)
+            if self.wcfg["show_trend"]:
+                rain_trend = self.rain_trend.update(raininess, lap_etime)
+                self.update_raininess_trend(self.bar_raininess_trend, rain_trend)
 
         # Surface wetness
         if self.wcfg["show_wetness"]:
@@ -224,9 +229,10 @@ class Realtime(Overlay):
                     laps_session += (minfo.vehicles.totalCompletedLaps * rubber_scale)
                 self.update_rubber(self.bar_wetness, laps_session)
             # Wet trend
-            wetness = wet_min + wet_max + wet_avg
-            wet_trend = self.wet_trend.update(wetness, lap_etime)
-            self.update_wetness_trend(self.bar_wetness_trend, wet_trend)
+            if self.wcfg["show_trend"]:
+                wetness = wet_min + wet_max + wet_avg
+                wet_trend = self.wet_trend.update(wetness, lap_etime)
+                self.update_wetness_trend(self.bar_wetness_trend, wet_trend)
 
     # GUI update methods
     def update_temperature(self, target, data, track, air):

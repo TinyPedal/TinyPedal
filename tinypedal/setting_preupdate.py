@@ -32,7 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 7), _user_prior_2_42_7),  # 2026-03-06
+        ((2, 42, 8), _user_prior_2_42_8),  # 2026-03-06
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -46,14 +46,23 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
-def _user_prior_2_42_7(dict_user: dict):
-    """Update user setting prior to 2.42.7"""
-    # Copy old setting from sectors module to sectors widget
+def _user_prior_2_42_8(dict_user: dict):
+    """Update user setting prior to 2.42.8"""
+    # Copy options from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
     if isinstance(module_sectors, dict) and isinstance(sectors, dict):
         if "enable_all_time_best_sectors" in module_sectors:
             sectors["enable_all_time_best_sectors"] = module_sectors["enable_all_time_best_sectors"]
+    # Copy options in instrument widget
+    instrument = dict_user.get("instrument")
+    if isinstance(instrument, dict):
+        if "bkg_color" in instrument:
+            instrument["bkg_color_headlights"] = instrument["bkg_color"]
+            instrument["bkg_color_ignition"] = instrument["bkg_color"]
+            instrument["bkg_color_clutch"] = instrument["bkg_color"]
+            instrument["bkg_color_wheel_lock"] = instrument["bkg_color"]
+            instrument["bkg_color_wheel_slip"] = instrument["bkg_color"]
     # Rename options in fuel widget
     fuel = dict_user.get("fuel")
     if isinstance(fuel, dict):
@@ -82,7 +91,29 @@ def _user_prior_2_42_7(dict_user: dict):
         _rename_key(virtual_energy, "_bias", "_fuel_bias")
         _rename_key(virtual_energy, "_refill", "_refilling")
         _rename_key(virtual_energy, "_remain", "_remaining")
-    # Rename "bar" to "delta_bar" in deltabest widget
+    # Rename options in steering widget
+    steering = dict_user.get("steering")
+    if isinstance(steering, dict):
+        if "font_color" in steering:
+            steering["font_color_steering_angle"] = steering["font_color"]
+    # Rename options in track map widget
+    track_map = dict_user.get("track_map")
+    if isinstance(track_map, dict):
+        if "enabled_fixed_pitout_prediction" in track_map:
+            track_map["enable_fixed_pitout_prediction"] = track_map["enabled_fixed_pitout_prediction"]
+        if "show_vehicle_standings" in track_map:
+            track_map["show_vehicle_class_standings"] = track_map["show_vehicle_standings"]
+    # Rename options in navigation widget
+    navigation = dict_user.get("navigation")
+    if isinstance(navigation, dict):
+        if "show_vehicle_standings" in navigation:
+            navigation["show_vehicle_class_standings"] = navigation["show_vehicle_standings"]
+    # Rename options in friction_circle widget
+    friction_circle = dict_user.get("friction_circle")
+    if isinstance(friction_circle, dict):
+        if "font_color" in friction_circle:
+            friction_circle["font_color_readings"] = friction_circle["font_color"]
+    # Rename options in deltabest widget
     deltabest = dict_user.get("deltabest")
     if isinstance(deltabest, dict):
         if "bkg_color_deltabar" in deltabest:
@@ -95,23 +126,24 @@ def _user_prior_2_42_7(dict_user: dict):
             deltabest["delta_bar_display_range"] = deltabest["bar_display_range"]
         if "show_animated_deltabest" in deltabest:
             deltabest["enable_animated_deltabest"] = deltabest["show_animated_deltabest"]
-    # Rename "auto_hide" to "enable_auto_hide"
+    # Rename options in radar widget
     radar = dict_user.get("radar")
     if isinstance(radar, dict):
         if "auto_hide" in radar:
             radar["enable_auto_hide"] = radar["auto_hide"]
         if "auto_hide_in_private_qualifying" in radar:
             radar["enable_auto_hide_in_private_qualifying"] = radar["auto_hide_in_private_qualifying"]
-    # Rename "auto_hide_if_not_available" to "enable_auto_hide_if_not_available"
+    # Rename options in pace notes widget
     pace_notes = dict_user.get("pace_notes")
     if isinstance(pace_notes, dict):
         if "auto_hide_if_not_available" in pace_notes:
             pace_notes["enable_auto_hide_if_not_available"] = pace_notes["auto_hide_if_not_available"]
+    # Rename options in track notes widget
     track_notes = dict_user.get("track_notes")
     if isinstance(track_notes, dict):
         if "auto_hide_if_not_available" in track_notes:
             track_notes["enable_auto_hide_if_not_available"] = track_notes["auto_hide_if_not_available"]
-    # Rename "draw_order" to "display_order"
+    # Rename options in trailing widget
     trailing = dict_user.get("trailing")
     if isinstance(trailing, dict):
         _rename_key(trailing, "draw_order_index", "display_order")

@@ -155,7 +155,7 @@ class Realtime(Overlay):
         self.last_veh_data_version = None
         self.autohide_timer_start = 1
         self.show_radar = True
-        self.always_show = False
+        self.always_show = True
 
     def timerEvent(self, event):
         """Update when vehicle on track"""

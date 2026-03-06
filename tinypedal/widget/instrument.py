@@ -41,13 +41,6 @@ class Realtime(Overlay):
 
         # Config variable
         icon_size = max(self.wcfg["icon_size"], 16) // 2 * 2
-        self.warning_color = (
-            self.wcfg["bkg_color"],  # 0
-            self.wcfg["warning_color_stalling"],  # 1
-            self.wcfg["warning_color_clutch"],  # 2
-            self.wcfg["warning_color_wheel_lock"],  # 3
-            self.wcfg["warning_color_wheel_slip"],  # 4
-        )
 
         # Config canvas
         pixmap_icon = QPixmap(ImageFile.INSTRUMENT).scaledToWidth(
@@ -65,7 +58,7 @@ class Realtime(Overlay):
                 image=self.pixmap_headlights[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
-                bg_color=self.warning_color[0],
+                bg_color=self.wcfg["bkg_color_headlights"],
             )
             self.set_primary_orient(
                 target=self.bar_headlights,
@@ -74,11 +67,15 @@ class Realtime(Overlay):
 
         # Ignition
         if self.wcfg["show_ignition"]:
+            self.color_ignition = (
+                self.wcfg["bkg_color_ignition"],
+                self.wcfg["warning_color_stalling"],
+            )
             self.bar_ignition = self.set_rawimage(
                 image=self.pixmap_ignition[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
-                bg_color=self.warning_color[0],
+                bg_color=self.color_ignition[0],
             )
             self.set_primary_orient(
                 target=self.bar_ignition,
@@ -87,11 +84,15 @@ class Realtime(Overlay):
 
         # Clutch
         if self.wcfg["show_clutch"]:
+            self.color_clutch = (
+                self.wcfg["bkg_color_clutch"],
+                self.wcfg["warning_color_clutch"],
+            )
             self.bar_clutch = self.set_rawimage(
                 image=self.pixmap_clutch[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
-                bg_color=self.warning_color[0],
+                bg_color=self.color_clutch[0],
             )
             self.set_primary_orient(
                 target=self.bar_clutch,
@@ -100,11 +101,15 @@ class Realtime(Overlay):
 
         # Lock
         if self.wcfg["show_wheel_lock"]:
+            self.color_wlock = (
+                self.wcfg["bkg_color_wheel_lock"],
+                self.wcfg["warning_color_wheel_lock"],
+            )
             self.bar_wlock = self.set_rawimage(
                 image=self.pixmap_wlock[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
-                bg_color=self.warning_color[0],
+                bg_color=self.color_wlock[0],
             )
             self.set_primary_orient(
                 target=self.bar_wlock,
@@ -113,11 +118,15 @@ class Realtime(Overlay):
 
         # Slip
         if self.wcfg["show_wheel_slip"]:
+            self.color_wslip = (
+                self.wcfg["bkg_color_wheel_slip"],
+                self.wcfg["warning_color_wheel_slip"],
+            )
             self.bar_wslip = self.set_rawimage(
                 image=self.pixmap_wslip[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
-                bg_color=self.warning_color[0],
+                bg_color=self.color_wslip[0],
             )
             self.set_primary_orient(
                 target=self.bar_wslip,
@@ -180,7 +189,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.image = self.pixmap_ignition[data == 0]
-            target.bg = self.warning_color[data == 1]
+            target.bg = self.color_ignition[data == 1]
             target.update()
 
     def update_clutch(self, target, data):
@@ -188,7 +197,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.image = self.pixmap_clutch[data < 2]
-            target.bg = self.warning_color[data % 2 * 2]
+            target.bg = self.color_clutch[data % 2]
             target.update()
 
     def update_wlock(self, target, data):
@@ -196,7 +205,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.image = self.pixmap_wlock[data == 0]
-            target.bg = self.warning_color[data * 3]
+            target.bg = self.color_wlock[data]
             target.update()
 
     def update_wslip(self, target, data):
@@ -204,7 +213,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.image = self.pixmap_wslip[data == 0]
-            target.bg = self.warning_color[data * 4]
+            target.bg = self.color_wslip[data]
             target.update()
 
 

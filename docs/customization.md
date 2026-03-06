@@ -3872,14 +3872,14 @@ Set amount time offset (in seconds) for catching up with vehicle speed after pit
 Note, this value is important for accurate prediction, as initial vehicle speed is much slower after pit-out, so extra time is needed for driver to catch up, and also affected by pit-out line location. For most tracks, this extra time after pit-out is roughly within `1` to `5` seconds.
 
     pitout_duration_minimum
-Set pit stop duration (in seconds) of first prediction. This option has no effect if `enabled_fixed_pitout_prediction` is enabled.
+Set pit stop duration (in seconds) of first prediction. This option has no effect if `enable_fixed_pitout_prediction` is enabled.
 
     pitout_duration_increment
-Set each pit stop duration (in seconds) increment after previous prediction. Default increment is `10` seconds. This option has no effect if `enabled_fixed_pitout_prediction` is enabled.
+Set each pit stop duration (in seconds) increment after previous prediction. Default increment is `10` seconds. This option has no effect if `enable_fixed_pitout_prediction` is enabled.
 
 Note, each time when pit stop duration of the nearest prediction exceeded current pit stop timer, the prediction circle will be removed, and a new prediction circle will be appended with pit stop duration increment after the last prediction.
 
-    enabled_fixed_pitout_prediction
+    enable_fixed_pitout_prediction
 Show pit-out prediction based on user-defined fixed pitstop duration instead. This option overrides `pitout_duration_minimum` and `pitout_duration_increment` options.
 
 While this option is enabled, total pit-out duration is calculated from the sum of `pit-out time offset`, `fixed pit stop duration` and `estimated pit lane pass-through duration`. It's required to enter and exit pit lane at least once to get correct total pit-out duration.
@@ -4213,6 +4213,9 @@ Note, depleting virtual energy could result a `Stop-Go` penalty in `LMU`; while 
     show_temperature
 Show track and ambient temperature.
 
+    decimal_places_temperature
+Set amount decimal places to keep. Default is `1` decimal place, set to `0` to hide decimals. Note, when number of digits is less than expected, extra leading zero or decimal place will be added to fill the gap.
+
     show_rain
 Show rain precipitation in percentage.
 
@@ -4249,13 +4252,13 @@ Set starting rubber coverage (percent) in corresponding sessions (practice, qual
 
 Note, since session starting rubber coverage data is not available from game API, it is required to manually set the value.
 
+    show_trend
+Show weather change trend for temperature, raininess, surface wetness readings.
+
     temperature_trend_interval, raininess_trend_interval, wetness_trend_interval
-Set weather change trend interval in seconds for temperature, raininess, surface wetness readings. Default interval is `60` seconds.
+Set weather change trend interval in seconds. Default interval is `60` seconds.
 
 If weather readings increased within the interval, `▲` uparrow sign will be shown; if readings decreased within the interval, `▼` downarrow sign will be shown; If readings has not changed during the interval, `●` sign will be shown after.
-
-    decimal_places_temperature
-Set amount decimal places to keep. Default is `1` decimal place, set to `0` to hide decimals. Note, when number of digits is less than expected, extra leading zero or decimal place will be added to fill the gap.
 
 [**`Back to Top`**](#)
 

@@ -84,7 +84,7 @@ class Realtime(Overlay):
             self.pitout_time_offset = max(self.wcfg["pitout_time_offset"], 0)
             self.min_pit_time = self.wcfg["pitout_duration_minimum"] + self.pitout_time_offset
             self.pit_time_increment = max(self.wcfg["pitout_duration_increment"], 1)
-            if self.wcfg["enabled_fixed_pitout_prediction"]:
+            if self.wcfg["enable_fixed_pitout_prediction"]:
                 self.fixed_pit_times = tuple(sorted(set(self.set_fixed_pit_time())))
             self.pen_pit_styles = (
                 self.set_veh_pen_style(self.wcfg["prediction_outline_color"], self.wcfg["prediction_outline_width"]),
@@ -307,7 +307,7 @@ class Realtime(Overlay):
                 painter.drawEllipse(self.veh_shape)
 
             # Draw text standings
-            if self.wcfg["show_vehicle_standings"]:
+            if self.wcfg["show_vehicle_class_standings"]:
                 if self.show_position_in_class:
                     place_veh = data.positionInClass
                 else:
@@ -347,7 +347,7 @@ class Realtime(Overlay):
                 painter.drawEllipse(self.veh_shape)
 
             # Draw text standings
-            if self.wcfg["show_vehicle_standings"]:
+            if self.wcfg["show_vehicle_class_standings"]:
                 if self.show_position_in_class:
                     place_veh = data.positionInClass
                 else:
@@ -436,7 +436,7 @@ class Realtime(Overlay):
         """Generate target pit time"""
         max_prediction = self.prediction_count
         # Fixed time
-        if self.wcfg["enabled_fixed_pitout_prediction"]:
+        if self.wcfg["enable_fixed_pitout_prediction"]:
             pass_time = minfo.mapping.pitPassTime
             valid_count = 0
             for fixed_time in self.fixed_pit_times:
