@@ -214,7 +214,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_gap,
-                column=self.wcfg["display_order_timegap"],
+                column=self.wcfg["display_order_time_gap"],
             )
         # Vehicle laptime
         if self.wcfg["show_laptime"]:
@@ -348,7 +348,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pit,
-                column=self.wcfg["display_order_pitstatus"],
+                column=self.wcfg["display_order_pit_status"],
             )
         # Tyre compound index
         if self.wcfg["show_tyre_compound"]:

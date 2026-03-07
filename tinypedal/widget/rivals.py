@@ -185,7 +185,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_int,
-                column=self.wcfg["display_order_timeinterval"],
+                column=self.wcfg["display_order_time_interval"],
                 hide_start=1,
             )
         # Vehicle laptime
@@ -311,7 +311,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pit,
-                column=self.wcfg["display_order_pitstatus"],
+                column=self.wcfg["display_order_pit_status"],
                 hide_start=1,
             )
         # Tyre compound index

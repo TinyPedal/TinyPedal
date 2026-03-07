@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 15), _user_prior_2_42_15),  # 2026-03-07
+        ((2, 42, 16), _user_prior_2_42_16),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -67,7 +67,7 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_15(dict_user: dict):
+def _user_prior_2_42_16(dict_user: dict):
     # Prioritized
     # Rename all "column_index" to "display_order"
     for option in dict_user.values():
@@ -221,11 +221,31 @@ def _user_prior_2_42_15(dict_user: dict):
     if isinstance(friction_circle, dict):
         if "font_color" in friction_circle:
             friction_circle["font_color_readings"] = friction_circle["font_color"]
+    # Rename options in relative widget
+    relative = dict_user.get("relative")
+    if isinstance(relative, dict):
+        if "display_order_timegap" in relative:
+            relative["display_order_time_gap"] = relative["display_order_timegap"]
+        if "display_order_pitstatus" in relative:
+            relative["display_order_pit_status"] = relative["display_order_pitstatus"]
+    # Rename options in rivals widget
+    rivals = dict_user.get("rivals")
+    if isinstance(rivals, dict):
+        if "display_order_timeinterval" in rivals:
+            rivals["display_order_time_interval"] = rivals["display_order_timeinterval"]
+        if "display_order_pitstatus" in rivals:
+            rivals["display_order_pit_status"] = rivals["display_order_pitstatus"]
     # Rename options in standings widget
     standings = dict_user.get("standings")
     if isinstance(standings, dict):
         if "min_top_vehicles" in standings:
             standings["minimum_top_vehicles"] = standings["min_top_vehicles"]
+        if "display_order_timeinterval" in standings:
+            standings["display_order_time_interval"] = standings["display_order_timeinterval"]
+        if "display_order_timegap" in standings:
+            standings["display_order_time_gap"] = standings["display_order_timegap"]
+        if "display_order_pitstatus" in standings:
+            standings["display_order_pit_status"] = standings["display_order_pitstatus"]
     # Rename options in deltabest widget
     deltabest = dict_user.get("deltabest")
     if isinstance(deltabest, dict):
