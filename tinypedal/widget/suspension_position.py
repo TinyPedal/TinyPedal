@@ -53,7 +53,7 @@ class Realtime(Overlay):
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
-        max_range = max(int(self.wcfg["position_max_range"]), 10)
+        max_range = max(int(self.wcfg["position_maximum_range"]), 10)
         susp_mark_color = (
             self.wcfg["third_spring_position_mark_color"]
             if self.wcfg["show_third_spring_position_mark"]

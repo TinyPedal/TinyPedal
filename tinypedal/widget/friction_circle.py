@@ -107,7 +107,7 @@ class Realtime(Overlay):
 
         # Last data
         self.gforce_raw = 0,0
-        self.data_gforce = deque([], max(self.wcfg["trace_max_samples"], 5))
+        self.data_gforce = deque([], max(self.wcfg["trace_maximum_samples"], 5))
         self.last_x = self.area_center
         self.last_y = self.area_center
 
@@ -146,13 +146,13 @@ class Realtime(Overlay):
         # Draw g circle background
         painter.drawPixmap(0, 0, self.pixmap_background)
         # Draw max average g circle
-        if self.wcfg["show_max_average_lateral_g_circle"]:
+        if self.wcfg["show_maximum_average_lateral_g_circle"]:
             self.draw_circle_mark(
                 painter,
-                self.wcfg["max_average_lateral_g_circle_style"],
+                self.wcfg["maximum_average_lateral_g_circle_style"],
                 minfo.force.maxAvgLatGForce,
-                self.wcfg["max_average_lateral_g_circle_width"],
-                self.wcfg["max_average_lateral_g_circle_color"]
+                self.wcfg["maximum_average_lateral_g_circle_width"],
+                self.wcfg["maximum_average_lateral_g_circle_color"]
             )
         # Draw trace
         if self.wcfg["show_trace"]:

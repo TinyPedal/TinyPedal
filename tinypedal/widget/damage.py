@@ -50,8 +50,8 @@ class Realtime(Overlay):
         display_margin = max(int(self.wcfg["display_margin"]), 0)
         inner_gap = max(int(self.wcfg["inner_gap"]), 0)
 
-        parts_max_width = max(int(self.wcfg["parts_max_width"]), 4)
-        parts_max_height = max(int(self.wcfg["parts_max_height"]), 4)
+        parts_max_width = max(int(self.wcfg["parts_maximum_width"]), 4)
+        parts_max_height = max(int(self.wcfg["parts_maximum_height"]), 4)
 
         parts_full_width = parts_max_width * 3 + inner_gap * 2
         parts_full_height = parts_max_height * 3 + inner_gap * 2

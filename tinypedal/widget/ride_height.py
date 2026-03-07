@@ -57,7 +57,7 @@ class Realtime(Overlay):
             self.wcfg["ride_height_offset_rear_left"],
             self.wcfg["ride_height_offset_rear_right"],
         )
-        max_range = max(int(self.wcfg["ride_height_max_range"]), 10)
+        max_range = max(int(self.wcfg["ride_height_maximum_range"]), 10)
 
         # Caption
         if self.wcfg["show_caption"]:

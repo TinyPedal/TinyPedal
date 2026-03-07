@@ -187,7 +187,7 @@ class Realtime(Overlay):
         """Set pedal size"""
         max_gap = max(self.wcfg["inner_gap"], 0)
         pedal_length = max(int(self.wcfg["bar_length"]), 10)
-        pedal_extend = max(int(self.wcfg["max_indicator_height"]), 0) + max_gap
+        pedal_extend = max(int(self.wcfg["maximum_indicator_height"]), 0) + max_gap
         pedal_uwidth = max(int(self.wcfg["bar_width_unfiltered"]), 1)
         pedal_fwidth = max(int(self.wcfg["bar_width_filtered"]), 1)
         bar_length = pedal_length + pedal_extend

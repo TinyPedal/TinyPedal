@@ -875,11 +875,11 @@ class OutputUsage():
         layout.addWidget(self.total_minutes, 7, 0)
         layout.addWidget(QLabel("min"), 7, 1)
 
-        layout.addWidget(QLabel("Max Stint Laps:"), 8, 0, 1, 2)
+        layout.addWidget(QLabel("Maximum Stint Laps:"), 8, 0, 1, 2)
         layout.addWidget(self.stint_laps, 9, 0)
         layout.addWidget(QLabel("lap"), 9, 1)
 
-        layout.addWidget(QLabel("Max Stint Minutes:"), 10, 0, 1, 2)
+        layout.addWidget(QLabel("Maximum Stint Minutes:"), 10, 0, 1, 2)
         layout.addWidget(self.stint_minutes, 11, 0)
         layout.addWidget(QLabel("min"), 11, 1)
 

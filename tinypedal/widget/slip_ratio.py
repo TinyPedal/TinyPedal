@@ -51,7 +51,7 @@ class Realtime(Overlay):
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
-        max_range = min(max(int(self.wcfg["slip_ratio_max_range"]), 10), 100)
+        max_range = min(max(int(self.wcfg["slip_ratio_maximum_range"]), 10), 100)
         self.opt_range = min(max(int(self.wcfg["slip_ratio_optimal_range"]), 0), 100)
 
         # Caption

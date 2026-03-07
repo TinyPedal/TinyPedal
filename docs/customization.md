@@ -858,9 +858,9 @@ Enable `Manually Select Pace Notes File` check box to disable auto-file-name mat
 
 `Global offset` adds global position offset (in meters) to current vehicle position on track, which affects when next pace note line will be played. This option only takes effect after clicked `Apply` button.
 
-`Max duration` sets maximum playback duration for each sound file, which can be used to limit sound file maximum playing duration. Default duration is `10` seconds. This option only takes effect after clicked `Apply` button.
+`Maximum duration` sets maximum playback duration for each sound file, which can be used to limit sound file maximum playing duration. Default duration is `10` seconds. This option only takes effect after clicked `Apply` button.
 
-`Max Queue` sets maximum number of sound files in playback queues. Default is `5` sound files. This option only takes effect after clicked `Apply` button.
+`Maximum Queue` sets maximum number of sound files in playback queues. Default is `5` sound files. This option only takes effect after clicked `Apply` button.
 
 `Playback volume` sets output volume for sound file. This option takes immediate effect when adjusted.
 
@@ -996,7 +996,7 @@ Show theoretical fuel or energy consumption in order to make one less pit stop.
     Total laps, Total minutes
 Show total laps and minutes can run based on `Total race fuel` or `Total race energy` value.
 
-    Max stint laps, Max stint minutes
+    Maximum stint laps, Maximum stint minutes
 Show maximum laps and minutes can run per stint based on `Tank capacity` value (or 100% capacity for virtual energy).
 
     Starting fuel, Starting energy
@@ -1012,13 +1012,13 @@ Set average starting tyre tread (percent). For example, 100% for new tyres, and 
 Set average tyre tread wear (percent) per lap. This value can be retrieved from `Tyre` column.
 
     Tread wear per stint
-Show total average tyre tread wear (percent) per stint. Note, while virtual energy is available, this value will be calculated based on the least `max stint laps` between fuel and virtual energy.
+Show total average tyre tread wear (percent) per stint. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
 
     Lifespan laps, Lifespan minutes
 Show total tyre lifespan in laps and minutes based on `tread wear per lap` and `lap time`.
 
     Lifespan stints
-Show estimated tyre lifespan in number of stints. Note, while virtual energy is available, this value will be calculated based on the least `max stint laps` between fuel and virtual energy.
+Show estimated tyre lifespan in number of stints. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
 
 [**`Back to Top`**](#)
 
@@ -1390,19 +1390,19 @@ Enable force module.
     gravitational_acceleration
 Set gravitational acceleration value on earth.
 
-    max_g_force_reset_delay
+    maximum_g_force_reset_delay
 Set time delay in seconds for resetting maximum g force reading.
 
-    max_average_g_force_samples
+    maximum_average_g_force_samples
 Set amount samples for calculating maximum average g force. Minimum value is limited to `3`.
 
-    max_average_g_force_difference
+    maximum_average_g_force_difference
 Set maximum average g force difference threshold which compares with the standard deviation calculated from maximum average g force samples. Default is `0.2` g.
 
-    max_average_g_force_reset_delay
+    maximum_average_g_force_reset_delay
 Set time delay in seconds for resetting maximum average g force. Default is `30` seconds.
 
-    max_braking_rate_reset_delay
+    maximum_braking_rate_reset_delay
 Set time delay in seconds for resetting maximum braking rate. Default is `60` seconds.
 
 [**`Back to Top`**](#)
@@ -1650,11 +1650,11 @@ Set value to `1` to manual override and use rear allocation, which is commonly s
 ## Brake performance
 **This widget displays brake performance info.**
 
-    show_transient_max_braking_rate
+    show_transient_maximum_braking_rate
 Show transient maximum braking rate (g) from last braking input, and resets after 3 seconds.
 
-    show_max_braking_rate
-Show maximum braking rate (g), and resets after a set period of time that defined by `max_braking_rate_reset_delay` value in Force Module.
+    show_maximum_braking_rate
+Show maximum braking rate (g), and resets after a set period of time that defined by `maximum_braking_rate_reset_delay` value in Force Module.
 
     show_delta_braking_rate
 Show maximum braking rate difference (g) against transient maximum braking rate, and resets on the next braking.
@@ -1821,7 +1821,7 @@ Set body parts width in pixels. Minimum value is limited to `1`.
     parts_width_ratio
 Set width ratio between side and center body parts. Value range in `0.1` to `1.0`.
 
-    parts_max_width, parts_max_height
+    parts_maximum_width, parts_maximum_height
 Set maximum body parts width, height in pixels. Minimum value is limited to `4`.
 
     wheel_width, wheel_height
@@ -2203,13 +2203,13 @@ Fade out circle background edge.
     fade_in_radius, fade_out_radius
 Set fade in/out radius, value range in `0.0` to `1.0`.
 
-    show_max_average_lateral_g_circle
+    show_maximum_average_lateral_g_circle
 Show maximum average lateral g force reference circle.
 
-    max_average_lateral_g_circle_style
+    maximum_average_lateral_g_circle_style
 Set circle line style. `0` for dashed line, `1` for solid line.
 
-    max_average_lateral_g_circle_width
+    maximum_average_lateral_g_circle_width
 Set circle line width in pixels.
 
     show_dot
@@ -2221,7 +2221,7 @@ Set g force dot size in pixels.
     show_trace
 Show g force trace.
 
-    trace_max_samples
+    trace_maximum_samples
 Set maximum amount g force trace samples.
 
     trace_style
@@ -2773,7 +2773,7 @@ Set pedal bar length and width in pixels.
     inner_gap
 Set gap between pedal and maximum indicator.
 
-    max_indicator_height
+    maximum_indicator_height
 This is the indicator height when pedal reaches maximum travel (100%), value in pixel.
 
     show_brake_pressure
@@ -3251,7 +3251,7 @@ Set prediction pit time for leader or local player.
 ## Ride height
 **This widget displays visualized ride height info.**
 
-    ride_height_max_range
+    ride_height_maximum_range
 Set visualized maximum ride height display range (millimeter).
 
     rideheight_offset*
@@ -3384,7 +3384,7 @@ Note, this is the same value that used for calculating estimated refueling value
     slip_ratio_optimal_range
 Set optimal slip ratio range (percentage) for optimal and critical slip ratio color indication, value range in `0` to `100`. Default is `30` percent.
 
-    slip_ratio_max_range
+    slip_ratio_maximum_range
 Set visualized maximum slip ratio display range (percentage), value range in `10` to `100`. Default is `50` percent.
 
 [**`Back to Top`**](#)
@@ -3431,22 +3431,22 @@ Enable single-class exclusive mode, which displays vehicles from player's class 
     enable_multi_class_split_mode
 Enable multi-class split mode, which splits and displays each vehicle class in separated groups. This mode will only take effect when there is more than one vehicle class present in a session, otherwise it will automatically fall back to normal single class mode.
 
-    min_top_vehicles
-Set minimum amount top place vehicles to display. This value has higher priority over other `max_vehicles` settings. Default is `3`, which always shows top 3 vehicles if present.
+    minimum_top_vehicles
+Set minimum amount top place vehicles to display. This value has higher priority over other `maximum_vehicles` settings. Default is `3`, which always shows top 3 vehicles if present.
 
-    max_vehicles_exclusive_mode
+    maximum_vehicles_exclusive_mode
 Set maximum amount vehicles to display in exclusive mode, which takes effect when `enable_single_class_exclusive_mode` is enabled.
 
-    max_vehicles_combined_mode
+    maximum_vehicles_combined_mode
 Set maximum amount vehicles to display in combined mode, which takes effect when `enable_multi_class_split_mode` is not enabled. When total vehicle number is lower than this value, extra rows will auto-hide. When total vehicle number is above this value, the top 3 vehicles will always show, and rest of the vehicles will be selected from the nearest front and behind places related to player.
 
-    max_vehicles_split_mode
+    maximum_vehicles_split_mode
 Set maximum amount vehicles to display in split mode, which takes effect when in multi-class session and `enable_multi_class_split_mode` is enabled. If total vehicle number is above this value, any extra vehicles will not be shown. Default is `50`, which is sufficient in most case.
 
-    max_vehicles_per_split_player
+    maximum_vehicles_per_split_player
 Set maximum amount vehicles to display for class where player is in. Default is `7`. Note that, if player is not in first place, then at least one opponent ahead of player will always be displayed, even if this value sets lower.
 
-    max_vehicles_per_split_others
+    maximum_vehicles_per_split_others
 Set maximum amount vehicles to display for classes where player is not in. Default is `3`.
 
     split_gap
@@ -3657,7 +3657,7 @@ Show percentage force ratio between each and total suspension force. Set `false`
 ## Suspension position
 **This widget displays visualized suspension position info.**
 
-    position_max_range
+    position_maximum_range
 Set visualized maximum display range of suspension position (millimeter).
 
     show_third_spring_position_mark

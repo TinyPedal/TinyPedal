@@ -46,17 +46,17 @@ class Realtime(DataModule):
 
         output = minfo.force
         g_accel = max(self.mcfg["gravitational_acceleration"], 0.01)
-        max_g_diff = self.mcfg["max_average_g_force_difference"]
+        max_g_diff = self.mcfg["maximum_average_g_force_difference"]
         calc_ema_gforce = partial(
             calc.exp_mov_avg,
-            calc.ema_factor(self.mcfg["max_average_g_force_samples"], 3)
+            calc.ema_factor(self.mcfg["maximum_average_g_force_samples"], 3)
         )
 
-        calc_max_lgt = transient_max(self.mcfg["max_g_force_reset_delay"])
-        calc_max_lat = transient_max(self.mcfg["max_g_force_reset_delay"])
-        calc_max_avg_lat = transient_max(self.mcfg["max_average_g_force_reset_delay"], True)
+        calc_max_lgt = transient_max(self.mcfg["maximum_g_force_reset_delay"])
+        calc_max_lat = transient_max(self.mcfg["maximum_g_force_reset_delay"])
+        calc_max_avg_lat = transient_max(self.mcfg["maximum_average_g_force_reset_delay"], True)
         calc_max_transient_rate = transient_max(3)
-        calc_max_braking_rate = transient_max(self.mcfg["max_braking_rate_reset_delay"], True)
+        calc_max_braking_rate = transient_max(self.mcfg["maximum_braking_rate_reset_delay"], True)
 
         while not _event_wait(update_interval):
             if realtime_state.active:

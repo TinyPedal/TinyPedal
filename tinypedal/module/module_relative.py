@@ -78,15 +78,15 @@ class Realtime(DataModule):
                     max_veh_behind = max_relative_vehicles(
                         setting_relative["additional_players_behind"])
                     min_top_veh = min_top_vehicles_in_class(
-                        setting_standings["min_top_vehicles"])
+                        setting_standings["minimum_top_vehicles"])
                     veh_limit_exclusive = max_vehicles_in_class(
-                        setting_standings["max_vehicles_exclusive_mode"], min_top_veh, 2)
+                        setting_standings["maximum_vehicles_exclusive_mode"], min_top_veh, 2)
                     veh_limit_combined = max_vehicles_in_class(
-                        setting_standings["max_vehicles_combined_mode"], min_top_veh, 2)
+                        setting_standings["maximum_vehicles_combined_mode"], min_top_veh, 2)
                     veh_limit_other = max_vehicles_in_class(
-                        setting_standings["max_vehicles_per_split_others"], min_top_veh, 0)
+                        setting_standings["maximum_vehicles_per_split_others"], min_top_veh, 0)
                     veh_limit_player = max_vehicles_in_class(
-                        setting_standings["max_vehicles_per_split_player"], min_top_veh, 2)
+                        setting_standings["maximum_vehicles_per_split_player"], min_top_veh, 2)
 
                 # Base info
                 veh_total = max(api.read.vehicle.total_vehicles(), 1)

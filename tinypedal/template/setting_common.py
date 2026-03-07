@@ -53,8 +53,8 @@ COMMON_DEFAULT = {
         "pace_notes_sound_path": "/",
         "pace_notes_sound_format": "wav",
         "pace_notes_sound_volume": 50,
-        "pace_notes_sound_max_duration": 10,
-        "pace_notes_sound_max_queue": 5,
+        "pace_notes_sound_maximum_duration": 10,
+        "pace_notes_sound_maximum_queue": 5,
         "pace_notes_global_offset": 0,
     },
 }

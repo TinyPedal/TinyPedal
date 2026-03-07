@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 9), _user_prior_2_42_9),  # 2026-03-07
+        ((2, 42, 10), _user_prior_2_42_10),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -67,7 +67,7 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_9(dict_user: dict):
+def _user_prior_2_42_10(dict_user: dict):
     # Copy options from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
@@ -153,6 +153,11 @@ def _user_prior_2_42_9(dict_user: dict):
     if isinstance(friction_circle, dict):
         if "font_color" in friction_circle:
             friction_circle["font_color_readings"] = friction_circle["font_color"]
+    # Rename options in standings widget
+    standings = dict_user.get("standings")
+    if isinstance(standings, dict):
+        if "min_top_vehicles" in standings:
+            standings["minimum_top_vehicles"] = standings["min_top_vehicles"]
     # Rename options in deltabest widget
     deltabest = dict_user.get("deltabest")
     if isinstance(deltabest, dict):
@@ -195,6 +200,10 @@ def _user_prior_2_42_9(dict_user: dict):
     for option in dict_user.values():
         if isinstance(option, dict):
             _rename_key(option, "bkg_color", "background_color")
+    # Rename all "max_" to "maximum_"
+    for option in dict_user.values():
+        if isinstance(option, dict):
+            _rename_key(option, "max_", "maximum_")
     # Swap all suffix "_decimal_places" with prefix "decimal_places_"
     for option in dict_user.values():
         if isinstance(option, dict):

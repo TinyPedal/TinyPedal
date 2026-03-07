@@ -47,35 +47,35 @@ class Realtime(Overlay):
         bar_width = font_m.width * 5 + bar_padx
 
         # Transient max braking rate
-        if self.wcfg["show_transient_max_braking_rate"]:
+        if self.wcfg["show_transient_maximum_braking_rate"]:
             self.bar_trans_rate = self.set_rawtext(
                 text="0.00g",
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_transient_max_braking_rate"],
-                bg_color=self.wcfg["background_color_transient_max_braking_rate"],
+                fg_color=self.wcfg["font_color_transient_maximum_braking_rate"],
+                bg_color=self.wcfg["background_color_transient_maximum_braking_rate"],
                 last=0,
             )
             self.set_primary_orient(
                 target=self.bar_trans_rate,
-                column=self.wcfg["display_order_transient_max_braking_rate"],
+                column=self.wcfg["display_order_transient_maximum_braking_rate"],
             )
 
         # Max braking rate
-        if self.wcfg["show_max_braking_rate"]:
+        if self.wcfg["show_maximum_braking_rate"]:
             self.bar_max_rate = self.set_rawtext(
                 text="0.00g",
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_max_braking_rate"],
-                bg_color=self.wcfg["background_color_max_braking_rate"],
+                fg_color=self.wcfg["font_color_maximum_braking_rate"],
+                bg_color=self.wcfg["background_color_maximum_braking_rate"],
                 last=0,
             )
             self.set_primary_orient(
                 target=self.bar_max_rate,
-                column=self.wcfg["display_order_max_braking_rate"],
+                column=self.wcfg["display_order_maximum_braking_rate"],
             )
 
         # Delta braking rate
@@ -134,12 +134,12 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Transient max braking rate
-        if self.wcfg["show_transient_max_braking_rate"]:
+        if self.wcfg["show_transient_maximum_braking_rate"]:
             transient_rate = minfo.force.transientMaxBrakingRate
             self.update_braking_rate(self.bar_trans_rate, transient_rate)
 
         # Max braking rate
-        if self.wcfg["show_max_braking_rate"]:
+        if self.wcfg["show_maximum_braking_rate"]:
             max_rate = minfo.force.maxBrakingRate
             self.update_braking_rate(self.bar_max_rate, max_rate)
 

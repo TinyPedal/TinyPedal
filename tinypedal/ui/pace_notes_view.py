@@ -154,14 +154,14 @@ class PaceNotesPlayer(QMediaPlayer):
     def __update_queue(self, pace_note: str | None):
         """Update playback queue"""
         if (pace_note is not None
-            and len(self._play_queue) < self.mcfg["pace_notes_sound_max_queue"]):
+            and len(self._play_queue) < self.mcfg["pace_notes_sound_maximum_queue"]):
             self._play_queue.append(pace_note)
 
     def __play_next_in_queue(self):
         """Play next sound in playback queue"""
         # Wait if is playing & not exceeded max duration
         if (self.is_playing() and
-            self.position() < self.mcfg["pace_notes_sound_max_duration"] * 1000):
+            self.position() < self.mcfg["pace_notes_sound_maximum_duration"] * 1000):
             return
         # Play next sound in queue
         self.set_source()
@@ -306,8 +306,8 @@ class PaceNotesControl(QWidget):
         self.path_selector.setText(self.mcfg["pace_notes_sound_path"])
         self.combobox_format.setEditText(self.mcfg["pace_notes_sound_format"])
         self.spinbox_offset.setValue(self.mcfg["pace_notes_global_offset"])
-        self.spinbox_max_duration.setValue(self.mcfg["pace_notes_sound_max_duration"])
-        self.spinbox_max_queue.setValue(self.mcfg["pace_notes_sound_max_queue"])
+        self.spinbox_max_duration.setValue(self.mcfg["pace_notes_sound_maximum_duration"])
+        self.spinbox_max_queue.setValue(self.mcfg["pace_notes_sound_maximum_queue"])
         self.slider_volume.setValue(self.mcfg["pace_notes_sound_volume"])
 
         # Update button state only if changed
@@ -353,10 +353,10 @@ class PaceNotesControl(QWidget):
         self.update_config("pace_notes_global_offset", global_offset)
 
         max_duration = self.spinbox_max_duration.value()
-        self.update_config("pace_notes_sound_max_duration", max_duration)
+        self.update_config("pace_notes_sound_maximum_duration", max_duration)
 
         max_queue = int(self.spinbox_max_queue.value())
-        self.update_config("pace_notes_sound_max_queue", max_queue)
+        self.update_config("pace_notes_sound_maximum_queue", max_queue)
 
     def set_sound_volume(self, volume: int):
         """Set sound volume"""
