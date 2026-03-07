@@ -107,7 +107,7 @@ class Realtime(Overlay):
         if self.wcfg["show_last"]:
             text_last = f"{self.prefix_last}{TEXT_NOLAPTIME}"
             self.bar_style_last = (
-                self.wcfg["font_color_invalid_laptime"],
+                self.wcfg["font_color_invalid_last"],
                 self.wcfg["font_color_last"],
             )
             self.bar_last = self.set_rawtext(

@@ -86,7 +86,7 @@ class Realtime(Overlay):
                     self.wcfg["background_color_last_time"],
                 ),
                 (
-                    self.wcfg["font_color_invalid_laptime"],
+                    self.wcfg["font_color_invalid_time"],
                     self.wcfg["background_color_last_time"],
                 ),
             )

@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 13), _user_prior_2_42_13),  # 2026-03-07
+        ((2, 42, 14), _user_prior_2_42_14),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -67,8 +67,8 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_13(dict_user: dict):
-    # Copy options from sectors module to sectors widget
+def _user_prior_2_42_14(dict_user: dict):
+    # Copy options from module_sectors to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
     if isinstance(module_sectors, dict) and isinstance(sectors, dict):
@@ -109,7 +109,7 @@ def _user_prior_2_42_13(dict_user: dict):
     gear = dict_user.get("gear")
     if isinstance(gear, dict):
         _swap_suffix_with_prefix(gear, "_bkg_color", "bkg_color_")
-    # Rename options in weather forecast widget
+    # Rename options in weather_forecast widget
     weather_forecast = dict_user.get("weather_forecast")
     if isinstance(weather_forecast, dict):
         _swap_suffix_with_prefix(weather_forecast, "_bkg_color", "bkg_color_")
@@ -129,11 +129,21 @@ def _user_prior_2_42_13(dict_user: dict):
             weather["prefix_wetness_dry"] = weather["prefix_dry"]
         if "prefix_wet" in weather:
             weather["prefix_wetness_wet"] = weather["prefix_wet"]
-    # Rename options in laps and position widget
+    # Rename options in laps_and_position widget
     laps_and_position = dict_user.get("laps_and_position")
     if isinstance(laps_and_position, dict):
         if "background_color_maxlap_warn" in laps_and_position:
             laps_and_position["warning_color_maximum_laps"] = laps_and_position["background_color_maxlap_warn"]
+    # Rename options in lap_time_history widget
+    lap_time_history = dict_user.get("lap_time_history")
+    if isinstance(lap_time_history, dict):
+        if "font_color_invalid_laptime" in lap_time_history:
+            lap_time_history["font_color_invalid_time"] = lap_time_history["font_color_invalid_laptime"]
+    # Rename options in timing widget
+    timing = dict_user.get("timing")
+    if isinstance(timing, dict):
+        if "font_color_invalid_laptime" in timing:
+            timing["font_color_invalid_last"] = timing["font_color_invalid_laptime"]
     # Rename options in fuel widget
     fuel = dict_user.get("fuel")
     if isinstance(fuel, dict):
@@ -147,7 +157,7 @@ def _user_prior_2_42_13(dict_user: dict):
         _rename_key(fuel, "_end", "_end_remaining")
         _rename_key(fuel, "_refuel", "_refueling")
         _rename_key(fuel, "_remain", "_remaining")
-    # Rename options in virtual energy widget
+    # Rename options in virtual_energy widget
     virtual_energy = dict_user.get("virtual_energy")
     if isinstance(virtual_energy, dict):
         _rename_key(virtual_energy, "_laps", "_estimated_laps")
@@ -167,7 +177,7 @@ def _user_prior_2_42_13(dict_user: dict):
     if isinstance(steering, dict):
         if "font_color" in steering:
             steering["font_color_steering_angle"] = steering["font_color"]
-    # Rename options in track map widget
+    # Rename options in track_map widget
     track_map = dict_user.get("track_map")
     if isinstance(track_map, dict):
         if "enabled_fixed_pitout_prediction" in track_map:
@@ -209,12 +219,12 @@ def _user_prior_2_42_13(dict_user: dict):
             radar["enable_auto_hide"] = radar["auto_hide"]
         if "auto_hide_in_private_qualifying" in radar:
             radar["enable_auto_hide_in_private_qualifying"] = radar["auto_hide_in_private_qualifying"]
-    # Rename options in pace notes widget
+    # Rename options in pace_notes widget
     pace_notes = dict_user.get("pace_notes")
     if isinstance(pace_notes, dict):
         if "auto_hide_if_not_available" in pace_notes:
             pace_notes["enable_auto_hide_if_not_available"] = pace_notes["auto_hide_if_not_available"]
-    # Rename options in track notes widget
+    # Rename options in track_notes widget
     track_notes = dict_user.get("track_notes")
     if isinstance(track_notes, dict):
         if "auto_hide_if_not_available" in track_notes:
