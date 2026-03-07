@@ -37,6 +37,7 @@ GLOBAL_DEFAULT = {
         "enable_high_dpi_scaling": True,
         "enable_auto_load_preset": False,
         "enable_global_hotkey": False,
+        "show_option_group_title": True,
         "show_confirmation_for_batch_toggle": True,
         "check_for_updates_on_startup": True,
         'snap_distance': 10,

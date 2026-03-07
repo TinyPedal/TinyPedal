@@ -25,6 +25,7 @@ from __future__ import annotations
 import os
 import re
 import time
+from itertools import islice, zip_longest
 from typing import Callable, Mapping, Sequence
 
 from PySide2.QtCore import Qt
@@ -66,6 +67,7 @@ from ._option import (
     FloatEdit,
     ImagePathEdit,
     IntegerEdit,
+    OptionGroup,
     StringEdit,
 )
 from .display_order import DisplayOrder
@@ -231,11 +233,12 @@ class UserConfig(BaseDialog):
 
         # Option dict (key: option editor)
         self.option_edit: dict = {}
+        option_word_set: set[str] = set()
 
         # Create options
         self.layout_option = QGridLayout()
         self.layout_option.setAlignment(Qt.AlignTop)
-        option_word_set = self.create_options(self.layout_option)
+        self.create_options(self.layout_option, option_word_set)
         option_box = QWidget(self)
         option_box.setLayout(self.layout_option)
 
@@ -261,7 +264,7 @@ class UserConfig(BaseDialog):
         layout_search.addWidget(button_clearsearch)
 
         # Button
-        has_display_order = (cfg_type == ConfigType.WIDGET and "Display" in option_word_set)
+        has_display_order = (cfg_type == ConfigType.WIDGET and "Display" in option_word_set and "Order" in option_word_set)
         if has_display_order:
             button_display_order = QPushButton("Configure Display Order")
             button_display_order.clicked.connect(self.open_display_order)
@@ -370,10 +373,22 @@ class UserConfig(BaseDialog):
         )
         QMessageBox.warning(self, "Error", msg_text)
 
-    def create_options(self, layout: QGridLayout) -> set[str]:
+    def create_options(self, layout: QGridLayout, option_word_set: set[str]):
         """Create options"""
-        option_word_set = set()
-        for row_index, key in enumerate(self.user_setting[self.key_name]):
+        option_keys = self.user_setting[self.key_name].keys()
+        row_index = -1
+        show_group_title = cfg.application["show_option_group_title"]
+        group_name = ""
+
+        for key, next_key in zip_longest(option_keys, islice(option_keys, 1, None), fillvalue=""):
+            row_index += 1
+            # Group name
+            if show_group_title:
+                group_name = option_group_name(key, next_key, group_name)
+                if group_name and group_name != "_same_group":
+                    self._add_group_label(row_index, group_name, layout)
+                    row_index += 1
+            # Option name
             option_name = format_option_name(key)
             option_word_set.update(option_name.split())
             self._add_option_label(row_index, option_name, layout)
@@ -422,8 +437,6 @@ class UserConfig(BaseDialog):
             # Float or int
             self._add_option_float(row_index, key, layout)
 
-        return option_word_set
-
     def _choice_match(self, choice_dict: Mapping, row_index: int, key: str, layout: QGridLayout) -> bool:
         """Choice match"""
         for ref_key, choice_list in choice_dict.items():
@@ -432,9 +445,15 @@ class UserConfig(BaseDialog):
                 return True
         return False
 
+    def _add_group_label(self, row_index: int, option_name: str, layout: QGridLayout):
+        """Option group"""
+        label = OptionGroup(option_name, self)
+        label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(label, row_index, COLUMN_LABEL, 1, 2)
+
     def _add_option_label(self, row_index: int, option_name: str, layout: QGridLayout):
         """Option label"""
-        label = QLabel(option_name)
+        label = QLabel(option_name, self)
         label.setMinimumHeight(UIScaler.size(1.8))
         layout.addWidget(label, row_index, COLUMN_LABEL)
 
@@ -484,11 +503,11 @@ class UserConfig(BaseDialog):
         layout.addWidget(editor, row_index, COLUMN_OPTION)
         self.option_edit[key] = editor
 
-    def _add_option_combolist(self, row_index: int, key: str, layout: QGridLayout, item_list: Sequence[str]):
+    def _add_option_combolist(self, row_index: int, key: str, layout: QGridLayout, items: Sequence[str]):
         """Combo droplist string"""
         editor = DropDownListEdit(self)
         editor.setFixedWidth(self.option_width)
-        editor.addItems(item_list)
+        editor.addItems(items)
         # Load selected option
         editor.setCurrentText(str(self.user_setting[self.key_name][key]))
         editor.set_default(self.default_setting[self.key_name][key])
@@ -548,3 +567,55 @@ def set_preset_name(cfg_type: str) -> str:
     if cfg_type == ConfigType.CONFIG:
         return f"{cfg.filename.config} (global)"
     return cfg.filename.setting
+
+
+def is_different_option(key: str, next_key: str) -> bool:
+    """Check if two options are different types"""
+    option_refer = set(key.split("_"))
+    option_refer.difference_update(
+        (
+            "show",
+            "enable",
+            "for",
+            "to",
+            "in",
+            "on",
+            "with",
+            "and",
+            "into",
+            "if",
+            "while",
+            "from",
+            "as",
+            "info",
+            "decimal",
+            "places",
+            "prefix",
+        )
+    )
+    return option_refer.isdisjoint(next_key.split("_"))
+
+
+def option_group_name(key: str, next_key: str, group_name: str) -> str:
+    """Create option group name"""
+    # Unique group
+    if key == "opacity":
+        return "Base Display"
+    if key == "font_name":
+        return "Font Style"
+    # Ignore font_offset
+    if "font_offset" in key:
+        return ""
+    # Ignore none option group key name
+    if not re.search(rxp.CFG_GROUP_KEY, key):
+        return ""
+    # Ignore all-different keywords
+    if is_different_option(key, next_key):
+        return ""
+    # Same group already created
+    if group_name:
+        return "_same_group"
+    # New group if current and next option are same
+    if "display_order" in key:
+        return "Display Order"
+    return format_option_name(re.sub(rxp.CFG_GROUP_KEY, "", key))

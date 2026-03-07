@@ -33,6 +33,16 @@ rex_invalid_char = re.compile(r'[\\/:*?"<>|]')
 rex_special_char = re.compile(r'[\\/:*?"<>|!@#$%^&\'{}~`;]')
 rex_number_extract = re.compile(r"\d*\.?\d+")
 
+# Group key, for splitting and display option group name
+CFG_GROUP_KEY = (
+    "^decimal_places_|"
+    "^display_order_|"
+    "^enable_|"
+    "^notify_|"
+    "^prefix_|"
+    "^show_"
+)
+
 # Bool
 CFG_BOOL = (
     # Exact match

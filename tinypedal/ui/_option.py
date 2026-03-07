@@ -33,6 +33,7 @@ from PySide2.QtWidgets import (
     QColorDialog,
     QComboBox,
     QFileDialog,
+    QLabel,
     QLineEdit,
     QMenu,
 )
@@ -40,6 +41,11 @@ from PySide2.QtWidgets import (
 from ..const_file import FileFilter
 from ..userfile import set_relative_path, set_user_data_path
 from ..validator import image_exists, is_clock_format, is_hex_color, is_string_number
+
+
+# Misc
+class OptionGroup(QLabel):
+    """Option group label"""
 
 
 # Base option edit class

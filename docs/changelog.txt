@@ -8,13 +8,14 @@ WIP
   - Added "background color" option for each instrument icon in Instrument Widget.
   - Added "show_trend" option in Weather Widget.
 
-* Auto Backup Car Setup
-  - Added auto backup car setup support for RF2.
-
-* Config Dialog
+* Major change to Config Dialog (quality of life)
+  - Added "show_option_group_title" option in "Application" Config dialog (requested by user "Oost-hash"), which groups similar options under same title for improved readability.
   - Added "Option Search Box" on the top of config dialog (requested by user "Oost-hash"), which allows to quickly filter and find specific options.
   - Added "Configure Display Order" button, which opens "Display Order" dialog for configuring info display order in widget (implemented by @Oost-hash). This feature is only available for widget with "column_index" option.
     To quickly rearranging display order, select a row and drag to reorder.
+
+* Auto Backup Car Setup
+  - Added auto backup car setup support for RF2.
 
 * Sectors Widget
   - Moved "enable_all_time_best_sectors" option from "Sectors Module" to "Sectors Widget" for easy access. Old setting will be automatically transferred over.

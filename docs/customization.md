@@ -634,6 +634,9 @@ This option is disabled by default.
     enable_global_hotkey
 Enable `Global Hotkey` support. This option can be toggled from [Hotkey Tab](#hotkey) in main window.
 
+    show_option_group_title
+Show option group title in `Config` dialog.
+
     show_confirmation_for_batch_toggle
 Show confirmation dialog for enabling or disabling all widgets or modules. This option is enabled by default.
 

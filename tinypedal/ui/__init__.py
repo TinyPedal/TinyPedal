@@ -414,6 +414,15 @@ def set_style_window(base_font_pt: int) -> str:
             font-size: {font_pt_app_name}pt;
         }}
 
+        /* Config dialog */
+        UserConfig OptionGroup {{
+            font-size: {font_pt_item_name}pt;
+            font-weight: bold;
+            color: {color_active_window_text};
+            background: {color_disabled_highlight};
+            padding: 0.2em 0;
+        }}
+
         /* Display order dialog */
         DisplayOrder > QListView {{
             font-size: {font_pt_item_name}pt;
