@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 14), _user_prior_2_42_14),  # 2026-03-07
+        ((2, 42, 15), _user_prior_2_42_15),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -67,7 +67,26 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_14(dict_user: dict):
+def _user_prior_2_42_15(dict_user: dict):
+    # Prioritized
+    # Rename all "column_index" to "display_order"
+    for option in dict_user.values():
+        if isinstance(option, dict):
+            _rename_key(option, "column_index", "display_order")
+    # Rename all "bkg_color" to "background_color"
+    for option in dict_user.values():
+        if isinstance(option, dict):
+            _rename_key(option, "bkg_color", "background_color")
+    # Rename all "max_" to "maximum_"
+    for option in dict_user.values():
+        if isinstance(option, dict):
+            _rename_key(option, "max_", "maximum_")
+    # Swap all suffix "_decimal_places" with prefix "decimal_places_"
+    for option in dict_user.values():
+        if isinstance(option, dict):
+            _swap_suffix_with_prefix(option, "_decimal_places", "decimal_places_")
+
+    # Secondary
     # Copy options from module_sectors to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
@@ -96,23 +115,31 @@ def _user_prior_2_42_14(dict_user: dict):
             force["display_order_longitudinal_g_force"] = force["display_order_long_gforce"]
         if "display_order_lat_gforce" in force:
             force["display_order_lateral_g_force"] = force["display_order_lat_gforce"]
+    # Copy options in pedal widget
+    pedal = dict_user.get("pedal")
+    if isinstance(pedal, dict):
+        if "background_color" in pedal:
+            pedal["background_color_throttle"] = pedal["background_color"]
+            pedal["background_color_brake"] = pedal["background_color"]
+            pedal["background_color_clutch"] = pedal["background_color"]
+            pedal["background_color_ffb"] = pedal["background_color"]
     # Copy options in instrument widget
     instrument = dict_user.get("instrument")
     if isinstance(instrument, dict):
-        if "bkg_color" in instrument:
-            instrument["bkg_color_headlights"] = instrument["bkg_color"]
-            instrument["bkg_color_ignition"] = instrument["bkg_color"]
-            instrument["bkg_color_clutch"] = instrument["bkg_color"]
-            instrument["bkg_color_wheel_lock"] = instrument["bkg_color"]
-            instrument["bkg_color_wheel_slip"] = instrument["bkg_color"]
+        if "background_color" in instrument:
+            instrument["background_color_headlights"] = instrument["background_color"]
+            instrument["background_color_ignition"] = instrument["background_color"]
+            instrument["background_color_clutch"] = instrument["background_color"]
+            instrument["background_color_wheel_lock"] = instrument["background_color"]
+            instrument["background_color_wheel_slip"] = instrument["background_color"]
     # Rename options in gear widget
     gear = dict_user.get("gear")
     if isinstance(gear, dict):
-        _swap_suffix_with_prefix(gear, "_bkg_color", "bkg_color_")
+        _swap_suffix_with_prefix(gear, "_background_color", "background_color_")
     # Rename options in weather_forecast widget
     weather_forecast = dict_user.get("weather_forecast")
     if isinstance(weather_forecast, dict):
-        _swap_suffix_with_prefix(weather_forecast, "_bkg_color", "bkg_color_")
+        _swap_suffix_with_prefix(weather_forecast, "_background_color", "background_color_")
     # Rename options in flag widget
     flag = dict_user.get("flag")
     if isinstance(flag, dict):
@@ -202,8 +229,8 @@ def _user_prior_2_42_14(dict_user: dict):
     # Rename options in deltabest widget
     deltabest = dict_user.get("deltabest")
     if isinstance(deltabest, dict):
-        if "bkg_color_deltabar" in deltabest:
-            deltabest["bkg_color_delta_bar"] = deltabest["bkg_color_deltabar"]
+        if "background_color_deltabar" in deltabest:
+            deltabest["background_color_delta_bar"] = deltabest["background_color_deltabar"]
         if "bar_length" in deltabest:
             deltabest["delta_bar_length"] = deltabest["bar_length"]
         if "bar_height" in deltabest:
@@ -233,22 +260,6 @@ def _user_prior_2_42_14(dict_user: dict):
     trailing = dict_user.get("trailing")
     if isinstance(trailing, dict):
         _rename_key(trailing, "draw_order_index", "display_order")
-    # Rename all "column_index" to "display_order"
-    for option in dict_user.values():
-        if isinstance(option, dict):
-            _rename_key(option, "column_index", "display_order")
-    # Rename all "bkg_color" to "background_color"
-    for option in dict_user.values():
-        if isinstance(option, dict):
-            _rename_key(option, "bkg_color", "background_color")
-    # Rename all "max_" to "maximum_"
-    for option in dict_user.values():
-        if isinstance(option, dict):
-            _rename_key(option, "max_", "maximum_")
-    # Swap all suffix "_decimal_places" with prefix "decimal_places_"
-    for option in dict_user.values():
-        if isinstance(option, dict):
-            _swap_suffix_with_prefix(option, "_decimal_places", "decimal_places_")
 
 
 def _user_prior_2_41_0(dict_user: dict):
