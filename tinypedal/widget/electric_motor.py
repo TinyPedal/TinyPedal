@@ -56,7 +56,7 @@ class Realtime(Overlay):
         # Motor temperature
         if self.wcfg["show_motor_temperature"]:
             self.bar_style_motor = (
-                self.wcfg["bkg_color_motor_temperature"],
+                self.wcfg["background_color_motor_temperature"],
                 self.wcfg["warning_color_overheat"],
             )
             self.bar_motor = self.set_rawtext(
@@ -75,7 +75,7 @@ class Realtime(Overlay):
         # Motor water temperature
         if self.wcfg["show_water_temperature"]:
             self.bar_style_water = (
-                self.wcfg["bkg_color_water_temperature"],
+                self.wcfg["background_color_water_temperature"],
                 self.wcfg["warning_color_overheat"],
             )
             self.bar_water = self.set_rawtext(
@@ -99,7 +99,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_rpm"],
-                bg_color=self.wcfg["bkg_color_rpm"],
+                bg_color=self.wcfg["background_color_rpm"],
             )
             self.set_primary_orient(
                 target=self.bar_rpm,
@@ -114,7 +114,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_torque"],
-                bg_color=self.wcfg["bkg_color_torque"],
+                bg_color=self.wcfg["background_color_torque"],
             )
             self.set_primary_orient(
                 target=self.bar_torque,
@@ -129,7 +129,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_power"],
-                bg_color=self.wcfg["bkg_color_power"],
+                bg_color=self.wcfg["background_color_power"],
             )
             self.set_primary_orient(
                 target=self.bar_power,

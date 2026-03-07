@@ -72,7 +72,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.bar_style_time_target[2],
-            bg_color=self.wcfg["bkg_color_target_time"],
+            bg_color=self.wcfg["background_color_target_time"],
         )
         layout_laptime.addWidget(self.bar_time_target, 0, 0)
 
@@ -83,7 +83,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_current_time"],
-            bg_color=self.wcfg["bkg_color_current_time"],
+            bg_color=self.wcfg["background_color_current_time"],
         )
         layout_laptime.addWidget(self.bar_time_curr, 0, 1)
 
@@ -92,15 +92,15 @@ class Realtime(Overlay):
         self.bar_style_gap = (
             (
                 self.wcfg["font_color_sector_highlighted"],
-                self.wcfg["bkg_color_time_loss"],
+                self.wcfg["background_color_time_loss"],
             ),
             (
                 self.wcfg["font_color_sector_highlighted"],
-                self.wcfg["bkg_color_time_gain"],
+                self.wcfg["background_color_time_gain"],
             ),
             (
                 self.wcfg["font_color_sector"],
-                self.wcfg["bkg_color_sector"],
+                self.wcfg["background_color_sector"],
             ),
         )
         self.bars_time_gap = self.set_rawtext(

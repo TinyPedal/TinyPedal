@@ -32,7 +32,7 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 8), _user_prior_2_42_8),  # 2026-03-06
+        ((2, 42, 9), _user_prior_2_42_9),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -46,8 +46,8 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
             logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
 
 
-def _user_prior_2_42_8(dict_user: dict):
-    """Update user setting prior to 2.42.8"""
+def _user_prior_2_42_9(dict_user: dict):
+    """Update user setting prior to 2.42.9"""
     # Copy options from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
@@ -63,6 +63,14 @@ def _user_prior_2_42_8(dict_user: dict):
             instrument["bkg_color_clutch"] = instrument["bkg_color"]
             instrument["bkg_color_wheel_lock"] = instrument["bkg_color"]
             instrument["bkg_color_wheel_slip"] = instrument["bkg_color"]
+    # Rename options in gear widget
+    gear = dict_user.get("gear")
+    if isinstance(gear, dict):
+        _swap_suffix_with_prefix(gear, "_bkg_color", "bkg_color_")
+    # Rename options in weather forecast widget
+    weather_forecast = dict_user.get("weather_forecast")
+    if isinstance(weather_forecast, dict):
+        _swap_suffix_with_prefix(weather_forecast, "_bkg_color", "bkg_color_")
     # Rename options in fuel widget
     fuel = dict_user.get("fuel")
     if isinstance(fuel, dict):
@@ -151,6 +159,10 @@ def _user_prior_2_42_8(dict_user: dict):
     for option in dict_user.values():
         if isinstance(option, dict):
             _rename_key(option, "column_index", "display_order")
+    # Rename all "bkg_color" to "background_color"
+    for option in dict_user.values():
+        if isinstance(option, dict):
+            _rename_key(option, "bkg_color", "background_color")
     # Swap all suffix "_decimal_places" with prefix "decimal_places_"
     for option in dict_user.values():
         if isinstance(option, dict):

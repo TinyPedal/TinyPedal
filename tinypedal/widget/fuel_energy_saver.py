@@ -79,7 +79,7 @@ class Realtime(Overlay):
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
             fg_color=self.wcfg["font_color_target_laps"],
-            bg_color=self.wcfg["bkg_color_target_laps"],
+            bg_color=self.wcfg["background_color_target_laps"],
             count=self.total_slot,
             last=-MAX_SECONDS,
         )
@@ -89,7 +89,7 @@ class Realtime(Overlay):
         else:
             self.bars_target_lap[0].text = "LAST"
         self.bars_target_lap[self.center_slot].fg = self.wcfg["font_color_current_laps"]
-        self.bars_target_lap[self.center_slot].bg = self.wcfg["bkg_color_current_laps"]
+        self.bars_target_lap[self.center_slot].bg = self.wcfg["background_color_current_laps"]
         self.set_grid_layout_table_row(
             layout=layout,
             targets=self.bars_target_lap,
@@ -104,7 +104,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_target_consumption"],
-            bg_color=self.wcfg["bkg_color_target_consumption"],
+            bg_color=self.wcfg["background_color_target_consumption"],
             last=-MAX_SECONDS,
             count=self.total_slot,
         )
@@ -127,7 +127,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.delta_color[2],
-            bg_color=self.wcfg["bkg_color_delta_consumption"],
+            bg_color=self.wcfg["background_color_delta_consumption"],
             count=self.total_slot,
             last=-MAX_SECONDS,
         )

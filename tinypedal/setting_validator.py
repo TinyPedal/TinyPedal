@@ -251,9 +251,12 @@ class PresetValidator:
     @staticmethod
     def preupdate_global_preset(dict_user: dict):
         """Pre update global preset, run before validation"""
-        telemetry_api = dict_user.get("telemetry_api")
-        if isinstance(telemetry_api, dict):
-            dict_user["telemetry"] = telemetry_api.copy()
+        # Rename all "bkg_color" to "background_color"
+        for option in dict_user.values():
+            if isinstance(option, dict):
+                for key in tuple(option):
+                    if "bkg_color" in key:
+                        option[key.replace("bkg_color", "background_color")] = option[key]
 
     @staticmethod
     def preupdate_user_preset(dict_user: dict, dict_def: dict):

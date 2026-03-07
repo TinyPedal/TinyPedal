@@ -188,7 +188,7 @@ class Realtime(Overlay):
 
     def draw_background(self):
         """Draw background"""
-        self.pixmap_background.fill(self.wcfg["bkg_color"])
+        self.pixmap_background.fill(self.wcfg["background_color"])
         painter = QPainter(self.pixmap_background)
         painter.setRenderHint(QPainter.Antialiasing, True)
         # Draw reference line

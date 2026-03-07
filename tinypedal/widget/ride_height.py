@@ -74,7 +74,7 @@ class Realtime(Overlay):
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["bkg_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
             )
             self.set_primary_orient(
                 target=cap_bar,
@@ -84,7 +84,7 @@ class Realtime(Overlay):
         # Ride height
         layout_inner = self.set_grid_layout(gap_hori=bar_gap_hori, gap_vert=bar_gap_vert)
         self.rideh_color = (
-            self.wcfg["bkg_color"],
+            self.wcfg["background_color"],
             self.wcfg["warning_color_bottoming"],
         )
         self.bars_rideh = tuple(
@@ -97,7 +97,7 @@ class Realtime(Overlay):
                 display_range=max_range,
                 input_color=self.wcfg["highlight_color"],
                 fg_color=self.wcfg["font_color"],
-                bg_color=self.wcfg["bkg_color"],
+                bg_color=self.wcfg["background_color"],
                 right_side=idx % 2,
             ) for idx in range(4)
         )

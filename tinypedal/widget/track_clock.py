@@ -60,7 +60,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_track_clock"],
-                bg_color=self.wcfg["bkg_color_track_clock"],
+                bg_color=self.wcfg["background_color_track_clock"],
             )
             self.set_primary_orient(
                 target=self.bar_track_clock,
@@ -77,7 +77,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_time_scale"],
-                bg_color=self.wcfg["bkg_color_time_scale"],
+                bg_color=self.wcfg["background_color_time_scale"],
             )
             self.set_primary_orient(
                 target=self.bar_time_scale,
@@ -94,7 +94,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_sunlight_phase_countdown"],
-                bg_color=self.wcfg["bkg_color_sunlight_phase_countdown"],
+                bg_color=self.wcfg["background_color_sunlight_phase_countdown"],
             )
             layout_phase.addWidget(self.bar_countdown, 0, 0)
 
@@ -108,7 +108,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_phase[0],
-                bg_color=self.wcfg["bkg_color_sunlight_phase_countdown"],
+                bg_color=self.wcfg["background_color_sunlight_phase_countdown"],
             )
             layout_phase.addWidget(self.bar_phase_sign, 0, 1)
             self.set_primary_orient(

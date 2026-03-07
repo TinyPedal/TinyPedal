@@ -450,10 +450,10 @@ class MapView(QWidget):
         painter.setRenderHint(QPainter.Antialiasing, True)
 
         if self.osd["dark_background"]:
-            bkg_color = self.ecfg["bkg_color_dark"]
+            background_color = self.ecfg["background_color_dark"]
         else:
-            bkg_color = self.ecfg["bkg_color_light"]
-        painter.fillRect(0, 0, self.size().width(), self.size().height(), bkg_color)
+            background_color = self.ecfg["background_color_light"]
+        painter.fillRect(0, 0, self.size().width(), self.size().height(), background_color)
 
         if not self.raw_coords:
             return

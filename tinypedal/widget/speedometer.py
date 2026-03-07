@@ -61,7 +61,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_speed"],
-                bg_color=self.wcfg["bkg_color_speed"],
+                bg_color=self.wcfg["background_color_speed"],
             )
             self.set_primary_orient(
                 target=self.bar_speed_curr,
@@ -75,7 +75,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_speed_minimum"],
-                bg_color=self.wcfg["bkg_color_speed_minimum"],
+                bg_color=self.wcfg["background_color_speed_minimum"],
             )
             self.set_primary_orient(
                 target=self.bar_speed_min,
@@ -89,7 +89,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_speed_maximum"],
-                bg_color=self.wcfg["bkg_color_speed_maximum"],
+                bg_color=self.wcfg["background_color_speed_maximum"],
             )
             self.set_primary_orient(
                 target=self.bar_speed_max,
@@ -103,7 +103,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_speed_fastest"],
-                bg_color=self.wcfg["bkg_color_speed_fastest"],
+                bg_color=self.wcfg["background_color_speed_fastest"],
             )
             self.set_primary_orient(
                 target=self.bar_speed_fast,

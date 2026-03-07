@@ -79,7 +79,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_pass_duration"],
-            bg_color=self.wcfg["bkg_color_pass_duration"],
+            bg_color=self.wcfg["background_color_pass_duration"],
         )
         self.bar_pass.decimals = max(self.wcfg["decimal_places_pass_duration"], 0)
         layout_upper.addWidget(self.bar_pass, 1, 0)
@@ -91,7 +91,7 @@ class Realtime(Overlay):
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["bkg_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
             )
             layout_upper.addWidget(cap_temp, row_idx_upper, 0)
 
@@ -102,7 +102,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_pit_timer"],
-            bg_color=self.wcfg["bkg_color_pit_timer"],
+            bg_color=self.wcfg["background_color_pit_timer"],
         )
         self.bar_timer.decimals = max(self.wcfg["decimal_places_pit_timer"], 0)
         layout_lower.addWidget(self.bar_timer, 1, 0)
@@ -114,13 +114,13 @@ class Realtime(Overlay):
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["bkg_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
             )
             layout_lower.addWidget(cap_temp, row_idx_lower, 0)
 
         # Estimated pit stop time
         self.bar_style_stop = (
-            self.wcfg["bkg_color_stop_duration"],
+            self.wcfg["background_color_stop_duration"],
             self.wcfg["warning_color_lengthy_stop"],
         )
         self.bar_stop = self.set_rawtext(
@@ -141,7 +141,7 @@ class Realtime(Overlay):
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["bkg_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
             )
             layout_upper.addWidget(cap_temp, row_idx_upper, 1)
 
@@ -152,7 +152,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_minimum_total_duration"],
-            bg_color=self.wcfg["bkg_color_minimum_total_duration"],
+            bg_color=self.wcfg["background_color_minimum_total_duration"],
             last=-1,
         )
         self.bar_minpit.decimals = max(self.wcfg["decimal_places_minimum_total_duration"], 0)
@@ -165,7 +165,7 @@ class Realtime(Overlay):
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["bkg_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
             )
             layout_lower.addWidget(cap_temp, row_idx_lower, 1)
 
@@ -177,7 +177,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_actual_relative_refill"],
-                bg_color=self.wcfg["bkg_color_actual_relative_refill"],
+                bg_color=self.wcfg["background_color_actual_relative_refill"],
             )
             self.bar_refill.decimals = max(self.wcfg["decimal_places_actual_relative_refill"], 0)
             layout_upper.addWidget(self.bar_refill, 1, 2)
@@ -189,7 +189,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_upper.addWidget(cap_temp, row_idx_upper, 2)
 
@@ -200,7 +200,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_total_relative_refill"],
-                bg_color=self.wcfg["bkg_color_total_relative_refill"],
+                bg_color=self.wcfg["background_color_total_relative_refill"],
             )
             self.bar_needed.decimals = max(self.wcfg["decimal_places_total_relative_refill"], 0)
             layout_lower.addWidget(self.bar_needed, 1, 2)
@@ -212,7 +212,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_lower.addWidget(cap_temp, row_idx_lower, 2)
 
@@ -224,7 +224,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_pit_occupancy"],
-                bg_color=self.wcfg["bkg_color_pit_occupancy"],
+                bg_color=self.wcfg["background_color_pit_occupancy"],
             )
             layout_upper.addWidget(self.bar_inpit, 1, 3)
 
@@ -235,7 +235,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_upper.addWidget(cap_temp, row_idx_upper, 3)
 
@@ -246,7 +246,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_pit_requests"],
-                bg_color=self.wcfg["bkg_color_pit_requests"],
+                bg_color=self.wcfg["background_color_pit_requests"],
                 last=-1,
             )
             layout_lower.addWidget(self.bar_request, 1, 3)
@@ -258,7 +258,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_lower.addWidget(cap_temp, row_idx_lower, 3)
 

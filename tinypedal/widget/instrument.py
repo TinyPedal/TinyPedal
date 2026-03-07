@@ -58,7 +58,7 @@ class Realtime(Overlay):
                 image=self.pixmap_headlights[1],
                 fixed_width=icon_size,
                 fixed_height=icon_size,
-                bg_color=self.wcfg["bkg_color_headlights"],
+                bg_color=self.wcfg["background_color_headlights"],
             )
             self.set_primary_orient(
                 target=self.bar_headlights,
@@ -68,7 +68,7 @@ class Realtime(Overlay):
         # Ignition
         if self.wcfg["show_ignition"]:
             self.color_ignition = (
-                self.wcfg["bkg_color_ignition"],
+                self.wcfg["background_color_ignition"],
                 self.wcfg["warning_color_stalling"],
             )
             self.bar_ignition = self.set_rawimage(
@@ -85,7 +85,7 @@ class Realtime(Overlay):
         # Clutch
         if self.wcfg["show_clutch"]:
             self.color_clutch = (
-                self.wcfg["bkg_color_clutch"],
+                self.wcfg["background_color_clutch"],
                 self.wcfg["warning_color_clutch"],
             )
             self.bar_clutch = self.set_rawimage(
@@ -102,7 +102,7 @@ class Realtime(Overlay):
         # Lock
         if self.wcfg["show_wheel_lock"]:
             self.color_wlock = (
-                self.wcfg["bkg_color_wheel_lock"],
+                self.wcfg["background_color_wheel_lock"],
                 self.wcfg["warning_color_wheel_lock"],
             )
             self.bar_wlock = self.set_rawimage(
@@ -119,7 +119,7 @@ class Realtime(Overlay):
         # Slip
         if self.wcfg["show_wheel_slip"]:
             self.color_wslip = (
-                self.wcfg["bkg_color_wheel_slip"],
+                self.wcfg["background_color_wheel_slip"],
                 self.wcfg["warning_color_wheel_slip"],
             )
             self.bar_wslip = self.set_rawimage(

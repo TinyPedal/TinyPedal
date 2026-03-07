@@ -51,19 +51,19 @@ class Realtime(Overlay):
             self.bar_style_charge = (
                 (
                     self.wcfg["font_color_battery_cooldown"],  # 0 cooldown
-                    self.wcfg["bkg_color_battery_cooldown"],
+                    self.wcfg["background_color_battery_cooldown"],
                 ),
                 (
                     self.wcfg["font_color_battery_charge"],  # 1 ready
-                    self.wcfg["bkg_color_battery_charge"],
+                    self.wcfg["background_color_battery_charge"],
                 ),
                 (
                     self.wcfg["font_color_battery_charge"],  # 2 drain
-                    self.wcfg["bkg_color_battery_drain"],
+                    self.wcfg["background_color_battery_drain"],
                 ),
                 (
                     self.wcfg["font_color_battery_charge"],  # 3 regen
-                    self.wcfg["bkg_color_battery_regen"],
+                    self.wcfg["background_color_battery_regen"],
                 ),
             )
             self.bar_charge = self.set_rawtext(
@@ -84,11 +84,11 @@ class Realtime(Overlay):
             self.bar_style_timer = (
                 (
                     self.wcfg["font_color_activation_timer"],
-                    self.wcfg["bkg_color_activation_timer"],
+                    self.wcfg["background_color_activation_timer"],
                 ),
                 (
                     self.wcfg["font_color_activation_cooldown"],
-                    self.wcfg["bkg_color_activation_cooldown"],
+                    self.wcfg["background_color_activation_cooldown"],
                 ),
             )
             self.bar_timer = self.set_rawtext(

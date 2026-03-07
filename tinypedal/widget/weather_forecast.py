@@ -80,7 +80,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_estimated_time"],
-                bg_color=self.wcfg["bkg_color_estimated_time"],
+                bg_color=self.wcfg["background_color_estimated_time"],
                 count=self.total_slot,
             )
             self.bars_time[0].text = "now"
@@ -99,7 +99,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_ambient_temperature"],
-                bg_color=self.wcfg["bkg_color_ambient_temperature"],
+                bg_color=self.wcfg["background_color_ambient_temperature"],
                 count=self.total_slot,
             )
             self.set_grid_layout_table_row(
@@ -117,7 +117,7 @@ class Realtime(Overlay):
                     width=self.bar_width,
                     height=self.bar_rain_height,
                     input_color=self.wcfg["rain_chance_bar_color"],
-                    bg_color=self.wcfg["rain_chance_bar_bkg_color"],
+                    bg_color=self.wcfg["background_color_rain_chance_bar"],
                 ) for _ in range(self.total_slot)
             )
             self.set_grid_layout_table_row(
@@ -132,7 +132,7 @@ class Realtime(Overlay):
             image=self.pixmap_weather[-1],
             fixed_width=self.bar_width,
             fixed_height=icon_size,
-            bg_color=self.wcfg["bkg_color"],
+            bg_color=self.wcfg["background_color"],
             count=self.total_slot,
         )
         self.set_grid_layout_table_row(

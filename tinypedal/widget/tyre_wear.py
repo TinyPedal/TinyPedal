@@ -70,7 +70,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_remain[0],
-                bg_color=self.wcfg["bkg_color_remaining"],
+                bg_color=self.wcfg["background_color_remaining"],
                 count=4,
                 last=0,
             )
@@ -90,7 +90,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_remain.addWidget(cap_remain, 0, 0, 1, 0)
 
@@ -107,7 +107,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_diff[0],
-                bg_color=self.wcfg["bkg_color_wear_difference"],
+                bg_color=self.wcfg["background_color_wear_difference"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -126,7 +126,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_diff.addWidget(cap_diff, 0, 0, 1, 0)
 
@@ -143,7 +143,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_live[0],
-                bg_color=self.wcfg["bkg_color_live_wear_difference"],
+                bg_color=self.wcfg["background_color_live_wear_difference"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -162,7 +162,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_live.addWidget(cap_live, 0, 0, 1, 0)
 
@@ -179,7 +179,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_laps[0],
-                bg_color=self.wcfg["bkg_color_lifespan_laps"],
+                bg_color=self.wcfg["background_color_lifespan_laps"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -198,7 +198,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_laps.addWidget(cap_laps, 0, 0, 1, 0)
 
@@ -215,7 +215,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_mins[0],
-                bg_color=self.wcfg["bkg_color_lifespan_minutes"],
+                bg_color=self.wcfg["background_color_lifespan_minutes"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -234,7 +234,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_mins.addWidget(cap_mins, 0, 0, 1, 0)
 
@@ -251,7 +251,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_end[0],
-                bg_color=self.wcfg["bkg_color_end_stint_remaining"],
+                bg_color=self.wcfg["background_color_end_stint_remaining"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -270,7 +270,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_end.addWidget(cap_end, 0, 0, 1, 0)
 

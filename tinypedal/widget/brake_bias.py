@@ -64,7 +64,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_brake_bias"],
-                bg_color=self.wcfg["bkg_color_brake_bias"],
+                bg_color=self.wcfg["background_color_brake_bias"],
             )
             self.set_primary_orient(
                 target=self.bar_bbias,
@@ -80,7 +80,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_baseline_bias_delta"],
-                bg_color=self.wcfg["bkg_color_baseline_bias_delta"],
+                bg_color=self.wcfg["background_color_baseline_bias_delta"],
             )
             self.set_primary_orient(
                 target=self.bar_delta,
@@ -96,7 +96,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_brake_migration"],
-                bg_color=self.wcfg["bkg_color_brake_migration"],
+                bg_color=self.wcfg["background_color_brake_migration"],
             )
             self.set_primary_orient(
                 target=self.bar_bmigt,

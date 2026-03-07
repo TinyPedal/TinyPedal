@@ -137,7 +137,7 @@ class Realtime(Overlay):
         painter.setRenderHint(QPainter.Antialiasing, True)
 
         if self.wcfg["show_background"]:
-            painter.fillRect(self.rect_background, self.wcfg["bkg_color"])
+            painter.fillRect(self.rect_background, self.wcfg["background_color"])
 
         if self.wcfg["led_outline_width"] > 0:
             painter.setPen(self.pen_led)

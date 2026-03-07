@@ -51,7 +51,7 @@ class Realtime(Overlay):
         # Battery charge
         if self.wcfg["show_battery_charge"]:
             self.bar_style_charge = (
-                self.wcfg["bkg_color_battery_charge"],
+                self.wcfg["background_color_battery_charge"],
                 self.wcfg["warning_color_low_battery"],
                 self.wcfg["warning_color_high_battery"],
             )
@@ -76,7 +76,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_battery_drain"],
-                bg_color=self.wcfg["bkg_color_battery_drain"],
+                bg_color=self.wcfg["background_color_battery_drain"],
             )
             self.set_primary_orient(
                 target=self.bar_drain,
@@ -91,7 +91,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_battery_regen"],
-                bg_color=self.wcfg["bkg_color_battery_regen"],
+                bg_color=self.wcfg["background_color_battery_regen"],
             )
             self.set_primary_orient(
                 target=self.bar_regen,
@@ -106,7 +106,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_estimated_net_change"],
-                bg_color=self.wcfg["bkg_color_estimated_net_change"],
+                bg_color=self.wcfg["background_color_estimated_net_change"],
             )
             self.set_primary_orient(
                 target=self.bar_net,
@@ -121,7 +121,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_activation_timer"],
-                bg_color=self.wcfg["bkg_color_activation_timer"],
+                bg_color=self.wcfg["background_color_activation_timer"],
             )
             self.set_primary_orient(
                 target=self.bar_timer,

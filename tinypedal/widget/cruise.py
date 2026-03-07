@@ -71,7 +71,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_compass"],
-                bg_color=self.wcfg["bkg_color_compass"],
+                bg_color=self.wcfg["background_color_compass"],
             )
             self.set_primary_orient(
                 target=self.bar_compass,
@@ -87,7 +87,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_elevation"],
-                bg_color=self.wcfg["bkg_color_elevation"],
+                bg_color=self.wcfg["background_color_elevation"],
             )
             self.set_primary_orient(
                 target=self.bar_elevation,
@@ -103,7 +103,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_odometer"],
-                bg_color=self.wcfg["bkg_color_odometer"],
+                bg_color=self.wcfg["background_color_odometer"],
             )
             self.set_primary_orient(
                 target=self.bar_odometer,
@@ -119,7 +119,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_distance_into_lap"],
-                bg_color=self.wcfg["bkg_color_distance_into_lap"],
+                bg_color=self.wcfg["background_color_distance_into_lap"],
             )
             self.set_primary_orient(
                 target=self.bar_lap_distance,
@@ -135,7 +135,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_cornering_radius"],
-                bg_color=self.wcfg["bkg_color_cornering_radius"],
+                bg_color=self.wcfg["background_color_cornering_radius"],
             )
             self.set_primary_orient(
                 target=self.bar_cornering_radius,

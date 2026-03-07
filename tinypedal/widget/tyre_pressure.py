@@ -61,21 +61,21 @@ class Realtime(Overlay):
         layout_tpres = self.set_grid_layout(gap=inner_gap)
         self.bar_style_tpres = (
             (
-                self.wcfg["bkg_color_pressure"],
+                self.wcfg["background_color_pressure"],
                 self.wcfg["font_color_pressure_cold"],
             ),
             (
-                self.wcfg["bkg_color_pressure"],
+                self.wcfg["background_color_pressure"],
                 self.wcfg["font_color_pressure_hot"],
             ),
         ) if self.wcfg["swap_style"] else (
             (
                 self.wcfg["font_color_pressure_cold"],
-                self.wcfg["bkg_color_pressure"],
+                self.wcfg["background_color_pressure"],
             ),
             (
                 self.wcfg["font_color_pressure_hot"],
-                self.wcfg["bkg_color_pressure"],
+                self.wcfg["background_color_pressure"],
             ),
         )
         self.bars_tpres = self.set_rawtext(
@@ -104,7 +104,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tyre_compound"],
-                bg_color=self.wcfg["bkg_color_tyre_compound"],
+                bg_color=self.wcfg["background_color_tyre_compound"],
                 count=2,
             )
             self.set_grid_layout_vert(
@@ -121,7 +121,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_pressure_deviation"],
-                bg_color=self.wcfg["bkg_color_pressure_deviation"],
+                bg_color=self.wcfg["background_color_pressure_deviation"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -148,7 +148,7 @@ class Realtime(Overlay):
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.wcfg["font_color_tyre_compound"],
-                    bg_color=self.wcfg["bkg_color_tyre_compound"],
+                    bg_color=self.wcfg["background_color_tyre_compound"],
                     count=2,
                 )
                 self.set_grid_layout_vert(

@@ -110,7 +110,7 @@ class Realtime(Overlay):
     def paintEvent(self, event):
         """Draw"""
         painter = QPainter(self)
-        painter.fillRect(self.rect_steer, self.wcfg["bkg_color"])
+        painter.fillRect(self.rect_steer, self.wcfg["background_color"])
 
         # Draw steering
         steer_pos = self.steer_position(self.raw_steering, self.bar_width * 2)

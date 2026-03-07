@@ -54,7 +54,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_transient_max_braking_rate"],
-                bg_color=self.wcfg["bkg_color_transient_max_braking_rate"],
+                bg_color=self.wcfg["background_color_transient_max_braking_rate"],
                 last=0,
             )
             self.set_primary_orient(
@@ -70,7 +70,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_max_braking_rate"],
-                bg_color=self.wcfg["bkg_color_max_braking_rate"],
+                bg_color=self.wcfg["background_color_max_braking_rate"],
                 last=0,
             )
             self.set_primary_orient(
@@ -81,9 +81,9 @@ class Realtime(Overlay):
         # Delta braking rate
         if self.wcfg["show_delta_braking_rate"]:
             self.bar_style_delta_rate = (
-                self.wcfg["bkg_color_braking_rate_loss"],
-                self.wcfg["bkg_color_braking_rate_gain"],
-                self.wcfg["bkg_color_delta_braking_rate"],
+                self.wcfg["background_color_braking_rate_loss"],
+                self.wcfg["background_color_braking_rate_gain"],
+                self.wcfg["background_color_delta_braking_rate"],
             )
             self.bar_delta_rate = self.set_rawtext(
                 text="+0.00",
@@ -107,7 +107,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_front_wheel_lock_duration"],
-                bg_color=self.wcfg["bkg_color_front_wheel_lock_duration"],
+                bg_color=self.wcfg["background_color_front_wheel_lock_duration"],
                 last=0,
             )
             self.set_primary_orient(
@@ -123,7 +123,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_rear_wheel_lock_duration"],
-                bg_color=self.wcfg["bkg_color_rear_wheel_lock_duration"],
+                bg_color=self.wcfg["background_color_rear_wheel_lock_duration"],
                 last=0,
             )
             self.set_primary_orient(

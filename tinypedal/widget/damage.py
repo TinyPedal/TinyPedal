@@ -180,7 +180,7 @@ class Realtime(Overlay):
         painter.fillRect(self.rect_mask, Qt.white)
         if self.wcfg["show_background"]:  # draw background below mask
             painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-            painter.fillRect(self.rect_background, self.wcfg["bkg_color"])
+            painter.fillRect(self.rect_background, self.wcfg["background_color"])
         painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
 
     def draw_damage_body(self, painter):

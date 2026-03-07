@@ -118,7 +118,7 @@ class Base(QWidget):
     def __set_window_style(self):
         """Set window style"""
         palette = self.palette()
-        palette.setColor(QPalette.Window, self.cfg.compatibility["global_bkg_color"])
+        palette.setColor(QPalette.Window, self.cfg.compatibility["background_color_global"])
         self.setPalette(palette)
 
     def __save_position(self):

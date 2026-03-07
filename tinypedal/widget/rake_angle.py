@@ -53,7 +53,7 @@ class Realtime(Overlay):
 
         # Rake angle
         self.bar_style_rake = (
-            self.wcfg["bkg_color_rake_angle"],
+            self.wcfg["background_color_rake_angle"],
             self.wcfg["warning_color_negative_rake"],
         )
         text_rake = self.format_rake(0)

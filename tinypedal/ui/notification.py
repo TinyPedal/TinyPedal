@@ -81,7 +81,7 @@ class NotifyBar(QWidget):
         if self.presetlocked.isVisible():
             self.presetlocked.setStyleSheet(
                 f"color: {cfg.notification['font_color_locked_preset']};"
-                f"background: {cfg.notification['bkg_color_locked_preset']};"
+                f"background: {cfg.notification['background_color_locked_preset']};"
             )
         # Spectate mode
         self.spectate.setVisible(
@@ -91,7 +91,7 @@ class NotifyBar(QWidget):
         if self.spectate.isVisible():
             self.spectate.setStyleSheet(
                 f"color: {cfg.notification['font_color_spectate_mode']};"
-                f"background: {cfg.notification['bkg_color_spectate_mode']};"
+                f"background: {cfg.notification['background_color_spectate_mode']};"
             )
         # Pace notes playback
         self.pacenotes.setVisible(
@@ -101,7 +101,7 @@ class NotifyBar(QWidget):
         if self.pacenotes.isVisible():
             self.pacenotes.setStyleSheet(
                 f"color: {cfg.notification['font_color_pace_notes_playback']};"
-                f"background: {cfg.notification['bkg_color_pace_notes_playback']};"
+                f"background: {cfg.notification['background_color_pace_notes_playback']};"
             )
         # Global hotkey
         self.hotkey.setVisible(
@@ -111,7 +111,7 @@ class NotifyBar(QWidget):
         if self.hotkey.isVisible():
             self.hotkey.setStyleSheet(
                 f"color: {cfg.notification['font_color_global_hotkey']};"
-                f"background: {cfg.notification['bkg_color_global_hotkey']};"
+                f"background: {cfg.notification['background_color_global_hotkey']};"
             )
         # Auto backup car setup
         self.carsetup.setVisible(
@@ -121,7 +121,7 @@ class NotifyBar(QWidget):
         if self.carsetup.isVisible():
             self.carsetup.setStyleSheet(
                 f"color: {cfg.notification['font_color_auto_backup_car_setup']};"
-                f"background: {cfg.notification['bkg_color_auto_backup_car_setup']};"
+                f"background: {cfg.notification['background_color_auto_backup_car_setup']};"
             )
 
 

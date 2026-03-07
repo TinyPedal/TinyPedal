@@ -53,7 +53,6 @@ def format_option_name(name: str) -> str:
     """Format option name"""
     return uppercase_abbr(
         name
-        .replace("bkg", "background")
         .replace("_", " ")
         .title()
     )

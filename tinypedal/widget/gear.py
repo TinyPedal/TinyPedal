@@ -73,7 +73,7 @@ class Realtime(Overlay):
         (limiter_width, gauge_width, gauge_height, gear_size, speed_size
          ) = self.set_gauge_size(font_m, font_scale_speed)
         self.gauge_color = (
-            self.wcfg["bkg_color"],  # 0, -4 flicker
+            self.wcfg["background_color"],  # 0, -4 flicker
             self.wcfg["rpm_color_safe"],  # 1
             self.wcfg["rpm_color_redline"],  # 2
             self.wcfg["rpm_color_over_rev"],  # 3
@@ -86,7 +86,7 @@ class Realtime(Overlay):
             gear_size=gear_size,
             speed_size=speed_size,
             fg_color=self.wcfg["font_color"],
-            bg_color=self.wcfg["bkg_color"],
+            bg_color=self.wcfg["background_color"],
             show_speed=self.wcfg["show_speed"],
         )
         self.set_primary_orient(
@@ -106,7 +106,7 @@ class Realtime(Overlay):
                 offset_y=font_rpm_m.voffset,
                 input_color=self.wcfg["rpm_bar_color"],
                 fg_color=self.wcfg["font_color_rpm"],
-                bg_color=self.wcfg["rpm_bar_bkg_color"],
+                bg_color=self.wcfg["background_color_rpm_bar"],
                 decimals=self.wcfg["decimal_places_rpm"],
                 show_reading=self.wcfg["show_rpm_reading"],
                 align=self.set_text_alignment(self.wcfg["rpm_reading_text_alignment"]),
@@ -135,7 +135,7 @@ class Realtime(Overlay):
                 offset_y=font_batt_m.voffset,
                 input_color=self.battbar_color[0],
                 fg_color=self.wcfg["font_color_battery"],
-                bg_color=self.wcfg["battery_bar_bkg_color"],
+                bg_color=self.wcfg["background_color_battery_bar"],
                 decimals=self.wcfg["decimal_places_battery"],
                 show_reading=self.wcfg["show_battery_reading"],
                 align=self.set_text_alignment(self.wcfg["battery_reading_text_alignment"]),
@@ -155,7 +155,7 @@ class Realtime(Overlay):
                 fixed_height=gauge_height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_speed_limiter"],
-                bg_color=self.wcfg["bkg_color_speed_limiter"],
+                bg_color=self.wcfg["background_color_speed_limiter"],
             )
             self.set_primary_orient(
                 target=self.bar_limiter,

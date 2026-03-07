@@ -72,7 +72,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_front_to_rear_distribution"],
-                bg_color=self.wcfg["bkg_color_front_to_rear_distribution"],
+                bg_color=self.wcfg["background_color_front_to_rear_distribution"],
                 last=0,
             )
             self.set_primary_orient(
@@ -89,7 +89,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_left_to_right_distribution"],
-                bg_color=self.wcfg["bkg_color_left_to_right_distribution"],
+                bg_color=self.wcfg["background_color_left_to_right_distribution"],
                 last=0,
             )
             self.set_primary_orient(
@@ -106,7 +106,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_cross_weight"],
-                bg_color=self.wcfg["bkg_color_cross_weight"],
+                bg_color=self.wcfg["background_color_cross_weight"],
                 last=0,
             )
             self.set_primary_orient(

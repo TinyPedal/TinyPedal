@@ -70,7 +70,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_system"],
-                bg_color=self.wcfg["bkg_color_system"],
+                bg_color=self.wcfg["background_color_system"],
                 last=0,
             )
             self.set_primary_orient(
@@ -87,7 +87,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tinypedal"],
-                bg_color=self.wcfg["bkg_color_tinypedal"],
+                bg_color=self.wcfg["background_color_tinypedal"],
                 last=0,
             )
             self.set_primary_orient(

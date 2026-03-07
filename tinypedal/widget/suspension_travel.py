@@ -64,7 +64,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_total_travel"],
-                bg_color=self.wcfg["bkg_color_total_travel"],
+                bg_color=self.wcfg["background_color_total_travel"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -83,7 +83,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_total.addWidget(cap_total, 0, 0, 1, 0)
 
@@ -96,7 +96,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_bump_travel"],
-                bg_color=self.wcfg["bkg_color_bump_travel"],
+                bg_color=self.wcfg["background_color_bump_travel"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -115,7 +115,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_bump.addWidget(cap_bump, 0, 0, 1, 0)
 
@@ -128,7 +128,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_rebound_travel"],
-                bg_color=self.wcfg["bkg_color_rebound_travel"],
+                bg_color=self.wcfg["background_color_rebound_travel"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -147,7 +147,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_rebound.addWidget(cap_rebound, 0, 0, 1, 0)
 
@@ -160,7 +160,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_travel_ratio"],
-                bg_color=self.wcfg["bkg_color_travel_ratio"],
+                bg_color=self.wcfg["background_color_travel_ratio"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -179,7 +179,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_ratio.addWidget(cap_ratio, 0, 0, 1, 0)
 
@@ -192,7 +192,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_minimum_position"],
-                bg_color=self.wcfg["bkg_color_minimum_position"],
+                bg_color=self.wcfg["background_color_minimum_position"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -211,7 +211,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_minpos.addWidget(cap_minpos, 0, 0, 1, 0)
 
@@ -224,7 +224,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_maximum_position"],
-                bg_color=self.wcfg["bkg_color_maximum_position"],
+                bg_color=self.wcfg["background_color_maximum_position"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -243,7 +243,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_maxpos.addWidget(cap_maxpos, 0, 0, 1, 0)
 
@@ -256,7 +256,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_live_position"],
-                bg_color=self.wcfg["bkg_color_live_position"],
+                bg_color=self.wcfg["background_color_live_position"],
                 count=4,
             )
             self.set_grid_layout_quad(
@@ -275,7 +275,7 @@ class Realtime(Overlay):
                     fixed_height=font_cap_m.height,
                     offset_y=font_cap_m.voffset,
                     fg_color=self.wcfg["font_color_caption"],
-                    bg_color=self.wcfg["bkg_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
                 )
                 layout_live.addWidget(cap_live, 0, 0, 1, 0)
 

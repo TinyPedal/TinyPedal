@@ -50,10 +50,10 @@ class Realtime(Overlay):
         drs_height = int(font_m.capital + pady * 2)
 
         self.drs_color = (
-            (self.wcfg["font_color_not_available"], self.wcfg["bkg_color_not_available"]),
-            (self.wcfg["font_color_available"], self.wcfg["bkg_color_available"]),
-            (self.wcfg["font_color_allowed"], self.wcfg["bkg_color_allowed"]),
-            (self.wcfg["font_color_activated"], self.wcfg["bkg_color_activated"]),
+            (self.wcfg["font_color_not_available"], self.wcfg["background_color_not_available"]),
+            (self.wcfg["font_color_available"], self.wcfg["background_color_available"]),
+            (self.wcfg["font_color_allowed"], self.wcfg["background_color_allowed"]),
+            (self.wcfg["font_color_activated"], self.wcfg["background_color_activated"]),
         )
 
         # Rect

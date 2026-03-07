@@ -55,7 +55,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_g_force"],
-                bg_color=self.wcfg["bkg_color_g_force"],
+                bg_color=self.wcfg["background_color_g_force"],
             )
             self.set_primary_orient(
                 target=self.bar_gforce_lgt,
@@ -68,7 +68,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_g_force"],
-                bg_color=self.wcfg["bkg_color_g_force"],
+                bg_color=self.wcfg["background_color_g_force"],
             )
             self.set_primary_orient(
                 target=self.bar_gforce_lat,
@@ -83,7 +83,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_downforce_ratio"],
-                bg_color=self.wcfg["bkg_color_downforce_ratio"],
+                bg_color=self.wcfg["background_color_downforce_ratio"],
             )
             self.set_primary_orient(
                 target=self.bar_df_ratio,
@@ -93,7 +93,7 @@ class Realtime(Overlay):
         # Front downforce
         if self.wcfg["show_front_downforce"]:
             self.bar_style_df_front = (
-                self.wcfg["bkg_color_front_downforce"],
+                self.wcfg["background_color_front_downforce"],
                 self.wcfg["warning_color_liftforce"],
             )
             self.bar_df_front = self.set_rawtext(
@@ -112,7 +112,7 @@ class Realtime(Overlay):
         # Rear downforce
         if self.wcfg["show_rear_downforce"]:
             self.bar_style_df_rear = (
-                self.wcfg["bkg_color_rear_downforce"],
+                self.wcfg["background_color_rear_downforce"],
                 self.wcfg["warning_color_liftforce"],
             )
             self.bar_df_rear = self.set_rawtext(

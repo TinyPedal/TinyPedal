@@ -206,7 +206,7 @@ class Realtime(Overlay):
     def draw_background(self, map_path):
         """Draw background image"""
         if self.wcfg["show_background"]:
-            self.pixmap_background.fill(self.wcfg["bkg_color"])
+            self.pixmap_background.fill(self.wcfg["background_color"])
         else:
             self.pixmap_background.fill(Qt.transparent)
         painter = QPainter(self.pixmap_background)
@@ -222,7 +222,7 @@ class Realtime(Overlay):
         # Draw elevation background
         if self.wcfg["show_elevation_background"]:
             brush = QBrush(Qt.SolidPattern)
-            brush.setColor(self.wcfg["bkg_color_elevation"])
+            brush.setColor(self.wcfg["background_color_elevation"])
             painter.setBrush(brush)
             painter.setPen(Qt.NoPen)
             painter.drawPath(map_path)

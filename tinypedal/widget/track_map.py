@@ -208,7 +208,7 @@ class Realtime(Overlay):
     def draw_map_image(self, map_path, circular_map=True):
         """Draw map image separately"""
         if self.wcfg["show_background"]:
-            self.pixmap_map.fill(self.wcfg["bkg_color"])
+            self.pixmap_map.fill(self.wcfg["background_color"])
         else:
             self.pixmap_map.fill(Qt.transparent)
         painter = QPainter(self.pixmap_map)
@@ -217,7 +217,7 @@ class Realtime(Overlay):
         # Draw map inner background
         if self.wcfg["show_map_background"] and circular_map:
             brush = QBrush(Qt.SolidPattern)
-            brush.setColor(self.wcfg["bkg_color_map"])
+            brush.setColor(self.wcfg["background_color_map"])
             painter.setBrush(brush)
             painter.setPen(Qt.NoPen)
             painter.drawPath(map_path)
@@ -425,7 +425,7 @@ class Realtime(Overlay):
 
             # Draw text pitstop duration
             if self.wcfg["show_pitstop_duration"]:
-                painter.fillRect(self.pit_text_shape, self.wcfg["bkg_color_pitstop_duration"])
+                painter.fillRect(self.pit_text_shape, self.wcfg["background_color_pitstop_duration"])
                 painter.setPen(self.pen_pit_styles[1])
                 text_time = f"{min(target_pit_time - self.pitout_time_offset, 999):.0f}"
                 painter.drawText(self.pit_text_shape, Qt.AlignCenter, text_time)

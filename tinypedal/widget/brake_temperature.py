@@ -71,7 +71,7 @@ class Realtime(Overlay):
                 default_name=HEATMAP_DEFAULT_BRAKE,
                 swap_style=not self.wcfg["swap_style"],
                 fg_color=self.wcfg["font_color_temperature"],
-                bg_color=self.wcfg["bkg_color_temperature"],
+                bg_color=self.wcfg["background_color_temperature"],
             )
         ]
 
@@ -83,7 +83,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_temperature"],
-            bg_color=self.wcfg["bkg_color_temperature"],
+            bg_color=self.wcfg["background_color_temperature"],
             count=4,
             last=0,
         )
@@ -105,7 +105,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_average"],
-                bg_color=self.wcfg["bkg_color_average"],
+                bg_color=self.wcfg["background_color_average"],
                 count=4,
                 last=0,
             )
@@ -200,14 +200,14 @@ class Realtime(Overlay):
             default_name=HEATMAP_DEFAULT_BRAKE,
             swap_style=not self.wcfg["swap_style"],
             fg_color=self.wcfg["font_color_temperature"],
-            bg_color=self.wcfg["bkg_color_temperature"],
+            bg_color=self.wcfg["background_color_temperature"],
         )
         heatmap_style_r = load_heatmap_color(
             heatmap_name=heatmap_r,
             default_name=HEATMAP_DEFAULT_BRAKE,
             swap_style=not self.wcfg["swap_style"],
             fg_color=self.wcfg["font_color_temperature"],
-            bg_color=self.wcfg["bkg_color_temperature"],
+            bg_color=self.wcfg["background_color_temperature"],
         )
         self.heatmap_styles[0] = heatmap_style_f
         self.heatmap_styles[1] = heatmap_style_f

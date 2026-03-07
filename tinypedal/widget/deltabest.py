@@ -80,7 +80,7 @@ class Realtime(Overlay):
         self.rect_text_delta = self.rect_delta.adjusted(0, font_m.voffset, 0, 0)
 
         self.freeze_duration = min(max(self.wcfg["freeze_duration"], 0), 30)
-        self.delta_color = self.wcfg["bkg_color_time_gain"], self.wcfg["bkg_color_time_loss"]
+        self.delta_color = self.wcfg["background_color_time_gain"], self.wcfg["background_color_time_loss"]
 
         # Config canvas
         if self.wcfg["show_delta_bar"]:
@@ -124,7 +124,7 @@ class Realtime(Overlay):
         # Draw deltabar
         if self.wcfg["show_delta_bar"]:
             self.rect_deltapos.setLeft(delta_pos)
-            painter.fillRect(self.rect_deltabar, self.wcfg["bkg_color_delta_bar"])
+            painter.fillRect(self.rect_deltabar, self.wcfg["background_color_delta_bar"])
             painter.fillRect(self.rect_deltapos, highlight_color)
 
             if self.wcfg["enable_animated_deltabest"]:
@@ -137,11 +137,11 @@ class Realtime(Overlay):
 
         # Draw delta readings
         if self.wcfg["swap_style"]:
-            self.pen_text.setColor(self.wcfg["bkg_color_deltabest"])
+            self.pen_text.setColor(self.wcfg["background_color_deltabest"])
             bg_color = highlight_color
         else:
             self.pen_text.setColor(highlight_color)
-            bg_color =  self.wcfg["bkg_color_deltabest"]
+            bg_color =  self.wcfg["background_color_deltabest"]
 
         painter.fillRect(self.rect_delta, bg_color)
         painter.setPen(self.pen_text)

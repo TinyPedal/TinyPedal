@@ -72,7 +72,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_power_locking_front"],
-                bg_color=self.wcfg["bkg_color_power_locking_front"],
+                bg_color=self.wcfg["background_color_power_locking_front"],
                 last=0,
             )
             self.set_primary_orient(
@@ -89,7 +89,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_coast_locking_front"],
-                bg_color=self.wcfg["bkg_color_coast_locking_front"],
+                bg_color=self.wcfg["background_color_coast_locking_front"],
                 last=0,
             )
             self.set_primary_orient(
@@ -106,7 +106,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_power_locking_rear"],
-                bg_color=self.wcfg["bkg_color_power_locking_rear"],
+                bg_color=self.wcfg["background_color_power_locking_rear"],
                 last=0,
             )
             self.set_primary_orient(
@@ -123,7 +123,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_coast_locking_rear"],
-                bg_color=self.wcfg["bkg_color_coast_locking_rear"],
+                bg_color=self.wcfg["background_color_coast_locking_rear"],
                 last=0,
             )
             self.set_primary_orient(

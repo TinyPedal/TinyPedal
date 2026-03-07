@@ -60,15 +60,15 @@ class Realtime(Overlay):
             self.bar_style_pit_timer = (
                 (
                     self.wcfg["font_color_pit_timer"],
-                    self.wcfg["bkg_color_pit_timer"],
+                    self.wcfg["background_color_pit_timer"],
                 ),
                 (
                     self.wcfg["font_color_pit_timer_stopped"],
-                    self.wcfg["bkg_color_pit_timer_stopped"],
+                    self.wcfg["background_color_pit_timer_stopped"],
                 ),
                 (
                     self.wcfg["font_color_pit_closed"],
-                    self.wcfg["bkg_color_pit_closed"],
+                    self.wcfg["background_color_pit_closed"],
                 ),
             )
             self.bar_pit_timer = self.set_rawtext(
@@ -92,7 +92,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_low_fuel"],
-                bg_color=self.wcfg["bkg_color_low_fuel"],
+                bg_color=self.wcfg["background_color_low_fuel"],
             )
             self.set_primary_orient(
                 target=self.bar_lowfuel,
@@ -107,7 +107,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_speed_limiter"],
-                bg_color=self.wcfg["bkg_color_speed_limiter"],
+                bg_color=self.wcfg["background_color_speed_limiter"],
             )
             self.set_primary_orient(
                 target=self.bar_limiter,
@@ -122,7 +122,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_yellow_flag"],
-                bg_color=self.wcfg["bkg_color_yellow_flag"],
+                bg_color=self.wcfg["background_color_yellow_flag"],
             )
             self.set_primary_orient(
                 target=self.bar_yellowflag,
@@ -137,7 +137,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_blue_flag"],
-                bg_color=self.wcfg["bkg_color_blue_flag"],
+                bg_color=self.wcfg["background_color_blue_flag"],
             )
             self.set_primary_orient(
                 target=self.bar_blueflag,
@@ -147,8 +147,8 @@ class Realtime(Overlay):
         # Start lights
         if self.wcfg["show_startlights"]:
             self.bar_style_startlights = (
-                self.wcfg["bkg_color_red_lights"],
-                self.wcfg["bkg_color_green_flag"],
+                self.wcfg["background_color_red_lights"],
+                self.wcfg["background_color_green_flag"],
             )
             self.bar_startlights = self.set_rawtext(
                 text="SLIGHTS",
@@ -171,7 +171,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_traffic"],
-                bg_color=self.wcfg["bkg_color_traffic"],
+                bg_color=self.wcfg["background_color_traffic"],
             )
             self.set_primary_orient(
                 target=self.bar_traffic,
@@ -186,7 +186,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_pit_request"],
-                bg_color=self.wcfg["bkg_color_pit_request"],
+                bg_color=self.wcfg["background_color_pit_request"],
             )
             self.set_primary_orient(
                 target=self.bar_pit_request,
@@ -198,11 +198,11 @@ class Realtime(Overlay):
             self.bar_style_finish_state = (
                 (
                     self.wcfg["font_color_finish"],
-                    self.wcfg["bkg_color_finish"],
+                    self.wcfg["background_color_finish"],
                 ),
                 (
                     self.wcfg["font_color_disqualify"],
-                    self.wcfg["bkg_color_disqualify"],
+                    self.wcfg["background_color_disqualify"],
                 ),
             )
             self.bar_finish_state = self.set_rawtext(

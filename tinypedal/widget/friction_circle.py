@@ -168,7 +168,7 @@ class Realtime(Overlay):
     def draw_background(self, center):
         """Draw g circle background (one time)"""
         if self.wcfg["show_background"]:
-            self.pixmap_background.fill(self.wcfg["bkg_color"])
+            self.pixmap_background.fill(self.wcfg["background_color"])
         else:
             self.pixmap_background.fill(Qt.transparent)
         painter = QPainter(self.pixmap_background)
@@ -181,14 +181,14 @@ class Realtime(Overlay):
                 rad_gra = QRadialGradient(center, center, scale)
                 rad_gra.setColorAt(
                     calc.zero_one(self.wcfg["fade_in_radius"]),
-                    self.wcfg["bkg_color_circle"])
+                    self.wcfg["background_color_circle"])
                 rad_gra.setColorAt(
                     calc.zero_one(self.wcfg["fade_out_radius"]),
                     Qt.transparent)
                 painter.setBrush(rad_gra)
             else:
                 brush = QBrush(Qt.SolidPattern)
-                brush.setColor(self.wcfg["bkg_color_circle"])
+                brush.setColor(self.wcfg["background_color_circle"])
                 painter.setBrush(brush)
             painter.drawEllipse(center - scale, center - scale, scale * 2, scale * 2)
 

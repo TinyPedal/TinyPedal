@@ -63,7 +63,7 @@ class Realtime(Overlay):
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["bkg_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
             )
             self.set_primary_orient(
                 target=cap_camber,
@@ -82,7 +82,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_camber"],
-            bg_color=self.wcfg["bkg_color_camber"],
+            bg_color=self.wcfg["background_color_camber"],
             count=4,
             last=0,
         )
@@ -108,7 +108,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_camber_difference"],
-                bg_color=self.wcfg["bkg_color_camber_difference"],
+                bg_color=self.wcfg["background_color_camber_difference"],
                 count=2,
                 last=0,
             )

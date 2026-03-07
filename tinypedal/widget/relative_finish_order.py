@@ -90,7 +90,7 @@ class Realtime(Overlay):
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
             fg_color=self.wcfg["font_color_pit_time"],
-            bg_color=self.wcfg["bkg_color_pit_time"],
+            bg_color=self.wcfg["background_color_pit_time"],
             count=self.total_slot,
         )
         for _pit_time, target in zip(self.leader_pit_time_set, self.bars_pit_leader):
@@ -115,7 +115,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.leader_lap_color[0],
-            bg_color=self.wcfg["bkg_color_leader"],
+            bg_color=self.wcfg["background_color_leader"],
             count=self.total_slot,
         )
         self.bars_lap_leader[0].text = "LDR"
@@ -138,7 +138,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.player_lap_color[0],
-            bg_color=self.wcfg["bkg_color_player"],
+            bg_color=self.wcfg["background_color_player"],
             count=self.total_slot,
         )
         self.set_grid_layout_table_row(
@@ -155,7 +155,7 @@ class Realtime(Overlay):
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
             fg_color=self.wcfg["font_color_pit_time"],
-            bg_color=self.wcfg["bkg_color_pit_time"],
+            bg_color=self.wcfg["background_color_pit_time"],
             count=self.total_slot,
         )
         for _pit_time, target in zip(self.player_pit_time_set, self.bars_pit_player):
@@ -175,7 +175,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_refill"],
-            bg_color=self.wcfg["bkg_color_refill"],
+            bg_color=self.wcfg["background_color_refill"],
             count=self.total_slot,
         )
         self.set_grid_layout_table_row(
@@ -193,7 +193,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_refill"],
-                bg_color=self.wcfg["bkg_color_refill"],
+                bg_color=self.wcfg["background_color_refill"],
                 count=self.total_slot,
             )
             self.bars_refill_extra[0].text = f"EX+{self.extra_laps}"

@@ -75,7 +75,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_all_time_deltabest"],
-                bg_color=self.wcfg["bkg_color_all_time_deltabest"],
+                bg_color=self.wcfg["background_color_all_time_deltabest"],
                 last=0,
             )
             self.set_primary_orient(
@@ -92,7 +92,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_session_deltabest"],
-                bg_color=self.wcfg["bkg_color_session_deltabest"],
+                bg_color=self.wcfg["background_color_session_deltabest"],
                 last=0,
             )
             self.set_primary_orient(
@@ -109,7 +109,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_stint_deltabest"],
-                bg_color=self.wcfg["bkg_color_stint_deltabest"],
+                bg_color=self.wcfg["background_color_stint_deltabest"],
                 last=0,
             )
             self.set_primary_orient(
@@ -126,7 +126,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_deltalast"],
-                bg_color=self.wcfg["bkg_color_deltalast"],
+                bg_color=self.wcfg["background_color_deltalast"],
                 last=0,
             )
             self.set_primary_orient(

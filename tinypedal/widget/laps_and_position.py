@@ -67,8 +67,8 @@ class Realtime(Overlay):
         if self.wcfg["show_lap_number"]:
             text_lap_number = f"{self.prefix_lap_number}   0.00/0.00"
             self.bar_style_lap_number = (
-                self.wcfg["bkg_color_lap_number"],
-                self.wcfg["bkg_color_maxlap_warn"],
+                self.wcfg["background_color_lap_number"],
+                self.wcfg["background_color_maxlap_warn"],
             )
             self.bar_lap_number = self.set_rawtext(
                 text=text_lap_number,
@@ -92,7 +92,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_position_overall"],
-                bg_color=self.wcfg["bkg_color_position_overall"],
+                bg_color=self.wcfg["background_color_position_overall"],
             )
             self.set_primary_orient(
                 target=self.bar_pos_overall,
@@ -108,7 +108,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_position_in_class"],
-                bg_color=self.wcfg["bkg_color_position_in_class"],
+                bg_color=self.wcfg["background_color_position_in_class"],
             )
             self.set_primary_orient(
                 target=self.bar_pos_inclass,

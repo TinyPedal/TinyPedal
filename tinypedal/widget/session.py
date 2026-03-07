@@ -66,7 +66,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_session_name"],
-                bg_color=self.wcfg["bkg_color_session_name"],
+                bg_color=self.wcfg["background_color_session_name"],
             )
             self.set_primary_orient(
                 target=self.bar_session_name,
@@ -82,7 +82,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_system_clock"],
-                bg_color=self.wcfg["bkg_color_system_clock"],
+                bg_color=self.wcfg["background_color_system_clock"],
             )
             self.set_primary_orient(
                 target=self.bar_system_clock,
@@ -98,7 +98,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_session_time"],
-                bg_color=self.wcfg["bkg_color_session_time"],
+                bg_color=self.wcfg["background_color_session_time"],
             )
             self.set_primary_orient(
                 target=self.bar_session_time,
@@ -114,7 +114,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_estimated_laps"],
-                bg_color=self.wcfg["bkg_color_estimated_laps"],
+                bg_color=self.wcfg["background_color_estimated_laps"],
             )
             self.set_primary_orient(
                 target=self.bar_estimated_laps,

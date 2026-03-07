@@ -71,7 +71,7 @@ class Realtime(Overlay):
                 default_name=HEATMAP_DEFAULT_TYRE,
                 swap_style=self.wcfg["swap_style"],
                 fg_color=self.wcfg["font_color_surface"],
-                bg_color=self.wcfg["bkg_color_surface"],
+                bg_color=self.wcfg["background_color_surface"],
             )
         ]
 
@@ -92,7 +92,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tyre_compound"],
-                bg_color=self.wcfg["bkg_color_tyre_compound"],
+                bg_color=self.wcfg["background_color_tyre_compound"],
                 count=2,
             )
             self.set_grid_layout_vert(
@@ -165,7 +165,7 @@ class Realtime(Overlay):
             default_name=HEATMAP_DEFAULT_TYRE,
             swap_style=self.wcfg["swap_style"],
             fg_color=self.wcfg["font_color_surface"],
-            bg_color=self.wcfg["bkg_color_surface"],
+            bg_color=self.wcfg["background_color_surface"],
         )
         self.heatmap_styles[index] = heatmap_style
         self.heatmap_styles[index + 1] = heatmap_style
@@ -181,7 +181,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_surface"],
-                bg_color=self.wcfg["bkg_color_surface"],
+                bg_color=self.wcfg["background_color_surface"],
                 count=12,  # 3 x 4 tyres
                 last=0,
             )
@@ -195,7 +195,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_surface"],
-                bg_color=self.wcfg["bkg_color_surface"],
+                bg_color=self.wcfg["background_color_surface"],
                 count=4,
                 last=0,
             )

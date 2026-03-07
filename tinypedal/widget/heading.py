@@ -200,7 +200,7 @@ class Realtime(Overlay):
     def draw_background(self, center):
         """Draw circle background image"""
         if self.wcfg["show_background"]:
-            self.pixmap_background.fill(self.wcfg["bkg_color"])
+            self.pixmap_background.fill(self.wcfg["background_color"])
         else:
             self.pixmap_background.fill(Qt.transparent)
         painter = QPainter(self.pixmap_background)
@@ -210,7 +210,7 @@ class Realtime(Overlay):
         if self.wcfg["show_circle_background"]:
             painter.setPen(Qt.NoPen)
             brush = QBrush(Qt.SolidPattern)
-            brush.setColor(self.wcfg["bkg_color_circle"])
+            brush.setColor(self.wcfg["background_color_circle"])
             painter.setBrush(brush)
             painter.drawEllipse(0, 0, self.area_size, self.area_size)
 

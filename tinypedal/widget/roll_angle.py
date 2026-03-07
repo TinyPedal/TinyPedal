@@ -74,7 +74,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_roll_angle_front"],
-            bg_color=self.wcfg["bkg_color_roll_angle_front"],
+            bg_color=self.wcfg["background_color_roll_angle_front"],
             last=0,
         )
         self.set_primary_orient(
@@ -90,7 +90,7 @@ class Realtime(Overlay):
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_roll_angle_rear"],
-            bg_color=self.wcfg["bkg_color_roll_angle_rear"],
+            bg_color=self.wcfg["background_color_roll_angle_rear"],
             last=0,
         )
         self.set_primary_orient(
@@ -112,7 +112,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_roll_angle_difference"],
-                bg_color=self.wcfg["bkg_color_roll_angle_difference"],
+                bg_color=self.wcfg["background_color_roll_angle_difference"],
             )
             self.set_primary_orient(
                 target=self.bar_rolld,
@@ -128,7 +128,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_roll_angle_ratio"],
-                bg_color=self.wcfg["bkg_color_roll_angle_ratio"],
+                bg_color=self.wcfg["background_color_roll_angle_ratio"],
                 last=0,
             )
             self.set_primary_orient(

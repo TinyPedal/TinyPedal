@@ -94,7 +94,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_temperature"],
-                bg_color=self.wcfg["bkg_color_temperature"],
+                bg_color=self.wcfg["background_color_temperature"],
                 last=0,
             )
             layout_temp.addWidget(self.bar_temp, 0, 0)
@@ -112,7 +112,7 @@ class Realtime(Overlay):
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_trend[0],
-                    bg_color=self.wcfg["bkg_color_temperature"],
+                    bg_color=self.wcfg["background_color_temperature"],
                     last=0,
                 )
                 layout_temp.addWidget(self.bar_temp_trend, 0, 1)
@@ -127,7 +127,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_rain"],
-                bg_color=self.wcfg["bkg_color_rain"],
+                bg_color=self.wcfg["background_color_rain"],
                 last=0,
             )
             layout_rain.addWidget(self.bar_rain, 0, 0)
@@ -145,7 +145,7 @@ class Realtime(Overlay):
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_trend[0],
-                    bg_color=self.wcfg["bkg_color_rain"],
+                    bg_color=self.wcfg["background_color_rain"],
                     last=0,
                 )
                 layout_rain.addWidget(self.bar_raininess_trend, 0, 1)
@@ -160,7 +160,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_wetness"],
-                bg_color=self.wcfg["bkg_color_wetness"],
+                bg_color=self.wcfg["background_color_wetness"],
                 last=0,
             )
             layout_wetness.addWidget(self.bar_wetness, 0, 0)
@@ -178,7 +178,7 @@ class Realtime(Overlay):
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_trend[0],
-                    bg_color=self.wcfg["bkg_color_wetness"],
+                    bg_color=self.wcfg["background_color_wetness"],
                     last=0,
                 )
                 layout_wetness.addWidget(self.bar_wetness_trend, 0, 1)

@@ -89,7 +89,7 @@ class Realtime(Overlay):
         self.pen_text = QPen()
         self.pen_text.setColor(self.wcfg["font_color_steering_angle"])
         self.brush_circle = QBrush(Qt.SolidPattern)
-        self.brush_circle.setColor(self.wcfg["bkg_color_circle"])
+        self.brush_circle.setColor(self.wcfg["background_color_circle"])
 
         # Last data
         self.steering_angle = 0
@@ -116,7 +116,7 @@ class Realtime(Overlay):
         painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
         # Draw background
         if self.wcfg["show_background"]:
-            painter.fillRect(self.rect_bg, self.wcfg["bkg_color"])
+            painter.fillRect(self.rect_bg, self.wcfg["background_color"])
         if self.wcfg["show_circle_background"]:
             painter.setPen(Qt.NoPen)
             painter.setBrush(self.brush_circle)

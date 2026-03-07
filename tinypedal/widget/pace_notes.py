@@ -53,9 +53,9 @@ class Realtime(Overlay):
 
         # Base style
         if self.wcfg["show_background"]:
-            bg_color_notes = self.wcfg["bkg_color_pace_notes"]
-            bg_color_comments = self.wcfg["bkg_color_comments"]
-            bg_color_debugging = self.wcfg["bkg_color_debugging"]
+            bg_color_notes = self.wcfg["background_color_pace_notes"]
+            bg_color_comments = self.wcfg["background_color_comments"]
+            bg_color_debugging = self.wcfg["background_color_debugging"]
         else:
             bg_color_notes = ""
             bg_color_comments = ""

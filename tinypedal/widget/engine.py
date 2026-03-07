@@ -58,7 +58,7 @@ class Realtime(Overlay):
         # Oil temperature
         if self.wcfg["show_oil_temperature"]:
             self.bar_style_oil = (
-                self.wcfg["bkg_color_oil"],
+                self.wcfg["background_color_oil"],
                 self.wcfg["warning_color_overheat"],
             )
             self.bar_oil = self.set_rawtext(
@@ -77,7 +77,7 @@ class Realtime(Overlay):
         # Water temperature
         if self.wcfg["show_water_temperature"]:
             self.bar_style_water = (
-                self.wcfg["bkg_color_water"],
+                self.wcfg["background_color_water"],
                 self.wcfg["warning_color_overheat"],
             )
             self.bar_water = self.set_rawtext(
@@ -101,7 +101,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_turbo"],
-                bg_color=self.wcfg["bkg_color_turbo"],
+                bg_color=self.wcfg["background_color_turbo"],
             )
             self.set_primary_orient(
                 target=self.bar_turbo,
@@ -116,7 +116,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_rpm"],
-                bg_color=self.wcfg["bkg_color_rpm"],
+                bg_color=self.wcfg["background_color_rpm"],
             )
             self.set_primary_orient(
                 target=self.bar_rpm,
@@ -131,7 +131,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_rpm_maximum"],
-                bg_color=self.wcfg["bkg_color_rpm_maximum"],
+                bg_color=self.wcfg["background_color_rpm_maximum"],
             )
             self.set_primary_orient(
                 target=self.bar_rpm_max,
@@ -146,7 +146,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_torque"],
-                bg_color=self.wcfg["bkg_color_torque"],
+                bg_color=self.wcfg["background_color_torque"],
             )
             self.set_primary_orient(
                 target=self.bar_torque,
@@ -161,7 +161,7 @@ class Realtime(Overlay):
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_power"],
-                bg_color=self.wcfg["bkg_color_power"],
+                bg_color=self.wcfg["background_color_power"],
             )
             self.set_primary_orient(
                 target=self.bar_power,

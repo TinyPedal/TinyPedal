@@ -73,7 +73,7 @@ class Realtime(Overlay):
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["bkg_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
             )
             self.set_primary_orient(
                 target=cap_bar,
@@ -91,7 +91,7 @@ class Realtime(Overlay):
                 offset_y=font_m.voffset,
                 input_color=self.wcfg["highlight_color"],
                 fg_color=self.wcfg["font_color"],
-                bg_color=self.wcfg["bkg_color"],
+                bg_color=self.wcfg["background_color"],
                 maxrange_color=brake_input_color,
                 maxrange_height=max(self.wcfg["brake_input_size"], 0),
                 right_side=idx % 2,
