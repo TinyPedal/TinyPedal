@@ -68,7 +68,7 @@ class Realtime(Overlay):
             text_lap_number = f"{self.prefix_lap_number}   0.00/0.00"
             self.bar_style_lap_number = (
                 self.wcfg["background_color_lap_number"],
-                self.wcfg["background_color_maxlap_warn"],
+                self.wcfg["warning_color_maximum_laps"],
             )
             self.bar_lap_number = self.set_rawtext(
                 text=text_lap_number,

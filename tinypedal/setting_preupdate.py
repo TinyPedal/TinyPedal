@@ -91,6 +91,18 @@ def _user_prior_2_42_9(dict_user: dict):
     weather_forecast = dict_user.get("weather_forecast")
     if isinstance(weather_forecast, dict):
         _swap_suffix_with_prefix(weather_forecast, "_bkg_color", "bkg_color_")
+    # Rename options in weather widget
+    weather = dict_user.get("weather")
+    if isinstance(weather, dict):
+        if "prefix_dry" in weather:
+            weather["prefix_wetness_dry"] = weather["prefix_dry"]
+        if "prefix_wet" in weather:
+            weather["prefix_wetness_wet"] = weather["prefix_wet"]
+    # Rename options in laps and position widget
+    laps_and_position = dict_user.get("laps_and_position")
+    if isinstance(laps_and_position, dict):
+        if "background_color_maxlap_warn" in laps_and_position:
+            laps_and_position["warning_color_maximum_laps"] = laps_and_position["background_color_maxlap_warn"]
     # Rename options in fuel widget
     fuel = dict_user.get("fuel")
     if isinstance(fuel, dict):

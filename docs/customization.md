@@ -681,7 +681,7 @@ Set `true` to enable main application window position correction, which is used 
     enable_x11_platform_plugin_override
 Set Qt platform plugin type to `X11` via environment variable on Linux. This option may help work around some issues with overlay dragging and position on `Wayland`. This option requires restarting TinyPedal to take effect. This option is enabled by default on Linux.
 
-    global_bkg_color
+    background_color_global
 Sets global background color for all widgets.
 
 Note, global background color will only be visible when `enable_translucent_background` option is disabled or translucent background is not supported. Some widgets with own background setting may override this option.
@@ -1946,16 +1946,16 @@ Set cooldown duration (seconds) before resetting minimum power or coast locking 
     drs_text
 Set custom DRS text.
 
-    font_color_activated, bkg_color_activated
+    font_color_activated, background_color_activated
 Set color when DRS is activated by player.
 
-    font_color_allowed, bkg_color_allowed
+    font_color_allowed, background_color_allowed
 Set color when DRS is allowed but not yet activated by player.
 
-    font_color_available, bkg_color_available
+    font_color_available, background_color_available
 Set color when DRS is available but current disallowed to use.
 
-    font_color_not_available, bkg_color_not_available
+    font_color_not_available, background_color_not_available
 Set color when DRS is unavailable for current track or car.
 
 [**`Back to Top`**](#)
@@ -2084,7 +2084,7 @@ Set highlight duration for total amount time spent in pit after exit pit.
     pit_closed_text
 Set custom pit closed text.
 
-    font_color_pit_closed, bkg_color_pit_closed
+    font_color_pit_closed, background_color_pit_closed
 Set color indicator on pit timer when pit lane is closed.
 
     show_low_fuel
@@ -2626,8 +2626,8 @@ Show your current lap number (lap progression) and total race laps. If total rac
 
 Note, estimated total laps reading is calculated based on local player's lap time pace data from Delta Module, which can be different from in-game HUD reading. This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it.
 
-    bkg_color_maxlap_warn
-Set warning color that shows 1 lap before exceeding maximum-lap in qualify (or indicates the last lap of a lap-type race).
+    warning_color_maximum_laps
+Set warning color that shows 1 lap before exceeding maximum laps in qualify (or indicates the last lap of a lap-type race).
 
     show_position_overall
 Show your current overall position against all drivers in a session.

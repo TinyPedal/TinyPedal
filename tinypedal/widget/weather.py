@@ -47,12 +47,12 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        prefix_wetness_just = max(len(self.wcfg["prefix_dry"]), len(self.wcfg["prefix_wet"]))
+        prefix_wetness_just = max(len(self.wcfg["prefix_wetness_dry"]), len(self.wcfg["prefix_wetness_wet"]))
         decimals = min(max(self.wcfg["decimal_places_temperature"], 0), 6)
 
         self.prefix_rain = self.wcfg["prefix_rain"]
-        self.prefix_dry = self.wcfg["prefix_dry"].ljust(prefix_wetness_just)
-        self.prefix_wet = self.wcfg["prefix_wet"].ljust(prefix_wetness_just)
+        self.prefix_dry = self.wcfg["prefix_wetness_dry"].ljust(prefix_wetness_just)
+        self.prefix_wet = self.wcfg["prefix_wetness_wet"].ljust(prefix_wetness_just)
         self.temp_cut = 2 + (self.cfg.units["temperature_unit"] == "Fahrenheit") + (decimals != 0) + decimals
         self.temp_digits = f"0{self.temp_cut + round(0.1 + decimals * 0.1, decimals)}f"
 
