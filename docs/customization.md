@@ -2164,8 +2164,11 @@ Show finish or disqualify state.
     layout
 2 layouts are available: `0` = vertical layout, `1` = horizontal layout.
 
-    show_g_force
-Show longitudinal and lateral g force with direction indicator.
+    show_longitudinal_g_force
+Show longitudinal g force with direction indicator.
+
+    show_lateral_g_force
+Show lateral g force with direction indicator.
 
     show_downforce_ratio
 Show downforce ratio between front and rear. 50% indicates equal downforce; higher than 50% indicates front has more downforce.

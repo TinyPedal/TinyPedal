@@ -47,32 +47,34 @@ class Realtime(Overlay):
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 6 + bar_padx
 
-        # G force
-        if self.wcfg["show_g_force"]:
+        # Longitudinal g-force
+        if self.wcfg["show_longitudinal_g_force"]:
             self.bar_gforce_lgt = self.set_rawtext(
                 text=TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_g_force"],
-                bg_color=self.wcfg["background_color_g_force"],
+                fg_color=self.wcfg["font_color_longitudinal_g_force"],
+                bg_color=self.wcfg["background_color_longitudinal_g_force"],
             )
             self.set_primary_orient(
                 target=self.bar_gforce_lgt,
-                column=self.wcfg["display_order_long_gforce"],
+                column=self.wcfg["display_order_longitudinal_g_force"],
             )
 
+        # Lateral g-force
+        if self.wcfg["show_lateral_g_force"]:
             self.bar_gforce_lat = self.set_rawtext(
                 text=TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_g_force"],
-                bg_color=self.wcfg["background_color_g_force"],
+                fg_color=self.wcfg["font_color_lateral_g_force"],
+                bg_color=self.wcfg["background_color_lateral_g_force"],
             )
             self.set_primary_orient(
                 target=self.bar_gforce_lat,
-                column=self.wcfg["display_order_lat_gforce"],
+                column=self.wcfg["display_order_lateral_g_force"],
             )
 
         # Downforce ratio
@@ -130,13 +132,13 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        # G force
-        if self.wcfg["show_g_force"]:
-            # Longitudinal g-force
+        # Longitudinal g-force
+        if self.wcfg["show_longitudinal_g_force"]:
             gf_lgt = round(minfo.force.lgtGForceRaw, 2)
             self.update_gf_lgt(self.bar_gforce_lgt, gf_lgt)
 
-            # Lateral g-force
+        # Lateral g-force
+        if self.wcfg["show_lateral_g_force"]:
             gf_lat = round(minfo.force.latGForceRaw, 2)
             self.update_gf_lat(self.bar_gforce_lat, gf_lat)
 

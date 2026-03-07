@@ -1,12 +1,8 @@
 WIP
 -----------------------------
 * Major change to option names
-  - To improve readability and support new features, a large amount options were renamed in this update. Old setting will be automatically transferred over.
+  - To improve readability and support new features (such as option grouping), a large amount options were renamed in this update. All old setting will be automatically transferred and updated under new name.
     Important note, due to large amount changes to option name, it is recommended to manually backup all your presets before upgrading to this version.
-  - Renamed options in Fuel & Virtual Energy Widget for better clarity.
-  - Renamed all "column_index" & "draw_order" options to "display_order".
-  - Added "background color" option for each instrument icon in Instrument Widget.
-  - Added "show_trend" option in Weather Widget.
 
 * Major change to Config Dialog (quality of life)
   - Added "show_option_group_title" option in "Application" Config dialog (requested by user "Oost-hash"), which groups similar options under same title for improved readability.

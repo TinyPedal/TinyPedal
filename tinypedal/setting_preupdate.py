@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 12), _user_prior_2_42_12),  # 2026-03-07
+        ((2, 42, 13), _user_prior_2_42_13),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -67,7 +67,7 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_12(dict_user: dict):
+def _user_prior_2_42_13(dict_user: dict):
     # Copy options from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
@@ -80,6 +80,22 @@ def _user_prior_2_42_12(dict_user: dict):
         if "font_color" in elevation:
             elevation["font_color_elevation_reading"] = elevation["font_color"]
             elevation["font_color_elevation_scale"] = elevation["font_color"]
+    # Copy options in force widget
+    force = dict_user.get("force")
+    if isinstance(force, dict):
+        if "show_g_force" in force:
+            force["show_longitudinal_g_force"] = force["show_g_force"]
+            force["show_lateral_g_force"] = force["show_g_force"]
+        if "font_color_g_force" in force:
+            force["font_color_longitudinal_g_force"] = force["font_color_g_force"]
+            force["font_color_lateral_g_force"] = force["font_color_g_force"]
+        if "background_color_g_force" in force:
+            force["background_color_longitudinal_g_force"] = force["background_color_g_force"]
+            force["background_color_lateral_g_force"] = force["background_color_g_force"]
+        if "display_order_long_gforce" in force:
+            force["display_order_longitudinal_g_force"] = force["display_order_long_gforce"]
+        if "display_order_lat_gforce" in force:
+            force["display_order_lateral_g_force"] = force["display_order_lat_gforce"]
     # Copy options in instrument widget
     instrument = dict_user.get("instrument")
     if isinstance(instrument, dict):
