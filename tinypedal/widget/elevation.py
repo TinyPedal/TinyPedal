@@ -82,8 +82,10 @@ class Realtime(Overlay):
         self.pen_mark = QPen()
         self.pen_mark.setWidth(self.wcfg["position_mark_width"])
         self.pen_mark.setColor(self.wcfg["position_mark_color"])
-        self.pen_text = QPen()
-        self.pen_text.setColor(self.wcfg["font_color"])
+        self.pen_text_elevation = QPen()
+        self.pen_text_elevation.setColor(self.wcfg["font_color_elevation_reading"])
+        self.pen_text_scale = QPen()
+        self.pen_text_scale.setColor(self.wcfg["font_color_elevation_scale"])
 
         # Last data
         self.last_modified = 0
@@ -139,8 +141,8 @@ class Realtime(Overlay):
             painter.drawLine(self.veh_pos, 0, self.veh_pos, self.display_height)
 
         # Draw readings
-        painter.setPen(self.pen_text)
         if self.wcfg["show_elevation_reading"]:
+            painter.setPen(self.pen_text_elevation)
             painter.drawText(
                 self.rect_text_elevation,
                 self.elevation_text_alignment,
@@ -149,6 +151,7 @@ class Realtime(Overlay):
         if self.wcfg["show_elevation_scale"]:
             # Format elevation scale (meter or feet per pixel)
             map_scale = round(self.unit_dist(1 / self.map_scale[1]), 2) if self.map_scale[1] else 1
+            painter.setPen(self.pen_text_scale)
             painter.drawText(
                 self.rect_text_scale,
                 self.scale_text_alignment,

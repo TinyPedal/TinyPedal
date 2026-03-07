@@ -386,7 +386,7 @@ class UserConfig(BaseDialog):
             if show_group_title:
                 group_name = option_group_name(key, next_key, group_name)
                 if group_name and group_name != "_same_group":
-                    self._add_group_label(row_index, group_name, layout)
+                    self._add_group_label(row_index, format_option_name(group_name), layout)
                     row_index += 1
             # Option name
             option_name = format_option_name(key)
@@ -600,9 +600,9 @@ def option_group_name(key: str, next_key: str, group_name: str) -> str:
     """Create option group name"""
     # Unique group
     if key == "opacity":
-        return "Base Display"
+        return "base_display"
     if key == "font_name":
-        return "Font Style"
+        return "font_style"
     # Ignore font_offset
     if "font_offset" in key:
         return ""
@@ -617,5 +617,5 @@ def option_group_name(key: str, next_key: str, group_name: str) -> str:
         return "_same_group"
     # New group if current and next option are same
     if "display_order" in key:
-        return "Display Order"
-    return format_option_name(re.sub(rxp.CFG_GROUP_KEY, "", key))
+        return "display_order"
+    return re.sub(rxp.CFG_GROUP_KEY, "", key)

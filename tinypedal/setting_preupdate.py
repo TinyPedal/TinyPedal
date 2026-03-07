@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 10), _user_prior_2_42_10),  # 2026-03-07
+        ((2, 42, 11), _user_prior_2_42_11),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -67,13 +67,19 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_10(dict_user: dict):
+def _user_prior_2_42_11(dict_user: dict):
     # Copy options from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
     if isinstance(module_sectors, dict) and isinstance(sectors, dict):
         if "enable_all_time_best_sectors" in module_sectors:
             sectors["enable_all_time_best_sectors"] = module_sectors["enable_all_time_best_sectors"]
+    # Copy options in elevation widget
+    elevation = dict_user.get("elevation")
+    if isinstance(elevation, dict):
+        if "font_color" in elevation:
+            elevation["font_color_elevation_reading"] = elevation["font_color"]
+            elevation["font_color_elevation_scale"] = elevation["font_color"]
     # Copy options in instrument widget
     instrument = dict_user.get("instrument")
     if isinstance(instrument, dict):
