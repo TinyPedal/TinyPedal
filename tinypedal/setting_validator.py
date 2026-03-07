@@ -29,7 +29,7 @@ from . import regex_pattern as rxp
 from . import version
 from .const_common import VERSION_NA
 from .hotkey.common import validate_hotkey
-from .setting_preupdate import preupdate_specific_version
+from .setting_preupdate import preupdate_global_setting, preupdate_user_setting
 from .template.setting_brakes import BRAKEINFO_DEFAULT
 from .template.setting_classes import CLASSINFO_DEFAULT
 from .template.setting_compounds import COMPOUNDINFO_DEFAULT
@@ -40,7 +40,20 @@ from .validator import is_clock_format, is_hex_color
 from .version_check import parse_version_string
 
 
-def validate_style(dict_user: dict[str, dict], dict_def: Mapping[str, Any]) -> bool:
+def _get_preset_version(dict_user: dict, version_current: str) -> tuple[int, int, int]:
+    """Get stored preset version, and update to current running version"""
+    # Check preset version
+    preset_info = dict_user.get("preset")
+    if not isinstance(preset_info, dict):
+        dict_user["preset"] = {}  # create preset info section if missing
+        preset_info = dict_user["preset"]
+    preset_version = parse_version_string(preset_info.get("version", "0.0.0"))
+    # Update preset version
+    dict_user["preset"]["version"] = version_current
+    return preset_version
+
+
+def _validate_style(dict_user: dict[str, dict], dict_def: Mapping[str, Any]) -> bool:
     """Validate style dict entries"""
     save_change = False
     for name, data in dict_user.items():
@@ -65,17 +78,17 @@ class StyleValidator:
     @staticmethod
     def classes(dict_user: dict[str, dict]) -> bool:
         """Classes style validator"""
-        return validate_style(dict_user, CLASSINFO_DEFAULT)
+        return _validate_style(dict_user, CLASSINFO_DEFAULT)
 
     @staticmethod
     def brakes(dict_user: dict[str, dict]) -> bool:
         """Brakes style validator"""
-        return validate_style(dict_user, BRAKEINFO_DEFAULT)
+        return _validate_style(dict_user, BRAKEINFO_DEFAULT)
 
     @staticmethod
     def compounds(dict_user: dict[str, dict]) -> bool:
         """Compounds style validator"""
-        return validate_style(dict_user, COMPOUNDINFO_DEFAULT)
+        return _validate_style(dict_user, COMPOUNDINFO_DEFAULT)
 
     @staticmethod
     def heatmap(dict_user: dict[str, dict]) -> bool:
@@ -96,12 +109,12 @@ class StyleValidator:
     @staticmethod
     def tracks(dict_user: dict[str, dict]) -> bool:
         """Tracks style validator"""
-        return validate_style(dict_user, TRACKINFO_DEFAULT)
+        return _validate_style(dict_user, TRACKINFO_DEFAULT)
 
     @staticmethod
     def filelock(dict_user: dict[str, dict]) -> bool:
         """File lock validator"""
-        return validate_style(dict_user, FILELOCKINFO_DEFAULT)
+        return _validate_style(dict_user, FILELOCKINFO_DEFAULT)
 
 
 class ValueValidator:
@@ -248,38 +261,26 @@ class PresetValidator:
         cls.add_missing_key(dict_user, dict_def)
         cls.sort_key_order(dict_user, dict_def)
 
-    @staticmethod
-    def preupdate_global_preset(dict_user: dict):
-        """Pre update global preset, run before validation"""
-        # Rename all "bkg_color" to "background_color"
-        for option in dict_user.values():
-            if isinstance(option, dict):
-                for key in tuple(option):
-                    if "bkg_color" in key:
-                        option[key.replace("bkg_color", "background_color")] = option[key]
-
-    @staticmethod
-    def preupdate_user_preset(dict_user: dict, dict_def: dict):
-        """Pre update user preset, run before validation"""
-        # Check preset version
-        preset_info = dict_user.get("preset")
-        if not isinstance(preset_info, dict):
-            dict_user["preset"] = {}
-            preset_info = dict_user["preset"]
-        preset_version = parse_version_string(preset_info.get("version", "0.0.0"))
-
-        # Update preset version
-        dict_user["preset"]["version"] = dict_def["preset"]["version"]
-
-        # Skip check if already newest version
-        build_version = parse_version_string(version.__version__)
-        if preset_version == VERSION_NA or preset_version < build_version:
-            preupdate_specific_version(preset_version, dict_user)
-
     @classmethod
     def global_preset(cls, dict_user: dict, dict_def: dict) -> dict:
         """Validate global preset"""
-        cls.preupdate_global_preset(dict_user)
+        # Pre update global preset, run before validation
+        preset_version = _get_preset_version(dict_user, version.__version__)
+        build_version = parse_version_string(version.__version__)
+        if preset_version == VERSION_NA or preset_version < build_version:
+            preupdate_global_setting(preset_version, dict_user)
+        # Validate preset
+        return cls._validate(dict_user, dict_def)
+
+    @classmethod
+    def user_preset(cls, dict_user: dict, dict_def: dict) -> dict:
+        """Validate user preset"""
+        # Pre update user preset, run before validation
+        preset_version = _get_preset_version(dict_user, version.__version__)
+        build_version = parse_version_string(version.__version__)
+        if preset_version == VERSION_NA or preset_version < build_version:
+            preupdate_user_setting(preset_version, dict_user)
+        # Validate preset
         return cls._validate(dict_user, dict_def)
 
     @classmethod
@@ -289,12 +290,6 @@ class PresetValidator:
         for options in dict_user.values():
             options["bind"] = validate_hotkey(options["bind"])
         return dict_user
-
-    @classmethod
-    def user_preset(cls, dict_user: dict, dict_def: dict) -> dict:
-        """Validate user preset"""
-        cls.preupdate_user_preset(dict_user, dict_def)
-        return cls._validate(dict_user, dict_def)
 
     @classmethod
     def _validate(cls, dict_user: dict, dict_def: dict) -> dict:

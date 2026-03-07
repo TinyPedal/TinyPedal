@@ -23,8 +23,12 @@ Default global (config) setting template
 from ..const_api import API_DEFAULT_NAME
 from ..const_app import PLATFORM
 from ..userfile import set_default_config_path, set_default_data_path
+from ..version import __version__
 
 GLOBAL_DEFAULT = {
+    "preset": {
+        "version": __version__,
+    },
     "application": {
         "show_at_startup": True,
         "minimize_to_tray": PLATFORM.WINDOWS,

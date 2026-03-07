@@ -27,8 +27,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: dict):
-    """Pre update old setting from specific version"""
+def preupdate_global_setting(preset_version: tuple[int, int, int], dict_user: dict):
+    """Pre update global setting from specific version"""
+    # Create target version and update function list
+    # Very old version may be removed later
+    target_versions = (
+        ((2, 42, 9), _global_prior_2_42_9),  # 2026-03-07
+    )
+    for _version, _update in reversed(target_versions):
+        if preset_version < _version:
+            _update(dict_user)
+            logger.info("USERDATA: updated global setting prior to %s.%s.%s", *_version)
+
+
+def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict):
+    """Pre update user setting from specific version"""
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
@@ -38,16 +51,23 @@ def preupdate_specific_version(preset_version: tuple[int, int, int], dict_user: 
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
         ((2, 37, 0), _user_prior_2_37_0),  # 2025-12-24
         ((2, 36, 0), _user_prior_2_36_0),  # 2025-12-13
-        ((2, 33, 1), _user_prior_2_33_1),  # 2025-08-22
     )
     for _version, _update in reversed(target_versions):
         if preset_version < _version:
             _update(dict_user)
-            logger.info("USERDATA: updated old setting prior to %s.%s.%s", *_version)
+            logger.info("USERDATA: updated user setting prior to %s.%s.%s", *_version)
 
 
+# Global setting update function
+def _global_prior_2_42_9(dict_user: dict):
+    # Rename all "bkg_color" to "background_color"
+    for option in dict_user.values():
+        if isinstance(option, dict):
+            _rename_key(option, "bkg_color", "background_color")
+
+
+# User setting update function
 def _user_prior_2_42_9(dict_user: dict):
-    """Update user setting prior to 2.42.9"""
     # Copy options from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
@@ -170,7 +190,6 @@ def _user_prior_2_42_9(dict_user: dict):
 
 
 def _user_prior_2_41_0(dict_user: dict):
-    """Update user setting prior to 2.41.0"""
     # Rename "p2p" to "push to pass"
     p2p = dict_user.get("p2p")
     if isinstance(p2p, dict):
@@ -189,7 +208,6 @@ def _user_prior_2_41_0(dict_user: dict):
 
 
 def _user_prior_2_40_0(dict_user: dict):
-    """Update user setting prior to 2.40.0"""
     track_map = dict_user.get("track_map")
     if isinstance(track_map, dict):
         if "pitstop_duration_minimum" in track_map:
@@ -199,7 +217,6 @@ def _user_prior_2_40_0(dict_user: dict):
 
 
 def _user_prior_2_39_0(dict_user: dict):
-    """Update user setting prior to 2.39.0"""
     suspension_position = dict_user.get("suspension_position")
     if isinstance(suspension_position, dict):
         if suspension_position["negative_position_color"] == "#FF2200":
@@ -207,7 +224,6 @@ def _user_prior_2_39_0(dict_user: dict):
 
 
 def _user_prior_2_37_0(dict_user: dict):
-    """Update user setting prior to 2.37.0"""
     # Transfer wheel_alignment setting to new widgets
     wheel_alignment = dict_user.get("wheel_alignment")
     if isinstance(wheel_alignment, dict):
@@ -218,7 +234,6 @@ def _user_prior_2_37_0(dict_user: dict):
 
 
 def _user_prior_2_36_0(dict_user: dict):
-    """Update user setting prior to 2.36.0"""
     # Copy old telemetry_api setting
     telemetry_api = dict_user.get("telemetry_api")
     if isinstance(telemetry_api, dict):
@@ -229,18 +244,6 @@ def _user_prior_2_36_0(dict_user: dict):
     if isinstance(module_vehicles, dict):
         if module_vehicles["update_interval"] == 20:
             module_vehicles["update_interval"] = 10
-
-
-def _user_prior_2_33_1(dict_user: dict):
-    """Update user setting prior to 2.33.1"""
-    # Fix option name typo "predication"
-    relative_finish_order = dict_user.get("relative_finish_order")
-    if isinstance(relative_finish_order, dict):
-        _rename_key(relative_finish_order, "predication", "prediction")
-
-    track_map = dict_user.get("track_map")
-    if isinstance(track_map, dict):
-        _rename_key(track_map, "predication", "prediction")
 
 
 # Misc function
