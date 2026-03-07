@@ -41,7 +41,7 @@ class DisplayOrder(BaseDialog):
 
     def __init__(self, parent, user_orders: dict, default_orders: dict):
         super().__init__(parent)
-        self.setWindowTitle("Display Order")
+        self.set_config_title("Display Order", parent.windowTitle().split(" - ")[0])
         self.setMinimumSize(UIScaler.size(20), UIScaler.size(25))
 
         self._parent = parent
