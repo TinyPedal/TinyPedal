@@ -99,6 +99,8 @@ class MapView(QWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.ecfg = cfg.user.config["track_map_viewer"]
+
         # Style
         self.load_config(False)
         self.pen = QPen()
@@ -127,23 +129,6 @@ class MapView(QWidget):
         self.marked_coords = []
         self.highlighted_coords = None
 
-        # Toggle
-        self.osd = {
-            "map_info": True,
-            "position_info": True,
-            "curve_info": True,
-            "slope_info": True,
-            "separator1":"",
-            "center_mark": True,
-            "distance_circle": True,
-            "osculating_circle": True,
-            "curve_section": True,
-            "marked_coordinates": True,
-            "highlighted_coordinates": True,
-            "separator2":"",
-            "dark_background": cfg.application["window_color_theme"] == "Dark",
-        }
-
         # Set layout
         self.set_controls()
         layout_inner_control = QHBoxLayout()
@@ -153,7 +138,6 @@ class MapView(QWidget):
 
     def load_config(self, is_reload: bool = True):
         """Load config"""
-        self.ecfg = cfg.user.config["track_map_viewer"]
         self.distance_circle_radius = [
             self.ecfg[f"distance_circle_{idx}_radius"] for idx in range(10)
         ]
@@ -190,7 +174,6 @@ class MapView(QWidget):
     def set_controls(self):
         """Set controls"""
         # Context menu
-        self.map_context_menu = self.set_context_menu()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.open_context_menu)
 
@@ -311,24 +294,40 @@ class MapView(QWidget):
 
     def set_context_menu(self):
         """Set context menu"""
-        menu = QMenu(self)
-        for key, item in self.osd.items():
-            if key.startswith("separator"):
+        menu = QMenu()  # temp menu, no parent
+        menu_items = (
+            "show_dark_background",
+            None,
+            "show_map_info",
+            "show_position_info",
+            "show_curve_info",
+            "show_slope_info",
+            None,
+            "show_center_mark",
+            "show_distance_circle",
+            "show_osculating_circle",
+            "show_curve_section",
+            "show_marked_coordinates",
+            "show_highlighted_coordinates",
+        )
+        for key in menu_items:
+            if key is None:
                 menu.addSeparator()
                 continue
-            option = menu.addAction(key.title().replace("_", " "))
+            option = menu.addAction(key.replace("show_", "").replace("_", " ").title())
             option.setCheckable(True)
-            option.setChecked(item)
+            option.setChecked(self.ecfg[key])
         return menu
 
     def open_context_menu(self, position: QPoint):
         """Open context menu"""
-        action = self.map_context_menu.exec_(self.mapToGlobal(position))
-        if not action:
-            return
-        name = action.text().replace(" ", "_").lower()
-        self.osd[name] = not self.osd[name]
-        self.update()
+        menu = self.set_context_menu()
+        action = menu.exec_(self.mapToGlobal(position))
+        if action:
+            name = "show_" + action.text().replace(" ", "_").lower()
+            self.ecfg[name] = not self.ecfg[name]
+            cfg.save(cfg_type=ConfigType.CONFIG)
+            self.update()
 
     def open_config_dialog(self):
         """Open config"""
@@ -449,7 +448,7 @@ class MapView(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing, True)
 
-        if self.osd["dark_background"]:
+        if self.ecfg["show_dark_background"]:
             background_color = self.ecfg["background_color_dark"]
         else:
             background_color = self.ecfg["background_color_light"]
@@ -557,7 +556,7 @@ class MapView(QWidget):
     def draw_osculating_circle(
         self, painter, arc_center_pos, arc_radius, point_one, point_end):
         """Draw osculating circle"""
-        if self.osd["osculating_circle"]:
+        if self.ecfg["show_osculating_circle"]:
             self.pen.setWidth(self.ecfg["osculating_circle_width"])
             self.pen.setColor(self.ecfg["osculating_circle_color"])
             painter.setPen(self.pen)
@@ -570,7 +569,7 @@ class MapView(QWidget):
 
     def draw_curve(self, painter, curve_section):
         """Draw curve"""
-        if self.osd["curve_section"]:
+        if self.ecfg["show_curve_section"]:
             self.pen.setWidth(self.ecfg["curve_section_width"])
             self.pen.setColor(self.ecfg["curve_section_color"])
             painter.setPen(self.pen)
@@ -578,13 +577,13 @@ class MapView(QWidget):
 
     def draw_marked_coords(self, painter):
         """Draw marked coordinates"""
-        if self.osd["marked_coordinates"] and self.marked_coords:
+        if self.ecfg["show_marked_coordinates"] and self.marked_coords:
             self.pen.setWidth(self.ecfg["marked_coordinates_size"])
             self.pen.setColor(self.ecfg["marked_coordinates_color"])
             painter.setPen(self.pen)
             painter.drawPoints(self.marked_coords)
 
-        if self.osd["highlighted_coordinates"] and self.highlighted_coords:
+        if self.ecfg["show_highlighted_coordinates"] and self.highlighted_coords:
             self.pen.setWidth(self.ecfg["highlighted_coordinates_width"])
             self.pen.setColor(self.ecfg["highlighted_coordinates_color"])
             painter.setPen(self.pen)
@@ -599,7 +598,7 @@ class MapView(QWidget):
 
     def draw_distance_circle(self, painter):
         """Draw distance circle"""
-        if self.osd["distance_circle"]:
+        if self.ecfg["show_distance_circle"]:
             self.pen.setWidth(self.ecfg["distance_circle_width"])
             self.pen.setColor(self.ecfg["distance_circle_color"])
             painter.setPen(self.pen)
@@ -613,7 +612,7 @@ class MapView(QWidget):
 
     def draw_center_mark(self, painter, yaw_radians):
         """Draw center mark"""
-        if self.osd["center_mark"]:
+        if self.ecfg["show_center_mark"]:
             self.pen.setWidth(self.ecfg["center_mark_width"])
             self.pen.setColor(self.ecfg["center_mark_color"])
             painter.setPen(self.pen)
@@ -632,7 +631,7 @@ class MapView(QWidget):
             margin, margin, (self.center_x - margin) * 2,
             (self.center_y - margin - self.slider_pos_dist.height()) * 2
         )
-        if self.osd["dark_background"]:
+        if self.ecfg["show_dark_background"]:
             font_color = self.ecfg["font_color_light"]
         else:
             font_color = self.ecfg["font_color_dark"]
@@ -641,7 +640,7 @@ class MapView(QWidget):
 
     def draw_map_info(self, painter):
         """Draw map info"""
-        if self.osd["map_info"]:
+        if self.ecfg["show_map_info"]:
             painter.drawText(
                 self.rect_info, Qt.AlignRight,
                 f"{self.map_length:.3f}m ({self.map_nodes} nodes)"
@@ -650,7 +649,7 @@ class MapView(QWidget):
     def draw_curve_info(
         self, painter, curve_length, arc_radius, arc_angle, curve_desc, length_desc):
         """Draw curve info"""
-        if self.osd["curve_info"]:
+        if self.ecfg["show_curve_info"]:
             painter.drawText(
                 self.rect_info, Qt.AlignLeft,
                 (
@@ -663,7 +662,7 @@ class MapView(QWidget):
 
     def draw_slope_info(self, painter, slope_percent, slope_angle, slope_delta, slope_desc):
         """Draw slope info"""
-        if self.osd["slope_info"]:
+        if self.ecfg["show_slope_info"]:
             painter.drawText(
                 self.rect_info, Qt.AlignLeft | Qt.AlignBottom,
                 (
@@ -675,7 +674,7 @@ class MapView(QWidget):
 
     def draw_position_info(self, painter, pos_x, pos_y, pos_z, pos_dist):
         """Draw position info"""
-        if self.osd["position_info"]:
+        if self.ecfg["show_position_info"]:
             painter.drawText(
                 self.rect_info, Qt.AlignRight | Qt.AlignBottom,
                 (

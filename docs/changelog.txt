@@ -13,6 +13,9 @@ WIP
 * Auto Backup Car Setup
   - Added auto backup car setup support for RF2.
 
+* Track Map Viewer
+  - Now remembers each map display setting from context menu.
+
 * Sectors Widget
   - Moved "enable_all_time_best_sectors" option from "Sectors Module" to "Sectors Widget" for easy access. Old setting will be automatically transferred over.
 
