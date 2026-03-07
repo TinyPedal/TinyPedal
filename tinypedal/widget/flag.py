@@ -145,7 +145,7 @@ class Realtime(Overlay):
             )
 
         # Start lights
-        if self.wcfg["show_startlights"]:
+        if self.wcfg["show_start_lights"]:
             self.bar_style_startlights = (
                 self.wcfg["background_color_red_lights"],
                 self.wcfg["background_color_green_flag"],
@@ -155,12 +155,12 @@ class Realtime(Overlay):
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_startlights"],
+                fg_color=self.wcfg["font_color_start_lights"],
                 bg_color=self.bar_style_startlights[0],
             )
             self.set_primary_orient(
                 target=self.bar_startlights,
-                column=self.wcfg["display_order_startlights"],
+                column=self.wcfg["display_order_start_lights"],
             )
 
         # Incoming traffic
@@ -270,7 +270,7 @@ class Realtime(Overlay):
             self.update_yellowflag(self.bar_yellowflag, yellow_state)
 
         # Start lights
-        if self.wcfg["show_startlights"]:
+        if self.wcfg["show_start_lights"]:
             green_state = self.green_timer.update(lap_etime)
             self.update_startlights(self.bar_startlights, green_state)
 

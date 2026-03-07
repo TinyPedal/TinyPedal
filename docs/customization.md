@@ -2125,17 +2125,17 @@ Show blue flag indicator with nearest leading vehicle class name displayed on th
     show_blue_flag_for_race_only
 Only show blue flag indicator during race session.
 
-    show_startlights
+    show_start_lights
 Show race start lights indicator with light frame number for standing-type start.
-
-    green_flag_duration
-Set display duration(seconds) for green flag text before it disappears. Default is `3`.
 
     red_lights_text
 Set custom text for red lights.
 
     green_flag_text
 Set custom text for green flag.
+
+    green_flag_duration
+Set display duration(seconds) for green flag text before it disappears. Default is `3`.
 
     show_traffic
 Show nearest incoming on-track traffic indicator (time gap) while in pit lane or after pit-out.

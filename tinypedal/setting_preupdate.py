@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 11), _user_prior_2_42_11),  # 2026-03-07
+        ((2, 42, 12), _user_prior_2_42_12),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -67,7 +67,7 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_11(dict_user: dict):
+def _user_prior_2_42_12(dict_user: dict):
     # Copy options from sectors module to sectors widget
     module_sectors = dict_user.get("module_sectors")
     sectors = dict_user.get("sectors")
@@ -97,6 +97,15 @@ def _user_prior_2_42_11(dict_user: dict):
     weather_forecast = dict_user.get("weather_forecast")
     if isinstance(weather_forecast, dict):
         _swap_suffix_with_prefix(weather_forecast, "_bkg_color", "bkg_color_")
+    # Rename options in flag widget
+    flag = dict_user.get("flag")
+    if isinstance(flag, dict):
+        if "show_startlights" in flag:
+            flag["show_start_lights"] = flag["show_startlights"]
+        if "font_color_startlights" in flag:
+            flag["font_color_start_lights"] = flag["font_color_startlights"]
+        if "display_order_startlights" in flag:
+            flag["display_order_start_lights"] = flag["display_order_startlights"]
     # Rename options in weather widget
     weather = dict_user.get("weather")
     if isinstance(weather, dict):
