@@ -151,7 +151,7 @@ def update_vehicle_data(
                 opt_ori_yaw = api.read.vehicle.orientation_yaw_radians(index)
                 # Player data update rate may be (twice) higher than opponents
                 # Interpolate coordinates to avoid desync
-                est_pos_x, est_pos_y = interp_coordinate(
+                est_pos_x, est_pos_y = calc.time_interp_coordinate(
                     opt_pos_x,
                     data.worldPositionX,
                     opt_pos_y,
@@ -264,26 +264,6 @@ def update_vehicle_data(
         output.totalStoppedPits = total_stopped_pits
         output.totalPitRequests = total_pit_requests
         output.totalCompletedLaps = total_completed_laps
-
-
-def interp_coordinate(
-    pos_curr_x: float,
-    pos_last_x: float,
-    pos_curr_y: float,
-    pos_last_y: float,
-    etime_curr: float,
-    etime_last: float,
-    etime_player: float,
-) -> tuple[float, float]:
-    """Interpolate coordinates based on time & coordinate delta"""
-    etime_diff = etime_player - etime_curr
-    if etime_diff <= 0:
-        return pos_curr_x, pos_curr_y
-    etime_frac = etime_diff / (etime_curr - etime_last)
-    return (
-        (pos_curr_x - pos_last_x) * etime_frac + pos_curr_x,
-        (pos_curr_y - pos_last_y) * etime_frac + pos_curr_y,
-    )
 
 
 def update_qualify_position(output: VehiclesInfo) -> None:

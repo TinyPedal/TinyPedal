@@ -154,6 +154,46 @@ def rotate_coordinate(ori_rad: float, pos_x: float, pos_y: float) -> CoordXY:
             cos_rad * pos_y + sin_rad * pos_x)
 
 
+def time_interp_coordinate(
+    pos_end_x: float,
+    pos_start_x: float,
+    pos_end_y: float,
+    pos_start_y: float,
+    time_end: float,
+    time_start: float,
+    time_middle: float,
+) -> tuple[float, float]:
+    """Interpolate coordinates based on time & coordinate delta"""
+    time_delta = time_middle - time_end
+    if time_delta <= 0:
+        return pos_end_x, pos_end_y
+    factor = time_delta / (time_end - time_start)
+    return (
+        (pos_end_x - pos_start_x) * factor + pos_end_x,
+        (pos_end_y - pos_start_y) * factor + pos_end_y,
+    )
+
+
+def distance_interp_coordinate(
+    pos_end_x: float,
+    pos_start_x: float,
+    pos_end_y: float,
+    pos_start_y: float,
+    dist_end: float,
+    dist_start: float,
+    dist_middle: float,
+) -> tuple[float, float]:
+    """Interpolate coordinates based on distance & coordinate delta"""
+    dist_delta = dist_middle - dist_start
+    if dist_delta <= 0:
+        return pos_end_x, pos_end_y
+    factor = dist_delta / (dist_end - dist_start)
+    return (
+        (pos_end_x - pos_start_x) * factor + pos_end_x,
+        (pos_end_y - pos_start_y) * factor + pos_end_y,
+    )
+
+
 def lap_progress_distance(dist_into: float, length: float) -> float:
     """Current lap progress (distance into lap) fraction"""
     if length < 1:

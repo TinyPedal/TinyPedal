@@ -255,3 +255,22 @@ def vehicle_position_sync(max_diff: float = 200, max_desync: int = 20):
             pos_synced = pos_curr
             if desync_count:
                 desync_count = 0
+
+
+@generator_init
+def vehicle_position_interp():
+    """Interpolate vehicle traveled distance based on time delta"""
+    time_last = 0.0
+    dist_last = 0.0
+    dist_est = 0.0
+
+    while True:
+        time_curr, dist_curr = yield dist_est
+
+        if dist_last != dist_curr:
+            dist_delta = dist_curr - dist_last
+            time_delta = time_curr - time_last
+            dist_last = dist_curr
+            time_last = time_curr
+        elif time_delta > 0 < dist_delta:
+            dist_est = dist_last + dist_delta * (time_curr - time_last) / time_delta
