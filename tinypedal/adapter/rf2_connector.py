@@ -77,6 +77,7 @@ class MMapDataSet:
         "tele",
         "ext",
         "ffb",
+        "rule",
     )
 
     def __init__(self) -> None:
@@ -84,6 +85,7 @@ class MMapDataSet:
         self.tele = MMapControl(rFactor2Constants.MM_TELEMETRY_FILE_NAME, rF2data.rF2Telemetry)
         self.ext = MMapControl(rFactor2Constants.MM_EXTENDED_FILE_NAME, rF2data.rF2Extended)
         self.ffb = MMapControl(rFactor2Constants.MM_FORCE_FEEDBACK_FILE_NAME, rF2data.rF2ForceFeedback)
+        self.rule = MMapControl(rFactor2Constants.MM_RULES_FILE_NAME, rF2data.rF2Rules)
 
     def __del__(self):
         logger.info("sharedmemory: GC: MMapDataSet")
@@ -99,6 +101,7 @@ class MMapDataSet:
         self.tele.create(access_mode, rf2_pid)
         self.ext.create(1, rf2_pid)
         self.ffb.create(1, rf2_pid)
+        self.rule.create(1, rf2_pid)
 
     def close_mmap(self) -> None:
         """Close mmap instance"""
@@ -106,6 +109,7 @@ class MMapDataSet:
         self.tele.close()
         self.ext.close()
         self.ffb.close()
+        self.rule.close()
 
     def update_mmap(self) -> None:
         """Update mmap data"""
@@ -320,6 +324,7 @@ class RF2Info:
         "_tele",
         "_ext",
         "_ffb",
+        "_rule",
     )
 
     def __init__(self) -> None:
@@ -333,6 +338,7 @@ class RF2Info:
         self._tele = self._sync.dataset.tele
         self._ext = self._sync.dataset.ext
         self._ffb = self._sync.dataset.ffb
+        self._rule = self._sync.dataset.rule
 
     def __del__(self):
         logger.info("sharedmemory: GC: RF2Info")
@@ -411,6 +417,11 @@ class RF2Info:
     def rf2Ffb(self) -> rF2data.rF2ForceFeedback:
         """rF2 force feedback data"""
         return self._ffb.data
+
+    @property
+    def rf2Rule(self) -> rF2data.rF2Rules:
+        """rF2 Rules info data"""
+        return self._rule.data
 
     @property
     def playerIndex(self) -> int:

@@ -306,6 +306,14 @@ class Lap(_reader.Lap, DataAdapter):
         """Laps behind next place"""
         return self.shmm.lmuScorVeh(index).mLapsBehindNext
 
+    def safety_car_distance(self) -> float:
+        """Safety car's distance into lap (meters)"""
+        return 0.0  # not available for LMU
+
+    def safety_car_active(self) -> bool:
+        """Is safety car active on track"""
+        return False  # not available for LMU
+
 
 class Session(_reader.Session, DataAdapter):
     """Session"""

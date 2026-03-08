@@ -234,6 +234,14 @@ class Lap(ABC):
     def behind_next(self, index: int | None = None) -> int:
         """Laps behind next place"""
 
+    @abstractmethod
+    def safety_car_distance(self) -> float:
+        """Safety car's distance into lap (meters)"""
+
+    @abstractmethod
+    def safety_car_active(self) -> bool:
+        """Is safety car active on track"""
+
 
 class Session(ABC):
     """Session"""

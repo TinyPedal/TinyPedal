@@ -304,6 +304,14 @@ class Lap(_reader.Lap, DataAdapter):
         """Laps behind next place"""
         return self.shmm.rf2ScorVeh(index).mLapsBehindNext
 
+    def safety_car_distance(self) -> float:
+        """Safety car's distance into lap (meters)"""
+        return rmnan(self.shmm.rf2Rule.mTrackRules.mSafetyCarLapDist)
+
+    def safety_car_active(self) -> bool:
+        """Is safety car active on track"""
+        return self.shmm.rf2Rule.mTrackRules.mSafetyCarActive
+
 
 class Session(_reader.Session, DataAdapter):
     """Session"""
