@@ -3802,14 +3802,14 @@ Enable time scaled countdown, which scales with session track clock time scale m
 ## Track map
 **This widget displays track map and standings. Note: at least one complete and valid lap is required to generate track map.**
 
-    vehicle_scale, vehicle_scale_player
-Set vehicle scale that multiplies base vehicle size. Note, base vehicle size is determined by `font size` and `bar padding`. Minimum scale is limited to `1.0`.
-
     display_orientation
 Set track map display orientation in degrees. For example, a `270` value will rotate map by `270` degrees clockwise. Default value is `0`, which always displays track map `North Up` in game's coordinate system.
 
     display_detail_level
 Sets detail level for track map. Default value is `1`, which auto adjusts map detail according to display size. Higher value reduces map detail and RAM usage, and may also help reduce rough edges from large map. Set to `0` for full detail.
+
+    vehicle_scale, vehicle_scale_player, vehicle_scale_safety_car
+Set vehicle scale that multiplies base vehicle size. Note, base vehicle size is determined by `font size` and `bar padding`. Minimum scale is limited to `1.0`.
 
     area_size
 Set area display size.
@@ -3858,6 +3858,14 @@ Show position in class while `enable_multi_class_styling` option is also enabled
 
     show_lap_difference_outline
 Show outline color based on lap difference (ahead or behind) between player and opponents. This option is disabled by default.
+
+    show_safety_car
+Show safety car position on map if available. This option currently only works in RF2.
+
+Note, safety car position has a very low update rate from RF2 API, in order to workaround this limitation, safety car position is interpolated with speed, but may still desync occasionally.
+
+    safety_car_text
+Set custom text for safety car. Default is `SC`.
 
     show_pitout_prediction
 Show estimated pit-out on-track position indication for each pit stop duration. Default indication shows `circle` with `pit stop duration` displayed above.

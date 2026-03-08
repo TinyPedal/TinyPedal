@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 16), _user_prior_2_42_16),  # 2026-03-07
+        ((2, 42, 17), _user_prior_2_42_17),  # 2026-03-07
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -67,7 +67,7 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_16(dict_user: dict):
+def _user_prior_2_42_17(dict_user: dict):
     # Prioritized
     # Rename all "column_index" to "display_order"
     for option in dict_user.values():
@@ -211,6 +211,10 @@ def _user_prior_2_42_16(dict_user: dict):
             track_map["enable_fixed_pitout_prediction"] = track_map["enabled_fixed_pitout_prediction"]
         if "show_vehicle_standings" in track_map:
             track_map["show_vehicle_class_standings"] = track_map["show_vehicle_standings"]
+        if "vehicle_outline_player_width" in track_map:
+            track_map["vehicle_outline_width_player"] = track_map["vehicle_outline_player_width"]
+        if "vehicle_outline_player_color" in track_map:
+            track_map["vehicle_outline_color_player"] = track_map["vehicle_outline_player_color"]
     # Rename options in navigation widget
     navigation = dict_user.get("navigation")
     if isinstance(navigation, dict):

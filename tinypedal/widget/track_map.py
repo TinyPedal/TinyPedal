@@ -27,6 +27,7 @@ from .. import calculation as calc
 from ..api_control import api
 from ..formatter import random_color_class
 from ..module_info import minfo
+from ..validator import vehicle_position_interp
 from ._base import Overlay
 
 
@@ -50,14 +51,6 @@ class Realtime(Overlay):
         self.show_position_in_class = self.wcfg["enable_multi_class_styling"] and self.wcfg["show_position_in_class"]
         self.display_detail_level = max(self.wcfg["display_detail_level"], 0)
 
-        veh_size_base = self.wcfg["font_size"] + round(font_m.width * self.wcfg["bar_padding"])
-        veh_size_opt = veh_size_base * max(self.wcfg["vehicle_scale"], 1.0)
-        veh_size_plr = veh_size_base * max(self.wcfg["vehicle_scale_player"], 1.0)
-
-        self.veh_shape = QRectF(-veh_size_opt * 0.5, -veh_size_opt * 0.5, veh_size_opt, veh_size_opt)
-        self.veh_shape_player = QRectF(-veh_size_plr * 0.5, -veh_size_plr * 0.5, veh_size_plr, veh_size_plr)
-        self.veh_text_shape = QRectF(-veh_size_base * 0.5, -veh_size_base * 0.5 + font_m.voffset, veh_size_base, veh_size_base)
-
         # Config canvas
         self.area_size = max(self.wcfg["area_size"], 100)
         self.area_margin = min(max(self.wcfg["area_margin"], 0), int(self.area_size/4))
@@ -65,18 +58,43 @@ class Realtime(Overlay):
 
         self.resize(self.area_size, self.area_size)
         self.pixmap_map = QPixmap(self.area_size, self.area_size)
-        self.pen_veh = (
-            self.set_veh_pen_style(self.wcfg["vehicle_outline_color"], self.wcfg["vehicle_outline_width"]),
-            self.set_veh_pen_style(self.wcfg["vehicle_outline_player_color"], self.wcfg["vehicle_outline_player_width"]),
-            self.set_veh_pen_style(self.wcfg["vehicle_outline_color_laps_ahead"], self.wcfg["vehicle_outline_width_laps_ahead"]),
-            self.set_veh_pen_style(self.wcfg["vehicle_outline_color_laps_behind"], self.wcfg["vehicle_outline_width_laps_behind"]),
-        )
-        self.pen_text = QPen(self.wcfg["font_color"]), QPen(self.wcfg["font_color_player"])
 
-        self.brush_classes = {}
-        self.brush_overall = self.set_veh_brush_style(
-            "player","leader","in_pit","yellow","laps_ahead","laps_behind","same_lap"
+        self.pen_text = (
+            QPen(self.wcfg["font_color"]),
+            QPen(self.wcfg["font_color_player"]),
+            QPen(self.wcfg["font_color_safety_car"]),
+            QPen(self.wcfg["font_color_pitstop_duration"]),
         )
+        self.pen_outline = {
+            "opponent": self.set_pen_style("vehicle_outline_color", "vehicle_outline_width"),
+            "laps_ahead": self.set_pen_style("vehicle_outline_color_laps_ahead", "vehicle_outline_width_laps_ahead"),
+            "laps_behind": self.set_pen_style("vehicle_outline_color_laps_behind", "vehicle_outline_width_laps_behind"),
+            "player": self.set_pen_style("vehicle_outline_color_player", "vehicle_outline_width_player"),
+            "safety_car": self.set_pen_style("vehicle_outline_color_safety_car", "vehicle_outline_width_safety_car"),
+            "prediction": self.set_pen_style("prediction_outline_color", "prediction_outline_width"),
+            "proximity": self.set_pen_style("proximity_circle_color", "proximity_circle_width"),
+        }
+        self.brush_classes = {}
+        self.brush_overall = {
+            "player": self.set_brush_style("vehicle_color_player"),
+            "leader": self.set_brush_style("vehicle_color_leader"),
+            "in_pit": self.set_brush_style("vehicle_color_in_pit"),
+            "yellow": self.set_brush_style("vehicle_color_yellow"),
+            "laps_ahead": self.set_brush_style("vehicle_color_laps_ahead"),
+            "laps_behind": self.set_brush_style("vehicle_color_laps_behind"),
+            "same_lap": self.set_brush_style("vehicle_color_same_lap"),
+            "safety_car": self.set_brush_style("vehicle_color_safety_car"),
+        }
+
+        veh_size_base = self.wcfg["font_size"] + round(font_m.width * self.wcfg["bar_padding"])
+        veh_size_opt = veh_size_base * max(self.wcfg["vehicle_scale"], 1.0)
+        veh_size_plr = veh_size_base * max(self.wcfg["vehicle_scale_player"], 1.0)
+        veh_size_sc = veh_size_base * max(self.wcfg["vehicle_scale_safety_car"], 1.0)
+
+        self.veh_shape = QRectF(-veh_size_opt * 0.5, -veh_size_opt * 0.5, veh_size_opt, veh_size_opt)
+        self.veh_shape_player = QRectF(-veh_size_plr * 0.5, -veh_size_plr * 0.5, veh_size_plr, veh_size_plr)
+        self.veh_shape_safetycar = QRectF(-veh_size_sc * 0.5, -veh_size_sc * 0.5, veh_size_sc, veh_size_sc)
+        self.veh_text_shape = QRectF(-veh_size_base * 0.5, -veh_size_base * 0.5 + font_m.voffset, veh_size_base, veh_size_base)
 
         if self.wcfg["show_pitout_prediction"]:
             self.show_while_requested = self.wcfg["show_pitout_prediction_while_requested_pitstop"]
@@ -86,10 +104,6 @@ class Realtime(Overlay):
             self.pit_time_increment = max(self.wcfg["pitout_duration_increment"], 1)
             if self.wcfg["enable_fixed_pitout_prediction"]:
                 self.fixed_pit_times = tuple(sorted(set(self.set_fixed_pit_time())))
-            self.pen_pit_styles = (
-                self.set_veh_pen_style(self.wcfg["prediction_outline_color"], self.wcfg["prediction_outline_width"]),
-                QPen(self.wcfg["font_color_pitstop_duration"]),
-            )
             self.pit_text_shape = QRectF(
                 -veh_size_base * 0.5 - 2,
                 font_m.voffset - veh_size_opt * 0.5 - veh_size_base - 3,
@@ -98,11 +112,10 @@ class Realtime(Overlay):
             )
 
         if self.wcfg["show_proximity_circle"]:
-            self.pen_proximity = self.set_veh_pen_style(
-                self.wcfg["proximity_circle_color"],
-                self.wcfg["proximity_circle_width"],
-            )
             self.rect_proximity = QRectF()
+
+        if self.wcfg["show_safety_car"]:
+            self.gen_position_interp = vehicle_position_interp()
 
         # Last data
         self.last_modified = 0
@@ -149,11 +162,12 @@ class Realtime(Overlay):
             self.draw_vehicle_on_map(
                 painter, minfo.vehicles.dataSet, minfo.relative.drawOrder
             )
+            if self.wcfg["show_safety_car"] and api.read.lap.safety_car_active():
+                self.draw_safetycar_on_map(painter, self.map_scaled)
         else:
             self.draw_vehicle_on_circle(
                 painter, minfo.vehicles.dataSet, minfo.relative.drawOrder
             )
-
         if self.wcfg["show_pitout_prediction"]:
             self.draw_pitout_prediction(
                 painter,
@@ -340,7 +354,7 @@ class Realtime(Overlay):
             if data.isPlayer:
                 painter.drawEllipse(self.veh_shape_player)
                 if self.wcfg["show_proximity_circle"]:
-                    painter.setPen(self.pen_proximity)
+                    painter.setPen(self.pen_outline["proximity"])
                     painter.setBrush(Qt.NoBrush)
                     painter.drawEllipse(self.rect_proximity)
             else:
@@ -355,6 +369,42 @@ class Realtime(Overlay):
                 painter.setPen(self.pen_text[data.isPlayer])
                 painter.drawText(self.veh_text_shape, Qt.AlignCenter, f"{place_veh}")
             painter.resetTransform()
+
+    def draw_safetycar_on_map(self, painter, map_data):
+        """Draw safety car on map"""
+        # Verify data set
+        if not map_data:  # x, y coords
+            return
+        dist_data = minfo.mapping.elevations
+        if not dist_data:  # distance, z coords
+            return
+        dist_end_index = min(len(dist_data), len(map_data)) - 1
+        # Interpolate safety car distance
+        safetycar_dist = self.gen_position_interp.send((api.read.timing.elapsed(), api.read.lap.safety_car_distance()))
+        # Interpolate safety car coordinates
+        index_higher = calc.binary_search_higher_column(
+            dist_data, safetycar_dist, 0, dist_end_index)
+        if index_higher > 0:
+            index_lower = index_higher - 1
+            pos_x, pos_y = calc.distance_interp_coordinate(
+                map_data[index_higher][0],
+                map_data[index_lower][0],
+                map_data[index_higher][1],
+                map_data[index_lower][1],
+                dist_data[index_higher][0],
+                dist_data[index_lower][0],
+                safetycar_dist,
+            )
+        else:
+            pos_x, pos_y = map_data[0]
+
+        painter.translate(pos_x, pos_y)
+        painter.setPen(self.pen_outline["safety_car"])
+        painter.setBrush(self.brush_overall["safety_car"])
+        painter.drawEllipse(self.veh_shape_safetycar)
+        painter.setPen(self.pen_text[2])
+        painter.drawText(self.veh_text_shape, Qt.AlignCenter, self.wcfg["safety_car_text"])
+        painter.resetTransform()
 
     def draw_pitout_prediction(self, painter, map_data, plr_veh_info):
         """Draw pitout prediction circles"""
@@ -420,13 +470,13 @@ class Realtime(Overlay):
 
             dist_node_index = calc.binary_search_higher_column(dist_data, estimate_dist, 0, dist_end_index)
             painter.translate(*map_data[dist_node_index])
-            painter.setPen(self.pen_pit_styles[0])
+            painter.setPen(self.pen_outline["prediction"])
             painter.drawEllipse(self.veh_shape)
 
             # Draw text pitstop duration
             if self.wcfg["show_pitstop_duration"]:
                 painter.fillRect(self.pit_text_shape, self.wcfg["background_color_pitstop_duration"])
-                painter.setPen(self.pen_pit_styles[1])
+                painter.setPen(self.pen_text[3])
                 text_time = f"{min(target_pit_time - self.pitout_time_offset, 999):.0f}"
                 painter.drawText(self.pit_text_shape, Qt.AlignCenter, text_time)
 
@@ -457,12 +507,12 @@ class Realtime(Overlay):
         if class_name in self.brush_classes:
             return self.brush_classes[class_name]
         # Get vehicle class style from user defined dictionary
-        brush = QBrush(Qt.SolidPattern)
         styles = self.cfg.user.classes.get(class_name)
         if styles is not None:
-            brush.setColor(styles["color"])
+            color = styles["color"]
         else:
-            brush.setColor(random_color_class(class_name))
+            color = random_color_class(class_name)
+        brush = QBrush(color, Qt.SolidPattern)
         # Add to brush cache
         self.brush_classes[class_name] = brush
         return brush
@@ -478,14 +528,13 @@ class Realtime(Overlay):
     def outline_vehicle(self, veh_info):
         """Set vehicle outline"""
         if veh_info.isPlayer:
-            return self.pen_veh[1]
-        if not self.wcfg["show_lap_difference_outline"]:
-            return self.pen_veh[0]
-        if veh_info.isLapped > 0:
-            return self.pen_veh[2]
-        if veh_info.isLapped < 0:
-            return self.pen_veh[3]
-        return self.pen_veh[0]
+            return self.pen_outline["player"]
+        if self.wcfg["show_lap_difference_outline"]:
+            if veh_info.isLapped > 0:
+                return self.pen_outline["laps_ahead"]
+            if veh_info.isLapped < 0:
+                return self.pen_outline["laps_behind"]
+        return self.pen_outline["opponent"]
 
     def color_vehicle(self, veh_info):
         """Set vehicle color"""
@@ -507,22 +556,19 @@ class Realtime(Overlay):
             return self.brush_overall["laps_behind"]
         return self.brush_overall["same_lap"]
 
-    def set_veh_pen_style(self, color: str, width: int):
-        """Set vehicle pen style"""
-        if width > 0:
+    def set_pen_style(self, color: str, width: str):
+        """Set pen style"""
+        if self.wcfg[width] > 0:
             pen_veh = QPen()
-            pen_veh.setWidth(width)
-            pen_veh.setColor(color)
+            pen_veh.setWidth(self.wcfg[width])
+            pen_veh.setColor(self.wcfg[color])
         else:
             pen_veh = Qt.NoPen
         return pen_veh
 
-    def set_veh_brush_style(self, *suffixes: str) -> dict:
-        """Set vehicle brush style"""
-        return {
-            suffix: QBrush(self.wcfg[f"vehicle_color_{suffix}"], Qt.SolidPattern)
-            for suffix in suffixes
-        }
+    def set_brush_style(self, name: str):
+        """Set brush style"""
+        return QBrush(self.wcfg[name], Qt.SolidPattern)
 
     def set_fixed_pit_time(self):
         """Set fixed target pit time"""

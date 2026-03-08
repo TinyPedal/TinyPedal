@@ -16,6 +16,10 @@ WIP
 * Track Map Viewer
   - Now remembers each map display setting from context menu.
 
+* Track map Widget
+  - Added "show_safety_car" and related customizable options (requested by user "yashiman"), which shows safety car position on map if available. This option currently only works in RF2.
+    Note, safety car position has a very low update rate from RF2 API, in order to workaround this limitation, safety car position is interpolated with speed, but may still desync occasionally.
+
 * Sectors Widget
   - Moved "enable_all_time_best_sectors" option from "Sectors Module" to "Sectors Widget" for easy access. Old setting will be automatically transferred over.
 
