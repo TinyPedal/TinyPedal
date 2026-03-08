@@ -55,17 +55,17 @@ class Realtime(Overlay):
 
         if self.wcfg["show_circle_vehicle_shape"]:
             self.veh_shape = QRectF(
-                self.veh_size * 0.5,
-                self.veh_size * 0.5,
+                -self.veh_size * 0.5,
+                -self.veh_size * 0.5,
                 self.veh_size,
                 self.veh_size,
             )
         else:
             self.veh_shape = (
-                QPointF(self.veh_size, self.veh_size * 0.5),
-                QPointF(self.veh_size * 1.5, self.veh_size * 1.5),
-                QPointF(self.veh_size, self.veh_size * 1.3),
-                QPointF(self.veh_size * 0.5, self.veh_size * 1.5),
+                QPointF(0, -self.veh_size * 0.6),
+                QPointF(self.veh_size * 0.5, self.veh_size * 0.4),
+                QPointF(0, self.veh_size * 0.2),
+                QPointF(-self.veh_size * 0.5, self.veh_size * 0.4),
             )
         self.veh_text_shape = QRectF(
             -self.veh_size * 0.5,
@@ -84,30 +84,27 @@ class Realtime(Overlay):
         self.pixmap_background = QPixmap(self.area_size, self.area_size)
         self.pixmap_mask = QPixmap(self.area_size, self.area_size)
 
-        self.pixmap_veh_player = self.draw_vehicle_pixmap("player")
-        self.pixmap_veh_leader = self.draw_vehicle_pixmap("leader")
-        self.pixmap_veh_in_pit = self.draw_vehicle_pixmap("in_pit")
-        self.pixmap_veh_yellow = self.draw_vehicle_pixmap("yellow")
-        self.pixmap_veh_laps_ahead = self.draw_vehicle_pixmap("laps_ahead")
-        self.pixmap_veh_laps_behind = self.draw_vehicle_pixmap("laps_behind")
-        self.pixmap_veh_same_lap = self.draw_vehicle_pixmap("same_lap")
-
-        self.pen_outline = QPen()
-        self.pen_outline.setJoinStyle(Qt.RoundJoin)
-        self.pen_outline.setWidth(self.wcfg["map_width"] + self.wcfg["map_outline_width"])
-        self.pen_outline.setColor(self.wcfg["map_outline_color"])
-        self.pen_map = QPen()
-        self.pen_map.setJoinStyle(Qt.RoundJoin)
-        self.pen_map.setWidth(self.wcfg["map_width"])
-        self.pen_map.setColor(self.wcfg["map_color"])
-        self.pen_sfinish = QPen()
-        self.pen_sfinish.setWidth(self.wcfg["start_line_width"])
-        self.pen_sfinish.setColor(self.wcfg["start_line_color"])
-        self.pen_sector = QPen()
-        self.pen_sector.setWidth(self.wcfg["sector_line_width"])
-        self.pen_sector.setColor(self.wcfg["sector_line_color"])
-        self.pen_text = QPen()
-        self.pen_text.setColor(self.wcfg["font_color"])
+        self.pen_text = {
+            "opponent": QPen(self.wcfg["font_color"]),
+            "player": QPen(self.wcfg["font_color_player"]),
+        }
+        self.pen_outline = {
+            "opponent": self.set_pen_style(self.wcfg["vehicle_outline_color"], self.wcfg["vehicle_outline_width"]),
+            "player": self.set_pen_style(self.wcfg["vehicle_outline_color_player"], self.wcfg["vehicle_outline_width_player"]),
+            "map_outline": self.set_pen_style(self.wcfg["map_outline_color"], self.wcfg["map_width"] + self.wcfg["map_outline_width"], True),
+            "map": self.set_pen_style(self.wcfg["map_color"], self.wcfg["map_width"], True),
+            "sfinish": self.set_pen_style(self.wcfg["start_line_color"], self.wcfg["start_line_width"]),
+            "sector": self.set_pen_style(self.wcfg["sector_line_color"], self.wcfg["sector_line_width"]),
+        }
+        self.brush_overall = {
+            "player": self.set_brush_style(self.wcfg["vehicle_color_player"]),
+            "leader": self.set_brush_style(self.wcfg["vehicle_color_leader"]),
+            "same_lap": self.set_brush_style(self.wcfg["vehicle_color_same_lap"]),
+            "laps_ahead": self.set_brush_style(self.wcfg["vehicle_color_laps_ahead"]),
+            "laps_behind": self.set_brush_style(self.wcfg["vehicle_color_laps_behind"]),
+            "in_pit": self.set_brush_style(self.wcfg["vehicle_color_in_pit"]),
+            "yellow": self.set_brush_style(self.wcfg["vehicle_color_yellow"]),
+        }
 
         # Last data
         self.last_veh_data_version = None
@@ -245,43 +242,45 @@ class Realtime(Overlay):
         if self.map_path:
             # Draw map outline
             if self.wcfg["map_outline_width"] > 0:
-                painter.setPen(self.pen_outline)
+                painter.setPen(self.pen_outline["map_outline"])
                 painter.drawPath(self.map_path)
 
             # Draw map
-            painter.setPen(self.pen_map)
+            painter.setPen(self.pen_outline["map"])
             painter.drawPath(self.map_path)
 
         # Draw start/finish line
         if self.wcfg["show_start_line"] and self.sfinish_path:
-            painter.setPen(self.pen_sfinish)
+            painter.setPen(self.pen_outline["sfinish"])
             painter.drawPath(self.sfinish_path)
 
         # Draw sectors line
         if self.wcfg["show_sector_line"] and self.sector_path:
-            painter.setPen(self.pen_sector)
+            painter.setPen(self.pen_outline["sector"])
             painter.drawPath(self.sector_path)
 
         painter.resetTransform()
 
     def draw_vehicle(self, painter, veh_info, veh_draw_order):
         """Draw vehicles"""
-        painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
-        if self.wcfg["show_vehicle_class_standings"]:
-            painter.setPen(self.pen_text)
+        if self.wcfg["show_circle_vehicle_shape"]:
+            draw_shape = painter.drawEllipse
+        else:
+            draw_shape = painter.drawPolygon
 
         # Draw vehicle within view range
         for index in veh_draw_order:
             data = veh_info[index]
             # Draw player vehicle
             if data.isPlayer:
+                painter.setPen(self.pen_outline["player"])
+                painter.setBrush(self.color_vehicle(data))
                 painter.translate(self.area_center, self.veh_offset_y)
-                painter.drawPixmap(-self.veh_size, -self.veh_size, self.pixmap_veh_player)
+                draw_shape(self.veh_shape)
 
                 if self.wcfg["show_vehicle_class_standings"]:
-                    painter.drawText(
-                        self.veh_text_shape, Qt.AlignCenter,
-                        f"{data.positionOverall}")
+                    painter.setPen(self.pen_text["player"])
+                    painter.drawText(self.veh_text_shape, Qt.AlignCenter, f"{data.positionOverall}")
                 painter.resetTransform()
 
             # Draw opponent vehicle in view range
@@ -294,16 +293,17 @@ class Realtime(Overlay):
 
                 if not self.wcfg["show_circle_vehicle_shape"]:
                     painter.rotate(calc.rad2deg(-data.relativeOrientationRadians))
-                painter.drawPixmap(
-                    -self.veh_size, -self.veh_size,
-                    self.color_veh_pixmap(data))
+
+                painter.setPen(self.pen_outline["opponent"])
+                painter.setBrush(self.color_vehicle(data))
+                draw_shape(self.veh_shape)
 
                 if self.wcfg["show_vehicle_class_standings"]:
-                    painter.resetTransform()
-                    painter.translate(pos_x, pos_y)
-                    painter.drawText(
-                        self.veh_text_shape, Qt.AlignCenter,
-                        f"{data.positionOverall}")
+                    if not self.wcfg["show_circle_vehicle_shape"]:
+                        painter.resetTransform()
+                        painter.translate(pos_x, pos_y)
+                    painter.setPen(self.pen_text["opponent"])
+                    painter.drawText(self.veh_text_shape, Qt.AlignCenter, f"{data.positionOverall}")
                 painter.resetTransform()
 
     def draw_map_mask_pixmap(self):
@@ -319,42 +319,22 @@ class Realtime(Overlay):
         painter.setPen(Qt.NoPen)
         painter.drawEllipse(0, 0, self.area_size, self.area_size)
 
-    def draw_vehicle_pixmap(self, suffix):
-        """Draw vehicles pixmap"""
-        pixmap_veh = QPixmap(self.veh_size * 2, self.veh_size * 2)
-        pixmap_veh.fill(Qt.transparent)
-        painter = QPainter(pixmap_veh)
-        painter.setRenderHint(QPainter.Antialiasing, True)
-        if self.wcfg["vehicle_outline_width"] > 0:
-            pen = QPen()
-            pen.setWidth(self.wcfg["vehicle_outline_width"])
-            pen.setColor(self.wcfg["vehicle_outline_color"])
-            painter.setPen(pen)
-        else:
-            painter.setPen(Qt.NoPen)
-        brush = QBrush(Qt.SolidPattern)
-        brush.setColor(self.wcfg[f"vehicle_color_{suffix}"])
-        painter.setBrush(brush)
-        if self.wcfg["show_circle_vehicle_shape"]:
-            painter.drawEllipse(self.veh_shape)
-        else:
-            painter.drawPolygon(self.veh_shape)
-        return pixmap_veh
-
     # Additional methods
-    def color_veh_pixmap(self, veh_info):
+    def color_vehicle(self, veh_info):
         """Compare lap differences & set color"""
-        if veh_info.positionOverall == 1:
-            return self.pixmap_veh_leader
-        if veh_info.inPit:
-            return self.pixmap_veh_in_pit
         if veh_info.isYellow and not veh_info.inPit:
-            return self.pixmap_veh_yellow
+            return self.brush_overall["yellow"]
+        if veh_info.inPit and not veh_info.isPlayer:
+            return self.brush_overall["in_pit"]
+        if veh_info.isPlayer:
+            return self.brush_overall["player"]
+        if veh_info.positionOverall == 1:
+            return self.brush_overall["leader"]
         if veh_info.isLapped > 0:
-            return self.pixmap_veh_laps_ahead
+            return self.brush_overall["laps_ahead"]
         if veh_info.isLapped < 0:
-            return self.pixmap_veh_laps_behind
-        return self.pixmap_veh_same_lap
+            return self.brush_overall["laps_behind"]
+        return self.brush_overall["same_lap"]
 
     def create_sector_path(self, path, dataset, node_index, length):
         """Create sector line path"""
@@ -368,3 +348,19 @@ class Realtime(Overlay):
         path.moveTo(pos_x1, pos_y1)
         path.lineTo(pos_x2, pos_y2)
         return path
+
+    def set_pen_style(self, color: str, width: int, rounded: bool = False):
+        """Set pen style"""
+        if width > 0:
+            pen = QPen()
+            pen.setWidth(width)
+            pen.setColor(color)
+            if rounded:
+                pen.setJoinStyle(Qt.RoundJoin)
+        else:
+            pen = Qt.NoPen
+        return pen
+
+    def set_brush_style(self, color: str):
+        """Set brush style"""
+        return QBrush(color, Qt.SolidPattern)

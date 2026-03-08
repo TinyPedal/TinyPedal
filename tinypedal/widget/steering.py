@@ -144,15 +144,13 @@ class Realtime(Overlay):
         painter.fillRect(self.rect_center, edge_color)
 
     # Additional methods
-    @staticmethod
-    def scale_mark(degree, rot_range, width):
+    def scale_mark(self, degree, rot_range, width):
         """Scale mark gap (degree), mark counts"""
         mark_num = max(int(rot_range / max(degree, 10) * 0.5), 0)
         if rot_range != 0:
             return degree / (rot_range * 0.5) * width, mark_num
         return 0, mark_num
 
-    @staticmethod
-    def steer_position(pos, length):
+    def steer_position(self, pos, length):
         """Delta position"""
         return (length - calc.sym_max(pos * -length, length)) * 0.5

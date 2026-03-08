@@ -57,7 +57,7 @@ class Realtime(Overlay):
         self.decimals = max(int(self.wcfg["decimal_places"]), 0)
         text_width = font_m.width * (5 + self.decimals)
 
-        self.pixmap_wheel = self.load_image(
+        self.pixmap_wheel = load_wheel_image(
             filename=ImageFile.STEERING_WHEEL,
             userfile=self.wcfg["custom_steering_wheel_image_file"],
             size=int(wheel_size * 1.5),
@@ -142,13 +142,12 @@ class Realtime(Overlay):
             painter.setPen(self.pen_text)
             painter.drawText(self.rect_text, Qt.AlignCenter, text_angle)
 
-    # Additional methods
-    @staticmethod
-    def load_image(filename: str, userfile: str, size: int, show_custom: bool):
-        """Load steering wheel image"""
-        if show_custom:
-            temp_filename = userfile
-            if image_exists(temp_filename):
-                filename = temp_filename
-        icon_source = QPixmap(filename)
-        return icon_source.scaled(size, size, mode=Qt.SmoothTransformation)
+
+def load_wheel_image(filename: str, userfile: str, size: int, show_custom: bool):
+    """Load steering wheel image"""
+    if show_custom:
+        temp_filename = userfile
+        if image_exists(temp_filename):
+            filename = temp_filename
+    icon_source = QPixmap(filename)
+    return icon_source.scaled(size, size, mode=Qt.SmoothTransformation)

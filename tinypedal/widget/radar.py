@@ -131,22 +131,16 @@ class Realtime(Overlay):
         self.rect_radar = QRectF(0, 0, self.area_size, self.area_size)
 
         # Vehicle pen & brush
-        if self.wcfg["vehicle_outline_width"] > 0:
-            self.pen_veh = QPen()
-            self.pen_veh.setWidth(self.wcfg["vehicle_outline_width"])
-            self.pen_veh.setColor(self.wcfg["vehicle_outline_color"])
-        else:
-            self.pen_veh = Qt.NoPen
-
-        self.brush_veh = (
-            QBrush(self.wcfg["vehicle_color_player"], Qt.SolidPattern),  # 0
-            QBrush(self.wcfg["vehicle_color_leader"], Qt.SolidPattern),  # 1
-            QBrush(self.wcfg["vehicle_color_in_pit"], Qt.SolidPattern),  # 2
-            QBrush(self.wcfg["vehicle_color_yellow"], Qt.SolidPattern),  # 3
-            QBrush(self.wcfg["vehicle_color_laps_ahead"], Qt.SolidPattern),  # 4
-            QBrush(self.wcfg["vehicle_color_laps_behind"], Qt.SolidPattern),  # 5
-            QBrush(self.wcfg["vehicle_color_same_lap"], Qt.SolidPattern),  # 6
-        )
+        self.pen_veh = self.set_pen_style(self.wcfg["vehicle_outline_color"], self.wcfg["vehicle_outline_width"])
+        self.brush_veh = {
+            "player": self.set_brush_style(self.wcfg["vehicle_color_player"]),
+            "leader": self.set_brush_style(self.wcfg["vehicle_color_leader"]),
+            "same_lap": self.set_brush_style(self.wcfg["vehicle_color_same_lap"]),
+            "laps_ahead": self.set_brush_style(self.wcfg["vehicle_color_laps_ahead"]),
+            "laps_behind": self.set_brush_style(self.wcfg["vehicle_color_laps_behind"]),
+            "in_pit": self.set_brush_style(self.wcfg["vehicle_color_in_pit"]),
+            "yellow": self.set_brush_style(self.wcfg["vehicle_color_yellow"]),
+        }
 
         self.draw_radar_marks(self.area_center)
         self.draw_radar_mask()
@@ -264,7 +258,7 @@ class Realtime(Overlay):
 
         # Draw player vehicle (one time only)
         painter.setPen(self.pen_veh)
-        painter.setBrush(self.brush_veh[0])
+        painter.setBrush(self.brush_veh["player"])
         painter.translate(self.area_center, self.area_center)
         painter.drawRoundedRect(self.veh_shape, self.veh_radius, self.veh_radius)
 
@@ -380,16 +374,16 @@ class Realtime(Overlay):
     def color_lap_diff(self, veh_info):
         """Compare lap differences & set color"""
         if veh_info.positionOverall == 1:
-            return self.brush_veh[1]
+            return self.brush_veh["leader"]
         if veh_info.inPit:
-            return self.brush_veh[2]
-        if veh_info.isYellow and not veh_info.inPit:
-            return self.brush_veh[3]
+            return self.brush_veh["in_pit"]
+        if veh_info.isYellow:
+            return self.brush_veh["yellow"]
         if veh_info.isLapped > 0:
-            return self.brush_veh[4]
+            return self.brush_veh["laps_ahead"]
         if veh_info.isLapped < 0:
-            return self.brush_veh[5]
-        return self.brush_veh[6]
+            return self.brush_veh["laps_behind"]
+        return self.brush_veh["same_lap"]
 
     def is_radar_visible(self) -> bool:
         """Set radar visibility"""
@@ -475,3 +469,17 @@ class Realtime(Overlay):
         range_diff = range_fade_out - range_fade_in
         range_scale = range_fade_out / range_diff
         return range_scale / radar_radius
+
+    def set_pen_style(self, color: str, width: int):
+        """Set pen style"""
+        if width > 0:
+            pen = QPen()
+            pen.setWidth(width)
+            pen.setColor(color)
+        else:
+            pen = Qt.NoPen
+        return pen
+
+    def set_brush_style(self, color: str):
+        """Set brush style"""
+        return QBrush(color, Qt.SolidPattern)

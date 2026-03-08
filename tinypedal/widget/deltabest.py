@@ -152,7 +152,6 @@ class Realtime(Overlay):
         )
 
     # Additional methods
-    @staticmethod
-    def delta_position(rng, delta, length):
+    def delta_position(self, rng, delta, length):
         """Delta position"""
         return (1 - calc.sym_max(delta, rng) / rng) * length

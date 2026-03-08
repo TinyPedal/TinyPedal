@@ -801,8 +801,7 @@ class Realtime(Overlay):
             self.toggle_visibility(target, data[-1])
 
     # Additional methods
-    @staticmethod
-    def toggle_visibility(target, state):
+    def toggle_visibility(self, target, state):
         """Hide bar if unavailable"""
         target.update()
         if target.state == state:
@@ -830,8 +829,7 @@ class Realtime(Overlay):
             return class_name, random_color_class(class_name)
         return class_name, self.wcfg["background_color_class"]
 
-    @staticmethod
-    def set_laptime(laptime, valid: bool = True):
+    def set_laptime(self, laptime, valid: bool = True):
         """Set lap time"""
         if 0 < laptime < MAX_SECONDS:
             if valid:
@@ -839,8 +837,7 @@ class Realtime(Overlay):
             return f"*{calc.sec2laptime_full(laptime)}"
         return TEXT_NOLAPTIME
 
-    @staticmethod
-    def set_pittime(inpit, pit_time):
+    def set_pittime(self, inpit, pit_time):
         """Set lap time"""
         if 0 < pit_time < MAX_SECONDS:
             return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"

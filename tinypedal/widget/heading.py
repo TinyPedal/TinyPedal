@@ -248,8 +248,7 @@ class Realtime(Overlay):
         painter.drawEllipse(self.dot_size * 0.5, self.dot_size * 0.5, self.dot_size, self.dot_size)
 
     # Additional methods
-    @staticmethod
-    def display_yaw_angle(angle):
+    def display_yaw_angle(self, angle):
         """Set yaw angle display range"""
         if angle < -180:
             angle = 360 + angle
