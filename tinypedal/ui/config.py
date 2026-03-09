@@ -264,7 +264,7 @@ class UserConfig(BaseDialog):
         layout_search.addWidget(button_clearsearch)
 
         # Button
-        has_display_order = (cfg_type == ConfigType.WIDGET and "Display" in option_word_set and "Order" in option_word_set)
+        has_display_order = (cfg_type == ConfigType.WIDGET and self.has_display_order())
         if has_display_order:
             button_display_order = QPushButton("Configure Display Order")
             button_display_order.clicked.connect(self.open_display_order)
@@ -295,6 +295,13 @@ class UserConfig(BaseDialog):
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(layout_main)
         self.setMinimumWidth(self.sizeHint().width() + UIScaler.size(2))
+
+    def has_display_order(self) -> bool:
+        """Check whether has display order option"""
+        for key in reversed(self.user_setting[self.key_name].keys()):
+            if "display_order" in key:
+                return True
+        return False
 
     def search_options(self, text: str):
         """Search for options"""

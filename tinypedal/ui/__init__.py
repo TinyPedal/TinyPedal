@@ -435,7 +435,7 @@ def set_style_window(base_font_pt: int) -> str:
         }}
         DisplayOrder > QListView::item:selected {{
             selection-color: {color_active_highlighted_text};
-            background: {color_active_highlight};
+            background: #CC0088DD;
             border: 0.1em solid {color_active_highlight};
         }}
         DisplayOrder > QListView::item:hover {{

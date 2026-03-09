@@ -42,18 +42,19 @@ class DisplayOrder(BaseDialog):
     def __init__(self, parent, user_orders: dict, default_orders: dict):
         super().__init__(parent)
         self.set_config_title("Display Order", parent.windowTitle().split(" - ")[0])
-        self.setMinimumSize(UIScaler.size(20), UIScaler.size(25))
+        self.setMinimumWidth(UIScaler.size(23))
+        self.resize(self.size())  # shrink initial size
 
         self._parent = parent
         self.temp_orders = user_orders
         self.default_orders = default_orders
 
         # List
-        self.list_widget = QListWidget(self)
+        self.list_widget = DisplayOrderList(self, default_orders)
         self.list_widget.setSelectionMode(QListWidget.SingleSelection)
         self.list_widget.setDragDropMode(QAbstractItemView.InternalMove)
         self.list_widget.setSpacing(1)
-        self._populate_list(self.temp_orders)
+        self.list_widget.refresh(self.temp_orders)
 
         # Button
         button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
@@ -78,8 +79,13 @@ class DisplayOrder(BaseDialog):
         main_layout.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(main_layout)
 
-        # Calculate size based on content after populating
-        # self._fit_to_content()
+        # Fit dialog height to list content
+        self.list_widget.set_min_height(self.list_widget.count() + 1)
+
+    def showEvent(self, event):
+        """Readjust minimum list height when dialog shown"""
+        self.list_widget.set_min_height(5)
+        super().showEvent(event)
 
     def _apply_order(self):
         """Apply display order"""
@@ -92,19 +98,6 @@ class DisplayOrder(BaseDialog):
         self._parent.update_display_order(self.temp_orders)
         self._parent.applying()
 
-    def _populate_list(self, target_orders: dict):
-        """Populate list"""
-        self.list_widget.clear()
-
-        for key in sorted(target_orders, key=lambda k: target_orders[k]):
-            # Strip prefix, then format
-            short_key = key.replace("display_order_", "")
-            item = QListWidgetItem(format_option_name(short_key))
-            item.setTextAlignment(Qt.AlignCenter)
-            item.setToolTip("Click & Drag to Reorder Display")
-            item.setData(Qt.UserRole, key)
-            self.list_widget.addItem(item)
-
     def _reset_order(self):
         """Reset display order"""
         msg_text = (
@@ -112,34 +105,56 @@ class DisplayOrder(BaseDialog):
             "Changes are only saved after clicking Apply Button."
         )
         if self.confirm_operation(title="Reset Options", message=msg_text):
-            self._populate_list(self.default_orders)
-            self.list_widget.setCurrentRow(0)
+            self.list_widget.refresh(self.default_orders)
 
-    # def _fit_to_content(self):
-    #     """Fit dialog size to content"""
-    #     self.layout().activate()
 
-    #     # Get width needed for longest item
-    #     width = 0
-    #     for row in range(self.list_widget.count()):
-    #         item = self.list_widget.item(row)
-    #         item_width = self.list_widget.fontMetrics().horizontalAdvance(item.text())
-    #         width = max(width, item_width)
+class DisplayOrderList(QListWidget):
+    """Display order list"""
 
-    #     # Add scrollbar width if needed, plus margins
-    #     scrollbar_width = self.style().pixelMetric(self.style().PM_ScrollBarExtent)
-    #     margins = self.layout().contentsMargins()
+    def __init__(self, parent, default_orders: dict):
+        super().__init__(parent)
+        self._default_orders = default_orders
 
-    #     total_width = (width + scrollbar_width + margins.left() + margins.right() +
-    #                 UIScaler.size(6))
+    def focusInEvent(self, event):
+        """Validate data against default data in case item missing due to some reasons"""
+        if self.count() == len(self._default_orders):
+            return
+        # Remove invalid or duplicated item
+        valid_items = set()
+        for row in range(self.count() - 1, -1, -1):
+            item = self.item(row)
+            key = item.data(Qt.UserRole)
+            if key in self._default_orders and key not in valid_items:
+                valid_items.add(key)
+            else:
+                self.takeItem(row)
+        # Add missing item
+        missing_items = (key for key in self._default_orders if key not in valid_items)
+        for key in missing_items:
+            self._add_item(key)
 
-    #     # Height based on item count (with max limit)
-    #     item_height = self.list_widget.sizeHintForRow(0)
-    #     max_visible_items = 15  # Limit height for long lists
-    #     visible_items = min(self.list_widget.count(), max_visible_items)
+    def refresh(self, target_orders: dict):
+        """Refresh list"""
+        self.clear()
+        row = 0
+        for key in sorted(target_orders, key=lambda k: target_orders[k]):
+            self._add_item(key)
+            row += 1
+        self.setCurrentRow(0)
 
-    #     total_height = (item_height * visible_items + margins.top() + margins.bottom() +
-    #                     UIScaler.size(10))  # button row
+    def set_min_height(self, rows: int, min_rows: int = 5):
+        """Set minimum list height based on row height"""
+        row_height = self.sizeHintForRow(0)
+        row_spacing = self.spacing()
+        row_count = max(rows, min_rows)
+        list_height = (row_height + row_spacing * 2) * row_count + row_spacing * 2
+        self.setMinimumHeight(list_height)
 
-    #     self.resize(total_width, total_height)
-    #     self.setMinimumSize(total_width, total_height)
+    def _add_item(self, key: str):
+        """Add display order item"""
+        short_key = key.replace("display_order_", "")
+        item = QListWidgetItem(format_option_name(short_key))
+        item.setTextAlignment(Qt.AlignCenter)
+        item.setToolTip("Click & Drag to Reorder Display")
+        item.setData(Qt.UserRole, key)
+        self.addItem(item)
