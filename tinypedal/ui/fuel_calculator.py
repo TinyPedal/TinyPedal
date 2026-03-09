@@ -55,7 +55,7 @@ from ..formatter import laptime_string_to_seconds
 from ..module_info import ConsumptionDataSet, minfo
 from ..setting import cfg
 from ..userfile.consumption_history import load_consumption_history_file
-from ._common import BaseDialog, CheckedButton, UIScaler
+from ._common import BaseDialog, UIScaler
 
 
 def set_grid_layout(parent, spacing: int = 2, margin: int = 4):
@@ -97,7 +97,7 @@ class FuelCalculator(BaseDialog):
         # Panel history
         self.panel_history = HistoryPanel(self)
 
-        self.button_adddata = QPushButton("Add Selected Data", self)
+        self.button_adddata = QPushButton("Add Selected Data")
         self.button_adddata.clicked.connect(self.add_selected_data)
         self.button_adddata.setFocusPolicy(Qt.NoFocus)
 
@@ -108,24 +108,26 @@ class FuelCalculator(BaseDialog):
         # Panel calculator
         self.panel_calculator = CalculatorPanel(self)
 
-        button_loadlive = QPushButton("Load Live", self)
+        button_loadlive = QPushButton("Load Live")
         button_loadlive.clicked.connect(self.load_live_data)
         button_loadlive.setFocusPolicy(Qt.NoFocus)
 
-        button_loadfile = QPushButton("Load File", self)
+        button_loadfile = QPushButton("Load File")
         button_loadfile.clicked.connect(self.load_file_data)
         button_loadfile.setFocusPolicy(Qt.NoFocus)
 
-        button_toggle = CheckedButton(self, "Show History", "Hide History")
-        button_toggle.toggled.connect(self.toggle_history_panel)
-        button_toggle.setChecked(cfg.user.config["fuel_calculator"]["show_consumption_history"])
-        button_toggle.setFocusPolicy(Qt.NoFocus)
+        self.button_toggle = QPushButton("Hide History")
+        self.button_toggle.setCheckable(True)
+        self.button_toggle.setChecked(True)
+        self.button_toggle.toggled.connect(self.toggle_history_panel)
+        self.button_toggle.setChecked(cfg.user.config["fuel_calculator"]["show_consumption_history"])
+        self.button_toggle.setFocusPolicy(Qt.NoFocus)
 
         layout_button = QHBoxLayout()
         layout_button.addWidget(button_loadlive, stretch=1)
         layout_button.addWidget(button_loadfile, stretch=1)
         layout_button.addStretch(1)
-        layout_button.addWidget(button_toggle, stretch=2)
+        layout_button.addWidget(self.button_toggle, stretch=2)
 
         layout_calculator = QVBoxLayout()
         layout_calculator.addWidget(self.panel_calculator)
@@ -181,6 +183,7 @@ class FuelCalculator(BaseDialog):
         """Toggle history data panel"""
         self.panel_history.setHidden(not checked)
         self.button_adddata.setHidden(not checked)
+        self.button_toggle.setText("Hide History" if checked else "Show History")
 
         if checked:
             width = self.sizeHint().width()

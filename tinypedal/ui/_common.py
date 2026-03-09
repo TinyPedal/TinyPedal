@@ -149,25 +149,6 @@ class CompactButton(QPushButton):
         )
 
 
-class CheckedButton(QPushButton):
-    """Checked button"""
-
-    def __init__(self, parent, unchecked_text: str, checked_text: str):
-        super().__init__(parent)
-        self._unchecked_text = unchecked_text
-        self._checked_text = checked_text
-        self.setCheckable(True)
-        self.toggled.connect(self.set_toggle_state)
-        self.setChecked(True)
-
-    def set_toggle_state(self, checked: bool):
-        """Set button state"""
-        if checked:
-            self.setText(self._checked_text)
-        else:
-            self.setText(self._unchecked_text)
-
-
 # Dialog class
 class BaseDialog(QDialog):
     """Base dialog class"""

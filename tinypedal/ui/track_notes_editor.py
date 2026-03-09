@@ -116,14 +116,10 @@ class TrackNotesEditor(BaseEditor):
         layout_main.addWidget(self.status_bar)
         self.setLayout(layout_main)
 
-    def toggle_trackmap_panel(self):
+    def toggle_trackmap_panel(self, checked: bool):
         """Toggle trackmap panel"""
-        if self.trackmap_panel.isHidden():
-            self.trackmap_panel.show()
-            self.button_showmap.setText("Hide Map")
-        else:
-            self.trackmap_panel.hide()
-            self.button_showmap.setText("Show Map")
+        self.trackmap_panel.setHidden(not checked)
+        self.button_showmap.setText("Hide Map" if checked else "Show Map")
 
     def set_layout_trackmap(self):
         """Set track map panel"""
@@ -198,6 +194,8 @@ class TrackNotesEditor(BaseEditor):
 
         # Button
         self.button_showmap = CompactButton("Hide Map")
+        self.button_showmap.setCheckable(True)
+        self.button_showmap.setChecked(True)
         self.button_showmap.clicked.connect(self.toggle_trackmap_panel)
 
         button_add = CompactButton("Add")
