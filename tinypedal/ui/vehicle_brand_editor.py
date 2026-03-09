@@ -208,7 +208,7 @@ class VehicleBrandEditor(BaseEditor):
 
         try:
             # Limit import file size under 5120kb
-            if os.path.getsize(filename_full) > 5120000:
+            if os.path.getsize(filename_full) > 5_120_000:
                 raise TypeError
             # Load JSON
             with open(filename_full, "r", encoding="utf-8") as jsonfile:

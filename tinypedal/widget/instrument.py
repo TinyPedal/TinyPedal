@@ -26,8 +26,8 @@ from PySide2.QtGui import QPixmap
 from ..api_control import api
 from ..const_file import ImageFile
 from ..module_info import minfo
+from ..userfile.custom_image import split_pixmap_image
 from ._base import Overlay
-from ._painter import split_pixmap_icon
 
 
 class Realtime(Overlay):
@@ -220,6 +220,6 @@ class Realtime(Overlay):
 def create_icon_set(pixmap_icon: QPixmap, icon_size: int, v_offset: int):
     """Create icon set"""
     return tuple(
-        split_pixmap_icon(pixmap_icon, icon_size, h_offset, v_offset)
+        split_pixmap_image(pixmap_icon, icon_size, h_offset, v_offset)
         for h_offset in range(2)
     )

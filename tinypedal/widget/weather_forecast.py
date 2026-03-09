@@ -35,8 +35,9 @@ from ..const_common import (
 )
 from ..const_file import ImageFile
 from ..process.weather import WeatherNode, forecast_sky_type
+from ..userfile.custom_image import split_pixmap_image
 from ._base import Overlay
-from ._painter import ProgressBar, split_pixmap_icon
+from ._painter import ProgressBar
 
 
 class Realtime(Overlay):
@@ -269,6 +270,6 @@ def create_weather_icon_set(icon_size: int):
     icon_source = QPixmap(ImageFile.WEATHER)
     pixmap_icon = icon_source.scaledToWidth(icon_size * 12, mode=Qt.SmoothTransformation)
     return tuple(
-        split_pixmap_icon(pixmap_icon, icon_size, h_offset)
+        split_pixmap_image(pixmap_icon, icon_size, h_offset)
         for h_offset in range(12)
     )

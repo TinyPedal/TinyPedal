@@ -21,11 +21,11 @@ Steering wheel Widget
 """
 
 from PySide2.QtCore import QRect, Qt
-from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap
+from PySide2.QtGui import QBrush, QPainter, QPen
 
 from ..api_control import api
 from ..const_file import ImageFile
-from ..validator import image_exists
+from ..userfile.custom_image import load_custom_image
 from ._base import Overlay
 
 
@@ -57,11 +57,17 @@ class Realtime(Overlay):
         self.decimals = max(int(self.wcfg["decimal_places"]), 0)
         text_width = font_m.width * (5 + self.decimals)
 
-        self.pixmap_wheel = load_wheel_image(
-            filename=ImageFile.STEERING_WHEEL,
-            userfile=self.wcfg["custom_steering_wheel_image_file"],
-            size=int(wheel_size * 1.5),
-            show_custom=self.wcfg["show_custom_steering_wheel"],
+        image_size = int(wheel_size * 1.5)
+        if self.wcfg["show_custom_steering_wheel"]:
+            image_file = self.wcfg["custom_steering_wheel_image_file"]
+        else:
+            image_file = ""
+
+        self.pixmap_wheel = load_custom_image(
+            user_file=image_file,
+            default_file=ImageFile.STEERING_WHEEL,
+            width=image_size,
+            height=image_size,
         )
 
         self.rect_bg = QRect(0, 0, area_size, area_size)
@@ -141,13 +147,3 @@ class Realtime(Overlay):
                 text_angle = f"{abs(self.steering_angle):.{self.decimals}f}"
             painter.setPen(self.pen_text)
             painter.drawText(self.rect_text, Qt.AlignCenter, text_angle)
-
-
-def load_wheel_image(filename: str, userfile: str, size: int, show_custom: bool):
-    """Load steering wheel image"""
-    if show_custom:
-        temp_filename = userfile
-        if image_exists(temp_filename):
-            filename = temp_filename
-    icon_source = QPixmap(filename)
-    return icon_source.scaled(size, size, mode=Qt.SmoothTransformation)

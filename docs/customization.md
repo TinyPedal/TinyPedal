@@ -291,7 +291,7 @@ To allow `auto notes loading` function to work, track notes file name must match
 ## Brand logo
 TinyPedal supports user-defined brand logo image in `PNG` format (.png extension) which is placed under `TinyPedal\brandlogo` folder (default).
 
-Note: TinyPedal does not provide brand logo image assets, it is up to user to prepare images. Maximum `PNG` file size is limited to `1MB`.
+Note: TinyPedal does not provide brand logo image assets, it is up to user to prepare images. Maximum `PNG` file size is limited to `5MB`.
 
 How to prepare brand logo image:
 1. Brand logo image should have all transparent borders cropped. For example, in `GIMP` this can be done by selecting `Image` > `Crop to Content`.
@@ -3578,7 +3578,7 @@ Show user-defined custom steering wheel image instead of default image.
     custom_steering_wheel_image_file
 Set custom steering wheel image file path. Double-click this option in widget's `Config` dialog to select an image file.
 
-Note, image file must be in `PNG` format with same width and height. Maximum supported `PNG` file size is limited to `5MB`. Default image will be used if selected image is not valid.
+Note, image file must be in `PNG` format with same width and height. Maximum supported `PNG` file size is limited to `10MB`. Default image will be used if selected image is not valid.
 
     display_size
 Set widget display size in pixels.

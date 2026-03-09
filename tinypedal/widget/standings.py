@@ -26,7 +26,7 @@ from ..api_control import api
 from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
-from ..userfile.brand_logo import load_brand_logo_file
+from ..userfile.custom_image import load_brand_logo_image
 from ..userfile.heatmap import select_compound_symbol
 from ._base import Overlay
 from ._painter import RawFrame
@@ -1029,7 +1029,7 @@ class Realtime(Overlay):
     def set_brand_logo(self, brand_name: str):
         """Set brand logo"""
         if brand_name not in self.pixmap_brandlogo:  # load & cache logo
-            self.pixmap_brandlogo[brand_name] = load_brand_logo_file(
+            self.pixmap_brandlogo[brand_name] = load_brand_logo_image(
                 filepath=self.cfg.path.brand_logo,
                 filename=brand_name,
                 max_width=self.brd_width,

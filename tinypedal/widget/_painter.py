@@ -31,16 +31,6 @@ from PySide2.QtWidgets import QWidget
 from ..const_common import GEAR_SEQUENCE
 
 
-def split_pixmap_icon(
-    pixmap_icon: QPixmap, icon_size: int, h_offset: int = 0, v_offset: int = 0) -> QPixmap:
-    """Split pixmap icon set"""
-    pixmap = QPixmap(icon_size, icon_size)
-    pixmap.fill(Qt.transparent)
-    painter = QPainter(pixmap)
-    painter.drawPixmap(0, 0, pixmap_icon, icon_size * h_offset, icon_size * v_offset, 0, 0)
-    return pixmap
-
-
 class WheelGaugeBar(QWidget):
     """Wheel gauge bar"""
 

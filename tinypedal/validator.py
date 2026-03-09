@@ -119,8 +119,8 @@ def file_last_modified(filepath: str = "", filename: str = "", extension: str = 
     return 0
 
 
-def image_exists(filepath: str, extension: str = FileExt.PNG, max_size: int = 5120000) -> bool:
-    """Validate image file path, file format (default PNG), max file size (default < 5MB)"""
+def image_exists(filepath: str, extension: str = FileExt.PNG, max_size: int = 10_240_000) -> bool:
+    """Validate image file path, file format (default PNG), max file size (default < 10MB)"""
     return (
         os.path.exists(filepath) and
         os.path.getsize(filepath) < max_size and
