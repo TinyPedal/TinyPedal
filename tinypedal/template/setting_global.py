@@ -94,6 +94,9 @@ GLOBAL_DEFAULT = {
         "font_color_auto_backup_car_setup": "#FFFFFF",
         "background_color_auto_backup_car_setup": "#334499",
     },
+    "fuel_calculator": {
+        "show_consumption_history": True,
+    },
     "track_map_viewer": {
         "show_dark_background": True,
         "show_map_info": True,

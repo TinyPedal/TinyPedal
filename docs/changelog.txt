@@ -1,17 +1,24 @@
 WIP
 -----------------------------
-* Major change to option names
-  - To improve readability and support new features (such as option grouping), a large amount options were renamed in this update. All old setting will be automatically transferred and updated under new name.
-    Important note, due to large amount changes to option name, it is recommended to manually backup all your presets before upgrading to this version.
+* Major changes to option names
+  - To improve readability and support new features (such as new option grouping), a large amount options were renamed in this update.
+  - All old setting will be automatically transferred and updated under new option name.
+  - Many widgets received additional separate color options.
+  - Important note:
+    Due to large amount changes to option name, it is recommended to manually backup all your presets before upgrading to new version, especially in case if you wish to downgrade to previous version later.
 
-* Major change to Config Dialog (quality of life)
-  - Added "show_option_group_title" option in "Application" Config dialog (requested by user "Oost-hash"), which groups similar options under same title for improved readability.
-  - Added "Option Search Box" on the top of config dialog (requested by user "Oost-hash"), which allows to quickly filter and find specific options.
-  - Added "Configure Display Order" button, which opens "Display Order" dialog for configuring info display order in widget (implemented by @Oost-hash). This feature is only available for widget with "column_index" option.
+* Major quality of life additions
+  - Thanks to the help from new contributor @Oost-hash, we were able to bring some major quality of life additions to "Config Dialog", which improves user experience with option customization.
+  - Added "show_option_group_title" option in "Application" Config dialog, which groups similar options under same title for improved readability.
+  - Added "Option Search Box" on the top of config dialog, which allows to quickly filter and find specific options.
+  - Added "Configure Display Order" button, which opens "Display Order" dialog for configuring info display order in widget (implemented by @Oost-hash). This feature is only available for widget with "display_order" option.
     To quickly rearranging display order, select a row and drag to reorder.
 
 * Auto Backup Car Setup
   - Added auto backup car setup support for RF2.
+
+* Fuel calculator
+  - Now remembers "Show or Hide History" panel toggle state.
 
 * Track Map Viewer
   - Now remembers each map display setting from context menu.

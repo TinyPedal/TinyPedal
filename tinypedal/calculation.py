@@ -89,6 +89,15 @@ def decimal_strip(raw_range: float, max_decimals: int) -> float:
     return float(value_str[:pos + max_decimals])
 
 
+def dataset_mean(dataset: Sequence[float]) -> float:
+    """Calculate data set mean"""
+    if not dataset:
+        return 0
+    if len(dataset) > 1:
+        return fmean(dataset)
+    return dataset[0]
+
+
 def mean_iter(average: float, value: float, num_samples: int) -> float:
     """Average value"""
     return (average * num_samples + value) / (num_samples + 1)
