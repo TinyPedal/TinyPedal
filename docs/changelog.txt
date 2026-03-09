@@ -1,4 +1,4 @@
-WIP
+2.43.0 (2026-03-09)
 -----------------------------
 * Major changes to option names
   - To improve readability and support new features (such as new option grouping), a large amount options were renamed in this update.
@@ -11,11 +11,11 @@ WIP
   - Thanks to the help from new contributor @Oost-hash, we were able to bring some major quality of life additions to "Config Dialog", which improves user experience with option customization.
   - Added "show_option_group_title" option in "Application" Config dialog, which groups similar options under same title for improved readability.
   - Added "Option Search Box" on the top of config dialog, which allows to quickly filter and find specific options.
-  - Added "Configure Display Order" button, which opens "Display Order" dialog for configuring info display order in widget (implemented by @Oost-hash). This feature is only available for widget with "display_order" option.
+  - Added "Configure Display Order" button, which opens "Display Order" dialog for configuring info display order in widget (implemented by @Oost-hash). This feature is only available for widget with "display order" option.
     To quickly rearranging display order, select a row and drag to reorder.
 
 * Auto Backup Car Setup
-  - Added auto backup car setup support for RF2.
+  - Added auto backup car setup support for "RF2".
 
 * Stats Module
   - Driver stats recording functions are now disabled if multiple TinyPedal instances are running at the same time via command line arguments.
@@ -27,8 +27,9 @@ WIP
   - Now remembers each map display setting from context menu.
 
 * Track map Widget
-  - Added "show_safety_car" and related customizable options (requested by user "yashiman"), which shows safety car position on map if available. This option currently only works in RF2.
-    Note, safety car position has a very low update rate from RF2 API, in order to workaround this limitation, safety car position is interpolated with speed, but may still desync occasionally.
+  - Added "show_safety_car" and related customizable options (requested by user "yashiman"), which shows safety car position on map if available. This option currently only works in "RF2".
+    Note, safety car position data from RF2 API is fairly limited, and has a very low update rate, in order to workaround API limitation, safety car position data is interpolated to display smoothly, but may still desync occasionally.
+    It's also not possible to add safety car display for Radar or Navigation Widget, since precise safety car coordinates data are not available in game API.
 
 * Sectors Widget
   - Moved "enable_all_time_best_sectors" option from "Sectors Module" to "Sectors Widget" for easy access. Old setting will be automatically transferred over.

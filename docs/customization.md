@@ -3866,7 +3866,7 @@ Show outline color based on lap difference (ahead or behind) between player and 
     show_safety_car
 Show safety car position on map if available. This option currently only works in RF2.
 
-Note, safety car position has a very low update rate from RF2 API, in order to workaround this limitation, safety car position is interpolated with speed, but may still desync occasionally.
+Note, safety car position data from RF2 API is fairly limited, and has a very low update rate, in order to workaround API limitation, safety car position data is interpolated to display smoothly, but may still desync occasionally.
 
     safety_car_text
 Set custom text for safety car. Default is `SC`.

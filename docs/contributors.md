@@ -10,7 +10,7 @@
 * Sergio Rafael Lemke (srlemke) - Cross-platform (Linux) assistance, features, bug fixes
 
 ## Implementation
-* Oost-hash - Widget Display Order Configuration Dialog
+* Oost-hash - Widget display order dialog, various features
 * nikidigi - Widget snapping & alignment
 * TiberiuC39 - VR compatibility toggle
 * Sihyung Park (naturale0) - Auto load preset system

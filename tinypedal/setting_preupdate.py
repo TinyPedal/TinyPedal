@@ -32,7 +32,7 @@ def preupdate_global_setting(preset_version: tuple[int, int, int], dict_user: di
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 9), _global_prior_2_42_9),  # 2026-03-07
+        ((2, 43, 0), _global_prior_2_43_0),  # 2026-03-09
     )
     for _version, _update in reversed(target_versions):
         if preset_version < _version:
@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 42, 17), _user_prior_2_42_17),  # 2026-03-07
+        ((2, 43, 0), _user_prior_2_43_0),  # 2026-03-09
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
         ((2, 39, 0), _user_prior_2_39_0),  # 2026-01-13
@@ -59,7 +59,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
 
 
 # Global setting update function
-def _global_prior_2_42_9(dict_user: dict):
+def _global_prior_2_43_0(dict_user: dict):
     # Rename all "bkg_color" to "background_color"
     for option in dict_user.values():
         if isinstance(option, dict):
@@ -67,7 +67,7 @@ def _global_prior_2_42_9(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_42_17(dict_user: dict):
+def _user_prior_2_43_0(dict_user: dict):
     # Prioritized
     # Rename all "column_index" to "display_order"
     for option in dict_user.values():
