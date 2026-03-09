@@ -385,7 +385,7 @@ To allow `Auto Backup Car Setup` function to work, following additional options 
 - `Enable RestAPI Access` & `Enable Garage Setup Info` from `API` option dialog.
 
 Additional notes:
-- Auto backup car setup function is disabled while in `spectate mode` or `state overriding`.
+- Auto backup car setup function is disabled while in `spectate mode` or `state overriding`, or not running in `single instance mode`.
 - Backup file is only generated after leaving pit lane. Stint best lap time (if available) will be auto-appended to backup file name after back to garage.
 - Only one backup file of the most recent setup will be generated if no changes were made.
 - Backup file name format:\
@@ -883,7 +883,7 @@ To clear key binding, click `Clear` button from `Key Binding` dialog.
 
 To clear all key bindings, click `Clear All` from `Hotkey Tab`.
 
-### Available options:
+**Available options:**
 
     overlay_visibility
 Show or hide overlay.
@@ -1310,7 +1310,7 @@ Set road slope classification by slope percent.
 
 Note, by default the editor starts in `Pace Notes` edit mode as displayed in status bar.
 
-**Important note, the editor does not provide `undo` function, it is recommended to save file before doing heavy modification.**
+**Important notes:** The editor does not provide `undo` function, it is recommended to save file before doing heavy modification.
 
 The editor consists of two panel views:
 * Left panel is the `Track Map Viewer`, which can be used to visualize track map and providing analytic info for assisting notes creation. See [Track Map Viewer](#track-map-viewer) section for details.
@@ -1474,7 +1474,11 @@ Enable sectors module.
 ## Stats module
 **This module records driver stats data.**
 
-Note, while `enable_player_index_override` or `enable_active_state_override` option is enabled in [Telemetry API](#telemetry-api), driver stats will not be recorded. Stats are only saved when driver returned to garage.
+**Important notes:** Driver stats will not be recorded while:
+- `enable_player_index_override` or `enable_active_state_override` option is enabled in [Telemetry API](#telemetry-api).
+- `Single instance mode` is disabled via [Command Line Arguments](#command-line-arguments).
+
+Stats are only saved when driver returned to garage.
 
     module_stats
 Enable stats module.
@@ -1718,7 +1722,7 @@ Set duration (seconds) for continuously updating average brake temperature for a
 ## Brake wear
 **This widget displays brake wear info.**
 
-Important note: Brake wear data is currently only available on `LMU`. `RF2` currently doesn't provide brake wear data. Depends on vehicle, brake may or may not have noticeable wear.
+**Important notes:** Brake wear data is currently only available on `LMU`. `RF2` currently doesn't provide brake wear data. Depends on vehicle, brake may or may not have noticeable wear.
 
     layout
 2 layouts are available: `0` = vertical layout, `1` = horizontal layout.

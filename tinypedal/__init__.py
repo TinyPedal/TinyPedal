@@ -40,6 +40,7 @@ class RealtimeState:
         hidden: whether overlay is hidden.
         overriding: whether is state override mode enabled.
         spectating: whether is spectate mode enabled.
+        singleton: whether is single-instance mode enabled.
     """
 
     __slots__ = (
@@ -48,6 +49,7 @@ class RealtimeState:
         "hidden",
         "overriding",
         "spectating",
+        "singleton",
     )
 
     def __init__(self):
@@ -56,6 +58,7 @@ class RealtimeState:
         self.hidden: bool = False
         self.overriding: bool = False
         self.spectating: bool = False
+        self.singleton: bool = False
 
 
 class OverlaySignal(QObject):

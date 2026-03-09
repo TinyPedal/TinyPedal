@@ -30,7 +30,7 @@ from PySide2.QtCore import QCoreApplication, QLocale, Qt
 from PySide2.QtGui import QFont, QGuiApplication, QIcon, QPixmapCache
 from PySide2.QtWidgets import QApplication, QMessageBox
 
-from . import version_check
+from . import realtime_state, version_check
 from .const_app import (
     APP_NAME,
     PLATFORM,
@@ -73,6 +73,7 @@ def is_pid_exist() -> bool:
 
 def single_instance_check(is_single_instance: bool):
     """Single instance check"""
+    realtime_state.singleton = is_single_instance
     # Check if single instance mode enabled
     if not is_single_instance:
         logger.info("Single instance mode: OFF")
@@ -189,7 +190,7 @@ def start_app(cli_args):
     set_environment()
     # Main GUI
     root = init_gui()
-    single_instance_check(cli_args.single_instance)
+    single_instance_check(bool(cli_args.single_instance))
     # Load core modules
     from . import loader
     loader.start()

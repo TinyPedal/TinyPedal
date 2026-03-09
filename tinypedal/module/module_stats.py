@@ -63,7 +63,7 @@ class Realtime(DataModule):
         while not _event_wait(update_interval):
 
             # Ignore stats while in spectate or override mode
-            if realtime_state.spectating or realtime_state.overriding:
+            if not realtime_state.singleton or realtime_state.spectating or realtime_state.overriding:
                 if reset:
                     reset = False  # make sure stats not saved
                     update_interval = self.idle_interval

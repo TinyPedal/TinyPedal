@@ -17,6 +17,9 @@ WIP
 * Auto Backup Car Setup
   - Added auto backup car setup support for RF2.
 
+* Stats Module
+  - Driver stats recording functions are now disabled if multiple TinyPedal instances are running at the same time via command line arguments.
+
 * Fuel calculator
   - Now remembers "Show or Hide History" panel toggle state.
 
