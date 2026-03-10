@@ -53,7 +53,7 @@ class DisplayOrder(BaseDialog):
         self.list_widget = DisplayOrderList(self, default_orders)
         self.list_widget.setSelectionMode(QListWidget.SingleSelection)
         self.list_widget.setDragDropMode(QAbstractItemView.InternalMove)
-        self.list_widget.setSpacing(1)
+        self.list_widget.setSpacing(0)
         self.list_widget.refresh(self.temp_orders)
 
         # Button
@@ -144,10 +144,10 @@ class DisplayOrderList(QListWidget):
 
     def set_min_height(self, rows: int, min_rows: int = 5):
         """Set minimum list height based on row height"""
+        margin = 1
         row_height = self.sizeHintForRow(0)
-        row_spacing = self.spacing()
         row_count = max(rows, min_rows)
-        list_height = (row_height + row_spacing * 2) * row_count + row_spacing * 2
+        list_height = row_height * row_count + margin * 2
         self.setMinimumHeight(list_height)
 
     def _add_item(self, key: str):

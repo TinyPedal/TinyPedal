@@ -429,7 +429,7 @@ def set_style_window(base_font_pt: int) -> str:
             outline: none;
         }}
         DisplayOrder > QListView::item {{
-            border: none;
+            margin: 1px;
             padding: 0.1em;
             border: 0.1em solid {color_disabled_highlight};
         }}
