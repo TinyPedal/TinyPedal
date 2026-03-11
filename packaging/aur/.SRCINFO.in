@@ -1,0 +1,18 @@
+pkgbase = tinypedal
+    pkgdesc = TinyPedal is a Free and Open Source telemetry overlay application for racing simulation.
+    pkgver = {{PKGVER}}
+    pkgrel = 1
+    url = https://github.com/TinyPedal/TinyPedal
+    arch = any
+    license = GPL3
+    license = CC-BY-SA-4.0
+    depends = python
+    depends = python-psutil
+    depends = python-pyxdg
+    depends = pyside6
+    optdepends = python-pyside2: Use PySide2 instead of PySide6
+    install = tinypedal.install
+    source = tinypedal-{{PKGVER}}.tar.gz::https://github.com/TinyPedal/TinyPedal/archive/refs/tags/v{{PKGVER}}.tar.gz
+    sha256sums = SKIP
+
+pkgname = tinypedal
