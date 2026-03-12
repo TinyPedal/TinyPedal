@@ -111,6 +111,13 @@ class APIControl:
         self._api.stop()
         logger.info("DISCONNECTED: %s API", self._api.NAME)
 
+    def close(self):
+        """Close & dereference API"""
+        if self._api:
+            self._api.close()
+        for var in self.__slots__:
+            setattr(self, var, None)
+
     def restart(self):
         """Restart API"""
         self.stop()

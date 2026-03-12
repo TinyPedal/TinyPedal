@@ -79,8 +79,10 @@ def close():
     logger.info("CLOSING............")
     # 1 unload modules
     unload_modules()
-    # 2 stop api
+    # 2 stop & close api
     api.stop()
+    api.close()
+    logger.info("API: closed")
 
 
 def restart():

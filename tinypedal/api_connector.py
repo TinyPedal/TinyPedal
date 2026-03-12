@@ -59,6 +59,11 @@ class Connector(ABC):
     def setup(self, config: dict):
         """Setup API parameters"""
 
+    def close(self):
+        """Dereference all instances"""
+        for var in self.__slots__:
+            setattr(self, var, None)
+
 
 class SimLMU(Connector):
     """Le Mans Ultimate - LMU Native Sharedmemory API"""
