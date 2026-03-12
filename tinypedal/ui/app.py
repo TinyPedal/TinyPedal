@@ -366,6 +366,7 @@ class AppWindow(QMainWindow):
         """Show app window"""
         self.showNormal()
         self.activateWindow()
+        app_signal.refresh.emit(True)
 
     @Slot(bool)  # type: ignore[operator]
     def quit_app(self):

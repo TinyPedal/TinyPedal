@@ -1,3 +1,8 @@
+WIP
+-----------------------------
+* Misc
+  - Fixed partially uninitialized notification when "Show at Startup" option was disabled (reported by "sepi").
+
 2.43.0 (2026-03-09)
 -----------------------------
 * Major changes to option names
