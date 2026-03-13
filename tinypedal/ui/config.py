@@ -210,12 +210,20 @@ class UserConfig(BaseDialog):
     """User configuration"""
 
     def __init__(
-        self, parent, key_name: str, cfg_type: str, user_setting: dict,
-        default_setting: dict, reload_func: Callable, option_width: int = 9):
+        self,
+        parent,
+        key_name: str,
+        cfg_type: str,
+        user_setting: dict,
+        default_setting: dict,
+        reload_func: Callable,
+        option_width: int = 9,
+        allow_apply: bool = True,
+    ):
         """
         Args:
             key_name: config key name.
-            cfg_type: config type name from "ConfigType".
+            cfg_type: config type name from "ConfigType", set to "" for none config type.
             user_setting: user setting dictionary, ex. cfg.user.setting.
             default_setting: default setting dictionary, ex. cfg.default.setting.
             reload_func: config reload (callback) function.
@@ -284,6 +292,9 @@ class UserConfig(BaseDialog):
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
         layout_button.addWidget(button_save)
+
+        if not allow_apply:
+            button_apply.hide()
 
         # Set layout
         layout_main = QVBoxLayout()
@@ -356,16 +367,18 @@ class UserConfig(BaseDialog):
                 self.value_error_message(key)
                 return
             user_setting[key] = value
-        # Save global settings
-        if self.cfg_type == ConfigType.CONFIG:
-            cfg.update_path()
-            cfg.save(0, cfg_type=ConfigType.CONFIG)
-        # Save user preset settings
-        else:
-            cfg.save(0)
-        # Wait saving finish
-        while cfg.is_saving:
-            time.sleep(0.01)
+        # Check saving type
+        if self.cfg_type:
+            # Save global settings
+            if self.cfg_type == ConfigType.CONFIG:
+                cfg.update_path()
+                cfg.save(0, cfg_type=ConfigType.CONFIG)
+            # Save user preset settings
+            else:
+                cfg.save(0)
+            # Wait saving finish
+            while cfg.is_saving:
+                time.sleep(0.01)
         # Reload
         self.reloading()
         # Close
@@ -571,6 +584,8 @@ class UserConfig(BaseDialog):
 
 def set_preset_name(cfg_type: str) -> str:
     """Set preset name"""
+    if not cfg_type:
+        return ""
     if cfg_type == ConfigType.CONFIG:
         return f"{cfg.filename.config} (global)"
     return cfg.filename.setting

@@ -161,7 +161,11 @@ class BaseDialog(QDialog):
 
     def set_config_title(self, option_name: str, preset_name: str):
         """Set config dialog title"""
-        self.setWindowTitle(f"{option_name} - {preset_name}")
+        if preset_name:
+            title = f"{option_name} - {preset_name}"
+        else:
+            title = option_name
+        self.setWindowTitle(title)
 
     def set_utility_title(self, name: str):
         """Set utility dialog title"""
