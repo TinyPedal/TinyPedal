@@ -195,7 +195,7 @@ class FuelCalculator(BaseDialog):
 
         if checked != cfg.user.config["fuel_calculator"]["show_consumption_history"]:
             cfg.user.config["fuel_calculator"]["show_consumption_history"] = checked
-            cfg.save(cfg_type=ConfigType.CONFIG)
+            cfg.save(config_type=ConfigType.CONFIG)
 
 
 class PitStopPreview(QWidget):

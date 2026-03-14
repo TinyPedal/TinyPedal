@@ -326,7 +326,7 @@ class MapView(QWidget):
         if action:
             name = "show_" + action.text().replace(" ", "_").lower()
             self.ecfg[name] = not self.ecfg[name]
-            cfg.save(cfg_type=ConfigType.CONFIG)
+            cfg.save(config_type=ConfigType.CONFIG)
             self.update()
 
     def open_config_dialog(self):
@@ -335,7 +335,7 @@ class MapView(QWidget):
             parent=self,
             key_name="track_map_viewer",
             preset_name=cfg.filename.config,
-            cfg_type=ConfigType.CONFIG,
+            config_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
             reload_func=self.load_config,

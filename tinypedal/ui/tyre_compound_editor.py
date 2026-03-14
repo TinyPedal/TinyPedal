@@ -253,7 +253,7 @@ class TyreCompoundEditor(BaseEditor):
         """Save setting"""
         self.update_compounds_temp()
         cfg.user.compounds = copy_setting(self.compounds_temp)
-        cfg.save(0, cfg_type=ConfigType.COMPOUNDS)
+        cfg.save(0, config_type=ConfigType.COMPOUNDS)
         while cfg.is_saving:  # wait saving finish
             time.sleep(0.01)
         self.reloading()

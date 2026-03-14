@@ -214,7 +214,7 @@ class UserConfig(BaseDialog):
         parent,
         key_name: str,
         preset_name: str,
-        cfg_type: str,
+        config_type: str,
         user_setting: dict,
         default_setting: dict,
         reload_func: Callable,
@@ -224,18 +224,18 @@ class UserConfig(BaseDialog):
         Args:
             key_name: config key name.
             preset_name: preset name, can be file name.
-            cfg_type: config type name from "ConfigType"; set to "" for non-preset config type (apply only, without save button).
+            config_type: config type name from "ConfigType"; set to "" for non-preset config type (apply only, without save button).
             user_setting: user setting dictionary, ex. cfg.user.setting.
             default_setting: default setting dictionary, ex. cfg.default.setting.
             reload_func: config reload (callback) function.
             option_width: option column width in pixels.
         """
         super().__init__(parent)
-        self.set_config_title(format_option_name(key_name), set_preset_name(preset_name, cfg_type))
+        self.set_config_title(format_option_name(key_name), set_preset_name(preset_name, config_type))
 
         self.reloading = reload_func
         self.key_name = key_name
-        self.cfg_type = cfg_type
+        self.config_type = config_type
         self.user_setting = user_setting
         self.default_setting = default_setting
         self.option_width = UIScaler.size(option_width)
@@ -274,7 +274,7 @@ class UserConfig(BaseDialog):
         layout_search.addWidget(button_clearsearch)
 
         # Button
-        has_display_order = (cfg_type == ConfigType.WIDGET and self.has_display_order())
+        has_display_order = (config_type == ConfigType.WIDGET and self.has_display_order())
         if has_display_order:
             button_display_order = QPushButton("Configure Display Order")
             button_display_order.clicked.connect(self.open_display_order)
@@ -299,7 +299,7 @@ class UserConfig(BaseDialog):
         layout_button.addWidget(button_save)
         layout_button.addWidget(button_cancel)
 
-        if not self.cfg_type:
+        if not self.config_type:
             button_save.hide()
 
         # Set layout
@@ -349,7 +349,7 @@ class UserConfig(BaseDialog):
     def applying(self):
         """Save & apply"""
         self.save_setting()
-        if not self.cfg_type:
+        if not self.config_type:
             self.accept()
 
     def saving(self):
@@ -377,11 +377,11 @@ class UserConfig(BaseDialog):
                 return
             user_setting[key] = value
         # Check saving type
-        if self.cfg_type:
+        if self.config_type:
             # Save global settings
-            if self.cfg_type == ConfigType.CONFIG:
+            if self.config_type == ConfigType.CONFIG:
                 cfg.update_path()
-                cfg.save(0, cfg_type=ConfigType.CONFIG)
+                cfg.save(0, config_type=ConfigType.CONFIG)
             # Save user preset settings
             else:
                 cfg.save(0)
@@ -588,9 +588,9 @@ class UserConfig(BaseDialog):
         self.option_edit[key] = editor
 
 
-def set_preset_name(preset_name: str, cfg_type: str) -> str:
+def set_preset_name(preset_name: str, config_type: str) -> str:
     """Set preset name"""
-    if cfg_type == ConfigType.CONFIG:
+    if config_type == ConfigType.CONFIG:
         preset_name += " (global)"
     return preset_name
 

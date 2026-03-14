@@ -194,7 +194,7 @@ class StatusButtonBar(QStatusBar):
             return
 
         cfg.application["enable_high_dpi_scaling"] = not cfg.application["enable_high_dpi_scaling"]
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        cfg.save(config_type=ConfigType.CONFIG)
         loader.restart()
 
     def toggle_color_theme(self):
@@ -203,7 +203,7 @@ class StatusButtonBar(QStatusBar):
             cfg.application["window_color_theme"] = "Light"
         else:
             cfg.application["window_color_theme"] = "Dark"
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        cfg.save(config_type=ConfigType.CONFIG)
         app_signal.refresh.emit(True)
 
 
@@ -360,7 +360,7 @@ class AppWindow(QMainWindow):
                 save_changes = True
 
         if save_changes:
-            cfg.save(0, cfg_type=ConfigType.CONFIG)
+            cfg.save(0, config_type=ConfigType.CONFIG)
 
     def show_app(self):
         """Show app window"""

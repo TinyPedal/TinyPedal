@@ -85,7 +85,7 @@ def hotkey_select_next_api():
         save_type = ConfigType.SETTING
     else:
         save_type = ConfigType.CONFIG
-    cfg.save(cfg_type=save_type)
+    cfg.save(config_type=save_type)
     api.restart()
     app_signal.refresh.emit(True)
 
@@ -104,7 +104,7 @@ def hotkey_select_previous_api():
         save_type = ConfigType.SETTING
     else:
         save_type = ConfigType.CONFIG
-    cfg.save(cfg_type=save_type)
+    cfg.save(config_type=save_type)
     api.restart()
     app_signal.refresh.emit(True)
 

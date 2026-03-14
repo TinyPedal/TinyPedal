@@ -216,7 +216,7 @@ class VehicleClassEditor(BaseEditor):
         """Save setting"""
         self.update_classes_temp()
         cfg.user.classes = copy_setting(self.classes_temp)
-        cfg.save(0, cfg_type=ConfigType.CLASSES)
+        cfg.save(0, config_type=ConfigType.CLASSES)
         while cfg.is_saving:  # wait saving finish
             time.sleep(0.01)
         self.reloading()

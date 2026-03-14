@@ -326,7 +326,7 @@ class HeatmapEditor(BaseEditor):
         """Save heatmap"""
         self.update_heatmap_temp()
         cfg.user.heatmap = copy_setting(self.heatmap_temp)
-        cfg.save(0, cfg_type=ConfigType.HEATMAP)
+        cfg.save(0, config_type=ConfigType.HEATMAP)
         while cfg.is_saving:  # wait saving finish
             time.sleep(0.01)
         self.reloading()

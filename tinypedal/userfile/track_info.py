@@ -52,4 +52,4 @@ def save_track_info(track_name: str, **track_info: dict) -> None:
     if not isinstance(track, dict):
         track = add_missing_track(track_name)
     track.update(track_info)
-    cfg.save(cfg_type=ConfigType.TRACKS)
+    cfg.save(config_type=ConfigType.TRACKS)

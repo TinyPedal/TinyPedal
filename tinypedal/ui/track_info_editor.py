@@ -283,7 +283,7 @@ class TrackInfoEditor(BaseEditor):
         """Save setting"""
         self.update_tracks_temp()
         cfg.user.tracks = copy_setting(self.tracks_temp)
-        cfg.save(0, cfg_type=ConfigType.TRACKS)
+        cfg.save(0, config_type=ConfigType.TRACKS)
         while cfg.is_saving:  # wait saving finish
             time.sleep(0.01)
         self.reloading()

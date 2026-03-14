@@ -139,7 +139,7 @@ class PresetList(QWidget):
     def toggle_autoload(checked: bool):
         """Toggle auto load preset"""
         cfg.application["enable_auto_load_preset"] = checked
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        cfg.save(config_type=ConfigType.CONFIG)
 
     def open_context_menu(self, position: QPoint):
         """Open context menu"""
@@ -177,13 +177,13 @@ class PresetList(QWidget):
         # Set primary preset Class
         if action in cfg.user.classes:
             cfg.user.classes[action]["preset"] = selected_preset_name
-            cfg.save(cfg_type=ConfigType.CLASSES)
+            cfg.save(config_type=ConfigType.CLASSES)
         # Clear primary preset tag
         elif action == "Clear Primary Tag":
             for class_name, class_data in cfg.user.classes.items():
                 if selected_preset_name == class_data["preset"]:
                     class_data["preset"] = ""
-                    cfg.save(cfg_type=ConfigType.CLASSES)
+                    cfg.save(config_type=ConfigType.CLASSES)
         # Lock/unlock preset
         elif action == "Lock Preset":
             msg_text = (
@@ -192,12 +192,12 @@ class PresetList(QWidget):
             )
             if self.confirm_operation(title="Lock Preset", message=msg_text):
                 cfg.user.filelock[selected_filename] = {"version": VERSION}
-                cfg.save(cfg_type=ConfigType.FILELOCK)
+                cfg.save(config_type=ConfigType.FILELOCK)
         elif action == "Unlock Preset":
             msg_text = f"Unlock <b>{selected_filename}</b> preset?"
             if self.confirm_operation(title="Unlock Preset", message=msg_text):
                 if cfg.user.filelock.pop(selected_filename, None):
-                    cfg.save(cfg_type=ConfigType.FILELOCK)
+                    cfg.save(config_type=ConfigType.FILELOCK)
         # Duplicate preset
         elif action == "Duplicate":
             _dialog = CreatePreset(

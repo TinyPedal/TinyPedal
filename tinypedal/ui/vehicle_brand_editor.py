@@ -323,7 +323,7 @@ class VehicleBrandEditor(BaseEditor):
         """Save setting"""
         self.update_brands_temp()
         cfg.user.brands = copy_setting(self.brands_temp)
-        cfg.save(0, cfg_type=ConfigType.BRANDS)
+        cfg.save(0, config_type=ConfigType.BRANDS)
         while cfg.is_saving:  # wait saving finish
             time.sleep(0.01)
         self.reloading()

@@ -352,7 +352,7 @@ class ConfigMenu(QMenu):
             parent=self._parent,
             key_name="application",
             preset_name=cfg.filename.config,
-            cfg_type=ConfigType.CONFIG,
+            config_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
             reload_func=menu_reload_preset,
@@ -365,7 +365,7 @@ class ConfigMenu(QMenu):
             parent=self._parent,
             key_name="compatibility",
             preset_name=cfg.filename.config,
-            cfg_type=ConfigType.CONFIG,
+            config_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
             reload_func=menu_reload_preset,
@@ -378,7 +378,7 @@ class ConfigMenu(QMenu):
             parent=self._parent,
             key_name="user_path",
             preset_name=cfg.filename.config,
-            cfg_type=ConfigType.CONFIG,
+            config_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
             reload_func=menu_reload_preset,
@@ -392,7 +392,7 @@ class ConfigMenu(QMenu):
             parent=self._parent,
             key_name="notification",
             preset_name=cfg.filename.config,
-            cfg_type=ConfigType.CONFIG,
+            config_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
             reload_func=menu_refresh_only,
@@ -405,7 +405,7 @@ class ConfigMenu(QMenu):
             parent=self._parent,
             key_name="units",
             preset_name=cfg.filename.setting,
-            cfg_type=ConfigType.SETTING,
+            config_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,
             reload_func=menu_reload_only,
@@ -469,14 +469,14 @@ class APIMenu(QMenu):
         """Toggle API selection mode"""
         enabled = cfg.telemetry["enable_api_selection_from_preset"]
         cfg.telemetry["enable_api_selection_from_preset"] = not enabled
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        cfg.save(config_type=ConfigType.CONFIG)
         menu_reload_only()
 
     def toggle_carsetup_backup(self):
         """Toggle auto car setup backup"""
         enabled = cfg.telemetry["enable_auto_backup_car_setup"]
         cfg.telemetry["enable_auto_backup_car_setup"] = not enabled
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        cfg.save(config_type=ConfigType.CONFIG)
         menu_refresh_only()
 
     def toggle_legacy_api(self):
@@ -497,7 +497,7 @@ class APIMenu(QMenu):
         if restart_msg != QMessageBox.Yes:
             return
         cfg.telemetry["enable_legacy_api_selection"] = not enabled
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        cfg.save(config_type=ConfigType.CONFIG)
         loader.restart()
 
     def open_config_api(self):
@@ -506,7 +506,7 @@ class APIMenu(QMenu):
             parent=self._parent,
             key_name=cfg.api_key,
             preset_name=cfg.filename.setting,
-            cfg_type=ConfigType.SETTING,
+            config_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,
             reload_func=menu_restart_api,
@@ -539,7 +539,7 @@ class APIMenu(QMenu):
             save_type = ConfigType.SETTING
         else:
             save_type = ConfigType.CONFIG
-        cfg.save(cfg_type=save_type)
+        cfg.save(config_type=save_type)
         menu_reload_only()
 
 
@@ -686,7 +686,7 @@ class WindowMenu(QMenu):
     def __toggle_option(option_name: str):
         """Toggle option"""
         cfg.application[option_name] = not cfg.application[option_name]
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        cfg.save(config_type=ConfigType.CONFIG)
 
 
 class HelpMenu(QMenu):

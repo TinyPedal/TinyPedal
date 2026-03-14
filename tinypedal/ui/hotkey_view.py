@@ -108,7 +108,7 @@ class HotkeyList(QWidget):
     def toggle_hotkey(self, checked: bool):
         """Toggle hotkey mode"""
         cfg.application["enable_global_hotkey"] = checked
-        cfg.save(cfg_type=ConfigType.CONFIG)
+        cfg.save(config_type=ConfigType.CONFIG)
         kctrl.reload()
         app_signal.refresh.emit(True)
 
@@ -156,7 +156,7 @@ class HotkeyList(QWidget):
             # Clear all shortcuts
             for options in cfg.user.shortcuts.values():
                 options["bind"] = ""
-            cfg.save(0, cfg_type=ConfigType.SHORTCUTS)
+            cfg.save(0, config_type=ConfigType.SHORTCUTS)
             # Refresh button
             listbox_hotkey = self.listbox_hotkey
             for row_index in range(listbox_hotkey.count()):
@@ -289,7 +289,7 @@ class ConfigHotkey(BaseDialog):
             if self.check_duplicates(self.temp_hotkey):
                 return
             cfg.user.shortcuts[self.option_name]["bind"] = self.temp_hotkey
-            cfg.save(0, cfg_type=ConfigType.SHORTCUTS)
+            cfg.save(0, config_type=ConfigType.SHORTCUTS)
         self.close()
 
     def check_duplicates(self, temp_hotkey: str) -> bool:

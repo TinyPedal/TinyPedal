@@ -375,29 +375,29 @@ class Setting:
             JSON filename (without file extension) list.
         """
         if by_date:
-            date_cfg_list = (
+            date_file_list = (
                 (os.path.getmtime(f"{self.path.settings}{_filename}"), _filename[:-5])
                 for _filename in os.listdir(self.path.settings)
                 if _filename.lower().endswith(FileExt.JSON)
             )
-            valid_cfg_list = [
+            valid_file_list = [
                 _filename[1]
-                for _filename in sorted(date_cfg_list, reverse=reverse)
+                for _filename in sorted(date_file_list, reverse=reverse)
                 if is_allowed_filename(_filename[1])
             ]
         else:
-            name_cfg_list = (
+            name_file_list = (
                 _filename[:-5]
                 for _filename in os.listdir(self.path.settings)
                 if _filename.lower().endswith(FileExt.JSON)
             )
-            valid_cfg_list = [
+            valid_file_list = [
                 _filename
-                for _filename in sorted(name_cfg_list, key=lambda n:n.lower(), reverse=reverse)
+                for _filename in sorted(name_file_list, key=lambda n:n.lower(), reverse=reverse)
                 if is_allowed_filename(_filename)
             ]
-        if valid_cfg_list:
-            return valid_cfg_list
+        if valid_file_list:
+            return valid_file_list
         return ["default"]
 
     def create(self, filename: str):
@@ -409,14 +409,14 @@ class Setting:
             max_attempts=self.max_saving_attempts,
         )
 
-    def save(self, delay: int = 66, cfg_type: str = ConfigType.SETTING, next_task: bool = False):
+    def save(self, delay: int = 66, config_type: str = ConfigType.SETTING, next_task: bool = False):
         """Save trigger, limit to one save operation for a given period.
 
         Args:
             count:
                 Set time delay(count) that can be refreshed before starting saving thread.
                 Default is roughly one sec delay, use 0 for instant saving.
-            cfg_type:
+            config_type:
                 Set saving config type.
             next_task:
                 Skip adding save task, run next save task in queue.
@@ -426,20 +426,20 @@ class Setting:
             return
 
         self._save_delay = delay
-        filename = getattr(self.filename, cfg_type, None)
+        filename = getattr(self.filename, config_type, None)
         if filename in self._save_queue:
             return
 
         # Check if valid file name
         if filename is None:
-            logger.error("USERDATA: invalid config type %s, abort saving", cfg_type)
+            logger.error("USERDATA: invalid config type %s, abort saving", config_type)
         # Check if file is locked
         elif filename in self.user.filelock:
             logger.info("USERDATA: %s is locked, changes not saved", filename)
         # Add to save queue
         elif filename not in self._save_queue:
             # Save to global config path
-            if cfg_type in (
+            if config_type in (
                 ConfigType.CONFIG,
                 ConfigType.FILELOCK,
                 ConfigType.SHORTCUTS,
@@ -448,7 +448,7 @@ class Setting:
             # Save to settings (preset) path
             else:
                 filepath = self.path.settings
-            dict_user = getattr(self.user, cfg_type)
+            dict_user = getattr(self.user, config_type)
             self._save_queue[filename] = (filepath, dict_user)
 
         if not self._save_queue:
