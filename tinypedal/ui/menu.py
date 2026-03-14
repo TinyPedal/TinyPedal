@@ -351,6 +351,7 @@ class ConfigMenu(QMenu):
         _dialog = UserConfig(
             parent=self._parent,
             key_name="application",
+            preset_name=cfg.filename.config,
             cfg_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
@@ -363,6 +364,7 @@ class ConfigMenu(QMenu):
         _dialog = UserConfig(
             parent=self._parent,
             key_name="compatibility",
+            preset_name=cfg.filename.config,
             cfg_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
@@ -375,6 +377,7 @@ class ConfigMenu(QMenu):
         _dialog = UserConfig(
             parent=self._parent,
             key_name="user_path",
+            preset_name=cfg.filename.config,
             cfg_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
@@ -388,6 +391,7 @@ class ConfigMenu(QMenu):
         _dialog = UserConfig(
             parent=self._parent,
             key_name="notification",
+            preset_name=cfg.filename.config,
             cfg_type=ConfigType.CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
@@ -400,6 +404,7 @@ class ConfigMenu(QMenu):
         _dialog = UserConfig(
             parent=self._parent,
             key_name="units",
+            preset_name=cfg.filename.setting,
             cfg_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,
@@ -500,6 +505,7 @@ class APIMenu(QMenu):
         _dialog = UserConfig(
             parent=self._parent,
             key_name=cfg.api_key,
+            preset_name=cfg.filename.setting,
             cfg_type=ConfigType.SETTING,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,

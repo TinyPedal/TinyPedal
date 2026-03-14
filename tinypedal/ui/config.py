@@ -213,24 +213,25 @@ class UserConfig(BaseDialog):
         self,
         parent,
         key_name: str,
+        preset_name: str,
         cfg_type: str,
         user_setting: dict,
         default_setting: dict,
         reload_func: Callable,
         option_width: int = 9,
-        allow_apply: bool = True,
     ):
         """
         Args:
             key_name: config key name.
-            cfg_type: config type name from "ConfigType", set to "" for none config type.
+            preset_name: preset name, can be file name.
+            cfg_type: config type name from "ConfigType"; set to "" for non-preset config type (apply only, without save button).
             user_setting: user setting dictionary, ex. cfg.user.setting.
             default_setting: default setting dictionary, ex. cfg.default.setting.
             reload_func: config reload (callback) function.
             option_width: option column width in pixels.
         """
         super().__init__(parent)
-        self.set_config_title(format_option_name(key_name), set_preset_name(cfg_type))
+        self.set_config_title(format_option_name(key_name), set_preset_name(preset_name, cfg_type))
 
         self.reloading = reload_func
         self.key_name = key_name
@@ -266,6 +267,7 @@ class UserConfig(BaseDialog):
 
         button_clearsearch = CompactButton("Clear")
         button_clearsearch.clicked.connect(edit_search.clear)
+        button_clearsearch.setFocusPolicy(Qt.NoFocus)
 
         layout_search = QHBoxLayout()
         layout_search.addWidget(edit_search, stretch=1)
@@ -279,22 +281,26 @@ class UserConfig(BaseDialog):
 
         button_reset = QDialogButtonBox(QDialogButtonBox.Reset)
         button_reset.clicked.connect(self.reset_setting)
+        button_reset.setFocusPolicy(Qt.NoFocus)
 
         button_apply = QDialogButtonBox(QDialogButtonBox.Apply)
         button_apply.clicked.connect(self.applying)
 
-        button_save = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        button_save = QDialogButtonBox(QDialogButtonBox.Save)
         button_save.accepted.connect(self.saving)
-        button_save.rejected.connect(self.reject)
+
+        button_cancel = QDialogButtonBox(QDialogButtonBox.Cancel)
+        button_cancel.rejected.connect(self.reject)
 
         layout_button = QHBoxLayout()
         layout_button.addWidget(button_reset)
         layout_button.addStretch(1)
         layout_button.addWidget(button_apply)
         layout_button.addWidget(button_save)
+        layout_button.addWidget(button_cancel)
 
-        if not allow_apply:
-            button_apply.hide()
+        if not self.cfg_type:
+            button_save.hide()
 
         # Set layout
         layout_main = QVBoxLayout()
@@ -342,11 +348,14 @@ class UserConfig(BaseDialog):
 
     def applying(self):
         """Save & apply"""
-        self.save_setting(close=False)
+        self.save_setting()
+        if not self.cfg_type:
+            self.accept()
 
     def saving(self):
         """Save & close"""
-        self.save_setting(close=True)
+        self.save_setting()
+        self.accept()
 
     def reset_setting(self):
         """Reset setting"""
@@ -358,7 +367,7 @@ class UserConfig(BaseDialog):
             for editor in self.option_edit.values():
                 editor.reset_to_default()
 
-    def save_setting(self, close: bool):
+    def save_setting(self):
         """Save setting"""
         user_setting = self.user_setting[self.key_name]
         for key, editor in self.option_edit.items():
@@ -381,9 +390,6 @@ class UserConfig(BaseDialog):
                 time.sleep(0.01)
         # Reload
         self.reloading()
-        # Close
-        if close:
-            self.accept()
 
     def value_error_message(self, option_name: str):
         """Value error message"""
@@ -582,13 +588,11 @@ class UserConfig(BaseDialog):
         self.option_edit[key] = editor
 
 
-def set_preset_name(cfg_type: str) -> str:
+def set_preset_name(preset_name: str, cfg_type: str) -> str:
     """Set preset name"""
-    if not cfg_type:
-        return ""
     if cfg_type == ConfigType.CONFIG:
-        return f"{cfg.filename.config} (global)"
-    return cfg.filename.setting
+        preset_name += " (global)"
+    return preset_name
 
 
 def is_different_option(key: str, next_key: str) -> bool:

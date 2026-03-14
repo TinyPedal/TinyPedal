@@ -618,6 +618,7 @@ def config_widget(widget_name: str):
     _dialog = UserConfig(
         parent=_widget,
         key_name=widget_name,
+        preset_name=cfg.filename.setting,
         cfg_type=wctrl.type_id,
         user_setting=cfg.user.setting,
         default_setting=cfg.default.setting,

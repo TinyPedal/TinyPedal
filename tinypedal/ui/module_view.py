@@ -191,6 +191,7 @@ class ModuleControlItem(QWidget):
         _dialog = UserConfig(
             parent=self._parent,
             key_name=self.module_name,
+            preset_name=cfg.filename.setting,
             cfg_type=self.module_control.type_id,
             user_setting=cfg.user.setting,
             default_setting=cfg.default.setting,
