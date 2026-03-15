@@ -2109,6 +2109,11 @@ Set amount lap threshold to show low fuel indicator when total completable laps 
     show_speed_limiter
 Show speed limiter indicator.
 
+    show_current_speed_while_limiter_on
+Show current vehicle speed while speed limiter is on. This option is enabled by default.
+
+Note, while enabled, the first letter of `speed_limiter_text` option will be displayed as prefix beside speed reading. Remove all text from `speed_limiter_text` option will show only speed reading.
+
     speed_limiter_text
 Set custom pit speed limiter text which shows when speed limiter is engaged.
 

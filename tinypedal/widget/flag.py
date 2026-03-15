@@ -53,6 +53,7 @@ class Realtime(Overlay):
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
         self.unit_dist = units.set_unit_distance(self.cfg.units["distance_unit"])
+        self.unit_speed = units.set_unit_speed(self.cfg.units["speed_unit"])
         self.symbol_dist = units.set_symbol_distance(self.cfg.units["distance_unit"])
 
         # Pit status
@@ -101,8 +102,11 @@ class Realtime(Overlay):
 
         # Speed limiter
         if self.wcfg["show_speed_limiter"]:
+            self.decimals_speed = max(self.wcfg["decimal_places_speed"], 0)
+            limiter_text = self.wcfg["speed_limiter_text"]
+            self.prefix_limiter = limiter_text[0] if limiter_text else ""
             self.bar_limiter = self.set_rawtext(
-                text=self.wcfg["speed_limiter_text"],
+                text=limiter_text,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -257,7 +261,11 @@ class Realtime(Overlay):
         # Pit limiter
         if self.wcfg["show_speed_limiter"]:
             limiter_state = api.read.switch.speed_limiter()
-            self.update_limiter(self.bar_limiter, limiter_state)
+            if limiter_state and self.wcfg["show_current_speed_while_limiter_on"]:
+                speed = api.read.vehicle.speed()
+            else:
+                speed = -1
+            self.update_limiter(self.bar_limiter, limiter_state, speed)
 
         # Blue flag
         if self.wcfg["show_blue_flag"]:
@@ -330,11 +338,22 @@ class Realtime(Overlay):
                 target.state = hidden
                 target.setHidden(hidden)
 
-    def update_limiter(self, target, data):
+    def update_limiter(self, target, *data):
         """Speed limiter"""
         if target.last != data:
             target.last = data
-            target.setHidden(not data)
+            hidden = not data[0]
+            if data[0] and data[1] >= 0:
+                if self.prefix_limiter:
+                    text_limiter = f"{self.prefix_limiter}{self.unit_speed(data[1]): >6.{self.decimals_speed}f}"[:7]
+                else:
+                    text_limiter = f"{self.unit_speed(data[1]):.{self.decimals_speed}f}"[:7]
+                target.text = text_limiter
+                target.update()
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
 
     def update_blueflag(self, target, data):
         """Blue flag"""

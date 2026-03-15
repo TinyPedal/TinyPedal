@@ -1,5 +1,10 @@
 WIP
 -----------------------------
+* Flag Widget
+  - Added "show_current_speed_while_limiter_on" option (requested by user "sdmichaels"), which shows current vehicle speed while speed limiter is on. This option is now enabled by default.
+    Note, while enabled, the first letter of "speed_limiter_text" option will be displayed as prefix beside speed reading. Remove all text from "speed_limiter_text" option will show only speed reading.
+  - Added "decimal_places_speed" option.
+
 * Misc
   - Fixed partially uninitialized notification when "Show at Startup" option was disabled (reported by "sepi").
 

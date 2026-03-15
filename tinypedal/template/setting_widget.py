@@ -635,6 +635,8 @@ WIDGET_DEFAULT = {
         "font_color_low_fuel": "#000000",
         "background_color_low_fuel": "#EE7700",
         "show_speed_limiter": True,
+        "show_current_speed_while_limiter_on": True,
+        "decimal_places_speed": 2,
         "speed_limiter_text": "LIMITER",
         "font_color_speed_limiter": "#000000",
         "background_color_speed_limiter": "#FF2200",
