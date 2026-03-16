@@ -30,7 +30,7 @@ jobs:
 
     steps:
     - name: Checkout master and submodules
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         submodules: "true"
 
@@ -71,7 +71,7 @@ jobs:
 
     steps:
     - name: Checkout master and submodules
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         submodules: "true"
 
@@ -120,7 +120,7 @@ jobs:
 
     steps:
     - name: Checkout master and submodules
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Get latest change log
       run: |
