@@ -97,6 +97,9 @@ GLOBAL_DEFAULT = {
     "fuel_calculator": {
         "show_consumption_history": True,
     },
+    "tyre_strategy_planner": {
+        "last_file_path": "",
+    },
     "track_map_viewer": {
         "show_dark_background": True,
         "show_map_info": True,

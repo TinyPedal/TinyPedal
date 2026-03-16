@@ -164,18 +164,19 @@ class TrackNotesEditor(BaseEditor):
         # File menu
         file_menu = QMenu(self)
 
-        open_pacenotes = file_menu.addAction("Open Pace Notes")
-        open_pacenotes.triggered.connect(self.load_pacenotes_file)
-
-        open_tracknotes = file_menu.addAction("Open Track Notes")
-        open_tracknotes.triggered.connect(self.load_tracknotes_file)
-        file_menu.addSeparator()
-
         create_pacenotes = file_menu.addAction("New Pace Notes")
         create_pacenotes.triggered.connect(self.create_pacenotes)
 
         create_tracknotes = file_menu.addAction("New Track Notes")
         create_tracknotes.triggered.connect(self.create_tracknotes)
+
+        file_menu.addSeparator()
+
+        open_pacenotes = file_menu.addAction("Open Pace Notes")
+        open_pacenotes.triggered.connect(self.load_pacenotes_file)
+
+        open_tracknotes = file_menu.addAction("Open Track Notes")
+        open_tracknotes.triggered.connect(self.load_tracknotes_file)
 
         button_file = CompactButton("File", has_menu=True)
         button_file.setMenu(file_menu)
@@ -219,7 +220,7 @@ class TrackNotesEditor(BaseEditor):
         button_metadata = CompactButton("Info")
         button_metadata.clicked.connect(self.open_metadata_dialog)
 
-        button_save = CompactButton("Save")
+        button_save = CompactButton("Save As")
         button_save.clicked.connect(self.saving)
 
         button_close = CompactButton("Close")

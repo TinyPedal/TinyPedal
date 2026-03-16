@@ -288,6 +288,12 @@ To allow `auto notes loading` function to work, track notes file name must match
 [**`Back to Top`**](#)
 
 
+## Tyre strategy
+`TinyPedal Tyre Strategy` file is stored as `JSON` format (.tyre-strategy extension). Tyre strategy file can be created or edited with [Tyre Strategy Planner](#tyre-strategy-planner) from `Tools` menu in main window.
+
+[**`Back to Top`**](#)
+
+
 ## Brand logo
 TinyPedal supports user-defined brand logo image in `PNG` format (.png extension) which is placed under `TinyPedal\brandlogo` folder (default).
 
@@ -1306,7 +1312,7 @@ Set road slope classification by slope percent.
 
 
 ## Track notes editor
-**Track notes editor allows for creating and editing track or pace notes, which can be accessed from `Tools` menu in main window.**
+**Track notes editor allows to create and edit track or pace notes, which can be accessed from `Tools` menu in main window.**
 
 Note, by default the editor starts in `Pace Notes` edit mode as displayed in status bar.
 
@@ -1353,6 +1359,72 @@ To replace words, click `Replace` and select a column, then use `Find` and `Repl
 To batch offset `distance` (position) values, first select one or multiple note lines from `distance` column, then click `Offset` button. Click `Scale Mode` check box to scale distance values. Note, offset option will be reset to `0` each time after applying. Last applied offset value is displayed on top of dialog.
 
 To highlight a `distance` value on `Track Map Viewer`, right-click on a note line and click `Highlight on Map`.
+
+[**`Back to Top`**](#)
+
+
+## Tyre strategy planner
+**Tyre strategy planner allows to create and edit tyre strategy plan, which can be accessed from `Tools` menu in main window.**
+
+Note, all setting and data are saved per file as [Tyre strategy](#tyre-strategy) format.
+
+**Important notes:** The planner does not provide `undo` function, it is recommended to save file before doing heavy modification.
+
+**Tyre rule setting (top panel):**
+- Maximum Tyres: set number of available tyres allowed for race.
+- Change Time: set tyre change time during pit stop for corresponding number of tyres. Default values match `LMU` tyre change rule.
+- Restrict Allocation: enable restricted tyre allocation, where an already used tyre cannot be allocated on a different wheel in later stint, which matches `LMU` tyre allocation rule.
+
+**Tyre set & stock list (left panel):**
+- Tyre compound selector: select a predefined `tyre compound` to be added or configured. Tyre name that starts with `Q` is the tyre reused from qualifying session.
+- Add: add selected tyre compound to `tyre stock` list. Each newly added tyre compound will be attached with a `unique number` and `stints` label that indicates number of running stints for each tyre.
+- Config: set tyre compound setting for currently selected tyre compound in tyre compound selector. See `Tyre compound setting` below for details.
+- Sort By: sort tyre stock list by either `Compound Type` or `Number of Stints`.
+- Remove: remove selected tyre from `tyre stock` list. This will also remove corresponding tyre from `tyre plan` table.
+- Clear All: remove all tyres from `tyre stock` list and `tyre plan` table.
+
+**Tyre compound setting (Config button):**
+- Enable Limited Stock: enable limited stock for this tyre compound, which counts towards `Maximum Tyres` from `tyre rule` setting. This option is enabled for all `dry compound` tyres, and disabled for all `wet compound` tyres by default, which matches `LMU` tyre rule.
+- Starting Tread: set starting tyre tread (percent). Set `100` for fresh new tyre, and less for worn tyre such as reused from qualifying session.
+- Wear Per Stint: set average tyre tread wear (percent) per stint.
+
+**Tyre plan table (right panel):**
+- Duplicate Row: duplicate selected row and associated tyres.
+- New Row: add a new row at the bottom of table.
+- Insert Below: insert a new row below selected row.
+- Insert Above: insert a new row above selected row.
+- Delete Row: delete selected rows.
+
+**File menu:**
+- New File: create new tyre strategy file.
+- Open File: open a tyre strategy file, only support [Tyre strategy](#tyre-strategy) format.
+- Save As: save current tyre strategy as [Tyre strategy](#tyre-strategy) format to file.
+- Export As: export current tyre strategy as spreadsheet (CSV) format to file.
+
+**Table rows:**
+- Each row represents a stint with corresponding tyre usage info.
+
+**Table columns:**
+- Front Left: tyre that installed on front left wheel.
+- Front Right: tyre that installed on front right wheel.
+- Rear Left: tyre that installed on rear left wheel.
+- Rear Right: tyre that installed on rear right wheel.
+- Change: amount tyre change time during pit stop.
+
+**Status bar**
+- Stock: shows total number of tyres in `tyre stock` list, and maximum available tyres allowed for race. A `invalid` text is displayed if exceeded maximum available tyres.
+- Used: shows total number of tyres used in `tyre plan` table.
+- Stints: number of stints that corresponds to rows in `tyre plan` table.
+- Pits: number of pit stops that corresponds to rows in `tyre plan` table.
+- Changes: number of pit stops with tyre changes.
+- Time: sum of tyre change time from all stints.
+
+**Usage**
+- To add `tyre` from list to table, select a tyre name in `tyre stock` list, then `hold` and `drag` it into `tyre plan` table. You can also drag & copy tyre in the table.
+- To select multiple tyres, hold `Ctrl` or `Shift` while clicking on tyres. Note, `drag` is disabled while selected multiple tyres.
+- Right-click on tyre list or table to open context menu for quick-access options.
+- To highlight new tyres (first time installed in race session) in table, enabled `Highlight New Tyre` check box at top panel.
+- To delete tyres from list or table, select one or more tyres, then right-click and select "Removed Selected". A confirmation dialog will be displayed before deletion.
 
 [**`Back to Top`**](#)
 

@@ -441,4 +441,47 @@ def set_style_window(base_font_pt: int) -> str:
         DisplayOrder > QListView::item:hover {{
             border: 0.1em solid {color_active_highlight};
         }}
-    """)
+
+        /* Tyre strategy planner (dialog) */
+        TyreSetList {{
+            font-size: {font_pt_item_toggle}pt;
+            font-weight: bold;
+            outline: none;
+        }}
+        TyreSetList::item {{
+            margin: 1px;
+            padding: 0.1em;
+            border: 0.1em solid {color_disabled_highlight};
+        }}
+        TyreSetList::item:selected {{
+            selection-color: {color_active_highlighted_text};
+            background: #CC0088DD;
+            border: 0.1em solid {color_active_highlight};
+        }}
+        TyreSetItemTag QLabel {{
+            font-size: {font_pt_text_browser}pt;
+            font-weight: bold;
+            color: {color_active_highlighted_text};
+            border-radius: {border_radius_button}em;
+            margin-left: 0.2em;
+        }}
+        TyrePlanTable {{
+            font-size: {font_pt_item_toggle}pt;
+            font-weight: bold;
+            outline: none;
+        }}
+        TyrePlanTable::item {{
+            margin: 1px;
+            padding: 0.1em;
+            border: 0.1em solid {color_disabled_highlight};
+        }}
+        TyrePlanTable::item:selected {{
+            margin: 1px;
+            padding: 0.1em;
+            selection-color: {color_active_highlighted_text};
+            background: #CC0088DD;
+        }}
+        TyreStatusBar QLabel {{
+            font-weight:bold;
+        }}
+        """)

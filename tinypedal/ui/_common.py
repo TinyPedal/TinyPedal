@@ -38,6 +38,7 @@ from PySide2.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QDoubleSpinBox,
+    QFrame,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -59,6 +60,14 @@ QVAL_FLOAT = QDoubleValidator(-999999.9999, 999999.9999, 6)
 QVAL_COLOR = QRegularExpressionValidator(QRegularExpression('^#[0-9a-fA-F]*'))
 QVAL_HEATMAP = QRegularExpressionValidator(QRegularExpression('[0-9a-zA-Z_]*'))
 QVAL_FILENAME = QRegularExpressionValidator(QRegularExpression('[^\\\\/:*?"<>|]*'))
+
+
+def add_vertical_separator() -> QFrame:
+    """Add vertical separator"""
+    separator = QFrame()
+    separator.setFrameShape(QFrame.VLine)
+    separator.setFrameShadow(QFrame.Sunken)
+    return separator
 
 
 def singleton_dialog(dialog_type: str, show_error: bool = True):

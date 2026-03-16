@@ -75,6 +75,7 @@ class FileExt:
     TPTN = ".tptn"
     STATS = ".stats"
     LOCK = ".lock"
+    TYRESTRATEGY = ".tyre-strategy"
 
 
 class FileFilter:
@@ -92,9 +93,10 @@ class FileFilter:
     PNG = qfile_filter(FileExt.PNG, "PNG image")
     # Specific
     CONSUMPTION = qfile_filter(FileExt.CONSUMPTION, "Consumption History")
+    GPLINI = qfile_filter(FileExt.INI, "GPL Pace Notes")
     TPPN = qfile_filter(FileExt.TPPN, "TinyPedal Pace Notes")
     TPTN = qfile_filter(FileExt.TPTN, "TinyPedal Track Notes")
-    GPLINI = qfile_filter(FileExt.INI, "GPL Pace Notes")
+    TYRESTRATEGY = qfile_filter(FileExt.TYRESTRATEGY, "TinyPedal Tyre Strategy")
 
 
 class ImageFile:

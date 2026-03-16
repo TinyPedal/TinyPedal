@@ -45,6 +45,7 @@ from .track_info_editor import TrackInfoEditor
 from .track_map_viewer import TrackMapViewer
 from .track_notes_editor import TrackNotesEditor
 from .tyre_compound_editor import TyreCompoundEditor
+from .tyre_strategy_planner import TyreStrategyPlanner
 from .vehicle_brand_editor import VehicleBrandEditor
 from .vehicle_class_editor import VehicleClassEditor
 
@@ -553,6 +554,9 @@ class ToolsMenu(QMenu):
         utility_fuelcalc = self.addAction("Fuel Calculator")
         utility_fuelcalc.triggered.connect(self.open_utility_fuelcalc)
 
+        utility_tyreplanner = self.addAction("Tyre Strategy Planner")
+        utility_tyreplanner.triggered.connect(self.open_utility_tyreplanner)
+
         utility_driverstats = self.addAction("Driver Stats Viewer")
         utility_driverstats.triggered.connect(self.open_utility_driverstats)
 
@@ -584,6 +588,11 @@ class ToolsMenu(QMenu):
     def open_utility_fuelcalc(self):
         """Fuel calculator"""
         _dialog = FuelCalculator(self._parent)
+        _dialog.show()
+
+    def open_utility_tyreplanner(self):
+        """Tyre strategy planner"""
+        _dialog = TyreStrategyPlanner(self._parent)
         _dialog.show()
 
     def open_utility_driverstats(self):
