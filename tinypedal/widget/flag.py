@@ -262,10 +262,8 @@ class Realtime(Overlay):
         if self.wcfg["show_speed_limiter"]:
             limiter_state = api.read.switch.speed_limiter()
             if limiter_state and self.wcfg["show_current_speed_while_limiter_on"]:
-                speed = api.read.vehicle.speed()
-            else:
-                speed = -1
-            self.update_limiter(self.bar_limiter, limiter_state, speed)
+                limiter_state = api.read.vehicle.speed() + 0.0000001
+            self.update_limiter(self.bar_limiter, limiter_state)
 
         # Blue flag
         if self.wcfg["show_blue_flag"]:
@@ -338,18 +336,20 @@ class Realtime(Overlay):
                 target.state = hidden
                 target.setHidden(hidden)
 
-    def update_limiter(self, target, *data):
+    def update_limiter(self, target, data):
         """Speed limiter"""
         if target.last != data:
             target.last = data
-            hidden = not data[0]
-            if data[0] and data[1] >= 0:
+            if data:
                 if self.prefix_limiter:
-                    text_limiter = f"{self.prefix_limiter}{self.unit_speed(data[1]): >6.{self.decimals_speed}f}"[:7]
+                    text_limiter = f"{self.prefix_limiter}{self.unit_speed(data): >6.{self.decimals_speed}f}"[:7]
                 else:
-                    text_limiter = f"{self.unit_speed(data[1]):.{self.decimals_speed}f}"[:7]
+                    text_limiter = f"{self.unit_speed(data):.{self.decimals_speed}f}"[:7]
                 target.text = text_limiter
                 target.update()
+                hidden = False
+            else:
+                hidden = True
 
             if target.state != hidden:
                 target.state = hidden
