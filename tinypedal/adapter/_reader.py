@@ -618,11 +618,7 @@ class Vehicle(ABC):
 
     @abstractmethod
     def virtual_energy(self, index: int | None = None) -> float:
-        """Remaining virtual energy (joule)"""
-
-    @abstractmethod
-    def max_virtual_energy(self, index: int | None = None) -> float:
-        """Max virtual energy (joule)"""
+        """Remaining virtual energy (fraction)"""
 
     @abstractmethod
     def orientation_yaw_radians(self, index: int | None = None) -> float:

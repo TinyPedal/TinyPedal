@@ -195,12 +195,12 @@ class Realtime(Overlay):
         # Last data
         self.empty_data = ConsumptionDataSet()
         self.last_data_version = -1
-        self.last_max_energy = 0.0
+        self.last_energy_type = None
         self.update_laps_history(())
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        max_energy = api.read.vehicle.max_virtual_energy()
+        energy_type = minfo.energy.available
 
         # Current laps data
         if self.wcfg["show_laps"]:
@@ -210,7 +210,7 @@ class Realtime(Overlay):
         if self.wcfg["show_delta"]:
             self.update_delta(self.bars_delta[0], minfo.delta.deltaLast)
         if self.wcfg["show_fuel"]:
-            if self.wcfg["show_virtual_energy_if_available"] and max_energy:
+            if self.wcfg["show_virtual_energy_if_available"] and energy_type:
                 fuel = minfo.energy.estimatedConsumption
                 sign_fuel = "E" if self.sign_fuel else ""
             else:
@@ -223,10 +223,10 @@ class Realtime(Overlay):
         # History laps data
         if (
             self.last_data_version != minfo.history.consumptionDataVersion
-            or self.last_max_energy != max_energy
+            or self.last_energy_type != energy_type
         ):
             self.last_data_version = minfo.history.consumptionDataVersion
-            self.last_max_energy = max_energy
+            self.last_energy_type = energy_type
             self.update_laps_history(minfo.history.consumptionDataSet)
 
     # GUI update methods

@@ -470,7 +470,7 @@ class Realtime(Overlay):
         if self.wcfg["show_low_fuel_for_race_only"] and not in_race:
             return ""
 
-        if api.read.vehicle.max_virtual_energy() and minfo.energy.estimatedLaps < minfo.fuel.estimatedLaps:
+        if minfo.energy.available and minfo.energy.estimatedLaps < minfo.fuel.estimatedLaps:
             prefix = "LE"
             amount_curr = minfo.energy.amountCurrent
             est_laps = minfo.energy.estimatedLaps
@@ -492,7 +492,7 @@ class Realtime(Overlay):
         if not api.read.vehicle.pit_request():
             return ""
 
-        if api.read.vehicle.max_virtual_energy():
+        if minfo.energy.available:
             est_laps = min(minfo.fuel.estimatedLaps, minfo.energy.estimatedLaps)
         else:
             est_laps = minfo.fuel.estimatedLaps

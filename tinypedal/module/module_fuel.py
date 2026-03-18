@@ -87,7 +87,8 @@ class Realtime(DataModule):
                 gen_fuel_usage.send(True)
 
                 # Calculate virtual energy if available
-                if api.read.vehicle.max_virtual_energy():
+                minfo.energy.available = (api.read.vehicle.virtual_energy() != 0)
+                if minfo.energy.available:
                     gen_energy_usage.send(True)
 
                     # Update hybrid info
@@ -128,14 +129,13 @@ def telemetry_fuel() -> tuple[float, float]:
 
 def telemetry_battery() -> tuple[float, float]:
     """Telemetry battery, capacity is always 100%"""
-    return 100, api.read.emotor.battery_charge() * 100
+    return 100.0, api.read.emotor.battery_charge() * 100
 
 
 def telemetry_energy() -> tuple[float, float]:
     """Telemetry energy, output in percentage"""
-    max_energy = api.read.vehicle.max_virtual_energy()
-    if max_energy:
-        return 100.0, api.read.vehicle.virtual_energy() / max_energy * 100
+    if minfo.energy.available:
+        return 100.0, api.read.vehicle.virtual_energy() * 100
     return 100.0, 0.0
 
 

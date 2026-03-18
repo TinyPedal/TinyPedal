@@ -429,6 +429,7 @@ class FuelInfo:
     """Fuel output data"""
 
     __slots__ = (
+        "available",
         "capacity",
         "amountStart",
         "amountCurrent",
@@ -452,6 +453,7 @@ class FuelInfo:
 
     def reset(self):
         """Reset"""
+        self.available: bool = False
         self.capacity: float = 0.0
         self.amountStart: float = 0.0
         self.amountCurrent: float = 0.0

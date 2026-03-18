@@ -294,7 +294,7 @@ class Realtime(Overlay):
 
         if self.wcfg["show_relative_refilling"]:
             # Calculate relative refilling
-            if api.read.vehicle.max_virtual_energy():
+            if minfo.energy.available:
                 actual_refill = abs_refill - minfo.energy.amountCurrent
                 total_refill = calc.sym_max(minfo.energy.neededRelative, 9999)
             else:

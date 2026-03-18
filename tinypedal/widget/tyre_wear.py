@@ -277,7 +277,7 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         laptime_pace = minfo.delta.lapTimePace
-        if api.read.vehicle.max_virtual_energy():
+        if minfo.energy.available:
             est_runlaps = min(minfo.fuel.estimatedLaps, minfo.energy.estimatedLaps)
         else:
             est_runlaps = minfo.fuel.estimatedLaps

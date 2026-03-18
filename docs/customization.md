@@ -1412,8 +1412,8 @@ Note, all setting and data are saved per file as [Tyre strategy](#tyre-strategy)
 - Change: amount tyre change time during pit stop.
 
 **Status bar**
-- Stock: shows total number of tyres in `tyre stock` list, and maximum available tyres allowed for race. A `invalid` text is displayed if exceeded maximum available tyres.
-- Used: shows total number of tyres used in `tyre plan` table.
+- Stock: shows total number of tyres in `tyre stock` list, and maximum available tyres allowed for race. A `invalid` text is displayed if exceeded maximum available tyres. Note, tyres that without limited stock are not counted toward total stock, such as wet tyres (from default setting).
+- Used: shows total number of tyres used in `tyre plan` table, including tyres that without limited stock.
 - Stints: number of stints that corresponds to rows in `tyre plan` table.
 - Pits: number of pit stops that corresponds to rows in `tyre plan` table.
 - Changes: number of pit stops with tyre changes.

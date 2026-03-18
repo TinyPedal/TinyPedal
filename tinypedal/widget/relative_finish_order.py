@@ -211,7 +211,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         is_lap_type_session = api.read.session.lap_type()
         pre_race = api.read.session.pre_race()
-        energy_type = api.read.vehicle.max_virtual_energy()
+        energy_type = minfo.energy.available
 
         leader_index = minfo.vehicles.leaderIndex
         player_index = minfo.vehicles.playerIndex

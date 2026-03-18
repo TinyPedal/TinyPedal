@@ -26,7 +26,6 @@ from collections import deque
 
 from .. import calculation as calc
 from .. import units
-from ..api_control import api
 from ..module_info import StintData, StintDataSet, minfo
 from ._base import Overlay
 
@@ -224,7 +223,7 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        show_energy = self.wcfg["show_virtual_energy_if_available"] and api.read.vehicle.max_virtual_energy()
+        energy_type = self.wcfg["show_virtual_energy_if_available"] and minfo.energy.available
         stint_data = minfo.history.stintData
 
         # Current stint data
@@ -233,7 +232,7 @@ class Realtime(Overlay):
         if self.wcfg["show_time"]:
             self.update_time(self.bars_time[0], stint_data.totalTime)
         if self.wcfg["show_fuel"]:
-            if show_energy:
+            if energy_type:
                 fuel = stint_data.totalEnergy
                 sign_fuel = "E" if self.sign_fuel else ""
             else:
