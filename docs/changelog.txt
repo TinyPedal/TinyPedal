@@ -1,3 +1,8 @@
+WIP
+-----------------------------
+* Misc
+  - Fixed an issue where "LIMIT" text was not displayed correctly if disabled "show_current_speed_while_limiter_on".
+
 2.44.0 (2026-03-16)
 -----------------------------
 * [New]Tyre Strategy Planner

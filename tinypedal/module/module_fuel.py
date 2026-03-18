@@ -134,9 +134,7 @@ def telemetry_battery() -> tuple[float, float]:
 
 def telemetry_energy() -> tuple[float, float]:
     """Telemetry energy, output in percentage"""
-    if minfo.energy.available:
-        return 100.0, api.read.vehicle.virtual_energy() * 100
-    return 100.0, 0.0
+    return 100.0, api.read.vehicle.virtual_energy() * 100
 
 
 @generator_init
