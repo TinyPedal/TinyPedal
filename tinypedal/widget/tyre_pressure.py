@@ -26,7 +26,7 @@ from .. import calculation as calc
 from .. import units
 from ..api_control import api
 from ..const_common import TEXT_NA, TEXT_PLACEHOLDER, WHEELS_ZERO
-from ..userfile.heatmap import select_compound_symbol
+from ..userfile.heatmap import select_compound_color, select_compound_symbol
 from ._base import Overlay
 
 
@@ -189,4 +189,6 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = select_compound_symbol(data)
+            if self.wcfg["show_compound_color_per_type"]:
+                target.fg = select_compound_color(data)
             target.update()

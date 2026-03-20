@@ -1216,6 +1216,8 @@ Tyre compound editor is used for editing [Compounds Preset](#compounds-preset). 
 
 `Symbol` column is alternative symbol character that replaces full tyre compound name for displaying.
 
+`Color` column is custom compound color for each different compound type.
+
 `Heatmap name` column is heatmap style name selector. Click on heatmap selector to open drop down list and select a heatmap style.
 
 To add new tyre compound, click `Add` button. Note, the editor can auto-detect and fill-in missing tyre compounds found from running vehicles in current active session, existing data will not be changed.
@@ -4142,6 +4144,9 @@ Set number of samples for reducing data fluctuation. Lower value may result more
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
 
+    show_compound_color_per_type
+Show custom compound color that defined in [Compounds Preset](#compounds-preset) for each different compound type.
+
 [**`Back to Top`**](#)
 
 
@@ -4173,6 +4178,9 @@ Set amount leading zeros for each temperature value. Default is `2`. Minimum val
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
 
+    show_compound_color_per_type
+Show custom compound color that defined in [Compounds Preset](#compounds-preset) for each different compound type.
+
 [**`Back to Top`**](#)
 
 
@@ -4202,6 +4210,9 @@ Swap cold and hot pressure color.
 
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
+
+    show_compound_color_per_type
+Show custom compound color that defined in [Compounds Preset](#compounds-preset) for each different compound type.
 
 [**`Back to Top`**](#)
 
@@ -4233,6 +4244,9 @@ Set amount leading zeros for each temperature value. Default is `2`. Minimum val
 
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
+
+    show_compound_color_per_type
+Show custom compound color that defined in [Compounds Preset](#compounds-preset) for each different compound type.
 
 [**`Back to Top`**](#)
 

@@ -75,9 +75,10 @@ class HeatmapEditor(BaseEditor):
         self.table_heatmap.verticalHeader().setVisible(False)
         self.table_heatmap.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table_heatmap.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Color column
         self.table_heatmap.horizontalHeader().setSectionResizeMode(1, QHeaderView.Fixed)
-        self.table_heatmap.setColumnWidth(1, UIScaler.size(8))
-        self.table_heatmap.cellChanged.connect(self.set_modified)
+        self.table_heatmap.setColumnWidth(1, UIScaler.size(7))
+
         self.table_heatmap.cellChanged.connect(self.verify_input)
         self.refresh_table()
         self.set_unmodified()

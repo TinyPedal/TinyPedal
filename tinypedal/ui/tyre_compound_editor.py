@@ -38,13 +38,15 @@ from ..const_file import ConfigType
 from ..setting import cfg, copy_setting
 from ..userfile.heatmap import HEATMAP_DEFAULT_TYRE, set_predefined_compound_symbol
 from ._common import (
+    QVAL_COLOR,
     BaseEditor,
     CompactButton,
     TableBatchReplace,
     UIScaler,
 )
+from ._option import ColorEdit
 
-HEADER_COMPOUNDS = "Compound name","Symbol","Heatmap name"
+HEADER_COMPOUNDS = "Compound name", "Symbol", "Color", "Heatmap name"
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +57,7 @@ class TyreCompoundEditor(BaseEditor):
     def __init__(self, parent):
         super().__init__(parent)
         self.set_utility_title("Tyre Compound Editor")
-        self.setMinimumSize(UIScaler.size(45), UIScaler.size(38))
+        self.setMinimumSize(UIScaler.size(42), UIScaler.size(38))
 
         self.compounds_temp = copy_setting(cfg.user.compounds)
 
@@ -65,10 +67,16 @@ class TyreCompoundEditor(BaseEditor):
         self.table_compounds.setHorizontalHeaderLabels(HEADER_COMPOUNDS)
         self.table_compounds.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table_compounds.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Symbol column
         self.table_compounds.horizontalHeader().setSectionResizeMode(1, QHeaderView.Fixed)
-        self.table_compounds.setColumnWidth(1, UIScaler.size(6))
+        self.table_compounds.setColumnWidth(1, UIScaler.size(5))
+        # Color column
         self.table_compounds.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
-        self.table_compounds.setColumnWidth(2, UIScaler.size(12))
+        self.table_compounds.setColumnWidth(2, UIScaler.size(7))
+        # Heatmap column
+        self.table_compounds.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
+        self.table_compounds.setColumnWidth(3, UIScaler.size(12))
+
         self.table_compounds.cellChanged.connect(self.verify_input)
         self.refresh_table()
         self.set_unmodified()
@@ -131,9 +139,19 @@ class TyreCompoundEditor(BaseEditor):
                 row_index,
                 compound_name,
                 compound_data["symbol"],
+                compound_data["color"],
                 compound_data["heatmap"],
             )
             row_index += 1
+
+    def __add_option_color(self, key):
+        """Color string"""
+        color_edit = ColorEdit(self, key)
+        color_edit.setMaxLength(9)
+        color_edit.setValidator(QVAL_COLOR)
+        color_edit.textChanged.connect(self.set_modified)
+        color_edit.setText(key)  # load selected option
+        return color_edit
 
     def __add_option_combolist(self, key):
         """Combo droplist string"""
@@ -168,17 +186,18 @@ class TyreCompoundEditor(BaseEditor):
         # Add new name entry
         if start_index == row_index:
             new_compound_name = self.new_name_increment("New Compound Name", self.table_compounds)
-            self.add_compound_entry(row_index, new_compound_name, "?")
+            self.add_compound_entry(row_index, new_compound_name)
             self.table_compounds.setCurrentCell(row_index, 0)
 
     def add_compound_entry(
-        self, row_index: int, compound_name: str, symbol_name: str,
+        self, row_index: int, compound_name: str, symbol_name: str = "?", color: str = "#AAAAAA",
         heatmap_name: str = HEATMAP_DEFAULT_TYRE):
         """Add new compound entry to table"""
         self.table_compounds.insertRow(row_index)
         self.table_compounds.setItem(row_index, 0, QTableWidgetItem(compound_name))
         self.table_compounds.setItem(row_index, 1, QTableWidgetItem(symbol_name))
-        self.table_compounds.setCellWidget(row_index, 2, self.__add_option_combolist(heatmap_name))
+        self.table_compounds.setCellWidget(row_index, 2, self.__add_option_color(color))
+        self.table_compounds.setCellWidget(row_index, 3, self.__add_option_combolist(heatmap_name))
 
     def sort_compound(self):
         """Sort compounds in ascending order"""
@@ -237,9 +256,11 @@ class TyreCompoundEditor(BaseEditor):
         for index in range(self.table_compounds.rowCount()):
             compound_name = self.table_compounds.item(index, 0).text()
             symbol_name = self.table_compounds.item(index, 1).text()
-            heatmap_name = self.table_compounds.cellWidget(index, 2).currentText()
+            color = self.table_compounds.cellWidget(index, 2).text()
+            heatmap_name = self.table_compounds.cellWidget(index, 3).currentText()
             self.compounds_temp[compound_name] = {
                 "symbol": symbol_name,
+                "color": color,
                 "heatmap": heatmap_name,
             }
 

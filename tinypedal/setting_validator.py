@@ -30,12 +30,12 @@ from . import version
 from .const_common import VERSION_NA
 from .hotkey.common import validate_hotkey
 from .setting_preupdate import preupdate_global_setting, preupdate_user_setting
-from .template.setting_brakes import BRAKEINFO_DEFAULT
-from .template.setting_classes import CLASSINFO_DEFAULT
-from .template.setting_compounds import COMPOUNDINFO_DEFAULT
-from .template.setting_filelock import FILELOCKINFO_DEFAULT
+from .template.setting_brakes import BRAKEINFO_DEFAULT, BRAKES_DEFAULT
+from .template.setting_classes import CLASSES_DEFAULT, CLASSINFO_DEFAULT
+from .template.setting_compounds import COMPOUNDINFO_DEFAULT, COMPOUNDS_DEFAULT
+from .template.setting_filelock import FILELOCK_DEFAULT, FILELOCKINFO_DEFAULT
 from .template.setting_heatmap import HEATMAP_DEFAULT
-from .template.setting_tracks import TRACKINFO_DEFAULT
+from .template.setting_tracks import TRACKINFO_DEFAULT, TRACKS_DEFAULT
 from .validator import is_clock_format, is_hex_color
 from .version_check import parse_version_string
 
@@ -53,21 +53,27 @@ def _get_preset_version(dict_user: dict, version_current: str) -> tuple[int, int
     return preset_version
 
 
-def _validate_style(dict_user: dict[str, dict], dict_def: Mapping[str, Any]) -> bool:
+def _validate_style(dict_user: dict[str, dict], dict_def: Mapping[str, dict], info_def: Mapping[str, Any]) -> bool:
     """Validate style dict entries"""
     save_change = False
     for name, data in dict_user.items():
         # Reset invalid data set
         if not isinstance(data, dict):
-            dict_user[name] = dict_def.copy()
+            if name in dict_def:
+                dict_user[name] = dict_def[name].copy()
+            else:
+                dict_user[name] = info_def.copy()
             save_change = True
             continue
         # Reset invalid value or add missing
-        for key, default_value in dict_def.items():
+        for key, default_value in info_def.items():
             if key not in data or not isinstance(
                 data[key], type(default_value)
             ):
-                data[key] = default_value
+                if name in dict_def:
+                    data[key] = dict_def[name][key]
+                else:
+                    data[key] = default_value
                 save_change = True
     return save_change
 
@@ -78,17 +84,17 @@ class StyleValidator:
     @staticmethod
     def classes(dict_user: dict[str, dict]) -> bool:
         """Classes style validator"""
-        return _validate_style(dict_user, CLASSINFO_DEFAULT)
+        return _validate_style(dict_user, CLASSES_DEFAULT, CLASSINFO_DEFAULT)
 
     @staticmethod
     def brakes(dict_user: dict[str, dict]) -> bool:
         """Brakes style validator"""
-        return _validate_style(dict_user, BRAKEINFO_DEFAULT)
+        return _validate_style(dict_user, BRAKES_DEFAULT, BRAKEINFO_DEFAULT)
 
     @staticmethod
     def compounds(dict_user: dict[str, dict]) -> bool:
         """Compounds style validator"""
-        return _validate_style(dict_user, COMPOUNDINFO_DEFAULT)
+        return _validate_style(dict_user, COMPOUNDS_DEFAULT, COMPOUNDINFO_DEFAULT)
 
     @staticmethod
     def heatmap(dict_user: dict[str, dict]) -> bool:
@@ -109,12 +115,12 @@ class StyleValidator:
     @staticmethod
     def tracks(dict_user: dict[str, dict]) -> bool:
         """Tracks style validator"""
-        return _validate_style(dict_user, TRACKINFO_DEFAULT)
+        return _validate_style(dict_user, TRACKS_DEFAULT, TRACKINFO_DEFAULT)
 
     @staticmethod
     def filelock(dict_user: dict[str, dict]) -> bool:
         """File lock validator"""
-        return _validate_style(dict_user, FILELOCKINFO_DEFAULT)
+        return _validate_style(dict_user, FILELOCK_DEFAULT, FILELOCKINFO_DEFAULT)
 
 
 class ValueValidator:

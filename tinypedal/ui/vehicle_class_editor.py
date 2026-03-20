@@ -65,8 +65,10 @@ class VehicleClassEditor(BaseEditor):
         self.table_classes.verticalHeader().setVisible(False)
         self.table_classes.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table_classes.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Color column
         self.table_classes.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
         self.table_classes.setColumnWidth(2, UIScaler.size(7))
+
         self.table_classes.cellChanged.connect(self.set_modified)
         self.refresh_table()
         self.set_unmodified()

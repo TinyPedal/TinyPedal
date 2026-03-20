@@ -66,10 +66,13 @@ class BrakeEditor(BaseEditor):
         self.table_brakes.setHorizontalHeaderLabels(HEADER_BRAKES)
         self.table_brakes.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table_brakes.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Thickness column
         self.table_brakes.horizontalHeader().setSectionResizeMode(1, QHeaderView.Fixed)
+        self.table_brakes.setColumnWidth(1, UIScaler.size(7))
+        # Heatmap column
         self.table_brakes.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
-        self.table_brakes.setColumnWidth(1, UIScaler.size(8))
         self.table_brakes.setColumnWidth(2, UIScaler.size(12))
+
         self.table_brakes.cellChanged.connect(self.verify_input)
         self.refresh_table()
         self.set_unmodified()

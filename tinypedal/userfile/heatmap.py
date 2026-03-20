@@ -124,11 +124,21 @@ def set_predefined_compound_symbol(compound_name: str) -> str:
 def select_compound_symbol(compound_name: str) -> str:
     """Select compound symbol"""
     compound = cfg.user.compounds.get(compound_name)
-    if compound is not None:
-        return compound.get("symbol", "?")
-    if not invalid_save_name(compound_name):
-        add_missing_compound(compound_name)
-    return set_predefined_compound_symbol(compound_name)
+    if compound is None:
+        if invalid_save_name(compound_name):
+            return "?"
+        compound = add_missing_compound(compound_name)
+    return compound.get("symbol", "?")
+
+
+def select_compound_color(compound_name: str) -> str:
+    """Select compound color"""
+    compound = cfg.user.compounds.get(compound_name)
+    if compound is None:
+        if invalid_save_name(compound_name):
+            return "#AAAAAA"
+        compound = add_missing_compound(compound_name)
+    return compound.get("color", "#AAAAAA")
 
 
 def select_tyre_heatmap_name(compound_name: str) -> str:

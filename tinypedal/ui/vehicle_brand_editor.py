@@ -72,6 +72,7 @@ class VehicleBrandEditor(BaseEditor):
         self.table_brands.setHorizontalHeaderLabels(HEADER_BRANDS)
         self.table_brands.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table_brands.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+
         self.table_brands.cellChanged.connect(self.set_modified)
         self.refresh_table()
         self.set_unmodified()
