@@ -457,8 +457,8 @@ class Overlay(Base):
         layout: QGridLayout,
         targets: tuple[QWidget | QLayout, ...],
         row_start: int = 1,
-        column_left: int = 0,
-        column_right: int = 9,
+        column_start: int = 0,
+        column_offset: int = 9,
     ):
         """Set grid layout - quad - (0,1), (2,3), (4,5), ...
 
@@ -466,7 +466,7 @@ class Overlay(Base):
         """
         for index, target in enumerate(targets):
             row = row_start + (index // 2)
-            column = column_left + (index % 2) * column_right
+            column = column_start + (index % 2) * column_offset
             if isinstance(target, QWidget):
                 layout.addWidget(target, row, column)
             else:

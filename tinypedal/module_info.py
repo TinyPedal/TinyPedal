@@ -79,7 +79,7 @@ class StintData:
         self.totalTyreWear: float = 0.0
         self.lapTimeDelta: float = 0.0
         self.lapTimeConsistency: float = 0.0
-        self.tyreCompound: str = "??"
+        self.tyreCompound: str = "----"
 
 
 class StintDataSet(NamedTuple):
@@ -92,7 +92,7 @@ class StintDataSet(NamedTuple):
     totalTyreWear: float = 0.0
     lapTimeDelta: float = 0.0
     lapTimeConsistency: float = 0.0
-    tyreCompound: str = "??"
+    tyreCompound: str = "----"
 
 
 class DeltaLapTime(array):
@@ -295,8 +295,7 @@ class VehicleDataSet:
         "isClassFastestLastLap",
         "numPitStops",
         "pitRequested",
-        "tireCompoundFront",
-        "tireCompoundRear",
+        "tireCompoundName",
         "relativeOrientationRadians",
         "relativeStraightDistance",
         "worldPositionX",
@@ -338,8 +337,7 @@ class VehicleDataSet:
         self.isClassFastestLastLap: bool = False
         self.numPitStops: int = 0
         self.pitRequested: bool = False
-        self.tireCompoundFront: str = ""
-        self.tireCompoundRear: str = ""
+        self.tireCompoundName: tuple[str, ...] = ("", "", "", "")
         self.relativeOrientationRadians: float = 0.0
         self.relativeStraightDistance: float = 0.0
         self.worldPositionX: float = 0.0

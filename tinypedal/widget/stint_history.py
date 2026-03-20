@@ -125,8 +125,8 @@ class Realtime(Overlay):
         # Tyre compound
         if self.wcfg["show_tyre"]:
             self.bars_cmpd = self.set_rawtext(
-                text="--",
-                width=font_m.width * 2 + bar_padx,
+                text="----",
+                width=font_m.width * 4 + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_stint_tyre"],

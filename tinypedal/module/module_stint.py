@@ -244,10 +244,9 @@ def calc_stint_history(
             consistency = 1.0
             delta = 0.0
             # Update compound info once per stint
-            class_name = api.read.vehicle.class_name()
             stint_data.tyreCompound = "".join(
-                select_compound_symbol(f"{class_name} - {tcmpd_name}")
-                for tcmpd_name in api.read.tyre.compound_name()
+                select_compound_symbol(compound_class)
+                for compound_class in api.read.tyre.compound_class()
             )
 
         if start_fuel < fuel_curr:

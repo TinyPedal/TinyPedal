@@ -219,9 +219,8 @@ def update_vehicle_data(
             data.driverName = api.read.vehicle.driver_name(index)
             data.vehicleName = api.read.vehicle.vehicle_name(index)
             data.vehicleClass = api.read.vehicle.class_name(index)
-            data.tireCompoundFront = f"{data.vehicleClass} - {api.read.tyre.compound_name_front(index)}"
-            data.tireCompoundRear = f"{data.vehicleClass} - {api.read.tyre.compound_name_rear(index)}"
             data.vehicleIntegrity = api.read.vehicle.integrity(index)
+            data.tireCompoundName = api.read.tyre.compound_class(index)
 
             data.gapBehindNext = calc_gap_behind_next(index)
             data.gapBehindLeader = calc_gap_behind_leader(index)

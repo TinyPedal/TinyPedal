@@ -583,35 +583,31 @@ class Timing(_reader.Timing, DataAdapter):
 
 
 class Tyre(_reader.Tyre, DataAdapter):
-    """Tyre"""
+    """Tyre (front left, front right, rear left, rear right)"""
 
     __slots__ = ()
 
-    def compound_front(self, index: int | None = None) -> int:
-        """Tyre compound (front)"""
-        return self.shmm.lmuTeleVeh(index).mFrontTireCompoundIndex
-
-    def compound_rear(self, index: int | None = None) -> int:
-        """Tyre compound (rear)"""
-        return self.shmm.lmuTeleVeh(index).mRearTireCompoundIndex
-
-    def compound(self, index: int | None = None) -> tuple[int, int]:
-        """Tyre compound set (front, rear)"""
+    def compound_index(self, index: int | None = None) -> tuple[int, int, int, int]:
+        """Tyre compound index set"""
         tele_veh = self.shmm.lmuTeleVeh(index)
-        return tele_veh.mFrontTireCompoundIndex, tele_veh.mRearTireCompoundIndex
+        front = tele_veh.mFrontTireCompoundIndex
+        rear = tele_veh.mRearTireCompoundIndex
+        return front, front, rear, rear
 
-    def compound_name_front(self, index: int | None = None) -> str:
-        """Tyre compound name (front)"""
-        return tostr(self.shmm.lmuTeleVeh(index).mFrontTireCompoundName)
-
-    def compound_name_rear(self, index: int | None = None) -> str:
-        """Tyre compound name (rear)"""
-        return tostr(self.shmm.lmuTeleVeh(index).mRearTireCompoundName)
-
-    def compound_name(self, index: int | None = None) -> tuple[str, str]:
-        """Tyre compound name set (front, rear)"""
+    def compound_name(self, index: int | None = None) -> tuple[str, str, str, str]:
+        """Tyre compound name set"""
         tele_veh = self.shmm.lmuTeleVeh(index)
-        return tostr(tele_veh.mFrontTireCompoundName), tostr(tele_veh.mRearTireCompoundName)
+        front = tostr(tele_veh.mFrontTireCompoundName)
+        rear = tostr(tele_veh.mRearTireCompoundName)
+        return front, front, rear, rear
+
+    def compound_class(self, index: int | None = None) -> tuple[str, str, str, str]:
+        """Tyre compound name set with class name prefix"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        class_name = tostr(self.shmm.lmuScorVeh(index).mVehicleClass)
+        front = f"{class_name} - {tostr(tele_veh.mFrontTireCompoundName)}"
+        rear = f"{class_name} - {tostr(tele_veh.mRearTireCompoundName)}"
+        return front, front, rear, rear
 
     def surface_temperature_avg(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre surface temperature set (Celsius) average"""
@@ -940,7 +936,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
 
 class Wheel(_reader.Wheel, DataAdapter):
-    """Wheel & suspension"""
+    """Wheel & suspension (front left, front right, rear left, rear right)"""
 
     __slots__ = ()
 

@@ -155,14 +155,8 @@ class TyreCompoundEditor(BaseEditor):
         # Add all missing vehicle name from active session
         veh_total = api.read.vehicle.total_vehicles()
         for index in range(veh_total):
-            class_name = api.read.vehicle.class_name(index)
-            compound_names = set(
-                (
-                    f"{class_name} - {api.read.tyre.compound_name_front(index)}",
-                    f"{class_name} - {api.read.tyre.compound_name_rear(index)}",
-                )
-            )
-            for compound in compound_names:
+            compounds = set(api.read.tyre.compound_class(index))
+            for compound in compounds:
                 if not self.is_value_in_table(compound, self.table_compounds):
                     self.add_compound_entry(
                         row_index,

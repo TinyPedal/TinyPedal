@@ -36,8 +36,14 @@ class Realtime(Overlay):
     def __init__(self, config, widget_name):
         # Assign base setting
         super().__init__(config, widget_name)
-        layout = self.set_grid_layout(gap=self.wcfg["bar_gap"])
+        layout = self.set_grid_layout(
+            gap_hori=self.wcfg["horizontal_gap"],
+            gap_vert=self.wcfg["vertical_gap"],
+        )
         self.set_primary_layout(layout=layout)
+
+        layout_inner = tuple(self.set_grid_layout(gap=self.wcfg["inner_gap"]) for _ in range(4))
+        self.set_grid_layout_quad(layout=layout, targets=layout_inner)
 
         # Config font
         font = self.config_font(
@@ -50,7 +56,6 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        inner_gap = self.wcfg["inner_gap"]
         self.text_width = 3 + (self.cfg.units["tyre_pressure_unit"] != "kPa")
         self.hot_pres_temp = max(self.wcfg["hot_pressure_temperature_threshold"], 0)
 
@@ -58,7 +63,7 @@ class Realtime(Overlay):
         self.unit_pres = units.set_unit_pressure(self.cfg.units["tyre_pressure_unit"])
 
         # Tyre pressure
-        layout_tpres = self.set_grid_layout(gap=inner_gap)
+        base_row = 1
         self.bar_style_tpres = (
             (
                 self.wcfg["background_color_pressure"],
@@ -88,15 +93,11 @@ class Realtime(Overlay):
             count=4,
             last=0,
         )
-        self.set_grid_layout_quad(
-            layout=layout_tpres,
-            targets=self.bars_tpres,
-        )
-        self.set_primary_orient(
-            target=layout_tpres,
-            column=self.wcfg["display_order_pressure"],
-        )
+        # Column 1, 1
+        for idx, inner in enumerate(layout_inner):
+            inner.addWidget(self.bars_tpres[idx], base_row, 1)
 
+        # Tyre compound
         if self.wcfg["show_tyre_compound"]:
             self.bars_tcmpd = self.set_rawtext(
                 text=TEXT_PLACEHOLDER,
@@ -105,16 +106,14 @@ class Realtime(Overlay):
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tyre_compound"],
                 bg_color=self.wcfg["background_color_tyre_compound"],
-                count=2,
+                count=4,
             )
-            self.set_grid_layout_vert(
-                layout=layout_tpres,
-                targets=self.bars_tcmpd,
-            )
+            # Column 2, 0
+            for idx, inner in enumerate(layout_inner):
+                inner.addWidget(self.bars_tcmpd[idx], base_row, (1 - idx % 2) * 2)
 
         # Pressure deviation
         if self.wcfg["show_pressure_deviation"]:
-            layout_pdiff = self.set_grid_layout(gap=inner_gap)
             self.bars_pdiff = self.set_rawtext(
                 text=TEXT_NA,
                 width=font_m.width * self.text_width + bar_padx,
@@ -124,14 +123,9 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_pressure_deviation"],
                 count=4,
             )
-            self.set_grid_layout_quad(
-                layout=layout_pdiff,
-                targets=self.bars_pdiff,
-            )
-            self.set_primary_orient(
-                target=layout_pdiff,
-                column=self.wcfg["display_order_pressure_deviation"],
-            )
+            # Column 0, 2
+            for idx, inner in enumerate(layout_inner):
+                inner.addWidget(self.bars_pdiff[idx], base_row, 2 * (idx % 2))
 
             self.tpavg = list(WHEELS_ZERO)
             update_interval = max(self.wcfg["update_interval"], 0.01)
@@ -141,23 +135,9 @@ class Realtime(Overlay):
                 calc.ema_factor(average_samples)
             )
 
-            if self.wcfg["show_tyre_compound"]:
-                bars_blank = self.set_rawtext(
-                    text="",
-                    width=font_m.width + bar_padx,
-                    fixed_height=font_m.height,
-                    offset_y=font_m.voffset,
-                    fg_color=self.wcfg["font_color_tyre_compound"],
-                    bg_color=self.wcfg["background_color_tyre_compound"],
-                    count=2,
-                )
-                self.set_grid_layout_vert(
-                    layout=layout_pdiff,
-                    targets=bars_blank
-                )
-
         # Last data
         self.last_in_pits = -1
+        self.last_compounds = ("", "", "", "")
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -166,14 +146,14 @@ class Realtime(Overlay):
         # Update compound while in pit (or switched pit state)
         if in_pits or self.last_in_pits != in_pits:
             self.last_in_pits = in_pits
-            class_name = api.read.vehicle.class_name()
-            tcmpd_f = f"{class_name} - {api.read.tyre.compound_name_front()}"
-            tcmpd_r = f"{class_name} - {api.read.tyre.compound_name_rear()}"
+            compounds = api.read.tyre.compound_class()
 
-            # Tyre compound
-            if self.wcfg["show_tyre_compound"]:
-                self.update_tcmpd(self.bars_tcmpd[0], tcmpd_f)
-                self.update_tcmpd(self.bars_tcmpd[1], tcmpd_r)
+            if self.last_compounds != compounds:
+                # Tyre compound
+                if self.wcfg["show_tyre_compound"]:
+                    for tyre_idx, bar_tcmpd in enumerate(self.bars_tcmpd):
+                        self.update_tcmpd(bar_tcmpd, compounds[tyre_idx])
+                self.last_compounds = compounds
 
         # Tyre pressure: 0 - fl, 1 - fr, 2 - rl, 3 - rr
         tpres = api.read.tyre.pressure()

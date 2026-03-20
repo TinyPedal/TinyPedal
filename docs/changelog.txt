@@ -1,5 +1,16 @@
 WIP
 -----------------------------
+* Tyre Compound Display
+  - Reworked general tyre compound display, which now supports to display tyre compound & associated heatmap on each wheel separately.
+  - Relative, Rivals, Standings Widgets now show four tyre compound symbols for every driver.
+  - Tyre temperature, Tyre inner layer, Tyre carcass, Tyre pressure Widgets are reworked to show tyre compounds on each wheel separately.
+  - Note, currently RF2 & LMU game API do not provide separate compound info for tyres on the same axle. Due to this limitation, when set left tyre compound differently than right tyre, the API will only output and show compound info from left tyre. This is not a bug.
+
+* Tyre carcass, Tyre pressure Widget
+  - Added "horizontal_gap", "vertical_gap" options, which allows to adjust horizontal & vertical gap between each wheel separately.
+  - Removed "layout", "bar_gap", "display_order" options, as those options no longer worked with the new tyre compound display.
+  - "Rate Of Change" & "Pressure Deviation" columns are now displayed horizontally at outer side of each tyre temperature reading.
+
 * Misc
   - Fixed an issue where "LIMIT" text was not displayed correctly if disabled "show_current_speed_while_limiter_on".
 

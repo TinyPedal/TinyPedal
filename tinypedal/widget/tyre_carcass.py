@@ -41,8 +41,14 @@ class Realtime(Overlay):
     def __init__(self, config, widget_name):
         # Assign base setting
         super().__init__(config, widget_name)
-        layout = self.set_grid_layout(gap=self.wcfg["bar_gap"])
+        layout = self.set_grid_layout(
+            gap_hori=self.wcfg["horizontal_gap"],
+            gap_vert=self.wcfg["vertical_gap"],
+        )
         self.set_primary_layout(layout=layout)
+
+        layout_inner = tuple(self.set_grid_layout(gap=self.wcfg["inner_gap"]) for _ in range(4))
+        self.set_grid_layout_quad(layout=layout, targets=layout_inner)
 
         # Config font
         font = self.config_font(
@@ -55,7 +61,6 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        inner_gap = self.wcfg["inner_gap"]
         self.rate_interval = min(max(self.wcfg["rate_of_change_interval"], 1), 60)
         self.leading_zero = min(max(self.wcfg["leading_zero"], 1), 3) + 0.0  # no decimal
         self.sign_text = "°" if self.wcfg["show_degree_sign"] else ""
@@ -76,7 +81,7 @@ class Realtime(Overlay):
         ]
 
         # Tyre carcass temperature
-        layout_ctemp = self.set_grid_layout(gap=inner_gap)
+        base_row = 1
         self.bars_ctemp = self.set_rawtext(
             text=TEXT_NA,
             width=font_m.width * text_width + bar_padx,
@@ -87,15 +92,11 @@ class Realtime(Overlay):
             count=4,
             last=0,
         )
-        self.set_grid_layout_quad(
-            layout=layout_ctemp,
-            targets=self.bars_ctemp,
-        )
-        self.set_primary_orient(
-            target=layout_ctemp,
-            column=self.wcfg["display_order_carcass"],
-        )
+        # Column 1, 1
+        for idx, inner in enumerate(layout_inner):
+            inner.addWidget(self.bars_ctemp[idx], base_row, 1)
 
+        # Tyre compound
         if self.wcfg["show_tyre_compound"]:
             self.bars_tcmpd = self.set_rawtext(
                 text=TEXT_PLACEHOLDER,
@@ -104,16 +105,14 @@ class Realtime(Overlay):
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tyre_compound"],
                 bg_color=self.wcfg["background_color_tyre_compound"],
-                count=2,
+                count=4,
             )
-            self.set_grid_layout_vert(
-                layout=layout_ctemp,
-                targets=self.bars_tcmpd,
-            )
+            # Column 2, 0
+            for idx, inner in enumerate(layout_inner):
+                inner.addWidget(self.bars_tcmpd[idx], base_row, (1 - idx % 2) * 2)
 
         # Rate of change
         if self.wcfg["show_rate_of_change"]:
-            layout_rtemp = self.set_grid_layout(gap=inner_gap)
             self.bar_style_rtemp = (
                 (
                     (
@@ -155,38 +154,18 @@ class Realtime(Overlay):
                 count=4,
                 last=0,
             )
-            self.set_grid_layout_quad(
-                layout=layout_rtemp,
-                targets=self.bars_rdiff,
-            )
-            self.set_primary_orient(
-                target=layout_rtemp,
-                column=self.wcfg["display_order_rate_of_change"],
-            )
+            # Column 0, 2
+            for idx, inner in enumerate(layout_inner):
+                inner.addWidget(self.bars_rdiff[idx], base_row, 2 * (idx % 2))
+
             self.calc_ema_rdiff = partial(
                 calc.exp_mov_avg,
                 calc.ema_factor(self.wcfg["rate_of_change_smoothing_samples"])
             )
 
-            if self.wcfg["show_tyre_compound"]:
-                bars_blank = self.set_rawtext(
-                    text="",
-                    width=font_m.width + bar_padx,
-                    fixed_height=font_m.height,
-                    offset_y=font_m.voffset,
-                    fg_color=self.wcfg["font_color_tyre_compound"],
-                    bg_color=self.wcfg["background_color_tyre_compound"],
-                    count=2,
-                )
-                self.set_grid_layout_vert(
-                    layout=layout_rtemp,
-                    targets=bars_blank
-                )
-
         # Last data
         self.last_in_pits = -1
-        self.last_tcmpd_f = ""
-        self.last_tcmpd_r = ""
+        self.last_compounds = ("", "", "", "")
         self.last_rtemp = list(WHEELS_ZERO)
         self.last_lap_etime = 0
 
@@ -196,23 +175,19 @@ class Realtime(Overlay):
         in_pits = api.read.vehicle.in_pits()
         if in_pits or self.last_in_pits != in_pits:
             self.last_in_pits = in_pits
-            class_name = api.read.vehicle.class_name()
-            tcmpd_f = f"{class_name} - {api.read.tyre.compound_name_front()}"
-            tcmpd_r = f"{class_name} - {api.read.tyre.compound_name_rear()}"
+            compounds = api.read.tyre.compound_class()
 
-            # Heatmap style
-            if self.wcfg["enable_heatmap_auto_matching"]:
-                if self.last_tcmpd_f != tcmpd_f:
-                    self.update_heatmap(tcmpd_f, 0)
-                    self.last_tcmpd_f = tcmpd_f
-                if self.last_tcmpd_r != tcmpd_r:
-                    self.update_heatmap(tcmpd_r, 2)
-                    self.last_tcmpd_r = tcmpd_r
-
-            # Tyre compound
-            if self.wcfg["show_tyre_compound"]:
-                self.update_tcmpd(self.bars_tcmpd[0], tcmpd_f)
-                self.update_tcmpd(self.bars_tcmpd[1], tcmpd_r)
+            if self.last_compounds != compounds:
+                # Heatmap
+                if self.wcfg["enable_heatmap_auto_matching"]:
+                    for index, name in enumerate(compounds):
+                        if self.last_compounds[index] != name:
+                            self.update_heatmap(name, index)
+                # Tyre compound
+                if self.wcfg["show_tyre_compound"]:
+                    for tyre_idx, bar_tcmpd in enumerate(self.bars_tcmpd):
+                        self.update_tcmpd(bar_tcmpd, compounds[tyre_idx])
+                self.last_compounds = compounds
 
         # Tyre carcass temperature: 0 - fl, 1 - fr, 2 - rl, 3 - rr
         ctemp = api.read.tyre.carcass_temperature()
@@ -266,12 +241,10 @@ class Realtime(Overlay):
 
     def update_heatmap(self, compound, index):
         """Heatmap style"""
-        heatmap_style = load_heatmap_color(
+        self.heatmap_styles[index] = load_heatmap_color(
             heatmap_name=select_tyre_heatmap_name(compound),
             default_name=HEATMAP_DEFAULT_TYRE,
             swap_style=self.wcfg["swap_style"],
             fg_color=self.wcfg["font_color_carcass"],
             bg_color=self.wcfg["background_color_carcass"],
         )
-        self.heatmap_styles[index] = heatmap_style
-        self.heatmap_styles[index + 1] = heatmap_style

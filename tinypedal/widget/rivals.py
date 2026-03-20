@@ -317,7 +317,7 @@ class Realtime(Overlay):
         # Tyre compound index
         if self.wcfg["show_tyre_compound"]:
             self.bars_tcp = self.set_rawtext(
-                width=2 * font_m.width + bar_padx,
+                width=4 * font_m.width + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tyre_compound"],
@@ -543,7 +543,7 @@ class Realtime(Overlay):
                 self.update_pit(self.bars_pit[idx], veh_info.inPit, veh_info.isYellow, state)
             # Tyre compound index
             if self.wcfg["show_tyre_compound"]:
-                self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundFront, veh_info.tireCompoundRear, state)
+                self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundName, state)
             # Pitstop count
             if self.wcfg["show_pitstop_count"]:
                 self.update_psc(self.bars_psc[idx], veh_info.numPitStops, veh_info.pitRequested, state)
@@ -715,7 +715,7 @@ class Realtime(Overlay):
         """Tyre compound index"""
         if target.last != data:
             target.last = data
-            target.text = f"{select_compound_symbol(data[0])}{select_compound_symbol(data[1])}"
+            target.text = "".join(select_compound_symbol(name) for name in data[0])
             self.toggle_visibility(target, data[-1])
 
     def update_psc(self, target, *data):

@@ -454,33 +454,21 @@ class Timing(ABC):
 
 
 class Tyre(ABC):
-    """Tyre"""
+    """Tyre (front left, front right, rear left, rear right)"""
 
     __slots__ = ()
 
     @abstractmethod
-    def compound_front(self, index: int | None = None) -> int:
-        """Tyre compound (front)"""
+    def compound_index(self, index: int | None = None) -> tuple[int, int, int, int]:
+        """Tyre compound index set"""
 
     @abstractmethod
-    def compound_rear(self, index: int | None = None) -> int:
-        """Tyre compound (rear)"""
+    def compound_name(self, index: int | None = None) -> tuple[str, str, str, str]:
+        """Tyre compound name set"""
 
     @abstractmethod
-    def compound(self, index: int | None = None) -> tuple[int, int]:
-        """Tyre compound set (front, rear)"""
-
-    @abstractmethod
-    def compound_name_front(self, index: int | None = None) -> str:
-        """Tyre compound name (front)"""
-
-    @abstractmethod
-    def compound_name_rear(self, index: int | None = None) -> str:
-        """Tyre compound name (rear)"""
-
-    @abstractmethod
-    def compound_name(self, index: int | None = None) -> tuple[str, str]:
-        """Tyre compound name set (front, rear)"""
+    def compound_class(self, index: int | None = None) -> tuple[str, str, str, str]:
+        """Tyre compound name set with class name prefix"""
 
     @abstractmethod
     def surface_temperature_avg(self, index: int | None = None) -> tuple[float, ...]:
@@ -710,7 +698,7 @@ class Vehicle(ABC):
 
 
 class Wheel(ABC):
-    """Wheel & suspension"""
+    """Wheel & suspension (front left, front right, rear left, rear right)"""
 
     __slots__ = ()
 
