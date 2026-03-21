@@ -27,9 +27,9 @@ from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME, TEXT_PLACEHOLDER
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ..userfile.custom_image import load_brand_logo_image
-from ..userfile.heatmap import select_compound_symbol
+from ..userfile.heatmap import select_compound_color, select_compound_symbol
 from ._base import Overlay
-from ._painter import RawFrame
+from ._painter import MultiCompounds, RawFrame
 
 
 class Realtime(Overlay):
@@ -431,7 +431,7 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_pit_status"],
                 hide_start=1,
             )
-        # Tyre compound index
+        # Tyre compound
         if self.wcfg["show_tyre_compound"]:
             self.bar_style_tcp = (
                 (
@@ -443,13 +443,19 @@ class Realtime(Overlay):
                     self.wcfg["background_color_player_tyre_compound"],
                 ),
             )
-            self.bars_tcp = self.set_rawtext(
-                width=4 * font_m.width + bar_padx,
-                fixed_height=font_m.height,
-                offset_y=font_m.voffset,
-                fg_color=self.bar_style_tcp[0][0],
-                bg_color=self.bar_style_tcp[0][1],
-                count=self.veh_range,
+            self.bars_tcp = tuple(
+                MultiCompounds(
+                    parent=self,
+                    count=4,
+                    spacing=max(self.wcfg["tyre_compound_spacing"], 0),
+                    padding=bar_padx,
+                    width=font_m.width,
+                    height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.bar_style_tcp[0][0],
+                    bg_color=self.bar_style_tcp[0][1],
+                )
+                for _ in range(self.veh_range)
             )
             self.set_grid_layout_table_column(
                 layout=layout,
@@ -718,7 +724,7 @@ class Realtime(Overlay):
             # Vehicle in pit
             if self.wcfg["show_pit_status"]:
                 self.update_pit(self.bars_pit[idx], veh_info.inPit, veh_info.isYellow, state)
-            # Tyre compound index
+            # Tyre compound
             if self.wcfg["show_tyre_compound"]:
                 self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundName, hi_player, state)
             # Pitstop count
@@ -914,11 +920,16 @@ class Realtime(Overlay):
             self.toggle_visibility(target, data[-1])
 
     def update_tcp(self, target, *data):
-        """Tyre compound index"""
+        """Tyre compound"""
         if target.last != data:
             target.last = data
-            target.text = "".join(select_compound_symbol(name) for name in data[0])
-            target.fg, target.bg = self.bar_style_tcp[data[1]]
+            color = self.bar_style_tcp[data[1]]
+            target.compounds = tuple(select_compound_symbol(name) for name in data[0])
+            if data[1] or not self.wcfg["show_compound_color_by_type"]:
+                target.colors = (color[0], color[0], color[0], color[0])
+            else:
+                target.colors = tuple(select_compound_color(name) for name in data[0])
+            target.bg = color[1]
             self.toggle_visibility(target, data[-1])
 
     def update_psc(self, target, *data):

@@ -530,3 +530,70 @@ class RawFrame(QWidget):
         """Draw"""
         painter = QPainter(self)
         painter.fillRect(0, 0, self._width, self._height, self.bg)
+
+
+class MultiCompounds(QWidget):
+    """Multi color compounds text"""
+
+    def __init__(
+        self,
+        parent,
+        font: QFont | None = None,
+        count: int = 4,
+        spacing: int = 0,
+        padding: int = 0,
+        width: int = 0,
+        height: int = 0,
+        offset_y: int = 0,
+        fg_color: str = "",
+        bg_color: str = "",
+        alignment: Qt.Alignment = Qt.AlignCenter,
+        last: Any | None = None,
+    ):
+        super().__init__(parent)
+        if font is not None:
+            self.setFont(font)
+
+        self.setFixedWidth(count * (width + spacing) + padding)
+        self.setFixedHeight(height)
+
+        self.state = None
+        self.last = last
+        fg = fg_color if fg_color else Qt.transparent
+        self.bg = bg_color if bg_color else Qt.transparent
+        self._alignment = alignment
+        self._offset_y = offset_y
+        self._padding = padding // 2
+        self._word_width = width + spacing
+        self._pen_text = QPen()
+        self._width = self.width()
+        self._height = self.height()
+        self.compounds = ("", "", "", "")
+        self.colors = (fg, fg, fg, fg)
+
+    def clear(self):
+        """Clear display"""
+        self.compounds = ("", "", "", "")
+        self.colors = (Qt.transparent, Qt.transparent, Qt.transparent, Qt.transparent)
+        self.bg = Qt.transparent
+
+    def resizeEvent(self, event):
+        """Update size info"""
+        self._width = self.width()
+        self._height = self.height()
+
+    def paintEvent(self, event):
+        """Draw"""
+        painter = QPainter(self)
+        painter.fillRect(0, 0, self._width, self._height, self.bg)
+        for index, compound in enumerate(self.compounds):
+            self._pen_text.setColor(self.colors[index])
+            painter.setPen(self._pen_text)
+            painter.drawText(
+                self._padding + self._word_width * index,
+                self._offset_y,
+                self._word_width,
+                self._height,
+                self._alignment,
+                compound,
+            )

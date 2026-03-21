@@ -459,15 +459,15 @@ class Tyre(ABC):
     __slots__ = ()
 
     @abstractmethod
-    def compound_index(self, index: int | None = None) -> tuple[int, int, int, int]:
+    def compound_index(self, index: int | None = None) -> tuple[int, ...]:
         """Tyre compound index set"""
 
     @abstractmethod
-    def compound_name(self, index: int | None = None) -> tuple[str, str, str, str]:
+    def compound_name(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set"""
 
     @abstractmethod
-    def compound_class(self, index: int | None = None) -> tuple[str, str, str, str]:
+    def compound_class(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set with class name prefix"""
 
     @abstractmethod

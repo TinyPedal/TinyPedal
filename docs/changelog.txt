@@ -20,7 +20,9 @@ WIP
   - "Rate Of Change" (from Tyre carcass) & "Pressure Deviation" (from Tyre pressure) columns are now displayed horizontally at outer side of each tyre temperature reading.
 
 * Relative, Rivals, Standings Widget
-  - Now shows tyre compound symbol for all tyres.
+  - Now shows tyre compound symbol for all tyres. Compound symbol display order is arranged as "front left, front right, rear left, rear right".
+  - Added "show_compound_color_by_type" option, which shows different compound color by compound type. Note, player's compound color is not affected by this setting while "show_player_highlighted" option is enabled.
+  - Added "tyre_compound_spacing" option, which sets display spacing (in pixels) between each compound symbol. Default is "1" pixel.
 
 * Misc
   - Fixed an issue where "LIMIT" text was not displayed correctly if disabled "show_current_speed_while_limiter_on".

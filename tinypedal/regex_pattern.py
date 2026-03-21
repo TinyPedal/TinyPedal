@@ -121,6 +121,7 @@ CFG_INTEGER = (
     "^snap_distance$|"
     "^snap_gap$|"
     "^stint_history_count$|"
+    "^tyre_compound_spacing$|"
     "^window_width$|"
     "^window_height$|"
     # Partial match

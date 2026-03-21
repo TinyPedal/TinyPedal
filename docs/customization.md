@@ -3171,7 +3171,17 @@ Set custom garage status text which shows when driver is in garage.
 Set custom yellow flag status text which shows when driver causes (or likely to) yellow flag. Note, unlike in-game yellow flag, the indicator is always displayed when driver's speed is below 28kph (outside pit lane), regardless whether driver has caused yellow flag on track.
 
     show_tyre_compound
-Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
+Show tyre compound symbol for all tyres that matches specific tyre compounds defined in `compounds.json` preset.
+
+Compound symbol display order is arranged as `front left, front right, rear left, rear right`.
+
+    show_compound_color_by_type
+Show different compound color by compound type, which can be customized in [Tyre Compound Editor](#tyre-compound-editor).
+
+Note, player's compound color is not affected by this setting while `show_player_highlighted` option is enabled.
+
+    tyre_compound_spacing
+Set display spacing (in pixels) between each compound symbol. Default is `1` pixel.
 
     show_pitstop_count
 Show each driver's pit stop count and penalty count if available. Note, when a driver accumulates one or more penalties, this column will show the number of penalties in negative value with purple (default) background to distinguish from number of pit stops.

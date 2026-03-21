@@ -585,21 +585,21 @@ class Tyre(_reader.Tyre, DataAdapter):
 
     __slots__ = ()
 
-    def compound_index(self, index: int | None = None) -> tuple[int, int, int, int]:
+    def compound_index(self, index: int | None = None) -> tuple[int, ...]:
         """Tyre compound index set"""
         tele_veh = self.shmm.rf2TeleVeh(index)
         front = tele_veh.mFrontTireCompoundIndex
         rear = tele_veh.mRearTireCompoundIndex
         return front, front, rear, rear
 
-    def compound_name(self, index: int | None = None) -> tuple[str, str, str, str]:
+    def compound_name(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set"""
         tele_veh = self.shmm.rf2TeleVeh(index)
         front = tostr(tele_veh.mFrontTireCompoundName)
         rear = tostr(tele_veh.mRearTireCompoundName)
         return front, front, rear, rear
 
-    def compound_class(self, index: int | None = None) -> tuple[str, str, str, str]:
+    def compound_class(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set with class name prefix"""
         tele_veh = self.shmm.rf2TeleVeh(index)
         class_name = tostr(self.shmm.rf2ScorVeh(index).mVehicleClass)
