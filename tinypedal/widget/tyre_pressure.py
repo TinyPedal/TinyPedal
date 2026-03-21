@@ -189,6 +189,6 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = select_compound_symbol(data)
-            if self.wcfg["show_compound_color_per_type"]:
+            if self.wcfg["show_compound_color_by_type"]:
                 target.fg = select_compound_color(data)
             target.update()

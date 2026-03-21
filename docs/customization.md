@@ -4144,8 +4144,8 @@ Set number of samples for reducing data fluctuation. Lower value may result more
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
 
-    show_compound_color_per_type
-Show custom compound color that defined in [Compounds Preset](#compounds-preset) for each different compound type.
+    show_compound_color_by_type
+Show different compound color by compound type, which can be customized in [Tyre Compound Editor](#tyre-compound-editor).
 
 [**`Back to Top`**](#)
 
@@ -4178,8 +4178,8 @@ Set amount leading zeros for each temperature value. Default is `2`. Minimum val
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
 
-    show_compound_color_per_type
-Show custom compound color that defined in [Compounds Preset](#compounds-preset) for each different compound type.
+    show_compound_color_by_type
+Show different compound color by compound type, which can be customized in [Tyre Compound Editor](#tyre-compound-editor).
 
 [**`Back to Top`**](#)
 
@@ -4211,8 +4211,8 @@ Swap cold and hot pressure color.
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
 
-    show_compound_color_per_type
-Show custom compound color that defined in [Compounds Preset](#compounds-preset) for each different compound type.
+    show_compound_color_by_type
+Show different compound color by compound type, which can be customized in [Tyre Compound Editor](#tyre-compound-editor).
 
 [**`Back to Top`**](#)
 
@@ -4245,8 +4245,8 @@ Set amount leading zeros for each temperature value. Default is `2`. Minimum val
     show_tyre_compound
 Show tyre compound symbols (front and rear) that matches specific tyre compounds defined in `compounds.json` preset.
 
-    show_compound_color_per_type
-Show custom compound color that defined in [Compounds Preset](#compounds-preset) for each different compound type.
+    show_compound_color_by_type
+Show different compound color by compound type, which can be customized in [Tyre Compound Editor](#tyre-compound-editor).
 
 [**`Back to Top`**](#)
 

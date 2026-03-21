@@ -15,12 +15,12 @@ WIP
 
 * Tyre temperature, Tyre inner layer, Tyre carcass, Tyre pressure Widget
   - Now all supports "horizontal_gap", "vertical_gap" options for adjusting horizontal & vertical gap separately between each wheel.
-  - Added "show_compound_color_per_type" option, which shows custom compound color (defined in Compounds Preset) for each different compound type.
+  - Added "show_compound_color_by_type" option, which shows different compound color by compound type that can be customized in Tyre Compound Editor.
   - Removed "layout", "bar_gap", "display_order" options, as those options no longer worked with the new tyre compound display.
   - "Rate Of Change" (from Tyre carcass) & "Pressure Deviation" (from Tyre pressure) columns are now displayed horizontally at outer side of each tyre temperature reading.
 
 * Relative, Rivals, Standings Widget
-  - Now shows four tyre compound symbols for each driver.
+  - Now shows tyre compound symbol for all tyres.
 
 * Misc
   - Fixed an issue where "LIMIT" text was not displayed correctly if disabled "show_current_speed_while_limiter_on".
