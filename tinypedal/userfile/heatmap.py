@@ -118,6 +118,9 @@ def set_predefined_compound_symbol(compound_name: str) -> str:
     for compound in COMMON_TYRE_COMPOUNDS:
         if re.search(compound[0], compound_name, flags=re.IGNORECASE):
             return compound[1]
+    compound_name = compound_name.split("-")[-1].strip()
+    if compound_name:  # use first letter if available
+        return compound_name[0].upper()
     return "?"
 
 
