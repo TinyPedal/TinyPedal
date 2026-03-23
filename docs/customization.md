@@ -3171,9 +3171,12 @@ Set custom garage status text which shows when driver is in garage.
 Set custom yellow flag status text which shows when driver causes (or likely to) yellow flag. Note, unlike in-game yellow flag, the indicator is always displayed when driver's speed is below 28kph (outside pit lane), regardless whether driver has caused yellow flag on track.
 
     show_tyre_compound
-Show tyre compound symbol for all tyres that matches specific tyre compounds defined in `compounds.json` preset.
+Show tyre compound symbol for tyre that matches specific tyre compounds defined in `compounds.json` preset.
 
-Compound symbol display order is arranged as `front left, front right, rear left, rear right`.
+    show_compound_for_each_wheel
+Show tyre compound symbol for each wheel. Compound symbol display order is arranged as `front left, front right, rear left, rear right`. This option is enabled by default.
+
+Disable this option to show a single symbol for all tyres, which allows a more compact view. If mixed tyres are used, a `X` symbol will be displayed instead, which can be customized by `mixed_compound_symbol` option.
 
     show_compound_color_by_type
 Show different compound color by compound type, which can be customized in [Tyre Compound Editor](#tyre-compound-editor).

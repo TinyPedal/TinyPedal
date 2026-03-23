@@ -97,6 +97,7 @@ CFG_STRING = (
     "prefix|"
     "sound_format|"
     "suffix|"
+    "symbol|"
     "text|"
     "unit|"
     "url_host"

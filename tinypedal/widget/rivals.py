@@ -316,10 +316,11 @@ class Realtime(Overlay):
             )
         # Tyre compound
         if self.wcfg["show_tyre_compound"]:
+            self.count_tcp = 4 if self.wcfg["show_compound_for_each_wheel"] else 1
             self.bars_tcp = tuple(
                 MultiCompounds(
                     parent=self,
-                    count=4,
+                    count=self.count_tcp,
                     spacing=max(self.wcfg["tyre_compound_spacing"], 0),
                     padding=bar_padx,
                     width=font_m.width,
@@ -721,9 +722,24 @@ class Realtime(Overlay):
         """Tyre compound"""
         if target.last != data:
             target.last = data
-            target.compounds = tuple(select_compound_symbol(name) for name in data[0])
-            if self.wcfg["show_compound_color_by_type"]:
-                target.colors = tuple(select_compound_color(name) for name in data[0])
+            # Single compound
+            if self.count_tcp == 1:
+                compound = data[0][0]
+                for name in data[0]:
+                    if name != compound:
+                        target.compounds = (self.wcfg["mixed_compound_symbol"][:1],)
+                        if self.wcfg["show_compound_color_by_type"]:
+                            target.colors = (self.wcfg["font_color_mixed_compound"],)
+                        break
+                else:
+                    target.compounds = (select_compound_symbol(compound),)
+                    if self.wcfg["show_compound_color_by_type"]:
+                        target.colors = (select_compound_color(compound),)
+            # All compounds
+            else:
+                target.compounds = tuple(select_compound_symbol(name) for name in data[0])
+                if self.wcfg["show_compound_color_by_type"]:
+                    target.colors = tuple(select_compound_color(name) for name in data[0])
             self.toggle_visibility(target, data[-1])
 
     def update_psc(self, target, *data):

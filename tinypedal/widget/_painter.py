@@ -561,6 +561,7 @@ class MultiCompounds(QWidget):
         self.last = last
         fg = fg_color if fg_color else Qt.transparent
         self.bg = bg_color if bg_color else Qt.transparent
+        self._count = count
         self._alignment = alignment
         self._offset_y = offset_y
         self._padding = padding // 2
@@ -568,13 +569,13 @@ class MultiCompounds(QWidget):
         self._pen_text = QPen()
         self._width = self.width()
         self._height = self.height()
-        self.compounds = ("", "", "", "")
-        self.colors = (fg, fg, fg, fg)
+        self.compounds = ("",) * count
+        self.colors = (fg,) * count
 
     def clear(self):
         """Clear display"""
-        self.compounds = ("", "", "", "")
-        self.colors = (Qt.transparent, Qt.transparent, Qt.transparent, Qt.transparent)
+        self.compounds = ("",) * self._count
+        self.colors = (Qt.transparent,) * self._count
         self.bg = Qt.transparent
 
     def resizeEvent(self, event):
@@ -587,6 +588,8 @@ class MultiCompounds(QWidget):
         painter = QPainter(self)
         painter.fillRect(0, 0, self._width, self._height, self.bg)
         for index, compound in enumerate(self.compounds):
+            if not compound:
+                continue
             self._pen_text.setColor(self.colors[index])
             painter.setPen(self._pen_text)
             painter.drawText(

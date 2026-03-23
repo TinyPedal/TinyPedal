@@ -433,6 +433,7 @@ class Realtime(Overlay):
             )
         # Tyre compound
         if self.wcfg["show_tyre_compound"]:
+            self.count_tcp = 4 if self.wcfg["show_compound_for_each_wheel"] else 1
             self.bar_style_tcp = (
                 (
                     self.wcfg["font_color_tyre_compound"],
@@ -446,7 +447,7 @@ class Realtime(Overlay):
             self.bars_tcp = tuple(
                 MultiCompounds(
                     parent=self,
-                    count=4,
+                    count=self.count_tcp,
                     spacing=max(self.wcfg["tyre_compound_spacing"], 0),
                     padding=bar_padx,
                     width=font_m.width,
@@ -924,12 +925,32 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             color = self.bar_style_tcp[data[1]]
-            target.compounds = tuple(select_compound_symbol(name) for name in data[0])
-            if data[1] or not self.wcfg["show_compound_color_by_type"]:
-                target.colors = (color[0], color[0], color[0], color[0])
-            else:
-                target.colors = tuple(select_compound_color(name) for name in data[0])
             target.bg = color[1]
+            show_color_by_type = (not data[1] and self.wcfg["show_compound_color_by_type"])
+            # Single compound
+            if self.count_tcp == 1:
+                compound = data[0][0]
+                for name in data[0]:
+                    if name != compound:
+                        target.compounds = (self.wcfg["mixed_compound_symbol"][:1],)
+                        if show_color_by_type:
+                            target.colors = (self.wcfg["font_color_mixed_compound"],)
+                        else:
+                            target.colors = (color[0],)
+                        break
+                else:
+                    target.compounds = (select_compound_symbol(compound),)
+                    if show_color_by_type:
+                        target.colors = (select_compound_color(compound),)
+                    else:
+                        target.colors = (color[0],)
+            # All compounds
+            else:
+                target.compounds = tuple(select_compound_symbol(name) for name in data[0])
+                if show_color_by_type:
+                    target.colors = tuple(select_compound_color(name) for name in data[0])
+                else:
+                    target.colors = (color[0],) * self.count_tcp
             self.toggle_visibility(target, data[-1])
 
     def update_psc(self, target, *data):
