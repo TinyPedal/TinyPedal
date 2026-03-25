@@ -17,10 +17,9 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Tyre load Widget
+Tyre deflection Widget
 """
 
-from .. import calculation as calc
 from ..api_control import api
 from ._base import Overlay
 from ._painter import WheelGaugeBar
@@ -52,6 +51,8 @@ class Realtime(Overlay):
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
+        max_range = max(int(self.wcfg["deflection_maximum_range"]), 10)
+        self.threshold_liftoff = self.wcfg["lift_off_threshold"]
 
         # Caption
         if self.wcfg["show_caption"]:
@@ -75,15 +76,20 @@ class Realtime(Overlay):
                 column=0,
             )
 
-        # Tyre load
+        # Tyre deflection
         layout_inner = self.set_grid_layout(gap_hori=bar_gap_hori, gap_vert=bar_gap_vert)
-        self.bars_tload = tuple(
+        self.deflect_color = (
+            self.wcfg["background_color"],
+            self.wcfg["warning_color_lift_off"],
+        )
+        self.bars_deflect = tuple(
             WheelGaugeBar(
                 self,
                 padding_x=padx,
                 bar_width=bar_width,
                 bar_height=bar_height,
                 offset_y=font_m.voffset,
+                display_range=max_range,
                 input_color=self.wcfg["highlight_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["background_color"],
@@ -92,7 +98,7 @@ class Realtime(Overlay):
         )
         self.set_grid_layout_quad(
             layout=layout_inner,
-            targets=self.bars_tload,
+            targets=self.bars_deflect,
         )
         self.set_primary_orient(
             target=layout_inner,
@@ -101,17 +107,14 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        tload_set = api.read.tyre.load()
-        sum_load = sum(tload_set)
-        for tload, bar_tload in zip(tload_set, self.bars_tload):
-            tratio = calc.part_to_whole_ratio(tload, sum_load)
-            if self.wcfg["show_tyre_load_ratio"]:
-                tload = tratio
-            self.update_tload(bar_tload, tload, tratio)
+        deflect_set = api.read.tyre.vertical_deflection()
+        for deflect, bar_deflect in zip(deflect_set, self.bars_deflect):
+            self.update_deflect(bar_deflect, deflect)
 
     # GUI update methods
-    def update_tload(self, target, data, ratio):
-        """Tyre load & ratio"""
+    def update_deflect(self, target, data):
+        """Tyre deflection"""
         if target.last != data:
             target.last = data
-            target.update_input(ratio)
+            target.bg_color = self.deflect_color[data <= self.threshold_liftoff]
+            target.update_input(data)

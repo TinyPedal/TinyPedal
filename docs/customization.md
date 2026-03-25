@@ -4165,6 +4165,18 @@ Show different compound color by compound type, which can be customized in [Tyre
 [**`Back to Top`**](#)
 
 
+## Tyre deflection
+**This widget displays visualized tyre vertical deflection info.**
+
+    deflection_maximum_range
+Set visualized maximum tyre deflection display range (millimeter).
+
+    lift_off_threshold
+Set millimeter threshold of tyre deflection for detecting lifted wheels. Default threshold is `1` millimeter.
+
+[**`Back to Top`**](#)
+
+
 ## Tyre inner layer
 **This widget displays tyre inner layer temperature info.**
 

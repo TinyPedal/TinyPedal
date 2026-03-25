@@ -109,7 +109,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         slip_set = minfo.wheels.slipRatio
         for slip, bar_slip in zip(slip_set, self.bars_slip):
-            self.update_slip(bar_slip, min(round(abs(slip * 100)), 100))
+            self.update_slip(bar_slip, min(abs(slip * 100), 100))
 
     # GUI update methods
     def update_slip(self, target, data):

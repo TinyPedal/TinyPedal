@@ -25,6 +25,10 @@ WIP
   - Added "show_compound_color_by_type" option, which shows different compound color by compound type. Note, player's compound color is not affected by this setting while "show_player_highlighted" option is enabled.
   - Added "tyre_compound_spacing" option, which sets display spacing (in pixels) between each compound symbol. Default is "1" pixel.
 
+* [New]Tyre deflection
+  - Show visualized tyre vertical deflection in millimeters.
+  - Show warning indication for lifted wheels.
+
 * Misc
   - Added support for "lap and time" based race (where finish criteria is determined by both remaining laps & time).
   - Default preset (when creating new preset) now enables only 10 commonly used widgets. Newly implemented widgets are no longer enabled by default.

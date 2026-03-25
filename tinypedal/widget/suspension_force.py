@@ -107,7 +107,7 @@ class Realtime(Overlay):
             ratio = calc.part_to_whole_ratio(force, sum_force)
             if self.wcfg["show_force_ratio"]:
                 force = ratio
-            self.update_force(bar_force, round(force), ratio)
+            self.update_force(bar_force, force, ratio)
 
     # GUI update methods
     def update_force(self, target, data, ratio):
