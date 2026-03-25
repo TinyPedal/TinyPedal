@@ -554,7 +554,9 @@ Set opacity for entire widget. By default, all widgets have a 90% opacity settin
 Set gap (screen pixel) between elements in a widget, only accept integer, `1` = 1 pixel.
 
     font_name
-Mono type font is highly recommended. To set custom font, write `full font name` inside quotation marks. If a font name is invalid, a default fallback font will be used by program.
+Select a font to be displayed in widget. Mono type font is highly recommended.
+
+Note, selected font must be already installed in operation system; if not, manually install required font. Default fallback font will be used if font is not found or installed in operation system.
 
     font_size
 Set font size in pixel, increase or decrease font size will also apply to widget size.
