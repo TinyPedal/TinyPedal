@@ -26,7 +26,7 @@ from .setting_heatmap import HEATMAP_DEFAULT_BRAKE, HEATMAP_DEFAULT_TYRE
 
 WIDGET_DEFAULT = {
     "battery": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 140,
         "position_y": 293,
@@ -70,7 +70,7 @@ WIDGET_DEFAULT = {
         "display_order_activation_timer": 5,
     },
     "brake_bias": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 593,
         "position_y": 292,
@@ -107,7 +107,7 @@ WIDGET_DEFAULT = {
         "display_order_brake_migration": 3,
     },
     "brake_performance": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 57,
         "position_y": 753,
@@ -145,7 +145,7 @@ WIDGET_DEFAULT = {
         "display_order_rear_wheel_lock_duration": 5,
     },
     "brake_pressure": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 253,
         "position_y": 476,
@@ -174,7 +174,7 @@ WIDGET_DEFAULT = {
         "background_color_caption": "#777777",
     },
     "brake_temperature": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 460,
         "position_y": 525,
@@ -204,7 +204,7 @@ WIDGET_DEFAULT = {
         "display_order_average": 2,
     },
     "brake_wear": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 688,
         "position_y": 720,
@@ -254,7 +254,7 @@ WIDGET_DEFAULT = {
         "display_order_lifespan_minutes": 5,
     },
     "cruise": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 57,
         "position_y": 98,
@@ -290,7 +290,7 @@ WIDGET_DEFAULT = {
         "display_order_cornering_radius": 5,
     },
     "damage": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 658,
         "position_y": 515,
@@ -340,8 +340,8 @@ WIDGET_DEFAULT = {
     "deltabest": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 317,
-        "position_y": 69,
+        "position_x": 987,
+        "position_y": 372,
         "font_name": "Consolas",
         "font_size": 17,
         "font_weight": "Bold",
@@ -369,7 +369,7 @@ WIDGET_DEFAULT = {
         "enable_animated_deltabest": True,
     },
     "deltabest_extended": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 320,
         "position_y": 123,
@@ -407,7 +407,7 @@ WIDGET_DEFAULT = {
         "display_order_deltalast": 4,
     },
     "differential": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 57,
         "position_y": 860,
@@ -448,7 +448,7 @@ WIDGET_DEFAULT = {
         "display_order_coast_locking_rear": 4,
     },
     "drs": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 504,
         "position_y": 352,
@@ -471,7 +471,7 @@ WIDGET_DEFAULT = {
         "background_color_not_available": "#222222",
     },
     "electric_motor": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 223,
         "position_y": 293,
@@ -509,7 +509,7 @@ WIDGET_DEFAULT = {
         "display_order_power": 5,
     },
     "elevation": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 115,
         "position_y": 753,
@@ -560,7 +560,7 @@ WIDGET_DEFAULT = {
         "position_mark_width": 2,
     },
     "engine": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 57,
         "position_y": 293,
@@ -608,8 +608,8 @@ WIDGET_DEFAULT = {
     "flag": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 556,
-        "position_y": 509,
+        "position_x": 1111,
+        "position_y": 97,
         "font_name": "Consolas",
         "font_size": 22,
         "font_weight": "Bold",
@@ -685,7 +685,7 @@ WIDGET_DEFAULT = {
         "display_order_finish_state": 9,
     },
     "force": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 453,
         "position_y": 395,
@@ -721,7 +721,7 @@ WIDGET_DEFAULT = {
         "display_order_rear_downforce": 5,
     },
     "friction_circle": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 1000,
         "position_y": 266,
@@ -790,8 +790,8 @@ WIDGET_DEFAULT = {
     "fuel": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 57,
-        "position_y": 208,
+        "position_x": 713,
+        "position_y": 564,
         "font_name": "Consolas",
         "font_size": 15,
         "font_weight": "Bold",
@@ -872,7 +872,7 @@ WIDGET_DEFAULT = {
         "display_order_lower": 3,
     },
     "fuel_energy_saver": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 115,
         "position_y": 912,
@@ -907,8 +907,8 @@ WIDGET_DEFAULT = {
     "gear": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 306,
-        "position_y": 293,
+        "position_x": 721,
+        "position_y": 408,
         "font_name": "Consolas",
         "font_size": 44,
         "font_weight_gear": "Bold",
@@ -973,7 +973,7 @@ WIDGET_DEFAULT = {
         "display_order_rpm": 3,
     },
     "heading": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 1015,
         "position_y": 455,
@@ -1025,7 +1025,7 @@ WIDGET_DEFAULT = {
         "center_mark_color": "#88999999",
     },
     "instrument": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 306,
         "position_y": 339,
@@ -1057,7 +1057,7 @@ WIDGET_DEFAULT = {
         "display_order_wheel_slip": 5,
     },
     "laps_and_position": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 57,
         "position_y": 42,
@@ -1088,7 +1088,7 @@ WIDGET_DEFAULT = {
         "display_order_position_in_class": 3,
     },
     "lap_time_history": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 523,
         "position_y": 393,
@@ -1142,7 +1142,7 @@ WIDGET_DEFAULT = {
         "display_order_wear": 5,
     },
     "navigation": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 1040,
         "position_y": 70,
@@ -1194,7 +1194,7 @@ WIDGET_DEFAULT = {
         "vehicle_outline_width": 1,
     },
     "pace_notes": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 739,
         "position_y": 251,
@@ -1236,8 +1236,8 @@ WIDGET_DEFAULT = {
     "pedal": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 374,
-        "position_y": 401,
+        "position_x": 1041,
+        "position_y": 439,
         "font_name": "Consolas",
         "font_size": 13,
         "font_weight": "Bold",
@@ -1280,7 +1280,7 @@ WIDGET_DEFAULT = {
         "display_order_ffb": 1,
     },
     "pit_stop_estimate": {
-        "enable": True,
+        "enable": False,
         "update_interval": 50,
         "position_x": 360,
         "position_y": 934,
@@ -1339,7 +1339,7 @@ WIDGET_DEFAULT = {
         "display_order_lower": 3,
     },
     "push_to_pass": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 556,
         "position_y": 457,
@@ -1375,8 +1375,8 @@ WIDGET_DEFAULT = {
     "radar": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 689,
-        "position_y": 353,
+        "position_x": 683,
+        "position_y": 46,
         "opacity": 0.9,
         "global_scale": 6,
         "radar_radius": 30,
@@ -1453,7 +1453,7 @@ WIDGET_DEFAULT = {
         "vehicle_maximum_visible_distance_side": -1,
     },
     "rake_angle": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 593,
         "position_y": 315,
@@ -1475,7 +1475,7 @@ WIDGET_DEFAULT = {
         "warning_color_negative_rake": "#00AAFF",
     },
     "relative": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 320,
         "position_y": 148,
@@ -1648,7 +1648,7 @@ WIDGET_DEFAULT = {
         "display_order_pit_status": 22,
     },
     "relative_finish_order": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 360,
         "position_y": 824,
@@ -1704,7 +1704,7 @@ WIDGET_DEFAULT = {
         "prediction_10_player_pit_time": 120,
     },
     "ride_height": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 253,
         "position_y": 384,
@@ -1736,7 +1736,7 @@ WIDGET_DEFAULT = {
         "background_color_caption": "#777777",
     },
     "rivals": {
-        "enable": True,
+        "enable": False,
         "update_interval": 50,
         "position_x": 433,
         "position_y": 688,
@@ -1871,7 +1871,7 @@ WIDGET_DEFAULT = {
         "display_order_pit_status": 22,
     },
     "roll_angle": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 770,
         "position_y": 720,
@@ -1910,7 +1910,7 @@ WIDGET_DEFAULT = {
         "display_order_roll_angle_ratio": 4,
     },
     "rpm_led": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 766,
         "position_y": 804,
@@ -1943,7 +1943,7 @@ WIDGET_DEFAULT = {
         "speed_limiter_flash_color": "#00FF00",
     },
     "sectors": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 57,
         "position_y": 157,
@@ -1972,7 +1972,7 @@ WIDGET_DEFAULT = {
         "background_color_time_loss": "#887700",
     },
     "session": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 57,
         "position_y": 127,
@@ -2010,7 +2010,7 @@ WIDGET_DEFAULT = {
         "display_order_estimated_laps": 3,
     },
     "slip_ratio": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 280,
         "position_y": 712,
@@ -2039,7 +2039,7 @@ WIDGET_DEFAULT = {
         "background_color_caption": "#777777",
     },
     "speedometer": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 57,
         "position_y": 640,
@@ -2076,7 +2076,7 @@ WIDGET_DEFAULT = {
         "display_order_speed_fastest": 4,
     },
     "standings": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 57,
         "position_y": 610,
@@ -2266,7 +2266,7 @@ WIDGET_DEFAULT = {
         "display_order_pit_status": 22,
     },
     "steering": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 585,
         "position_y": 358,
@@ -2294,8 +2294,8 @@ WIDGET_DEFAULT = {
     "steering_wheel": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 1050,
-        "position_y": 620,
+        "position_x": 1133,
+        "position_y": 467,
         "font_name": "Consolas",
         "font_size": 15,
         "font_weight": "Bold",
@@ -2324,7 +2324,7 @@ WIDGET_DEFAULT = {
         "rotation_line_margin": 2,
     },
     "stint_history": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 523,
         "position_y": 423,
@@ -2391,7 +2391,7 @@ WIDGET_DEFAULT = {
         "display_order_consistency": 7,
     },
     "suspension_force": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 391,
         "position_y": 713,
@@ -2418,7 +2418,7 @@ WIDGET_DEFAULT = {
         "background_color_caption": "#777777",
     },
     "suspension_position": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 145,
         "position_y": 670,
@@ -2452,7 +2452,7 @@ WIDGET_DEFAULT = {
         "background_color_caption": "#777777",
     },
     "suspension_travel": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 728,
         "position_y": 390,
@@ -2507,7 +2507,7 @@ WIDGET_DEFAULT = {
         "display_order_live_position": 7,
     },
     "system_performance": {
-        "enable": True,
+        "enable": False,
         "update_interval": 500,
         "position_x": 145,
         "position_y": 710,
@@ -2533,7 +2533,7 @@ WIDGET_DEFAULT = {
         "display_order_tinypedal": 2,
     },
     "timing": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 147,
         "position_y": 500,
@@ -2590,7 +2590,7 @@ WIDGET_DEFAULT = {
         "display_order_average_pace": 20,
     },
     "track_clock": {
-        "enable": True,
+        "enable": False,
         "update_interval": 200,
         "position_x": 340,
         "position_y": 42,
@@ -2714,7 +2714,7 @@ WIDGET_DEFAULT = {
         "background_color_pitstop_duration": "#AA000000",
     },
     "track_notes": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 739,
         "position_y": 182,
@@ -2757,8 +2757,8 @@ WIDGET_DEFAULT = {
     "trailing": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 433,
-        "position_y": 610,
+        "position_x": 713,
+        "position_y": 483,
         "opacity": 0.9,
         "background_color": "#CC222222",
         "display_width": 300,
@@ -2838,7 +2838,7 @@ WIDGET_DEFAULT = {
         "display_order_wheel_slip": 3,
     },
     "tyre_carcass": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 57,
         "position_y": 670,
@@ -2872,7 +2872,7 @@ WIDGET_DEFAULT = {
         "background_color_tyre_compound": "#222222",
     },
     "tyre_inner_layer": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 249,
         "position_y": 563,
@@ -2900,7 +2900,7 @@ WIDGET_DEFAULT = {
         "background_color_tyre_compound": "#222222",
     },
     "tyre_load": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 253,
         "position_y": 430,
@@ -2927,7 +2927,7 @@ WIDGET_DEFAULT = {
         "background_color_caption": "#777777",
     },
     "tyre_pressure": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 57,
         "position_y": 383,
@@ -2956,7 +2956,7 @@ WIDGET_DEFAULT = {
         "background_color_tyre_compound": "#222222",
     },
     "tyre_temperature": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 249,
         "position_y": 525,
@@ -2984,7 +2984,7 @@ WIDGET_DEFAULT = {
         "background_color_tyre_compound": "#222222",
     },
     "tyre_wear": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 57,
         "position_y": 444,
@@ -3040,8 +3040,8 @@ WIDGET_DEFAULT = {
     "virtual_energy": {
         "enable": True,
         "update_interval": 20,
-        "position_x": 115,
-        "position_y": 824,
+        "position_x": 949,
+        "position_y": 564,
         "font_name": "Consolas",
         "font_size": 15,
         "font_weight": "Bold",
@@ -3131,7 +3131,7 @@ WIDGET_DEFAULT = {
         "display_order_lower": 3,
     },
     "weather": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 57,
         "position_y": 70,
@@ -3176,7 +3176,7 @@ WIDGET_DEFAULT = {
         "display_order_wetness": 3,
     },
     "weather_forecast": {
-        "enable": True,
+        "enable": False,
         "update_interval": 100,
         "position_x": 256,
         "position_y": 640,
@@ -3209,7 +3209,7 @@ WIDGET_DEFAULT = {
         "display_order_rain_chance_bar": 4,
     },
     "weight_distribution": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 830,
         "position_y": 720,
@@ -3242,7 +3242,7 @@ WIDGET_DEFAULT = {
         "display_order_cross_weight": 3,
     },
     "wheel_camber": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 140,
         "position_y": 395,
@@ -3272,7 +3272,7 @@ WIDGET_DEFAULT = {
         "background_color_caption": "#777777",
     },
     "wheel_toe": {
-        "enable": True,
+        "enable": False,
         "update_interval": 20,
         "position_x": 140,
         "position_y": 447,
