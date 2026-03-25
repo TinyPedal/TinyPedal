@@ -223,6 +223,10 @@ class Lap(ABC):
         """Maximum lap"""
 
     @abstractmethod
+    def remaining(self, index: int | None = None) -> float:
+        """Remaining lap, count from current lap progress"""
+
+    @abstractmethod
     def sector_index(self, index: int | None = None) -> int:
         """Sector index, 0 = S1, 1 = S2, 2 = S3"""
 
@@ -281,8 +285,12 @@ class Session(ABC):
         """Session type, 0 = TESTDAY, 1 = PRACTICE, 2 = QUALIFY, 3 = WARMUP, 4 = RACE"""
 
     @abstractmethod
-    def lap_type(self) -> bool:
-        """Is lap type session, false for time type"""
+    def finish_type(self) -> int:
+        """Race finish type, 0 = time, 1 = lap only, 2 = lap & time"""
+
+    @abstractmethod
+    def finish_tendency(self, index: int | None = None, laptime: float = 0) -> bool:
+        """Race finish type tendency for when type is lap & time, False = time, True = lap"""
 
     @abstractmethod
     def in_race(self) -> bool:

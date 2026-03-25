@@ -209,7 +209,6 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        is_lap_type_session = api.read.session.lap_type()
         pre_race = api.read.session.pre_race()
         energy_type = minfo.energy.available
 
@@ -224,7 +223,9 @@ class Realtime(Overlay):
         leader_valid = 0 < leader_laptime_pace < MAX_SECONDS
         player_valid = 0 < player_laptime_pace < MAX_SECONDS
 
-        if is_lap_type_session and leader_valid and player_valid:
+        is_lap_type = api.read.session.finish_tendency(laptime=player_laptime_pace)
+
+        if is_lap_type and leader_valid and player_valid:
             laps_total = api.read.lap.maximum()
             leader_laps_left = laps_total - api.read.lap.completed_laps(leader_index) - leader_lap_into
             player_laps_left = laps_total - api.read.lap.completed_laps() - player_lap_into
@@ -248,7 +249,7 @@ class Realtime(Overlay):
 
         # Update lap progress difference & refill type
         self.update_energy_type(self.bars_refill[0], energy_type)
-        self.update_race_type(self.bars_pit_leader[0], is_lap_type_session)
+        self.update_race_type(self.bars_pit_leader[0], is_lap_type)
         lap_diff = calc.lap_progress_difference(leader_laptime_pace, player_laptime_pace)
         self.update_lap_int(self.bars_lap_player[0], lap_diff)
 
@@ -257,7 +258,7 @@ class Realtime(Overlay):
             # Predicate player
             if not player_valid:
                 lap_final, player_hi_range, full_laps_left = -MAX_SECONDS, 0, 0
-            elif is_lap_type_session and index > 1:
+            elif is_lap_type and index > 1:
                 lap_final = calc.lap_progress_offset(  # relative lap offset based on 0s column
                     player_laptime_pace, self.relative_lap_offset, self.player_pit_time_set[index])
                 player_hi_range = self.set_highlight_range(player_laptime_pace, lap_final % 1)
@@ -276,7 +277,7 @@ class Realtime(Overlay):
                 self.relative_lap_offset = lap_final
 
             # Player refill
-            if (is_lap_type_session and index != 1
+            if (is_lap_type and index != 1
                 or pre_race or not leader_valid or not player_valid):
                 refill_player = -MAX_SECONDS
             else:
@@ -302,7 +303,7 @@ class Realtime(Overlay):
             # Predicate leader
             if not leader_valid or player_index == leader_index:
                 leader_lap_final, leader_hi_range = -MAX_SECONDS, 0
-            elif is_lap_type_session:
+            elif is_lap_type:
                 # Lap-type final lap progress + lap difference from leader
                 # Round up laps difference for relative final lap progress against player
                 leader_lap_final = calc.lap_progress_offset(

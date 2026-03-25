@@ -123,7 +123,7 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        session_time = api.read.session.remaining()
+        remaining_time = api.read.session.remaining()
 
         # Session name
         if self.wcfg["show_session_name"]:
@@ -137,18 +137,21 @@ class Realtime(Overlay):
 
         # Session time
         if self.wcfg["show_session_time"]:
-            self.update_session_time(self.bar_session_time, session_time)
+            self.update_session_time(self.bar_session_time, remaining_time)
 
         # Estimated laps
         if self.wcfg["show_estimated_laps"]:
             laptime_pace = minfo.delta.lapTimePace
-            if not api.read.session.lap_type() and laptime_pace > 0:
+            is_lap_type = api.read.session.finish_tendency(laptime=laptime_pace)
+
+            if not is_lap_type and laptime_pace > 0:
                 lap_into = api.read.lap.progress()
-                end_timer_laps_left = calc.end_timer_laps_remain(lap_into, laptime_pace, session_time)
+                end_timer_laps_left = calc.end_timer_laps_remain(lap_into, laptime_pace, remaining_time)
                 laps_left = calc.time_type_laps_remain(calc.ceil(end_timer_laps_left), lap_into)
-                estimated_laps = f"{laps_left:>5.3f}"[:5]
             else:
-                estimated_laps = "-.---"
+                laps_left = api.read.lap.remaining()
+
+            estimated_laps = f"{laps_left:>5.3f}"[:5]
             self.update_estimated_laps(self.bar_estimated_laps, estimated_laps)
 
     # GUI update methods

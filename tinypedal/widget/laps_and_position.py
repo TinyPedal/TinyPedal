@@ -169,14 +169,16 @@ class Realtime(Overlay):
             lap_num = api.read.lap.number()
             lap_max = api.read.lap.maximum()
 
-            if api.read.session.lap_type():
+            # Finish type check
+            laptime_pace = minfo.delta.lapTimePace
+            if api.read.session.finish_tendency(laptime=laptime_pace):
                 text_lap_total = f"{lap_max:.2f}"[:6]
             else:
                 session_time = api.read.session.remaining()
                 if session_time <= 0:
                     lap_total = 0
                 else:
-                    lap_total = lap_num + calc.end_timer_laps_remain(data, minfo.delta.lapTimePace, session_time)
+                    lap_total = lap_num + calc.end_timer_laps_remain(data, laptime_pace, session_time)
                 text_lap_total = f"~{lap_total:.2f}"[:6]
 
             text_laps_done = f"{lap_num + data:.2f}"[:5]

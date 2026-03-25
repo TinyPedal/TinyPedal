@@ -147,7 +147,7 @@ def calc_consumption(
     validating = 0
     is_pit_lap = 0  # whether pit in or pit out lap
 
-    delta_array_last, used_last_valid, laptime_last = load_fuel_delta_file(
+    delta_array_last, used_last_valid, laptime_pace = load_fuel_delta_file(
         filepath=filepath,
         filename=filename,
         extension=extension,
@@ -206,7 +206,7 @@ def calc_consumption(
         laps_done = api.read.lap.completed_laps()
         lap_into = api.read.lap.progress()
         is_pit_lap |= api.read.vehicle.in_pits()
-        laptime_last = minfo.delta.lapTimePace
+        laptime_pace = minfo.delta.lapTimePace
 
         # Realtime fuel consumption
         if amount_start < amount_curr:
@@ -286,14 +286,14 @@ def calc_consumption(
             used_last_valid, delta_fuel, 0 == is_pit_lap < laps_done)
 
         # Total refuel = laps left * last consumption - remaining fuel
-        if api.read.session.lap_type():  # lap-type
+        if api.read.session.finish_tendency(laptime=laptime_pace):  # lap-type
             full_laps_left = calc.lap_type_full_laps_remain(
                 api.read.lap.maximum(), laps_done)
             laps_left = calc.lap_type_laps_remain(
                 full_laps_left, lap_into)
-        elif laptime_last > 0:  # time-type race
+        elif laptime_pace > 0:  # time-type race
             end_timer_laps_left = calc.end_timer_laps_remain(
-                lap_into, laptime_last, time_left)
+                lap_into, laptime_pace, time_left)
             full_laps_left = ceil(end_timer_laps_left)
             laps_left = calc.time_type_laps_remain(
                 full_laps_left, lap_into)
@@ -309,7 +309,7 @@ def calc_consumption(
             amount_curr, used_est)
 
         est_runmins = calc.end_stint_minutes(
-            est_runlaps, laptime_last)
+            est_runlaps, laptime_pace)
 
         est_empty = calc.end_lap_empty_capacity(
             capacity, amount_curr + used_curr, used_last_valid + delta_fuel)

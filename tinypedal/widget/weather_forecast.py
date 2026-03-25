@@ -149,7 +149,7 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Read weather data
-        is_lap_type = api.read.session.lap_type()
+        is_lap_type = api.read.session.finish_type() == 1
         forecast_info = api.read.session.weather_forecast()
         forecast_count = min(len(forecast_info), MAX_FORECASTS)
 

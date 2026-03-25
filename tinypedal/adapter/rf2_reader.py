@@ -33,7 +33,7 @@ from ..calculation import (
     slip_angle,
     vel2speed,
 )
-from ..const_common import MAX_SECONDS, STINT_USAGE_DEFAULT
+from ..const_common import FLOAT_INF, MAX_SECONDS, STINT_USAGE_DEFAULT
 from ..formatter import strip_invalid_char
 from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
@@ -286,6 +286,13 @@ class Lap(_reader.Lap, DataAdapter):
         """Maximum lap"""
         return self.shmm.rf2ScorInfo.mMaxLaps
 
+    def remaining(self, index: int | None = None) -> float:
+        """Remaining lap, count from current lap progress"""
+        scor = self.shmm.rf2ScorInfo
+        scor_veh = self.shmm.rf2ScorVeh(index)
+        progress = lap_progress_distance(scor_veh.mLapDist, scor.mLapDist)
+        return rmnan(scor.mMaxLaps - scor_veh.mTotalLaps - progress)
+
     def sector_index(self, index: int | None = None) -> int:
         """Sector index, 0 = S1, 1 = S2, 2 = S3"""
         # RF2 sector index 0 = S3, index 1 = S1, index 2 = S2
@@ -367,9 +374,27 @@ class Session(_reader.Session, DataAdapter):
             return 1
         return 0  # test day
 
-    def lap_type(self) -> bool:
-        """Is lap type session, false for time type"""
-        return self.shmm.rf2ScorInfo.mMaxLaps < 99999
+    def finish_type(self) -> int:
+        """Race finish type, 0 = time, 1 = lap only, 2 = lap & time"""
+        scor = self.shmm.rf2ScorInfo
+        if scor.mMaxLaps > 999999:
+            return 0  # time only
+        if scor.mEndET < 1:
+            return 1  # lap only
+        return 2  # lap & time
+
+    def finish_tendency(self, index: int | None = None, laptime: float = FLOAT_INF) -> bool:
+        """Race finish type tendency for when type is lap & time, False = time, True = lap"""
+        scor = self.shmm.rf2ScorInfo
+        if scor.mMaxLaps > 999999:
+            return False  # time only
+        if scor.mEndET < 1:
+            return True  # lap only
+        scor_veh = self.shmm.rf2ScorVeh(index)
+        progress = lap_progress_distance(scor_veh.mLapDist, scor.mLapDist)
+        laps_remain = scor.mMaxLaps - scor_veh.mTotalLaps - progress
+        seconds_remain = scor.mEndET - scor.mCurrentET
+        return laptime * laps_remain < seconds_remain
 
     def in_race(self) -> bool:
         """Is in race session"""

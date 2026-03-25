@@ -147,7 +147,7 @@ class Realtime(Overlay):
             )
             self.bars_rdiff = self.set_rawtext(
                 text=TEXT_NA,
-                width=font_m.width * text_width + bar_padx,
+                width=font_m.width * 3 + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_rtemp[2][0],

@@ -26,6 +26,7 @@ WIP
   - Added "tyre_compound_spacing" option, which sets display spacing (in pixels) between each compound symbol. Default is "1" pixel.
 
 * Misc
+  - Added support for "lap and time" based race (where finish criteria is determined by both remaining laps & time).
   - Fixed an issue where "LIMIT" text was not displayed correctly if disabled "show_current_speed_while_limiter_on".
 
 2.44.0 (2026-03-16)
