@@ -2948,6 +2948,8 @@ WIDGET_DEFAULT = {
         "font_color": "#AAAAAA",
         "highlight_color": "#FFFFFF",
         "background_color": "#222222",
+        "low_load_threshold": 1,
+        "warning_color_low_load": "#FF2200",
         "show_tyre_load_ratio": True,
         "show_caption": False,
         "font_scale_caption": 0.8,

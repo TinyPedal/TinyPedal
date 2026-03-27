@@ -4217,6 +4217,9 @@ Show different compound color by compound type, which can be customized in [Tyre
     show_tyre_load_ratio
 Show percentage load ratio between each and total tyre load. Set `false` to show individual tyre load in Newtons.
 
+    low_load_threshold
+Show warning indication when load (in Newtons) is below the threshold.
+
 [**`Back to Top`**](#)
 
 

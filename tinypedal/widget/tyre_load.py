@@ -52,6 +52,7 @@ class Realtime(Overlay):
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
+        self.threshold_lowload = self.wcfg["low_load_threshold"]
 
         # Caption
         if self.wcfg["show_caption"]:
@@ -77,6 +78,10 @@ class Realtime(Overlay):
 
         # Tyre load
         layout_inner = self.set_grid_layout(gap_hori=bar_gap_hori, gap_vert=bar_gap_vert)
+        self.tload_color = (
+            self.wcfg["background_color"],
+            self.wcfg["warning_color_low_load"],
+        )
         self.bars_tload = tuple(
             WheelGaugeBar(
                 self,
@@ -114,4 +119,5 @@ class Realtime(Overlay):
         """Tyre load & ratio"""
         if target.last != data:
             target.last = data
+            target.bg_color = self.tload_color[data <= self.threshold_lowload]
             target.update_input(ratio)

@@ -29,6 +29,9 @@ WIP
   - Show visualized tyre vertical deflection in millimeters.
   - Show warning indication for lifted wheels.
 
+* Tyre load Widget
+  - Added "low_load_threshold" option that shows warning indication when load is below the threshold.
+
 * Misc
   - Added support for "lap and time" based race (where finish criteria is determined by both remaining laps & time).
   - Default preset (when creating new preset) now enables only 10 commonly used widgets. Newly implemented widgets are no longer enabled by default.
