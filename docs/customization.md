@@ -3997,6 +3997,16 @@ Set each pit stop duration (in seconds) increment after previous prediction. Def
 
 Note, each time when pit stop duration of the nearest prediction exceeded current pit stop timer, the prediction circle will be removed, and a new prediction circle will be appended with pit stop duration increment after the last prediction.
 
+    enable_auto_pitout_prediction
+Show auto-estimated pit-out duration prediction. Default indication shows as a green circle. This option does not count towards `number_of_prediction` limit.
+
+Auto estimated pit-out duration is calculated in the same way as [Pit Stop Estimate](#pit-stop-estimate) Widget.
+
+Note, this option only works for `LMU`, and `enable_restapi_access` must be enabled in [LMU API](#le-mans-ultimate-api) setting.
+
+    auto_prediction_additional_pitstop_time
+Set additional pit stop time it takes to decelerate and accelerate towards and away from pit spot. This option corresponds to `additional_pitstop_time` option from `Pit stop estimate` Widget, and both should be set to same amount. Default value is `2` seconds.
+
     enable_fixed_pitout_prediction
 Show pit-out prediction based on user-defined fixed pitstop duration instead. This option overrides `pitout_duration_minimum` and `pitout_duration_increment` options.
 

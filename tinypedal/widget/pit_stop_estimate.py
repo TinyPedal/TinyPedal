@@ -273,10 +273,10 @@ class Realtime(Overlay):
 
         # Min total pit time, update while not in pit
         if not api.read.vehicle.in_pits() or self.bar_minpit.last < pass_time:
-            if min_pitstop_time:
+            if min_pitstop_time > 0:
                 min_total = min_pitstop_time + pass_time + self.wcfg["additional_pitstop_time"]
             else:
-                min_total = 0
+                min_total = pass_time
         else:
             min_total = self.bar_minpit.last
 

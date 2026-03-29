@@ -72,6 +72,7 @@ class Realtime(Overlay):
             "player": self.set_pen_style(self.wcfg["vehicle_outline_color_player"], self.wcfg["vehicle_outline_width_player"]),
             "safety_car": self.set_pen_style(self.wcfg["vehicle_outline_color_safety_car"], self.wcfg["vehicle_outline_width_safety_car"]),
             "prediction": self.set_pen_style(self.wcfg["prediction_outline_color"], self.wcfg["prediction_outline_width"]),
+            "auto_prediction": self.set_pen_style(self.wcfg["auto_prediction_outline_color"], self.wcfg["auto_prediction_outline_width"]),
             "proximity": self.set_pen_style(self.wcfg["proximity_circle_color"], self.wcfg["proximity_circle_width"]),
         }
         self.brush_classes = {}
@@ -102,6 +103,7 @@ class Realtime(Overlay):
             self.pitout_time_offset = max(self.wcfg["pitout_time_offset"], 0)
             self.min_pit_time = self.wcfg["pitout_duration_minimum"] + self.pitout_time_offset
             self.pit_time_increment = max(self.wcfg["pitout_duration_increment"], 1)
+            self.auto_pit_time = -1
             if self.wcfg["enable_fixed_pitout_prediction"]:
                 self.fixed_pit_times = tuple(sorted(set(self.set_fixed_pit_time())))
             self.pit_text_shape = QRectF(
@@ -455,7 +457,7 @@ class Realtime(Overlay):
 
         painter.setBrush(Qt.NoBrush)
 
-        for target_pit_time in self.get_target_pit_time(target_pit_time, pit_timer):
+        for target_pit_time, auto_prediction in self.get_target_pit_time(target_pit_time, pit_timer, plr_veh_info.inPit):
             # Calc estimated pitout_time_into based on laptime_pace
             offset_time_into = pitout_time_extend - target_pit_time
             pitout_time_into = (offset_time_into - offset_time_into // laptime_pace * laptime_pace) * laptime_scale
@@ -476,7 +478,7 @@ class Realtime(Overlay):
 
             dist_node_index = calc.binary_search_higher_column(dist_data, estimate_dist, 0, dist_end_index)
             painter.translate(*map_data[dist_node_index])
-            painter.setPen(self.pen_outline["prediction"])
+            painter.setPen(self.pen_outline["auto_prediction" if auto_prediction else "prediction"])
             painter.drawEllipse(self.veh_shape)
 
             # Draw text pitstop duration
@@ -488,12 +490,13 @@ class Realtime(Overlay):
 
             painter.resetTransform()
 
-    def get_target_pit_time(self, target_pit_time: float, pit_timer: float):
+    def get_target_pit_time(self, target_pit_time: float, pit_timer: float, in_pit: bool):
         """Generate target pit time"""
         max_prediction = self.prediction_count
+        pass_time = minfo.mapping.pitPassTime
+
         # Fixed time
         if self.wcfg["enable_fixed_pitout_prediction"]:
-            pass_time = minfo.mapping.pitPassTime
             valid_count = 0
             for fixed_time in self.fixed_pit_times:
                 if valid_count >= max_prediction:
@@ -501,12 +504,22 @@ class Realtime(Overlay):
                 fixed_time += pass_time
                 if fixed_time > pit_timer:
                     valid_count += 1
-                    yield fixed_time
+                    yield fixed_time, False
         # Auto incremented time
         else:
             increment = self.pit_time_increment
             for idx in range(max_prediction):
-                yield target_pit_time + increment * idx
+                yield target_pit_time + increment * idx, False
+
+        # Auto estimated time
+        if self.wcfg["enable_auto_pitout_prediction"]:
+            if in_pit != 1:
+                est_stop_time = api.read.vehicle.pit_stop_time()
+                if est_stop_time > 0:
+                    est_stop_time += max(self.wcfg["auto_prediction_additional_pitstop_time"], 0)
+                self.auto_pit_time = est_stop_time + pass_time + self.pitout_time_offset
+            if self.auto_pit_time > pit_timer:
+                yield self.auto_pit_time, True
 
     def classes_style(self, class_name: str) -> str:
         """Get vehicle class style from brush cache"""
