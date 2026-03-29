@@ -22,6 +22,7 @@ Gear Widget
 
 from .. import units
 from ..api_control import api
+from ..const_common import TEXT_NA
 from ..module_info import minfo
 from ._base import Overlay
 from ._painter import GearGaugeBar, ProgressBar
@@ -97,9 +98,11 @@ class Realtime(Overlay):
         # RPM bar
         if self.wcfg["show_rpm_bar"]:
             font_rpm_m = self.get_font_metrics(font_rpm)
+            self.decimals_rpm = max(self.wcfg["decimal_places_rpm"], 0)
             self.bar_rpmbar = ProgressBar(
                 self,
                 font=font_rpm,
+                text=TEXT_NA,
                 width=gauge_width,
                 height=max(self.wcfg["rpm_bar_height"], 1),
                 offset_x=self.wcfg["rpm_reading_offset_x"],
@@ -107,7 +110,6 @@ class Realtime(Overlay):
                 input_color=self.wcfg["rpm_bar_color"],
                 fg_color=self.wcfg["font_color_rpm"],
                 bg_color=self.wcfg["background_color_rpm_bar"],
-                decimals=self.wcfg["decimal_places_rpm"],
                 show_reading=self.wcfg["show_rpm_reading"],
                 align=self.set_text_alignment(self.wcfg["rpm_reading_text_alignment"]),
                 right_side=self.wcfg["show_inverted_rpm"],
@@ -120,6 +122,7 @@ class Realtime(Overlay):
         # Battery bar
         if self.wcfg["show_battery_bar"]:
             font_batt_m = self.get_font_metrics(font_batt)
+            self.decimals_batt = max(self.wcfg["decimal_places_battery"], 0)
             self.battbar_color = (
                 self.wcfg["battery_bar_color"],
                 self.wcfg["battery_bar_color_regen"],
@@ -129,6 +132,7 @@ class Realtime(Overlay):
             self.bar_battbar = ProgressBar(
                 self,
                 font=font_batt,
+                text=TEXT_NA,
                 width=gauge_width,
                 height=max(self.wcfg["battery_bar_height"], 1),
                 offset_x=self.wcfg["battery_reading_offset_x"],
@@ -136,7 +140,6 @@ class Realtime(Overlay):
                 input_color=self.battbar_color[0],
                 fg_color=self.wcfg["font_color_battery"],
                 bg_color=self.wcfg["background_color_battery_bar"],
-                decimals=self.wcfg["decimal_places_battery"],
                 show_reading=self.wcfg["show_battery_reading"],
                 align=self.set_text_alignment(self.wcfg["battery_reading_text_alignment"]),
                 right_side=self.wcfg["show_inverted_battery"],
@@ -238,7 +241,9 @@ class Realtime(Overlay):
                 rpm_percent = rpm_offset / self.rpm_range
             else:
                 rpm_percent = 0
-            target.update_input(rpm_percent, data)
+            if target.show_reading:
+                target.text = f"{data:.{self.decimals_rpm}f}"
+            target.update_input(rpm_percent)
 
     def update_battbar(self, target, data, state):
         """Battery bar"""
@@ -258,8 +263,10 @@ class Realtime(Overlay):
                 color_index = 2
             else:
                 color_index = 0
+            if target.show_reading:
+                target.text = f"{data:.{self.decimals_batt}f}"
             target.input_color = self.battbar_color[color_index]
-            target.update_input(data * 0.01, data)
+            target.update_input(data * 0.01)
 
     def update_limiter(self, target, data):
         """Limiter"""

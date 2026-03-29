@@ -4417,6 +4417,9 @@ Show estimated ambient temperature reading for upcoming weather. Note, the `now`
     show_rain_chance_bar
 Show visualized rain chance bar reading for upcoming weather. Note, the `now` column always shows current raininess instead.
 
+    show_rain_chance_reading
+Show rain chance reading in percentage.
+
     number_of_forecasts
 Set number of forecasts to display. Value range in `1` to `4`. Default is `4` forecasts.
 

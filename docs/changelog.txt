@@ -32,6 +32,9 @@ WIP
 * Tyre load Widget
   - Added "low_load_threshold" option that shows warning indication when load is below the threshold.
 
+* Weather forecast Widget
+  - Added "show_rain_chance_reading" option (requested by user "Zezituh"), which shows rain chance reading in percentage.
+
 * Misc
   - Added support for "lap and time" based race (where finish criteria is determined by both remaining laps & time).
   - Default preset (when creating new preset) now enables only 10 commonly used widgets. Newly implemented widgets are no longer enabled by default.

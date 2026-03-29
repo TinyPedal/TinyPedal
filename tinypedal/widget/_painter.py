@@ -217,6 +217,7 @@ class ProgressBar(QWidget):
         self,
         parent,
         font: QFont | None = None,
+        text: str = "",
         width: int = 0,
         height: int = 0,
         offset_x: int = 0,
@@ -224,14 +225,13 @@ class ProgressBar(QWidget):
         input_color: str = "",
         fg_color: str = "",
         bg_color: str = "",
-        decimals: int = 0,
         show_reading: bool = False,
         align: Qt.Alignment = Qt.AlignCenter,
         right_side: bool = False,
     ):
         super().__init__(parent)
         self.last = -1
-        self.input_reading = 0.0
+        self.text = text
         if show_reading and font is not None:
             height = max(font.pixelSize(), height)
             self.setFont(font)
@@ -246,12 +246,10 @@ class ProgressBar(QWidget):
         self.right_side = right_side
         self.pen = QPen()
         self.pen.setColor(fg_color)
-        self.decimals = max(decimals, 0)
         self.setFixedSize(width, height)
 
-    def update_input(self, input_value: float, input_reading: float):
+    def update_input(self, input_value: float):
         """Update input"""
-        self.input_reading = input_reading
         if self.right_side:
             self.rect_input.setLeft((1 - input_value) * self.bar_width)
         else:
@@ -265,7 +263,7 @@ class ProgressBar(QWidget):
         painter.fillRect(self.rect_input, self.input_color)
         if self.show_reading:
             painter.setPen(self.pen)
-            painter.drawText(self.rect_text, self.align, f"{self.input_reading:.{self.decimals}f}")
+            painter.drawText(self.rect_text, self.align, self.text)
 
 
 class FuelLevelBar(QWidget):

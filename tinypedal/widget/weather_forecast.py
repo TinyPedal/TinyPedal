@@ -115,10 +115,16 @@ class Realtime(Overlay):
             self.bars_rain = tuple(
                 ProgressBar(
                     self,
+                    font=font,
+                    text=TEXT_NA,
                     width=self.bar_width,
                     height=self.bar_rain_height,
+                    offset_x=0.5,
+                    offset_y=font_m.voffset,
                     input_color=self.wcfg["rain_chance_bar_color"],
+                    fg_color=self.wcfg["font_color_rain_chance"],
                     bg_color=self.wcfg["background_color_rain_chance_bar"],
+                    show_reading=self.wcfg["show_rain_chance_reading"],
                 ) for _ in range(self.total_slot)
             )
             self.set_grid_layout_table_row(
@@ -227,7 +233,9 @@ class Realtime(Overlay):
         """Rain chance (fraction)"""
         if target.last != data:
             target.last = data
-            target.update_input(data, data)
+            if target.show_reading:
+                target.text = f"{data:.0%}"
+            target.update_input(data)
 
     def update_weather_icon(self, target, icon_index, slot_index):
         """Weather icon, toggle visibility"""

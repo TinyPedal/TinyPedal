@@ -3234,6 +3234,8 @@ WIDGET_DEFAULT = {
         "rain_chance_bar_height": 5,
         "rain_chance_bar_color": "#FF00FF",
         "background_color_rain_chance_bar": "#88222222",
+        "show_rain_chance_reading": False,
+        "font_color_rain_chance": "#FFFFFF",
         "display_order_estimated_time": 1,
         "display_order_weather_icon": 2,
         "display_order_ambient_temperature": 3,
