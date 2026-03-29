@@ -48,24 +48,29 @@ class Realtime(Overlay):
         text_def = "00/00"
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
 
-        if self.wcfg["layout"] == 0:
-            self.just_right = 12
-            prefix_just = max(
-                len(self.wcfg["prefix_lap_number"]),
-                len(self.wcfg["prefix_position_overall"]),
-                len(self.wcfg["prefix_position_in_class"]),
-            )
-        else:
-            self.just_right = 6
-            prefix_just = 0
+        self.prefix_lap_number = self.wcfg["prefix_lap_number"]
+        self.prefix_pos_overall = self.wcfg["prefix_position_overall"]
+        self.prefix_pos_inclass = self.wcfg["prefix_position_in_class"]
 
-        self.prefix_lap_number = self.wcfg["prefix_lap_number"].ljust(prefix_just)
-        self.prefix_pos_overall = self.wcfg["prefix_position_overall"].ljust(prefix_just)
-        self.prefix_pos_inclass = self.wcfg["prefix_position_in_class"].ljust(prefix_just)
+        if self.wcfg["layout"] == 0:
+            self.max_width = max(
+                len(self.prefix_lap_number) + 12,
+                len(self.prefix_pos_overall) + 5,
+                len(self.prefix_pos_inclass) + 5,
+            )
+            self.just_lap_number = self.max_width - len(self.prefix_lap_number)
+            self.just_pos_overall = self.max_width - len(self.prefix_pos_overall)
+            self.just_pos_inclass = self.max_width - len(self.prefix_pos_inclass)
+            self.just_pos_change = self.max_width - 1
+        else:
+            self.just_lap_number = 12
+            self.just_pos_overall = 5
+            self.just_pos_inclass = 5
+            self.just_pos_change = 2
 
         # Lap number
         if self.wcfg["show_lap_number"]:
-            text_lap_number = f"{self.prefix_lap_number}   0.00/0.00"
+            text_lap_number = f"{self.prefix_lap_number}{'0.00/0.00': >{self.just_lap_number}}"
             self.bar_style_lap_number = (
                 self.wcfg["background_color_lap_number"],
                 self.wcfg["warning_color_maximum_laps"],
@@ -85,7 +90,7 @@ class Realtime(Overlay):
 
         # Position overall
         if self.wcfg["show_position_overall"]:
-            text_pos_overall = f"{self.prefix_pos_overall}{text_def: >{self.just_right}}"
+            text_pos_overall = f"{self.prefix_pos_overall}{text_def: >{self.just_pos_overall}}"
             self.bar_pos_overall = self.set_rawtext(
                 text=text_pos_overall,
                 width=font_m.width * len(text_pos_overall) + bar_padx,
@@ -101,7 +106,7 @@ class Realtime(Overlay):
 
         # Position in class
         if self.wcfg["show_position_in_class"]:
-            text_pos_inclass = f"{self.prefix_pos_inclass}{text_def: >{self.just_right}}"
+            text_pos_inclass = f"{self.prefix_pos_inclass}{text_def: >{self.just_pos_inclass}}"
             self.bar_pos_inclass = self.set_rawtext(
                 text=text_pos_inclass,
                 width=font_m.width * len(text_pos_inclass) + bar_padx,
@@ -115,9 +120,39 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_position_in_class"],
             )
 
+        # Position change
+        if self.wcfg["show_position_change"]:
+            text_pos_change = f"-{'0': >{self.just_pos_change}}"
+            self.bar_style_pos_change = (
+                (
+                    self.wcfg["font_color_position_same"],
+                    self.wcfg["background_color_position_same"],
+                ),
+                (
+                    self.wcfg["font_color_position_gain"],
+                    self.wcfg["background_color_position_gain"],
+                ),
+                (
+                    self.wcfg["font_color_position_loss"],
+                    self.wcfg["background_color_position_loss"],
+                ),
+            )
+            self.bar_pos_change = self.set_rawtext(
+                text=text_pos_change,
+                width=font_m.width * len(text_pos_change) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_pos_change[0][0],
+                bg_color=self.bar_style_pos_change[0][1],
+            )
+            self.set_primary_orient(
+                target=self.bar_pos_change,
+                column=self.wcfg["display_order_position_change"],
+            )
+
         # Last data
-        self.last_veh_total = 0
-        self.last_plr_place = 0
+        self.last_veh_total = -1
+        self.last_plr_place = -1
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -138,10 +173,7 @@ class Realtime(Overlay):
 
                 # Position overall
                 if self.wcfg["show_position_overall"]:
-                    self.update_position(
-                        self.bar_pos_overall, plr_place, veh_total,
-                        self.prefix_pos_overall
-                    )
+                    self.update_position_overall(self.bar_pos_overall, plr_place, veh_total)
 
                 # Position in class
                 if self.wcfg["show_position_in_class"]:
@@ -156,10 +188,16 @@ class Realtime(Overlay):
                                 place_higher += 1
 
                     pos_in_class = total_class_vehicle - place_higher
-                    self.update_position(
-                        self.bar_pos_inclass, pos_in_class, total_class_vehicle,
-                        self.prefix_pos_inclass
-                    )
+                    self.update_position_inclass(self.bar_pos_inclass, pos_in_class, total_class_vehicle)
+
+                # Position change
+                if self.wcfg["show_position_change"]:
+                    veh_info = minfo.vehicles.dataSet[minfo.vehicles.playerIndex]
+                    if self.wcfg["show_position_change_in_class"]:
+                        pos_diff = veh_info.qualifyInClass - veh_info.positionInClass
+                    else:
+                        pos_diff = veh_info.qualifyOverall - veh_info.positionOverall
+                    self.update_position_change(self.bar_pos_change, pos_diff)
 
     # GUI update methods
     def update_lap_number(self, target, data):
@@ -183,12 +221,33 @@ class Realtime(Overlay):
 
             text_laps_done = f"{lap_num + data:.2f}"[:5]
             text_laps = f"{text_laps_done}/{text_lap_total}"[:12]
-            target.text = f"{self.prefix_lap_number}{text_laps: >12}"
+            target.text = f"{self.prefix_lap_number}{text_laps: >{self.just_lap_number}}"
             target.bg = self.bar_style_lap_number[lap_num - lap_max >= -1]
             target.update()
 
-    def update_position(self, target, place, total, prefix):
+    def update_position_overall(self, target, place, total):
         """Driver place & total vehicles"""
         text_pos = f"{place:02.0f}/{total:02.0f}"
-        target.text = f"{prefix}{text_pos: >{self.just_right}}"
+        target.text = f"{self.prefix_pos_overall}{text_pos: >{self.just_pos_overall}}"
+        target.update()
+
+    def update_position_inclass(self, target, place, total):
+        """Driver place & total vehicles"""
+        text_pos = f"{place:02.0f}/{total:02.0f}"
+        target.text = f"{self.prefix_pos_inclass}{text_pos: >{self.just_pos_inclass}}"
+        target.update()
+
+    def update_position_change(self, target, pos_diff):
+        """Driver place change"""
+        if pos_diff > 0:
+            prefix = "▲"
+            color_index = 1
+        elif pos_diff < 0:
+            prefix = "▼"
+            color_index = 2
+        else:
+            prefix = "-"
+            color_index = 0
+        target.text = f"{prefix}{abs(pos_diff): >{self.just_pos_change}}"
+        target.fg, target.bg = self.bar_style_pos_change[color_index]
         target.update()

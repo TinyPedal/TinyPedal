@@ -2668,6 +2668,32 @@ Set percentage threshold for triggering wheel slip warning under acceleration. `
 [**`Back to Top`**](#)
 
 
+## Laps and position
+**This widget displays lap number, driver overall position, position in class info.**
+
+    show_lap_number
+Show your current lap number (lap progression) and total race laps. If total race laps is not available, such as in time-based session, estimated total laps will be displayed instead, and a `~` sign will be displayed before estimated total laps reading, and up to two decimal places will be kept.
+
+Note, estimated total laps reading is calculated based on local player's lap time pace data from Delta Module, which can be different from in-game HUD reading. This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it.
+
+    warning_color_maximum_laps
+Set warning color that shows 1 lap before exceeding maximum laps in qualify (or indicates the last lap of a lap-type race).
+
+    show_position_overall
+Show your current overall position against all drivers in a session.
+
+    show_position_in_class
+Show your current position in class against all drivers from the same class.
+
+    show_position_change
+Show overall driver position change relative to overall qualification position.
+
+    show_position_change_in_class
+Show driver position change in class instead of overall. This option is enabled by default.
+
+[**`Back to Top`**](#)
+
+
 ## Lap time history
 **This widget displays lap time history info.**
 
@@ -2705,26 +2731,6 @@ Show average tyre wear (percent) per lap.
 
     show_wear_sign
 Show tyre wear percentage sign.
-
-[**`Back to Top`**](#)
-
-
-## Laps and position
-**This widget displays lap number, driver overall position, position in class info.**
-
-    show_lap_number
-Show your current lap number (lap progression) and total race laps. If total race laps is not available, such as in time-based session, estimated total laps will be displayed instead, and a `~` sign will be displayed before estimated total laps reading, and up to two decimal places will be kept.
-
-Note, estimated total laps reading is calculated based on local player's lap time pace data from Delta Module, which can be different from in-game HUD reading. This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it.
-
-    warning_color_maximum_laps
-Set warning color that shows 1 lap before exceeding maximum laps in qualify (or indicates the last lap of a lap-type race).
-
-    show_position_overall
-Show your current overall position against all drivers in a session.
-
-    show_position_in_class
-Show your current position in class against all drivers from the same class.
 
 [**`Back to Top`**](#)
 

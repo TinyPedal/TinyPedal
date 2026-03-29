@@ -45,6 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
+        ((2, 44, 2), _user_prior_2_44_2),  # 2026-03-29
         ((2, 43, 0), _user_prior_2_43_0),  # 2026-03-09
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
         ((2, 40, 0), _user_prior_2_40_0),  # 2026-01-23
@@ -67,6 +68,15 @@ def _global_prior_2_43_0(dict_user: dict):
 
 
 # User setting update function
+def _user_prior_2_44_2(dict_user: dict):
+    laps_and_position = dict_user.get("laps_and_position")
+    if isinstance(laps_and_position, dict):
+        if laps_and_position.get("prefix_position_overall") == "P":
+            laps_and_position["prefix_position_overall"] = "P "
+        if laps_and_position.get("prefix_position_in_class") == "C":
+            laps_and_position["prefix_position_in_class"] = "C "
+
+
 def _user_prior_2_43_0(dict_user: dict):
     # Prioritized
     # Rename all "column_index" to "display_order"
