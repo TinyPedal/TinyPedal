@@ -45,7 +45,6 @@ class Realtime(Overlay):
         font_m = self.get_font_metrics(font)
 
         # Config variable
-        text_def = "00/00"
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
 
         self.prefix_lap_number = self.wcfg["prefix_lap_number"]
@@ -53,15 +52,15 @@ class Realtime(Overlay):
         self.prefix_pos_inclass = self.wcfg["prefix_position_in_class"]
 
         if self.wcfg["layout"] == 0:
-            self.max_width = max(
+            max_width = max(
                 len(self.prefix_lap_number) + 12,
                 len(self.prefix_pos_overall) + 5,
                 len(self.prefix_pos_inclass) + 5,
             )
-            self.just_lap_number = self.max_width - len(self.prefix_lap_number)
-            self.just_pos_overall = self.max_width - len(self.prefix_pos_overall)
-            self.just_pos_inclass = self.max_width - len(self.prefix_pos_inclass)
-            self.just_pos_change = self.max_width - 1
+            self.just_lap_number = max_width - len(self.prefix_lap_number)
+            self.just_pos_overall = max_width - len(self.prefix_pos_overall)
+            self.just_pos_inclass = max_width - len(self.prefix_pos_inclass)
+            self.just_pos_change = max_width - 1
         else:
             self.just_lap_number = 12
             self.just_pos_overall = 5
@@ -90,7 +89,7 @@ class Realtime(Overlay):
 
         # Position overall
         if self.wcfg["show_position_overall"]:
-            text_pos_overall = f"{self.prefix_pos_overall}{text_def: >{self.just_pos_overall}}"
+            text_pos_overall = f"{self.prefix_pos_overall}{'00/00': >{self.just_pos_overall}}"
             self.bar_pos_overall = self.set_rawtext(
                 text=text_pos_overall,
                 width=font_m.width * len(text_pos_overall) + bar_padx,
@@ -106,7 +105,7 @@ class Realtime(Overlay):
 
         # Position in class
         if self.wcfg["show_position_in_class"]:
-            text_pos_inclass = f"{self.prefix_pos_inclass}{text_def: >{self.just_pos_inclass}}"
+            text_pos_inclass = f"{self.prefix_pos_inclass}{'00/00': >{self.just_pos_inclass}}"
             self.bar_pos_inclass = self.set_rawtext(
                 text=text_pos_inclass,
                 width=font_m.width * len(text_pos_inclass) + bar_padx,

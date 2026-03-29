@@ -36,7 +36,7 @@ WIP
   - Added "show_rain_chance_reading" option (requested by user "Zezituh"), which shows rain chance reading in percentage.
 
 * Laps and position Widget
-  - Added "show_position_change" & "show_position_change_in_class" options, which shows local player's position change relative to qualification position.
+  - Added "show_position_change" & "show_position_change_in_class" options (requested by user "JustEmailMe"), which shows local player's position change relative to qualification position.
 
 * Misc
   - Added support for "lap and time" based race (where finish criteria is determined by both remaining laps & time).
