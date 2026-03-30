@@ -161,42 +161,41 @@ class Realtime(Overlay):
             self.update_lap_number(self.bar_lap_number, lap_into)
 
         # Position update
-        if self.wcfg["show_position_overall"] or self.wcfg["show_position_in_class"]:
-            plr_place = api.read.vehicle.place()
-            veh_total = api.read.vehicle.total_vehicles()
+        plr_place = api.read.vehicle.place()
+        veh_total = api.read.vehicle.total_vehicles()
 
-            # Only update if total vehicle or player position changes
-            if self.last_plr_place != plr_place or self.last_veh_total != veh_total:
-                self.last_plr_place = plr_place
-                self.last_veh_total = veh_total
+        # Only update if total vehicle or player position changes
+        if self.last_plr_place != plr_place or self.last_veh_total != veh_total:
+            self.last_plr_place = plr_place
+            self.last_veh_total = veh_total
 
-                # Position overall
-                if self.wcfg["show_position_overall"]:
-                    self.update_position_overall(self.bar_pos_overall, plr_place, veh_total)
+            # Position overall
+            if self.wcfg["show_position_overall"]:
+                self.update_position_overall(self.bar_pos_overall, plr_place, veh_total)
 
-                # Position in class
-                if self.wcfg["show_position_in_class"]:
-                    plr_class = api.read.vehicle.class_name()
-                    total_class_vehicle = 0
-                    place_higher = 0
+            # Position in class
+            if self.wcfg["show_position_in_class"]:
+                plr_class = api.read.vehicle.class_name()
+                total_class_vehicle = 0
+                place_higher = 0
 
-                    for index in range(veh_total):
-                        if api.read.vehicle.class_name(index) == plr_class:
-                            total_class_vehicle += 1
-                            if api.read.vehicle.place(index) > plr_place:
-                                place_higher += 1
+                for index in range(veh_total):
+                    if api.read.vehicle.class_name(index) == plr_class:
+                        total_class_vehicle += 1
+                        if api.read.vehicle.place(index) > plr_place:
+                            place_higher += 1
 
-                    pos_in_class = total_class_vehicle - place_higher
-                    self.update_position_inclass(self.bar_pos_inclass, pos_in_class, total_class_vehicle)
+                pos_in_class = total_class_vehicle - place_higher
+                self.update_position_inclass(self.bar_pos_inclass, pos_in_class, total_class_vehicle)
 
-                # Position change
-                if self.wcfg["show_position_change"]:
-                    veh_info = minfo.vehicles.dataSet[minfo.vehicles.playerIndex]
-                    if self.wcfg["show_position_change_in_class"]:
-                        pos_diff = veh_info.qualifyInClass - veh_info.positionInClass
-                    else:
-                        pos_diff = veh_info.qualifyOverall - veh_info.positionOverall
-                    self.update_position_change(self.bar_pos_change, pos_diff)
+        # Position change
+        if self.wcfg["show_position_change"]:
+            veh_info = minfo.vehicles.dataSet[minfo.vehicles.playerIndex]
+            if self.wcfg["show_position_change_in_class"]:
+                pos_diff = veh_info.qualifyInClass - veh_info.positionInClass
+            else:
+                pos_diff = veh_info.qualifyOverall - veh_info.positionOverall
+            self.update_position_change(self.bar_pos_change, pos_diff)
 
     # GUI update methods
     def update_lap_number(self, target, data):
@@ -212,10 +211,7 @@ class Realtime(Overlay):
                 text_lap_total = f"{lap_max:.2f}"[:6]
             else:
                 session_time = api.read.session.remaining()
-                if session_time <= 0:
-                    lap_total = 0
-                else:
-                    lap_total = lap_num + calc.end_timer_laps_remain(data, laptime_pace, session_time)
+                lap_total = lap_num + calc.end_timer_laps_remain(data, laptime_pace, session_time)
                 text_lap_total = f"~{lap_total:.2f}"[:6]
 
             text_laps_done = f"{lap_num + data:.2f}"[:5]
@@ -236,17 +232,19 @@ class Realtime(Overlay):
         target.text = f"{self.prefix_pos_inclass}{text_pos: >{self.just_pos_inclass}}"
         target.update()
 
-    def update_position_change(self, target, pos_diff):
+    def update_position_change(self, target, data):
         """Driver place change"""
-        if pos_diff > 0:
-            prefix = "▲"
-            color_index = 1
-        elif pos_diff < 0:
-            prefix = "▼"
-            color_index = 2
-        else:
-            prefix = "-"
-            color_index = 0
-        target.text = f"{prefix}{abs(pos_diff): >{self.just_pos_change}}"
-        target.fg, target.bg = self.bar_style_pos_change[color_index]
-        target.update()
+        if target.last != data:
+            target.last = data
+            if data > 0:
+                prefix = "▲"
+                color_index = 1
+            elif data < 0:
+                prefix = "▼"
+                color_index = 2
+            else:
+                prefix = "-"
+                color_index = 0
+            target.text = f"{prefix}{abs(data): >{self.just_pos_change}}"
+            target.fg, target.bg = self.bar_style_pos_change[color_index]
+            target.update()
