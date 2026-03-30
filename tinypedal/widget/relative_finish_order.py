@@ -32,7 +32,6 @@ from ..const_common import (
     TEXT_PLACEHOLDER,
 )
 from ..module_info import minfo
-from ..validator import generator_init
 from ._base import Overlay
 
 
@@ -78,10 +77,6 @@ class Realtime(Overlay):
 
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
-
-        self.gen_leader_pace = calc_laptime_pace(
-            self.wcfg["leader_laptime_pace_samples"],
-            max(self.wcfg["leader_laptime_pace_margin"], 0.1))
 
         # Leader pit time row
         self.bars_pit_leader = self.set_rawtext(
@@ -217,7 +212,7 @@ class Realtime(Overlay):
         leader_lap_into = api.read.lap.progress(leader_index)
         player_lap_into = api.read.lap.progress()
 
-        leader_laptime_pace = self.gen_leader_pace.send(leader_index)
+        leader_laptime_pace = minfo.vehicles.leaderRecentBestLapTime
         player_laptime_pace = minfo.delta.lapTimePace
 
         leader_valid = 0 < leader_laptime_pace < MAX_SECONDS
@@ -409,50 +404,3 @@ class Realtime(Overlay):
             if lap_final > 1 - min(self.range_finish, range_limit) / laptime_pace:
                 return -1  # near finish
         return 0
-
-
-@generator_init
-def calc_laptime_pace(samples: int = 6, margin: float = 5, laptime: float = MAX_SECONDS):
-    """Calculate lap time pace for specific player"""
-    laptime_pace = laptime
-    laptime_margin = margin
-    ema_factor = calc.ema_factor(samples)
-    last_vehicle_class = ""
-    last_lap_stime = -1.0
-    is_pit_lap = 0  # whether pit in or pit out lap
-    validating = 0.0
-
-    while True:
-        player_index = yield laptime_pace
-        # Calculate laptime pace
-        lap_stime = api.read.timing.start(player_index)
-        veh_class = api.read.vehicle.class_name(player_index)
-        is_pit_lap |= api.read.vehicle.in_pits(player_index)
-
-        # Reset if vehicle class changes
-        if last_vehicle_class != veh_class:
-            last_vehicle_class = veh_class
-            laptime_pace = api.read.timing.reference_laptime(player_index)
-
-        if last_lap_stime != lap_stime:
-            last_lap_stime = lap_stime
-            validating = api.read.timing.elapsed()
-            is_pit_lap = 0
-
-        if validating:
-            timer = api.read.timing.elapsed() - validating
-            laptime_last = api.read.timing.last_laptime(player_index)
-            if 1 < timer <= 10 and 0 < laptime_last:
-                if not is_pit_lap:
-                    if laptime_pace > laptime_last:
-                        laptime_pace = laptime_last
-                    else:
-                        laptime_pace = min(
-                            calc.exp_mov_avg(ema_factor, laptime_pace, laptime_last),
-                            laptime_pace + laptime_margin,
-                        )
-                elif laptime_pace >= MAX_SECONDS:
-                    laptime_pace = api.read.timing.reference_laptime(player_index)
-                validating = 0
-            elif timer > 10:  # switch off after 10s
-                validating = 0

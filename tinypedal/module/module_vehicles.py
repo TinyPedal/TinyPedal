@@ -248,6 +248,7 @@ def update_vehicle_data(
             if data.positionOverall == 1:
                 output.leaderIndex = index
                 output.leaderBestLapTime = data.bestLapTime
+                output.leaderRecentBestLapTime = api.read.timing.reference_laptime(index, data.lapTimeHistory.best())
 
     # Output extra info
     output.nearestLine = nearest_line

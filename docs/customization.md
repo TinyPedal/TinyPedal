@@ -3330,14 +3330,6 @@ Set detection range (in seconds) near (after) start/finish line to show color in
     near_finish_range
 Set detection range (in seconds) near (before) start/finish line to show color indicator when vehicle is within the range (or less). Default is `20` seconds. Default color is orange.
 
-    leader_laptime_pace_samples
-Set number of samples for average laptime pace calculation. Default is `6` samples. Set `1` to disable averaging.
-
-Note, initial laptime pace is always based on leader's session personal best laptime if available. If a new laptime is faster than current laptime pace, it will replace current laptime pace without calculating average. Invalid lap, pit-in/out laps are always excluded from laptime pace calculation.
-
-    leader_laptime_pace_margin
-Set additional margin for laptime pace that cannot exceed the sum of previous `laptime pace` and `margin`. This option is used to minimize the impact of unusually slow laptime. Default value is `5` seconds. Minimum value is limited to `0.1`.
-
     show_absolute_refilling
 Show absolute refilling value instead of relative refilling when enabled. Note, `+` or `-` sign is not displayed with absolute refilling.
 

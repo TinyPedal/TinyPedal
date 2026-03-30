@@ -69,6 +69,7 @@ def _global_prior_2_43_0(dict_user: dict):
 
 # User setting update function
 def _user_prior_2_44_2(dict_user: dict):
+    # Update prefix in laps_and_position widget
     laps_and_position = dict_user.get("laps_and_position")
     if isinstance(laps_and_position, dict):
         if laps_and_position.get("prefix_position_overall") == "P":

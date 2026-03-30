@@ -108,7 +108,7 @@ class DeltaLapTime(array):
     def update(self, lap_start: float):
         """Update delta lap time history"""
         if self[-1] != lap_start:
-            if self[-1] < lap_start:
+            if 0 < self[-1] < lap_start:
                 self[0], self[1], self[2], self[3] = self[1], self[2], self[3], self[4]
                 self[4] = lap_start - self[-1]  # last lap time
             else:  # reset all laptime on session change
@@ -676,6 +676,7 @@ class VehiclesInfo:
         "nearestYellowBehind",
         "nearestBlueClass",
         "leaderBestLapTime",
+        "leaderRecentBestLapTime",
     )
 
     def __init__(self):
@@ -697,6 +698,7 @@ class VehiclesInfo:
         self.nearestYellowBehind: float = -MAX_METERS
         self.nearestBlueClass: str = ""
         self.leaderBestLapTime: float = MAX_SECONDS
+        self.leaderRecentBestLapTime: float = MAX_SECONDS
 
 
 class WheelsInfo:

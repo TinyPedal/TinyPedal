@@ -417,7 +417,7 @@ class Timing(ABC):
         """Best lap time (seconds)"""
 
     @abstractmethod
-    def reference_laptime(self, index: int | None = None):
+    def reference_laptime(self, index: int | None = None, laptime: float = 0) -> float:
         """Reference lap time (seconds)"""
 
     @abstractmethod

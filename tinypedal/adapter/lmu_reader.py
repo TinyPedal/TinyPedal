@@ -550,8 +550,10 @@ class Timing(_reader.Timing, DataAdapter):
         """Best lap time (seconds)"""
         return rmnan(self.shmm.lmuScorVeh(index).mBestLapTime)
 
-    def reference_laptime(self, index: int | None = None):
+    def reference_laptime(self, index: int | None = None, laptime: float = 0) -> float:
         """Reference lap time (seconds)"""
+        if 0 < laptime < MAX_SECONDS:
+            return laptime
         init_time = min_nonzero((
             self.best_laptime(index),
             self.last_laptime(index),

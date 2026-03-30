@@ -1686,8 +1686,6 @@ WIDGET_DEFAULT = {
         "font_color_near_finish": "#DD5500",
         "decimal_places_laps": 2,
         "decimal_places_refill": 1,
-        "leader_laptime_pace_samples": 6,
-        "leader_laptime_pace_margin": 5,
         "show_extra_refilling": True,
         "number_of_extra_laps": 1,
         "number_of_prediction": 4,
