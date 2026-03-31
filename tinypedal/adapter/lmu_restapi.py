@@ -48,8 +48,6 @@ class RestAPIData:
         "trackClockTime",
         "privateQualifying",
         "steeringWheelRange",
-        "currentVirtualEnergy",
-        "maxVirtualEnergy",
         "aeroDamage",
         "pitStopTime",
         "absoluteRefill",
@@ -67,8 +65,6 @@ class RestAPIData:
         self.trackClockTime: float = -1.0
         self.privateQualifying: int = 0
         self.steeringWheelRange: float = 0.0
-        self.currentVirtualEnergy: float = 0.0
-        self.maxVirtualEnergy: float = 0.0
         self.aeroDamage: float = -1.0
         self.pitStopTime: float = 0.0
         self.absoluteRefill: float = 0.0
@@ -93,8 +89,6 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
         ResOutput("forecastRace", FORECAST_DEFAULT, forecast_rf2, ("RACE",)),
     )
     res_currentstint = (
-        ResOutput("currentVirtualEnergy", 0.0, valid_value_type, ("fuelInfo", "currentVirtualEnergy")),
-        ResOutput("maxVirtualEnergy", 0.0, valid_value_type, ("fuelInfo", "maxVirtualEnergy")),
         ResOutput("aeroDamage", -1.0, valid_value_type, ("wearables", "body", "aero")),
         ResOutput("brakeWear", WHEELS_NA, export_wheels, ("wearables", "brakes")),
         ResOutput("suspensionDamage", WHEELS_NA, export_wheels, ("wearables", "suspension")),

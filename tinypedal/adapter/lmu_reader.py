@@ -844,10 +844,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def virtual_energy(self, index: int | None = None) -> float:
         """Remaining virtual energy (fraction)"""
-        max_energy = self.rest.maxVirtualEnergy
-        if max_energy:
-            return self.rest.currentVirtualEnergy / max_energy
-        return 0.0
+        return self.shmm.lmuTeleVeh(index).mVirtualEnergy
 
     def orientation_yaw_radians(self, index: int | None = None) -> float:
         """Orientation yaw (radians)"""
