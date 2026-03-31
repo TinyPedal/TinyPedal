@@ -379,7 +379,9 @@ Set API name for accessing data from supported API.
 Set `true` to remember and load API selection from preset; set `false` to select API globally for all presets.
 
     enable_legacy_api_selection
-Enable legacy API selection. This option is disabled on Windows by default, and enabled on Linux.
+Enable legacy API selection. This option is disabled by default.
+
+Important note, legacy APIs are deprecated and no longer maintained or supported, and will be removed in the future. It is not recommended to use them.
 
     enable_auto_backup_car_setup
 Enable `Auto Backup Car Setup` function, currently support `LMU` and `RF2`.

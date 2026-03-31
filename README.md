@@ -21,11 +21,14 @@ Currently supports `rFactor 2` and `Le Mans Ultimate`, and runs on `Windows` and
 | Supported API | Windows | Linux |
 |:-:|:-:|:-:|
 | Le Mans Ultimate | No plugin required | Requires third-party plugin |
-| Le Mans Ultimate (legacy) | rF2SharedMemoryMapPlugin | rF2SharedMemoryMapPlugin(Wine) |
 | rFactor 2 | rF2SharedMemoryMapPlugin | rF2SharedMemoryMapPlugin(Wine) |
 
+| Legacy API | Windows | Linux |
+|:-:|:-:|:-:|
+| Le Mans Ultimate (legacy) | rF2SharedMemoryMapPlugin | rF2SharedMemoryMapPlugin(Wine) |
+
 > [!IMPORTANT]
-> `Le Mans Ultimate (legacy)` API is provided only as a fallback option for Linux user. This option will be removed in the future.
+> Legacy APIs are deprecated and no longer maintained or supported, and will be removed in the future. It is not recommended to use them.
 
 ### Display Mode
 
@@ -39,9 +42,7 @@ Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fu
 
 #### Linux
 
-* LMU's built-in API can be selected on Linux, but may not work without support from third-party plugin (see discussion [#9](https://github.com/TinyPedal/TinyPedal/issues/9)).
-
-* Alternatively, `rF2 Shared Memory Map Plugin` can be used for accessing LMU legacy API. Please follow [Setup for rFactor 2](#setup-for-rfactor-2) and [Running on Linux](#running-on-linux) sections for instruction.
+* LMU's built-in API can be selected on Linux, but may require third-party plugin to access (see discussion [#9](https://github.com/TinyPedal/TinyPedal/issues/9)).
 
 ### Setup for rFactor 2
 
@@ -59,21 +60,13 @@ https://github.com/schlegp/rF2SharedMemoryMapPlugin_Wine/blob/master/build
 
 #### Install plugin
 
-The plugin file is named `rFactor2SharedMemoryMapPlugin64.dll` and should be placed in:
-
-- For `rFactor 2`, it is `rFactor 2\Bin64\Plugins` folder.
-
-- For `Le Mans Ultimate` (legacy API only), it is `Le Mans Ultimate\Plugins` folder.
+The plugin file is named `rFactor2SharedMemoryMapPlugin64.dll` and should be placed in `rFactor 2\Bin64\Plugins` folder.
 
 Note, manually create this `Plugins` folder if it is missing.
 
 #### Enable plugin in game
 
 - For `rFactor 2`, in game `Settings` -> `Gameplay` page, find `Plugins` section and toggle on `rFactor2SharedMemoryMapPlugin64.dll`.
-
-- For `Le Mans Ultimate` (legacy API only):
-    1. In `Le Mans Ultimate\UserData\player` folder, find and open `CustomPluginVariables.JSON` file with notepad, then set `" Enabled"` value to `1`.
-    2. In game `Settings` -> `Gameplay` page, find `Enable Plugins` option and make sure it is turned `ON`.
 
 After plugin enabled, must `restart game` to take effect.
 

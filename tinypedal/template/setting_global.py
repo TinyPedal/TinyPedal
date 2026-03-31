@@ -63,7 +63,7 @@ GLOBAL_DEFAULT = {
         "api_name": API_DEFAULT_NAME,
         "enable_api_selection_from_preset": True,
         "enable_auto_backup_car_setup": False,
-        "enable_legacy_api_selection": (not PLATFORM.WINDOWS),
+        "enable_legacy_api_selection": False,
     },
     "user_path": {
         "settings_path": set_default_config_path("settings/"),
