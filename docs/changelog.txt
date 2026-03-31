@@ -1,11 +1,11 @@
 WIP
 -----------------------------
 * [New]Adaptive race length calculation
-  - Implemented adaptive race length and fuel calculation for "Lap" and "Laps & Time" finish criteria based race, which allows to automatically determine the shortest race length from "remaining laps" and "remaining time" based on race leader's lap time pace, and calculating race length and fuel usage accordingly for increased accuracy and efficiency.
+  - Implemented adaptive race length and fuel calculation for "Lap" and "Laps & Time" finish criteria based race, which automatically determines the shortest race length and calculates fuel usage accordingly for increased accuracy and efficiency.
     Note, unlike "Time" based race, finish criteria in "Laps & Time" based race is determined by both "remaining laps" and "remaining time" (whichever reaches zero first), such as seen from Qatar 1812km event.
-  - Added "finish_time_difference_threshold" option to "Vehicles Module", which sets estimated finish time difference threshold between race leader and local player for determine the shortest race length (either laps or time). Default threshold is "200" seconds (roughly a lap at LeMans).
-    When finish time difference is lower than threshold, shortest race length is determined by player's lap time pace.
-    When finish time difference is higher than threshold, shortest race length is determined by leader's lap time pace.
+  - Added "finish_time_difference_threshold" option to "Vehicles Module", which sets estimated finish time difference threshold between race leader and local player for determine the shortest race length (either in laps or time). Default threshold is "200" seconds (roughly a lap at LeMans).
+    When finish time difference is lower than threshold, shortest race length is determined by player's lap time pace. This is useful for compensating strategy difference within the same leading class, and potentially catching up with leader.
+    When finish time difference is higher than threshold, shortest race length is determined by leader's lap time pace. This is useful for much slower classes to align their finish time towards the leading class.
     This option only affects "Lap" or "Laps & Time" based race.
 
 * API
@@ -34,10 +34,10 @@ WIP
 * [New]Lift and coast LED Widget
   - Show lift and coast LED that matches in-game fuel & energy saving target (requested by user "Gio Nuvoli" & "FabrizioDelfino95").
   - Show TC & ABS activation LED (requested by user "dibreiras").
-  - Four available LED orientations: left to right (horizontal), bottom to top (vertical), right to left (horizontal), top to bottom (vertical).
+  - Four available LED orientations: "0" = left to right (horizontal), "1" = bottom to top (vertical), "2" = right to left (horizontal), "3" = top to bottom (vertical).
     Note, currently this widget only works for "LMU".
 
-* [New]Tyre deflection
+* [New]Tyre deflection Widget
   - Show visualized tyre vertical deflection in millimeters.
   - Show warning indication for lifted wheels.
 
@@ -51,7 +51,7 @@ WIP
   - Added "show_position_change" & "show_position_change_in_class" options (requested by user "JustEmailMe"), which shows local player's position change relative to qualification position.
 
 * Session Widget
-  - Now shows estimated remaining time based on leader's lap time pace in "Laps" finish criteria.
+  - Now shows estimated remaining time based on leader's lap time pace in "Laps" based race.
 
 * Track map Widget
   - Added "enable_auto_pitout_prediction" option (requested by user "Zezituh"), which shows auto-estimated pit-out duration prediction. Default indication shows as a green circle. This option does not count towards "number_of_prediction" limit.

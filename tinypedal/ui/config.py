@@ -364,8 +364,9 @@ class UserConfig(BaseDialog):
             "Changes are only saved after clicking Apply or Save Button."
         )
         if self.confirm_operation(title="Reset Options", message=msg_text):
-            for editor in self.option_edit.values():
-                editor.reset_to_default()
+            for key, editor in self.option_edit.items():
+                if key != "enable":
+                    editor.reset_to_default()
 
     def save_setting(self):
         """Save setting"""

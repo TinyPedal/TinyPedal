@@ -127,6 +127,7 @@ class Realtime(Overlay):
         """Draw LICO LED"""
         lico_scaled = lico * self.max_led
         full_light = True
+        is_critical = (lico > self.lico_critical) + 1
 
         if self.abs_active:
             painter.setBrush(self.brush_led[4])
@@ -146,7 +147,7 @@ class Realtime(Overlay):
             if not full_light:
                 # Progressive
                 if index < lico_scaled:
-                    painter.setBrush(self.brush_led[(lico > self.lico_critical) + 1])
+                    painter.setBrush(self.brush_led[is_critical])
                 # Off
                 else:
                     painter.setBrush(self.brush_led[0])
