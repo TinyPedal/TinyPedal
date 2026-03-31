@@ -1,5 +1,13 @@
 WIP
 -----------------------------
+* [New]Adaptive race length calculation
+  - Implemented adaptive race length and fuel calculation for "Lap" and "Laps & Time" finish criteria based race, which allows to automatically determine the shortest race length from "remaining laps" and "remaining time" based on race leader's lap time pace, and calculating race length and fuel usage accordingly for increased accuracy and efficiency.
+    Note, in "Laps & Time" based race, finish criteria is determined by both "remaining laps" and "remaining time" (whichever reaches zero first), such as seen from Qatar 1812km event.
+  - Added "finish_time_difference_threshold" option to "Vehicles Module", which sets estimated finish time difference threshold between race leader and local player for determine the shortest race length (either laps or time). Default threshold is "200" seconds (roughly a lap at LeMans).
+    When finish time difference is lower than threshold, shortest race length is determined by player's lap time pace.
+    When finish time difference is higher than threshold, shortest race length is determined by leader's lap time pace.
+    This option only affects "Lap" or "Laps & Time" based race. "Time" based race is not affected by this option.
+
 * Tyre Compound Display
   - Reworked general tyre compound display for related widgets, which now supports to display tyre compound & associated heatmap for each wheel separately.
   - Note, currently RF2 & LMU game API do not provide separate compound info for tyres on the same axle. Due to this limitation, when set left tyre compound differently than right tyre, the API will only output and show compound info from left tyre. This is not a bug.
@@ -38,6 +46,9 @@ WIP
 * Laps and position Widget
   - Added "show_position_change" & "show_position_change_in_class" options (requested by user "JustEmailMe"), which shows local player's position change relative to qualification position.
 
+* Session Widget
+  - Now shows estimated remaining time based on leader's lap time pace in "Laps" finish criteria.
+
 * Track map Widget
   - Added "enable_auto_pitout_prediction" option (requested by user "Zezituh"), which shows auto-estimated pit-out duration prediction. Default indication shows as a green circle. This option does not count towards "number_of_prediction" limit.
     Auto estimated pit-out duration is calculated in the same way as "Pit stop estimate" Widget.
@@ -45,7 +56,6 @@ WIP
   - Added "auto_prediction_additional_pitstop_time" option, which sets additional pit stop time it takes to decelerate and accelerate towards and away from pit spot. This option corresponds to "additional_pitstop_time" option from "Pit stop estimate" Widget, and both should be set to same amount. Default value is "2" seconds.
 
 * Misc
-  - Added support for "lap and time" based race (where finish criteria is determined by both remaining laps & time).
   - Default preset (when creating new preset) now enables only 10 commonly used widgets. Newly implemented widgets are no longer enabled by default.
   - Fixed an issue where "LIMIT" text was not displayed correctly if disabled "show_current_speed_while_limiter_on".
 

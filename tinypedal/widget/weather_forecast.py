@@ -155,14 +155,14 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Read weather data
-        is_lap_type = api.read.session.finish_type() == 1
+        finish_as_lap = api.read.session.finish_type() == 1
         forecast_info = api.read.session.weather_forecast()
         forecast_count = min(len(forecast_info), MAX_FORECASTS)
 
         if forecast_count < 1:
             return
 
-        if is_lap_type:
+        if finish_as_lap:
             index_offset = 0
         else:  # time type race, add index offset to ignore negative estimated time
             index_offset = self.set_forecast_time(forecast_info)
@@ -182,7 +182,7 @@ class Realtime(Overlay):
                 rain_chance = forecast_info[index_bias].rain_chance
                 icon_index = forecast_info[index_bias].sky_type
                 estimated_temp = forecast_info[index_bias].temperature
-                if is_lap_type:
+                if finish_as_lap:
                     estimated_time = MAX_FORECAST_MINUTES
                 else:
                     estimated_time = self.estimated_time[index_bias]

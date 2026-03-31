@@ -278,19 +278,15 @@ class Session(ABC):
 
     @abstractmethod
     def remaining(self) -> float:
-        """Session time remaining (seconds)"""
+        """Session time remaining (seconds), minimum limit to 0"""
 
     @abstractmethod
     def session_type(self) -> int:
         """Session type, 0 = TESTDAY, 1 = PRACTICE, 2 = QUALIFY, 3 = WARMUP, 4 = RACE"""
 
     @abstractmethod
-    def finish_type(self) -> int:
-        """Race finish type, 0 = time, 1 = lap only, 2 = lap & time"""
-
-    @abstractmethod
-    def finish_tendency(self, index: int | None = None, laptime: float = 0) -> bool:
-        """Race finish type tendency for when type is lap & time, False = time, True = lap"""
+    def finish_type(self, as_lap: bool | None = None) -> int:
+        """Race finish type, 0 = time, 1 = laps only, 2 = laps & time"""
 
     @abstractmethod
     def in_race(self) -> bool:

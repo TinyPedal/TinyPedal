@@ -286,12 +286,13 @@ def calc_consumption(
             used_last_valid, delta_fuel, 0 == is_pit_lap < laps_done)
 
         # Total refuel = laps left * last consumption - remaining fuel
-        if api.read.session.finish_tendency(laptime=laptime_pace):  # lap-type
+        if api.read.session.finish_type(minfo.vehicles.finishAsLap):  # lap-type
             full_laps_left = calc.lap_type_full_laps_remain(
                 api.read.lap.maximum(), laps_done)
             laps_left = calc.lap_type_laps_remain(
                 full_laps_left, lap_into)
         elif laptime_pace > 0:  # time-type race
+            time_left -= minfo.vehicles.finishTimeOffset
             end_timer_laps_left = calc.end_timer_laps_remain(
                 lap_into, laptime_pace, time_left)
             full_laps_left = ceil(end_timer_laps_left)

@@ -1608,6 +1608,17 @@ Lap difference (percentage) threshold for tagging opponents as ahead. Default is
     lap_difference_behind_threshold
 Lap difference (percentage) threshold for tagging opponents as behind. Default is `0.9` lap.
 
+    finish_time_difference_threshold
+Set estimated finish time difference threshold between race leader and local player for determine the shortest race length (either laps or time). Default threshold is `200` seconds (roughly a lap at LeMans).
+
+This option is used for adaptive race length and fuel calculation for `Lap` or `Laps & Time` finish criteria based race, where finish criteria is determined by both `remaining laps` and `remaining time` (whichever reaches zero first), such as seen from Qatar 1812km event.
+
+This option only affects `Lap` or `Laps & Time` based race. `Time` based race is not affected by this option.
+
+- When finish time difference is lower than threshold, shortest race length is determined by player's lap time pace.
+- When finish time difference is higher than threshold, shortest race length is determined by leader's lap time pace.
+
+
 [**`Back to Top`**](#)
 
 

@@ -97,6 +97,7 @@ MODULE_DEFAULT = {
         "idle_update_interval": 400,
         "lap_difference_ahead_threshold": 0.9,
         "lap_difference_behind_threshold": 0.9,
+        "finish_time_difference_threshold": 200,
     },
     "module_wheels": {
         "enable": True,

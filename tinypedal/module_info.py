@@ -99,22 +99,25 @@ class DeltaLapTime(array):
     """Delta lap time history data
 
     Recent lap time index range: 0 - 4.
-    Recent best lap time index: 5 (-2).
-    Last lap start time index: 6 (-1).
+    Recent average lap time index: 5 (-3).
+    Recent best lap time index: 6 (-2).
+    Last lap start time index: 7 (-1).
     """
 
     __slots__ = ()
 
-    def update(self, lap_start: float):
+    def update(self, lap_start: float, elapsed_time: float, best_valid: float):
         """Update delta lap time history"""
-        if self[-1] != lap_start:
+        if self[-1] != lap_start and elapsed_time - lap_start > 1:
             if 0 < self[-1] < lap_start:
                 self[0], self[1], self[2], self[3] = self[1], self[2], self[3], self[4]
                 self[4] = lap_start - self[-1]  # last lap time
             else:  # reset all laptime on session change
                 self[0] = self[1] = self[2] = self[3] = self[4] = 0.0
             self[-1] = lap_start
-            self[-2] = min(self._filter_laptime())
+            # Recalculate once per lap
+            self[-2] = min(self._filter_laptime(best_valid))
+            self[-3] = self._average_laptime(self[-2])
 
     def delta(self, target: DeltaLapTime, max_output: int):
         """Generate delta from target player's lap time data set"""
@@ -132,10 +135,32 @@ class DeltaLapTime(array):
         """Best lap time from recent laps"""
         return self[-2]
 
-    def _filter_laptime(self):
+    def average(self) -> float:
+        """Average lap time from recent laps"""
+        return self[-3]
+
+    def _average_laptime(self, laptime_best: float) -> float:
+        """Calculate average lap time"""
+        if laptime_best >= MAX_SECONDS:
+            return MAX_SECONDS
+        laptime_sum = 0
+        count = 0
+        margin = laptime_best * 1.2
+        for laptime in self._filter_laptime(laptime_best):
+            # Make sure lap time within 120% of recent best laptime
+            if laptime <= margin:
+                laptime_sum += laptime
+                count += 1
+        if count:
+            return laptime_sum / count
+        return laptime_best
+
+    def _filter_laptime(self, best_valid: float):
         """Filter invalid lap time"""
+        best_valid -= 0.01  # compensate precision
         for laptime in islice(self, 5):
-            if laptime > 0:
+            # Make sure lap time is not lower than session best valid lap time
+            if laptime >= best_valid > 0:
                 yield laptime
             else:
                 yield MAX_SECONDS
@@ -350,7 +375,7 @@ class VehicleDataSet:
         self.currentStintLaps: int = 0
         self.pitTimer: VehiclePitTimer = VehiclePitTimer()
         self.speedTrap: VehicleSpeedTrap = VehicleSpeedTrap()
-        self.lapTimeHistory: DeltaLapTime = DeltaLapTime("d", [0.0] * 7)
+        self.lapTimeHistory: DeltaLapTime = DeltaLapTime("d", [0.0] * 8)
 
 
 class DeltaInfo:
@@ -676,7 +701,8 @@ class VehiclesInfo:
         "nearestYellowBehind",
         "nearestBlueClass",
         "leaderBestLapTime",
-        "leaderRecentBestLapTime",
+        "finishTimeOffset",
+        "finishAsLap",
     )
 
     def __init__(self):
@@ -698,7 +724,8 @@ class VehiclesInfo:
         self.nearestYellowBehind: float = -MAX_METERS
         self.nearestBlueClass: str = ""
         self.leaderBestLapTime: float = MAX_SECONDS
-        self.leaderRecentBestLapTime: float = MAX_SECONDS
+        self.finishTimeOffset: float = 0.0
+        self.finishAsLap: bool = True
 
 
 class WheelsInfo:

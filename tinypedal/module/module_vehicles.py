@@ -48,6 +48,7 @@ class Realtime(DataModule):
         output = minfo.vehicles
         max_lap_diff_ahead = self.mcfg["lap_difference_ahead_threshold"]
         max_lap_diff_behind = self.mcfg["lap_difference_behind_threshold"]
+        max_finish_time_diff = max(self.mcfg["finish_time_difference_threshold"], 0)
 
         gen_low_priority_timer = state_timer(0.2)
 
@@ -62,22 +63,30 @@ class Realtime(DataModule):
 
                 veh_total = output.totalVehicles = api.read.vehicle.total_vehicles()
                 if veh_total > 0:
+                    update_low_priority = next(gen_low_priority_timer)
+
                     update_vehicle_data(
                         output,
                         max_lap_diff_ahead,
                         max_lap_diff_behind,
-                        next(gen_low_priority_timer),
+                        update_low_priority,
                     )
 
-                if last_veh_total != veh_total:
-                    last_veh_total = veh_total
-                    if veh_total > 0:
-                        update_qualify_position(output)
+                    if update_low_priority:
+                        if last_veh_total != veh_total:
+                            last_veh_total = veh_total
+                            update_qualify_position(output)
+
+                        update_finish_time(output, max_finish_time_diff)
 
             else:
                 if reset:
                     reset = False
                     update_interval = self.idle_interval
+
+        # Must reset on close
+        output.finishTimeOffset = 0.0
+        output.finishAsLap = True
 
 
 def update_vehicle_data(
@@ -227,7 +236,7 @@ def update_vehicle_data(
             data.gapBehindNextInClass = calc_time_gap_behind(opt_index_ahead, index, track_length, data.totalLapProgress)
             data.gapBehindLeaderInClass = calc_time_gap_behind(opt_index_leader, index, track_length, data.totalLapProgress)
 
-            data.lapTimeHistory.update(api.read.timing.start(index))
+            data.lapTimeHistory.update(api.read.timing.start(index), elapsed_time, data.bestLapTime)
             last_laptime = api.read.timing.last_laptime(index)
             data.isValidLap = last_laptime > 0
             data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last()
@@ -248,7 +257,6 @@ def update_vehicle_data(
             if data.positionOverall == 1:
                 output.leaderIndex = index
                 output.leaderBestLapTime = data.bestLapTime
-                output.leaderRecentBestLapTime = api.read.timing.reference_laptime(index, data.lapTimeHistory.best())
 
     # Output extra info
     output.nearestLine = nearest_line
@@ -264,6 +272,56 @@ def update_vehicle_data(
         output.totalStoppedPits = total_stopped_pits
         output.totalPitRequests = total_pit_requests
         output.totalCompletedLaps = total_completed_laps
+
+
+def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> None:
+    """Estimated finish time & offset based on remaining laps"""
+    finish_type = api.read.session.finish_type()
+    # Time only
+    if finish_type == 0:
+        output.finishTimeOffset = 0.0
+        output.finishAsLap = True
+        return
+
+    remaining_time = api.read.session.remaining()
+
+    # Leader time
+    leader_index = output.leaderIndex
+    leader_pace = output.dataSet[leader_index].lapTimeHistory.average()
+    if leader_index >= 0 and 0 < leader_pace < MAX_SECONDS:
+        leader_finish_time = leader_pace * api.read.lap.remaining(leader_index)
+        leader_finish_offset = max(remaining_time - leader_finish_time, 0.0)
+    else:  # default to lap if unavailable
+        leader_finish_time = 0.1
+        leader_finish_offset = 0.1
+
+    # Player time
+    player_index = output.playerIndex
+    player_pace = output.dataSet[player_index].lapTimeHistory.average()
+    if player_index >= 0 and 0 < player_pace < MAX_SECONDS:
+        player_finish_time = player_pace * api.read.lap.remaining(player_index)
+        player_finish_offset = max(remaining_time - player_finish_time, 0.0)
+    else:  # default to lap if unavailable
+        player_finish_time = 0.1
+        player_finish_offset = 0.1
+
+    # Laps only
+    if finish_type == 1:
+        output.finishTimeOffset = -leader_finish_time
+        output.finishAsLap = (
+            leader_finish_time > 0  # default to lap if unavailable
+            and player_finish_time - leader_finish_time < max_finish_time_diff
+        )
+        return
+
+    # Laps & time
+    if finish_type == 2:
+        output.finishTimeOffset = leader_finish_offset
+        output.finishAsLap = (
+            leader_finish_offset > 0
+            and leader_finish_offset - player_finish_offset < max_finish_time_diff
+        )
+        return
 
 
 def update_qualify_position(output: VehiclesInfo) -> None:
