@@ -100,6 +100,14 @@ class Brake(_reader.Brake, DataAdapter):
         """Brake bias front (fraction)"""
         return 1 - rmnan(self.shmm.lmuTeleVeh(index).mRearBrakeBias)
 
+    def migration(self, index: int | None = None) -> float:
+        """Brake migration (percent)"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        max_migration = tele_veh.mMigrationMax
+        if max_migration > 0:
+            return rmnan(1 - tele_veh.mMigration / max_migration) * 2.5
+        return 0.0
+
     def pressure(self, index: int | None = None, scale: float = 1) -> tuple[float, ...]:
         """Brake pressure (fraction)"""
         wheel_data = self.shmm.lmuTeleVeh(index).mWheels

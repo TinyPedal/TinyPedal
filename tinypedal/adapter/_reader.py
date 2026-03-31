@@ -59,6 +59,10 @@ class Brake(ABC):
         """Brake bias front (fraction)"""
 
     @abstractmethod
+    def migration(self, index: int | None = None) -> float:
+        """Brake migration (percent)"""
+
+    @abstractmethod
     def pressure(self, index: int | None = None, scale: float = 1) -> tuple[float, ...]:
         """Brake pressure (fraction)"""
 

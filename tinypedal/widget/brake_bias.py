@@ -129,7 +129,9 @@ class Realtime(Overlay):
 
         # Brake migration
         if self.wcfg["show_brake_migration"]:
-            bmigt = self.brake_bmigt.send(bbias)
+            bmigt = api.read.brake.migration()
+            if bmigt < 0:
+                bmigt = self.brake_bmigt.send(bbias) * 100
             self.update_bmigt(self.bar_bmigt, bmigt)
 
     # GUI update methods
@@ -169,7 +171,7 @@ class Realtime(Overlay):
 
     def format_brake_migt(self, value: float) -> str:
         """Format brake migration"""
-        reading = f"{value * 100:.{self.decimals_migt}f}"[:2 + self.decimals_migt]
+        reading = f"{value:.{self.decimals_migt}f}"[:2 + self.decimals_migt]
         return f"{self.prefix_migt}{reading}{self.suffix_migt}"
 
 
