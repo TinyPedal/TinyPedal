@@ -2,27 +2,21 @@ WIP
 -----------------------------
 * [New]Adaptive race length calculation
   - Implemented adaptive race length and fuel calculation for "Lap" and "Laps & Time" finish criteria based race, which allows to automatically determine the shortest race length from "remaining laps" and "remaining time" based on race leader's lap time pace, and calculating race length and fuel usage accordingly for increased accuracy and efficiency.
-    Note, in "Laps & Time" based race, finish criteria is determined by both "remaining laps" and "remaining time" (whichever reaches zero first), such as seen from Qatar 1812km event.
+    Note, unlike "Time" based race, finish criteria in "Laps & Time" based race is determined by both "remaining laps" and "remaining time" (whichever reaches zero first), such as seen from Qatar 1812km event.
   - Added "finish_time_difference_threshold" option to "Vehicles Module", which sets estimated finish time difference threshold between race leader and local player for determine the shortest race length (either laps or time). Default threshold is "200" seconds (roughly a lap at LeMans).
     When finish time difference is lower than threshold, shortest race length is determined by player's lap time pace.
     When finish time difference is higher than threshold, shortest race length is determined by leader's lap time pace.
-    This option only affects "Lap" or "Laps & Time" based race. "Time" based race is not affected by this option.
+    This option only affects "Lap" or "Laps & Time" based race.
 
 * API
   - Updated "pyLMUSharedMemory" library for accessing new API data from LMU's 1.3 updates.
   - "Le Mans Ultimate (legacy)" is now deprecated and no longer maintained or supported. It can still be selected from API menu, but will be removed in future.
 
-* Tyre Compound Display
+* Tyre Compound & Heatmap
   - Reworked general tyre compound display for related widgets, which now supports to display tyre compound & associated heatmap for each wheel separately.
-
-* Compounds Preset
   - Updated default tyre compounds preset with new custom compound color.
-
-* Heatmap Preset
-  - Added default "tyre_optimal_50", "tyre_optimal_60" presets for wet tyre.
-
-* Tyre Compound Editor
-  - Added "Color" column for customizing compound color for each different compound type.
+  - Added default "tyre_optimal_50", "tyre_optimal_60" heatmap presets for wet tyre.
+  - Added "Color" column in "Tyre Compound Editor" for customizing compound color for each different compound type.
 
 * Tyre temperature, Tyre inner layer, Tyre carcass, Tyre pressure Widget
   - Now all supports "horizontal_gap", "vertical_gap" options for adjusting horizontal & vertical gap separately between each wheel.
@@ -36,6 +30,12 @@ WIP
   - Added "show_compound_color_by_type" option, which shows different compound color by compound type. Note, player's compound color is not affected by this setting while "show_player_highlighted" option is enabled.
   - Added "tyre_compound_spacing" option, which sets display spacing (in pixels) between each compound symbol. Default is "1" pixel.
   - Added "finish_status_text" option, which sets custom finish (checkered flag) status text that shows when driver finished race.
+
+* [New]Lift and coast LED Widget
+  - Show lift and coast LED that matches in-game fuel & energy saving target (requested by user "Gio Nuvoli" & "FabrizioDelfino95").
+  - Show TC & ABS activation LED (requested by user "dibreiras").
+  - Four available LED orientations: left to right (horizontal), bottom to top (vertical), right to left (horizontal), top to bottom (vertical).
+    Note, currently this widget only works for "LMU".
 
 * [New]Tyre deflection
   - Show visualized tyre vertical deflection in millimeters.

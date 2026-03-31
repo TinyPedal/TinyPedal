@@ -2748,6 +2748,23 @@ Show tyre wear percentage sign.
 [**`Back to Top`**](#)
 
 
+## Lift and coast LED
+**This widget displays lift and coast, TC & ABS activation LED info.**
+
+Note, currently this widget only works for `LMU`.
+
+    number_of_led
+Set number of LED to display. Minimum LED is limited to `3`.
+
+    led_width, led_height, led_radius
+Set LED width, height, radius in pixels. To achieve circle LED, set a higher radius value.
+
+    lift_and_coast_multiplier_critical
+This value multiplies maximum lift and coast range, which sets critical range of lift and coast LED.
+
+[**`Back to Top`**](#)
+
+
 ## Navigation
 **This widget displays a zoomed navigation map that centered on player's vehicle. Note: at least one complete and valid lap is required to generate map.**
 

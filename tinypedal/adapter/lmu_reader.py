@@ -201,6 +201,10 @@ class Engine(_reader.Engine, DataAdapter):
         """Water temperature (Celsius)"""
         return rmnan(self.shmm.lmuTeleVeh(index).mEngineWaterTemp)
 
+    def lift_and_coast_progress(self, index: int | None = None) -> float:
+        """Lift and coast progress (fraction), range 0.0 to 1.0"""
+        return self.shmm.lmuTeleVeh(index).mLiftAndCoastProgress / 255
+
 
 class Inputs(_reader.Inputs, DataAdapter):
     """Inputs"""
@@ -532,6 +536,14 @@ class Switch(_reader.Switch, DataAdapter):
     def speed_limiter(self, index: int | None = None) -> int:
         """Speed limiter"""
         return self.shmm.lmuTeleVeh(index).mSpeedLimiter
+
+    def tc_active(self, index: int | None = None) -> bool:
+        """TC activation state"""
+        return self.shmm.lmuTeleVeh(index).mTCActive
+
+    def abs_active(self, index: int | None = None) -> bool:
+        """ABS activation state"""
+        return self.shmm.lmuTeleVeh(index).mABSActive
 
     def drs_status(self, index: int | None = None) -> int:
         """DRS status, 0 not_available, 1 available, 2 allowed(not activated), 3 activated"""

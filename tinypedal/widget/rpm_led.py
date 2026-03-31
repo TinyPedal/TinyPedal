@@ -39,19 +39,19 @@ class Realtime(Overlay):
         # Config variable
         self.double_side_led = self.wcfg["enable_double_side_led"]
         self.display_margin = max(int(self.wcfg["display_margin"]), 0)
-        self.inner_gap = max(int(self.wcfg["inner_gap"]), 0)
+        inner_gap = max(int(self.wcfg["inner_gap"]), 0)
 
         self.led_width = max(int(self.wcfg["led_width"]), 1)
         self.led_height = max(int(self.wcfg["led_height"]), 1)
-        self.led_offset = self.led_width + self.inner_gap
+        self.led_offset = self.led_width + inner_gap
         self.led_radius = max(self.wcfg["led_radius"], 0)
         self.max_led = max(int(self.wcfg["number_of_led"]), 3)
 
-        display_width = self.led_width * self.max_led + self.inner_gap * (self.max_led - 1)
+        display_width = self.led_width * self.max_led + inner_gap * (self.max_led - 1)
         display_height = self.led_height + self.display_margin * 2
 
         if self.double_side_led:
-            display_width += display_width + self.inner_gap + self.display_margin * 2
+            display_width += display_width + inner_gap + self.display_margin * 2
         else:
             display_width += self.display_margin * 2
 
@@ -63,9 +63,12 @@ class Realtime(Overlay):
         self.rect_led = QRect(0, 0, self.led_width, self.led_height)
         self.rect_background = QRect(0, 0, display_width, display_height)
 
-        self.pen_led = QPen()
-        self.pen_led.setColor(self.wcfg["led_outline_color"])
-        self.pen_led.setWidth(self.wcfg["led_outline_width"])
+        if self.wcfg["led_outline_width"] > 0:
+            self.pen_led = QPen()
+            self.pen_led.setColor(self.wcfg["led_outline_color"])
+            self.pen_led.setWidth(self.wcfg["led_outline_width"])
+        else:
+            self.pen_led = Qt.NoPen
 
         self.brush_led = (
             QBrush(self.wcfg["rpm_color_off"], Qt.SolidPattern),
@@ -139,14 +142,8 @@ class Realtime(Overlay):
         if self.wcfg["show_background"]:
             painter.fillRect(self.rect_background, self.wcfg["background_color"])
 
-        if self.wcfg["led_outline_width"] > 0:
-            painter.setPen(self.pen_led)
-        else:
-            painter.setPen(Qt.NoPen)
-
-        rpm = self.rpm - self.rpm_low
-
         # Set flicker state
+        rpm = self.rpm - self.rpm_low
         if self.wcfg["show_speed_limiter_flash"] and self.limiter:
             self.flicker = self.warn_flash.send(True)
         elif (
@@ -158,6 +155,7 @@ class Realtime(Overlay):
         else:
             self.flicker = False
 
+        painter.setPen(self.pen_led)
         self.draw_rpm_led(
             painter,
             rpm,

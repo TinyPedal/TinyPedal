@@ -138,6 +138,10 @@ class Engine(ABC):
     def water_temperature(self, index: int | None = None) -> float:
         """Water temperature (Celsius)"""
 
+    @abstractmethod
+    def lift_and_coast_progress(self, index: int | None = None) -> float:
+        """Lift and coast progress (fraction), range 0.0 to 1.0"""
+
 
 class Inputs(ABC):
     """Inputs"""
@@ -391,6 +395,14 @@ class Switch(ABC):
     @abstractmethod
     def speed_limiter(self, index: int | None = None) -> int:
         """Speed limiter"""
+
+    @abstractmethod
+    def tc_active(self, index: int | None = None) -> bool:
+        """TC activation state"""
+
+    @abstractmethod
+    def abs_active(self, index: int | None = None) -> bool:
+        """ABS activation state"""
 
     @abstractmethod
     def drs_status(self, index: int | None = None) -> int:
