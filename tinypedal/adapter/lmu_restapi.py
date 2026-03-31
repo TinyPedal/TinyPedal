@@ -45,7 +45,6 @@ class RestAPIData:
 
     __slots__ = (
         "timeScale",
-        "trackClockTime",
         "privateQualifying",
         "steeringWheelRange",
         "aeroDamage",
@@ -62,7 +61,6 @@ class RestAPIData:
 
     def __init__(self):
         self.timeScale: int = 1
-        self.trackClockTime: float = -1.0
         self.privateQualifying: int = 0
         self.steeringWheelRange: float = 0.0
         self.aeroDamage: float = -1.0
@@ -92,7 +90,6 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
         ResOutput("aeroDamage", -1.0, valid_value_type, ("wearables", "body", "aero")),
         ResOutput("brakeWear", WHEELS_NA, export_wheels, ("wearables", "brakes")),
         ResOutput("suspensionDamage", WHEELS_NA, export_wheels, ("wearables", "suspension")),
-        ResOutput("trackClockTime", -1.0, valid_value_type, ("sessionTime", "timeOfDay")),
         ResOutput("absoluteRefill", 0.0, absolute_refilling, ("pitMenu", "pitMenu")),
     )
     res_garagesetup = (

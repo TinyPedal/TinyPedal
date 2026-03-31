@@ -475,7 +475,7 @@ class Session(_reader.Session, DataAdapter):
 
     def track_time(self) -> float:
         """Track time"""
-        return self.rest.trackClockTime
+        return -1.0
 
     def time_scale(self) -> int:
         """Time scale"""

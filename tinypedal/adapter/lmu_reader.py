@@ -477,7 +477,7 @@ class Session(_reader.Session, DataAdapter):
 
     def track_time(self) -> float:
         """Track time"""
-        return self.rest.trackClockTime
+        return self.shmm.lmuScorInfo.mTimeOfDay
 
     def time_scale(self) -> int:
         """Time scale"""
