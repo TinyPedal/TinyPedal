@@ -14,7 +14,6 @@ WIP
 
 * Tyre Compound Display
   - Reworked general tyre compound display for related widgets, which now supports to display tyre compound & associated heatmap for each wheel separately.
-  - Note, currently RF2 & LMU game API do not provide separate compound info for tyres on the same axle. Due to this limitation, when set left tyre compound differently than right tyre, the API will only output and show compound info from left tyre. This is not a bug.
 
 * Compounds Preset
   - Updated default tyre compounds preset with new custom compound color.

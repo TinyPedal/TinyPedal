@@ -37,6 +37,7 @@ if TYPE_CHECKING:  # for type checker only
 else:  # run time only
     from pyLMUSharedMemory import lmu_data
 
+from pyLMUSharedMemory import lmu_enum
 from pyLMUSharedMemory.lmu_mmap import (
     INVALID_INDEX,
     MAX_VEHICLES,
@@ -45,6 +46,9 @@ from pyLMUSharedMemory.lmu_mmap import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Enum map
+LMU_COMPOUND_TYPE = lmu_enum.enum_map(lmu_enum.LMUCompoundType)
 
 
 def copy_struct(struct_data):

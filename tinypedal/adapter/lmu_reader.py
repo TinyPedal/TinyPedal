@@ -38,7 +38,9 @@ from ..formatter import strip_invalid_char
 from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
-from . import _reader, lmu_connector, lmu_restapi
+from . import _reader
+from .lmu_connector import LMU_COMPOUND_TYPE, LMUInfo
+from .lmu_restapi import RestAPIData
 
 
 class DataAdapter:
@@ -49,7 +51,7 @@ class DataAdapter:
         "rest",
     )
 
-    def __init__(self, shmm: lmu_connector.LMUInfo, rest: lmu_restapi.RestAPIData) -> None:
+    def __init__(self, shmm: LMUInfo, rest: RestAPIData) -> None:
         """Initialize API setting
 
         Args:
@@ -615,18 +617,24 @@ class Tyre(_reader.Tyre, DataAdapter):
 
     def compound_name(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set"""
-        tele_veh = self.shmm.lmuTeleVeh(index)
-        front = tostr(tele_veh.mFrontTireCompoundName)
-        rear = tostr(tele_veh.mRearTireCompoundName)
-        return front, front, rear, rear
+        wheel_data = self.shmm.lmuTeleVeh(index).mWheels
+        return (
+            LMU_COMPOUND_TYPE(wheel_data[0].mCompoundType),
+            LMU_COMPOUND_TYPE(wheel_data[1].mCompoundType),
+            LMU_COMPOUND_TYPE(wheel_data[2].mCompoundType),
+            LMU_COMPOUND_TYPE(wheel_data[3].mCompoundType),
+        )
 
     def compound_class(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set with class name prefix"""
-        tele_veh = self.shmm.lmuTeleVeh(index)
+        wheel_data = self.shmm.lmuTeleVeh(index).mWheels
         class_name = tostr(self.shmm.lmuScorVeh(index).mVehicleClass)
-        front = f"{class_name} - {tostr(tele_veh.mFrontTireCompoundName)}"
-        rear = f"{class_name} - {tostr(tele_veh.mRearTireCompoundName)}"
-        return front, front, rear, rear
+        return (
+            f"{class_name} - {LMU_COMPOUND_TYPE(wheel_data[0].mCompoundType)}",
+            f"{class_name} - {LMU_COMPOUND_TYPE(wheel_data[1].mCompoundType)}",
+            f"{class_name} - {LMU_COMPOUND_TYPE(wheel_data[2].mCompoundType)}",
+            f"{class_name} - {LMU_COMPOUND_TYPE(wheel_data[3].mCompoundType)}",
+        )
 
     def surface_temperature_avg(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre surface temperature set (Celsius) average"""

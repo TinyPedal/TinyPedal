@@ -38,7 +38,9 @@ from ..formatter import strip_invalid_char
 from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
-from . import _reader, rf2_connector, rf2_restapi
+from . import _reader
+from .rf2_connector import RF2Info
+from .rf2_restapi import RestAPIData
 
 
 class DataAdapter:
@@ -49,7 +51,7 @@ class DataAdapter:
         "rest",
     )
 
-    def __init__(self, shmm: rf2_connector.RF2Info, rest: rf2_restapi.RestAPIData) -> None:
+    def __init__(self, shmm: RF2Info, rest: RestAPIData) -> None:
         """Initialize API setting
 
         Args:
