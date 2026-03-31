@@ -136,6 +136,21 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_power"],
             )
 
+        # Regeneration level
+        if self.wcfg["show_regeneration_level"]:
+            self.bar_regen = self.set_rawtext(
+                text="REGEN",
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_regeneration_level"],
+                bg_color=self.wcfg["background_color_regeneration_level"],
+            )
+            self.set_primary_orient(
+                target=self.bar_regen,
+                column=self.wcfg["display_order_regeneration_level"],
+            )
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Motor temperature
@@ -163,6 +178,11 @@ class Realtime(Overlay):
             power = round(calc.engine_power(
                 api.read.emotor.torque(), api.read.emotor.rpm()), 2)
             self.update_power(self.bar_power, power)
+
+        # Regeneration level
+        if self.wcfg["show_regeneration_level"]:
+            regen = round(api.read.emotor.regeneration_level(), 2)
+            self.update_regen(self.bar_regen, regen)
 
     # GUI update methods
     def update_motor(self, target, data):
@@ -201,5 +221,13 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             text = f"{self.unit_power(data): >6.2f}"[:6]
+            target.text = f"{text}{self.symbol_power}"
+            target.update()
+
+    def update_regen(self, target, data):
+        """Motor regen level"""
+        if target.last != data:
+            target.last = data
+            text = f"{self.unit_power(data): >+6.2f}"[:6]
             target.text = f"{text}{self.symbol_power}"
             target.update()

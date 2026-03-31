@@ -2080,6 +2080,9 @@ Show electric motor torque.
     show_power
 Show electric motor power.
 
+    show_regeneration_level
+Show electric motor regeneration level.
+
 [**`Back to Top`**](#)
 
 

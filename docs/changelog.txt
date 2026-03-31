@@ -59,6 +59,9 @@ WIP
     Note, this option only works for "LMU", and "enable_restapi_access" option must be enabled in "LMU API" setting.
   - Added "auto_prediction_additional_pitstop_time" option, which sets additional pit stop time it takes to decelerate and accelerate towards and away from pit spot. This option corresponds to "additional_pitstop_time" option from "Pit stop estimate" Widget, and both should be set to same amount. Default value is "2" seconds.
 
+* Electric motor Widget
+  - Added "show_regeneration_level" option, which shows electric motor regeneration level.
+
 * Misc
   - Default preset (when creating new preset) now enables only 10 commonly used widgets. Newly implemented widgets are no longer enabled by default.
   - Fixed an issue where "LIMIT" text was not displayed correctly if disabled "show_current_speed_while_limiter_on".

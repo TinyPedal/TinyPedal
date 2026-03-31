@@ -104,6 +104,10 @@ class ElectricMotor(ABC):
     def water_temperature(self, index: int | None = None) -> float:
         """Motor water temperature (Celsius)"""
 
+    @abstractmethod
+    def regeneration_level(self, index: int | None = None) -> float:
+        """Regeneration level (kW)"""
+
 
 class Engine(ABC):
     """Engine"""

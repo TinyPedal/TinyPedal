@@ -171,6 +171,10 @@ class ElectricMotor(_reader.ElectricMotor, DataAdapter):
         """Motor water temperature (Celsius)"""
         return rmnan(self.shmm.lmuTeleVeh(index).mElectricBoostWaterTemperature)
 
+    def regeneration_level(self, index: int | None = None) -> float:
+        """Regeneration level (kW)"""
+        return rmnan(self.shmm.lmuTeleVeh(index).mRegen)
+
 
 class Engine(_reader.Engine, DataAdapter):
     """Engine"""
