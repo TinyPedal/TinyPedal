@@ -34,7 +34,7 @@ from ..const_common import (
     TEXT_NA,
 )
 from ..const_file import ImageFile
-from ..process.weather import WeatherNode, forecast_sky_type
+from ..process.weather import WeatherNode
 from ..userfile.custom_image import split_pixmap_image
 from ._base import Overlay
 from ._painter import ProgressBar
@@ -174,7 +174,7 @@ class Realtime(Overlay):
             # Update slot 0 with live(now) weather condition
             if index == 0:
                 rain_chance = api.read.session.raininess()
-                icon_index = forecast_sky_type(forecast_info[index_bias].sky_type, rain_chance)
+                icon_index = api.read.session.cloud_coverage()
                 estimated_temp = api.read.session.ambient_temperature()
                 estimated_time = 0
             # Update slot with available forecast

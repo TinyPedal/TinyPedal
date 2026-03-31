@@ -444,7 +444,11 @@ class Session(_reader.Session, DataAdapter):
         return rmnan(self.shmm.lmuScorInfo.mAmbientTemp)
 
     def raininess(self) -> float:
-        """Rain severity (fraction)"""
+        """Rain severity (fraction), range 0.0 - 1.0
+
+        Rain in percent:
+            1-10 drizzle, 11-20 light rain, 21-40 rain, 41-60 heavy rain, 61-100 storm
+        """
         return rmnan(self.shmm.lmuScorInfo.mRaining)
 
     def wetness_minimum(self) -> float:
@@ -474,6 +478,34 @@ class Session(_reader.Session, DataAdapter):
         if session_type == 2:  # qualify session
             return self.rest.forecastQualify
         return self.rest.forecastRace  # race session
+
+    def cloud_coverage(self) -> int:
+        """Cloud coverage (type index), range 0 to 10
+
+        Sky type:
+            0 Clear, 1 Light Clouds, 2 Partially Cloudy, 3 Mostly Cloudy, 4 Overcast,
+            5 Cloudy & Drizzle, 6 Cloudy & Light Rain, 7 Overcast & Light Rain,
+            8 Overcast & Rain, 9 Overcast & Heavy Rain, 10 Overcast & Storm
+        """
+        raininess = rmnan(self.shmm.lmuScorInfo.mRaining)
+        if raininess <= 0:
+            coverage = self.shmm.lmuScorInfo.mCloudCoverage
+            if 0 >= coverage:
+                return 0
+            if 4 <= coverage:
+                return 4
+            return coverage
+        if raininess <= 0.10:
+            return 5
+        if raininess <= 0.15:
+            return 6
+        if raininess <= 0.20:
+            return 7
+        if raininess <= 0.40:
+            return 8
+        if raininess <= 0.60:
+            return 9
+        return 10
 
     def track_time(self) -> float:
         """Track time"""

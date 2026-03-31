@@ -330,7 +330,11 @@ class Session(ABC):
 
     @abstractmethod
     def raininess(self) -> float:
-        """Rain severity (fraction)"""
+        """Rain severity (fraction), range 0.0 - 1.0
+
+        Rain in percent:
+            1-10 drizzle, 11-20 light rain, 21-40 rain, 41-60 heavy rain, 61-100 storm
+        """
 
     @abstractmethod
     def wetness_minimum(self) -> float:
@@ -351,6 +355,16 @@ class Session(ABC):
     @abstractmethod
     def weather_forecast(self) -> tuple[WeatherNode, ...]:
         """Weather forecast nodes"""
+
+    @abstractmethod
+    def cloud_coverage(self) -> int:
+        """Cloud coverage (type index), range 0 to 10
+
+        Sky type:
+            0 Clear, 1 Light Clouds, 2 Partially Cloudy, 3 Mostly Cloudy, 4 Overcast,
+            5 Cloudy & Drizzle, 6 Cloudy & Light Rain, 7 Overcast & Light Rain,
+            8 Overcast & Rain, 9 Overcast & Heavy Rain, 10 Overcast & Storm
+        """
 
     @abstractmethod
     def track_time(self) -> float:

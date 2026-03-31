@@ -22,7 +22,6 @@ Weather forecast function
 
 from __future__ import annotations
 
-from functools import lru_cache
 from typing import NamedTuple
 
 from ..const_common import ABS_ZERO_CELSIUS
@@ -63,42 +62,3 @@ def forecast_rf2(data: dict, default: tuple[WeatherNode, ...]) -> tuple[WeatherN
     except (KeyError, TypeError, ValueError):
         output = default
     return output
-
-
-@lru_cache(maxsize=2)
-def forecast_sky_type(sky_type: int, raininess: float) -> int:
-    """Correct current sky type index based on current raininess
-
-    Rain percent:
-        1-10 drizzle, 11-20 light rain, 21-40 rain, 41-60 heavy rain, 61-100 storm
-
-    Sky type:
-        0 Clear
-        1 Light Clouds
-        2 Partially Cloudy
-        3 Mostly Cloudy
-        4 Overcast
-        5 Cloudy & Drizzle
-        6 Cloudy & Light Rain
-        7 Overcast & Light Rain
-        8 Overcast & Rain
-        9 Overcast & Heavy Rain
-        10 Overcast & Storm
-    """
-    if raininess <= 0:
-        if sky_type > 4:
-            return 4
-        return 0
-    if 0 < raininess <= 10:
-        return 5
-    if 10 < raininess <= 15:
-        return 6
-    if 15 < raininess <= 20:
-        return 7
-    if 20 < raininess <= 40:
-        return 8
-    if 40 < raininess <= 60:
-        return 9
-    if 60 < raininess:
-        return 10
-    return sky_type
