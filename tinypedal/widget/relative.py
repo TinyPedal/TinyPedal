@@ -322,6 +322,7 @@ class Realtime(Overlay):
                 self.wcfg["pit_status_text"],
                 self.wcfg["garage_status_text"],
                 self.wcfg["yellow_flag_status_text"],
+                self.wcfg["finish_status_text"],
             )
             self.bar_style_pit = (
                 ("#00000000", "#00000000"),
@@ -336,6 +337,10 @@ class Realtime(Overlay):
                 (
                     self.wcfg["font_color_yellow_flag"],
                     self.wcfg["background_color_yellow_flag"],
+                ),
+                (
+                    self.wcfg["font_color_finish"],
+                    self.wcfg["background_color_finish"],
                 ),
             )
             self.bars_pit = self.set_rawtext(
@@ -619,7 +624,7 @@ class Realtime(Overlay):
                 self.update_cls(self.bars_cls[idx], veh_info.vehicleClass, state)
             # Vehicle in pit
             if self.wcfg["show_pit_status"]:
-                self.update_pit(self.bars_pit[idx], veh_info.inPit, veh_info.isYellow, state)
+                self.update_pit(self.bars_pit[idx], veh_info.inPit, veh_info.isYellow, veh_info.isFinished, state)
             # Tyre compound
             if self.wcfg["show_tyre_compound"]:
                 self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundName, hi_player, state)
@@ -832,9 +837,12 @@ class Realtime(Overlay):
         """Vehicle in pit"""
         if target.last != data:
             target.last = data
-            index = data[0]
-            if data[1] and index == 0:  # show yellow flag outside pits
-                index = 3
+            if data[2]:  # finish flag
+                index = 4
+            else:
+                index = data[0]
+                if data[1] and index == 0:  # show yellow flag outside pits
+                    index = 3
             target.text = self.pit_status_text[index]
             target.fg, target.bg = self.bar_style_pit[index]
             target.update()

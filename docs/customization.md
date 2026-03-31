@@ -3189,6 +3189,9 @@ Set custom garage status text which shows when driver is in garage.
     yellow_flag_status_text
 Set custom yellow flag status text which shows when driver causes (or likely to) yellow flag. Note, unlike in-game yellow flag, the indicator is always displayed when driver's speed is below 28kph (outside pit lane), regardless whether driver has caused yellow flag on track.
 
+    finish_status_text
+Set custom finish (checkered flag) status text which shows when driver finished race.
+
     show_tyre_compound
 Show tyre compound symbol for tyre that matches specific tyre compounds defined in `compounds.json` preset.
 

@@ -236,6 +236,7 @@ def update_vehicle_data(
             data.gapBehindNextInClass = calc_time_gap_behind(opt_index_ahead, index, track_length, data.totalLapProgress)
             data.gapBehindLeaderInClass = calc_time_gap_behind(opt_index_leader, index, track_length, data.totalLapProgress)
 
+            data.isFinished = api.read.vehicle.finish_state(index) == 1
             data.lapTimeHistory.update(api.read.timing.start(index), elapsed_time, data.bestLapTime)
             last_laptime = api.read.timing.last_laptime(index)
             data.isValidLap = last_laptime > 0

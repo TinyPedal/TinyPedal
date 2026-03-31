@@ -316,6 +316,7 @@ class VehicleDataSet:
         "isLapped",
         "isYellow",
         "isValidLap",
+        "isFinished",
         "inPit",
         "isClassFastestLastLap",
         "numPitStops",
@@ -358,6 +359,7 @@ class VehicleDataSet:
         self.isLapped: float = 0.0
         self.isYellow: bool = False
         self.isValidLap: bool = False
+        self.isFinished: bool = False
         self.inPit: int = 0
         self.isClassFastestLastLap: bool = False
         self.numPitStops: int = 0

@@ -32,6 +32,7 @@ WIP
   - Disable "show_compound_for_each_wheel" option to show a single symbol for all tyres (requested by user "louisgendron26"), which allows a more compact view. If mixed tyres are used, a "X" symbol will be displayed instead, which can be customized by "mixed_compound_symbol" option.
   - Added "show_compound_color_by_type" option, which shows different compound color by compound type. Note, player's compound color is not affected by this setting while "show_player_highlighted" option is enabled.
   - Added "tyre_compound_spacing" option, which sets display spacing (in pixels) between each compound symbol. Default is "1" pixel.
+  - Added "finish_status_text" option, which sets custom finish (checkered flag) status text that shows when driver finished race.
 
 * [New]Tyre deflection
   - Show visualized tyre vertical deflection in millimeters.
