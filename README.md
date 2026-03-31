@@ -23,13 +23,6 @@ Currently supports `rFactor 2` and `Le Mans Ultimate`, and runs on `Windows` and
 | Le Mans Ultimate | No plugin required | Requires third-party plugin |
 | rFactor 2 | rF2SharedMemoryMapPlugin | rF2SharedMemoryMapPlugin(Wine) |
 
-| Legacy API | Windows | Linux |
-|:-:|:-:|:-:|
-| Le Mans Ultimate (legacy) | rF2SharedMemoryMapPlugin | rF2SharedMemoryMapPlugin(Wine) |
-
-> [!IMPORTANT]
-> Legacy APIs are deprecated and no longer maintained or supported, and will be removed in the future. It is not recommended to use them.
-
 ### Display Mode
 
 Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fullscreen` mode is not supported.
@@ -42,7 +35,7 @@ Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fu
 
 #### Linux
 
-* LMU's built-in API can be selected on Linux, but may require third-party plugin to access (see discussion [#9](https://github.com/TinyPedal/TinyPedal/issues/9)).
+* LMU's built-in API can be selected on Linux, but may require third-party plugin to access, see [discussion #9](https://github.com/TinyPedal/TinyPedal/issues/9) for info.
 
 ### Setup for rFactor 2
 
@@ -66,7 +59,7 @@ Note, manually create this `Plugins` folder if it is missing.
 
 #### Enable plugin in game
 
-- For `rFactor 2`, in game `Settings` -> `Gameplay` page, find `Plugins` section and toggle on `rFactor2SharedMemoryMapPlugin64.dll`.
+In game `Settings` -> `Gameplay` page, find `Plugins` section and toggle on `rFactor2SharedMemoryMapPlugin64.dll`.
 
 After plugin enabled, must `restart game` to take effect.
 
