@@ -1,4 +1,4 @@
-WIP
+2.45.0 (2026-04-01)
 -----------------------------
 * [New]Adaptive race length calculation
   - Implemented adaptive race length and fuel calculation for "Lap" and "Laps & Time" finish criteria based race, which automatically determines the shortest race length and calculates fuel usage accordingly for increased accuracy and efficiency.

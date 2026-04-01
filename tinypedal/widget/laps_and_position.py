@@ -211,7 +211,7 @@ class Realtime(Overlay):
         # Track limits points
         if self.wcfg["show_track_limits_points"]:
             current_points = api.read.session.cut_points()
-            total_points = api.read.session.limits_points()
+            total_points = api.read.session.limits_points() * api.read.session.in_race()
             self.update_cut_points(self.bar_cut_points, current_points, total_points)
 
         # Position change
@@ -260,7 +260,7 @@ class Realtime(Overlay):
         """Update track limits points"""
         if target.last != data:
             target.last = data
-            if api.read.session.in_race():
+            if data[1] > 0:
                 text_total = f"{data[1]:.0f}"
             else:
                 text_total = "-"
