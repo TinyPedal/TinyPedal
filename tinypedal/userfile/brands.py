@@ -29,7 +29,14 @@ from ..setting import cfg
 
 
 def extract_lmu_brand_name(value: str, default: str) -> str:
-    """Extract LMU brand name from vehicle model"""
+    """Extract LMU brand name from vehicle model
+
+    Extraction pattern assumes:
+        - No numbers in name.
+        - Max of 2 words.
+        - Minimum of 2 letters for first word.
+        - Minimum of 3 letters for second word (optional), must be in title case.
+    """
     try:
         match_obj = rex_lmu_brand_extract.search(value)
         assert match_obj is not None

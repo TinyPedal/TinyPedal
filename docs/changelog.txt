@@ -34,6 +34,11 @@ WIP
   - Added "tyre_compound_spacing" option, which sets display spacing (in pixels) between each compound symbol. Default is "1" pixel.
   - Added "finish_status_text" option, which sets custom finish (checkered flag) status text that shows when driver finished race.
 
+* [New]Engine temperature Widget
+  - New dedicated "Engine temperature" Widget that shows additional oil and water temperature analysis data.
+  - Show oil and water temperature rate of change for a specific time interval, useful for tracking recent temperature change.
+  - Show oil and water temperature net change per lap, useful for tracking total temperature change of each lap.
+
 * [New]Lift and coast LED Widget
   - Show lift and coast LED that matches in-game fuel & energy saving target (requested by user "Gio Nuvoli" & "FabrizioDelfino95").
   - Show TC & ABS activation LED (requested by user "dibreiras").

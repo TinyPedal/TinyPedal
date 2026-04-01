@@ -2145,8 +2145,11 @@ Show player's current position line mark.
     layout
 2 layouts are available: `0` = vertical layout, `1` = horizontal layout.
 
-    show_temperature
-Show oil and water temperature.
+    show_oil_temperature
+Show oil temperature.
+
+    show_water_temperature
+Show water temperature.
 
     overheat_threshold_oil, overheat_threshold_water
 Set temperature threshold for oil and water overheat color indicator, unit in Celsius.
@@ -2165,6 +2168,33 @@ Show engine torque.
 
     show_power
 Show engine power.
+
+[**`Back to Top`**](#)
+
+
+## Engine temperature
+**This widget displays additional engine temperature info.**
+
+    show_oil_temperature
+Show oil temperature.
+
+    show_water_temperature
+Show water temperature.
+
+    overheat_threshold_oil, overheat_threshold_water
+Set temperature threshold for oil and water overheat color indicator, unit in Celsius.
+
+    show_rate_of_change
+Show temperature rate of change for a specific time interval.
+
+    rate_of_change_interval
+Set time interval in seconds for rate of change calculation. Default interval is `10` seconds. Minimum interval is limited to `1` second, maximum interval is limited to `60` seconds.
+
+    rate_of_change_smoothing_samples
+Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
+
+    show_net_change_per_lap
+Show temperature net change per lap.
 
 [**`Back to Top`**](#)
 
@@ -4199,7 +4229,7 @@ Set `true` to show degree sign for each temperature value.
 Set amount leading zeros for each temperature value. Default is `2`. Minimum value is limited to `1`.
 
     show_rate_of_change
-Show carcass temeperature rate of change for a specific time interval.
+Show carcass temperature rate of change for a specific time interval.
 
     rate_of_change_interval
 Set time interval in seconds for rate of change calculation. Default interval is `5` seconds. Minimum interval is limited to `1` second, maximum interval is limited to `60` seconds.
