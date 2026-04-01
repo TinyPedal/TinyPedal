@@ -2700,6 +2700,9 @@ Show your current overall position against all drivers in a session.
     show_position_in_class
 Show your current position in class against all drivers from the same class.
 
+    show_track_limits_points
+Show current track cut points against total track limits points per penalty.
+
     show_position_change
 Show overall driver position change relative to overall qualification position.
 

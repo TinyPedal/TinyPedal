@@ -520,6 +520,14 @@ class Session(_reader.Session, DataAdapter):
         """Time scale"""
         return max(self.rest.timeScale, 0)
 
+    def limits_points(self) -> float:
+        """Track limits points per penalty"""
+        return 0.0
+
+    def cut_points(self, index: int | None = None) -> float:
+        """Current track limits cut points per penalty"""
+        return 0.0
+
 
 class Switch(_reader.Switch, DataAdapter):
     """Switch"""

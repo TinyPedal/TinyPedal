@@ -531,6 +531,21 @@ class Session(_reader.Session, DataAdapter):
         """Time scale"""
         return max(self.rest.timeScale, 0)
 
+    def limits_points(self) -> float:
+        """Track limits points per penalty"""
+        scor = self.shmm.lmuScorInfo
+        points = scor.mTrackLimitsStepsPerPoint
+        if points:
+            return scor.mTrackLimitsStepsPerPenalty / points
+        return 0.0
+
+    def cut_points(self, index: int | None = None) -> float:
+        """Current track limits cut points per penalty"""
+        points = self.shmm.lmuScorInfo.mTrackLimitsStepsPerPoint
+        if points:
+            return self.shmm.lmuTeleVeh(index).mTrackLimitsSteps / points
+        return 0.0
+
 
 class Switch(_reader.Switch, DataAdapter):
     """Switch"""

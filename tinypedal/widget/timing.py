@@ -271,7 +271,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if 0 < data < MAX_SECONDS:
-                text = f"{prefix}{calc.sec2laptime(data)[:8]: >8}"
+                text = f"{prefix}{calc.sec2laptime(data): >8.8}"
             else:
                 text = f"{prefix}{TEXT_NOLAPTIME}"
             target.text = text
@@ -284,7 +284,7 @@ class Realtime(Overlay):
             target.fg = self.bar_style_last[data > 0]
             data = abs(data)
             if 0 < data < MAX_SECONDS:
-                text = f"{prefix}{calc.sec2laptime(data)[:8]: >8}"
+                text = f"{prefix}{calc.sec2laptime(data): >8.8}"
             else:
                 text = f"{prefix}{TEXT_NOLAPTIME}"
             target.text = text

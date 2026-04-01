@@ -386,6 +386,14 @@ class Session(ABC):
     def time_scale(self) -> int:
         """Time scale"""
 
+    @abstractmethod
+    def limits_points(self) -> float:
+        """Track limits points per penalty"""
+
+    @abstractmethod
+    def cut_points(self, index: int | None = None) -> float:
+        """Current track limits cut points per penalty"""
+
 
 class Switch(ABC):
     """Switch"""

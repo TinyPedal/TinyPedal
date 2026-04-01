@@ -50,21 +50,25 @@ class Realtime(Overlay):
         self.prefix_lap_number = self.wcfg["prefix_lap_number"]
         self.prefix_pos_overall = self.wcfg["prefix_position_overall"]
         self.prefix_pos_inclass = self.wcfg["prefix_position_in_class"]
+        self.prefix_cut_points = self.wcfg["prefix_track_limits_points"]
 
         if self.wcfg["layout"] == 0:
             max_width = max(
                 len(self.prefix_lap_number) + 12,
                 len(self.prefix_pos_overall) + 5,
                 len(self.prefix_pos_inclass) + 5,
+                len(self.prefix_cut_points) + 7,
             )
             self.just_lap_number = max_width - len(self.prefix_lap_number)
             self.just_pos_overall = max_width - len(self.prefix_pos_overall)
             self.just_pos_inclass = max_width - len(self.prefix_pos_inclass)
+            self.just_cut_points = max_width - len(self.prefix_cut_points)
             self.just_pos_change = max_width - 1
         else:
             self.just_lap_number = 12
             self.just_pos_overall = 5
             self.just_pos_inclass = 5
+            self.just_cut_points = 7
             self.just_pos_change = 2
 
         # Lap number
@@ -117,6 +121,22 @@ class Realtime(Overlay):
             self.set_primary_orient(
                 target=self.bar_pos_inclass,
                 column=self.wcfg["display_order_position_in_class"],
+            )
+
+        # Track limits points
+        if self.wcfg["show_track_limits_points"]:
+            text_cut_points = f"{self.prefix_cut_points}{'0.000/-': >{self.just_cut_points}}"
+            self.bar_cut_points = self.set_rawtext(
+                text=text_cut_points,
+                width=font_m.width * len(text_cut_points) + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_track_limits_points"],
+                bg_color=self.wcfg["background_color_track_limits_points"],
+            )
+            self.set_primary_orient(
+                target=self.bar_cut_points,
+                column=self.wcfg["display_order_track_limits_points"],
             )
 
         # Position change
@@ -188,6 +208,12 @@ class Realtime(Overlay):
                 pos_in_class = total_class_vehicle - place_higher
                 self.update_position_inclass(self.bar_pos_inclass, pos_in_class, total_class_vehicle)
 
+        # Track limits points
+        if self.wcfg["show_track_limits_points"]:
+            current_points = api.read.session.cut_points()
+            total_points = api.read.session.limits_points()
+            self.update_cut_points(self.bar_cut_points, current_points, total_points)
+
         # Position change
         if self.wcfg["show_position_change"]:
             veh_info = minfo.vehicles.dataSet[minfo.vehicles.playerIndex]
@@ -229,6 +255,20 @@ class Realtime(Overlay):
         text_pos = f"{place:02.0f}/{total:02.0f}"
         target.text = f"{self.prefix_pos_inclass}{text_pos: >{self.just_pos_inclass}}"
         target.update()
+
+    def update_cut_points(self, target, *data):
+        """Update track limits points"""
+        if target.last != data:
+            target.last = data
+            if api.read.session.in_race():
+                text_total = f"{data[1]:.0f}"
+            else:
+                text_total = "-"
+            size = 3 - (len(text_total) > 1)
+            text_cut = f"{data[0]:.{size}f}"
+            text_points = f"{text_cut:.{size + 2}}/{text_total}"
+            target.text = f"{self.prefix_cut_points}{text_points: >{self.just_cut_points}}"
+            target.update()
 
     def update_position_change(self, target, data):
         """Driver place change"""
