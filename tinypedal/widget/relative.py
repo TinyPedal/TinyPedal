@@ -590,10 +590,14 @@ class Realtime(Overlay):
                 self.update_drv(self.bars_drv[idx], veh_info.driverName, is_lapped, hi_player, state)
             # Vehicle name
             if self.wcfg["show_vehicle_name"]:
-                self.update_veh(self.bars_veh[idx], veh_info.vehicleName, is_lapped, hi_player, state)
+                if self.wcfg["show_vehicle_brand_as_name"]:
+                    vehicle_name = veh_info.vehicleBrand
+                else:
+                    vehicle_name = veh_info.vehicleName
+                self.update_veh(self.bars_veh[idx], vehicle_name, is_lapped, hi_player, state)
             # Brand logo
             if self.wcfg["show_brand_logo"]:
-                self.update_brd(self.bars_brd[idx], veh_info.vehicleName, hi_player, state)
+                self.update_brd(self.bars_brd[idx], veh_info.vehicleBrand, hi_player, state)
             # Time gap
             if self.wcfg["show_time_gap"]:
                 self.update_gap(self.bars_gap[idx], rel_time_gap, hi_player, state)
@@ -725,10 +729,7 @@ class Realtime(Overlay):
             else:
                 color = self.bar_style_veh[0]
             if data[-1]:
-                if self.wcfg["show_vehicle_brand_as_name"]:
-                    text = self.cfg.user.brands.get(data[0], data[0])
-                else:
-                    text = data[0]
+                text = data[0]
                 if self.wcfg["vehicle_name_uppercase"]:
                     text = text.upper()
                 if self.wcfg["vehicle_name_align_center"]:
@@ -746,7 +747,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data[-1]:
-                target.image = self.set_brand_logo(self.cfg.user.brands.get(data[0], data[0]))
+                target.image = self.set_brand_logo(data[0])
             else:
                 target.image = None
             target.bg = self.bar_style_brd[data[1]]

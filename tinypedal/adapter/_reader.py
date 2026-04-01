@@ -583,6 +583,10 @@ class Vehicle(ABC):
         """Vehicle name"""
 
     @abstractmethod
+    def vehicle_model(self, index: int | None = None) -> str:
+        """Vehicle model name (brand name + model ID)"""
+
+    @abstractmethod
     def class_name(self, index: int | None = None) -> str:
         """Vehicle class name"""
 

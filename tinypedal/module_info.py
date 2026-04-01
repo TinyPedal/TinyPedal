@@ -303,6 +303,7 @@ class VehicleDataSet:
         "qualifyInClass",
         "driverName",
         "vehicleName",
+        "vehicleBrand",
         "vehicleClass",
         "classBestLapTime",
         "bestLapTime",
@@ -346,6 +347,7 @@ class VehicleDataSet:
         self.qualifyInClass: int = 0
         self.driverName: str = ""
         self.vehicleName: str = ""
+        self.vehicleBrand: str = ""
         self.vehicleClass: str = ""
         self.classBestLapTime: float = MAX_SECONDS
         self.bestLapTime: float = MAX_SECONDS

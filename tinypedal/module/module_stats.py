@@ -29,6 +29,7 @@ from .. import realtime_state
 from ..api_control import api
 from ..const_common import FLOAT_INF, POS_XYZ_INF
 from ..module_info import minfo
+from ..userfile.brands import select_brand_name
 from ..userfile.car_setup import (
     rename_car_setup_file,
     save_car_setup_file,
@@ -58,7 +59,7 @@ class Realtime(DataModule):
         max_moved_distance = 1500 * update_interval
         podium_by_class = self.mcfg["enable_podium_by_class"]
         vehicle_class = self.mcfg["vehicle_classification"]
-        gen_auto_backup_car_setup = auto_backup_car_setup(self.cfg.path.car_setups, self.cfg.user.brands)
+        gen_auto_backup_car_setup = auto_backup_car_setup(self.cfg.path.car_setups)
 
         while not _event_wait(update_interval):
 
@@ -195,7 +196,7 @@ class Realtime(DataModule):
         if vehicle_class == "Class":
             name = api.read.vehicle.class_name()
         elif vehicle_class == "Class - Brand":
-            brand_name = self.cfg.user.brands.get(api.read.vehicle.vehicle_name(), "")
+            brand_name = select_brand_name(vehicle_name=api.read.vehicle.vehicle_name())
             class_name = api.read.vehicle.class_name()
             if brand_name:
                 name = f"{class_name} - {brand_name}"
@@ -226,7 +227,7 @@ def finish_position(podium_by_class: bool) -> int:
 
 
 @generator_init
-def auto_backup_car_setup(filepath: str, brands_data: dict):
+def auto_backup_car_setup(filepath: str):
     """Auto backup car setup"""
     last_reset = None  # reset check
     data_available = False
@@ -283,7 +284,7 @@ def auto_backup_car_setup(filepath: str, brands_data: dict):
                             strftime("%Y-%m-%d %H-%M-%S", localtime()),
                             api.read.session.track_name(),
                             api.read.vehicle.class_name(),
-                            brands_data.get(api.read.vehicle.vehicle_name(), api.read.vehicle.vehicle_name()),
+                            select_brand_name(vehicle_name=api.read.vehicle.vehicle_name()),
                         )
                         save_car_setup_file(
                             filepath=filepath,

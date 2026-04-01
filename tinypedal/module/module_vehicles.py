@@ -27,6 +27,7 @@ from .. import realtime_state
 from ..api_control import api
 from ..const_common import MAX_METERS, MAX_SECONDS
 from ..module_info import VehicleDataSet, VehiclesInfo, minfo
+from ..userfile.brands import select_brand_name
 from ..validator import state_timer
 from ._base import DataModule
 
@@ -227,6 +228,7 @@ def update_vehicle_data(
             data.pitRequested = api.read.vehicle.pit_request(index)
             data.driverName = api.read.vehicle.driver_name(index)
             data.vehicleName = api.read.vehicle.vehicle_name(index)
+            data.vehicleBrand = select_brand_name(index, data.vehicleName)
             data.vehicleClass = api.read.vehicle.class_name(index)
             data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.tireCompoundName = api.read.tyre.compound_class(index)

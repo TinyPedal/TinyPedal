@@ -513,10 +513,14 @@ class Realtime(Overlay):
                 self.update_drv(self.bars_drv[idx], veh_info.driverName, state)
             # Vehicle name
             if self.wcfg["show_vehicle_name"]:
-                self.update_veh(self.bars_veh[idx], veh_info.vehicleName, state)
+                if self.wcfg["show_vehicle_brand_as_name"]:
+                    vehicle_name = veh_info.vehicleBrand
+                else:
+                    vehicle_name = veh_info.vehicleName
+                self.update_veh(self.bars_veh[idx], vehicle_name, state)
             # Brand logo
             if self.wcfg["show_brand_logo"]:
-                self.update_brd(self.bars_brd[idx], veh_info.vehicleName, state)
+                self.update_brd(self.bars_brd[idx], veh_info.vehicleBrand, state)
             # Time interval
             if self.wcfg["show_time_interval"]:
                 is_ahead = veh_info.positionOverall < plr_veh_info.positionOverall
@@ -623,10 +627,7 @@ class Realtime(Overlay):
         """Vehicle name"""
         if target.last != data:
             target.last = data
-            if self.wcfg["show_vehicle_brand_as_name"]:
-                text = self.cfg.user.brands.get(data[0], data[0])
-            else:
-                text = data[0]
+            text = data[0]
             if self.wcfg["vehicle_name_uppercase"]:
                 text = text.upper()
             if self.wcfg["vehicle_name_align_center"]:
@@ -640,7 +641,7 @@ class Realtime(Overlay):
         """Brand logo"""
         if target.last != data:
             target.last = data
-            target.image = self.set_brand_logo(self.cfg.user.brands.get(data[0], data[0]))
+            target.image = self.set_brand_logo(data[0])
             self.toggle_visibility(target, data[-1])
 
     def update_int(self, target, *data):

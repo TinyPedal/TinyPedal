@@ -843,6 +843,10 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Vehicle name"""
         return tostr(self.shmm.lmuScorVeh(index).mVehicleName)
 
+    def vehicle_model(self, index: int | None = None) -> str:
+        """Vehicle model name (brand name + model ID)"""
+        return tostr(self.shmm.lmuTeleVeh(index).mVehicleModel)
+
     def class_name(self, index: int | None = None) -> str:
         """Vehicle class name"""
         return tostr(self.shmm.lmuScorVeh(index).mVehicleClass)

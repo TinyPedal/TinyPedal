@@ -42,7 +42,7 @@ def expected_usage(value: str, default: float) -> float:
         match_obj = rex_number_extract.findall(value)
         assert match_obj is not None
         return float(match_obj[0]) / float(match_obj[1])
-    except (ZeroDivisionError, AttributeError, IndexError, TypeError, ValueError):
+    except (AssertionError, ZeroDivisionError, AttributeError, IndexError, TypeError, ValueError):
         return default
 
 
@@ -52,7 +52,7 @@ def steerlock_to_number(value: str, default: float) -> float:
         match_obj = rex_number_extract.search(value)
         assert match_obj is not None
         return float(match_obj.group())
-    except (AttributeError, TypeError, ValueError):
+    except (AssertionError, AttributeError, TypeError, ValueError):
         return default
 
 

@@ -31,6 +31,7 @@ from ..template.setting_brakes import BRAKEINFO_DEFAULT
 from ..template.setting_compounds import COMPOUNDINFO_DEFAULT
 from ..template.setting_heatmap import HEATMAP_DEFAULT_BRAKE, HEATMAP_DEFAULT_TYRE
 from ..validator import invalid_save_name, is_hex_color
+from .brands import select_brand_name
 
 
 # Brake function
@@ -61,7 +62,7 @@ def set_predefined_brake_name(class_name: str, vehicle_name: str, is_front: bool
     if class_name == "":
         return ""
     suffix_name = "Front Brake" if is_front else "Rear Brake"
-    brand_name = cfg.user.brands.get(vehicle_name, "")
+    brand_name = select_brand_name(vehicle_name=vehicle_name)
     if brand_name != "":
         return f"{class_name} - {brand_name} {suffix_name}"
     return f"{class_name} - {suffix_name}"

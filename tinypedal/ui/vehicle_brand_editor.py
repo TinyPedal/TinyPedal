@@ -44,6 +44,7 @@ from ..async_request import get_response, set_header_get
 from ..const_api import API_LMU_ALIAS, API_LMU_CONFIG, API_RF2_ALIAS, API_RF2_CONFIG
 from ..const_file import ConfigType, FileFilter
 from ..setting import cfg, copy_setting
+from ..userfile.brands import extract_lmu_brand_name
 from ._common import (
     BaseEditor,
     CompactButton,
@@ -257,8 +258,9 @@ class VehicleBrandEditor(BaseEditor):
         veh_total = api.read.vehicle.total_vehicles()
         for index in range(veh_total):
             veh_name = api.read.vehicle.vehicle_name(index)
+            brand_name = extract_lmu_brand_name(api.read.vehicle.vehicle_model(index), "Unknown")
             if not self.is_value_in_table(veh_name, self.table_brands):
-                self.add_vehicle_entry(row_index, veh_name, "Unknown")
+                self.add_vehicle_entry(row_index, veh_name, brand_name)
                 row_index += 1
         # Add new name entry
         if start_index == row_index:

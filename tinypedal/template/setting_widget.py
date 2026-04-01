@@ -1180,7 +1180,7 @@ WIDGET_DEFAULT = {
         "lift_and_coast_color_off": "#111111",
         "lift_and_coast_color_low": "#9900FF",
         "lift_and_coast_color_critical": "#FF00FF",
-        "tc_activation_color": "#00FF00",
+        "tc_activation_color": "#FFAA00",
         "abs_activation_color": "#0088FF",
     },
     "navigation": {

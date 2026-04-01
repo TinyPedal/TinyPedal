@@ -10,7 +10,10 @@ WIP
 
 * API
   - Updated "pyLMUSharedMemory" library for accessing new API data from LMU's 1.3 updates.
-  - "Le Mans Ultimate (legacy)" is now deprecated and no longer maintained or supported. It can still be selected from API menu, but will be removed in future.
+  - "Le Mans Ultimate (legacy)" API is now deprecated and no longer maintained. It can still be selected from API menu, but no support for it, and will be removed in future.
+
+* Brands Preset
+  - Now automatically detects and saves new vehicle brand names to "Brands Preset" for "LMU" (requested by "DanRZ"). It is no longer required to manually import brand data for "LMU".
 
 * Tyre Compound & Heatmap
   - Reworked general tyre compound display for related widgets, which now supports to display tyre compound & associated heatmap for each wheel separately.

@@ -459,7 +459,7 @@ Enable access to `garage setup` data from Rest API. This is required for accessi
 Enable access to `session` data from Rest API. This is required for accessing various session data, such as time-scale. This data is requested `only once` when player exited garage each time.
 
     enable_vehicle_info
-Enable access to `vehicle` data from Rest API. This is essential for accessing `virtual energy`, `brake wear`, `vehicle damage`, `pit stop timing` data. Minimum request interval is hard-limited to `0.2` second (5 requests per second) for this data.
+Enable access to `vehicle` data from Rest API. This is essential for accessing `brake wear`, `vehicle damage`, `pit stop timing` data. Minimum request interval is hard-limited to `0.2` second (5 requests per second) for this data.
 
     enable_weather_info
 Enable access to `weather` data from Rest API. This is required for showing weather forecast. This data is requested `only once` when player exited garage each time.
@@ -1096,6 +1096,8 @@ For brand logo image preparation, see [Brand Logo](#brand-logo) section.
 `Vehicle name` is full vehicle name that must match in-game vehicle name.
 
 `Brand name` is custom brand name.
+
+Note, brands data are automatically imported for `LMU` while driving, there is no need to manually import them. However it is required to manually import for `RF2`.
 
 To import vehicle brand data from `Rest API`, click `Import from` menu, and select either `RF2 Rest API` or `LMU Rest API`. Note, game updates may introduce new vehicles, it is recommended to re-import after each game update to keep brand info updated.
 
