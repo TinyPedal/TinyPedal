@@ -127,12 +127,26 @@ def verify_json_file(
     filename_source = f"{filepath}{filename}{extension}"
     try:
         with open(filename_source, "r", encoding="utf-8") as jsonfile:
-            return json.load(jsonfile) == dict_user
+            saved = json.dumps(json.load(jsonfile))
+            loaded = json.dumps(dict_user)
+            return saved == loaded
     except FileNotFoundError:
         logger.error("USERDATA: not found %s", filename_source)
-    except (ValueError, OSError):
+    except (TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to verify %s", filename_source)
     return False
+
+
+def copy_and_verify_file(filename_source: str, filename_copied: str) -> bool:
+    """Copy and verify json file"""
+    shutil.copyfile(filename_source, filename_copied)
+    # Source
+    with open(filename_source, "r", encoding="utf-8") as source_jsonfile:
+        source = json.dumps(json.load(source_jsonfile))
+    # Copied
+    with open(filename_copied, "r", encoding="utf-8") as copied_jsonfile:
+        copied = json.dumps(json.load(copied_jsonfile))
+    return source == copied
 
 
 def create_backup_file(
@@ -142,7 +156,8 @@ def create_backup_file(
     filename_source = f"{filepath}{filename}"
     filename_backup = f"{filepath}{filename}{extension}"
     try:
-        shutil.copyfile(filename_source, filename_backup)
+        if not copy_and_verify_file(filename_source, filename_backup):
+            raise FileNotFoundError
         if show_log:
             logger.info("USERDATA: backup saved %s", filename_backup)
         return True
@@ -150,7 +165,7 @@ def create_backup_file(
         logger.error("USERDATA: not found %s", filename_source)
     except PermissionError:
         logger.error("USERDATA: no permission to access %s", filename_source)
-    except OSError:
+    except (TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to create backup %s", filename_source)
     return False
 
@@ -162,14 +177,15 @@ def restore_backup_file(
     filename_backup = f"{filepath}{filename}{extension}"
     filename_source = f"{filepath}{filename}"
     try:
-        shutil.copyfile(filename_backup, filename_source)
+        if not copy_and_verify_file(filename_backup, filename_source):
+            raise FileNotFoundError
         logger.info("USERDATA: backup restored %s", filename_source)
         return True
     except FileNotFoundError:
         logger.error("USERDATA: backup not found %s", filename_backup)
     except PermissionError:
         logger.error("USERDATA: no permission to access backup %s", filename_backup)
-    except OSError:
+    except (TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to restore backup %s", filename_backup)
     return False
 
@@ -181,14 +197,15 @@ def copy_and_rename_backup_file(
     filename_backup = f"{filepath}{filename}{extension}"
     filename_renamed = f"{filepath}{filename}{set_backup_timestamp()}"
     try:
-        shutil.copyfile(filename_backup, filename_renamed)
+        if not copy_and_verify_file(filename_backup, filename_renamed):
+            raise FileNotFoundError
         logger.info("USERDATA: backup renamed %s", filename_renamed)
         return True
     except FileNotFoundError:
         logger.error("USERDATA: backup not found %s", filename_backup)
     except PermissionError:
         logger.error("USERDATA: no permission to access backup %s", filename_backup)
-    except OSError:
+    except (TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to copy and rename backup %s", filename_backup)
     return False
 
