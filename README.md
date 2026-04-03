@@ -18,7 +18,9 @@ Currently supports `rFactor 2` and `Le Mans Ultimate`, and runs on `Windows` and
 
 ## Requirements
 
-| Supported API | Windows | Linux |
+### Supported Sims
+
+| API | Windows | Linux |
 |:-:|:-:|:-:|
 | Le Mans Ultimate | No plugin required | Requires third-party plugin |
 | rFactor 2 | rF2SharedMemoryMapPlugin | rF2SharedMemoryMapPlugin(Wine) |
@@ -88,7 +90,7 @@ Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `Cu
 
 6. To quit APP, `Right Click` on tray icon and select `Quit`; or, click `Overlay` menu from main window and select `Quit`.
 
-## Run from source
+## Run from Source
 
 ### Dependencies:
 * [Python](https://www.python.org/) 3.8, 3.9, or 3.10
@@ -106,38 +108,83 @@ Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `Cu
 
 #### Method 1
 
-1. Download TinyPedal source code from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page; or click `Code` button at the top of repository and select `Download ZIP`.
+Download TinyPedal source code from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page; or click `Code` button at the top of repository and select `Download ZIP`.
 
-2. Download submodule source code from following links:
-    - pyLMUSharedMemory: https://github.com/TinyPedal/pyLMUSharedMemory
-    - pyRfactor2SharedMemory: https://github.com/TinyPedal/pyRfactor2SharedMemory
+Download submodule source code from following links:
+- pyLMUSharedMemory: https://github.com/TinyPedal/pyLMUSharedMemory
+- pyRfactor2SharedMemory: https://github.com/TinyPedal/pyRfactor2SharedMemory
 
-3. Extract TinyPedal source code ZIP file. Then extract submodule ZIP files and put them in corresponding folder in the root folder of TinyPedal.
+Extract TinyPedal source code ZIP file. Then extract submodule ZIP files and put them in corresponding folder in the root folder of TinyPedal.
 
 #### Method 2
 
-1. Use [Git](https://git-scm.com/) tool and run following command to clone TinyPedal source code alongside required submodules:\
-    `git clone --recursive https://github.com/TinyPedal/TinyPedal.git`
-2. To update submodules, run command:\
-    `git submodule update --init`
+Use [Git](https://git-scm.com/) tool and run following command to clone TinyPedal source code alongside required submodules:
+```
+git clone --recursive https://github.com/TinyPedal/TinyPedal.git
+```
+
+To update submodules, run command:
+```
+git submodule update --init
+```
+
+Since `master` branch is the development branch, it may not be stable for normal use. You may switch to specific released version instead, such as `v2.45.0`, run command:
+```
+git checkout tags/v2.45.0
+```
+
+And to switch back to development branch, run:
+```
+git checkout master
+```
+
+### Setup development environment
+
+It is recommended to setup an isolated development environment for running and testing code, especially useful if multiple different versions of Python are installed.
+
+To start, make sure required Python version was installed. Currently the primary supported Python version is `3.8`, which is used in this example.
+
+First, we need to create a [Python virtual environment](https://docs.python.org/3/library/venv.html). On windows, run following command in `Powershell` (replace the last part to your preferred path, either relative or absolute path):
+
+```
+py -3.8 -m venv '.virtualenvs\tinypedal_py38'
+```
+
+Then run following command to activate this virtual environment:
+
+```
+.virtualenvs\tinypedal_py38\Scripts\activate.ps1
+```
+
+Once activated, you can continue with [Install dependencies](#install-dependencies) section to install required package for this virtual environment, and running or building TinyPedal inside this virtual environment.
+
+Finally, remember to activate this virtual environment (if haven't already) before installing packages or running the code.
 
 ### Install dependencies
 
-Install additional dependencies by using command:\
-`pip3 install PySide2 psutil`
+Install additional dependencies by using command:
+```
+pip3 install PySide2 psutil
+```
 
-To start TinyPedal, type command from root folder:\
-`python run.py`
+To start TinyPedal, type command from project root folder:
+```
+python run.py
+```
 
-## Build executable for Windows
+## Build Executable for Windows
 
 Executable file can be built with [py2exe](http://www.py2exe.org).
 
-To install py2exe, run command:\
-`pip3 install py2exe`
+To install py2exe, run command:
+```
+pip3 install py2exe
+```
 
-To build executable file, run command:\
-`python freeze_py2exe.py`
+To build executable file, run command:
+```
+python freeze_py2exe.py
+```
 
 After building completed, executable file can be found in `dist\TinyPedal` folder.
 
@@ -146,14 +193,16 @@ After building completed, executable file can be found in `dist\TinyPedal` folde
 
 ## Running on Linux
 
-The procedure described in the [Run from source](#run-from-source) section is mostly valid,
+The procedure described in the [Run from Source](#run-from-source) section is mostly valid,
 except some differences in the dependencies, and that no executable can be
 built. The differences are explained here.
 
 Configuration and data files will be stored in the defined user-specific
-directories, default to:\
-`$HOME/.config/TinyPedal/`\
-`$HOME/.local/share/TinyPedal/`
+directories, default to:
+```
+$HOME/.config/TinyPedal/
+$HOME/.local/share/TinyPedal/
+```
 
 The required Python packages are `PySide2`, `psutil` and `pyxdg`. Most distros
 name the package with a prefix, like `python3-pyside2`, `python3-psutil` and
@@ -165,11 +214,15 @@ Some distros split `PySide2` in subpackages. If you don't find
 
 Alternatively, you can install them using `pip3` but this will bypass your
 system package manager and it isn't the recommended option. The command to
-install the dependencies with this method is:\
-`pip3 install PySide2 psutil pyxdg`
+install the dependencies with this method is:
+```
+pip3 install PySide2 psutil pyxdg
+```
 
-To start TinyPedal type the following command:\
-`./run.py`
+To start TinyPedal type the following command:
+```
+./run.py
+```
 
 ### Installation
 
@@ -183,8 +236,10 @@ available as a command from the terminal.
 The files will be installed at the `/usr/local/` prefix. You'll need
 appropriate permissions to write there, for example, by using `sudo`.
 
-You can run the script as (it doesn't support any arguments or options):\
-`sudo ./install.sh`
+You can run the script as (it doesn't support any arguments or options):
+```sh
+sudo ./install.sh
+```
 
 If you need persistent launch arguments (for example, to force PySide6), create
 `~/.config/TinyPedal/launcher.conf` with:
