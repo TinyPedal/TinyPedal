@@ -22,11 +22,12 @@ Setting file function
 
 from __future__ import annotations
 
+import filecmp
 import json
 import logging
 import os
 import shutil
-from time import localtime, monotonic, sleep, strftime
+from time import localtime, monotonic, sleep, strftime, time
 from typing import Callable
 
 from ..const_file import FileExt
@@ -35,10 +36,12 @@ from ..setting_validator import PresetValidator
 logger = logging.getLogger(__name__)
 
 
-def set_backup_timestamp(prefix: str = ".backup-", timestamp: bool = True) -> str:
+def set_backup_timestamp(prefix: str = ".backup", timestamp: bool = True) -> str:
     """Set backup timestamp"""
     if timestamp:
-        time_stamp = strftime("%Y-%m-%d-%H-%M-%S", localtime())
+        time_local = strftime("%Y-%m-%d-%H-%M-%S", localtime())
+        time_millisecond = str(time() % 1)[2:8]  # keep 6 decimals
+        time_stamp = f"-{time_local}-{time_millisecond}"
     else:
         time_stamp = ""
     return f"{prefix}{time_stamp}"
@@ -132,21 +135,15 @@ def verify_json_file(
             return saved == loaded
     except FileNotFoundError:
         logger.error("USERDATA: not found %s", filename_source)
-    except (TypeError, ValueError, OSError):
+    except (AttributeError, TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to verify %s", filename_source)
     return False
 
 
 def copy_and_verify_file(filename_source: str, filename_copied: str) -> bool:
-    """Copy and verify json file"""
+    """Copy and verify (compare) json file"""
     shutil.copyfile(filename_source, filename_copied)
-    # Source
-    with open(filename_source, "r", encoding="utf-8") as source_jsonfile:
-        source = json.dumps(json.load(source_jsonfile))
-    # Copied
-    with open(filename_copied, "r", encoding="utf-8") as copied_jsonfile:
-        copied = json.dumps(json.load(copied_jsonfile))
-    return source == copied
+    return filecmp.cmp(filename_source, filename_copied)
 
 
 def create_backup_file(
@@ -165,7 +162,7 @@ def create_backup_file(
         logger.error("USERDATA: not found %s", filename_source)
     except PermissionError:
         logger.error("USERDATA: no permission to access %s", filename_source)
-    except (TypeError, ValueError, OSError):
+    except (AttributeError, TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to create backup %s", filename_source)
     return False
 
@@ -185,7 +182,7 @@ def restore_backup_file(
         logger.error("USERDATA: backup not found %s", filename_backup)
     except PermissionError:
         logger.error("USERDATA: no permission to access backup %s", filename_backup)
-    except (TypeError, ValueError, OSError):
+    except (AttributeError, TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to restore backup %s", filename_backup)
     return False
 
@@ -205,7 +202,7 @@ def copy_and_rename_backup_file(
         logger.error("USERDATA: backup not found %s", filename_backup)
     except PermissionError:
         logger.error("USERDATA: no permission to access backup %s", filename_backup)
-    except (TypeError, ValueError, OSError):
+    except (AttributeError, TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to copy and rename backup %s", filename_backup)
     return False
 
@@ -237,10 +234,11 @@ def save_and_verify_json_file(
 ) -> None:
     """Save and verify json file, backup or restore if saving failed"""
     file_found = os.path.exists(f"{filepath}{filename}")
+    backup_extension = set_backup_timestamp()
     # Create backup: abort saving if backup failed; skip backup and create new if not exist
     if not file_found:
         logger.info("USERDATA: %s not found, create new", filename)
-    elif not create_backup_file(filename, filepath):
+    elif not create_backup_file(filename, filepath, backup_extension):
         logger.info("USERDATA: %s saving abort", filename)
         return
     # Start saving attempts
@@ -258,11 +256,12 @@ def save_and_verify_json_file(
     if attempts > 0:
         state_text = "saved"
     else:
-        if file_found and not restore_backup_file(filename, filepath):
-            copy_and_rename_backup_file(filename, filepath)
+        if file_found and not restore_backup_file(filename, filepath, backup_extension):
+            if not copy_and_rename_backup_file(filename, filepath, backup_extension):
+                return  # abort without delete backup
         state_text = "failed saving"
     if file_found:
-        delete_backup_file(filename, filepath)
+        delete_backup_file(filename, filepath, backup_extension)
     logger.info(
         "USERDATA: %s %s (took %sms, %s/%s attempts)",
         filename,
