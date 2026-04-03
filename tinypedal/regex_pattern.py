@@ -147,6 +147,7 @@ CFG_INTEGER = (
     "horizontal_gap|"
     "icon_size|"
     "inner_gap|"
+    "double_side_led_gap|"
     "layout|"
     "maximum_queue|"
     "number_of|"

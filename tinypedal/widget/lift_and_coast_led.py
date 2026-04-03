@@ -35,28 +35,40 @@ class Realtime(Overlay):
         super().__init__(config, widget_name)
 
         # Config variable
+        self.double_side_led = self.wcfg["enable_double_side_led"]
+        self.double_side_gap = max(int(self.wcfg["double_side_led_gap"]), 0)
         self.display_margin = max(int(self.wcfg["display_margin"]), 0)
         inner_gap = max(int(self.wcfg["inner_gap"]), 0)
 
         self.led_width = max(int(self.wcfg["led_width"]), 1)
         self.led_height = max(int(self.wcfg["led_height"]), 1)
-        self.led_offset = self.led_width + inner_gap
         self.led_radius = max(self.wcfg["led_radius"], 0)
         self.max_led = max(int(self.wcfg["number_of_led"]), 3)
-
-        display_width = self.led_width * self.max_led + inner_gap * (self.max_led - 1) + self.display_margin * 2
-        display_height = self.led_height + self.display_margin * 2
 
         # Config canvas
         self.vertical = self.wcfg["display_orientation"] % 2
         if self.vertical:
-            display_width, display_height = display_height, display_width
+            self.led_offset = self.led_height + inner_gap
+            base_width = self.led_height * self.max_led + inner_gap * (self.max_led - 1) + self.display_margin * 2
+            base_height = self.led_width + self.display_margin * 2
+            self.display_width = base_height
+            self.display_height = base_width
+            if self.double_side_led:
+                self.display_width += self.double_side_gap + base_height - self.display_margin * 2
+        else:
+            self.led_offset = self.led_width + inner_gap
+            base_width = self.led_width * self.max_led + inner_gap * (self.max_led - 1) + self.display_margin * 2
+            base_height = self.led_height + self.display_margin * 2
+            self.display_width = base_width
+            self.display_height = base_height
+            if self.double_side_led:
+                self.display_width += self.double_side_gap + base_width - self.display_margin * 2
 
-        self.rect_viewport = self.set_viewport_orientation(self.wcfg["display_orientation"], display_width, display_height)
-        self.resize(display_width, display_height)
+        self.rect_viewport = self.set_viewport_orientation(self.wcfg["display_orientation"], self.display_width, self.display_height)
+        self.resize(self.display_width, self.display_height)
 
         self.rect_led = QRect(0, 0, self.led_width, self.led_height)
-        self.rect_background = QRect(0, 0, display_width, display_height)
+        self.rect_background = QRect(0, 0, self.display_width, self.display_height)
 
         if self.wcfg["led_outline_width"] > 0:
             self.pen_led = QPen()
@@ -109,7 +121,6 @@ class Realtime(Overlay):
         """Draw"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing, True)
-        painter.setViewport(self.rect_viewport)
 
         if self.wcfg["show_background"]:
             painter.fillRect(self.rect_background, self.wcfg["background_color"])
@@ -123,8 +134,27 @@ class Realtime(Overlay):
             self.led_offset,
         )
 
+        if self.double_side_led:
+            if self.vertical:
+                self.draw_lico_led(
+                    painter,
+                    self.lico,
+                    self.display_margin,
+                    self.double_side_gap + self.led_width + self.display_margin,
+                    self.led_offset,
+                )
+            else:
+                self.draw_lico_led(
+                    painter,
+                    self.lico,
+                    self.display_width - self.led_width - self.display_margin,
+                    self.display_margin,
+                    -self.led_offset,
+                )
+
     def draw_lico_led(self, painter, lico, x_offset, y_offset, led_offset):
         """Draw LICO LED"""
+        painter.setViewport(self.rect_viewport)
         lico_scaled = lico * self.max_led
         full_light = True
         is_critical = (lico > self.lico_critical) + 1

@@ -1209,6 +1209,8 @@ WIDGET_DEFAULT = {
         "inner_gap": 3,
         "show_background": False,
         "background_color": "#88000000",
+        "enable_double_side_led": False,
+        "double_side_led_gap": 100,
         "number_of_led": 10,
         "led_width": 30,
         "led_height": 30,
