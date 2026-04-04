@@ -1,7 +1,7 @@
 WIP
 -----------------------------
 * Lift and coast LED Widget
-  - Added "enable_double_side_led" option (requested by user "dustezzz"), which shows a second set of LEDs on the opposite side. Note, this option works for both horizontal & vertical orientations, however the horizontal orientation only supports lighting up from outer to center.
+  - Added "enable_double_side_led" option (requested by user "dustezzz"), which shows a second set of LEDs on the opposite side.
   - Added "double_side_led_gap" option, which sets horizontal gap (in pixels) between double side LEDs.
   - Fixed an issue where LEDs were cropped when set LED width higher than height in vertical orientation.
 

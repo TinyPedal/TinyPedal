@@ -2794,7 +2794,7 @@ Note, currently this widget only works for `LMU`.
 Set LED display orientation: `0` = left to right (horizontal), `1` = bottom to top (vertical), `2` = right to left (horizontal), `3` = top to bottom (vertical).
 
     enable_double_side_led
-Show a second set of LEDs on the opposite side. Note, this option works for both horizontal & vertical orientations, however the horizontal orientation only supports lighting up from outer to center.
+Show a second set of LEDs on the opposite side.
 
     double_side_led_gap
 Set horizontal gap (in pixels) between double side LEDs.
