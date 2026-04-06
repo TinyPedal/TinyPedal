@@ -21,7 +21,6 @@ Tyre Wear Widget
 """
 
 from .. import calculation as calc
-from ..api_control import api
 from ..const_common import TEXT_NA
 from ..module_info import minfo
 from ._base import Overlay
