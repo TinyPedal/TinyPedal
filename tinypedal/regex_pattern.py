@@ -178,22 +178,27 @@ CFG_INVALID_FILENAME = (
 )
 
 # Abbreviation
-ABBR_PATTERN = (
-    "^id | id$| id |"
-    "^ui | ui$| ui |"
-    "^vr | vr$| vr |"
-    "^led | led$| led |"
-    "^tc | tc$| tc |"
-    "^abs | abs$| abs |"
-    "api|"
-    "dpi|"
-    "drs|"
-    "ffb|"
-    "lmu|"
-    "rpm|"
-    "rf2|"
-    "url"
+ABBR_PATTERN = "|".join(
+    f"\\b{abbr}\\b"
+    for abbr in (
+        "id",
+        "ui",
+        "vr",
+        "led",
+        "tc",
+        "abs",
+        "arb",
+        "api",
+        "dpi",
+        "drs",
+        "ffb",
+        "lmu",
+        "rpm",
+        "rf2",
+        "url",
+    )
 )
+
 
 # Font weight
 FONT_WEIGHT_MAP = MappingProxyType({
