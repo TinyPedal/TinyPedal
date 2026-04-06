@@ -552,6 +552,66 @@ class Switch(_reader.Switch, DataAdapter):
 
     __slots__ = ()
 
+    def tc_level(self, index: int | None = None) -> int:
+        """TC level"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        if tele_veh.mTCMax:
+            return tele_veh.mTC
+        return -1
+
+    def tc_cut_level(self, index: int | None = None) -> int:
+        """TC cut level"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        if tele_veh.mTCCutMax:
+            return tele_veh.mTCCut
+        return -1
+
+    def tc_slip_level(self, index: int | None = None) -> int:
+        """TC slip level"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        if tele_veh.mTCSlipMax:
+            return tele_veh.mTCSlip
+        return -1
+
+    def abs_level(self, index: int | None = None) -> int:
+        """ABS level"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        if tele_veh.mABSMax:
+            return tele_veh.mABS
+        return -1
+
+    def motor_map_level(self, index: int | None = None) -> int:
+        """Motor or engine map level"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        if tele_veh.mMotorMapMax:
+            return tele_veh.mMotorMap
+        return -1
+
+    def brake_migration_level(self, index: int | None = None) -> int:
+        """Brake migration level"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        if tele_veh.mMigrationMax:
+            return tele_veh.mMigration
+        return -1
+
+    def front_arb_level(self, index: int | None = None) -> int:
+        """Front anti-roll bar level"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        if tele_veh.mFrontAntiSwayMax:
+            return tele_veh.mFrontAntiSway
+        return -1
+
+    def rear_arb_level(self, index: int | None = None) -> int:
+        """Rear anti-roll bar level"""
+        tele_veh = self.shmm.lmuTeleVeh(index)
+        if tele_veh.mRearAntiSwayMax:
+            return tele_veh.mRearAntiSway
+        return -1
+
+    def wipers(self, index: int | None = None) -> int:
+        """Wipers state, 0 = off, 1 = auto, 2 = slow, 3 = fast"""
+        return self.shmm.lmuTeleVeh(index).mWiperState
+
     def headlights(self, index: int | None = None) -> int:
         """Headlights"""
         return self.shmm.lmuTeleVeh(index).mHeadlights

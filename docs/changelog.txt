@@ -1,5 +1,9 @@
 WIP
 -----------------------------
+* [New]Onboard setting Widget
+  - Show onboard setting for TC, TC Cut, TC Slip, ABS, Brake Migration, Motor (or engine) Map, Front ARB, Rear ARB.
+  - Show TC, ABS activation state (requested by user "Shazem8").
+
 * Lift and coast LED Widget
   - Added "enable_double_side_led" option (requested by user "dustezzz"), which shows a second set of LEDs on the opposite side.
   - Added "double_side_led_gap" option, which sets horizontal gap (in pixels) between double side LEDs.

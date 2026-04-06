@@ -534,6 +534,42 @@ class Switch(_reader.Switch, DataAdapter):
 
     __slots__ = ()
 
+    def tc_level(self, index: int | None = None) -> int:
+        """TC level"""
+        return -1
+
+    def tc_cut_level(self, index: int | None = None) -> int:
+        """TC cut level"""
+        return -1
+
+    def tc_slip_level(self, index: int | None = None) -> int:
+        """TC slip level"""
+        return -1
+
+    def abs_level(self, index: int | None = None) -> int:
+        """ABS level"""
+        return -1
+
+    def motor_map_level(self, index: int | None = None) -> int:
+        """Motor or engine map level"""
+        return -1
+
+    def brake_migration_level(self, index: int | None = None) -> int:
+        """Brake migration level"""
+        return -1
+
+    def front_arb_level(self, index: int | None = None) -> int:
+        """Front anti-roll bar level"""
+        return -1
+
+    def rear_arb_level(self, index: int | None = None) -> int:
+        """Rear anti-roll bar level"""
+        return -1
+
+    def wipers(self, index: int | None = None) -> int:
+        """Wipers state, 0 = off, 1 = auto, 2 = slow, 3 = fast"""
+        return 0
+
     def headlights(self, index: int | None = None) -> int:
         """Headlights"""
         return self.shmm.rf2TeleVeh(index).mHeadlights

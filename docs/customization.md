@@ -2892,6 +2892,38 @@ Set maximum P2P activation time per lap, unit in seconds.
 [**`Back to Top`**](#)
 
 
+## Onboard setting
+**This widget displays onboard setting info.**
+
+Note, currently this widget only works for `LMU`.
+
+    show_abs
+Show current ABS level.
+
+    show_tc
+Show current TC level.
+
+    show_tc_cut
+Show current TC power cut level.
+
+    show_tc_slip
+Show current TC slip angle level.
+
+    show_brake_migration
+Show current brake migration level.
+
+    show_motor_map
+Show current motor (or engine) map level.
+
+    show_front_arb
+Show current front anti-roll bar level.
+
+    show_rear_arb
+Show current rear anti-roll bar level.
+
+[**`Back to Top`**](#)
+
+
 ## Pace notes
 **This widget displays pace notes, comments, debugging info.**
 

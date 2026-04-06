@@ -401,6 +401,42 @@ class Switch(ABC):
     __slots__ = ()
 
     @abstractmethod
+    def tc_level(self, index: int | None = None) -> int:
+        """TC level"""
+
+    @abstractmethod
+    def tc_cut_level(self, index: int | None = None) -> int:
+        """TC cut level"""
+
+    @abstractmethod
+    def tc_slip_level(self, index: int | None = None) -> int:
+        """TC slip level"""
+
+    @abstractmethod
+    def abs_level(self, index: int | None = None) -> int:
+        """ABS level"""
+
+    @abstractmethod
+    def motor_map_level(self, index: int | None = None) -> int:
+        """Motor or engine map level"""
+
+    @abstractmethod
+    def brake_migration_level(self, index: int | None = None) -> int:
+        """Brake migration level"""
+
+    @abstractmethod
+    def front_arb_level(self, index: int | None = None) -> int:
+        """Front anti-roll bar level"""
+
+    @abstractmethod
+    def rear_arb_level(self, index: int | None = None) -> int:
+        """Rear anti-roll bar level"""
+
+    @abstractmethod
+    def wipers(self, index: int | None = None) -> int:
+        """Wipers state, 0 = off, 1 = auto, 2 = slow, 3 = fast"""
+
+    @abstractmethod
     def headlights(self, index: int | None = None) -> int:
         """Headlights"""
 
