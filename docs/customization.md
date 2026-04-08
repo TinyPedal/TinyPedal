@@ -4191,6 +4191,12 @@ Invert pedal range display.
     show_inverted_trailing
 Invert trailing direction.
 
+    show_tc_activation
+Show TC activation plot, which overlaps throttle plot when active.
+
+    show_abs_activation
+Show ABS activation plot, which overlaps brake plot when active.
+
     show_throttle
 Show filtered throttle plot. Note, some vehicles may not provide filtered pedal input value, which the value will be zero.
 

@@ -36,6 +36,19 @@ class Realtime(Overlay):
         super().__init__(config, widget_name)
 
         # Config variable
+        plot_names = (
+            "tc_activation",
+            "abs_activation",
+            "throttle",
+            "brake",
+            "clutch",
+            "ffb",
+            "steering",
+            "speed",
+            "wheel_lock",
+            "wheel_slip",
+        )
+
         self.margin = max(int(self.wcfg["display_margin"]), 0)
         self.display_height = max(int(self.wcfg["display_height"]), 2)
         self.area_width = max(int(self.wcfg["display_width"]), 2)
@@ -52,15 +65,7 @@ class Realtime(Overlay):
             )
         self.display_scale = max(int(time_factor * self.wcfg["display_scale"]), 1)
 
-        max_line_width = int(max(
-            1,
-            self.wcfg["throttle_line_width"],
-            self.wcfg["brake_line_width"],
-            self.wcfg["clutch_line_width"],
-            self.wcfg["ffb_line_width"],
-            self.wcfg["steering_line_width"],
-            self.wcfg["speed_line_width"],
-        ))
+        max_line_width = int(max(1, *(self.wcfg[f"{plot_name}_line_width"] for plot_name in plot_names)))
         max_samples = 3 + max_line_width  # 3 offset + max line width
         self.samples_offset = max_samples - 2
 
@@ -74,6 +79,10 @@ class Realtime(Overlay):
         self.pixmap_plot_section = QPixmap(self.display_scale * 3, self.area_height)
         self.pixmap_plot_section.fill(Qt.transparent)
 
+        if self.wcfg["show_tc_activation"]:
+            self.data_tc_activation = self.create_data_samples(max_samples)
+        if self.wcfg["show_abs_activation"]:
+            self.data_abs_activation = self.create_data_samples(max_samples)
         if self.wcfg["show_throttle"]:
             self.data_throttle = self.create_data_samples(max_samples)
         if self.wcfg["show_brake"]:
@@ -92,7 +101,7 @@ class Realtime(Overlay):
         if self.wcfg["show_wheel_slip"]:
             self.data_wheel_slip = self.create_data_samples(max_samples)
 
-        self.draw_queue = tuple(d[1:] for d in sorted(self.config_display_order(), reverse=True))
+        self.draw_queue = tuple(d[1:] for d in sorted(self.config_display_order(plot_names), reverse=True))
         self.draw_background()
 
         # Last data
@@ -114,18 +123,35 @@ class Realtime(Overlay):
             throttle_raw = api.read.inputs.throttle_raw()
             brake_raw = api.read.inputs.brake_raw()
 
-            if self.wcfg["show_throttle"]:
-                if self.wcfg["show_raw_throttle"]:
-                    throttle = throttle_raw
+            if self.wcfg["show_raw_throttle"]:
+                throttle = throttle_raw
+            else:
+                throttle = api.read.inputs.throttle()
+
+            if self.wcfg["show_raw_brake"]:
+                brake = brake_raw
+            else:
+                brake = api.read.inputs.brake()
+
+            # Update sample
+            if self.wcfg["show_tc_activation"]:
+                if api.read.switch.tc_active():
+                    tc_active = throttle
                 else:
-                    throttle = api.read.inputs.throttle()
+                    tc_active = -1.0
+                self.update_sample(self.data_tc_activation, tc_active)
+
+            if self.wcfg["show_abs_activation"]:
+                if api.read.switch.abs_active():
+                    abs_active = brake
+                else:
+                    abs_active = -1.0
+                self.update_sample(self.data_abs_activation, abs_active)
+
+            if self.wcfg["show_throttle"]:
                 self.update_sample(self.data_throttle, throttle)
 
             if self.wcfg["show_brake"]:
-                if self.wcfg["show_raw_brake"]:
-                    brake = brake_raw
-                else:
-                    brake = api.read.inputs.brake()
                 self.update_sample(self.data_brake, brake)
 
             if self.wcfg["show_clutch"]:
@@ -265,18 +291,8 @@ class Realtime(Overlay):
             width = self.area_width
         return QRect(x_pos, y_pos, width, height)
 
-    def config_display_order(self):
+    def config_display_order(self, plot_names):
         """Config plot display order"""
-        plot_names = (
-            "throttle",
-            "brake",
-            "clutch",
-            "ffb",
-            "steering",
-            "speed",
-            "wheel_lock",
-            "wheel_slip",
-        )
         for plot_name in plot_names:
             if not self.wcfg[f"show_{plot_name}"]:
                 continue

@@ -61,14 +61,14 @@ class Realtime(Overlay):
             self.wcfg["rubber_time_scale_practice"],  # testday
             self.wcfg["rubber_time_scale_practice"],  # practice
             self.wcfg["rubber_time_scale_qualifying"],  # qualifying
-            self.wcfg["rubber_time_scale_race"],  # warmup
+            self.wcfg["rubber_time_scale_race"],  # warmup (shared with race)
             self.wcfg["rubber_time_scale_race"],  # race
         )
         self.rubber_starting = (
             self.wcfg["starting_rubber_practice"],  # testday
             self.wcfg["starting_rubber_practice"],  # practice
             self.wcfg["starting_rubber_qualifying"],  # qualifying
-            self.wcfg["starting_rubber_race"],  # warmup
+            self.wcfg["starting_rubber_race"],  # warmup (shared with race)
             self.wcfg["starting_rubber_race"],  # race
         )
 
