@@ -4,6 +4,9 @@ Thank you for your interests on **TinyPedal** project, any contribution is welco
 
 Before requesting features or reporting issues, make sure to read [Frequently Asked Questions](https://github.com/TinyPedal/TinyPedal/wiki/Frequently-Asked-Questions) and [User Guide](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide) for existing issues to avoid duplicates. You can also use [github search](https://github.com/search?q=repo%3ATinyPedal%2FTinyPedal&type=issues) to quickly search for related issue.
 
+> [!IMPORTANT]
+> Please keep **one request or report per issue with a concise title that clearly describes the issue**, otherwise the developer may not be able to keep track of every request that scattered in random posts and issues.
+
 ## Requesting Features
 
 For requesting features, please open [Issues](https://github.com/TinyPedal/TinyPedal/issues).
