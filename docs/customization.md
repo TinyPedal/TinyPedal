@@ -1960,6 +1960,30 @@ Invert integrity reading.
 [**`Back to Top`**](#)
 
 
+## Damage stats
+**This widget displays vehicle damage stats info.**
+
+    show_integrity_prefix
+Show prefix for each integrity reading.
+
+    show_aero_integrity
+Show body aero integrity reading.
+
+    show_body_integrity
+Show bodywork integrity reading.
+
+    show_suspension_integrity
+Show suspension integrity reading, measured from the wheel with the lowest suspension integrity.
+
+    show_tyre_integrity
+Show tyre integrity reading, measured from the wheel with the lowest tread depth.
+
+    low_*_integrity_threshold
+Set low integrity threshold for displaying warning indication.
+
+[**`Back to Top`**](#)
+
+
 ## Deltabest
 **This widget displays deltabest info.**
 

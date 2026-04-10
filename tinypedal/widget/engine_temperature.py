@@ -60,9 +60,6 @@ class Realtime(Overlay):
             width_oil = len(self.wcfg["prefix_oil_temperature"])
             width_water = len(self.wcfg["prefix_water_temperature"])
 
-        self.prefix_oil = self.wcfg["prefix_oil_temperature"]
-        self.prefix_water = self.wcfg["prefix_water_temperature"]
-
         # Config units
         self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
 
@@ -94,15 +91,15 @@ class Realtime(Overlay):
             )
             layout_oil.addWidget(self.bar_oil_temp, 0, 1)
             if self.wcfg["show_temperature_prefix"]:
-                self.bar_oil_prefix = self.set_rawtext(
-                    text=self.prefix_oil,
+                bar_oil_prefix = self.set_rawtext(
+                    text=self.wcfg["prefix_oil_temperature"],
                     width=font_m.width * width_oil + bar_padx,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.wcfg["font_color_prefix"],
                     bg_color=self.wcfg["background_color_prefix"],
                 )
-                layout_oil.addWidget(self.bar_oil_prefix, 0, 0)
+                layout_oil.addWidget(bar_oil_prefix, 0, 0)
             if self.wcfg["show_rate_of_change"]:
                 self.bar_oil_rate = self.set_rawtext(
                     text="0.0",
@@ -148,15 +145,15 @@ class Realtime(Overlay):
             )
             layout_water.addWidget(self.bar_water_temp, 0, 1)
             if self.wcfg["show_temperature_prefix"]:
-                self.bar_water_prefix = self.set_rawtext(
-                    text=self.prefix_water,
+                bar_water_prefix = self.set_rawtext(
+                    text=self.wcfg["prefix_water_temperature"],
                     width=font_m.width * width_water + bar_padx,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.wcfg["font_color_prefix"],
                     bg_color=self.wcfg["background_color_prefix"],
                 )
-                layout_water.addWidget(self.bar_water_prefix, 0, 0)
+                layout_water.addWidget(bar_water_prefix, 0, 0)
             if self.wcfg["show_rate_of_change"]:
                 self.bar_water_rate = self.set_rawtext(
                     text="0.0",

@@ -1,5 +1,11 @@
 WIP
 -----------------------------
+* [New]Damage stats Widget
+  - Show body aero integrity reading.
+  - Show bodywork integrity reading.
+  - Show suspension integrity reading, measured from the wheel with the lowest suspension integrity.
+  - Show tyre integrity reading, measured from the wheel with the lowest tread depth.
+
 * [New]Onboard setting Widget
   - Show onboard setting for TC, TC Cut, TC Slip, ABS, Brake Migration, Motor (or engine) Map, Front ARB, Rear ARB.
   - Show TC, ABS activation state (requested by user "Shazem8").
