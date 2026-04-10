@@ -379,6 +379,10 @@ class Session(ABC):
         """
 
     @abstractmethod
+    def grip_level(self) -> float:
+        """Track base grip level, convert to fraction 0.0 to 1.0"""
+
+    @abstractmethod
     def track_time(self) -> float:
         """Track time"""
 

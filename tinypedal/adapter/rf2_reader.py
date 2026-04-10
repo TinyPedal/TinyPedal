@@ -512,6 +512,10 @@ class Session(_reader.Session, DataAdapter):
             return 9
         return 10
 
+    def grip_level(self) -> float:
+        """Track base grip level, convert to fraction 0.0 to 1.0"""
+        return -1.0
+
     def track_time(self) -> float:
         """Track time"""
         return -1.0
