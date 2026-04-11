@@ -15,6 +15,9 @@ WIP
   - Added "double_side_led_gap" option, which sets horizontal gap (in pixels) between double side LEDs.
   - Fixed an issue where LEDs were cropped when set LED width higher than height in vertical orientation.
 
+* Lap time history, Stint history Widget
+  - Added "show_caption" option (requested by user "ssalamon"). This option is disabled by default.
+
 * Trailing Widget
   - Added "show_tc_activation" & "show_abs_activation" options (requested by user "dibreiras", "Shazem8"), which show TC and ABS activation plots that overlap throttle and brake plots when active. Both options are disabled by default.
     Note, due to large amount different colors of each plot option, it is up to user to properly configure each plot line color to distinguish them.

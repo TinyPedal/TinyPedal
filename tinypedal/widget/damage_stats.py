@@ -215,7 +215,7 @@ class Realtime(Overlay):
 
     # GUI update methods
     def update_integrity(self, target, data, style, threshold):
-        """Update laptime"""
+        """Update integrity"""
         if target.last != data:
             target.last = data
             if -1 != data:

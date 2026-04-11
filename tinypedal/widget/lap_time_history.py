@@ -46,10 +46,19 @@ class Realtime(Overlay):
         self.setFont(font)
         font_m = self.get_font_metrics(font)
 
+        if self.wcfg["show_caption"]:
+            font_cap = self.config_font(
+                self.wcfg["font_name"],
+                self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+                self.wcfg["font_weight"],
+            )
+            font_cap_m = self.get_font_metrics(font_cap)
+
         # Config variable
         layout_reversed = self.wcfg["layout"] != 0
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.history_slot = min(max(self.wcfg["lap_time_history_count"], 1), 100)
+        row_caption = (self.history_slot + 2) * self.wcfg["swap_upper_caption"]
 
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
@@ -70,9 +79,21 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_laps,
+                row_start=1,
                 column=self.wcfg["display_order_laps"],
                 bottom_to_top=layout_reversed,
             )
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_laps"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout.addWidget(cap_temp, row_caption, self.wcfg["display_order_laps"])
 
         # Time
         if self.wcfg["show_time"]:
@@ -104,9 +125,21 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_time,
+                row_start=1,
                 column=self.wcfg["display_order_time"],
                 bottom_to_top=layout_reversed,
             )
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_time"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout.addWidget(cap_temp, row_caption, self.wcfg["display_order_time"])
 
         # Lap time delta
         if self.wcfg["show_delta"]:
@@ -136,9 +169,21 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_delta,
+                row_start=1,
                 column=self.wcfg["display_order_delta"],
                 bottom_to_top=layout_reversed,
             )
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_delta"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout.addWidget(cap_temp, row_caption, self.wcfg["display_order_delta"])
 
         # Fuel
         if self.wcfg["show_fuel"]:
@@ -146,6 +191,7 @@ class Realtime(Overlay):
                 self.sign_fuel = units.set_symbol_fuel(self.cfg.units["fuel_unit"])[0].upper()
             else:
                 self.sign_fuel = ""
+            self.sign_energy = "E" if self.sign_fuel else ""
             decimals_fuel = max(self.wcfg["decimal_places_fuel"], 1)
             self.width_fuel = 2 + decimals_fuel
             self.bars_fuel = self.set_rawtext(
@@ -162,9 +208,21 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_fuel,
+                row_start=1,
                 column=self.wcfg["display_order_fuel"],
                 bottom_to_top=layout_reversed,
             )
+
+            if self.wcfg["show_caption"]:
+                self.cap_fuel = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_fuel"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout.addWidget(self.cap_fuel, row_caption, self.wcfg["display_order_fuel"])
 
         # Tyre wear
         if self.wcfg["show_wear"]:
@@ -188,9 +246,21 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_wear,
+                row_start=1,
                 column=self.wcfg["display_order_wear"],
                 bottom_to_top=layout_reversed,
             )
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_wear"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout.addWidget(cap_temp, row_caption, self.wcfg["display_order_wear"])
 
         # Last data
         self.empty_data = ConsumptionDataSet()
@@ -200,7 +270,7 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        energy_type = minfo.energy.available
+        energy_type = self.wcfg["show_virtual_energy_if_available"] and minfo.energy.available
 
         # Current laps data
         if self.wcfg["show_laps"]:
@@ -210,12 +280,14 @@ class Realtime(Overlay):
         if self.wcfg["show_delta"]:
             self.update_delta(self.bars_delta[0], minfo.delta.deltaLast)
         if self.wcfg["show_fuel"]:
-            if self.wcfg["show_virtual_energy_if_available"] and energy_type:
+            if energy_type:
                 fuel = minfo.energy.estimatedConsumption
-                sign_fuel = "E" if self.sign_fuel else ""
+                sign_fuel = self.sign_energy
             else:
                 fuel = self.unit_fuel(minfo.fuel.estimatedConsumption)
                 sign_fuel = self.sign_fuel
+            if self.wcfg["show_caption"]:
+                self.update_fuel_caption(self.cap_fuel, energy_type)
             self.update_fuel(self.bars_fuel[0], fuel, sign_fuel)
         if self.wcfg["show_wear"]:
             self.update_wear(self.bars_wear[0], calc.mean(minfo.wheels.estimatedTreadWear))
@@ -257,6 +329,17 @@ class Realtime(Overlay):
             target.last = data
             text_fuel = f"{data:.{self.width_fuel}f}"[:self.width_fuel].strip(".")
             target.text = f"{text_fuel}{sign}"
+            target.update()
+
+    def update_fuel_caption(self, target, data):
+        """Fuel caption"""
+        if target.last != data:
+            target.last = data
+            if data:
+                text_caption = self.wcfg["caption_text_virtual_energy"]
+            else:
+                text_caption = self.wcfg["caption_text_fuel"]
+            target.text = text_caption
             target.update()
 
     def update_wear(self, target, data):
