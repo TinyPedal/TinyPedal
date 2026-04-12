@@ -937,6 +937,10 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Remaining fuel (liters)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mFuel)
 
+    def fuel_fraction(self, index: int | None = None) -> float:
+        """Remaining fuel (fraction)"""
+        return self.shmm.rf2ScorVeh(index).mFuelFraction / 255
+
     def tank_capacity(self, index: int | None = None) -> float:
         """Fuel tank capacity (liters)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mFuelCapacity)

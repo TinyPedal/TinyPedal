@@ -691,6 +691,10 @@ class Vehicle(ABC):
         """Remaining fuel (liters)"""
 
     @abstractmethod
+    def fuel_fraction(self, index: int | None = None) -> float:
+        """Remaining fuel (fraction)"""
+
+    @abstractmethod
     def tank_capacity(self, index: int | None = None) -> float:
         """Fuel tank capacity (liters)"""
 

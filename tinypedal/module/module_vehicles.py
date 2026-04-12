@@ -244,7 +244,7 @@ def update_vehicle_data(
             data.isValidLap = last_laptime > 0
             data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last()
 
-            update_stint_usage(data, laps_completed)
+            update_stint_usage(index, data, laps_completed)
 
             # Update counter
             total_completed_laps += laps_completed
@@ -386,7 +386,7 @@ def calc_gap_behind_leader(index: int) -> float:
     return api.read.timing.behind_leader(index)
 
 
-def update_stint_usage(data: VehicleDataSet, laps_completed: int) -> None:
+def update_stint_usage(index, data: VehicleDataSet, laps_completed: int) -> None:
     """Update stint usage data"""
     (ve_remaining, ve_used, total_laps_done, stint_laps_est, stint_laps_done
      ) = api.read.vehicle.stint_usage(data.driverName)
@@ -399,7 +399,9 @@ def update_stint_usage(data: VehicleDataSet, laps_completed: int) -> None:
         data.currentStintLaps = laps_completed - data.pitTimer.lap_stopped
 
     # Stint energy usage
-    if ve_remaining <= -1.0 or ve_used <= 0 or (data.pitTimer.pitting and not data.inPit):
+    if ve_remaining <= -1.0:
+        data.energyRemaining = api.read.vehicle.fuel_fraction(index)
+    elif ve_used <= 0 or (data.pitTimer.pitting and not data.inPit):
         data.energyRemaining = ve_remaining
     else:  # Apply linear interpolation
         data.energyRemaining = ve_remaining - ve_used * (data.totalLapProgress - total_laps_done)
