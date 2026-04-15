@@ -27,7 +27,7 @@ from collections import deque
 from itertools import islice
 from typing import Mapping, NamedTuple
 
-from .calculation import circular_relative_distance, linear_interp
+from .calculation import circular_position_relative, linear_interp
 from .const_common import (
     DELTA_DEFAULT,
     EMPTY_DICT,
@@ -95,7 +95,7 @@ class StintDataSet(NamedTuple):
     tyreCompound: str = "----"
 
 
-class DeltaLapTime(array):
+class DeltaLapTimeHistory(array):
     """Delta lap time history data
 
     Recent lap time index range: 0 - 4.
@@ -119,7 +119,7 @@ class DeltaLapTime(array):
             self[-2] = min(self._filter_laptime(best_valid))
             self[-3] = self._average_laptime(self[-2])
 
-    def delta(self, target: DeltaLapTime, max_output: int):
+    def delta(self, target: DeltaLapTimeHistory, max_output: int):
         """Generate delta from target player's lap time data set"""
         for index in range(5 - max_output, 5):  # max 5 records
             if target[index] > 0 < self[index]:  # check invalid lap time
@@ -166,6 +166,42 @@ class DeltaLapTime(array):
                 yield MAX_SECONDS
 
 
+class DeltaFuelHistory:
+    """Delta fuel history data
+
+    Attributes:
+        used: Last lap used fuel.
+        last: Last lap remaining fuel.
+        laps: Last lap remaining laps.
+    """
+
+    __slots__ = (
+        "_last_lap_start",
+        "used",
+        "last",
+        "laps",
+    )
+
+    def __init__(self):
+        self._last_lap_start = 0.0
+        self.used = 0.0
+        self.last = 0.0
+        self.laps = 0.0
+
+    def update(self, lap_start: float, fuel: float):
+        """Update delta lap time history"""
+        if self._last_lap_start != lap_start:
+            if 0 < self._last_lap_start < lap_start:
+                if self.last > fuel:
+                    self.used = self.last - fuel   # last lap fuel usage
+                self.last = fuel
+                if self.used > 0:
+                    self.laps = fuel / self.used
+            else:  # reset all laptime on session change
+                self.used = self.laps = self.last = 0.0
+            self._last_lap_start = lap_start
+
+
 class VehicleSpeedTrap:
     """Vehicle speed trap"""
 
@@ -191,7 +227,7 @@ class VehicleSpeedTrap:
         self._distance_last = distance_into
 
         # Center distance to speed trap position
-        distance_into = circular_relative_distance(track_length, speedtrap_distance, distance_into)
+        distance_into = circular_position_relative(track_length, speedtrap_distance, distance_into)
 
         if self._record_next:
             # Distance before speed trap
@@ -335,6 +371,7 @@ class VehicleDataSet:
         "currentStintLaps",
         "pitTimer",
         "speedTrap",
+        "fuelHistory",
         "lapTimeHistory",
     )
 
@@ -379,7 +416,8 @@ class VehicleDataSet:
         self.currentStintLaps: int = 0
         self.pitTimer: VehiclePitTimer = VehiclePitTimer()
         self.speedTrap: VehicleSpeedTrap = VehicleSpeedTrap()
-        self.lapTimeHistory: DeltaLapTime = DeltaLapTime("d", [0.0] * 8)
+        self.fuelHistory: DeltaFuelHistory = DeltaFuelHistory()
+        self.lapTimeHistory: DeltaLapTimeHistory = DeltaLapTimeHistory("d", [0.0] * 8)
 
 
 class DeltaInfo:

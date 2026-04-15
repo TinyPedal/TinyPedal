@@ -22,6 +22,10 @@ WIP
   - Added "show_tc_activation" & "show_abs_activation" options (requested by user "dibreiras", "Shazem8"), which show TC and ABS activation plots that overlap throttle and brake plots when active. Both options are disabled by default.
     Note, due to large amount different colors of each plot option, it is up to user to properly configure each plot line color to distinguish them.
 
+* Relative, Rivals, Standings Widget
+  - Now shows remaining fuel for vehicle without virtual energy, such as LMP2 (requested by user "bshpanchuk" & "jeremyNG-lab").
+  - Estimated total stint laps now works for vehicle without virtual energy.
+
 2.45.0 (2026-04-01)
 -----------------------------
 * [New]Adaptive race length calculation

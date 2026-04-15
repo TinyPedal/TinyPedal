@@ -3730,9 +3730,7 @@ Enable this option to invert layout order for delta lap time records.
 Set number of delta lap time records to display. Minimum number is limited to `2`, maximum is limited to `5`.
 
     show_stint_laps
-Show number of completed laps from current stint and estimated total stint laps.
-
-Note, `estimated total stint laps` reading is based on virtual energy usage data, which currently is only available on vehicles with virtual energy for LMU, and `enable_restapi_access` must be enabled for accessing stint data.
+Show number of completed laps from current stint and estimated total stint laps. Note, it may require a few laps to get accurate estimate.
 
     show_energy_remaining
 Show remaining virtual energy reading in percentage from each driver, with 4 different states:
@@ -3740,6 +3738,8 @@ Show remaining virtual energy reading in percentage from each driver, with 4 dif
 - High: above 30% remaining, default color green.
 - low: from 30% to 10% remaining, default color orange.
 - critical: 10% or lower remaining, default color red.
+
+Note, for vehicle without virtual energy, remaining fuel will be displayed instead.
 
 **Known limitation with remaining virtual energy readings**
 

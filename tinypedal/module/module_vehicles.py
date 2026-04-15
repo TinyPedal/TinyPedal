@@ -196,7 +196,7 @@ def update_vehicle_data(
                 nearest_line = data.relativeStraightDistance
             # Nearest traffic time gap (opponents behind local players)
             if not data.inPit:
-                opt_time_behind = calc.circular_relative_distance(
+                opt_time_behind = calc.circular_position_relative(
                     plr_laptime_est,
                     plr_timeinto_est,
                     api.read.timing.estimated_time_into(index),
@@ -207,7 +207,7 @@ def update_vehicle_data(
                         nearest_blue_class = data.vehicleClass
             # Nearest yellow flag distance
             if data.isYellow:
-                opt_rel_distance = calc.circular_relative_distance(
+                opt_rel_distance = calc.circular_position_relative(
                     track_length, plr_lap_distance, lap_distance)
                 if nearest_yellow_ahead > opt_rel_distance >= 0:
                     nearest_yellow_ahead = opt_rel_distance
@@ -232,19 +232,23 @@ def update_vehicle_data(
             data.vehicleClass = api.read.vehicle.class_name(index)
             data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.tireCompoundName = api.read.tyre.compound_class(index)
+            data.isFinished = api.read.vehicle.finish_state(index) == 1
 
             data.gapBehindNext = calc_gap_behind_next(index)
             data.gapBehindLeader = calc_gap_behind_leader(index)
             data.gapBehindNextInClass = calc_time_gap_behind(opt_index_ahead, index, track_length, data.totalLapProgress)
             data.gapBehindLeaderInClass = calc_time_gap_behind(opt_index_leader, index, track_length, data.totalLapProgress)
 
-            data.isFinished = api.read.vehicle.finish_state(index) == 1
-            data.lapTimeHistory.update(api.read.timing.start(index), elapsed_time, data.bestLapTime)
+            lap_start_time = api.read.timing.start(index)
             last_laptime = api.read.timing.last_laptime(index)
+            fuel_remaining = api.read.vehicle.fuel_fraction(index)
+
+            data.lapTimeHistory.update(lap_start_time, elapsed_time, data.bestLapTime)
+            data.fuelHistory.update(lap_start_time, fuel_remaining)
             data.isValidLap = last_laptime > 0
             data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last()
 
-            update_stint_usage(index, data, laps_completed)
+            update_stint_usage(data, laps_completed, fuel_remaining)
 
             # Update counter
             total_completed_laps += laps_completed
@@ -386,21 +390,24 @@ def calc_gap_behind_leader(index: int) -> float:
     return api.read.timing.behind_leader(index)
 
 
-def update_stint_usage(index, data: VehicleDataSet, laps_completed: int) -> None:
+def update_stint_usage(data: VehicleDataSet, laps_completed: int, fuel_remaining: float) -> None:
     """Update stint usage data"""
     (ve_remaining, ve_used, total_laps_done, stint_laps_est, stint_laps_done
      ) = api.read.vehicle.stint_usage(data.driverName)
 
     # Estimated stint laps
+    if stint_laps_done <= 0:
+        stint_laps_done = laps_completed - data.pitTimer.lap_stopped
+
+    if stint_laps_est <= 0:
+        stint_laps_est = stint_laps_done + data.fuelHistory.laps
+
+    data.currentStintLaps = stint_laps_done
     data.estimatedStintLaps = stint_laps_est
-    if stint_laps_done > 0:
-        data.currentStintLaps = stint_laps_done
-    else:
-        data.currentStintLaps = laps_completed - data.pitTimer.lap_stopped
 
     # Stint energy usage
     if ve_remaining <= -1.0:
-        data.energyRemaining = api.read.vehicle.fuel_fraction(index)
+        data.energyRemaining = fuel_remaining
     elif ve_used <= 0 or (data.pitTimer.pitting and not data.inPit):
         data.energyRemaining = ve_remaining
     else:  # Apply linear interpolation

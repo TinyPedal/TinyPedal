@@ -238,8 +238,8 @@ def lap_progress_difference(ahead_laptime: float, behind_laptime: float) -> floa
     return 0
 
 
-def circular_relative_distance(circle_length: float, plr_dist: float, opt_dist: float) -> float:
-    """Relative distance between opponent & player in a circle"""
+def circular_position_relative(circle_length: float, plr_dist: float, opt_dist: float) -> float:
+    """Circular relative position between player and opponent"""
     rel_dist = opt_dist - plr_dist
     # Relative dist is greater than half of track length
     if abs(rel_dist) > circle_length * 0.5:
