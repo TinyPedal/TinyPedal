@@ -301,10 +301,15 @@ class ConfigHotkey(BaseDialog):
                 continue
             msg_text = (
                 f"<b>{format_hotkey_name(temp_hotkey)}</b> already used for """
-                f"<b>{format_option_name(option_name)}</b>."
+                f"<b>{format_option_name(option_name)}</b>.<br><br>"
+                "Are you sure to assign the same key anyway?"
             )
-            QMessageBox.warning(self, "Error", msg_text)
-            return True
+            confirm_msg = QMessageBox.question(
+                self, "Confirm", msg_text,
+                buttons=QMessageBox.Yes | QMessageBox.Cancel,
+                defaultButton=QMessageBox.Cancel,
+            )
+            return confirm_msg != QMessageBox.Yes
         return False
 
     def reject(self):

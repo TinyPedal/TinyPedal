@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import logging
 import threading
+from itertools import chain
 from time import sleep
 from typing import Callable
 
@@ -40,15 +41,17 @@ from .setting import cfg
 logger = logging.getLogger(__name__)
 
 
-def gather_command(commands: tuple) -> dict[tuple[int, ...], tuple[str, Callable]]:
+def gather_command(commands: tuple) -> dict[tuple[int, ...], list[tuple[str, Callable]]]:
     """Gather & validate hotkey commands"""
-    temp_keys = {}
+    key_group = {}
     for hotkey_name, hotkey_func in commands:
         key_string = cfg.user.shortcuts[hotkey_name]["bind"]
         key_codes = load_hotkey(key_string)
         if key_codes:
-            temp_keys[key_codes] = (hotkey_name, hotkey_func)
-    return temp_keys
+            if key_codes not in key_group:
+                key_group[key_codes] = []  # create hotkey group list
+            key_group[key_codes].append((hotkey_name, hotkey_func))
+    return key_group
 
 
 class HotkeyControl:
@@ -85,11 +88,7 @@ class HotkeyControl:
     def __updating(self):
         """Update hotkey state"""
         _event_wait = self._event.wait
-        available_commands = {
-            **gather_command(COMMANDS_GENERAL),
-            **gather_command(COMMANDS_MODULE),
-            **gather_command(COMMANDS_WIDGET),
-        }
+        available_commands = gather_command(chain(COMMANDS_GENERAL, COMMANDS_MODULE, COMMANDS_WIDGET))
         available_key_codes = sort_key_codes(available_commands.keys())
 
         get_key_state = get_key_state_function()
@@ -102,14 +101,15 @@ class HotkeyControl:
             # Run command
             detected_key_codes = tuple(_key for _key in available_key_codes if get_key_state(_key))
             if detected_key_codes in available_commands:
-                hotkey_name, hotkey_func = available_commands[detected_key_codes]
+                hotkey_group = available_commands[detected_key_codes]
                 # Run command in main thread
-                app_signal.hotkey.emit(hotkey_func)
-                logger.info(
-                    "HOTKEY: %s (command: %s)",
-                    cfg.user.shortcuts[hotkey_name]["bind"],
-                    hotkey_name,
-                )
+                for hotkey_name, hotkey_func in hotkey_group:
+                    app_signal.hotkey.emit(hotkey_func)
+                    logger.info(
+                        "HOTKEY: %s (command: %s)",
+                        cfg.user.shortcuts[hotkey_name]["bind"],
+                        hotkey_name,
+                    )
 
         self._stopped = True
         logger.info("DISABLED: hotkey control")

@@ -1,5 +1,8 @@
 WIP
 -----------------------------
+* Hotkey Tab
+  - Now supports assign same key for multiple options (requested by user "H4dro"), which allows to group-toggle multiple widgets or modules at the same time.
+
 * [New]Damage stats Widget
   - Show body aero integrity reading.
   - Show bodywork integrity reading.
