@@ -50,7 +50,7 @@ CLASSES_DEFAULT = {
         "preset": "",
     },
     "LMP2_ELMS": {
-        "alias": "LMP2_ELMS",
+        "alias": "LMP2+",
         "color": "#0044AA",
         "preset": "",
     },

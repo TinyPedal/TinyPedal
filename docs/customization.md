@@ -887,7 +887,9 @@ Note, hotkey bindings are non-exclusive in TinyPedal, which means they will not 
 
 Click `Enabled` or `Disabled` button to toggle global hotkey on and off. Note, global hotkey can also be enabled by setting `enable_global_hotkey` option to `true` in [Application](#application) dialog.
 
-To change key binding, click key button on right side of each hotkey option, then in `Key Binding` dialog, press a `key` or `key combination` to register new key binding. Note, assign same key for multiple options will cause those options to be toggled at the same time.
+To change key binding, click key button on right side of each hotkey option, then in `Key Binding` dialog, press a `key` or `key combination` to register new key binding.
+
+Note, assign same key for multiple options will cause those options to be toggled at the same time. However, each option's toggle state is still handled individually.
 
 To clear key binding, click `Clear` button from `Key Binding` dialog.
 

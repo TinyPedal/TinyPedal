@@ -23,7 +23,12 @@ Relative Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME, TEXT_PLACEHOLDER
+from ..const_common import (
+    MAX_SECONDS,
+    REL_TIME_DEFAULT,
+    TEXT_NOLAPTIME,
+    TEXT_PLACEHOLDER,
+)
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ..userfile.custom_image import load_brand_logo_image
@@ -63,9 +68,10 @@ class Realtime(Overlay):
         self.nrg_width = 3 + self.nrg_decimals + (self.nrg_decimals > 0)
 
         # Max display players
-        veh_add_front = min(max(int(self.wcfg["additional_players_front"]), 0), 60)
-        veh_add_behind = min(max(int(self.wcfg["additional_players_behind"]), 0), 60)
-        self.veh_range = max(7 + veh_add_front + veh_add_behind, 7)
+        min_base_veh = 3
+        self.max_veh_front = min_base_veh + min(max(int(self.wcfg["additional_players_front"]), 0), 60)
+        self.max_veh_behind = min_base_veh + min(max(int(self.wcfg["additional_players_behind"]), 0), 60)
+        self.veh_range = max(self.max_veh_front + self.max_veh_behind, min_base_veh * 2) + 1
 
         # Empty dataset
         self.pixmap_brandlogo = {}
@@ -545,20 +551,19 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        relative_list = minfo.relative.relative
-        total_rel_idx = len(relative_list)
         player_idx = minfo.vehicles.playerIndex
+        relative_list = relative_data(
+            minfo.relative.relativeAhead,
+            minfo.relative.relativeBehind,
+            player_idx,
+            self.max_veh_front,
+            self.max_veh_behind,
+        )
         plr_veh_info = minfo.vehicles.dataSet[player_idx]
         in_race = api.read.session.in_race()
 
         # Relative update
-        for idx in range(self.veh_range):
-
-            if idx < total_rel_idx:
-                rel_time_gap, rel_idx = relative_list[idx]
-            else:
-                rel_time_gap, rel_idx = 0.0, -2
-
+        for idx, (rel_time_gap, rel_idx) in enumerate(relative_list):
             # Set row state: 1 - show text, 0 - hide text
             if rel_idx >= 0:
                 self.row_visible[idx] = True
@@ -1042,3 +1047,28 @@ def lap_difference_index(is_lapped, offset=2):
         0 = same lap, 1 = behind, 2 = ahead
     """
     return (is_lapped < 0) + (is_lapped > 0) * 2 + offset
+
+
+def relative_data(ahead_list: list, behind_list: list, player_index: int, max_ahead: int, max_behind: int):
+    """Generate relative time & index data"""
+    # Yield ahead data
+    ahead_count = len(ahead_list)
+    while ahead_count < max_ahead:
+        ahead_count += 1
+        yield REL_TIME_DEFAULT
+    for ahead_data in ahead_list:
+        if ahead_count > max_ahead:
+            ahead_count -= 1
+            continue
+        yield ahead_data
+    # Yield player data
+    yield (0.0, player_index)
+    # Yield behind data
+    behind_count = 0
+    for behind_data in behind_list:
+        if behind_count < max_behind:
+            behind_count += 1
+            yield behind_data
+    while behind_count < max_behind:
+        behind_count += 1
+        yield REL_TIME_DEFAULT

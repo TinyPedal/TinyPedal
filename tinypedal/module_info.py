@@ -663,14 +663,16 @@ class RelativeInfo:
     """Relative output data"""
 
     __slots__ = (
-        "relative",
+        "relativeAhead",
+        "relativeBehind",
         "standings",
         "classes",
         "drawOrder",
     )
 
     def __init__(self):
-        self.relative: list[tuple[float, int]] = [REL_TIME_DEFAULT]
+        self.relativeAhead: list[tuple[float, int]] = [REL_TIME_DEFAULT]
+        self.relativeBehind: list[tuple[float, int]] = [REL_TIME_DEFAULT]
         self.standings: list[int] = [-1]
         self.classes: list[list] = [[0, 1, "", 0.0, -1, -1, -1, False]]
         self.drawOrder: list = [0]

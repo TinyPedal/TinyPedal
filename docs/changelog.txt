@@ -1,8 +1,5 @@
 WIP
 -----------------------------
-* Hotkey Tab
-  - Now supports assign same key for multiple options (requested by user "H4dro"), which allows to group-toggle multiple widgets or modules at the same time.
-
 * [New]Damage stats Widget
   - Show body aero integrity reading.
   - Show bodywork integrity reading.
@@ -26,8 +23,10 @@ WIP
     Note, due to large amount different colors of each plot option, it is up to user to properly configure each plot line color to distinguish them.
 
 * Relative, Rivals, Standings Widget
-  - Now shows remaining fuel for vehicle without virtual energy, such as LMP2 (requested by user "bshpanchuk" & "jeremyNG-lab").
-  - Estimated total stint laps now works for vehicle without virtual energy.
+  - Now shows remaining fuel & estimated total stint laps for vehicle without virtual energy, such as LMP2 (requested by user "bshpanchuk" & "jeremyNG-lab").
+
+* Hotkey Tab
+  - Now supports assigning same key for multiple options (requested by user "H4dro"), which allows to toggle multiple options at the same time. Note, each option's toggle state is still handled individually.
 
 2.45.0 (2026-04-01)
 -----------------------------
