@@ -4196,6 +4196,9 @@ This widget is designed to show the nearest traffic vehicles that are closing in
 
 Note, vehicles are not counted as traffic if they cannot close the gap, or while in pit lane. For example, a driver that falls constantly 3 seconds behind you is not considered as traffic since he cannot close the gap and overtake you.
 
+    bar_width
+Set each column width, value in chars, such as 10 = 10 chars. Default is `6`. Minimum width is limited to `3`.
+
     show_class
 Show traffic vehicle class name.
 

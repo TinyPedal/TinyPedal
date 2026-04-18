@@ -1,4 +1,4 @@
-WIP
+2.46.0 (2026-04-18)
 -----------------------------
 * [New]Damage stats Widget
   - Show body aero integrity reading.

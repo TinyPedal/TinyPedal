@@ -32,7 +32,7 @@ rex_hex_color = re.compile(r"^#[0-9A-F]{3}$|^#[0-9A-F]{6}$|^#[0-9A-F]{8}$", flag
 rex_invalid_char = re.compile(r'[\\/:*?"<>|]')
 rex_special_char = re.compile(r'[\\/:*?"<>|!@#$%^&\'{}~`;]')
 rex_number_extract = re.compile(r"\d*\.?\d+")
-rex_lmu_brand_extract = re.compile(r"^([a-zA-Z-]{3,})(\s[A-Z][a-z]{2,}\s)?")
+rex_lmu_brand_extract = re.compile(r"^([a-zA-Z-]{2,})(\s[A-Z][a-z]{2,}\s)?")
 
 # Group key, for splitting and display option group name
 CFG_GROUP_KEY = (

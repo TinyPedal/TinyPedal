@@ -117,8 +117,8 @@ class DeltaTimeInterval(array):
                 data_verylong = self[1]
                 data_long = self[2]
                 data_short = self[3]
-                # Sync long with short if higher than 0.5 difference
-                if data_short < data_long - 0.5 or data_short > data_long + 0.5:
+                # Sync long with short if higher than 0.3 difference
+                if data_short < data_long - 0.3 or data_short > data_long + 0.3:
                     self[2] = self[3]
                 # Sync verylong with long if higher than 0.3 difference
                 if data_long < data_verylong - 0.3 or data_long > data_verylong + 0.3:

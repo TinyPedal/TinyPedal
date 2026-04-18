@@ -34,7 +34,7 @@ class Realtime(Overlay):
     def __init__(self, config, widget_name):
         # Assign base setting
         super().__init__(config, widget_name)
-        layout = self.set_grid_layout(gap=self.wcfg["bar_gap"])
+        layout = self.set_grid_layout(gap_hori=self.wcfg["bar_gap"])
         self.set_primary_layout(layout=layout)
 
         # Config font
@@ -64,14 +64,6 @@ class Realtime(Overlay):
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
-        # Create layout
-        layout_slower = self.set_grid_layout()
-        layout_leader = self.set_grid_layout()
-        layout_faster = self.set_grid_layout()
-        layout.addLayout(layout_slower, 0, self.wcfg["display_order_slower"])
-        layout.addLayout(layout_leader, 0, self.wcfg["display_order_leader"])
-        layout.addLayout(layout_faster, 0, self.wcfg["display_order_faster"])
-
         if self.wcfg["show_caption"]:
             cap_temps = self.set_rawtext(
                 font=font_cap,
@@ -89,9 +81,9 @@ class Realtime(Overlay):
             )
             for cap_temp, cap_text in zip(cap_temps, texts):
                 cap_temp.text = cap_text
-            layout_slower.addWidget(cap_temps[0], 0, 0)
-            layout_leader.addWidget(cap_temps[1], 0, 0)
-            layout_faster.addWidget(cap_temps[2], 0, 0)
+            layout.addWidget(cap_temps[0], 0, self.wcfg["display_order_slower"])
+            layout.addWidget(cap_temps[1], 0, self.wcfg["display_order_leader"])
+            layout.addWidget(cap_temps[2], 0, self.wcfg["display_order_faster"])
 
         # Class name
         if self.wcfg["show_class"]:
@@ -104,9 +96,9 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_class"],
                 count=3,
             )
-            layout_slower.addWidget(self.bar_classes[0], 1, 0)
-            layout_leader.addWidget(self.bar_classes[1], 1, 0)
-            layout_faster.addWidget(self.bar_classes[2], 1, 0)
+            layout.addWidget(self.bar_classes[0], 1, self.wcfg["display_order_slower"])
+            layout.addWidget(self.bar_classes[1], 1, self.wcfg["display_order_leader"])
+            layout.addWidget(self.bar_classes[2], 1, self.wcfg["display_order_faster"])
 
         # Estimated laps
         if self.wcfg["show_estimated_laps"]:
@@ -130,9 +122,9 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_estimated_laps"],
                 count=3,
             )
-            layout_slower.addWidget(self.bar_laps[0], 2, 0)
-            layout_leader.addWidget(self.bar_laps[1], 2, 0)
-            layout_faster.addWidget(self.bar_laps[2], 2, 0)
+            layout.addWidget(self.bar_laps[0], 2, self.wcfg["display_order_slower"])
+            layout.addWidget(self.bar_laps[1], 2, self.wcfg["display_order_leader"])
+            layout.addWidget(self.bar_laps[2], 2, self.wcfg["display_order_faster"])
 
         # Time interval
         if self.wcfg["show_time_interval"]:
@@ -146,9 +138,9 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_time_interval"],
                 count=3,
             )
-            layout_slower.addWidget(self.bar_time[0], 3, 0)
-            layout_leader.addWidget(self.bar_time[1], 3, 0)
-            layout_faster.addWidget(self.bar_time[2], 3, 0)
+            layout.addWidget(self.bar_time[0], 3, self.wcfg["display_order_slower"])
+            layout.addWidget(self.bar_time[1], 3, self.wcfg["display_order_leader"])
+            layout.addWidget(self.bar_time[2], 3, self.wcfg["display_order_faster"])
 
 
     def timerEvent(self, event):
