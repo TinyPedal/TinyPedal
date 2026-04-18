@@ -10,6 +10,16 @@ WIP
   - Show onboard setting for TC, TC Cut, TC Slip, ABS, Brake Migration, Motor (or engine) Map, Front ARB, Rear ARB.
   - Show TC, ABS activation state (requested by user "Shazem8").
 
+* [New]Traffic Widget
+  - Show the nearest traffic vehicles that are closing in, either the "slower" vehicle that you are catching up ahead, or the "faster" vehicle that is catching up from behind.
+    Note, vehicles are not counted as traffic if they cannot close the gap, or while in pit lane. For example, a driver that falls constantly 3 seconds behind you is not considered as traffic since he cannot close the gap and overtake you.
+  - Show estimated laps towards nearest reachable traffic vehicles. For example, a "2.34L" value from "faster" column indicates the amount laps it would take for the faster vehicle that behind you to catch up with you; while same value from "slower" column indicates the amount laps it would take for you to catch up with the slower vehicle ahead.
+    Note, it may take 1 or more laps to get accurate estimates.
+  - Highlight traffic vehicles that can potentially overtake or be overtaken from current lap, which is useful to determine fuel saving strategy.
+  - Show time interval between you and traffic vehicles.
+  - Always show race leader's estimated laps and time interval relative to you in "leader" column, which is useful to keep track of leader's relative position and when you will be overtaken by leader (requested by user "ssalamon").
+  - Show traffic vehicle class & driver name (optional).
+
 * Lift and coast LED Widget
   - Added "enable_double_side_led" option (requested by user "dustezzz"), which shows a second set of LEDs on the opposite side.
   - Added "double_side_led_gap" option, which sets horizontal gap (in pixels) between double side LEDs.

@@ -95,6 +95,37 @@ class StintDataSet(NamedTuple):
     tyreCompound: str = "----"
 
 
+class DeltaTimeInterval(array):
+    """Delta time interval data
+
+    Last time interval: 0.
+    Average time interval (very long duration): 1.
+    Average time interval (long duration): 2.
+    Average time interval (short duration): 3.
+    """
+
+    __slots__ = ()
+
+    def update(self, time_interval: float):
+        """Update delta time interval"""
+        if self[0] != time_interval:
+            diff = self[0] - time_interval
+            if abs(diff) < 3:  # position switch check
+                self[1] += 0.01 * (diff - self[1])  # 200s
+                self[2] += 0.02 * (diff - self[2])  # 100s
+                self[3] += 0.065 * (diff - self[3])  # 30s
+                data_verylong = self[1]
+                data_long = self[2]
+                data_short = self[3]
+                # Sync long with short if higher than 0.5 difference
+                if data_short < data_long - 0.5 or data_short > data_long + 0.5:
+                    self[2] = self[3]
+                # Sync verylong with long if higher than 0.3 difference
+                if data_long < data_verylong - 0.3 or data_long > data_verylong + 0.3:
+                    self[1] = self[2]
+            self[0] = time_interval
+
+
 class DeltaLapTimeHistory(array):
     """Delta lap time history data
 
@@ -668,6 +699,8 @@ class RelativeInfo:
         "standings",
         "classes",
         "drawOrder",
+        "relativeDeltaAhead",
+        "relativeDeltaBehind",
     )
 
     def __init__(self):
@@ -676,6 +709,13 @@ class RelativeInfo:
         self.standings: list[int] = [-1]
         self.classes: list[list] = [[0, 1, "", 0.0, -1, -1, -1, False]]
         self.drawOrder: list = [0]
+        temp_array = (0.0, 0.0, 0.0, 0.0)
+        self.relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = tuple(
+            DeltaTimeInterval("d", temp_array) for _ in range(MAX_VEHICLES)
+        )
+        self.relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = tuple(
+            DeltaTimeInterval("d", temp_array) for _ in range(MAX_VEHICLES)
+        )
 
 
 class SectorData:

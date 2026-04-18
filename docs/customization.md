@@ -1434,7 +1434,7 @@ Note, all setting and data are saved per file as [Tyre strategy](#tyre-strategy)
 - To select multiple tyres, hold `Ctrl` or `Shift` while clicking on tyres. Note, `drag` is disabled while selected multiple tyres.
 - Right-click on tyre list or table to open context menu for quick-access options.
 - To highlight new tyres (first time installed in race session) in table, enabled `Highlight New Tyre` check box at top panel.
-- To delete tyres from list or table, select one or more tyres, then right-click and select "Removed Selected". A confirmation dialog will be displayed before deletion.
+- To delete tyres from list or table, select one or more tyres, then right-click and select `Removed Selected`. A confirmation dialog will be displayed before deletion.
 
 [**`Back to Top`**](#)
 
@@ -4185,6 +4185,39 @@ Auto hide this widget if track notes data is not available for current track.
 
     maximum_display_duration
 Set maximum display duration (seconds) of each note. Set to `-1` to always display notes. Default is `-1`.
+
+[**`Back to Top`**](#)
+
+
+## Traffic
+**This widget displays traffic vehicle info.**
+
+This widget is designed to show the nearest traffic vehicles that are closing in, either the `slower` vehicle that you are catching up ahead, or the `faster` vehicle that is catching up from behind.
+
+Note, vehicles are not counted as traffic if they cannot close the gap, or while in pit lane. For example, a driver that falls constantly 3 seconds behind you is not considered as traffic since he cannot close the gap and overtake you.
+
+    show_class
+Show traffic vehicle class name.
+
+    show_driver_name_instead_of_class
+Show driver name instead of class name.
+
+    driver_name_shorten
+Shorten driver's first name.
+
+    driver_name_uppercase
+Set driver name to uppercase.
+
+    show_estimated_laps
+Show estimated laps towards nearest reachable traffic vehicles. Note, it may take 1 or more laps to get accurate estimates.
+
+For example, a `2.34L` value from `faster` column indicates the amount laps it would take for the faster vehicle that behind you to catch up with you; while same value from `slower` column indicates the amount laps it would take for you to catch up with the slower vehicle ahead.
+
+    enable_traffic_highlight_from_current_lap
+Highlight traffic vehicles that can potentially overtake or be overtaken from current lap, which is useful to determine fuel saving strategy.
+
+    show_time_interval
+Show time interval between you and traffic vehicles.
 
 [**`Back to Top`**](#)
 

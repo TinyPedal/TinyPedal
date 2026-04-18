@@ -31,6 +31,7 @@ from ..api_control import api
 from ..calculation import asym_max
 from ..const_common import MAX_SECONDS, MAX_VEHICLES
 from ..module_info import minfo
+from ..validator import state_timer
 from ._base import DataModule
 
 REF_PLACES = tuple(range(1, MAX_VEHICLES + 1))
@@ -59,6 +60,8 @@ class Realtime(DataModule):
         setting_relative = self.cfg.user.setting["relative"]
         setting_standings = self.cfg.user.setting["standings"]
         last_version_update = None
+
+        gen_one_second_timer = state_timer(1.0)
 
         while not _event_wait(update_interval):
             if not realtime_state.paused:
@@ -91,7 +94,9 @@ class Realtime(DataModule):
 
                 # Get vehicles info
                 (relative_ahead, relative_behind, classes_list, draw_order_list, is_multi_class,
-                 ) = get_vehicles_info(veh_total, plr_index, show_in_garage)
+                 ) = get_vehicles_info(
+                    veh_total, plr_index, show_in_garage, next(gen_one_second_timer),
+                    output.relativeDeltaAhead, output.relativeDeltaBehind)
 
                 # Create vehicle class position list (initially ordered by class name)
                 class_pos_list, plr_class_name, plr_class_place = create_position_in_class(
@@ -128,7 +133,10 @@ class Realtime(DataModule):
                     create_reference_place.cache_clear()
 
 
-def get_vehicles_info(veh_total: int, plr_index: int, show_in_garage: bool):
+def get_vehicles_info(
+    veh_total: int, plr_index: int, show_in_garage: bool, update_relative_delta: bool,
+    relative_delta_ahead: tuple, relative_delta_behind: tuple,
+):
     """Get vehicles info: relative time gap, classes, places, laptime"""
     laptime_est = api.read.timing.estimated_laptime()
     plr_time = api.read.timing.estimated_time_into()
@@ -162,6 +170,10 @@ def get_vehicles_info(veh_total: int, plr_index: int, show_in_garage: bool):
                 index,  # 1 player index
             )
             recorded_index += 1
+
+            if update_relative_delta:  # update at 1 sec interval
+                relative_delta_ahead[index].update(diff_time_ahead)
+                relative_delta_behind[index].update(-diff_time_behind)
 
         # Update classes list
         class_name = api.read.vehicle.class_name(index)
