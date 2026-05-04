@@ -212,7 +212,7 @@ class Realtime(Overlay):
         leader_lap_into = api.read.lap.progress(leader_index)
         player_lap_into = api.read.lap.progress()
 
-        leader_laptime_pace = minfo.vehicles.dataSet[leader_index].lapTimeHistory.average()
+        leader_laptime_pace = minfo.vehicles.dataSet[leader_index].lapTimeHistory.average
         player_laptime_pace = minfo.delta.lapTimePace
 
         leader_valid = 0 < leader_laptime_pace < MAX_SECONDS

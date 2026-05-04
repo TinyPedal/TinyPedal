@@ -24,7 +24,6 @@ from __future__ import annotations
 
 from array import array
 from collections import deque
-from itertools import islice
 from typing import Mapping, NamedTuple
 
 from .calculation import circular_position_relative, linear_interp
@@ -95,60 +94,81 @@ class StintDataSet(NamedTuple):
     tyreCompound: str = "----"
 
 
-class DeltaTimeInterval(array):
+class DeltaTimeInterval:
     """Delta time interval data
 
-    Last time interval: 0.
-    Average time interval (very long duration): 1.
-    Average time interval (long duration): 2.
-    Average time interval (short duration): 3.
+    Attributes:
+        last: Last time interval.
+        long: Average time interval (long duration).
+        normal: Average time interval (normal duration).
+        short: Average time interval (short duration).
     """
 
-    __slots__ = ()
+    __slots__ = (
+        "last",
+        "long",
+        "normal",
+        "short",
+    )
+
+    def __init__(self):
+        self.last = 0.0
+        self.long = 0.0
+        self.normal = 0.0
+        self.short = 0.0
 
     def update(self, time_interval: float):
         """Update delta time interval"""
-        if self[0] != time_interval:
-            diff = self[0] - time_interval
+        if self.last != time_interval:
+            diff = self.last - time_interval
             if abs(diff) < 3:  # position switch check
-                self[1] += 0.01 * (diff - self[1])  # 200s
-                self[2] += 0.02 * (diff - self[2])  # 100s
-                self[3] += 0.065 * (diff - self[3])  # 30s
-                data_verylong = self[1]
-                data_long = self[2]
-                data_short = self[3]
-                # Sync long with short if higher than 0.3 difference
-                if data_short < data_long - 0.3 or data_short > data_long + 0.3:
-                    self[2] = self[3]
-                # Sync verylong with long if higher than 0.3 difference
-                if data_long < data_verylong - 0.3 or data_long > data_verylong + 0.3:
-                    self[1] = self[2]
-            self[0] = time_interval
+                self.long += 0.01 * (diff - self.long)  # 200s
+                self.normal += 0.02 * (diff - self.normal)  # 100s
+                self.short += 0.065 * (diff - self.short)  # 30s
+                # Sync longer duration with short if higher than 0.3 difference
+                if abs(self.normal - self.short) > 0.3:
+                    self.normal = self.short
+                if abs(self.long - self.normal) > 0.3:
+                    self.long = self.normal
+            self.last = time_interval
 
 
 class DeltaLapTimeHistory(array):
     """Delta lap time history data
 
-    Recent lap time index range: 0 - 4.
-    Recent average lap time index: 5 (-3).
-    Recent best lap time index: 6 (-2).
-    Last lap start time index: 7 (-1).
+    Attributes:
+        best: Best lap time from recent laps.
+        last: Last lap time, can be invalid.
+        average: Average lap time from recent laps.
     """
 
-    __slots__ = ()
+    __slots__ = (
+        "_last_lap_start",
+        "best",
+        "last",
+        "average",
+    )
+
+    def __init__(self, typecode, initializer):
+        array.__init__(typecode, initializer)
+        self._last_lap_start = 0.0
+        self.best = 0.0
+        self.last = 0.0
+        self.average = 0.0
 
     def update(self, lap_start: float, elapsed_time: float, best_valid: float):
         """Update delta lap time history"""
-        if self[-1] != lap_start and elapsed_time - lap_start > 1:
-            if 0 < self[-1] < lap_start:
+        if self._last_lap_start != lap_start and elapsed_time - lap_start > 1:
+            if 0 < self._last_lap_start < lap_start:
                 self[0], self[1], self[2], self[3] = self[1], self[2], self[3], self[4]
-                self[4] = lap_start - self[-1]  # last lap time
+                self[4] = lap_start - self._last_lap_start  # last lap time
             else:  # reset all laptime on session change
                 self[0] = self[1] = self[2] = self[3] = self[4] = 0.0
-            self[-1] = lap_start
+            self._last_lap_start = lap_start
             # Recalculate once per lap
-            self[-2] = min(self._filter_laptime(best_valid))
-            self[-3] = self._average_laptime(self[-2])
+            self.best = min(self._filter_laptime(best_valid))
+            self.average = self._average_laptime(self.best)
+            self.last = self[4]
 
     def delta(self, target: DeltaLapTimeHistory, max_output: int):
         """Generate delta from target player's lap time data set"""
@@ -157,18 +177,6 @@ class DeltaLapTimeHistory(array):
                 yield target[index] - self[index]
             else:
                 yield MAX_SECONDS
-
-    def last(self) -> float:
-        """Last lap time, can be invalid"""
-        return self[4]
-
-    def best(self) -> float:
-        """Best lap time from recent laps"""
-        return self[-2]
-
-    def average(self) -> float:
-        """Average lap time from recent laps"""
-        return self[-3]
 
     def _average_laptime(self, laptime_best: float) -> float:
         """Calculate average lap time"""
@@ -189,7 +197,7 @@ class DeltaLapTimeHistory(array):
     def _filter_laptime(self, best_valid: float):
         """Filter invalid lap time"""
         best_valid -= 0.01  # compensate precision
-        for laptime in islice(self, 5):
+        for laptime in self:
             # Make sure lap time is not lower than session best valid lap time
             if laptime >= best_valid > 0:
                 yield laptime
@@ -448,7 +456,7 @@ class VehicleDataSet:
         self.pitTimer: VehiclePitTimer = VehiclePitTimer()
         self.speedTrap: VehicleSpeedTrap = VehicleSpeedTrap()
         self.fuelHistory: DeltaFuelHistory = DeltaFuelHistory()
-        self.lapTimeHistory: DeltaLapTimeHistory = DeltaLapTimeHistory("d", [0.0] * 8)
+        self.lapTimeHistory: DeltaLapTimeHistory = DeltaLapTimeHistory("d", (0, 0, 0, 0, 0))
 
 
 class DeltaInfo:
@@ -709,12 +717,11 @@ class RelativeInfo:
         self.standings: list[int] = [-1]
         self.classes: list[list] = [[0, 1, "", 0.0, -1, -1, -1, False]]
         self.drawOrder: list = [0]
-        temp_array = (0.0, 0.0, 0.0, 0.0)
         self.relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = tuple(
-            DeltaTimeInterval("d", temp_array) for _ in range(MAX_VEHICLES)
+            DeltaTimeInterval() for _ in range(MAX_VEHICLES)
         )
         self.relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = tuple(
-            DeltaTimeInterval("d", temp_array) for _ in range(MAX_VEHICLES)
+            DeltaTimeInterval() for _ in range(MAX_VEHICLES)
         )
 
 

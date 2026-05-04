@@ -721,7 +721,7 @@ class Realtime(Overlay):
             # Vehicle best laptime
             if self.wcfg["show_best_laptime"]:
                 if in_race and self.wcfg["show_best_laptime_from_recent_laps_in_race"]:
-                    laptime = veh_info.lapTimeHistory.best()
+                    laptime = veh_info.lapTimeHistory.best
                 else:
                     laptime = veh_info.bestLapTime
                 self.update_blp(self.bars_blp[idx], laptime, hi_player, state)

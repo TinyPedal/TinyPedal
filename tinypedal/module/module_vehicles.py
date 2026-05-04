@@ -248,7 +248,7 @@ def update_vehicle_data(
             data.lapTimeHistory.update(lap_start_time, elapsed_time, data.bestLapTime)
             data.fuelHistory.update(lap_start_time, fuel_remaining)
             data.isValidLap = last_laptime > 0
-            data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last()
+            data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last
 
             update_stint_usage(data, laps_completed, fuel_remaining)
 
@@ -296,7 +296,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
 
     # Leader time
     leader_index = output.leaderIndex
-    leader_pace = output.dataSet[leader_index].lapTimeHistory.average()
+    leader_pace = output.dataSet[leader_index].lapTimeHistory.average
     if leader_index >= 0 and 0 < leader_pace < MAX_SECONDS:
         leader_finish_time = leader_pace * api.read.lap.remaining(leader_index)
         leader_finish_offset = max(remaining_time - leader_finish_time, 0.0)
@@ -306,7 +306,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
 
     # Player time
     player_index = output.playerIndex
-    player_pace = output.dataSet[player_index].lapTimeHistory.average()
+    player_pace = output.dataSet[player_index].lapTimeHistory.average
     if player_index >= 0 and 0 < player_pace < MAX_SECONDS:
         player_finish_time = player_pace * api.read.lap.remaining(player_index)
         player_finish_offset = max(remaining_time - player_finish_time, 0.0)

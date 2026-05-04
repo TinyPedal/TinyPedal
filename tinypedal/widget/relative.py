@@ -621,7 +621,7 @@ class Realtime(Overlay):
             # Vehicle best laptime
             if self.wcfg["show_best_laptime"]:
                 if in_race and self.wcfg["show_best_laptime_from_recent_laps_in_race"]:
-                    laptime = veh_info.lapTimeHistory.best()
+                    laptime = veh_info.lapTimeHistory.best
                 else:
                     laptime = veh_info.bestLapTime
                 self.update_blp(self.bars_blp[idx], laptime, hi_player, state)
@@ -1059,8 +1059,8 @@ def relative_data(ahead_list: list, behind_list: list, player_index: int, max_ah
     for ahead_data in ahead_list:
         if ahead_count > max_ahead:
             ahead_count -= 1
-            continue
-        yield ahead_data
+        else:
+            yield ahead_data
     # Yield player data
     yield (0.0, player_index)
     # Yield behind data
@@ -1069,6 +1069,8 @@ def relative_data(ahead_list: list, behind_list: list, player_index: int, max_ah
         if behind_count < max_behind:
             behind_count += 1
             yield behind_data
+        else:
+            break
     while behind_count < max_behind:
         behind_count += 1
         yield REL_TIME_DEFAULT

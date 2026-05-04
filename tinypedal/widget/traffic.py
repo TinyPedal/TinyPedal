@@ -171,7 +171,7 @@ class Realtime(Overlay):
                 if veh_data[ahead_index].inPit:
                     continue
 
-                avg_delta_timegap = delta_time_interval_ahead[ahead_index][1]
+                avg_delta_timegap = delta_time_interval_ahead[ahead_index].long
 
                 if avg_delta_timegap > 0:
                     ahead_laps = ahead_timegap / avg_delta_timegap / player_laptime
@@ -191,7 +191,7 @@ class Realtime(Overlay):
                 if veh_data[behind_index].inPit:
                     continue
 
-                avg_delta_timegap = delta_time_interval_behind[behind_index][1]
+                avg_delta_timegap = delta_time_interval_behind[behind_index].long
 
                 if avg_delta_timegap > 0:
                     behind_laps = -behind_timegap / avg_delta_timegap / player_laptime
