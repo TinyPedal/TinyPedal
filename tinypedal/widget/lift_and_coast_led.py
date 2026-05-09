@@ -25,6 +25,7 @@ from PySide2.QtGui import QBrush, QPainter, QPen
 from PySide2.QtWidgets import QWidget
 
 from ..api_control import api
+from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -39,6 +40,13 @@ class Realtime(Overlay):
 
         # Config variable
         self.double_side_led = self.wcfg["enable_double_side_led"]
+        self.show_lift_and_coast = self.wcfg["show_lift_and_coast"]
+        self.show_tc_activation = self.wcfg["show_tc_activation"]
+        self.show_abs_activation = self.wcfg["show_abs_activation"]
+        self.show_wheel_lock = self.wcfg["show_wheel_lock"]
+        self.show_wheel_slip = self.wcfg["show_wheel_slip"]
+        self.wheel_lock_threshold = self.wcfg["wheel_lock_threshold"]
+        self.wheel_slip_threshold = self.wcfg["wheel_slip_threshold"]
 
         # LEDs
         self.bar_lico_left = LEDBar(
@@ -59,6 +67,8 @@ class Realtime(Overlay):
             lift_and_coast_color_critical=self.wcfg["lift_and_coast_color_critical"],
             tc_activation_color=self.wcfg["tc_activation_color"],
             abs_activation_color=self.wcfg["abs_activation_color"],
+            wheel_lock_color=self.wcfg["wheel_lock_color"],
+            wheel_slip_color=self.wcfg["wheel_slip_color"],
             lift_and_coast_multiplier_critical=self.wcfg["lift_and_coast_multiplier_critical"],
         )
         self.set_primary_orient(
@@ -88,6 +98,8 @@ class Realtime(Overlay):
                 lift_and_coast_color_critical=self.wcfg["lift_and_coast_color_critical"],
                 tc_activation_color=self.wcfg["tc_activation_color"],
                 abs_activation_color=self.wcfg["abs_activation_color"],
+                wheel_lock_color=self.wcfg["wheel_lock_color"],
+                wheel_slip_color=self.wcfg["wheel_slip_color"],
                 lift_and_coast_multiplier_critical=self.wcfg["lift_and_coast_multiplier_critical"],
             )
             self.set_primary_orient(
@@ -100,39 +112,67 @@ class Realtime(Overlay):
         self.lico = None
         self.tc_active = None
         self.abs_active = None
+        self.wheel_lock = None
+        self.wheel_slip = None
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
         update_later = False
 
         # Lift and coast
-        lico = api.read.engine.lift_and_coast_progress()
+        lico = api.read.engine.lift_and_coast_progress() if self.show_lift_and_coast else -1
         if self.lico != lico:
             self.lico = lico
             update_later = True
 
         # TC active
-        tc_active = api.read.switch.tc_active()
+        tc_active = self.show_tc_activation and api.read.switch.tc_active()
         if self.tc_active != tc_active:
             self.tc_active = tc_active
             update_later = True
 
         # ABS active
-        abs_active = api.read.switch.abs_active()
+        abs_active = self.show_abs_activation and api.read.switch.abs_active()
         if self.abs_active != abs_active:
             self.abs_active = abs_active
+            update_later = True
+
+        # Wheel lock / wheel slip
+        wheel_lock = False
+        wheel_slip = False
+        if self.show_wheel_lock or self.show_wheel_slip:
+            brake_raw = api.read.inputs.brake_raw()
+            throttle_raw = api.read.inputs.throttle_raw()
+            slip_ratio = minfo.wheels.slipRatio
+            if self.show_wheel_lock:
+                wheel_lock_val = min(abs(min(slip_ratio)), 1)
+                wheel_lock = wheel_lock_val >= self.wheel_lock_threshold and brake_raw > 0.02 and not abs_active
+            if self.show_wheel_slip:
+                wheel_slip_val = min(max(slip_ratio), 1)
+                wheel_slip = wheel_slip_val >= self.wheel_slip_threshold and throttle_raw > 0.02 and not tc_active
+
+        if self.wheel_lock != wheel_lock:
+            self.wheel_lock = wheel_lock
+            update_later = True
+
+        if self.wheel_slip != wheel_slip:
+            self.wheel_slip = wheel_slip
             update_later = True
 
         if update_later:
             self.bar_lico_left.lico = lico
             self.bar_lico_left.tc_active = tc_active
             self.bar_lico_left.abs_active = abs_active
+            self.bar_lico_left.wheel_lock = wheel_lock
+            self.bar_lico_left.wheel_slip = wheel_slip
             self.bar_lico_left.update()
 
             if self.double_side_led:
                 self.bar_lico_right.lico = lico
                 self.bar_lico_right.tc_active = tc_active
                 self.bar_lico_right.abs_active = abs_active
+                self.bar_lico_right.wheel_lock = wheel_lock
+                self.bar_lico_right.wheel_slip = wheel_slip
                 self.bar_lico_right.update()
 
 
@@ -158,6 +198,8 @@ class LEDBar(QWidget):
         lift_and_coast_color_critical: str = "",
         tc_activation_color: str = "",
         abs_activation_color: str = "",
+        wheel_lock_color: str = "",
+        wheel_slip_color: str = "",
         lift_and_coast_multiplier_critical: float = 0.8,
     ):
         super().__init__(parent)
@@ -196,8 +238,10 @@ class LEDBar(QWidget):
             QBrush(lift_and_coast_color_off, Qt.SolidPattern),
             QBrush(lift_and_coast_color_low, Qt.SolidPattern),
             QBrush(lift_and_coast_color_critical, Qt.SolidPattern),
-            QBrush(tc_activation_color, Qt.SolidPattern),
+            QBrush(wheel_lock_color, Qt.SolidPattern),
             QBrush(abs_activation_color, Qt.SolidPattern),
+            QBrush(wheel_slip_color, Qt.SolidPattern),
+            QBrush(tc_activation_color, Qt.SolidPattern),
         )
         self.setFixedSize(display_width, display_height)
 
@@ -206,6 +250,8 @@ class LEDBar(QWidget):
         self.lico = -1
         self.tc_active = False
         self.abs_active = False
+        self.wheel_lock = False
+        self.wheel_slip = False
 
     # GUI update methods
     def paintEvent(self, event):
@@ -225,10 +271,14 @@ class LEDBar(QWidget):
         is_critical = (self.lico > self.lico_critical) + 1
         full_light = True
 
-        if self.abs_active:
-            painter.setBrush(self.brush_led[4])
-        elif self.tc_active:
+        if self.wheel_lock:
             painter.setBrush(self.brush_led[3])
+        elif self.abs_active:
+            painter.setBrush(self.brush_led[4])
+        elif self.wheel_slip:
+            painter.setBrush(self.brush_led[5])
+        elif self.tc_active:
+            painter.setBrush(self.brush_led[6])
         elif self.lico <= 0:
             painter.setBrush(self.brush_led[0])
         else:
