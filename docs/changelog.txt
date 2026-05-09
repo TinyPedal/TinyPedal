@@ -1,3 +1,11 @@
+WIP
+-----------------------------
+* Lift and coast LED Widget
+  - Added "show_wheel_lock" & "show_wheel_slip" options (implemented by @RenBidge).
+
+* Misc
+  - Added new contributor "RenBidge" to contributors.md in "Implementation" section.
+
 2.46.0 (2026-04-18)
 -----------------------------
 * [New]Damage stats Widget

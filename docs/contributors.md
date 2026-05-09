@@ -10,6 +10,7 @@
 * Sergio Rafael Lemke (srlemke) - Cross-platform (Linux) assistance, features, bug fixes
 
 ## Implementation
+* Ben Ridgen (RenBidge) - Wheel lock & slip features in Lift and coast LED Widget
 * Oost-hash - Widget display order dialog, various features
 * nikidigi - Widget snapping & alignment
 * TiberiuC39 - VR compatibility toggle
