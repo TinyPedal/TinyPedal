@@ -2812,7 +2812,7 @@ Show tyre wear percentage sign.
 
 
 ## Lift and coast LED
-**This widget displays lift and coast, TC & ABS activation LED info.**
+**This widget displays lift and coast, TC & ABS activation, wheel slip & lock LED info.**
 
 Note, currently this widget only works for `LMU`.
 
@@ -2833,6 +2833,24 @@ Set LED width, height, radius in pixels. To achieve circle LED, set a higher rad
 
     lift_and_coast_multiplier_critical
 This value multiplies maximum lift and coast range, which sets critical range of lift and coast LED.
+
+    show_tc_activation
+Show TC activation state.
+
+    show_abs_activation
+Show ABS activation state.
+
+    show_wheel_lock
+Show wheel lock state.
+
+    show_wheel_slip
+Show wheel slip state.
+
+    wheel_lock_threshold
+Set percentage threshold for triggering wheel lock warning under braking. `0.3` means 30% of tyre slip ratio.
+
+    wheel_slip_threshold
+Set percentage threshold for triggering wheel slip warning under acceleration. `0.1` means 10% of tyre slip ratio.
 
 [**`Back to Top`**](#)
 
@@ -4198,6 +4216,15 @@ Note, vehicles are not counted as traffic if they cannot close the gap, or while
 
     bar_width
 Set each column width, value in chars, such as 10 = 10 chars. Default is `6`. Minimum width is limited to `3`.
+
+    show_race_leader
+Show column for race leader relatively from behind.
+
+    show_slower_ahead
+Show column for nearest reachable slower vehicle relatively ahead.
+
+    show_faster_behind
+Show column for nearest reachable faster vehicle relatively from behind.
 
     show_class
 Show traffic vehicle class name.

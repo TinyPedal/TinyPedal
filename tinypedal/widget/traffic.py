@@ -60,6 +60,9 @@ class Realtime(Overlay):
         style_width = font_m.width * bar_width + bar_padx
         self.lap_width = bar_width - 1
         self.cls_width = bar_width
+        self.show_slower_ahead = self.wcfg["show_slower_ahead"]
+        self.show_race_leader = self.wcfg["show_race_leader"]
+        self.show_faster_behind = self.wcfg["show_faster_behind"]
 
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
@@ -67,7 +70,6 @@ class Realtime(Overlay):
         if self.wcfg["show_caption"]:
             cap_temps = self.set_rawtext(
                 font=font_cap,
-                text=self.wcfg["caption_text_slower"],
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
@@ -81,9 +83,7 @@ class Realtime(Overlay):
             )
             for cap_temp, cap_text in zip(cap_temps, texts):
                 cap_temp.text = cap_text
-            layout.addWidget(cap_temps[0], 0, self.wcfg["display_order_slower"])
-            layout.addWidget(cap_temps[1], 0, self.wcfg["display_order_leader"])
-            layout.addWidget(cap_temps[2], 0, self.wcfg["display_order_faster"])
+            self.add_column(layout, cap_temps, 0)
 
         # Class name
         if self.wcfg["show_class"]:
@@ -96,9 +96,7 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_class"],
                 count=3,
             )
-            layout.addWidget(self.bar_classes[0], 1, self.wcfg["display_order_slower"])
-            layout.addWidget(self.bar_classes[1], 1, self.wcfg["display_order_leader"])
-            layout.addWidget(self.bar_classes[2], 1, self.wcfg["display_order_faster"])
+            self.add_column(layout, self.bar_classes, 1)
 
         # Estimated laps
         if self.wcfg["show_estimated_laps"]:
@@ -122,9 +120,7 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_estimated_laps"],
                 count=3,
             )
-            layout.addWidget(self.bar_laps[0], 2, self.wcfg["display_order_slower"])
-            layout.addWidget(self.bar_laps[1], 2, self.wcfg["display_order_leader"])
-            layout.addWidget(self.bar_laps[2], 2, self.wcfg["display_order_faster"])
+            self.add_column(layout, self.bar_laps, 2)
 
         # Time interval
         if self.wcfg["show_time_interval"]:
@@ -138,14 +134,12 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_time_interval"],
                 count=3,
             )
-            layout.addWidget(self.bar_time[0], 3, self.wcfg["display_order_slower"])
-            layout.addWidget(self.bar_time[1], 3, self.wcfg["display_order_leader"])
-            layout.addWidget(self.bar_time[2], 3, self.wcfg["display_order_faster"])
-
+            self.add_column(layout, self.bar_time, 3)
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
         veh_data = minfo.vehicles.dataSet
+        player_index = minfo.vehicles.playerIndex
         player_laptime = api.read.timing.estimated_laptime()
 
         ahead_overtake_laps = MAX_SECONDS
@@ -211,24 +205,33 @@ class Realtime(Overlay):
                 behind_overtake_laps = 0.0
 
         if self.wcfg["show_class"]:
-            veh_info = veh_data[ahead_overtake_index]
-            self.update_class(self.bar_classes[0], veh_info.vehicleClass, veh_info.driverName)
-            veh_info = veh_data[leader_overtake_index]
-            self.update_class(self.bar_classes[1], veh_info.vehicleClass, veh_info.driverName)
-            veh_info = veh_data[behind_overtake_index]
-            self.update_class(self.bar_classes[2], veh_info.vehicleClass, veh_info.driverName)
+            if self.show_slower_ahead:
+                veh_info = veh_data[ahead_overtake_index]
+                self.update_class(self.bar_classes[0], veh_info.vehicleClass, veh_info.driverName)
+            if self.show_race_leader:
+                veh_info = veh_data[leader_overtake_index]
+                self.update_class(self.bar_classes[1], veh_info.vehicleClass, veh_info.driverName)
+            if self.show_faster_behind:
+                veh_info = veh_data[behind_overtake_index]
+                self.update_class(self.bar_classes[2], veh_info.vehicleClass, veh_info.driverName)
 
         if self.wcfg["show_estimated_laps"]:
-            plr_lap_progress = 1 - api.read.lap.progress()
-            opt_lap_progress = 1 - api.read.lap.progress(ahead_overtake_index)
-            self.update_laps(self.bar_laps[0], ahead_overtake_laps, opt_lap_progress)
-            self.update_laps(self.bar_laps[1], leader_overtake_laps, plr_lap_progress)
-            self.update_laps(self.bar_laps[2], behind_overtake_laps, plr_lap_progress)
+            plr_lap_progress = 1 - veh_data[player_index].currentLapProgress
+            opt_lap_progress = 1 - veh_data[ahead_overtake_index].currentLapProgress
+            if self.show_slower_ahead:
+                self.update_laps(self.bar_laps[0], ahead_overtake_laps, opt_lap_progress)
+            if self.show_race_leader:
+                self.update_laps(self.bar_laps[1], leader_overtake_laps, plr_lap_progress)
+            if self.show_faster_behind:
+                self.update_laps(self.bar_laps[2], behind_overtake_laps, plr_lap_progress)
 
         if self.wcfg["show_time_interval"]:
-            self.update_time(self.bar_time[0], ahead_overtake_timegap)
-            self.update_time(self.bar_time[1], leader_overtake_timegap)
-            self.update_time(self.bar_time[2], behind_overtake_timegap)
+            if self.show_slower_ahead:
+                self.update_time(self.bar_time[0], ahead_overtake_timegap)
+            if self.show_race_leader:
+                self.update_time(self.bar_time[1], leader_overtake_timegap)
+            if self.show_faster_behind:
+                self.update_time(self.bar_time[2], behind_overtake_timegap)
 
     # GUI update methods
     def update_laps(self, target, *data):
@@ -283,3 +286,15 @@ class Realtime(Overlay):
         if class_name:
             return class_name, random_color_class(class_name)
         return TEXT_PLACEHOLDER, self.wcfg["background_color_class"]
+
+    def add_column(self, layout, bar_temp, row_index):
+        """Add column"""
+        layout.addWidget(bar_temp[0], row_index, self.wcfg["display_order_slower"])
+        if not self.show_slower_ahead:
+            bar_temp[0].hide()
+        layout.addWidget(bar_temp[1], row_index, self.wcfg["display_order_leader"])
+        if not self.show_race_leader:
+            bar_temp[1].hide()
+        layout.addWidget(bar_temp[2], row_index, self.wcfg["display_order_faster"])
+        if not self.show_faster_behind:
+            bar_temp[2].hide()
