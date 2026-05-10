@@ -220,6 +220,22 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_best_laptime"],
                 hide_start=1,
             )
+        # Vehicle average laptime
+        if self.wcfg["show_average_laptime"]:
+            self.bars_alp = self.set_rawtext(
+                width=8 * font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_average_laptime"],
+                bg_color=self.wcfg["background_color_average_laptime"],
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_alp,
+                column=self.wcfg["display_order_average_laptime"],
+                hide_start=1,
+            )
         # Delta laptime
         if self.wcfg["show_delta_laptime"]:
             self.bar_style_dlt_delta = (
@@ -548,6 +564,9 @@ class Realtime(Overlay):
                 else:
                     laptime = veh_info.bestLapTime
                 self.update_blp(self.bars_blp[idx], laptime, state)
+            # Vehicle average laptime
+            if self.wcfg["show_average_laptime"]:
+                self.update_alp(self.bars_alp[idx], veh_info.lapTimeHistory.average, state)
             # Position in class
             if self.wcfg["show_position_in_class"]:
                 self.update_pic(self.bars_pic[idx], veh_info.positionInClass, veh_info.vehicleClass, state)
@@ -665,6 +684,13 @@ class Realtime(Overlay):
 
     def update_blp(self, target, *data):
         """Vehicle best laptime"""
+        if target.last != data:
+            target.last = data
+            target.text = self.set_laptime(data[0])[:8]
+            self.toggle_visibility(target, data[-1])
+
+    def update_alp(self, target, *data):
+        """Vehicle average laptime"""
         if target.last != data:
             target.last = data
             target.text = self.set_laptime(data[0])[:8]

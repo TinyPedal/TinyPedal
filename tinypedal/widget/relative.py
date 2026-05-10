@@ -281,6 +281,31 @@ class Realtime(Overlay):
                 targets=self.bars_blp,
                 column=self.wcfg["display_order_best_laptime"],
             )
+        # Vehicle average laptime
+        if self.wcfg["show_average_laptime"]:
+            self.bar_style_alp = (
+                (
+                    self.wcfg["font_color_average_laptime"],
+                    self.wcfg["background_color_average_laptime"],
+                ),
+                (
+                    self.wcfg["font_color_player_average_laptime"],
+                    self.wcfg["background_color_player_average_laptime"],
+                ),
+            )
+            self.bars_alp = self.set_rawtext(
+                width=8 * font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_alp[0][0],
+                bg_color=self.bar_style_alp[0][1],
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_alp,
+                column=self.wcfg["display_order_average_laptime"],
+            )
         # Position in class
         if self.wcfg["show_position_in_class"]:
             self.bar_style_pic = (
@@ -625,6 +650,9 @@ class Realtime(Overlay):
                 else:
                     laptime = veh_info.bestLapTime
                 self.update_blp(self.bars_blp[idx], laptime, hi_player, state)
+            # Vehicle average laptime
+            if self.wcfg["show_average_laptime"]:
+                self.update_alp(self.bars_alp[idx], veh_info.lapTimeHistory.average, hi_player, state)
             # Position in class
             if self.wcfg["show_position_in_class"]:
                 self.update_pic(self.bars_pic[idx], veh_info.positionInClass, veh_info.vehicleClass, hi_player, state)
@@ -810,6 +838,18 @@ class Realtime(Overlay):
                 text = ""
             target.text = text
             target.fg, target.bg = self.bar_style_blp[data[1]]
+            target.update()
+
+    def update_alp(self, target, *data):
+        """Vehicle average laptime"""
+        if target.last != data:
+            target.last = data
+            if data[-1]:
+                text = self.set_laptime(data[0])[:8]
+            else:
+                text = ""
+            target.text = text
+            target.fg, target.bg = self.bar_style_alp[data[1]]
             target.update()
 
     def update_pic(self, target, *data):

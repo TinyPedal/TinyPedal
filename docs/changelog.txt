@@ -6,6 +6,9 @@ WIP
 * Traffic Widget
   - Added "show_race_leader", "show_slower_ahead", "show_faster_behind" options to show or hide corresponding columns (requested by user "louisgendron26").
 
+* Relative, Rivals, Standings Widget
+  - Added "show_average_laptime" option (requested by user "Levis1234", "DyniW"), which shows average lap time calculated from (five) most recent laps.
+
 * Misc
   - Added new contributor "RenBidge" to contributors.md in "Implementation" section.
 

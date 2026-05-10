@@ -3738,6 +3738,9 @@ Show driver's session best lap time.
     show_best_laptime_from_recent_laps_in_race
 Show driver's best lap time from (five) most recent laps in race session. This option provides a better view of driver's recent performance during longer race.
 
+    show_average_laptime
+Show driver's average lap time calculated from (five) most recent laps.
+
     show_delta_laptime
 Show lap time difference (delta) between player and opponents from most recent laps (up to 5 recent lap time records). The default layout order shows delta lap time records from right side column (most recent lap) to left.
 
