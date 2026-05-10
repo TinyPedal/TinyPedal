@@ -74,27 +74,24 @@ class Base(QWidget):
 
     def stop(self):
         """Stop and close widget"""
+        widget_name = self.widget_name
         self.__toggle_timer(True)
         self.__break_signal()
         self.__unload_resource()
         if not self.close():
-            logger.error(
-                "FAILED TO CLOSE: widget %s",
-                self._overlay.widget_name,
-            )
+            logger.error("FAILED TO CLOSE: widget %s", widget_name)
 
     @property
     def closed(self) -> bool:
         """Close state"""
-        return self.cfg is None and self.close()
+        return not self.__dict__ and self.close()
 
     def post_update(self):
         """Run once after state inactive"""
 
     def __unload_resource(self):
         """Unload widget resource"""
-        for var in self.__dict__:
-            setattr(self, var, None)
+        self.__dict__.clear()
 
     def __set_window_attributes(self):
         """Set window attributes"""
@@ -124,11 +121,13 @@ class Base(QWidget):
     def __save_position(self):
         """Save widget position"""
         save_changes = False
-        if self.wcfg["position_x"] != self.x():
-            self.wcfg["position_x"] = self.x()
+        x_pos = self.x()
+        y_pos = self.y()
+        if self.wcfg["position_x"] != x_pos:
+            self.wcfg["position_x"] = x_pos
             save_changes = True
-        if self.wcfg["position_y"] != self.y():
-            self.wcfg["position_y"] = self.y()
+        if self.wcfg["position_y"] != y_pos:
+            self.wcfg["position_y"] = y_pos
             save_changes = True
         if save_changes:
             self.cfg.save()
@@ -235,7 +234,7 @@ class Base(QWidget):
 
     def closeEvent(self, event):
         """Ignore attempts to close via window Close button when VR compatibility enabled"""
-        if self.cfg is not None:
+        if self.__dict__:
             event.ignore()
 
 
