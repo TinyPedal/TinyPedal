@@ -222,15 +222,15 @@ LMU_CARSETUP_MAP = MappingProxyType({
 })
 
 RF2_CARSETUP_REFERENCE_KEY = (
-    "VM_OIL_RADIATOR", # aerodynamics
-    "VM_BRAKE_PRESSURE", # brakes
-    "VM_STEER_LOCK", # chassis
-    "VM_DIFF_PRELOAD", # drivetrain
-    "VM_TRACTION_CONTROL", # electronics
-    "VM_FUEL_LEVEL", # fuel
-    "VM_ENGINE_MIXTURE", # gears
-    "VM_FRONT_ANTISWAY", # suspension
-    "WM_CAMBER-W_FL", # tires
+    "VM_OIL_RADIATOR",  # aerodynamics
+    "VM_BRAKE_PRESSURE",  # brakes
+    "VM_STEER_LOCK",  # chassis
+    "VM_DIFF_PRELOAD",  # drivetrain
+    "VM_TRACTION_CONTROL",  # electronics
+    "VM_FUEL_LEVEL",  # fuel
+    "VM_ENGINE_MIXTURE",  # gears
+    "VM_FRONT_ANTISWAY",  # suspension
+    "WM_CAMBER-W_FL",  # tires
 )
 
 

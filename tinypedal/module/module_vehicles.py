@@ -139,7 +139,7 @@ def update_vehicle_data(
         data.totalLapProgress = laps_completed + data.currentLapProgress
         data.isYellow = speed < 8
         data.inPit = api.read.vehicle.in_paddock(index)
-        data.pitTimer.update(api.read.vehicle.slot_id(index), data.inPit, elapsed_time, laps_completed, speed)
+        data.pitTimer.update(data.inPit, elapsed_time, laps_completed, speed)
 
         if not data.inPit:
             data.speedTrap.update(speed, lap_distance, speedtrap_distance, track_length)

@@ -823,13 +823,15 @@ class Realtime(Overlay):
             hp = int(data[0] * 10)
             if hp >= 10:  # full integrity
                 color_index = 0
-            elif hp <= 5:  # low
-                color_index = 2
-            else:  # high
+            elif hp > 5:  # high
                 color_index = 1
+            else:  # low
+                color_index = 2
             if hp >= 10:
                 text = TEXT_PLACEHOLDER
             else:
+                if hp < 0:
+                    hp = 0
                 text = f"{hp:d}"
             target.text = text
             target.fg, target.bg = self.bar_style_dmg[color_index]

@@ -1026,8 +1026,6 @@ class Vehicle(_reader.Vehicle, DataAdapter):
             - any(wheel_data.mDetached for wheel_data in data.mWheels) / 2
             - data.mDetached / 2
         )
-        if total < 0:
-            return 0
         return total
 
     def is_detached(self, index: int | None = None) -> bool:
