@@ -149,8 +149,8 @@ class Realtime(Overlay):
         if self.last_modified != data:
             self.last_modified = data
             raw_data = minfo.mapping.coordinates if data != -1 else None
-            map_path = self.create_map_path(raw_data)
-            self.draw_map_image(map_path, self.circular_map)
+            map_sector_paths, map_full_path = self.create_map_path(raw_data)
+            self.draw_map_image(map_sector_paths, map_full_path, self.circular_map)
             if self.wcfg["show_proximity_circle"]:
                 self.update_proximity_rect()
 
@@ -179,8 +179,9 @@ class Realtime(Overlay):
 
     def create_map_path(self, raw_coords=None):
         """Create map path"""
-        map_path = QPainterPath()
-        if raw_coords:
+        map_sector_paths = []
+        sectors_index = minfo.mapping.sectors
+        if raw_coords and isinstance(sectors_index, tuple):
             dist = calc.distance(raw_coords[0], raw_coords[-1])
             angle = max(int(self.wcfg["display_orientation"]), 0)
             angle = angle - angle // 360 * 360
@@ -191,37 +192,67 @@ class Realtime(Overlay):
             total_nodes = len(self.map_scaled) - 1
             skip_node = calc.skip_map_nodes(total_nodes, self.temp_map_size * 3, self.display_detail_level)
             last_skip = 0
+
+            sectors_indexes = (0, *sectors_index)
+            map_sector_path = None
+            # Sector map path
             for index, coords in enumerate(self.map_scaled):
-                if index == 0:
-                    map_path.moveTo(*coords)
+                if index in sectors_indexes:
+                    last_skip = 0
+                    if map_sector_path:  # close previous sector path
+                        map_sector_path.lineTo(*coords)
+                    # Create new sector path
+                    map_sector_path = QPainterPath()
+                    map_sector_path.moveTo(*coords)
+                    # Add to sector path list
+                    map_sector_paths.append(map_sector_path)
                 elif index >= total_nodes:  # don't skip last node
-                    map_path.lineTo(*coords)
+                    map_sector_path.lineTo(*coords)
                 elif last_skip >= skip_node:
-                    map_path.lineTo(*coords)
+                    map_sector_path.lineTo(*coords)
+                    last_skip = 0
+                last_skip += 1
+
+            # Map full path
+            map_full_path = QPainterPath()
+            for index, coords in enumerate(self.map_scaled):
+                if index in sectors_indexes:
+                    last_skip = 0
+                    if index == 0:
+                        map_full_path.moveTo(*coords)
+                    else:
+                        map_full_path.lineTo(*coords)
+                elif index >= total_nodes:  # don't skip last node
+                    map_full_path.lineTo(*coords)
+                elif last_skip >= skip_node:
+                    map_full_path.lineTo(*coords)
                     last_skip = 0
                 last_skip += 1
 
             # Close map loop if start & end distance less than 500 meters
             if dist < 500:
-                map_path.closeSubpath()
+                map_sector_path.lineTo(*self.map_scaled[0])
+                map_full_path.closeSubpath()
                 self.circular_map = True
             else:
                 self.circular_map = False
 
         # Temp(circular) map
         else:
+            map_full_path = QPainterPath()
+            map_sector_paths.append(map_full_path)
             self.map_scaled = None
             self.circular_map = True
             self.map_orient = 0
-            map_path.addEllipse(
+            map_full_path.addEllipse(
                 self.area_margin,
                 self.area_margin,
                 self.temp_map_size,
                 self.temp_map_size,
             )
-        return map_path
+        return map_sector_paths, map_full_path
 
-    def draw_map_image(self, map_path, circular_map=True):
+    def draw_map_image(self, map_sector_paths: list, map_full_path, circular_map=True):
         """Draw map image separately"""
         if self.wcfg["show_background"]:
             self.pixmap_map.fill(self.wcfg["background_color"])
@@ -236,27 +267,35 @@ class Realtime(Overlay):
             brush.setColor(self.wcfg["background_color_map"])
             painter.setBrush(brush)
             painter.setPen(Qt.NoPen)
-            painter.drawPath(map_path)
+            painter.drawPath(map_full_path)
             painter.setBrush(Qt.NoBrush)
 
-        # Set pen style
+        # Set map pen style
         pen = QPen()
         pen.setJoinStyle(Qt.RoundJoin)
+        pen.setCapStyle(Qt.FlatCap)
 
         # Draw map outline
         if self.wcfg["map_outline_width"] > 0:
             pen.setWidth(self.wcfg["map_width"] + self.wcfg["map_outline_width"])
             pen.setColor(self.wcfg["map_outline_color"])
             painter.setPen(pen)
-            painter.drawPath(map_path)
+            painter.drawPath(map_full_path)
 
         # Draw map
+        map_colors = (
+            self.wcfg["map_color_sector_1"],
+            self.wcfg["map_color_sector_2"],
+            self.wcfg["map_color_sector_3"],
+        )
         pen.setWidth(self.wcfg["map_width"])
-        pen.setColor(self.wcfg["map_color"])
-        painter.setPen(pen)
-        painter.drawPath(map_path)
+        for map_sector_path, map_color in zip(map_sector_paths, map_colors):
+            pen.setColor(map_color)
+            painter.setPen(pen)
+            painter.drawPath(map_sector_path)
 
-        # Draw sector
+        # Draw sector line
+        pen.setCapStyle(Qt.SquareCap)
         if self.map_scaled:
             # SF line
             if self.wcfg["show_start_line"]:

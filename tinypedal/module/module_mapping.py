@@ -310,7 +310,7 @@ class MapRecorder:
             filepath=self._filepath,
             filename=filename,
         )
-        if raw_coords and raw_dists:
+        if raw_coords and raw_dists and sectors_index:
             self.output.coords = raw_coords
             self.output.dists = raw_dists
             self.output.sectors = sectors_index

@@ -45,6 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
+        ((2, 46, 2), _user_prior_2_46_2),  # 2026-05-19
         ((2, 44, 2), _user_prior_2_44_2),  # 2026-03-29
         ((2, 43, 0), _user_prior_2_43_0),  # 2026-03-09
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
@@ -68,6 +69,16 @@ def _global_prior_2_43_0(dict_user: dict):
 
 
 # User setting update function
+def _user_prior_2_46_2(dict_user: dict):
+    # Update map color in track_map widget
+    track_map = dict_user.get("track_map")
+    if isinstance(track_map, dict):
+        if "map_color" in track_map:
+            track_map["map_color_sector_1"] = track_map["map_color"]
+            track_map["map_color_sector_2"] = track_map["map_color"]
+            track_map["map_color_sector_3"] = track_map["map_color"]
+
+
 def _user_prior_2_44_2(dict_user: dict):
     # Update prefix in laps_and_position widget
     laps_and_position = dict_user.get("laps_and_position")

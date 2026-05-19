@@ -6,6 +6,9 @@ WIP
 * Traffic Widget
   - Added "show_race_leader", "show_slower_ahead", "show_faster_behind" options to show or hide corresponding columns (requested by user "louisgendron26").
 
+* Track map Widget
+  - Added "map_color_sector_*" options, which allows customizing each sector color individually on map (requested by user "Wigg1es").
+
 * Relative, Rivals, Standings Widget
   - Added "show_average_laptime" option (requested by user "Levis1234", "DyniW"), which shows average lap time calculated from (five) most recent laps.
 

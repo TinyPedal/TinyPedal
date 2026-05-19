@@ -4077,6 +4077,9 @@ Show widget background.
     show_map_background
 Show background of the inner map area. This option only works for circular type tracks.
 
+    map_color_sector_*
+Set map sector color.
+
     map_width
 Set track map line width.
 
