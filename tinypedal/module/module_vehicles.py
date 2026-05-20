@@ -250,7 +250,7 @@ def update_vehicle_data(
             data.isValidLap = last_laptime > 0
             data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last
 
-            update_stint_usage(data, laps_completed, fuel_remaining)
+            update_stint_usage(data, fuel_remaining)
 
             # Update counter
             total_completed_laps += laps_completed
@@ -388,14 +388,14 @@ def calc_gap_behind_leader(index: int) -> float:
     return api.read.timing.behind_leader(index)
 
 
-def update_stint_usage(data: VehicleDataSet, laps_completed: int, fuel_remaining: float) -> None:
+def update_stint_usage(data: VehicleDataSet, fuel_remaining: float) -> None:
     """Update stint usage data"""
     (ve_remaining, ve_used, total_laps_done, stint_laps_est, stint_laps_done
      ) = api.read.vehicle.stint_usage(data.driverName)
 
     # Estimated stint laps
     if stint_laps_done <= 0:
-        stint_laps_done = laps_completed - data.pitTimer.lap_stopped
+        stint_laps_done = data.pitTimer.laps
 
     if stint_laps_est <= 0:
         stint_laps_est = stint_laps_done + data.fuelHistory.laps

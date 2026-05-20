@@ -242,7 +242,11 @@ class DeltaFuelHistory:
 
 
 class VehicleSpeedTrap:
-    """Vehicle speed trap"""
+    """Vehicle speed trap
+
+    Attributes:
+        speed: Speed(m/s) at speed trap.
+    """
 
     __slots__ = (
         "_record_next",
@@ -290,13 +294,20 @@ class VehicleSpeedTrap:
 
 
 class VehiclePitTimer:
-    """Vehicle pit timer"""
+    """Vehicle pit timer
+
+    Attributes:
+        elapsed: Total time spent in pit.
+        stopped: Total time spent while stopped in pit.
+        pitting: Is pitting in or out.
+        laps: Total laps done since last pit stop.
+    """
 
     __slots__ = (
         "elapsed",
         "stopped",
         "pitting",
-        "lap_stopped",
+        "laps",
         "_pitin_time",
         "_pitstop_time",
         "_last_state",
@@ -307,7 +318,7 @@ class VehiclePitTimer:
         self.elapsed: float = 0.0
         self.stopped: float = 0.0
         self.pitting: bool = False
-        self.lap_stopped: int = 0
+        self.laps: int = 0
         self._pitin_time: float = 0.0
         self._pitstop_time: float = 0.0
         self._last_state: int = 0
@@ -351,7 +362,7 @@ class VehiclePitTimer:
                 self._last_pit_lap = laps_done
         # Check whether is pitting lap
         self.pitting = (in_pit > 0 or laps_done == self._last_pit_lap)
-        self.lap_stopped = self._last_pit_lap
+        self.laps = laps_done - self._last_pit_lap
 
 
 class VehicleDataSet:

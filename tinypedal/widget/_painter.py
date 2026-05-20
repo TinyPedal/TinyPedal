@@ -586,7 +586,7 @@ class MultiCompounds(QWidget):
         painter = QPainter(self)
         painter.fillRect(0, 0, self._width, self._height, self.bg)
         for index, compound in enumerate(self.compounds):
-            if not compound:
+            if compound == "":
                 continue
             self._pen_text.setColor(self.colors[index])
             painter.setPen(self._pen_text)
@@ -597,4 +597,97 @@ class MultiCompounds(QWidget):
                 self._height,
                 self._alignment,
                 compound,
+            )
+
+
+class DeltaLapTime(QWidget):
+    """Delta lap time text"""
+
+    def __init__(
+        self,
+        parent,
+        font: QFont | None = None,
+        count: int = 5,
+        spacing: int = 0,
+        padding: int = 0,
+        width: int = 0,
+        height: int = 0,
+        offset_y: int = 0,
+        fg_color: str = "",
+        bg_color: str = "",
+        inverted: bool = False,
+        alignment: Qt.Alignment = Qt.AlignCenter,
+        last: Any | None = None,
+    ):
+        super().__init__(parent)
+        if font is not None:
+            self.setFont(font)
+
+        self.setFixedWidth(count * (width + spacing) + padding)
+        self.setFixedHeight(height)
+
+        self.state = None
+        self.last = last
+        fg = fg_color if fg_color else Qt.transparent
+        self.bg = bg_color if bg_color else Qt.transparent
+        self._count = count
+        self._alignment = alignment
+        self._offset_y = offset_y
+        self._padding = padding // 2
+        self._word_width = width + spacing
+        self._pen_text = QPen()
+        self._width = self.width()
+        self._height = self.height()
+        self._inverted = inverted
+        self.delta = ("",) * count
+        self.colors = (fg,) * count
+        self.is_player = False
+
+    def clear(self):
+        """Clear display"""
+        self.delta = ("",) * self._count
+        self.colors = (Qt.transparent,) * self._count
+        self.bg = Qt.transparent
+        self.is_player = False
+
+    def resizeEvent(self, event):
+        """Update size info"""
+        self._width = self.width()
+        self._height = self.height()
+
+    def paintEvent(self, event):
+        """Draw"""
+        painter = QPainter(self)
+        painter.fillRect(0, 0, self._width, self._height, self.bg)
+        for index, delta in enumerate(
+            reversed(self.delta) if self._inverted else self.delta
+        ):
+            if delta == "":
+                continue
+
+            if -999 < delta < 0:  # player time gain
+                text = f"{-delta:.1f}"[:3].strip(".")
+                color_index = 1
+            elif 0 < delta < 999:  # player time loss
+                text = f"{delta:.1f}"[:3].strip(".")
+                color_index = 2
+            elif delta == 0:
+                text = "0.0"
+                color_index = 0
+            else:
+                text = "-.-"
+                color_index = 0
+
+            if self.is_player:
+                color_index = -1
+
+            self._pen_text.setColor(self.colors[color_index])
+            painter.setPen(self._pen_text)
+            painter.drawText(
+                self._padding + self._word_width * index,
+                self._offset_y,
+                self._word_width,
+                self._height,
+                self._alignment,
+                text,
             )

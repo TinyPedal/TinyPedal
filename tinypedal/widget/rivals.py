@@ -29,7 +29,7 @@ from ..module_info import minfo
 from ..userfile.custom_image import load_brand_logo_image
 from ..userfile.heatmap import select_compound_color, select_compound_symbol
 from ._base import Overlay
-from ._painter import MultiCompounds, RawFrame
+from ._painter import DeltaLapTime, MultiCompounds
 
 
 class Realtime(Overlay):
@@ -244,12 +244,18 @@ class Realtime(Overlay):
                 self.wcfg["font_color_delta_laptime_loss"],
             )
             self.bars_dlt = tuple(
-                self.set_delta_table(
-                    font_m=font_m,
-                    width=4 * font_m.width,
-                    columns=self.max_delta,
-                    bar_padx=bar_padx // 2,
-                ) for _ in range(self.veh_range)
+                DeltaLapTime(
+                    parent=self,
+                    count=self.max_delta,
+                    padding=bar_padx,
+                    width=font_m.width * 4,
+                    height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.bar_style_dlt_delta[0],
+                    bg_color=self.wcfg["background_color_delta_laptime"],
+                    inverted=self.wcfg["show_inverted_delta_laptime_layout"],
+                )
+                for _ in range(self.veh_range)
             )
             self.set_grid_layout_table_column(
                 layout=layout,
@@ -700,22 +706,8 @@ class Realtime(Overlay):
         """Vehicle delta laptime"""
         if target.last != data:
             target.last = data
-            if data[-1]:
-                for bar_delta, delta in zip(target.bar_set, data[0]):
-                    if -999 < delta < 0:  # player time gain
-                        text = f"{-delta:.1f}"[:3].strip(".")
-                        color_index = 1
-                    elif 0 < delta < 999:  # player time loss
-                        text = f"{delta:.1f}"[:3].strip(".")
-                        color_index = 2
-                    elif delta == 0:
-                        text = "0.0"
-                        color_index = 0
-                    else:
-                        text = "-.-"
-                        color_index = 0
-                    bar_delta.text = text
-                    bar_delta.fg = self.bar_style_dlt_delta[color_index]
+            target.delta = data[0]
+            target.colors = self.bar_style_dlt_delta
             self.toggle_visibility(target, data[-1])
 
     def update_pic(self, target, *data):
@@ -909,22 +901,3 @@ class Realtime(Overlay):
         if isinstance(gap_behind_class, int):
             return f"{'+-'[is_ahead]}{gap_behind_class:.0f}L"
         return f"{'+-'[is_ahead]}{gap_behind_class:.{self.int_decimals}f}"
-
-    def set_delta_table(self, font_m, width: int, columns: int, bar_padx: int) -> RawFrame:
-        """Set delta laptime table"""
-        layout = self.set_grid_layout()
-        layout.setContentsMargins(bar_padx, 0, bar_padx, 0)
-        bar_temp = RawFrame(self, bg_color=self.wcfg["background_color_delta_laptime"])
-        bar_temp.setLayout(layout)
-        bar_temp.bar_set = self.set_rawtext(
-            fixed_width=width,
-            fixed_height=font_m.height,
-            offset_y=font_m.voffset,
-            count=columns,
-        )
-        self.set_grid_layout_table_row(
-            layout=layout,
-            targets=bar_temp.bar_set,
-            right_to_left=self.wcfg["show_inverted_delta_laptime_layout"],
-        )
-        return bar_temp

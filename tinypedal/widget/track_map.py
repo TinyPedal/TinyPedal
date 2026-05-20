@@ -195,7 +195,7 @@ class Realtime(Overlay):
 
             sectors_indexes = (0, *sectors_index)
             map_sector_path = None
-            # Sector map path
+            # Map sector path
             for index, coords in enumerate(self.map_scaled):
                 if index in sectors_indexes:
                     last_skip = 0
