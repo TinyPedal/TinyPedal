@@ -567,12 +567,12 @@ class MultiCompounds(QWidget):
         self._pen_text = QPen()
         self._width = self.width()
         self._height = self.height()
-        self.compounds = ("",) * count
+        self.compounds = ()
         self.colors = (fg,) * count
 
     def clear(self):
         """Clear display"""
-        self.compounds = ("",) * self._count
+        self.compounds = ()
         self.colors = (Qt.transparent,) * self._count
         self.bg = Qt.transparent
 
@@ -615,6 +615,9 @@ class DeltaLapTime(QWidget):
         offset_y: int = 0,
         fg_color: str = "",
         bg_color: str = "",
+        fg_color_gain: str = "",
+        fg_color_loss: str = "",
+        fg_color_player: str = "",
         inverted: bool = False,
         alignment: Qt.Alignment = Qt.AlignCenter,
         last: Any | None = None,
@@ -628,8 +631,11 @@ class DeltaLapTime(QWidget):
 
         self.state = None
         self.last = last
-        fg = fg_color if fg_color else Qt.transparent
+        self.fg = fg_color if fg_color else Qt.transparent
         self.bg = bg_color if bg_color else Qt.transparent
+        self.fg_gain = fg_color_gain
+        self.fg_loss = fg_color_loss
+        self.fg_player = fg_color_player
         self._count = count
         self._alignment = alignment
         self._offset_y = offset_y
@@ -639,14 +645,12 @@ class DeltaLapTime(QWidget):
         self._width = self.width()
         self._height = self.height()
         self._inverted = inverted
-        self.delta = ("",) * count
-        self.colors = (fg,) * count
+        self.delta = ()
         self.is_player = False
 
     def clear(self):
         """Clear display"""
-        self.delta = ("",) * self._count
-        self.colors = (Qt.transparent,) * self._count
+        self.delta = ()
         self.bg = Qt.transparent
         self.is_player = False
 
@@ -667,21 +671,21 @@ class DeltaLapTime(QWidget):
 
             if -999 < delta < 0:  # player time gain
                 text = f"{-delta:.1f}"[:3].strip(".")
-                color_index = 1
+                fg_color = self.fg_gain
             elif 0 < delta < 999:  # player time loss
                 text = f"{delta:.1f}"[:3].strip(".")
-                color_index = 2
+                fg_color = self.fg_loss
             elif delta == 0:
                 text = "0.0"
-                color_index = 0
+                fg_color = self.fg
             else:
                 text = "-.-"
-                color_index = 0
+                fg_color = self.fg
 
             if self.is_player:
-                color_index = -1
+                fg_color = self.fg_player
 
-            self._pen_text.setColor(self.colors[color_index])
+            self._pen_text.setColor(fg_color)
             painter.setPen(self._pen_text)
             painter.drawText(
                 self._padding + self._word_width * index,

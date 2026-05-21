@@ -238,11 +238,6 @@ class Realtime(Overlay):
             )
         # Delta laptime
         if self.wcfg["show_delta_laptime"]:
-            self.bar_style_dlt_delta = (
-                self.wcfg["font_color_delta_laptime"],
-                self.wcfg["font_color_delta_laptime_gain"],
-                self.wcfg["font_color_delta_laptime_loss"],
-            )
             self.bars_dlt = tuple(
                 DeltaLapTime(
                     parent=self,
@@ -251,8 +246,10 @@ class Realtime(Overlay):
                     width=font_m.width * 4,
                     height=font_m.height,
                     offset_y=font_m.voffset,
-                    fg_color=self.bar_style_dlt_delta[0],
+                    fg_color=self.wcfg["font_color_delta_laptime"],
                     bg_color=self.wcfg["background_color_delta_laptime"],
+                    fg_color_gain=self.wcfg["font_color_delta_laptime_gain"],
+                    fg_color_loss=self.wcfg["font_color_delta_laptime_loss"],
                     inverted=self.wcfg["show_inverted_delta_laptime_layout"],
                 )
                 for _ in range(self.veh_range)
@@ -707,7 +704,6 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.delta = data[0]
-            target.colors = self.bar_style_dlt_delta
             self.toggle_visibility(target, data[-1])
 
     def update_pic(self, target, *data):
