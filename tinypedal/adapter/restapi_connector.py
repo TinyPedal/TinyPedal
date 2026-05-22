@@ -30,7 +30,7 @@ from itertools import chain
 from typing import Any, Callable, NamedTuple
 
 from .. import realtime_state
-from ..async_request import http_get, set_header_get
+from ..async_request import http_get, resolve_hostname, set_header_get
 from ..const_common import TYPE_JSON
 
 logger = logging.getLogger(__name__)
@@ -190,7 +190,7 @@ class RestAPIConnector:
         logger.info("RestAPI: CONNECTING")
         # Load http connection setting
         sim_http = HttpSetup(
-            host=self._cfg["url_host"],
+            host=resolve_hostname(self._cfg["url_host"], self._cfg["url_port"]),
             port=self._cfg["url_port"],
             timeout=min(max(self._cfg["connection_timeout"], 0.5), 10),
             retry=min(max(int(self._cfg["connection_retry"]), 0), 10),

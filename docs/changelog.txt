@@ -14,6 +14,7 @@ WIP
 
 * Misc
   - Added new contributor "RenBidge" to contributors.md in "Implementation" section.
+  - Auto resolves local hostname in case "localhost" fails to connect (required for accessing "Rest API").
 
 2.46.0 (2026-04-18)
 -----------------------------

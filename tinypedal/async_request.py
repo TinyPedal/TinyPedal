@@ -22,14 +22,30 @@ Asynchronous request
 
 from __future__ import annotations
 
-from asyncio import StreamReader, open_connection, wait_for
+import asyncio
+import logging
+from asyncio import StreamReader, create_task, open_connection, wait_for
 from contextlib import asynccontextmanager
+from functools import partial
 from time import perf_counter
 from typing import Awaitable
 
 # Default limit from asyncio.open_connection is 2 ** 16
 # Lower limit to avoid getting incomplete data
 BUFFER_LIMIT = 32768  # 2 ** 15
+
+logger = logging.getLogger(__name__)
+
+
+def resolve_hostname(host: str, port: int, timeout: float = 3) -> str:
+    """Resolve hostname"""
+    if host == "localhost" or host.startswith("127."):
+        host_resolved = asyncio.run(
+            localhost_resolve({host, "localhost", "127.0.0.1"}, port, timeout)
+        )
+        if host_resolved:
+            return host_resolved
+    return host
 
 
 def set_header_get(uri: str = "/", host: str = "localhost", *headers: str) -> bytes:
@@ -114,6 +130,52 @@ async def get_response(request: bytes, host: str, port: int, time_out: float, ss
         return b""
 
 
+async def latency_test(result: list, request: bytes, host: str, port: int, time_out: float, ssl: bool = False) -> tuple[str, float]:
+    """Test hostname connection latency, returns hostname, latency (seconds)"""
+    start = perf_counter()
+    await get_response(request, host, port, time_out, ssl)
+    end = perf_counter()
+    if not result:
+        result.append((host, end - start))
+    return host, end - start
+
+
+def cancel_tasks(_, task_group: tuple[asyncio.Task, ...]) -> None:
+    """Cancel task group"""
+    for task in task_group:
+        task.cancel()
+
+
+async def localhost_resolve(hostnames: set[str], port: int, timeout: float = 3) -> str:
+    """Resolve localhost name, returns fastest address (or empty if none)"""
+    # Set task
+    result = []
+    task_group = []
+    for hostname in hostnames:
+        task = create_task(latency_test(result, "/", hostname, port, timeout))
+        task_group.append(task)
+        # Cancel all task on first response
+        task.add_done_callback(partial(cancel_tasks, task_group=task_group))
+    # Start task
+    for task in task_group:
+        try:
+            await task
+        except (asyncio.CancelledError, BaseException):
+            pass
+    # Get fastest host name
+    if result:
+        host, latency = result[0]
+        if latency < 2:
+            logger.info(
+                "RestAPI: local hostname resolved as '%s' (response %sms)",
+                host,
+                latency * 1000000 // 1 / 1000,
+            )
+            return host
+    logger.warning("RestAPI: unable to resolve local hostname, abort")
+    return ""
+
+
 async def _print_result(test_func: Awaitable):
     """Test result"""
     start = perf_counter()
@@ -127,20 +189,20 @@ async def _test_async_get(timeout: float):
     """Test run"""
     req1 = set_header_get("/rest/sessions/setting/SESSSET_race_timescale")
     req2 = set_header_get("/rest/sessions/weather")
-    req3 = set_header_get("/rest/sessions")
-    req4 = set_header_get("/rest/garage/getPlayerGarageData")
+    rf2_host = await localhost_resolve({"localhost", "127.0.0.1"}, 5397, timeout)
     task_rf2 = [
-        _print_result(get_response(req1, "localhost", 5397, timeout)),  # RF2
-        _print_result(get_response(req2, "localhost", 5397, timeout)),  # RF2
+        _print_result(get_response(req1, rf2_host, 5397, timeout)),  # RF2
+        _print_result(get_response(req2, rf2_host, 5397, timeout)),  # RF2
     ]
+    req3 = set_header_get("/rest/sessions/weather")
+    req4 = set_header_get("/rest/strategy/pitstop-estimate")
+    lmu_host = await localhost_resolve({"localhost", "127.0.0.1"}, 6397, timeout)
     task_lmu = [
-        _print_result(get_response(req3, "localhost", 6397, timeout)),  # LMU
-        _print_result(get_response(req4, "localhost", 6397, timeout)),  # LMU
+        _print_result(get_response(req3, lmu_host, 6397, timeout)),  # LMU
+        _print_result(get_response(req4, lmu_host, 6397, timeout)),  # LMU
     ]
     await asyncio.gather(*task_rf2, *task_lmu)
 
 
 if __name__ == "__main__":
-    import asyncio
-
     asyncio.run(_test_async_get(1))

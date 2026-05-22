@@ -40,7 +40,7 @@ from PySide2.QtWidgets import (
 )
 
 from ..api_control import api
-from ..async_request import get_response, set_header_get
+from ..async_request import get_response, resolve_hostname, set_header_get
 from ..const_api import API_LMU_ALIAS, API_LMU_CONFIG, API_RF2_ALIAS, API_RF2_CONFIG
 from ..const_file import ConfigType, FileFilter
 from ..setting import cfg, copy_setting
@@ -187,10 +187,10 @@ class VehicleBrandEditor(BaseEditor):
 
     def import_from_restapi(self, sim_name: str, url_host: str, url_port: int, resource_name: str):
         """Import brand from Rest API"""
-        request_header = set_header_get(resource_name, url_host)
-        time_out = 3
-
         try:
+            url_host = resolve_hostname(url_host, url_port)
+            request_header = set_header_get(resource_name, url_host)
+            time_out = 3
             raw_veh_data = asyncio.run(get_response(request_header, url_host, url_port, time_out))
             self.parse_brand_data(json.loads(raw_veh_data))
         except (AttributeError, TypeError, IndexError, KeyError, ValueError,

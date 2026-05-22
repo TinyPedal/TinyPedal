@@ -433,7 +433,7 @@ Set update interval (in milliseconds) for requesting data from Rest API.
 Note, minimum update interval is hard-limited to `200` milliseconds or higher, and some data are accessed `only once` per garage-exit. Update interval is auto-delayed up to `5` seconds if has not received new data recently. See individual data description for details.
 
     url_host
-Set Rest API host address. Default is `localhost`.
+Set Rest API host address. Host address must match `WebUI bind` value that sets in `LMU` (UserData\player\Settings.JSON) setting file in order to successfully connect to Rest API and receive data. The default host value for `LMU` is `localhost`, which is equivalent to `127.0.0.1`.
 
     url_port
 Set port for Rest API host address. Port value must match `WebUI port` value that sets in `LMU` (UserData\player\Settings.JSON) setting file in order to successfully connect to Rest API and receive data. The default port value for `LMU` is `6397`.
