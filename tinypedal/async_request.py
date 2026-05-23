@@ -130,32 +130,36 @@ async def get_response(request: bytes, host: str, port: int, time_out: float, ss
         return b""
 
 
-async def latency_test(result: list, request: bytes, host: str, port: int, time_out: float, ssl: bool = False) -> tuple[str, float]:
+async def latency_test(request: bytes, host: str, port: int, time_out: float, ssl: bool = False) -> tuple[str, float]:
     """Test hostname connection latency, returns hostname, latency (seconds)"""
     start = perf_counter()
     await get_response(request, host, port, time_out, ssl)
     end = perf_counter()
-    if not result:
-        result.append((host, end - start))
     return host, end - start
 
 
-def cancel_tasks(_, task_group: tuple[asyncio.Task, ...]) -> None:
+def cancel_tasks(current_task: asyncio.Task, task_group: list[asyncio.Task], result: list) -> None:
     """Cancel task group"""
-    for task in task_group:
-        task.cancel()
+    if not result:
+        result.append(current_task.result())
+    if task_group:
+        for task in reversed(task_group):
+            task.cancel()
+            task_group.remove(task)
 
 
 async def localhost_resolve(hostnames: set[str], port: int, timeout: float = 3) -> str:
     """Resolve localhost name, returns fastest address (or empty if none)"""
     # Set task
+    task_group = [
+        create_task(latency_test("/", hostname, port, timeout))
+        for hostname in hostnames
+    ]
+    # Cancel all task on first response
     result = []
-    task_group = []
-    for hostname in hostnames:
-        task = create_task(latency_test(result, "/", hostname, port, timeout))
-        task_group.append(task)
-        # Cancel all task on first response
-        task.add_done_callback(partial(cancel_tasks, task_group=task_group))
+    cancel_func = partial(cancel_tasks, task_group=task_group, result=result)
+    for task in task_group:
+        task.add_done_callback(cancel_func)
     # Start task
     for task in task_group:
         try:
@@ -165,14 +169,14 @@ async def localhost_resolve(hostnames: set[str], port: int, timeout: float = 3) 
     # Get fastest host name
     if result:
         host, latency = result[0]
-        if latency < 2:
+        if latency < 1:  # accept response time less than 1 second
             logger.info(
                 "RestAPI: local hostname resolved as '%s' (response %sms)",
                 host,
                 latency * 1000000 // 1 / 1000,
             )
             return host
-    logger.warning("RestAPI: unable to resolve local hostname, abort")
+    logger.warning("RestAPI: unable to resolve local hostname")
     return ""
 
 
