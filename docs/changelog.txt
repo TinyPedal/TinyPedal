@@ -1,5 +1,9 @@
 WIP
 -----------------------------
+* Flag Widget
+  - Added "show_traffic_while_off_track" option (requested by user "edurauseo"), which shows nearest incoming on-track traffic indicator while off-track. Note, only all four wheels that are on either grass, dirt, or gravel is considered off-track.
+  - Renamed "traffic_pitout_duration" option to "traffic_extended_duration", which sets traffic indicator extended duration (seconds) after pitting out, or recently recovered from off-track or low speed.
+
 * Lift and coast LED Widget
   - Added "show_wheel_lock" & "show_wheel_slip" options (implemented by @RenBidge).
 

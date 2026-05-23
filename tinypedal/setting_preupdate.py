@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 46, 2), _user_prior_2_46_2),  # 2026-05-19
+        ((2, 46, 4), _user_prior_2_46_4),  # 2026-05-23
         ((2, 44, 2), _user_prior_2_44_2),  # 2026-03-29
         ((2, 43, 0), _user_prior_2_43_0),  # 2026-03-09
         ((2, 41, 0), _user_prior_2_41_0),  # 2026-02-20
@@ -69,7 +69,12 @@ def _global_prior_2_43_0(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_46_2(dict_user: dict):
+def _user_prior_2_46_4(dict_user: dict):
+    # Update flag widget
+    flag = dict_user.get("flag")
+    if isinstance(flag, dict):
+        if "traffic_pitout_duration" in flag:
+            flag["traffic_extended_duration"] = flag["traffic_pitout_duration"]
     # Update map color in track_map widget
     track_map = dict_user.get("track_map")
     if isinstance(track_map, dict):

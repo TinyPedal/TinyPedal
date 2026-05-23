@@ -228,8 +228,9 @@ class Realtime(Overlay):
         self.blue_timer = BlueFlagTimer(self.wcfg["show_blue_flag_for_race_only"])
         self.traffic_timer = TrafficTimer(
             self.wcfg["traffic_maximum_time_gap"],
-            self.wcfg["traffic_pitout_duration"],
+            self.wcfg["traffic_extended_duration"],
             self.wcfg["traffic_low_speed_threshold"],
+            self.wcfg["show_traffic_while_off_track"],
         )
 
     def post_update(self):
@@ -557,19 +558,27 @@ class TrafficTimer:
         "_max_time_gap",
         "_pitout_duration",
         "_low_speed_threshold",
+        "_show_off_track",
     )
 
-    def __init__(self, max_time_gap: bool, pitout_duration: float, low_speed_threshold: float):
+    def __init__(self, max_time_gap: bool, pitout_duration: float, low_speed_threshold: float, show_off_track: bool):
         self._timer_start = 0.0
         self._last_in_pits = 0
         self._max_time_gap = max_time_gap
         self._pitout_duration = pitout_duration
         self._low_speed_threshold = low_speed_threshold
+        self._show_off_track = show_off_track
 
     def update(self, in_pits: bool, elapsed_time: float) -> float:
         """Check incoming traffic and time gap"""
         if self._last_in_pits > in_pits:
             self._timer_start = elapsed_time
+        elif not in_pits:
+            if (self._show_off_track and api.read.wheel.offroad() > 3) or (
+                api.read.vehicle.speed() < self._low_speed_threshold
+            ):
+                self._timer_start = elapsed_time
+
         self._last_in_pits = in_pits
 
         if self._timer_start and elapsed_time - self._timer_start > self._pitout_duration:
@@ -577,8 +586,7 @@ class TrafficTimer:
 
         traffic_time = minfo.vehicles.nearestTraffic
         if traffic_time < self._max_time_gap:
-            if (api.read.vehicle.speed() < self._low_speed_threshold > 0
-                or in_pits or self._timer_start):
+            if in_pits or self._timer_start:
                 return traffic_time
         return MAX_SECONDS
 

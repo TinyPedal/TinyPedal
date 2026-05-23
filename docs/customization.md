@@ -2298,11 +2298,14 @@ Set display duration(seconds) for green flag text before it disappears. Default 
     show_traffic
 Show nearest incoming on-track traffic indicator (time gap) while in pit lane or after pit-out.
 
+    show_traffic_while_off_track
+Show nearest incoming on-track traffic indicator while off-track. Note, only all four wheels that are on either grass, dirt, or gravel is considered off-track.
+
     traffic_maximum_time_gap
 Set maximum time gap (seconds) of incoming on-track traffic.
 
-    traffic_pitout_duration
-Set traffic indicator extended duration (seconds) after pit-out.
+    traffic_extended_duration
+Set traffic indicator extended duration (seconds) after pitting out, or recently recovered from off-track or low speed.
 
     traffic_low_speed_threshold
 Set low speed threshold for showing nearest incoming traffic indicator. Default is `8` m/s (roughly 28kph). Set to `0` to disable. This option can be useful to quickly determine nearby traffic situation after a spin or crash.
