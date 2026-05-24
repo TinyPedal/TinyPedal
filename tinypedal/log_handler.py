@@ -34,7 +34,7 @@ def new_stream_handler(_logger: logging.Logger, stream) -> logging.StreamHandler
         Stream handler.
     """
     format_console = logging.Formatter(
-        "%(asctime)s %(levelname)s: %(message)s", datefmt="%H:%M:%S"
+        "%(asctime)s.%(msecs)03d %(levelname)s: %(message)s", datefmt="%H:%M:%S"
     )
     _handler = logging.StreamHandler(stream)
     _handler.setFormatter(format_console)
