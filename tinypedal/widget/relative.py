@@ -522,6 +522,39 @@ class Realtime(Overlay):
                 targets=self.bars_dmg,
                 column=self.wcfg["display_order_vehicle_integrity"],
             )
+        # Incidents
+        if self.wcfg["show_incidents"]:
+            self.bar_style_icd = (
+                (
+                    self.wcfg["font_color_incidents_low"],
+                    self.wcfg["background_color_incidents_low"],
+                ),
+                (
+                    self.wcfg["font_color_incidents_high"],
+                    self.wcfg["background_color_incidents_high"],
+                ),
+                (
+                    self.wcfg["font_color_incidents_extreme"],
+                    self.wcfg["background_color_incidents_extreme"],
+                ),
+                (
+                    self.wcfg["font_color_player_incidents"],
+                    self.wcfg["background_color_player_incidents"],
+                ),
+            )
+            self.bars_icd = self.set_rawtext(
+                width=3 * font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_icd[0][0],
+                bg_color=self.bar_style_icd[0][1],
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_icd,
+                column=self.wcfg["display_order_incidents"],
+            )
         # Stint laps
         if self.wcfg["show_stint_laps"]:
             self.bar_style_stl = (
@@ -674,6 +707,9 @@ class Realtime(Overlay):
             # Vehicle integrity
             if self.wcfg["show_vehicle_integrity"]:
                 self.update_dmg(self.bars_dmg[idx], veh_info.vehicleIntegrity, hi_player, state)
+            # Incidents
+            if self.wcfg["show_incidents"]:
+                self.update_icd(self.bars_icd[idx], veh_info.incidents, hi_player, state)
             # Stint laps
             if self.wcfg["show_stint_laps"]:
                 self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, hi_player, state)
@@ -998,6 +1034,29 @@ class Realtime(Overlay):
                 text = f"{hp:d}"
             target.text = text
             target.fg, target.bg = self.bar_style_dmg[color_index]
+            target.update()
+
+    def update_icd(self, target, *data):
+        """Incidents"""
+        if target.last != data:
+            target.last = data
+            score = data[0]
+            if data[1]:  # highlighted player
+                color_index = 3
+            elif score >= self.wcfg["incidents_extreme_threshold"]:
+                color_index = 2
+            elif score >= self.wcfg["incidents_high_threshold"]:
+                color_index = 1
+            else:
+                color_index = 0
+            if not data[-1]:
+                text = ""
+            elif score <= 0:
+                text = "--"
+            else:
+                text = f"x{score:d}"
+            target.text = text
+            target.fg, target.bg = self.bar_style_icd[color_index]
             target.update()
 
     def update_stl(self, target, *data):

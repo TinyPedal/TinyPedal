@@ -455,6 +455,36 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_vehicle_integrity"],
                 hide_start=1,
             )
+        # Incidents
+        if self.wcfg["show_incidents"]:
+            self.bar_style_icd = (
+                (
+                    self.wcfg["font_color_incidents_low"],
+                    self.wcfg["background_color_incidents_low"],
+                ),
+                (
+                    self.wcfg["font_color_incidents_high"],
+                    self.wcfg["background_color_incidents_high"],
+                ),
+                (
+                    self.wcfg["font_color_incidents_extreme"],
+                    self.wcfg["background_color_incidents_extreme"],
+                ),
+            )
+            self.bars_icd = self.set_rawtext(
+                width=3 * font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_icd[0][0],
+                bg_color=self.bar_style_icd[0][1],
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_icd,
+                column=self.wcfg["display_order_incidents"],
+                hide_start=1,
+            )
         # Stint laps
         if self.wcfg["show_stint_laps"]:
             self.bars_stl = self.set_rawtext(
@@ -595,6 +625,9 @@ class Realtime(Overlay):
             # Vehicle integrity
             if self.wcfg["show_vehicle_integrity"]:
                 self.update_dmg(self.bars_dmg[idx], veh_info.vehicleIntegrity, state)
+            # Incidents
+            if self.wcfg["show_incidents"]:
+                self.update_icd(self.bars_icd[idx], veh_info.incidents, state)
             # Stint laps
             if self.wcfg["show_stint_laps"]:
                 self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, state)
@@ -823,6 +856,25 @@ class Realtime(Overlay):
                 text = f"{hp:d}"
             target.text = text
             target.fg, target.bg = self.bar_style_dmg[color_index]
+            self.toggle_visibility(target, data[-1])
+
+    def update_icd(self, target, *data):
+        """Incidents"""
+        if target.last != data:
+            target.last = data
+            score = data[0]
+            if score >= self.wcfg["incidents_extreme_threshold"]:
+                color_index = 2
+            elif score >= self.wcfg["incidents_high_threshold"]:
+                color_index = 1
+            else:
+                color_index = 0
+            if score <= 0:
+                text = "--"
+            else:
+                text = f"x{score:d}"
+            target.text = text
+            target.fg, target.bg = self.bar_style_icd[color_index]
             self.toggle_visibility(target, data[-1])
 
     def update_stl(self, target, *data):

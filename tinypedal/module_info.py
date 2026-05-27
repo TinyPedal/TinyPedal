@@ -404,6 +404,7 @@ class VehicleDataSet:
         "relativeRotatedPositionX",
         "relativeRotatedPositionY",
         "vehicleIntegrity",
+        "incidents",
         "energyRemaining",
         "estimatedStintLaps",
         "currentStintLaps",
@@ -449,6 +450,7 @@ class VehicleDataSet:
         self.relativeRotatedPositionX: float = 0.0
         self.relativeRotatedPositionY: float = 0.0
         self.vehicleIntegrity: float = 0.0
+        self.incidents: int = 0
         self.energyRemaining: float = 0.0
         self.estimatedStintLaps: float = 0.0
         self.currentStintLaps: int = 0

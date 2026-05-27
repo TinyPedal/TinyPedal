@@ -14,6 +14,8 @@ WIP
   - Added "map_color_sector_*" options, which allows customizing each sector color individually on map (requested by user "Wigg1es").
 
 * Relative, Rivals, Standings Widget
+  - Added "show_incidents" option (for "LMU" only), which shows total number of incidents for each driver from current session. This option helps tracking opponent's safeness and cleanness during long race.
+    Note, incidents are counted from vehicle contacts and track cuts only for each individual driver. Incidents are not counted towards team. Incidents are only counted while this APP is running, and reset if changed session or restarted this APP.
   - Added "show_average_laptime" option (requested by user "Levis1234", "DyniW"), which shows average lap time calculated from (five) most recent laps.
 
 * Misc

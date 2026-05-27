@@ -500,7 +500,7 @@ Set update interval (in milliseconds) for requesting data from Rest API.
 Note, minimum update interval is hard-limited to `200` milliseconds or higher, and some data are accessed `only once` per garage-exit. Update interval is auto-delayed up to `5` seconds if has not received new data recently. See individual data description for details.
 
     url_host
-Set Rest API host address. Default is `localhost`.
+Set Rest API host address. The default host value for `RF2` is `localhost`, which is equivalent to `127.0.0.1`.
 
     url_port
 Set port for Rest API host address. Port value must match `WebUI port` value that sets in `RF2` (UserData\player\player.JSON) setting file in order to successfully connect to Rest API and receive data. The default port value for `RF2` is `5397`.
@@ -3793,6 +3793,14 @@ The integrity reading is calculated from hull damage, detachable wheels and part
 - Full integrity (no damage), as `-` (default color grey).
 - High integrity (lightly damaged hull), from `9` to `5` (default color blue).
 - Low integrity (severely damaged hull, and most likely has detached wheels or parts), from `4` to `0` (default color red).
+
+    show_incidents
+Show total number of incidents for each driver from current session. This option helps tracking opponent's safeness and cleanness during long race.
+
+Note, incidents are counted from vehicle contacts and track cuts only for each individual driver. Incidents are not counted towards team. Incidents are only counted while this APP is running, and reset if changed session or restarted this APP.
+
+    incidents_high_threshold, incidents_extreme_threshold
+Set threshold for showing color indication when number of incidents are equal or above.
 
     show_speed_trap
 Show fastest recorded speed of each driver per lap at user-defined speed trap position on track. This option can be useful to keep track of each driver's straight line performance from most recent lap.

@@ -233,6 +233,7 @@ def update_vehicle_data(
             data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.tireCompoundName = api.read.tyre.compound_class(index)
             data.isFinished = api.read.vehicle.finish_state(index) == 1
+            data.incidents = api.read.vehicle.incidents(index)
 
             data.gapBehindNext = calc_gap_behind_next(index)
             data.gapBehindLeader = calc_gap_behind_leader(index)
