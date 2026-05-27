@@ -26,6 +26,7 @@ import ctypes
 import logging
 import threading
 from time import monotonic, sleep
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Sequence
 
 if __name__ == "__main__":  # local import check
@@ -73,6 +74,68 @@ def local_scoring_index(scor_veh: Sequence[lmu_data.LMUVehicleScoring]) -> int:
     return INVALID_INDEX
 
 
+class LMUResults:
+    """LMU results data (extracted from results stream)"""
+
+    DEFAULT = MappingProxyType({
+        "contact_vehicle": 0,
+        "contact_immovable": 0,
+        "track_cut": 0,
+    })
+    __slots__ = (
+        "data",
+        "version",
+        "_last_stream",
+    )
+
+    def __init__(self):
+        self.data = {}
+        self.version = 0
+        self._last_stream = ""
+
+    def check_missing(self, driver: bytes):
+        """Check & add missing driver"""
+        if driver not in self.data:
+            self.data[driver] = self.DEFAULT.copy()
+
+    def update(self, stream: str):
+        """Update results data"""
+        # Check stream
+        if self._last_stream == stream:
+            return
+        self._last_stream = stream
+        if not stream:
+            return
+        # Parse stream
+        results_data = self.data
+        for line in stream.split(b"\n"):
+            if not line:
+                continue
+            # Log incidents
+            if line.startswith(b"<Incident"):
+                pos_beg = line.find(b">")
+                if pos_beg > 8:
+                    pos_beg += 1
+                    pos_end = line.find(b"(", pos_beg)
+                    driver = line[pos_beg:pos_end]
+                    self.check_missing(driver)
+                    if b"with another vehicle" in line:
+                        results_data[driver]["contact_vehicle"] += 1
+                    else:
+                        results_data[driver]["contact_immovable"] += 1
+                continue
+            # Log track cuts
+            if line.startswith(b"<TrackLimits"):
+                if b"No Further Action" not in line:
+                    pos_beg = line.find(b"Driver=")
+                    if pos_beg > 11:
+                        pos_beg += 8
+                        pos_end = line.find(b'"', pos_beg)
+                        driver = line[pos_beg:pos_end]
+                        self.check_missing(driver)
+                        results_data[driver]["track_cut"] += 1
+
+
 class MMapDataSet:
     """Create mmap data set"""
 
@@ -113,6 +176,7 @@ class SyncData:
         player_scor_index: Local player scoring index.
         player_scor: Local player scoring data.
         player_tele: Local player telemetry data.
+        results: data from result stream.
     """
 
     __slots__ = (
@@ -126,6 +190,7 @@ class SyncData:
         "player_scor",
         "player_tele",
         "dataset",
+        "results",
     )
 
     def __init__(self) -> None:
@@ -140,6 +205,7 @@ class SyncData:
         self.player_scor = None
         self.player_tele = None
         self.dataset = MMapDataSet()
+        self.results = LMUResults()
 
     def __del__(self):
         logger.info("sharedmemory: GC: SyncData")
@@ -258,6 +324,8 @@ class SyncData:
                 self.dataset.shmm.data.telemetry,
                 self._tele_indexes,
             )
+            version_update = self.dataset.shmm.data.scoring.scoringInfo.mCurrentET
+
             # Update player data & index
             if not data_freezed:
                 # Get player data
@@ -274,8 +342,13 @@ class SyncData:
                         self.__sync_player_tele()
                         self.paused = True
                         logger.info("sharedmemory: UPDATING: player data paused")
+                # Result stream
+                if self.results.version != version_update:
+                    if self.results.version > version_update:
+                        self.results.data.clear()
+                    self.results.version = version_update
+                    self.results.update(self.dataset.shmm.data.scoring.scoringStream)
 
-            version_update = self.dataset.shmm.data.scoring.scoringInfo.mCurrentET
             if last_version_update != version_update:
                 last_version_update = version_update
                 last_update_time = monotonic()
@@ -361,6 +434,14 @@ class LMUInfo:
     def lmuScorInfo(self) -> lmu_data.LMUScoringInfo:
         """LMU scoring info data"""
         return self._shmm.data.scoring.scoringInfo
+
+    def lmuResults(self, index: int = INVALID_INDEX) -> dict[str, float]:
+        """LMU results data"""
+        if index is None:
+            data = self._sync.player_scor
+        else:
+            data = self._shmm.data.scoring.vehScoringInfo[index]
+        return self._sync.results.data.get(data.mDriverName, LMUResults.DEFAULT)
 
     def lmuScorVeh(self, index: int | None = None) -> lmu_data.LMUVehicleScoring:
         """LMU scoring vehicle data

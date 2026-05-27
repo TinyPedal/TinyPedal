@@ -599,6 +599,10 @@ class Vehicle(ABC):
     __slots__ = ()
 
     @abstractmethod
+    def incidents(self, index: int | None = None) -> int:
+        """Number of incidents"""
+
+    @abstractmethod
     def is_player(self, index: int=0) -> bool:
         """Is local player"""
 

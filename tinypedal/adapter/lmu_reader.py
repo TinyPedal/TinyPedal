@@ -892,6 +892,11 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     __slots__ = ()
 
+    def incidents(self, index: int | None = None) -> int:
+        """Number of incidents"""
+        data = self.shmm.lmuResults(index)
+        return data["contact_vehicle"] + data["track_cut"]
+
     def is_player(self, index: int=0) -> bool:
         """Is local player"""
         return self.shmm.playerIndex == index
