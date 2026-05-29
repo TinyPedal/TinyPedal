@@ -91,14 +91,14 @@ class LMUResults:
     def __init__(self):
         self.data = {}
         self.version = 0
-        self._last_stream = ""
+        self._last_stream = b""
 
     def check_missing(self, driver: bytes):
         """Check & add missing driver"""
         if driver not in self.data:
             self.data[driver] = self.DEFAULT.copy()
 
-    def update(self, stream: str):
+    def update(self, stream: bytes):
         """Update results data"""
         # Check stream
         if self._last_stream == stream:
