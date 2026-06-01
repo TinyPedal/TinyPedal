@@ -208,7 +208,7 @@ def state_timer(interval: float, last: float = 0):
     Args:
         interval: time interval in seconds.
         last: last time stamp in seconds.
-    Yield:
+    Yields:
         is_timeout: bool.
     """
     while True:

@@ -131,7 +131,7 @@ def update_vehicle_data(
         # Temp var only
         laps_completed = api.read.lap.completed_laps(index)
         lap_distance = api.read.lap.distance(index)
-        speed = api.read.vehicle.speed(index)
+        data.speed = speed = api.read.vehicle.speed(index)
 
         # Update high priority info
         data.isPlayer = api.read.vehicle.is_player(index)

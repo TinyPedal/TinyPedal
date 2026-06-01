@@ -3160,6 +3160,23 @@ Set nearby vehicle critical overlap detection range multiplier that scales with 
     indicator_size_multiplier
 Set indicator size multiplier that scales with vehicle width.
 
+    show_collision_course
+Show highlighted collision course from high speed approaching vehicle. Useful to quickly spot vehicle closing in at dangerous speed.
+
+    collision_course_minimum_speed_difference
+Set minimum speed difference (m/s) between you and opponent for displaying collision course. Default is `4` m/s.
+
+    collision_course_speed_increment_per_meter
+Set speed difference increment per meter for scaling speed difference threshold with the distance gap between you and opponent. Default is `0.5` m/s.
+
+For example, a value of `0.5` (m/s) increment with a `15` meters distance gap would require at least `0.5 x 15 = 7.5 m/s` speed difference between you and opponent to show collision course. Minimum speed difference is limited by `collision_course_minimum_speed_difference` option.
+
+    collision_course_nearby_range_multiplier
+Set nearby collision course detection range multiplier that scales with vehicle width. A value of `4` would result a 4-vehicle-wide detection range. Default is `4` vehicle-wide.
+
+    collision_course_critical_range_multiplier
+Set critical collision course detection range multiplier that scales with vehicle width. Default is `1.5` vehicle-wide.
+
     show_center_mark
 Show center mark on radar.
 

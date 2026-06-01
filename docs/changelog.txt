@@ -7,6 +7,9 @@ WIP
 * Lift and coast LED Widget
   - Added "show_wheel_lock" & "show_wheel_slip" options (implemented by @RenBidge).
 
+* Radar Widget
+  - Added "show_collision_course" option, which highlights collision course from high speed approaching vehicle. Useful to quickly spot vehicle closing in at dangerous speed.
+
 * Traffic Widget
   - Added "show_race_leader", "show_slower_ahead", "show_faster_behind" options to show or hide corresponding columns (requested by user "louisgendron26").
 

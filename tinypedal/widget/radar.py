@@ -124,6 +124,14 @@ class Realtime(Overlay):
             self.lin_grad_r[0].setStops(((0, Qt.transparent), (1 - self.indicator_dimension.edge, indicator_color_nearby), (1, Qt.transparent)))
             self.lin_grad_r[1].setStops(((0, Qt.transparent), (1 - self.indicator_dimension.edge, indicator_color_critical), (1, Qt.transparent)))
 
+        # Collision indicator
+        if self.wcfg["show_collision_course"]:
+            self.coll_range_critical = self.veh_width * max(self.wcfg["collision_course_critical_range_multiplier"], 0.1)
+            self.coll_range_nearby = self.veh_width * max(self.wcfg["collision_course_nearby_range_multiplier"], 0.1)
+            self.coll_min_speed = max(self.wcfg["collision_course_minimum_speed_difference"], 0.1)
+            self.coll_add_speed = max(self.wcfg["collision_course_speed_increment_per_meter"], 0.1)
+            self.coll_shape = self.veh_shape.adjusted(0, -self.area_size * 1.5, 0, 0)
+
         # Config canvas
         self.resize(self.area_size, self.area_size)
         self.pixmap_mask = QPixmap(self.area_size, self.area_size)
@@ -351,14 +359,19 @@ class Realtime(Overlay):
                     if indicator.min_range_x < raw_pos_x < nearest_right:
                         nearest_right = raw_pos_x
 
-                # Draw vehicle
-                painter.setBrush(self.color_lap_diff(veh_info))
+                # Transform position
                 painter.translate(  # scale vehicle position coordinate to global scale
                     raw_pos_x * self.global_scale + self.area_center,
                     raw_pos_y * self.global_scale + self.area_center,
                 )
                 if self.wcfg["show_vehicle_orientation"]:
                     painter.rotate(calc.rad2deg(-veh_info.relativeOrientationRadians))
+
+                # Draw vehicle
+                if self.wcfg["show_collision_course"]:
+                    self.draw_collision_course(painter, veh_info)
+
+                painter.setBrush(self.color_lap_diff(veh_info))
                 painter.drawRoundedRect(self.veh_shape, self.veh_radius, self.veh_radius)
                 painter.resetTransform()
 
@@ -369,6 +382,28 @@ class Realtime(Overlay):
                 self.draw_warning_cone(painter, nearest_left, nearest_right, indicator)
             else:
                 self.draw_warning_rect(painter, nearest_left, nearest_right, indicator)
+
+    def draw_collision_course(self, painter, veh_info):
+        """Draw collision course"""
+        intercept_x, intercept_y = calc.rotate_coordinate(
+            veh_info.relativeOrientationRadians,
+            veh_info.relativeRotatedPositionX,
+            veh_info.relativeRotatedPositionY,
+        )
+        if intercept_y <= 0:
+            return
+        abs_intercept_x = abs(intercept_x)
+        if abs_intercept_x > self.coll_range_nearby:
+            return
+        player_speed = minfo.vehicles.dataSet[minfo.vehicles.playerIndex].speed
+        relative_speed = veh_info.speed - player_speed
+        min_speed = max(self.coll_min_speed, self.coll_add_speed * veh_info.relativeStraightDistance)
+        if relative_speed > min_speed:
+            if abs_intercept_x <= self.coll_range_critical:
+                coll_color = self.wcfg["collision_course_critical_color"]
+            else:
+                coll_color = self.wcfg["collision_course_nearby_color"]
+            painter.fillRect(self.coll_shape, coll_color)
 
     # Additional methods
     def color_lap_diff(self, veh_info):
