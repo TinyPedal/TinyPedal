@@ -56,13 +56,19 @@ class Realtime(Overlay):
         font_cap_m = self.get_font_metrics(font_cap)
 
         # Config variable
-        self.pit_bias = self.wcfg["enable_pit_entry_bias"]
-        self.pitstop_threshold = self.wcfg["remaining_pitstop_threshold"]
         layout_reversed = self.wcfg["layout"] != 0
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.char_width = max(self.wcfg["bar_width"], 4)
         bar_width = font_m.width * self.char_width + bar_padx
-        self.center_slot = min(max(self.wcfg["number_of_less_laps"], 0), 5) + 1 + self.pit_bias  # column offset
+
+        self.pitin_bias = self.wcfg["enable_pit_entry_bias"]
+        self.consumption_rate = self.wcfg["show_rate_of_consumption"]
+
+        self.column_index_rate = 0
+        self.column_index_bias = self.consumption_rate
+        self.column_index_last = self.consumption_rate + self.pitin_bias
+
+        self.center_slot = min(max(self.wcfg["number_of_less_laps"], 0), 5) + 1 + self.column_index_last  # column offset
         self.total_slot = min(max(self.wcfg["number_of_more_laps"], 1), 10) + 1 + self.center_slot
         self.decimals_consumption = max(self.wcfg["decimal_places_consumption"], 0)
         self.decimals_delta = max(self.wcfg["decimal_places_delta"], 0)
@@ -83,11 +89,11 @@ class Realtime(Overlay):
             count=self.total_slot,
             last=-MAX_SECONDS,
         )
-        if self.pit_bias:
-            self.bars_target_lap[0].text = "BIAS"
-            self.bars_target_lap[1].text = "LAST"
-        else:
-            self.bars_target_lap[0].text = "LAST"
+
+        self.bars_target_lap[self.column_index_rate].text = "RATE"
+        self.bars_target_lap[self.column_index_bias].text = "BIAS"
+        self.bars_target_lap[self.column_index_last].text = "LAST"
+
         self.bars_target_lap[self.center_slot].fg = self.wcfg["font_color_current_laps"]
         self.bars_target_lap[self.center_slot].bg = self.wcfg["background_color_current_laps"]
         self.set_grid_layout_table_row(
@@ -161,18 +167,20 @@ class Realtime(Overlay):
             fuel_used_curr = minfo.energy.amountUsedCurrent
             fuel_used_last_raw = minfo.energy.lastLapConsumption
             est_pits = minfo.energy.estimatedNumPitStopsEnd
+            fuel_rate = minfo.energy.rateOfConsumption
         else:
             fuel_curr = minfo.fuel.amountCurrent
             fuel_est = minfo.fuel.estimatedConsumption
             fuel_used_curr = minfo.fuel.amountUsedCurrent
             fuel_used_last_raw = minfo.fuel.lastLapConsumption
             est_pits = minfo.fuel.estimatedNumPitStopsEnd
+            fuel_rate = minfo.fuel.rateOfConsumption
 
-        if self.pit_bias:
-            pit_pos = minfo.mapping.pitEntryPosition
+        if self.pitin_bias:
+            pitin_pos = minfo.mapping.pitEntryPosition
             track_length = api.read.lap.track_length()
-            if 0 < pit_pos < track_length and est_pits > self.pitstop_threshold:
-                pit_bias = 1 - pit_pos / track_length
+            if 0 < pitin_pos < track_length and est_pits > self.wcfg["remaining_pitstop_threshold"]:
+                pit_bias = 1 - pitin_pos / track_length
 
         # Check stint status
         if not in_pits:
@@ -195,20 +203,26 @@ class Realtime(Overlay):
         est_runlaps = floor(round(calc.end_stint_laps(
             total_fuel_remaining, fuel_est), 1)) - self.center_slot
 
+        if self.consumption_rate:
+            # Meter per second
+            self.update_speed(self.bars_delta[self.column_index_rate], api.read.vehicle.speed())
+            # Fuel/energy per second
+            self.update_target_use(self.bars_target_use[self.column_index_rate], fuel_rate, energy_type)
+
         # Pit entry bias
-        if self.pit_bias:
+        if self.pitin_bias:
             # Bias percent
-            self.update_pit_bias(self.bars_delta[0], pit_bias)
+            self.update_pit_bias(self.bars_delta[self.column_index_bias], pit_bias)
             # Bias amount
-            self.update_target_use(self.bars_target_use[0], pit_bias * fuel_est, energy_type)
+            self.update_target_use(self.bars_target_use[self.column_index_bias], pit_bias * fuel_est, energy_type)
 
         # Fuel or energy
-        self.update_energy_type(self.bars_delta[self.pit_bias], energy_type)
+        self.update_energy_type(self.bars_delta[self.column_index_last], energy_type)
         # Last lap consumption
-        self.update_target_use(self.bars_target_use[self.pit_bias], fuel_used_last_raw, energy_type)
+        self.update_target_use(self.bars_target_use[self.column_index_last], fuel_used_last_raw, energy_type)
 
         # Update slots
-        for index in range(1 + self.pit_bias, self.total_slot):
+        for index in range(1 + self.column_index_last, self.total_slot):
             # Progressive fuel saving
             total_laps_target = est_runlaps + index
 
@@ -219,19 +233,14 @@ class Realtime(Overlay):
                 target_laps = f"{laps_done + total_laps_target:d}"
             self.update_total_laps(self.bars_target_lap[index], target_laps)
 
-            # Target consumption
-            if total_laps_target > 0 and fuel_est > 0:
+            # Target & delta consumption
+            if total_laps_target > 0 < fuel_est:
                 target_use = total_fuel_remaining / total_laps_target
-            else:
-                target_use = -MAX_SECONDS
-            self.update_target_use(
-                self.bars_target_use[index], target_use, energy_type)
-
-            # Delta consumption
-            if total_laps_target > 0 and fuel_est > 0:
                 delta = fuel_est - target_use
             else:
+                target_use = -MAX_SECONDS
                 delta = -MAX_SECONDS
+            self.update_target_use(self.bars_target_use[index], target_use, energy_type)
             self.update_delta(self.bars_delta[index], delta, energy_type)
 
     # GUI update methods
@@ -283,4 +292,11 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = f"{data:.1%}"[:self.char_width]
+            target.update()
+
+    def update_speed(self, target, data):
+        """Reference speed (m/s)"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{data:.0f}m"[:self.char_width]
             target.update()

@@ -2568,12 +2568,19 @@ Set number of target slots for more completable laps. Default is `3`. Range in `
     number_of_less_laps
 Set number of target slots for less completable laps. Default is `0`. Range in `0` to `5`.
 
+    show_rate_of_consumption
+Show fuel or energy consumption per second, as well as current vehicle speed (meters per second) under `RATE` column.
+
+This option shows how consumption rate changes with throttle, RPM, engine map, etc. It also helps to determine amount distance required to lift-and-coast to save corresponding amount fuel or energy.
+
+For example, if energy consumption per second value is `0.05`, and current speed value is `75m`, it indicates it would take roughly 1 second and 75 meters of lift-and-coast time and distance to save 0.05 energy.
+
     enable_pit_entry_bias
 Auto calibrate target fuel (or energy) saving bias towards either pit entry position or finish line, depending on number of estimated remaining pit stops.
 
 This feature is made specially for tracks that have pit entry position located far away from finish line, which it is necessary to take pit entry position into fuel saving calculation for increased accuracy.
 
-While enabled, a new `BIAS` column will be added, which shows amount added fuel (or energy) bias towards pit entry position, as well as percentage pit entry bias from finish line, When bias is `0`, it means there is no pit entry bias added.
+While enabled, a `BIAS` column will be displayed, which shows amount added fuel (or energy) bias towards pit entry position, as well as percentage pit entry bias from finish line, When bias is `0`, it means there is no pit entry bias added.
 
 **Important notes:** Do not enable this feature if you are not sure what it does. You must enter pit at least once to record pit entry position of the track for this feature to work.
 

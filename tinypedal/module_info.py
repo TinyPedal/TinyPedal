@@ -553,6 +553,7 @@ class FuelInfo:
         "estimatedNumPitStopsEarly",
         "deltaConsumption",
         "oneLessPitConsumption",
+        "rateOfConsumption",
     )
 
     def __init__(self):
@@ -577,6 +578,7 @@ class FuelInfo:
         self.estimatedNumPitStopsEarly: float = 0.0
         self.deltaConsumption: float = 0.0
         self.oneLessPitConsumption: float = 0.0
+        self.rateOfConsumption: float = 0.0
 
 
 class HistoryInfo:

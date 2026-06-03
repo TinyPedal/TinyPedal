@@ -172,6 +172,7 @@ def calc_consumption(
     est_pits_early = 0.0  # estimate end-lap pit stop counts
     used_est_less = 0.0  # estimate fuel consumption for one less pit stop
 
+    last_elapsed_time = 0.0
     last_lap_stime = FLOAT_INF  # last lap start time
     laps_left = 0.0  # amount laps left at current lap distance
     end_timer_laps_left = 0.0  # amount laps left from start of current lap to end of race timer
@@ -198,6 +199,7 @@ def calc_consumption(
         # Read telemetry
         capacity, amount_curr = telemetry_func()
         lap_stime = api.read.timing.start()
+        elapsed_time = api.read.timing.elapsed()
         laptime_curr = api.read.timing.current_laptime()
         time_left = api.read.session.remaining()
         in_garage = api.read.vehicle.in_garage()
@@ -212,15 +214,23 @@ def calc_consumption(
         if amount_start < amount_curr:
             amount_start = amount_last = amount_curr
 
+        amount_diff = amount_last - amount_curr
+
         if amount_last < amount_curr:
             if api.read.vehicle.speed() > 1:  # regen check
-                used_curr += amount_last - amount_curr
+                used_curr += amount_diff
             else:  # pitstop refilling check
                 amount_start = amount_curr
             amount_last = amount_curr
         elif amount_last > amount_curr:
-            used_curr += amount_last - amount_curr
+            used_curr += amount_diff
             amount_last = amount_curr
+
+        if last_elapsed_time != elapsed_time:
+            time_diff = elapsed_time - last_elapsed_time
+            last_elapsed_time = elapsed_time
+            if time_diff > 0:
+                output.rateOfConsumption = amount_diff / time_diff
 
         # Lap start & finish detection
         if lap_stime > last_lap_stime:
@@ -231,7 +241,7 @@ def calc_consumption(
                     round6(lap_stime - last_lap_stime)
                 ))
                 delta_array_temp = tuple(delta_array_raw)
-                validating = api.read.timing.elapsed()
+                validating = elapsed_time
             delta_array_raw[:] = DELTA_DEFAULT
             pos_last = pos_recorded = pos_curr
             used_last_raw = used_curr
@@ -254,7 +264,7 @@ def calc_consumption(
 
         # Validating 1s after passing finish line
         if validating:
-            timer = api.read.timing.elapsed() - validating
+            timer = elapsed_time - validating
             if timer > 3:  # switch off after 3s
                 validating = 0
             elif (timer > 0.3 and  # compare current time

@@ -980,6 +980,7 @@ WIDGET_DEFAULT = {
         "minimum_reserve": 0.2,
         "number_of_more_laps": 3,
         "number_of_less_laps": 0,
+        "show_rate_of_consumption": False,
         "enable_pit_entry_bias": False,
         "remaining_pitstop_threshold": 0.1,
         "font_color_target_laps": "#EEEEEE",
