@@ -2569,7 +2569,7 @@ Set number of target slots for more completable laps. Default is `3`. Range in `
 Set number of target slots for less completable laps. Default is `0`. Range in `0` to `5`.
 
     show_rate_of_consumption
-Show fuel or energy consumption per second, as well as current vehicle speed (meters per second) under `RATE` column.
+Show fuel or energy consumption per second and current vehicle speed (meters per second) under `RATE` column.
 
 This option shows how consumption rate changes with throttle, RPM, engine map, etc. It also helps to determine amount distance required to lift-and-coast to save corresponding amount fuel or energy.
 

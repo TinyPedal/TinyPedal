@@ -1,11 +1,15 @@
-WIP
+2.47.0 (2026-06-04)
 -----------------------------
+* API
+  - Auto resolves local hostname in case the default "localhost" name fails to connect.
+    Note, this is required for accessing LMU Rest API after v1.3.3 game update.
+
 * Flag Widget
   - Added "show_traffic_while_off_track" option (requested by user "edurauseo"), which shows nearest incoming on-track traffic indicator while off-track. Note, only all four wheels that are on either grass, dirt, or gravel is considered off-track.
   - Renamed "traffic_pitout_duration" option to "traffic_extended_duration", which sets traffic indicator extended duration (seconds) after pitting out, or recently recovered from off-track or low speed.
 
 * Fuel energy saver Widget
-  - Added "show_rate_of_consumption" option, which shows fuel or energy consumption per second, as well as current vehicle speed (meters per second) under "RATE" column. This option shows how consumption rate changes with throttle, RPM, engine map, etc. It also helps to determine amount distance required to lift-and-coast to save corresponding amount fuel or energy.
+  - Added "show_rate_of_consumption" option, which shows fuel or energy consumption per second and current vehicle speed (meters per second) under "RATE" column. This option shows how consumption rate changes with throttle, RPM, engine map, etc. It also helps to determine amount distance required to lift-and-coast to save corresponding amount fuel or energy.
 
 * Lift and coast LED Widget
   - Added "show_wheel_lock" & "show_wheel_slip" options (implemented by @RenBidge).
@@ -26,7 +30,6 @@ WIP
 
 * Misc
   - Added new contributor "RenBidge" to contributors.md in "Implementation" section.
-  - Auto resolves local hostname in case "localhost" fails to connect (required for accessing "Rest API").
 
 2.46.0 (2026-04-18)
 -----------------------------
