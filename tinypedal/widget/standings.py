@@ -1047,7 +1047,7 @@ class Realtime(Overlay):
             ve = data[0]
             if data[1]:  # highlighted player
                 color_index = 4
-            elif ve <= -1:  # unavailable
+            elif ve <= -1 or ve == 0:  # unavailable
                 color_index = 0
             elif ve <= 0.1:  # 10% remaining
                 color_index = 3
@@ -1055,7 +1055,7 @@ class Realtime(Overlay):
                 color_index = 2
             else:
                 color_index = 1
-            if ve <= -1:
+            if ve <= -1 or ve == 0:
                 text = "-" * self.nrg_width
             else:
                 text = f"{ve:0{self.nrg_width}.{self.nrg_decimals}%}"[:self.nrg_width]
