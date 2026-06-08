@@ -3789,7 +3789,7 @@ Show remaining virtual energy reading in percentage from each driver, with 4 dif
 - low: from 30% to 10% remaining, default color orange.
 - critical: 10% or lower remaining, default color red.
 
-Note, for vehicle without virtual energy, remaining fuel will be displayed instead.
+Note, for vehicle without virtual energy, remaining fuel (only if available) will be displayed instead. If fuel data is not available from game API, then nothing will be displayed.
 
 **Known limitation with remaining virtual energy readings**
 

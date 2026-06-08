@@ -398,15 +398,18 @@ def update_stint_usage(data: VehicleDataSet, fuel_remaining: float) -> None:
     if stint_laps_done <= 0:
         stint_laps_done = data.pitTimer.laps
 
-    if stint_laps_est <= 0:
+    if stint_laps_est <= 0 < fuel_remaining:
         stint_laps_est = stint_laps_done + data.fuelHistory.laps
 
     data.currentStintLaps = stint_laps_done
     data.estimatedStintLaps = stint_laps_est
 
     # Stint energy usage
-    if ve_remaining <= -1.0:
-        data.energyRemaining = fuel_remaining
+    if ve_remaining <= -1:
+        if fuel_remaining > 0:
+            data.energyRemaining = fuel_remaining
+        else:
+            data.energyRemaining = -1
     elif ve_used <= 0 or (data.pitTimer.pitting and not data.inPit):
         data.energyRemaining = ve_remaining
     else:  # Apply linear interpolation
