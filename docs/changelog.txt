@@ -1,3 +1,12 @@
+WIP
+-----------------------------
+* Radar Widget
+  - Added "show_opposite_course" option, which highlights collision course from vehicle driving at opposite direction. Useful to quickly spot accidents or spins ahead.
+  - Added "minimum_opposite_course_angle" option, which sets minimum opposite course detection angle relative to local player. Default is "80" degrees.
+
+* Relative, Rivals, Standings Widget
+  - Now hides zero fuel readings (shown as "---") when fuel data is not available from game API.
+
 2.47.0 (2026-06-04)
 -----------------------------
 * API

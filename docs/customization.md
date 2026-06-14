@@ -3184,6 +3184,12 @@ Set nearby collision course detection range multiplier that scales with vehicle 
     collision_course_critical_range_multiplier
 Set critical collision course detection range multiplier that scales with vehicle width. Default is `1.5` vehicle-wide.
 
+    show_opposite_course
+Show highlighted collision course from vehicle driving at opposite direction. Useful to quickly spot accidents or spins ahead.
+
+    minimum_opposite_course_angle
+Set minimum opposite course detection angle relative to local player. Default is `80` degrees.
+
     show_center_mark
 Show center mark on radar.
 
@@ -3819,7 +3825,7 @@ The integrity reading is calculated from hull damage, detachable wheels and part
 - Low integrity (severely damaged hull, and most likely has detached wheels or parts), from `4` to `0` (default color red).
 
     show_incidents
-Show total number of incidents for each driver from current session. This option helps tracking opponent's safeness and cleanness during long race.
+Show total number of incidents for each driver from current session. This option helps tracking opponent's safeness and cleanness during long race. This option only works for `LMU`.
 
 Note, incidents are counted from vehicle contacts and track cuts only for each individual driver. Incidents are not counted towards team. Incidents are only counted while this APP is running, and reset if changed session or restarted this APP.
 

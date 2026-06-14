@@ -125,12 +125,12 @@ class Realtime(Overlay):
             self.lin_grad_r[1].setStops(((0, Qt.transparent), (1 - self.indicator_dimension.edge, indicator_color_critical), (1, Qt.transparent)))
 
         # Collision indicator
-        if self.wcfg["show_collision_course"]:
-            self.coll_range_critical = self.veh_width * max(self.wcfg["collision_course_critical_range_multiplier"], 0.1)
-            self.coll_range_nearby = self.veh_width * max(self.wcfg["collision_course_nearby_range_multiplier"], 0.1)
-            self.coll_min_speed = max(self.wcfg["collision_course_minimum_speed_difference"], 0.1)
-            self.coll_add_speed = max(self.wcfg["collision_course_speed_increment_per_meter"], 0.1)
-            self.coll_shape = self.veh_shape.adjusted(0, -self.area_size * 1.5, 0, 0)
+        self.coll_range_critical = self.veh_width * max(self.wcfg["collision_course_critical_range_multiplier"], 0.1)
+        self.coll_range_nearby = self.veh_width * max(self.wcfg["collision_course_nearby_range_multiplier"], 0.1)
+        self.coll_min_speed = max(self.wcfg["collision_course_minimum_speed_difference"], 0.1)
+        self.coll_add_speed = max(self.wcfg["collision_course_speed_increment_per_meter"], 0.1)
+        self.coll_shape = self.veh_shape.adjusted(0, -self.area_size * 1.5, 0, 0)
+        self.opposite_angle = calc.deg2rad(self.wcfg["minimum_opposite_course_angle"])
 
         # Config canvas
         self.resize(self.area_size, self.area_size)
@@ -368,9 +368,7 @@ class Realtime(Overlay):
                     painter.rotate(calc.rad2deg(-veh_info.relativeOrientationRadians))
 
                 # Draw vehicle
-                if self.wcfg["show_collision_course"]:
-                    self.draw_collision_course(painter, veh_info)
-
+                self.draw_collision_course(painter, veh_info)
                 painter.setBrush(self.color_lap_diff(veh_info))
                 painter.drawRoundedRect(self.veh_shape, self.veh_radius, self.veh_radius)
                 painter.resetTransform()
@@ -392,6 +390,18 @@ class Realtime(Overlay):
         )
         if intercept_y <= 0:
             return
+
+        if (
+            self.wcfg["show_opposite_course"]
+            and veh_info.inPit != 2
+            and abs(veh_info.relativeOrientationRadians) > self.opposite_angle
+        ):
+            painter.fillRect(self.coll_shape, self.wcfg["opposite_course_color"])
+            return
+
+        if not self.wcfg["show_collision_course"]:
+            return
+
         abs_intercept_x = abs(intercept_x)
         if abs_intercept_x > self.coll_range_nearby:
             return
