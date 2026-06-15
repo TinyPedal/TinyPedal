@@ -283,24 +283,26 @@ class HistoryPanel(QWidget):
         self.unit_fuel = units.set_unit_fuel(cfg.units["fuel_unit"])
         self.symbol_fuel = units.set_symbol_fuel(cfg.units["fuel_unit"])
 
-        columns_stretch = 7
-        self.table_history = QTableWidget(self)
-        self.table_history.setColumnCount(1 + columns_stretch)
-        self.table_history.verticalHeader().setVisible(False)
-        self.table_history.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.table_history.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
-        self.table_history.setColumnWidth(0, UIScaler.size(3))
-        self.table_history.setFixedWidth(UIScaler.size(3 + 5 * columns_stretch))
-        self.table_history.setHorizontalHeaderLabels((
+        headers = (
             "Lap",
             "Time",
             f"Fuel({self.symbol_fuel})",
             "Energy(%)",
+            "F/Ratio",
             "Drain(%)",
             "Regen(%)",
             "Tyre(%)",
             f"Tank({self.symbol_fuel})",
-        ))
+        )
+
+        self.table_history = QTableWidget(self)
+        self.table_history.setColumnCount(len(headers))
+        self.table_history.verticalHeader().setVisible(False)
+        self.table_history.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table_history.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
+        self.table_history.setColumnWidth(0, UIScaler.size(3))
+        self.table_history.setFixedWidth(UIScaler.size(3 + 5 * (len(headers) - 1)))
+        self.table_history.setHorizontalHeaderLabels(headers)
 
         layout_panel = QVBoxLayout()
         layout_panel.setContentsMargins(0, 0, 0, 0)
@@ -315,36 +317,32 @@ class HistoryPanel(QWidget):
         flag_unselectable = Qt.NoItemFlags
 
         for row_index, lap_data in enumerate(dataset):
-            lapnumber = self._add_table_item(f"{lap_data.lapNumber}", flag_unselectable)
-            laptime = self._add_table_item(calc.sec2laptime_full(lap_data.lapTimeLast), flag_selectable)
-            used_fuel = self._add_table_item(f"{self.unit_fuel(lap_data.lastLapUsedFuel):.3f}", flag_selectable)
-            used_energy = self._add_table_item(f"{lap_data.lastLapUsedEnergy:.3f}", flag_selectable)
-            battery_drain = self._add_table_item(f"{lap_data.batteryDrainLast:.3f}", flag_unselectable)
-            battery_regen = self._add_table_item(f"{lap_data.batteryRegenLast:.3f}", flag_unselectable)
-            tyre_wear = self._add_table_item(f"{lap_data.tyreAvgWearLast:.3f}", flag_selectable)
-            capacity_fuel = self._add_table_item(f"{self.unit_fuel(lap_data.capacityFuel):.3f}", flag_selectable)
-
-            if not lap_data.isValidLap:  # set invalid lap text color
-                laptime.setForeground(invalid_color)
-                used_fuel.setForeground(invalid_color)
-                used_energy.setForeground(invalid_color)
-
+            highlight_color = None if lap_data.isValidLap else invalid_color
             self.table_history.insertRow(row_index)
-            self.table_history.setItem(row_index, 0, lapnumber)
-            self.table_history.setItem(row_index, 1, laptime)
-            self.table_history.setItem(row_index, 2, used_fuel)
-            self.table_history.setItem(row_index, 3, used_energy)
-            self.table_history.setItem(row_index, 4, battery_drain)
-            self.table_history.setItem(row_index, 5, battery_regen)
-            self.table_history.setItem(row_index, 6, tyre_wear)
-            self.table_history.setItem(row_index, 7, capacity_fuel)
+            for column_index, item in enumerate(
+                (
+                    ("lap", f"{lap_data.lapNumber}", flag_unselectable),
+                    ("time", calc.sec2laptime_full(lap_data.lapTimeLast), flag_selectable, highlight_color),
+                    ("fuel", f"{self.unit_fuel(lap_data.lastLapUsedFuel):.3f}", flag_selectable, highlight_color),
+                    ("energy", f"{lap_data.lastLapUsedEnergy:.3f}", flag_selectable, highlight_color),
+                    ("ratio", f"{calc.fuel_to_energy_ratio(lap_data.lastLapUsedFuel, lap_data.lastLapUsedEnergy):.3f}", flag_unselectable),
+                    ("drain", f"{lap_data.batteryDrainLast:.3f}", flag_unselectable),
+                    ("regen", f"{lap_data.batteryRegenLast:.3f}", flag_unselectable),
+                    ("tyre", f"{lap_data.tyreAvgWearLast:.3f}", flag_selectable),
+                    ("tank", f"{self.unit_fuel(lap_data.capacityFuel):.3f}", flag_selectable),
+                )
+            ):
+                self.table_history.setItem(row_index, column_index, self._add_table_item(*item))
 
-    def _add_table_item(self, text: str, flags: Qt.ItemFlags):
+    def _add_table_item(self, header: str, text: str, flags: Qt.ItemFlags, highlight_color=None):
         """Add table item"""
         item = QTableWidgetItem()
+        item.header = header
         item.setText(text)
         item.setTextAlignment(Qt.AlignCenter)
         item.setFlags(flags)
+        if highlight_color:
+            item.setForeground(highlight_color)
         return item
 
 
@@ -426,16 +424,16 @@ class CalculatorPanel(QWidget):
         data_capacity = []
 
         for data in selected_data:
-            column_index = data.column()
-            if column_index == 1:
+            header = data.header
+            if header == "time":
                 data_laptime.append(laptime_string_to_seconds(data.text()))
-            if column_index == 2:
+            elif header == "fuel":
                 data_fuel.append(float(data.text()))
-            if column_index == 3:
+            elif header == "energy":
                 data_energy.append(float(data.text()))
-            if column_index == 6:
+            elif header == "tyre":
                 data_tyrewear.append(float(data.text()))
-            if column_index == 7:
+            elif header == "tank":
                 data_capacity.append(data)
 
         # Send data to calculator

@@ -955,7 +955,7 @@ This panel also includes a vertical `pit stop preview` bar on the left, which vi
 Note, when `Energy consumption` value is higher than zero, pit stops and stint laps from preview bar will be calculated based on energy usage. Stint lap mark may not be displayed if there is not enough space to draw.
 
     Consumption history table
-On the right side is consumption history table, which lists `lap number`, `lap time`, `fuel consumption`, `virtual energy consumption`, `battery drain`, `battery regen`, `average tyre tread wear`, `tank capacity` data from [Consumption History](#consumption-history) data. Invalid lap time or consumption data is highlighted in red.
+On the right side is consumption history table, which lists `lap number`, `lap time`, `fuel consumption`, `virtual energy consumption`, `fuel ratio`, `battery drain`, `battery regen`, `average tyre tread wear`, `tank capacity` data from [Consumption History](#consumption-history) data. Invalid lap time or consumption data is highlighted in red.
 
 Click `Load Live` button to load or update consumption history from live session to history table and automatically fill in latest data to calculator.
 

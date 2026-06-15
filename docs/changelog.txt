@@ -1,5 +1,8 @@
 WIP
 -----------------------------
+* Fuel calculator
+  - Added fuel ratio (F/Ratio) column to history table for quick reviewing.
+
 * Radar Widget
   - Added "show_opposite_course" option, which highlights collision course from vehicle driving at opposite direction. Useful to quickly spot accidents or spins ahead.
   - Added "minimum_opposite_course_angle" option, which sets minimum opposite course detection angle relative to local player. Default is "80" degrees.
