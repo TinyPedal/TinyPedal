@@ -39,7 +39,6 @@ class Realtime(Overlay):
         self.set_primary_layout(layout=layout)
 
         # Config variable
-        self.double_side_led = self.wcfg["enable_double_side_led"]
         self.show_lift_and_coast = self.wcfg["show_lift_and_coast"]
         self.show_tc_activation = self.wcfg["show_tc_activation"]
         self.show_abs_activation = self.wcfg["show_abs_activation"]
@@ -48,65 +47,8 @@ class Realtime(Overlay):
         self.wheel_lock_threshold = self.wcfg["wheel_lock_threshold"]
         self.wheel_slip_threshold = self.wcfg["wheel_slip_threshold"]
 
-        # LEDs
-        self.bar_lico_left = LEDBar(
-            self,
-            led_width=self.wcfg["led_width"],
-            led_height=self.wcfg["led_height"],
-            led_radius=self.wcfg["led_radius"],
-            led_count=self.wcfg["number_of_led"],
-            margin=self.wcfg["display_margin"],
-            inner_gap=self.wcfg["inner_gap"],
-            orientation=self.wcfg["display_orientation"],
-            show_background=self.wcfg["show_background"],
-            background_color=self.wcfg["background_color"],
-            led_outline_color=self.wcfg["led_outline_color"],
-            led_outline_width=self.wcfg["led_outline_width"],
-            lift_and_coast_color_off=self.wcfg["lift_and_coast_color_off"],
-            lift_and_coast_color_low=self.wcfg["lift_and_coast_color_low"],
-            lift_and_coast_color_critical=self.wcfg["lift_and_coast_color_critical"],
-            tc_activation_color=self.wcfg["tc_activation_color"],
-            abs_activation_color=self.wcfg["abs_activation_color"],
-            wheel_lock_color=self.wcfg["wheel_lock_color"],
-            wheel_slip_color=self.wcfg["wheel_slip_color"],
-            lift_and_coast_multiplier_critical=self.wcfg["lift_and_coast_multiplier_critical"],
-        )
-        self.set_primary_orient(
-            target=self.bar_lico_left,
-            column=0,
-            default=1,
-        )
-
-        if self.double_side_led:
-            orientation = self.wcfg["display_orientation"]
-            mirror_orientation = orientation if orientation % 2 else orientation + 2
-            self.bar_lico_right = LEDBar(
-                self,
-                led_width=self.wcfg["led_width"],
-                led_height=self.wcfg["led_height"],
-                led_radius=self.wcfg["led_radius"],
-                led_count=self.wcfg["number_of_led"],
-                margin=self.wcfg["display_margin"],
-                inner_gap=self.wcfg["inner_gap"],
-                orientation=mirror_orientation,
-                show_background=self.wcfg["show_background"],
-                background_color=self.wcfg["background_color"],
-                led_outline_color=self.wcfg["led_outline_color"],
-                led_outline_width=self.wcfg["led_outline_width"],
-                lift_and_coast_color_off=self.wcfg["lift_and_coast_color_off"],
-                lift_and_coast_color_low=self.wcfg["lift_and_coast_color_low"],
-                lift_and_coast_color_critical=self.wcfg["lift_and_coast_color_critical"],
-                tc_activation_color=self.wcfg["tc_activation_color"],
-                abs_activation_color=self.wcfg["abs_activation_color"],
-                wheel_lock_color=self.wcfg["wheel_lock_color"],
-                wheel_slip_color=self.wcfg["wheel_slip_color"],
-                lift_and_coast_multiplier_critical=self.wcfg["lift_and_coast_multiplier_critical"],
-            )
-            self.set_primary_orient(
-                target=self.bar_lico_right,
-                column=1,
-                default=1,
-            )
+        # LED bar
+        self.bars_lico = tuple(self.set_leds())
 
         # Last data
         self.lico = None
@@ -137,43 +79,66 @@ class Realtime(Overlay):
             self.abs_active = abs_active
             update_later = True
 
-        # Wheel lock / wheel slip
-        wheel_lock = False
-        wheel_slip = False
-        if self.show_wheel_lock or self.show_wheel_slip:
-            brake_raw = api.read.inputs.brake_raw()
-            throttle_raw = api.read.inputs.throttle_raw()
-            slip_ratio = minfo.wheels.slipRatio
-            if self.show_wheel_lock:
-                wheel_lock_val = min(abs(min(slip_ratio)), 1)
-                wheel_lock = wheel_lock_val >= self.wheel_lock_threshold and brake_raw > 0.02 and not abs_active
-            if self.show_wheel_slip:
-                wheel_slip_val = min(max(slip_ratio), 1)
-                wheel_slip = wheel_slip_val >= self.wheel_slip_threshold and throttle_raw > 0.02 and not tc_active
-
+        # Wheel lock
+        if self.show_wheel_lock and not abs_active and api.read.inputs.brake_raw() > 0.02:
+            wheel_lock = min(abs(min(minfo.wheels.slipRatio)), 1) >= self.wheel_lock_threshold
+        else:
+            wheel_lock = False
         if self.wheel_lock != wheel_lock:
             self.wheel_lock = wheel_lock
             update_later = True
 
+        # Wheel slip
+        if self.show_wheel_slip and not tc_active and api.read.inputs.throttle_raw() > 0.02:
+            wheel_slip = min(max(minfo.wheels.slipRatio), 1) >= self.wheel_slip_threshold
+        else:
+            wheel_slip = False
         if self.wheel_slip != wheel_slip:
             self.wheel_slip = wheel_slip
             update_later = True
 
         if update_later:
-            self.bar_lico_left.lico = lico
-            self.bar_lico_left.tc_active = tc_active
-            self.bar_lico_left.abs_active = abs_active
-            self.bar_lico_left.wheel_lock = wheel_lock
-            self.bar_lico_left.wheel_slip = wheel_slip
-            self.bar_lico_left.update()
+            for bar_lico in self.bars_lico:
+                bar_lico.lico = lico
+                bar_lico.tc_active = tc_active
+                bar_lico.abs_active = abs_active
+                bar_lico.wheel_lock = wheel_lock
+                bar_lico.wheel_slip = wheel_slip
+                bar_lico.update()
 
-            if self.double_side_led:
-                self.bar_lico_right.lico = lico
-                self.bar_lico_right.tc_active = tc_active
-                self.bar_lico_right.abs_active = abs_active
-                self.bar_lico_right.wheel_lock = wheel_lock
-                self.bar_lico_right.wheel_slip = wheel_slip
-                self.bar_lico_right.update()
+    def set_leds(self):
+        """Set lico leds bar"""
+        orientation = self.wcfg["display_orientation"]
+        for index in range(1 + self.wcfg["enable_double_side_led"]):
+            led_orientation = orientation if index == 0 or orientation % 2 else orientation + 2
+            bar_temp = LEDBar(
+                self,
+                led_width=self.wcfg["led_width"],
+                led_height=self.wcfg["led_height"],
+                led_radius=self.wcfg["led_radius"],
+                led_count=self.wcfg["number_of_led"],
+                margin=self.wcfg["display_margin"],
+                inner_gap=self.wcfg["inner_gap"],
+                orientation=led_orientation,
+                show_background=self.wcfg["show_background"],
+                background_color=self.wcfg["background_color"],
+                led_outline_color=self.wcfg["led_outline_color"],
+                led_outline_width=self.wcfg["led_outline_width"],
+                lift_and_coast_color_off=self.wcfg["lift_and_coast_color_off"],
+                lift_and_coast_color_low=self.wcfg["lift_and_coast_color_low"],
+                lift_and_coast_color_critical=self.wcfg["lift_and_coast_color_critical"],
+                tc_activation_color=self.wcfg["tc_activation_color"],
+                abs_activation_color=self.wcfg["abs_activation_color"],
+                wheel_lock_color=self.wcfg["wheel_lock_color"],
+                wheel_slip_color=self.wcfg["wheel_slip_color"],
+                lift_and_coast_multiplier_critical=self.wcfg["lift_and_coast_multiplier_critical"],
+            )
+            self.set_primary_orient(
+                target=bar_temp,
+                column=index,
+                default=1,
+            )
+            yield bar_temp
 
 
 class LEDBar(QWidget):

@@ -553,14 +553,13 @@ class Overlay(Base):
         """Set primary layout (QGridLayout) orientation
 
         Orientation is defined by "layout" option in Widget JSON.
-        0 = vertical, 1 = horizontal.
 
         Args:
             target: QWidget or QGridLayout that adds to primary layout.
             column: column index determines display order.
             row: row index determines side display order.
             option: layout option name in Widget JSON.
-            default: default layout value.
+            default: default layout orientation, 0 = vertical, 1 = horizontal.
         """
         layout = self.layout()
         assert isinstance(layout, QGridLayout)
