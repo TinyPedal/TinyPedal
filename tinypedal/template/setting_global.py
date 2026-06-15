@@ -96,6 +96,12 @@ GLOBAL_DEFAULT = {
     },
     "fuel_calculator": {
         "show_consumption_history": True,
+        "show_column_fuel_ratio": True,
+        "show_column_battery_drain": True,
+        "show_column_battery_regen": True,
+        "show_column_battery_net_change": True,
+        "show_column_tyre_wear": True,
+        "show_column_tank_capacity": True,
     },
     "tyre_strategy_planner": {
         "last_file_path": "",

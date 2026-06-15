@@ -26,7 +26,7 @@ import os
 from collections import deque
 from math import ceil, floor
 
-from PySide2.QtCore import Qt
+from PySide2.QtCore import QPoint, Qt
 from PySide2.QtGui import QColor, QPainter
 from PySide2.QtWidgets import (
     QDoubleSpinBox,
@@ -37,6 +37,7 @@ from PySide2.QtWidgets import (
     QHeaderView,
     QLabel,
     QLineEdit,
+    QMenu,
     QMessageBox,
     QPushButton,
     QSpinBox,
@@ -185,17 +186,44 @@ class FuelCalculator(BaseDialog):
         self.button_adddata.setHidden(not checked)
         self.button_toggle.setText("Hide History" if checked else "Show History")
 
-        if checked:
-            width = self.sizeHint().width()
-            self.setFixedWidth(width)
-        else:
-            margin = self.layout().contentsMargins()
-            width = self.panel_calculator.sizeHint().width()
-            self.setFixedWidth(width + margin.left() + margin.right())
+        margin = self.layout().contentsMargins()
+        width = self.panel_calculator.sizeHint().width() + margin.left() + margin.right()
 
-        if checked != cfg.user.config["fuel_calculator"]["show_consumption_history"]:
-            cfg.user.config["fuel_calculator"]["show_consumption_history"] = checked
+        if checked:
+            width += self.panel_history.sizeHint().width() + self.layout().spacing()
+        self.setFixedWidth(width)
+
+        config = cfg.user.config["fuel_calculator"]
+        if checked != config["show_consumption_history"]:
+            config["show_consumption_history"] = checked
             cfg.save(config_type=ConfigType.CONFIG)
+
+    def table_header_menu(self, position: QPoint):
+        """Open table header context menu"""
+        config = cfg.user.config["fuel_calculator"]
+        table = self.panel_history.table_history
+
+        menu = QMenu()  # no parent for temp menu
+
+        for option_name in config:
+            if option_name.startswith("show_column"):
+                action_name = option_name.replace("show_column_", "").replace("_", " ").title()
+                action = menu.addAction(action_name)
+                action.setCheckable(True)
+                action.setChecked(config[option_name])
+
+        selected_action = menu.exec_(table.mapToGlobal(position))
+        if not selected_action:
+            return
+
+        selected_name = "show_column_" + selected_action.text().replace(" ", "_").lower()
+        for option_name in config:
+            if selected_name == option_name:
+                config[option_name] = not config[option_name]
+                self.panel_history.toggle_column()
+                self.toggle_history_panel(config["show_consumption_history"])
+                cfg.save(config_type=ConfigType.CONFIG)
+                break
 
 
 class PitStopPreview(QWidget):
@@ -291,6 +319,7 @@ class HistoryPanel(QWidget):
             "F/Ratio",
             "Drain(%)",
             "Regen(%)",
+            "B/Net(%)",
             "Tyre(%)",
             f"Tank({self.symbol_fuel})",
         )
@@ -304,10 +333,31 @@ class HistoryPanel(QWidget):
         self.table_history.setFixedWidth(UIScaler.size(3 + 5 * (len(headers) - 1)))
         self.table_history.setHorizontalHeaderLabels(headers)
 
+        self.table_history.horizontalHeader().setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table_history.horizontalHeader().customContextMenuRequested.connect(parent.table_header_menu)
+        self.toggle_column()
+
         layout_panel = QVBoxLayout()
         layout_panel.setContentsMargins(0, 0, 0, 0)
         layout_panel.addWidget(self.table_history)
         self.setLayout(layout_panel)
+
+    def toggle_column(self):
+        """Toggle column visibility"""
+        config = cfg.user.config["fuel_calculator"]
+        self.table_history.setColumnHidden(4, not config["show_column_fuel_ratio"])
+        self.table_history.setColumnHidden(5, not config["show_column_battery_drain"])
+        self.table_history.setColumnHidden(6, not config["show_column_battery_regen"])
+        self.table_history.setColumnHidden(7, not config["show_column_battery_net_change"])
+        self.table_history.setColumnHidden(8, not config["show_column_tyre_wear"])
+        self.table_history.setColumnHidden(9, not config["show_column_tank_capacity"])
+
+        base_column_count = self.table_history.columnCount() - 1
+        hidden_column_count = 0
+        for column_index in range(self.table_history.columnCount()):
+            hidden_column_count += self.table_history.isColumnHidden(column_index)
+
+        self.table_history.setFixedWidth(UIScaler.size(3 + 5.1 * (base_column_count - hidden_column_count)))
 
     def refresh(self, dataset: deque[ConsumptionDataSet]):
         """Refresh history data table"""
@@ -328,6 +378,7 @@ class HistoryPanel(QWidget):
                     ("ratio", f"{calc.fuel_to_energy_ratio(lap_data.lastLapUsedFuel, lap_data.lastLapUsedEnergy):.3f}", flag_unselectable),
                     ("drain", f"{lap_data.batteryDrainLast:.3f}", flag_unselectable),
                     ("regen", f"{lap_data.batteryRegenLast:.3f}", flag_unselectable),
+                    ("net", f"{lap_data.batteryRegenLast - lap_data.batteryDrainLast:+.3f}", flag_unselectable),
                     ("tyre", f"{lap_data.tyreAvgWearLast:.3f}", flag_selectable),
                     ("tank", f"{self.unit_fuel(lap_data.capacityFuel):.3f}", flag_selectable),
                 )

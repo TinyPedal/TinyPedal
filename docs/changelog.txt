@@ -1,7 +1,8 @@
 WIP
 -----------------------------
 * Fuel calculator
-  - Added fuel ratio (F/Ratio) column to history table for quick reviewing.
+  - Added "fuel ratio (F/Ratio)" & "battery net change (B/Net)" columns to history table for quick reviewing.
+  - Added right-click context menu to history table header, which allows to show or hide nonessential data column.
 
 * Radar Widget
   - Added "show_opposite_course" option, which highlights collision course from vehicle driving at opposite direction. Useful to quickly spot accidents or spins ahead.
