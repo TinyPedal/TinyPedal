@@ -2812,6 +2812,9 @@ Show virtual energy consumption instead of fuel consumption if available. This o
     show_fuel_sign
 Show fuel (or virtual energy) unit sign. `L` for liter, `G` for Gallon, `E` for virtual energy.
 
+    show_fuel_ratio
+Show fuel ratio between fuel and energy consumption.
+
     show_wear
 Show average tyre wear (percent) per lap.
 

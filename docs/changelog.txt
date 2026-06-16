@@ -4,6 +4,9 @@ WIP
   - Added "fuel ratio (F/Ratio)" & "battery net change (B/Net)" columns to history table for quick reviewing.
   - Added right-click context menu to history table header, which allows to show or hide nonessential data column.
 
+* Lap time history Widget
+  - Added "show_fuel_ratio" option, which shows fuel ratio readings from current and previous laps.
+
 * Radar Widget
   - Added "show_opposite_course" option, which highlights collision course from vehicle driving at opposite direction. Useful to quickly spot accidents or spins ahead.
   - Added "minimum_opposite_course_angle" option, which sets minimum opposite course detection angle relative to local player. Default is "80" degrees.

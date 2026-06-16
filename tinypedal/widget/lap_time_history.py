@@ -224,6 +224,40 @@ class Realtime(Overlay):
                 )
                 layout.addWidget(self.cap_fuel, row_caption, self.wcfg["display_order_fuel"])
 
+        # Fuel ratio
+        if self.wcfg["show_fuel_ratio"]:
+            decimals_ratio = max(self.wcfg["decimal_places_fuel_ratio"], 1)
+            self.width_ratio = 2 + decimals_ratio
+            self.bars_ratio = self.set_rawtext(
+                text=f"-.{'-' * decimals_ratio}",
+                width=font_m.width * self.width_ratio + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_last_fuel_ratio"],
+                bg_color=self.wcfg["background_color_last_fuel_ratio"],
+                count=self.history_slot + 1,
+            )
+            self.bars_ratio[0].fg = self.wcfg["font_color_fuel_ratio"]
+            self.bars_ratio[0].bg = self.wcfg["background_color_fuel_ratio"]
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_ratio,
+                row_start=1,
+                column=self.wcfg["display_order_fuel_ratio"],
+                bottom_to_top=layout_reversed,
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_fuel_ratio"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout.addWidget(cap_temp, row_caption, self.wcfg["display_order_fuel_ratio"])
+
         # Tyre wear
         if self.wcfg["show_wear"]:
             if self.wcfg["show_wear_sign"]:
@@ -289,6 +323,8 @@ class Realtime(Overlay):
             if self.wcfg["show_caption"]:
                 self.update_fuel_caption(self.cap_fuel, energy_type)
             self.update_fuel(self.bars_fuel[0], fuel, sign_fuel)
+        if self.wcfg["show_fuel_ratio"]:
+            self.update_ratio(self.bars_ratio[0], minfo.hybrid.fuelEnergyRatio)
         if self.wcfg["show_wear"]:
             self.update_wear(self.bars_wear[0], calc.mean(minfo.wheels.estimatedTreadWear))
 
@@ -342,6 +378,13 @@ class Realtime(Overlay):
             target.text = text_caption
             target.update()
 
+    def update_ratio(self, target, data):
+        """Fuel ratio data"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{data:.{self.width_ratio}f}"[:self.width_ratio].strip(".")
+            target.update()
+
     def update_wear(self, target, data):
         """Wear data"""
         if target.last != data:
@@ -387,6 +430,11 @@ class Realtime(Overlay):
                     sign_fuel = self.sign_fuel
                 self.update_fuel(self.bars_fuel[index], fuel, sign_fuel)
                 self.bars_fuel[index].setHidden(hidden)
+
+            if self.wcfg["show_fuel_ratio"]:
+                fuel_ratio = calc.fuel_to_energy_ratio(data.lastLapUsedFuel, data.lastLapUsedEnergy)
+                self.update_ratio(self.bars_ratio[index], fuel_ratio)
+                self.bars_ratio[index].setHidden(hidden)
 
             if self.wcfg["show_wear"]:
                 self.update_wear(self.bars_wear[index], data.tyreAvgWearLast)

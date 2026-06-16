@@ -772,7 +772,7 @@ def one_less_pit_stop_consumption(
 
 def fuel_to_energy_ratio(fuel: float, energy: float) -> float:
     """Fuel to energy ratio"""
-    if energy:
+    if fuel and energy:
         return fuel / energy
     return 0
 
