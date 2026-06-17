@@ -125,6 +125,13 @@ def engine_power(torque: float, rpm: float) -> float:
     return 0
 
 
+def engine_torque(power_kw: float, rpm: float) -> float:
+    """Engine torque (Nm)"""
+    if rpm != 0:
+        return power_kw * 9549.3 / rpm
+    return 0
+
+
 def rake(height_fl: float, height_fr: float, height_rl: float, height_rr: float) -> float:
     """Raw rake (front & rear ride height difference in millimeters)"""
     return (height_rr + height_rl - height_fr - height_fl) * 0.5

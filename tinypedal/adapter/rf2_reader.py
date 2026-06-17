@@ -211,6 +211,26 @@ class Engine(_reader.Engine, DataAdapter):
         """Lift and coast progress (fraction), range 0.0 to 1.0"""
         return 0.0
 
+    def fuel(self, index: int | None = None) -> float:
+        """Remaining fuel (liters)"""
+        return rmnan(self.shmm.rf2TeleVeh(index).mFuel)
+
+    def fuel_fraction(self, index: int | None = None) -> float:
+        """Remaining fuel (fraction)"""
+        return self.shmm.rf2ScorVeh(index).mFuelFraction / 255
+
+    def tank_capacity(self, index: int | None = None) -> float:
+        """Fuel tank capacity (liters)"""
+        return rmnan(self.shmm.rf2TeleVeh(index).mFuelCapacity)
+
+    def virtual_energy(self, index: int | None = None) -> float:
+        """Remaining virtual energy (fraction)"""
+        return 0.0
+
+    def max_virtual_energy(self) -> float:
+        """Maximum virtual energy (joule)"""
+        return 0.0
+
 
 class Inputs(_reader.Inputs, DataAdapter):
     """Inputs"""
@@ -937,22 +957,6 @@ class Vehicle(_reader.Vehicle, DataAdapter):
             return 3
         return 0
 
-    def fuel(self, index: int | None = None) -> float:
-        """Remaining fuel (liters)"""
-        return rmnan(self.shmm.rf2TeleVeh(index).mFuel)
-
-    def fuel_fraction(self, index: int | None = None) -> float:
-        """Remaining fuel (fraction)"""
-        return self.shmm.rf2ScorVeh(index).mFuelFraction / 255
-
-    def tank_capacity(self, index: int | None = None) -> float:
-        """Fuel tank capacity (liters)"""
-        return rmnan(self.shmm.rf2TeleVeh(index).mFuelCapacity)
-
-    def virtual_energy(self, index: int | None = None) -> float:
-        """Remaining virtual energy (fraction)"""
-        return 0.0
-
     def orientation_yaw_radians(self, index: int | None = None) -> float:
         """Orientation yaw (radians)"""
         ori = self.shmm.rf2TeleVeh(index).mOri[2]
@@ -1027,7 +1031,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         total = (
             1
             - sum(data.mDentSeverity) / 16
-            - any(wheel_data.mDetached for wheel_data in data.mWheels) / 2
+            - any(wheel_data.mDetached for wheel_data in data.mWheels)
             - data.mDetached / 2
         )
         return total

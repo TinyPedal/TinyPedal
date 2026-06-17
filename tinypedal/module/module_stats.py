@@ -147,7 +147,7 @@ class Realtime(DataModule):
                     last_lap_etime = lap_etime
 
                 # Fuel consumed (liter)
-                fuel_curr = api.read.vehicle.fuel()
+                fuel_curr = api.read.engine.fuel()
                 if fuel_last < fuel_curr:
                     fuel_last = fuel_curr
                 elif fuel_last > fuel_curr:

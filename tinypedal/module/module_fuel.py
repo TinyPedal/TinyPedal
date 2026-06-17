@@ -87,7 +87,7 @@ class Realtime(DataModule):
                 gen_fuel_usage.send(True)
 
                 # Calculate virtual energy if available
-                minfo.energy.available = (api.read.vehicle.virtual_energy() != 0)
+                minfo.energy.available = (api.read.engine.virtual_energy() != 0)
                 if minfo.energy.available:
                     gen_energy_usage.send(True)
 
@@ -115,7 +115,7 @@ def detect_consumption_type() -> Callable:
     if (
         api.name == API_RF2_NAME
         and api.read.emotor.battery_charge() > 0
-        and (api.read.vehicle.tank_capacity() == 1 or api.read.vehicle.tank_capacity() == 0)
+        and (api.read.engine.tank_capacity() == 1 or api.read.engine.tank_capacity() == 0)
     ):
         return telemetry_battery
     # Fuel based vehicle
@@ -124,7 +124,7 @@ def detect_consumption_type() -> Callable:
 
 def telemetry_fuel() -> tuple[float, float]:
     """Telemetry fuel"""
-    return max(api.read.vehicle.tank_capacity(), 0.01), api.read.vehicle.fuel()
+    return max(api.read.engine.tank_capacity(), 0.01), api.read.engine.fuel()
 
 
 def telemetry_battery() -> tuple[float, float]:
@@ -134,7 +134,7 @@ def telemetry_battery() -> tuple[float, float]:
 
 def telemetry_energy() -> tuple[float, float]:
     """Telemetry energy, output in percentage"""
-    return 100.0, api.read.vehicle.virtual_energy() * 100
+    return 100.0, api.read.engine.virtual_energy() * 100
 
 
 @generator_init

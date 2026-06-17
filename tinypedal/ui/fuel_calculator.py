@@ -454,7 +454,7 @@ class CalculatorPanel(QWidget):
             self.input_laptime.seconds.setValue(laptime % 60)
             self.input_laptime.mseconds.setValue(laptime % 1 * 1000)
         # Load tank capacity
-        capacity = max(api.read.vehicle.tank_capacity(), latest_history.capacityFuel)
+        capacity = max(api.read.engine.tank_capacity(), latest_history.capacityFuel)
         if capacity:
             self.input_fuel.capacity.setValue(self.unit_fuel(capacity))
         # Load consumption from last valid lap

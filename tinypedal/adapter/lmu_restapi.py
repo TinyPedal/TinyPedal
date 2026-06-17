@@ -50,6 +50,7 @@ class RestAPIData:
         "aeroDamage",
         "pitStopTime",
         "absoluteRefill",
+        "maxVirtualEnergy",
         "forecastPractice",
         "forecastQualify",
         "forecastRace",
@@ -66,6 +67,7 @@ class RestAPIData:
         self.aeroDamage: float = -1.0
         self.pitStopTime: float = 0.0
         self.absoluteRefill: float = 0.0
+        self.maxVirtualEnergy: float = 0.0
         self.forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
         self.forecastQualify: tuple[WeatherNode, ...] = FORECAST_DEFAULT
         self.forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
@@ -91,6 +93,7 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
         ResOutput("brakeWear", WHEELS_NA, export_wheels, ("wearables", "brakes")),
         ResOutput("suspensionDamage", WHEELS_NA, export_wheels, ("wearables", "suspension")),
         ResOutput("absoluteRefill", 0.0, absolute_refilling, ("pitMenu", "pitMenu")),
+        ResOutput("maxVirtualEnergy", 0.0, valid_value_type, ("fuelInfo", "maxVirtualEnergy")),
     )
     res_garagesetup = (
         ResOutput("steeringWheelRange", 0.0, steerlock_to_number, ("VM_STEER_LOCK", "stringValue")),

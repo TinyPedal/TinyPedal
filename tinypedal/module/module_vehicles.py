@@ -244,7 +244,7 @@ def update_vehicle_data(
 
             lap_start_time = api.read.timing.start(index)
             last_laptime = api.read.timing.last_laptime(index)
-            fuel_remaining = api.read.vehicle.fuel_fraction(index)
+            fuel_remaining = api.read.engine.fuel_fraction(index)
 
             data.lapTimeHistory.update(lap_start_time, elapsed_time, data.bestLapTime)
             data.fuelHistory.update(lap_start_time, fuel_remaining)

@@ -23,6 +23,7 @@ Engine Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
+from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -170,6 +171,19 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
+        rpm = api.read.engine.rpm()
+        torque = api.read.engine.torque()
+        if torque == 0:
+            # Calculate power & torque based on energy consumption if torque n/a
+            max_ve = api.read.engine.max_virtual_energy()
+            if max_ve > 0:
+                power_kw = minfo.energy.rateOfConsumption * max_ve / 100_000
+                torque = calc.engine_torque(power_kw, rpm)
+            else:
+                power_kw = 0
+        else:
+            power_kw = calc.engine_power(torque, rpm)
+
         # Oil temperature
         if self.wcfg["show_oil_temperature"]:
             temp_oil = round(api.read.engine.oil_temperature(), 2)
@@ -187,8 +201,7 @@ class Realtime(Overlay):
 
         # Engine RPM
         if self.wcfg["show_rpm"]:
-            rpm = int(api.read.engine.rpm())
-            self.update_rpm(self.bar_rpm, rpm)
+            self.update_rpm(self.bar_rpm, int(rpm))
 
         # Engine RPM maximum
         if self.wcfg["show_rpm_maximum"]:
@@ -197,14 +210,11 @@ class Realtime(Overlay):
 
         # Engine torque
         if self.wcfg["show_torque"]:
-            torque = round(api.read.engine.torque(), 2)
             self.update_torque(self.bar_torque, torque)
 
         # Engine power
         if self.wcfg["show_power"]:
-            power = round(calc.engine_power(
-                api.read.engine.torque(), api.read.engine.rpm()), 2)
-            self.update_power(self.bar_power, power)
+            self.update_power(self.bar_power, power_kw)
 
     # GUI update methods
     def update_oil(self, target, data):

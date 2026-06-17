@@ -150,6 +150,26 @@ class Engine(ABC):
     def lift_and_coast_progress(self, index: int | None = None) -> float:
         """Lift and coast progress (fraction), range 0.0 to 1.0"""
 
+    @abstractmethod
+    def fuel(self, index: int | None = None) -> float:
+        """Remaining fuel (liters)"""
+
+    @abstractmethod
+    def fuel_fraction(self, index: int | None = None) -> float:
+        """Remaining fuel (fraction)"""
+
+    @abstractmethod
+    def tank_capacity(self, index: int | None = None) -> float:
+        """Fuel tank capacity (liters)"""
+
+    @abstractmethod
+    def virtual_energy(self, index: int | None = None) -> float:
+        """Remaining virtual energy (fraction)"""
+
+    @abstractmethod
+    def max_virtual_energy(self) -> float:
+        """Maximum virtual energy (joule)"""
+
 
 class Inputs(ABC):
     """Inputs"""
@@ -689,22 +709,6 @@ class Vehicle(ABC):
     @abstractmethod
     def finish_state(self, index: int | None = None) -> int:
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""
-
-    @abstractmethod
-    def fuel(self, index: int | None = None) -> float:
-        """Remaining fuel (liters)"""
-
-    @abstractmethod
-    def fuel_fraction(self, index: int | None = None) -> float:
-        """Remaining fuel (fraction)"""
-
-    @abstractmethod
-    def tank_capacity(self, index: int | None = None) -> float:
-        """Fuel tank capacity (liters)"""
-
-    @abstractmethod
-    def virtual_energy(self, index: int | None = None) -> float:
-        """Remaining virtual energy (fraction)"""
 
     @abstractmethod
     def orientation_yaw_radians(self, index: int | None = None) -> float:
