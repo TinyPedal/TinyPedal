@@ -122,8 +122,9 @@ class SyncData:
 
     Attributes:
         dataset: mmap data set.
-        paused: Data update state (boolean).
-        override_player_index: Player index override state (boolean).
+        paused: Is API data paused.
+        synced: Is player data synced.
+        override_player_index: is player index overidden.
         player_scor_index: Local player scoring index.
         player_scor: Local player scoring data.
         player_tele: Local player telemetry data.
@@ -135,6 +136,7 @@ class SyncData:
         "_event",
         "_tele_indexes",
         "paused",
+        "synced",
         "override_player_index",
         "player_scor_index",
         "player_scor",
@@ -149,6 +151,7 @@ class SyncData:
         self._tele_indexes = {_index: _index for _index in range(128)}
 
         self.paused = False
+        self.synced = False
         self.override_player_index = False
         self.player_scor_index = INVALID_INDEX
         self.player_scor = None
@@ -255,6 +258,8 @@ class SyncData:
     def __update(self) -> None:
         """Update synced player data"""
         self.paused = False  # make sure initial pause state is false
+        self.synced = False
+
         _event_wait = self._event.wait
         freezed_version = 0  # store freezed update version number
         last_version_update = 0  # store last update version number
@@ -273,14 +278,14 @@ class SyncData:
                 # Pause if local player index no longer exists, 5 tries
                 if data_synced:
                     reset_counter = 0
-                    self.paused = False
+                    self.synced = True
                 elif reset_counter < 6:
                     reset_counter += 1
                     if reset_counter == 5:
                         self.player_scor_index = INVALID_INDEX
                         self.__sync_player_scor()
                         self.__sync_player_tele()
-                        self.paused = True
+                        self.synced = False
                         logger.info("sharedmemory: UPDATING: player data paused")
 
             version_update = self.dataset.scor.data.mVersionUpdateEnd
@@ -302,6 +307,7 @@ class SyncData:
             elif monotonic() - last_update_time > 2:
                 update_delay = 0.5
                 self.paused = data_freezed = True
+                self.synced = False
                 freezed_version = last_version_update
                 logger.info(
                     "sharedmemory: UPDATING: paused, data version %s",
@@ -431,14 +437,14 @@ class RF2Info:
     @property
     def isPaused(self) -> bool:
         """Check whether data stopped updating"""
-        return self._sync.paused or self._sync.player_scor_index < 0
+        return self._sync.paused #or self._sync.player_scor_index < 0
 
     @property
     def isActive(self) -> bool:
         """Check whether in active (driving or overriding) state"""
         if self._state_override:
             return self._active_state
-        return not self._sync.paused and self._sync.player_scor_index >= 0 and (
+        return self._sync.synced and self._sync.player_scor_index >= 0 and (
             self.rf2ScorInfo.mInRealtime
             or self.rf2TeleVeh().mIgnitionStarter > 0
         )
