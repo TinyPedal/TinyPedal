@@ -20,6 +20,8 @@
 Track & pace notes editor
 """
 
+from __future__ import annotations
+
 import os
 
 from PySide2.QtCore import QPoint, Qt
@@ -42,16 +44,20 @@ from PySide2.QtWidgets import (
 )
 
 from ..api_control import api
-from ..formatter import strip_invalid_char
+from ..const_common import EMPTY_DICT
 from ..setting import cfg
 from ..userfile.track_notes import (
+    COLUMN_DISTANCE,
+    COLUMN_TAGS,
     NOTESTYPE_PACE,
     NOTESTYPE_TRACK,
+    TAG_PITNOTES,
     create_notes_metadata,
     load_notes_file,
     save_notes_file,
     set_notes_filter,
     set_notes_header,
+    set_notes_header_by_filter,
     set_notes_parser,
     set_notes_writer,
 )
@@ -89,7 +95,6 @@ class TrackNotesEditor(BaseEditor):
         self.notes_type = None
         self.notes_header = None
         self.notes_metadata = create_notes_metadata()
-        self.notes_temp = []
         self._verify_enabled = True
 
         # Set status bar
@@ -104,7 +109,7 @@ class TrackNotesEditor(BaseEditor):
         splitter.addWidget(self.editor_panel)
         splitter.setCollapsible(0, False)
         splitter.setCollapsible(1, False)
-        splitter.setStretchFactor(0,1)
+        #splitter.setStretchFactor(0,1)
 
         # Init setting & table
         self.create_pacenotes()
@@ -251,7 +256,7 @@ class TrackNotesEditor(BaseEditor):
         layout_editor.setContentsMargins(0, 0, 0, 0)
 
         editor_panel = QFrame(self)
-        editor_panel.setMinimumSize(UIScaler.size(38), UIScaler.size(38))
+        editor_panel.setMinimumSize(UIScaler.size(40), UIScaler.size(38))
         editor_panel.setLayout(layout_editor)
         return editor_panel
 
@@ -277,9 +282,8 @@ class TrackNotesEditor(BaseEditor):
 
         self.set_notes_type(notes_type)
         self.filename_entry.setText(self.get_track_name())
-        self.notes_temp.clear()
         self.notes_metadata.update(create_notes_metadata())
-        self.refresh_table()
+        self.refresh_table([])
         self.add_notes()
         self.set_unmodified()
 
@@ -321,36 +325,48 @@ class TrackNotesEditor(BaseEditor):
 
         notes_sorted, meta_info = notes_parsed
         self.set_notes_type(notes_type)
-        self.notes_temp = notes_sorted
         self.notes_metadata.update(meta_info)
         self.filename_entry.setText(filename)
-        self.refresh_table()
+        self.refresh_table(notes_sorted)
         self.set_unmodified()
         self.mark_positions_on_map()
 
-    def refresh_table(self):
+    def refresh_table(self, notes_sorted: list[dict]):
         """Refresh notes table"""
         self.table_notes.setRowCount(0)
         self.table_notes.setColumnCount(len(self.notes_header))
         self.table_notes.setHorizontalHeaderLabels(self.notes_header)
         self.table_notes.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
         self.table_notes.setColumnWidth(0, UIScaler.size(6))
+        self.table_notes.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
+        self.table_notes.setColumnWidth(3, UIScaler.size(3))
 
         self._verify_enabled = False
-        for row_index, note_line in enumerate(self.notes_temp):
-            self.table_notes.insertRow(row_index)
-            for column_index, fieldname in enumerate(self.notes_header):
-                value = note_line[fieldname]
-                if column_index == 0:
-                    item = FloatTableItem(round(value, DECIMALS))
-                else:
-                    item = QTableWidgetItem(value)
-                self.table_notes.setItem(row_index, column_index, item)
+        for row_index, note_line in enumerate(notes_sorted):
+            self.add_table_row(row_index, note_line)
         self._verify_enabled = True
+
+    def add_table_row(self, row_index: int, note_data: dict = EMPTY_DICT):
+        """Add new table row"""
+        self.table_notes.insertRow(row_index)
+        for column_index, fieldname in enumerate(self.notes_header):
+            if fieldname == COLUMN_DISTANCE:
+                value = note_data.get(fieldname, 0)
+                item = FloatTableItem(round(value, DECIMALS))
+            elif fieldname == COLUMN_TAGS:
+                value = note_data.get(fieldname, "")
+                item = QTableWidgetItem(value)
+                item.setFlags(Qt.NoItemFlags)
+                item.setForeground(Qt.red)
+            else:
+                value = note_data.get(fieldname, "")
+                item = QTableWidgetItem(value)
+            self.table_notes.setItem(row_index, column_index, item)
 
     def open_replace_dialog(self):
         """Open replace dialog"""
-        selector = {name: index for index, name in enumerate(self.notes_header) if index > 0}
+        excludes = (COLUMN_DISTANCE, COLUMN_TAGS)
+        selector = {name: index for index, name in enumerate(self.notes_header) if name not in excludes}
         _dialog = TableBatchReplace(self, selector, self.table_notes)
         _dialog.open()
 
@@ -416,24 +432,21 @@ class TrackNotesEditor(BaseEditor):
 
     def add_notes(self):
         """Add new notes entry"""
-        self.add_table_row(
-            self.table_notes.rowCount(),
-            self.table_notes.columnCount()
-        )
+        row_index = self.table_notes.rowCount()
+        self.add_table_row(row_index)
+        self.table_notes.setCurrentCell(row_index, 0)
 
     def insert_notes(self, row_offset: int = 0):
         """Insert new notes entry"""
-        self.add_table_row(
-            self.table_notes.currentRow() + row_offset,
-            self.table_notes.columnCount()
-        )
+        row_index = self.table_notes.currentRow() + row_offset
+        self.add_table_row(row_index)
+        self.table_notes.setCurrentCell(row_index, 0)
 
-    def sort_notes(self) -> bool:
+    def sort_notes(self):
         """Sort notes by distance in ascending order"""
         if self.table_notes.rowCount() > 1:
             self.table_notes.sortItems(0)
             self.set_modified()
-        return True
 
     def delete_notes(self):
         """Delete notes entry"""
@@ -450,7 +463,7 @@ class TrackNotesEditor(BaseEditor):
         self.set_modified()
         self.mark_positions_on_map()
 
-    def update_notes_temp(self, table_header):
+    def update_notes_temp(self, table_header: tuple[str, ...]):
         """Update temporary changes to notes temp"""
         temp = (
             {
@@ -461,7 +474,7 @@ class TrackNotesEditor(BaseEditor):
             }
             for row_index in range(self.table_notes.rowCount())
         )
-        self.notes_temp = list(temp)
+        return list(temp)
 
     @staticmethod
     def parse_notes(item, index: int):
@@ -476,14 +489,7 @@ class TrackNotesEditor(BaseEditor):
 
     def save_notes(self, notes_type: str):
         """Save notes"""
-        if not self.sort_notes():
-            return
-
-        self.update_notes_temp(self.notes_header)
-
-        if not self.notes_temp:
-            QMessageBox.warning(self, "Error", "Nothing to save.")
-            return
+        self.sort_notes()
 
         filename = self.filename_entry.text()
         if not filename:  # try find track name if file name was not set
@@ -497,13 +503,22 @@ class TrackNotesEditor(BaseEditor):
         if not filename_full:  # save canceled
             return
 
+        output_header = set_notes_header_by_filter(file_filter)
+        if not output_header:  # fallback to current header
+            output_header = self.notes_header
+        output_notes = self.update_notes_temp(output_header)
+
+        if not output_notes:
+            QMessageBox.warning(self, "Error", "Nothing to save.")
+            return
+
         filepath = os.path.dirname(filename_full) + "/"
         filename = os.path.basename(filename_full)
         save_notes_file(
             filepath=filepath,
             filename=filename,
-            table_header=self.notes_header,
-            dataset=self.notes_temp,
+            table_header=output_header,
+            dataset=output_notes,
             metadata=self.notes_metadata,
             writer=set_notes_writer(file_filter),
         )
@@ -526,18 +541,18 @@ class TrackNotesEditor(BaseEditor):
         """Verify input value"""
         if self._verify_enabled:
             self.set_modified()
-            item = self.table_notes.item(row_index, column_index)
             if column_index == 0:
+                item = self.table_notes.item(row_index, column_index)
                 item.validate()
                 self.mark_positions_on_map()
-            elif column_index == 1 and self.notes_type == NOTESTYPE_PACE:
-                # Remove invalid char (filename) from pace note column
-                item.setText(strip_invalid_char(item.text()))
 
     def set_context_menu(self):
         """Set context menu"""
         menu = QMenu(self)
         menu.addAction("Highlight on Map")
+        menu.addSeparator()
+        menu.addAction("Add Pit Tag")
+        menu.addAction("Remove Pit Tag")
         menu.addSeparator()
         menu.addAction("Set from Map")
         menu.addAction("Set from Telemetry")
@@ -549,7 +564,8 @@ class TrackNotesEditor(BaseEditor):
 
     def open_context_menu(self, position: QPoint):
         """Open context menu"""
-        if not self.table_notes.itemAt(position):
+        item = self.table_notes.itemAt(position)
+        if not item or item.column() == 3:
             return
 
         position += QPoint(  # position correction from header
@@ -565,6 +581,10 @@ class TrackNotesEditor(BaseEditor):
         if action == "Highlight on Map":
             self.mark_positions_on_map()
             self.highlight_position_on_map()
+        elif action == "Add Pit Tag":
+            self.add_tag(TAG_PITNOTES)
+        elif action == "Remove Pit Tag":
+            self.remove_tag(TAG_PITNOTES)
         elif action == "Set from Map":
             self.set_position_from_map()
         elif action == "Set from Telemetry":
@@ -575,6 +595,25 @@ class TrackNotesEditor(BaseEditor):
             self.insert_notes(1)
         elif action == "Delete Rows":
             self.delete_notes()
+
+    def add_tag(self, tag_name: str):
+        """Add tag"""
+        column_index = 3
+        row_indexes = set(data.row() for data in self.table_notes.selectedIndexes())
+        for row_index in row_indexes:
+            item = self.table_notes.item(row_index, column_index)
+            text = item.text()
+            if tag_name not in text:
+                item.setText(text + tag_name)
+
+    def remove_tag(self, tag_name: str):
+        """Remove tag"""
+        column_index = 3
+        row_indexes = set(data.row() for data in self.table_notes.selectedIndexes())
+        for row_index in row_indexes:
+            item = self.table_notes.item(row_index, column_index)
+            text = item.text()
+            item.setText(text.replace(tag_name, ""))
 
     def highlight_position_on_map(self):
         """Highlight selected position on map"""
@@ -596,17 +635,6 @@ class TrackNotesEditor(BaseEditor):
         if not track_name:
             return self.trackmap.map_filename
         return track_name
-
-    def add_table_row(self, row_index: int, column_count: int):
-        """Add new table row"""
-        self.table_notes.insertRow(row_index)
-        self.table_notes.setCurrentCell(row_index, 0)
-        for column_index in range(column_count):
-            if column_index == 0:
-                item = FloatTableItem(0)
-            else:
-                item = QTableWidgetItem("")
-            self.table_notes.setItem(row_index, column_index, item)
 
 
 class MetaDataEditor(BaseDialog):

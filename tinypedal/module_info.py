@@ -886,11 +886,13 @@ class ModuleInfo:
         "history",
         "hybrid",
         "mapping",
-        "pacenotes",
         "relative",
         "sectors",
         "stats",
+        "pacenotes",
+        "pacenotes_pit",
         "tracknotes",
+        "tracknotes_pit",
         "vehicles",
         "wheels",
     )
@@ -903,11 +905,13 @@ class ModuleInfo:
         self.history = HistoryInfo()
         self.hybrid = HybridInfo()
         self.mapping = MappingInfo()
-        self.pacenotes = NotesInfo()
         self.relative = RelativeInfo()
         self.sectors = SectorsInfo()
         self.stats = StatsInfo()
+        self.pacenotes = NotesInfo()
+        self.pacenotes_pit = NotesInfo()
         self.tracknotes = NotesInfo()
+        self.tracknotes_pit = NotesInfo()
         self.vehicles = VehiclesInfo()
         self.wheels = WheelsInfo()
 

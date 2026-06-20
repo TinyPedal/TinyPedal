@@ -71,6 +71,7 @@ class PaceNotesPlayer(QMediaPlayer):
         # Last data
         self._checked = False
         self._last_notes_index = None
+        self._last_pit_notes_index = None
         self._play_queue: list[str] = []
 
     def set_audio_device(self):
@@ -101,6 +102,7 @@ class PaceNotesPlayer(QMediaPlayer):
         """Reset"""
         self._checked = False
         self._last_notes_index = None
+        self._last_pit_notes_index = None
         self._play_queue.clear()
         self.stop()
         self.set_volume(self.mcfg["pace_notes_sound_volume"])
@@ -113,13 +115,21 @@ class PaceNotesPlayer(QMediaPlayer):
             if not self._checked:
                 self._checked = True
 
-            # Playback
+            # Out pit notes
             notes_index = minfo.pacenotes.currentIndex
             if self._last_notes_index != notes_index:
                 self._last_notes_index = notes_index
-                if self.mcfg["enable_playback_while_in_pit"] or not api.read.vehicle.in_pits():
+                if not api.read.vehicle.in_pits():
                     self.__update_queue(minfo.pacenotes.currentNote.get(COLUMN_PACENOTE))
 
+            # In pit notes
+            notes_index = minfo.pacenotes_pit.currentIndex
+            if self._last_pit_notes_index != notes_index:
+                self._last_pit_notes_index = notes_index
+                if self.mcfg["enable_playback_while_in_pit"] and api.read.vehicle.in_pits() and not api.read.vehicle.in_garage():
+                    self.__update_queue(minfo.pacenotes_pit.currentNote.get(COLUMN_PACENOTE))
+
+            # Playback
             if self._play_queue:
                 self.__play_next_in_queue()
 

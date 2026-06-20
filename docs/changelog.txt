@@ -1,5 +1,18 @@
 WIP
 -----------------------------
+* Track Notes Editor
+  - Added "tags" column for both track & pace notes files, which allows to add tags to specific notes that displayed or played under specific scenario (requested by user "scintilla0").
+  - Added "Add Pit Tag" & "Remove Pit Tag" options to right-click context menu, which adds or removes "#pit" tag from notes. Notes that tagged with "#pit" will be only displayed or played while in pit lane. Selecting multiple notes to add or remove tags in batch.
+  - Now supports saving "pace notes" as "track notes" file, or the opposite way.
+
+* Pace Notes Playback
+  - "Enable Playback While in Pit Lane" option now plays notes that tagged with "#pit" while in pit lane.
+  - Notes that without "#pit" tag are no longer played in pit lane.
+
+* Pace notes, Track notes Widget
+  - Now displays notes that tagged with "#pit" from pace or track notes file while in pit lane.
+  - Notes that without "#pit" tag are no longer displayed in pit lane.
+
 * Fuel calculator
   - Added "fuel ratio (F/Ratio)" & "battery net change (B/Net)" columns to history table for quick reviewing.
   - Added right-click context menu to history table header, which allows to show or hide nonessential data column.

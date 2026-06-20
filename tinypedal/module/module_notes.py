@@ -31,8 +31,10 @@ from ..const_file import FileExt
 from ..module_info import NotesInfo, minfo
 from ..userfile.track_notes import (
     COLUMN_DISTANCE,
+    COLUMN_TAGS,
     HEADER_PACE_NOTES,
     HEADER_TRACK_NOTES,
+    TAG_PITNOTES,
     load_notes_file,
     parse_csv_notes_only,
 )
@@ -58,6 +60,8 @@ class Realtime(DataModule):
         userpath_track_notes = self.cfg.path.track_notes
         output_pacenotes = minfo.pacenotes
         output_tracknotes = minfo.tracknotes
+        output_pacenotes_pit = minfo.pacenotes_pit
+        output_tracknotes_pit = minfo.tracknotes_pit
 
         setting_playback = self.cfg.user.setting["pace_notes_playback"]
 
@@ -82,7 +86,13 @@ class Realtime(DataModule):
                     if pace_notes:
                         gen_pacenotes = notes_selector(
                             output=output_pacenotes,
-                            dataset=pace_notes,
+                            dataset=filter_notes(pace_notes),
+                            pit_only=False,
+                        )
+                        gen_pacenotes_pit = notes_selector(
+                            output=output_pacenotes_pit,
+                            dataset=filter_tags(pace_notes, TAG_PITNOTES),
+                            pit_only=True,
                         )
 
                     # Load track notes
@@ -96,7 +106,13 @@ class Realtime(DataModule):
                     if track_notes:
                         gen_tracknotes = notes_selector(
                             output=output_tracknotes,
-                            dataset=track_notes,
+                            dataset=filter_notes(track_notes),
+                            pit_only=False,
+                        )
+                        gen_tracknotes_pit = notes_selector(
+                            output=output_tracknotes_pit,
+                            dataset=filter_tags(track_notes, TAG_PITNOTES),
+                            pit_only=True,
                         )
 
                 # Update position
@@ -104,11 +120,14 @@ class Realtime(DataModule):
 
                 # Update pace notes
                 if pace_notes:
-                    gen_pacenotes.send(pos_synced + setting_playback["pace_notes_global_offset"])
+                    pos_offset = pos_synced + setting_playback["pace_notes_global_offset"]
+                    gen_pacenotes.send(pos_offset)
+                    gen_pacenotes_pit.send(pos_offset)
 
                 # Update track notes
                 if track_notes:
                     gen_tracknotes.send(pos_synced)
+                    gen_tracknotes_pit.send(pos_synced)
 
             else:
                 if reset:
@@ -116,6 +135,8 @@ class Realtime(DataModule):
                     update_interval = self.idle_interval
                     output_pacenotes.reset()
                     output_tracknotes.reset()
+                    output_pacenotes_pit.reset()
+                    output_tracknotes_pit.reset()
 
 
 def load_pace_notes_file(
@@ -136,7 +157,7 @@ def load_pace_notes_file(
 
 
 @generator_init
-def notes_selector(output: NotesInfo, dataset: list[Mapping]):
+def notes_selector(output: NotesInfo, dataset: tuple[Mapping, ...], pit_only: bool):
     """Notes selector
 
     Args:
@@ -145,13 +166,17 @@ def notes_selector(output: NotesInfo, dataset: list[Mapping]):
     """
     last_index = -99999  # make sure initial index is different
     next_index = 0  # next note line index
-    end_index = len(dataset) - 1  # end note line index
     pos_reference = reference_position(dataset)
-    pos_final = pos_reference[-1]  # final reference position
+    end_index = len(pos_reference) - 1  # end note line index
+    pos_final = pos_reference[-1] if pos_reference else 0.0  # final reference position
     output.reset()  # initial reset before updating
 
     while True:
         pos_curr = yield
+
+        if not pos_reference:
+            continue
+
         curr_index = calc.binary_search_lower(pos_reference, pos_curr, 0, end_index)
 
         if last_index == curr_index:
@@ -160,10 +185,23 @@ def notes_selector(output: NotesInfo, dataset: list[Mapping]):
         last_index = curr_index
         next_index = (curr_index + 1) * (pos_curr < pos_final)
 
+        if curr_index < 0:
+            curr_index = end_index
+
         output.currentIndex = curr_index
         output.currentNote = dataset[curr_index]
         output.nextIndex = next_index
         output.nextNote = dataset[next_index]
+
+
+def filter_notes(dataset: list[Mapping]) -> tuple[Mapping, ...]:
+    """Filter notes without tags"""
+    return tuple(_note for _note in dataset if not _note.get(COLUMN_TAGS))
+
+
+def filter_tags(dataset: list[Mapping], tag_name: str) -> tuple[Mapping, ...]:
+    """Filter notes with specific tag"""
+    return tuple(_note for _note in dataset if tag_name in _note.get(COLUMN_TAGS, ""))
 
 
 def reference_position(notes: list[Mapping]) -> tuple[float, ...]:

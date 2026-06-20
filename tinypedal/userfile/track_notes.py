@@ -38,9 +38,12 @@ COLUMN_DISTANCE = "distance"
 COLUMN_PACENOTE = "pace note"
 COLUMN_TRACKNOTE = "track note"
 COLUMN_COMMENT = "comment"
+COLUMN_TAGS = "tags"
 
-HEADER_PACE_NOTES = COLUMN_DISTANCE, COLUMN_PACENOTE, COLUMN_COMMENT
-HEADER_TRACK_NOTES = COLUMN_DISTANCE, COLUMN_TRACKNOTE, COLUMN_COMMENT
+TAG_PITNOTES = "#pit"
+
+HEADER_PACE_NOTES = COLUMN_DISTANCE, COLUMN_PACENOTE, COLUMN_COMMENT, COLUMN_TAGS
+HEADER_TRACK_NOTES = COLUMN_DISTANCE, COLUMN_TRACKNOTE, COLUMN_COMMENT, COLUMN_TAGS
 
 METADATA_FIELDNAMES = "TITLE", "AUTHOR", "DATE", "DESCRIPTION"
 
@@ -52,6 +55,7 @@ def set_notes_filter(notes_type: str) -> str:
     if notes_type == NOTESTYPE_PACE:
         filter_set = (  # pace notes filters
             FileFilter.TPPN,
+            FileFilter.TPTN,
             FileFilter.GPLINI,
             FileFilter.CSV,
             FileFilter.INI,
@@ -60,6 +64,8 @@ def set_notes_filter(notes_type: str) -> str:
     else:
         filter_set = (  # track notes filters
             FileFilter.TPTN,
+            FileFilter.TPPN,
+            FileFilter.GPLINI,
             FileFilter.CSV,
             FileFilter.INI,
             FileFilter.ALL,
@@ -72,6 +78,17 @@ def set_notes_header(notes_type: str) -> tuple[str, ...]:
     if notes_type == NOTESTYPE_PACE:
         return HEADER_PACE_NOTES
     return HEADER_TRACK_NOTES
+
+
+def set_notes_header_by_filter(file_filter: str) -> tuple[str, ...]:
+    """Set notes header by file filter"""
+    if file_filter == FileFilter.TPTN:
+        return HEADER_TRACK_NOTES
+    if file_filter == FileFilter.TPPN:
+        return HEADER_PACE_NOTES
+    if file_filter == FileFilter.GPLINI:
+        return HEADER_PACE_NOTES
+    return ()
 
 
 def set_notes_parser(file_filter: str) -> Callable:
@@ -95,28 +112,26 @@ def create_notes_metadata() -> dict:
 
 def parse_csv_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
     """Parse TinyPedal notes"""
-    notes_reader = csv.DictReader(
-        notes_file, fieldnames=table_header, restval="", restkey="unknown")
-    column_key = table_header[0]
-    column_value = table_header[1]
-    metadata_checked = False
+    # Load meta info
     meta_info = create_notes_metadata()
-    notes_temp = []
-    for note_line in notes_reader:
+    notes_header = ()
+    column_key = table_header[0]
+    for meta_line in notes_file:
+        info_split = meta_line.split(",", 1)
         # Load metadata
-        if not metadata_checked:
-            key = note_line[column_key]
-            if key in meta_info:
-                meta_info[key] = note_line[column_value]
-                continue
-            if key == column_key:  # found start of header, set checked
-                metadata_checked = True
-                continue
-        # Load notes
-        if verify_notes(note_line, column_key):
-            if not metadata_checked:  # found first valid number, set checked
-                metadata_checked = True
-            notes_temp.append(note_line)
+        key = info_split[0]
+        if key in meta_info:
+            meta_info[key] = info_split[1].strip().strip('"')
+            continue
+        if key == column_key:  # start of header
+            notes_header = meta_line.strip().split(",")
+            break
+    # Abort if header not found
+    if not notes_header:
+        raise ValueError
+    # Load notes
+    notes_reader = csv.DictReader(notes_file, fieldnames=notes_header, restval="", restkey="unknown")
+    notes_temp = (note_line for note_line in notes_reader if verify_notes(note_line, column_key))
     return sorted(notes_temp, key=itemgetter(column_key)), meta_info
 
 
@@ -145,14 +160,14 @@ def parse_gpl_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
             split_string = split_line[-1].split(";", 1)
             distance = float(split_string[0].strip())
             if len(split_string) > 1:
-                annotation = split_string[1].strip()
+                comment = split_string[1].strip()
             else:
-                annotation = ""
+                comment = ""
             notes_temp.append(
                 {
                     table_header[0]: distance,
                     table_header[1]: pace_note,
-                    table_header[2]: annotation,
+                    table_header[2]: comment,
                 }
             )
     return sorted(notes_temp, key=itemgetter(column_key)), meta_info
@@ -161,10 +176,17 @@ def parse_gpl_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
 def parse_csv_notes_only(notes_file: Iterable[str], table_header: tuple[str, ...]):
     """Parse TinyPedal notes without metadata"""
     column_key = table_header[0]
-    notes_read = csv.DictReader(
-        notes_file, fieldnames=table_header, restval="", restkey="unknown")
-    lastlist = (note_line for note_line in notes_read if verify_notes(note_line, column_key))
-    return sorted(lastlist, key=itemgetter(column_key))
+    notes_header = ()
+    for meta_line in notes_file:
+        if meta_line.startswith(column_key):  # start of header
+            notes_header = meta_line.strip().split(",")
+            break
+    # Abort if header not found
+    if not notes_header:
+        raise ValueError
+    notes_reader = csv.DictReader(notes_file, fieldnames=notes_header, restval="", restkey="unknown")
+    notes_temp = (note_line for note_line in notes_reader if verify_notes(note_line, column_key))
+    return sorted(notes_temp, key=itemgetter(column_key))
 
 
 def load_notes_file(
@@ -190,7 +212,7 @@ def write_csv_notes(
     notes_file: Any, table_header: tuple, dataset: list, metadata: dict, _: str):
     """Write TinyPedal notes format to file"""
     # Write TinyPedal file version
-    notes_file.write(f"TINYPEDAL {table_header[1].upper()}S FILE VERSION,1")
+    notes_file.write(f"TINYPEDAL {table_header[1].upper()}S FILE VERSION,2")
     notes_file.write(CRLF * 2)
     # Write metadata
     meta_output = CRLF.join(f"{key},\"{value}\"" for key, value in metadata.items())
@@ -256,7 +278,7 @@ def save_notes_file(
 
 
 def verify_notes(note_line: dict, column_key: str) -> bool:
-    """Verify notes and show errors"""
+    """Verify first column value (must be float) from notes"""
     try:
         note_line[column_key] = float(note_line[column_key])
         return True

@@ -857,11 +857,11 @@ Click `Refresh` button to manually refresh player name list.
 ## Pace notes playback
 **Pace notes playback control panel can be accessed from `Pacenotes` tab in main window.**
 
-Note, [Notes Module](#notes-module) must be enabled to allow pace notes playback.
+Note, [Notes Module](#notes-module) must be enabled to allow pace notes playback. Pace notes can be created or edited using [Track Notes Editor](#track-notes-editor).
 
 Click `Playback Enabled` or `Playback Disabled` button to quickly enable or disable pace notes playback. Disabling this option does not affect `Notes Module` or `Pace notes Widget`.
 
-Click `Enable Playback While in Pit Lane` check box to enable or disable pace notes playback while in pit lane. This option takes immediate effect when changed.
+Click `Enable Playback While in Pit Lane` check box to enable or disable pace notes (that tagged with `#pit`) playback while in pit lane. This option takes immediate effect when changed.
 
 Enable `Manually Select Pace Notes File` check box to disable auto-file-name matching, and manually select a pace notes file that can be played on any track. By default, pace notes file is automatically loaded from `pace_notes_path` if a file that matches current track name is found. This option takes immediate effect when changed.
 
@@ -1330,12 +1330,19 @@ Note, by default the editor starts in `Pace Notes` edit mode as displayed in sta
 
 The editor consists of two panel views:
 * Left panel is the `Track Map Viewer`, which can be used to visualize track map and providing analytic info for assisting notes creation. See [Track Map Viewer](#track-map-viewer) section for details.
+
 * Right panel is the track and pace notes editor, which allows to create, open, and save track or pace notes file.
 
 The table view consists of multiple columns:
 * `distance` column defines track position (in meters) of a note line.
-* `pace note` column (in Pace Notes edit mode) defines `pace note` name that is used to match pace note sound file name. Because windows system excludes some special characters from used in file name, the `pace note` column will automatically strip off invalid characters. Note, DO NOT write file extension (format) in `pace note` column. File extension should be set in `Pace Notes` control panel tab from main window.
-* `track note` column (in Track Notes edit mode) defines track `corner name` or `section name` or any thing user wish to note.
+
+* `pace note` column (in Pace Notes edit mode) defines `pace note` name that is used to match pace note sound file name.\
+Note, DO NOT write file extension (format) in `pace note` column. File extension should be set in `Pace Notes` control panel tab from main window.
+
+* `track note` column (in Track Notes edit mode) defines track-specific notes, such as `corner name` or `section name`.
+
+* `tags` column attaches tags to specific notes, which will only be displayed or played under specific scenario. Currently the available tag is `#pit`. Notes that without `#pit` tag will not be displayed in pit lane.
+
 * `comment` column defines optional extra info for `pace note` or `track note` column for user. Note, a comment can be broken into multiple lines by adding `\n` to any part of the comment.
 
 To create or open pace notes, click `File` and select `New Pace Notes` or `Open Pace Notes`.
@@ -1344,7 +1351,7 @@ To create or open track notes, click `File` and select `New Track Notes` or `Ope
 
 To save notes file, click `Save`. Note, notes file name should exactly match with track name from track map file name for `auto notes loading` function to work. The editor will try to retrieve track name automatically in an active session, or from an opened track map in `Track Map Viewer`.
 
-To save notes file to other formats for used in other games, select a file format name from `save type` in save dialog, such as `GPL Pace Notes (*.ini)` which saves pace notes in GPL pace notes file format. Note, only `TinyPedal` notes file formats are supported for used in TinyPedal.
+To save notes file to other formats or for used in other games, select a file format name from `save type` in save dialog, such as `GPL Pace Notes (*.ini)` which saves pace notes in GPL pace notes file format. Note, only `TinyPedal` notes file formats are supported for used in TinyPedal.
 
 To hide map viewer, click `Hide Map`. To show map viewer, click `Show Map`.
 
@@ -1369,6 +1376,8 @@ To replace words, click `Replace` and select a column, then use `Find` and `Repl
 To batch offset `distance` (position) values, first select one or multiple note lines from `distance` column, then click `Offset` button. Click `Scale Mode` check box to scale distance values. Note, offset option will be reset to `0` each time after applying. Last applied offset value is displayed on top of dialog.
 
 To highlight a `distance` value on `Track Map Viewer`, right-click on a note line and click `Highlight on Map`.
+
+To add or remove `#pit` tag from specific notes, select one or more notes, right-click and click `Add Pit Tag` or `Remove Pit Tag`.
 
 [**`Back to Top`**](#)
 
