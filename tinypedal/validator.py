@@ -40,11 +40,14 @@ logger = logging.getLogger(__name__)
 
 # Decorator
 def generator_init(func):
-    """Initialize generator for send() method"""
+    """Initialize generator for send() method, returns None if StopIteration"""
     @wraps(func)
     def wrapper(*args, **kwargs):
         generator = func(*args, **kwargs)
-        next(generator)
+        try:
+            next(generator)
+        except StopIteration:
+            generator = None
         return generator
     return wrapper
 

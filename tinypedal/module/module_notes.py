@@ -83,17 +83,14 @@ class Realtime(DataModule):
                         parser=parse_csv_notes_only,
                         extension=FileExt.TPPN,
                     )
-                    if pace_notes:
-                        gen_pacenotes = notes_selector(
-                            output=output_pacenotes,
-                            dataset=filter_notes(pace_notes),
-                            pit_only=False,
-                        )
-                        gen_pacenotes_pit = notes_selector(
-                            output=output_pacenotes_pit,
-                            dataset=filter_tags(pace_notes, TAG_PITNOTES),
-                            pit_only=True,
-                        )
+                    gen_pacenotes = notes_selector(
+                        output=output_pacenotes,
+                        dataset=filter_notes(pace_notes),
+                    )
+                    gen_pacenotes_pit = notes_selector(
+                        output=output_pacenotes_pit,
+                        dataset=filter_tags(pace_notes, TAG_PITNOTES),
+                    )
 
                     # Load track notes
                     track_notes = load_notes_file(
@@ -103,30 +100,29 @@ class Realtime(DataModule):
                         parser=parse_csv_notes_only,
                         extension=FileExt.TPTN,
                     )
-                    if track_notes:
-                        gen_tracknotes = notes_selector(
-                            output=output_tracknotes,
-                            dataset=filter_notes(track_notes),
-                            pit_only=False,
-                        )
-                        gen_tracknotes_pit = notes_selector(
-                            output=output_tracknotes_pit,
-                            dataset=filter_tags(track_notes, TAG_PITNOTES),
-                            pit_only=True,
-                        )
+                    gen_tracknotes = notes_selector(
+                        output=output_tracknotes,
+                        dataset=filter_notes(track_notes),
+                    )
+                    gen_tracknotes_pit = notes_selector(
+                        output=output_tracknotes_pit,
+                        dataset=filter_tags(track_notes, TAG_PITNOTES),
+                    )
 
                 # Update position
                 pos_synced = minfo.delta.lapDistance
+                pos_offset = pos_synced + setting_playback["pace_notes_global_offset"]
 
                 # Update pace notes
-                if pace_notes:
-                    pos_offset = pos_synced + setting_playback["pace_notes_global_offset"]
+                if gen_pacenotes:
                     gen_pacenotes.send(pos_offset)
+                if gen_pacenotes_pit:
                     gen_pacenotes_pit.send(pos_offset)
 
                 # Update track notes
-                if track_notes:
+                if gen_tracknotes:
                     gen_tracknotes.send(pos_synced)
+                if gen_tracknotes_pit:
                     gen_tracknotes_pit.send(pos_synced)
 
             else:
@@ -157,13 +153,16 @@ def load_pace_notes_file(
 
 
 @generator_init
-def notes_selector(output: NotesInfo, dataset: tuple[Mapping, ...], pit_only: bool):
+def notes_selector(output: NotesInfo, dataset: tuple[Mapping, ...]):
     """Notes selector
 
     Args:
         output: module info.
         dataset: list of notes.
     """
+    if not dataset:
+        return
+
     last_index = -99999  # make sure initial index is different
     next_index = 0  # next note line index
     pos_reference = reference_position(dataset)
@@ -173,10 +172,6 @@ def notes_selector(output: NotesInfo, dataset: tuple[Mapping, ...], pit_only: bo
 
     while True:
         pos_curr = yield
-
-        if not pos_reference:
-            continue
-
         curr_index = calc.binary_search_lower(pos_reference, pos_curr, 0, end_index)
 
         if last_index == curr_index:
@@ -196,14 +191,20 @@ def notes_selector(output: NotesInfo, dataset: tuple[Mapping, ...], pit_only: bo
 
 def filter_notes(dataset: list[Mapping]) -> tuple[Mapping, ...]:
     """Filter notes without tags"""
+    if not dataset:
+        return ()
     return tuple(_note for _note in dataset if not _note.get(COLUMN_TAGS))
 
 
 def filter_tags(dataset: list[Mapping], tag_name: str) -> tuple[Mapping, ...]:
     """Filter notes with specific tag"""
+    if not dataset:
+        return ()
     return tuple(_note for _note in dataset if tag_name in _note.get(COLUMN_TAGS, ""))
 
 
-def reference_position(notes: list[Mapping]) -> tuple[float, ...]:
+def reference_position(dataset: tuple[Mapping]) -> tuple[float, ...]:
     """Reference notes position list"""
-    return tuple(note_line[COLUMN_DISTANCE] for note_line in notes)
+    if not dataset:
+        return ()
+    return tuple(_note[COLUMN_DISTANCE] for _note in dataset)

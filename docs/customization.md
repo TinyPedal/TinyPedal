@@ -1377,7 +1377,9 @@ To batch offset `distance` (position) values, first select one or multiple note 
 
 To highlight a `distance` value on `Track Map Viewer`, right-click on a note line and click `Highlight on Map`.
 
-To add or remove `#pit` tag from specific notes, select one or more notes, right-click and click `Add Pit Tag` or `Remove Pit Tag`.
+To add tag to specific notes, select one or more notes, right-click and click `Add Tag`, then select a tag name.
+
+To remove all tags from specific notes, select one or more notes, right-click and select `Clear Tag`.
 
 [**`Back to Top`**](#)
 

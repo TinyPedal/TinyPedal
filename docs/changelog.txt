@@ -2,7 +2,7 @@ WIP
 -----------------------------
 * Track Notes Editor
   - Added "tags" column for both track & pace notes files, which allows to add tags to specific notes that displayed or played under specific scenario (requested by user "scintilla0").
-  - Added "Add Pit Tag" & "Remove Pit Tag" options to right-click context menu, which adds or removes "#pit" tag from notes. Notes that tagged with "#pit" will be only displayed or played while in pit lane. Selecting multiple notes to add or remove tags in batch.
+  - Added "Add Tag" & "Clear Tag" options to right-click context menu, which adds or removes tags from notes. Notes that tagged with "#pit" will be only displayed or played while in pit lane. Selecting multiple notes to add or remove tags in batch.
   - Now supports saving "pace notes" as "track notes" file, or the opposite way.
 
 * Pace Notes Playback

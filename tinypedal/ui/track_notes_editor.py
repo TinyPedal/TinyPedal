@@ -551,8 +551,9 @@ class TrackNotesEditor(BaseEditor):
         menu = QMenu(self)
         menu.addAction("Highlight on Map")
         menu.addSeparator()
-        menu.addAction("Add Pit Tag")
-        menu.addAction("Remove Pit Tag")
+        tag_menu = menu.addMenu("Add Tag")
+        tag_menu.addAction("Pit")
+        menu.addAction("Clear Tag")
         menu.addSeparator()
         menu.addAction("Set from Map")
         menu.addAction("Set from Telemetry")
@@ -581,10 +582,10 @@ class TrackNotesEditor(BaseEditor):
         if action == "Highlight on Map":
             self.mark_positions_on_map()
             self.highlight_position_on_map()
-        elif action == "Add Pit Tag":
+        elif action == "Pit":
             self.add_tag(TAG_PITNOTES)
-        elif action == "Remove Pit Tag":
-            self.remove_tag(TAG_PITNOTES)
+        elif action == "Clear Tag":
+            self.clear_tag()
         elif action == "Set from Map":
             self.set_position_from_map()
         elif action == "Set from Telemetry":
@@ -606,14 +607,15 @@ class TrackNotesEditor(BaseEditor):
             if tag_name not in text:
                 item.setText(text + tag_name)
 
-    def remove_tag(self, tag_name: str):
-        """Remove tag"""
-        column_index = 3
-        row_indexes = set(data.row() for data in self.table_notes.selectedIndexes())
-        for row_index in row_indexes:
-            item = self.table_notes.item(row_index, column_index)
-            text = item.text()
-            item.setText(text.replace(tag_name, ""))
+    def clear_tag(self):
+        """Remove all tags"""
+        if self.confirm_operation("Clear Tag", "Clear all tags from selected notes?"):
+            column_index = 3
+            row_indexes = set(data.row() for data in self.table_notes.selectedIndexes())
+            for row_index in row_indexes:
+                item = self.table_notes.item(row_index, column_index)
+                item.setText("")
+                #item.setText(item.text().replace(tag_name, ""))
 
     def highlight_position_on_map(self):
         """Highlight selected position on map"""
