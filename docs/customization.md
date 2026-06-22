@@ -2666,6 +2666,24 @@ Show flickering effects when RPM is above critical range and gear is lower than 
     neutral_warning_speed_threshold, neutral_warning_time_threshold
 Set speed/time threshold value for neutral gear color warning, which activates color warning when speed and time-in-neutral is higher than threshold. Speed unit in meters per second, Default is `28`. Time unit in seconds, Default is `0.3` seconds.
 
+    show_consumption_bar
+Show fuel or energy consumption per second in a visualized progression bar.
+
+    show_virtual_energy_if_available
+Show virtual energy consumption instead of fuel consumption if available.
+
+    consumption_progression_exponential_scale
+Apply exponential scale to consumption progression, value range in `1.0` to `10.0`. This option affects visual only. Increase this option to scale up high end consumption range. Set to `1.0` to disable exponential scale. This option is useful to enlarge changes at high end consumption range for certain vehicles.
+
+    high_consumption_threshold
+Set high consumption threshold in percentage. Default is `0.95` (95%).
+
+    maximum_average_consumption_samples
+Set amount samples for calculating maximum average consumption per second, which helps filtering out unusual fluctuation. Minimum value is limited to `1`.
+
+    show_consumption_reading
+Show fuel or energy consumption per second reading.
+
 [**`Back to Top`**](#)
 
 

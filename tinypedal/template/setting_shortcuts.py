@@ -20,6 +20,8 @@
 Default keyboard shortcuts template
 """
 
+from __future__ import annotations
+
 from types import MappingProxyType
 
 from ..template.setting_module import MODULE_FILENAME
@@ -30,58 +32,31 @@ SHORTCUT_DEFAULT = MappingProxyType({
 })
 
 
-def generate_setting(source: tuple, prefix: str):
+def generate_shortcut_setting(source: tuple[str], prefix: str = "") -> dict:
+    """Generate shortcut setting"""
     if not prefix:
         return {name: SHORTCUT_DEFAULT.copy() for name in source}
     return {f"{prefix}_{name}": SHORTCUT_DEFAULT.copy() for name in source}
 
 
-SHORTCUTS_WIDGET = generate_setting(WIDGET_FILENAME, "widget")
-SHORTCUTS_MODULE = generate_setting(MODULE_FILENAME, "")
-SHORTCUTS_GENERAL = {
-    "overlay_visibility": {
-        "bind": "",
-    },
-    "overlay_lock": {
-        "bind": "",
-    },
-    "vr_compatibility": {
-        "bind": "",
-    },
-    "restart_api": {
-        "bind": "",
-    },
-    "select_next_api": {
-        "bind": "",
-    },
-    "select_previous_api": {
-        "bind": "",
-    },
-    "reload_preset": {
-        "bind": "",
-    },
-    "load_next_preset": {
-        "bind": "",
-    },
-    "load_previous_preset": {
-        "bind": "",
-    },
-    "spectate_mode": {
-        "bind": "",
-    },
-    "spectate_next_driver": {
-        "bind": "",
-    },
-    "spectate_previous_driver": {
-        "bind": "",
-    },
-    "pace_notes_playback": {
-        "bind": "",
-    },
-    "restart_application": {
-        "bind": "",
-    },
-    "quit_application": {
-        "bind": "",
-    },
-}
+SHORTCUTS_WIDGET = generate_shortcut_setting(WIDGET_FILENAME, "widget")
+SHORTCUTS_MODULE = generate_shortcut_setting(MODULE_FILENAME)
+SHORTCUTS_GENERAL = generate_shortcut_setting(
+    (
+        "overlay_visibility",
+        "overlay_lock",
+        "vr_compatibility",
+        "restart_api",
+        "select_next_api",
+        "select_previous_api",
+        "reload_preset",
+        "load_next_preset",
+        "load_previous_preset",
+        "spectate_mode",
+        "spectate_next_driver",
+        "spectate_previous_driver",
+        "pace_notes_playback",
+        "restart_application",
+        "quit_application",
+    )
+)

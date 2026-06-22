@@ -17,6 +17,9 @@ WIP
   - Added "fuel ratio (F/Ratio)" & "battery net change (B/Net)" columns to history table for quick reviewing.
   - Added right-click context menu to history table header, which allows to show or hide nonessential data column.
 
+* Gear Widget
+  - Added "show_consumption_bar" and related options, which visualizes fuel or energy consumption per second in a progression bar. Useful for checking consumption rate for fuel saving.
+
 * Lap time history Widget
   - Added "show_fuel_ratio" option, which shows fuel ratio readings from current and previous laps.
 

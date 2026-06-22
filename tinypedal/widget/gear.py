@@ -20,6 +20,7 @@
 Gear Widget
 """
 
+from .. import calculation as calc
 from .. import units
 from ..api_control import api
 from ..const_common import TEXT_NA
@@ -66,9 +67,15 @@ class Realtime(Overlay):
             self.wcfg["font_size_battery"],
             self.wcfg["font_weight_battery"]
         )
+        font_cons = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size_consumption"],
+            self.wcfg["font_weight_consumption"]
+        )
 
         # Config units
         self.unit_speed = units.set_unit_speed(self.cfg.units["speed_unit"])
+        self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
 
         # Gear gauge
         (limiter_width, gauge_width, gauge_height, gear_size, speed_size
@@ -150,6 +157,36 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_battery"],
             )
 
+        # Consumption bar
+        if self.wcfg["show_consumption_bar"]:
+            font_cons_m = self.get_font_metrics(font_cons)
+            self.decimals_cons = max(self.wcfg["decimal_places_consumption"], 0)
+            self.consbar_color = (
+                self.wcfg["consumption_color_normal"],
+                self.wcfg["consumption_color_high"],
+            )
+            self.max_cons_factor = calc.ema_factor(self.wcfg["maximum_average_consumption_samples"])
+            self.cons_exp = min(max(self.wcfg["consumption_progression_exponential_scale"], 1), 10)
+            self.bar_consbar = ProgressBar(
+                self,
+                font=font_cons,
+                text=TEXT_NA,
+                width=gauge_width,
+                height=max(self.wcfg["consumption_bar_height"], 1),
+                offset_x=self.wcfg["consumption_reading_offset_x"],
+                offset_y=font_cons_m.voffset,
+                input_color=self.consbar_color[0],
+                fg_color=self.wcfg["font_color_consumption"],
+                bg_color=self.wcfg["background_color_consumption_bar"],
+                show_reading=self.wcfg["show_consumption_reading"],
+                align=self.set_text_alignment(self.wcfg["consumption_reading_text_alignment"]),
+                right_side=self.wcfg["show_inverted_consumption"],
+            )
+            self.set_primary_orient(
+                target=self.bar_consbar,
+                column=self.wcfg["display_order_consumption"],
+            )
+
         # Speed limiter
         if self.wcfg["show_speed_limiter"]:
             self.bar_limiter = self.set_rawtext(
@@ -177,6 +214,12 @@ class Realtime(Overlay):
         self.rpm_max = 0
         self.gear_max = 0
         self.last_gear = 0
+        self.ema_fuel_rate = 0
+        self.max_fuel_rate = 0
+
+    def post_update(self):
+        self.ema_fuel_rate = 0
+        self.max_fuel_rate = 0
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -192,11 +235,11 @@ class Realtime(Overlay):
 
         # Shifting timer
         gear = api.read.engine.gear()
-        lap_etime = api.read.timing.elapsed()
+        elapsed_time = api.read.timing.elapsed()
         if self.last_gear != gear:
             self.last_gear = gear
-            self.shifting_timer_start = lap_etime
-        self.shifting_timer = lap_etime - self.shifting_timer_start
+            self.shifting_timer_start = elapsed_time
+        self.shifting_timer = elapsed_time - self.shifting_timer_start
 
         # Gauge
         rpm = api.read.engine.rpm()
@@ -217,6 +260,14 @@ class Realtime(Overlay):
         if self.wcfg["show_speed_limiter"]:
             limiter = api.read.switch.speed_limiter()
             self.update_limiter(self.bar_limiter, limiter)
+
+        # Consumption bar
+        if self.wcfg["show_consumption_bar"]:
+            if self.wcfg["show_virtual_energy_if_available"] and minfo.energy.available:
+                fuel_rate = minfo.energy.rateOfConsumption
+            else:
+                fuel_rate = self.unit_fuel(minfo.fuel.rateOfConsumption)
+            self.update_consbar(self.bar_consbar, fuel_rate)
 
     # GUI update methods
     def update_gauge(self, target, rpm, gear, speed):
@@ -267,6 +318,19 @@ class Realtime(Overlay):
                 target.text = f"{data:.{self.decimals_batt}f}"
             target.input_color = self.battbar_color[color_index]
             target.update_input(data * 0.01)
+
+    def update_consbar(self, target, data):
+        """Consumption bar"""
+        if target.last != data:
+            target.last = data
+            # Filter out fluctuation & calculate average max rate
+            if self.max_fuel_rate < data:
+                self.max_fuel_rate += self.max_cons_factor * (data - self.max_fuel_rate)
+            if target.show_reading:
+                target.text = f"{data:.{self.decimals_cons}f}"
+            rate = data / self.max_fuel_rate if self.max_fuel_rate else 0
+            target.input_color = self.consbar_color[rate >= self.wcfg["high_consumption_threshold"]]
+            target.update_input(rate ** self.cons_exp)
 
     def update_limiter(self, target, data):
         """Limiter"""
