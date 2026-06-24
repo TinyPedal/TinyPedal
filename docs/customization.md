@@ -1681,6 +1681,27 @@ Widget context menu can be accessed by `Right-Click` on widget, which provides a
 [**`Back to Top`**](#)
 
 
+## Acceleration
+**This widget displays acceleration timing info.**
+
+This widget shows active, last, best, and delta acceleration time (in seconds) that measured from customizable target speed range. To reset best acceleration time, shift gear into reverse, or reload widget.
+
+Note, timing precision is limited by `game API` and `update_interval`, which may not provide high decimal precision.
+
+    layout
+Set column horizontal display order. Set `0` to show from left to right. Set `1` to show from right to left instead.
+
+    speed_range_*_start, speed_range_*_end
+Set the start and end target speed values for measuring acceleration time. Speed value is defined in meter per second, and displayed according [Speed Units](#units) setting. To hide specific slot, set both target speed values to `0`.
+
+Note, to properly count acceleration from `0` start speed, set slightly higher value such as `0.6` instead of '0', because vehicle in game will not be sitting perfectly still at 0 speed while stopped.
+
+    speed_drop_threshold
+Set threshold for detecting speed drop during acceleration timing, which cancels timing when speed dropped below threshold. Default is `1` m/s.
+
+[**`Back to Top`**](#)
+
+
 ## Battery
 **This widget displays battery usage info.**
 

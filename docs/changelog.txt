@@ -17,6 +17,9 @@ WIP
   - Added "fuel ratio (F/Ratio)" & "battery net change (B/Net)" columns to history table for quick reviewing.
   - Added right-click context menu to history table header, which allows to show or hide nonessential data column.
 
+* [New]Acceleration Widget
+  - Show active, last, best, and delta acceleration time that measured from customizable target speed range. To reset best acceleration time, shift gear into reverse, or reload widget. See User Guide for details.
+
 * Gear Widget
   - Added "show_consumption_bar" and related options, which visualizes fuel or energy consumption per second in a progression bar. Useful for checking consumption rate for fuel saving.
 

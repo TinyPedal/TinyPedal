@@ -26,7 +26,7 @@ import logging
 import threading
 from itertools import chain
 from time import sleep
-from typing import Callable
+from typing import Callable, Iterable
 
 from . import app_signal
 from .hotkey.command import COMMANDS_GENERAL, COMMANDS_MODULE, COMMANDS_WIDGET
@@ -41,7 +41,7 @@ from .setting import cfg
 logger = logging.getLogger(__name__)
 
 
-def gather_command(commands: tuple) -> dict[tuple[int, ...], list[tuple[str, Callable]]]:
+def gather_command(commands: Iterable[tuple[str, Callable]]) -> dict[tuple[int, ...], list[tuple[str, Callable]]]:
     """Gather & validate hotkey commands"""
     key_group = {}
     for hotkey_name, hotkey_func in commands:

@@ -121,7 +121,7 @@ class Realtime(Overlay):
             right_to_left=layout_reversed,
         )
 
-        # Delat consumption row
+        # Delta consumption row
         self.delta_color = (
             self.wcfg["font_color_lap_gain"],
             self.wcfg["font_color_lap_loss"],
