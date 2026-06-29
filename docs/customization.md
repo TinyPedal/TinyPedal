@@ -4610,6 +4610,9 @@ Show estimated tyre wear difference per lap (at least one valid lap is required)
     show_live_wear_difference
 Show current lap tyre wear difference.
 
+    show_flat_spot
+Show amount wear from flat spot due to wheel lock.
+
     show_lifespan_laps
 Show estimated tyre lifespan in laps.
 

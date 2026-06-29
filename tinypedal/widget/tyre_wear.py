@@ -165,6 +165,42 @@ class Realtime(Overlay):
                 )
                 layout_live.addWidget(cap_live, 0, 0, 1, 0)
 
+        # Flat spot wear
+        if self.wcfg["show_flat_spot"]:
+            layout_lock = self.set_grid_layout()
+            self.bar_style_lock = (
+                self.wcfg["font_color_flat_spot"],
+                self.wcfg["font_color_warning"],
+            )
+            self.bars_lock = self.set_rawtext(
+                text=TEXT_NA,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_lock[0],
+                bg_color=self.wcfg["background_color_flat_spot"],
+                count=4,
+            )
+            self.set_grid_layout_quad(
+                layout=layout_lock,
+                targets=self.bars_lock,
+            )
+            self.set_primary_orient(
+                target=layout_lock,
+                column=self.wcfg["display_order_flat_spot"],
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_lock = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_flat_spot"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout_lock.addWidget(cap_lock, 0, 0, 1, 0)
+
         # Estimated lifespan in laps
         if self.wcfg["show_lifespan_laps"]:
             layout_laps = self.set_grid_layout()
@@ -283,8 +319,6 @@ class Realtime(Overlay):
 
         for idx in range(4):
             tread_curr = minfo.wheels.currentTreadDepth[idx]
-            live_wear = minfo.wheels.currentLapTreadWear[idx]
-            est_wear = minfo.wheels.estimatedTreadWear[idx]
             est_valid_wear = minfo.wheels.estimatedValidTreadWear[idx]
 
             # Remaining tyre tread
@@ -293,11 +327,15 @@ class Realtime(Overlay):
 
             # Wear differences
             if self.wcfg["show_wear_difference"]:
-                self.update_diff(self.bars_diff[idx], est_wear)
+                self.update_diff(self.bars_diff[idx], minfo.wheels.estimatedTreadWear[idx])
 
             # Live wear difference
             if self.wcfg["show_live_wear_difference"]:
-                self.update_live(self.bars_live[idx], live_wear)
+                self.update_live(self.bars_live[idx], minfo.wheels.currentLapTreadWear[idx])
+
+            # Flat spot wear
+            if self.wcfg["show_flat_spot"]:
+                self.update_lock(self.bars_lock[idx], minfo.wheels.lockingTreadWear[idx])
 
             # Estimated lifespan in laps
             if self.wcfg["show_lifespan_laps"]:
@@ -337,6 +375,14 @@ class Realtime(Overlay):
             target.last = data
             target.text = f"{data:.2f}"[:4].strip(".")
             target.fg = self.bar_style_live[data > self.wcfg["warning_threshold_wear"]]
+            target.update()
+
+    def update_lock(self, target, data):
+        """Flat spot wear"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{data:.2f}"[:4].strip(".")
+            target.fg = self.bar_style_lock[data > self.wcfg["warning_threshold_wear"]]
             target.update()
 
     def update_laps(self, target, data):

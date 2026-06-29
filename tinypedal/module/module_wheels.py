@@ -63,6 +63,7 @@ class Realtime(DataModule):
         gen_tyre_wear = calc_tyre_wear(
             output=minfo.wheels,
             min_delta_distance=self.mcfg["minimum_delta_distance"],
+            lock_threshold=min(-self.mcfg["wheel_lock_threshold"], 0.0),
         )
         gen_brake_wear = calc_brake_wear(
             output=minfo.wheels,
@@ -210,7 +211,7 @@ def calc_wheel_rotation(
 
 
 @generator_init
-def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
+def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold: float):
     """Calculate tyre wear & delta wear"""
     last_reset = None  # reset check
 
@@ -218,6 +219,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
     tread_last = list(WHEELS_ZERO)  # last moment remaining tread
     tread_wear_curr = list(WHEELS_ZERO)  # current lap tread wear
     tread_wear_valid = list(WHEELS_ZERO)  # valid last lap tread wear
+    tread_wear_locking = list(WHEELS_ZERO)
 
     is_pit_lap = 0  # whether pit in or pit out lap
     delta_recording = False
@@ -235,6 +237,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
             tread_last[:] = WHEELS_ZERO
             tread_wear_curr[:] = WHEELS_ZERO
             tread_wear_valid[:] = WHEELS_ZERO
+            tread_wear_locking[:] = WHEELS_ZERO
             delta_array_raw[:] = (WHEELS_DELTA_DEFAULT,)
             delta_array_last = (WHEELS_DELTA_DEFAULT,)
             is_valid_delta = False
@@ -246,6 +249,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
         laptime_curr = api.read.timing.current_laptime()
         pos_curr = api.read.lap.distance()
         in_pits = api.read.vehicle.in_pits()
+        slip_ratio = output.slipRatio
         is_pit_lap |= in_pits
 
         if lap_stime != last_lap_stime:
@@ -294,6 +298,12 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
             tread_last[idx] = tread_curr
             if wear_diff > 0:
                 tread_wear_curr[idx] += wear_diff
+                # Wear under locking
+                if slip_ratio[idx] < lock_threshold:
+                    tread_wear_locking[idx] += wear_diff
+            elif wear_diff < 0:
+                # Reset locking
+                tread_wear_locking[idx] = 0.0
 
             # Delta wear
             if index_higher > 0:
@@ -324,6 +334,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float):
             output.currentLapTreadWear[idx] = tread_wear_curr[idx]
             output.estimatedTreadWear[idx] = est_wear
             output.estimatedValidTreadWear[idx] = est_valid_wear
+            output.lockingTreadWear[idx] = tread_wear_locking[idx]
 
 
 @generator_init
