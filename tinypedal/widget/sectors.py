@@ -58,6 +58,7 @@ class Realtime(Overlay):
             self.prefix_best = "TB"
         else:
             self.prefix_best = "PB"
+        self.extra_width = max(int(self.wcfg["extra_digits"]), 0)
 
         # Target time
         layout_laptime = self.set_grid_layout(gap=bar_gap)
@@ -67,8 +68,8 @@ class Realtime(Overlay):
             self.wcfg["font_color_target_time"],
         )
         self.bar_time_target = self.set_rawtext(
-            text=f"{self.prefix_best}{TEXT_NOLAPTIME: >9}",
-            width=font_m.width * 11 + bar_padx,
+            text=f"{self.prefix_best}{TEXT_NOLAPTIME: >{9 + self.extra_width}}",
+            width=font_m.width * (11 + self.extra_width) + bar_padx,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.bar_style_time_target[2],
@@ -78,8 +79,8 @@ class Realtime(Overlay):
 
         # Current time
         self.bar_time_curr = self.set_rawtext(
-            text=f"{TEXT_NOLAPTIME: >11}",
-            width=font_m.width * 11 + bar_padx,
+            text=f"{TEXT_NOLAPTIME: >{11 + self.extra_width}}",
+            width=font_m.width * (11 + self.extra_width) + bar_padx,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_current_time"],
@@ -104,7 +105,7 @@ class Realtime(Overlay):
             ),
         )
         self.bars_time_gap = self.set_rawtext(
-            width=font_m.width * 7 + bar_padx,
+            width=font_m.width * (7 + self.extra_width) + bar_padx,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.bar_style_gap[2][0],
@@ -115,13 +116,8 @@ class Realtime(Overlay):
             bar_time_gap.text = SECTOR_ABBR_ID[idx]
             layout_sector.addWidget(bar_time_gap, 0, idx)
 
-        # Set layout
-        if self.wcfg["layout"] == 0:  # sector time above delta
-            layout.addLayout(layout_laptime, 0, 1)
-            layout.addLayout(layout_sector, 1, 1)
-        else:
-            layout.addLayout(layout_laptime, 1, 1)
-            layout.addLayout(layout_sector, 0, 1)
+        layout.addLayout(layout_laptime, self.wcfg["display_order_target_time"], 1)
+        layout.addLayout(layout_sector, self.wcfg["display_order_sector_time"], 1)
 
         # Last data
         self.last_sector_idx = -1  # previous recorded sector index value
@@ -203,7 +199,7 @@ class Realtime(Overlay):
         """Gap to best sector time"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:+.3f}"[:7]
+            target.text = f"{data:+.3f}"[:7 + self.extra_width]
             target.fg, target.bg = self.bar_style_gap[data < 0]
             target.update()
 
@@ -211,15 +207,15 @@ class Realtime(Overlay):
         """Current sector time text"""
         if target.last != data:
             target.last = data
-            target.text = f"{SECTOR_ABBR_ID[prev_s_idx]}{calc.sec2laptime(data)[:8]: >9}"
+            target.text = f"{SECTOR_ABBR_ID[prev_s_idx]}{calc.sec2laptime(data)[:8 + self.extra_width]: >{9 + self.extra_width}}"
             target.update()
 
     def update_time_target(self, target, seconds):
         """Target sector time text"""
         if seconds < MAX_SECONDS:  # bypass invalid value
-            text_laptime = f"{self.prefix_best}{calc.sec2laptime(seconds)[:8]: >9}"
+            text_laptime = f"{self.prefix_best}{calc.sec2laptime(seconds)[:8 + self.extra_width]: >{9 + self.extra_width}}"
         else:
-            text_laptime = f"{self.prefix_best}{TEXT_NOLAPTIME: >9}"
+            text_laptime = f"{self.prefix_best}{TEXT_NOLAPTIME: >{9 + self.extra_width}}"
         target.text = text_laptime
         target.fg = self.bar_style_time_target[2]
         target.update()
@@ -227,7 +223,7 @@ class Realtime(Overlay):
     def update_time_target_gap(self, target, delta_sec, sec_index):
         """Target sector time gap"""
         sector_gap = calc.accumulated_sum(delta_sec, sec_index)
-        target.text = f"{self.prefix_best}{sector_gap: >+9.3f}"[:11]
+        target.text = f"{self.prefix_best}{sector_gap: >+{9 + self.extra_width}.3f}"[:11 + self.extra_width]
         target.fg = self.bar_style_time_target[sector_gap < 0]
         target.update()
 
@@ -235,7 +231,10 @@ class Realtime(Overlay):
         """Restore best sector time"""
         for idx, bar_time_gap in enumerate(self.bars_time_gap):
             if valid_sectors(sector_time[idx]):
-                text_s = f"{sector_time[idx]:.3f}"[:7]
+                if self.wcfg["show_formatted_sector_time"]:
+                    text_s = calc.sec2laptime(sector_time[idx])[:7 + self.extra_width]
+                else:
+                    text_s = f"{sector_time[idx]:.3f}"[:7 + self.extra_width]
             else:
                 text_s = SECTOR_ABBR_ID[idx]
             bar_time_gap.text = text_s

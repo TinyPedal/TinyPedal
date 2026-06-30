@@ -138,6 +138,7 @@ CFG_INTEGER = (
     "bar_width|"
     "display_order|"
     "decimal_places|"
+    "digits|"
     "display_detail_level|"
     "display_height|"
     "display_margin|"

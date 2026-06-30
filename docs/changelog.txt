@@ -35,6 +35,11 @@ WIP
 * Relative, Rivals, Standings Widget
   - Now hides zero fuel readings (shown as "---") when fuel data is not available from game API.
 
+* Sectors Widget
+  - Added "show_formatted_sector_time" option (requested by user "ssalamon"), which shows sector time in "minutes:seconds" format. Disable this option to show sector time in "seconds" only.
+  - Added "extra_digits" option, which sets extra digits for sector time display.
+  - Added "display_order_target_time, display_order_sector_time" options, which replaces old "layout" option.
+
 * Tyre wear Widget
   - Added "show_flat_spot" option, which shows amount wear from flat spot due to wheel lock.
 

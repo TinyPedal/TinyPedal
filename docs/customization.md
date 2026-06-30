@@ -3683,9 +3683,6 @@ Set minimum time interval between each LED flash. Default is `0.25` seconds. Min
 ## Sectors
 **This widget displays sectors timing info.**
 
-    layout
-2 layouts are available: `0` = target and current sectors above deltabest sectors, `1` = deltabest sectors above target and current sectors.
-
     enable_all_time_best_sectors
 Show sectors timing based on all time best sectors instead of current session. This option is enabled by default. Set `false` to show sectors timing from current session only.
 
@@ -3694,6 +3691,12 @@ Set target laptime for display target reference lap and sector time. Set `Theore
 
     freeze_duration
 Set freeze duration (seconds) for displaying previous sector time. Default is `5` seconds.
+
+    show_formatted_sector_time
+Show sector time in `minutes:seconds` format. Disable this option to show sector time in `seconds` only.
+
+    extra_digits
+Set extra digits for sector time display.
 
 [**`Back to Top`**](#)
 
