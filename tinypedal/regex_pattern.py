@@ -91,6 +91,7 @@ CFG_USER_IMAGE = "_image_file"
 CFG_STRING = (
     # Exact match
     "^bind$|"
+    "^preset$|"
     "^process_id$|"
     "^version$|"
     # Partial match

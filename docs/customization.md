@@ -933,6 +933,15 @@ Restart TinyPedal.
     quit_application
 Quit TinyPedal.
 
+    preset_*
+Load assigned preset. Note, if assigned preset file is not found (such as deleted), it will not be loaded, and its name will be auto unassigned from list.
+
+    widget_*
+Enable or disable widget.
+
+    module_*
+Enable or disable module.
+
 [**`Back to Top`**](#)
 
 

@@ -1,5 +1,8 @@
 WIP
 -----------------------------
+* Hotkey Tab
+  - Added "Preset Keybinding" category, which allows to assign hotkey for loading specific preset (requested by user "elie-debons"). Note, if assigned preset file is not found (such as deleted), it will not be loaded, and its name will be auto unassigned from list.
+
 * Track Notes Editor
   - Added "tags" column for both track & pace notes files, which allows to add tags to specific notes that displayed or played under specific scenario (requested by user "scintilla0").
   - Added "Add Tag" & "Clear Tag" options to right-click context menu, which adds or removes tags from notes. Notes that tagged with "#pit" will be only displayed or played while in pit lane. Selecting multiple notes to add or remove tags in batch.

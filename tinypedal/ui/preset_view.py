@@ -44,6 +44,7 @@ from ..const_app import VERSION
 from ..const_file import ConfigType, FileExt
 from ..formatter import strip_filename_extension
 from ..setting import cfg
+from ..template.setting_shortcuts import SHORTCUTS_PRESET
 from ..validator import is_allowed_filename
 from ._common import QVAL_FILENAME, BaseDialog, UIScaler
 from .preset_transfer import PresetTransfer
@@ -156,11 +157,9 @@ class PresetList(QWidget):
         menu.addAction("Unlock Preset" if is_locked else "Lock Preset")
         menu.addSeparator()
 
-        menu_class = QMenu()
-        menu_class.setTitle("Set Primary for Class")
+        menu_class = menu.addMenu("Set Primary for Class")
         for class_name in cfg.user.classes:
             menu_class.addAction(class_name)
-        menu.addMenu(menu_class)
 
         menu.addAction("Clear Primary Tag")
         menu.addSeparator()
@@ -301,6 +300,13 @@ class CreatePreset(BaseDialog):
                 f"{filepath}{source_filename}",
                 f"{filepath}{entered_filename}{FileExt.JSON}"
             )
+            # Rename matching preset shortcut
+            source_name = source_filename[:-5]
+            for option_name in SHORTCUTS_PRESET:
+                preset_name = cfg.user.shortcuts[option_name]["preset"]
+                if source_name == preset_name:
+                    cfg.user.shortcuts[option_name]["preset"] = entered_filename
+                    cfg.save(config_type=ConfigType.SHORTCUTS)
             # Reload if renamed file was loaded
             if cfg.is_loaded(source_filename):
                 cfg.set_next_to_load(f"{entered_filename}{FileExt.JSON}")

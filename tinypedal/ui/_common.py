@@ -196,7 +196,6 @@ class BaseEditor(BaseDialog):
     def __init__(self, parent):
         super().__init__(parent)
         self._is_modified = False
-        self._is_rejected = False
 
     def confirm_discard(self) -> bool:
         """Confirm save or discard changes"""
@@ -232,14 +231,10 @@ class BaseEditor(BaseDialog):
 
     def reject(self):
         """Reject(ESC) confirm"""
-        if self.confirm_discard():
-            self._is_rejected = True
-            self.close()
+        self.close()
 
     def closeEvent(self, event):
         """Close editor"""
-        if self._is_rejected:
-            return
         if not self.confirm_discard():
             event.ignore()
 

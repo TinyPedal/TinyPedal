@@ -29,7 +29,12 @@ from time import sleep
 from typing import Callable, Iterable
 
 from . import app_signal
-from .hotkey.command import COMMANDS_GENERAL, COMMANDS_MODULE, COMMANDS_WIDGET
+from .hotkey.command import (
+    COMMANDS_GENERAL,
+    COMMANDS_MODULE,
+    COMMANDS_PRESET,
+    COMMANDS_WIDGET,
+)
 from .hotkey.common import (
     get_key_state_function,
     load_hotkey,
@@ -88,7 +93,7 @@ class HotkeyControl:
     def __updating(self):
         """Update hotkey state"""
         _event_wait = self._event.wait
-        available_commands = gather_command(chain(COMMANDS_GENERAL, COMMANDS_MODULE, COMMANDS_WIDGET))
+        available_commands = gather_command(chain(COMMANDS_GENERAL, COMMANDS_PRESET, COMMANDS_MODULE, COMMANDS_WIDGET))
         available_key_codes = sort_key_codes(available_commands.keys())
 
         get_key_state = get_key_state_function()

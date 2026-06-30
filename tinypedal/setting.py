@@ -47,6 +47,7 @@ from .template.setting_module import MODULE_DEFAULT
 from .template.setting_shortcuts import (
     SHORTCUTS_GENERAL,
     SHORTCUTS_MODULE,
+    SHORTCUTS_PRESET,
     SHORTCUTS_WIDGET,
 )
 from .template.setting_tracks import TRACKS_DEFAULT
@@ -161,7 +162,7 @@ class Preset:
         # Global preset
         self.config = MappingProxyType(GLOBAL_DEFAULT)
         self.filelock = MappingProxyType(FILELOCK_DEFAULT)
-        self.shortcuts = MappingProxyType(ChainMap(SHORTCUTS_MODULE, SHORTCUTS_WIDGET, SHORTCUTS_GENERAL))
+        self.shortcuts = MappingProxyType(ChainMap(SHORTCUTS_MODULE, SHORTCUTS_WIDGET, SHORTCUTS_PRESET, SHORTCUTS_GENERAL))
         # User preset
         self.setting = MappingProxyType(ChainMap(WIDGET_DEFAULT, MODULE_DEFAULT, API_DEFAULT, COMMON_DEFAULT))
         # Style preset

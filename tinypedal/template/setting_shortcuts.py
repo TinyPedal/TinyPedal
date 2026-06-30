@@ -23,24 +23,33 @@ Default keyboard shortcuts template
 from __future__ import annotations
 
 from types import MappingProxyType
+from typing import Mapping, Sequence
 
 from ..template.setting_module import MODULE_FILENAME
 from ..template.setting_widget import WIDGET_FILENAME
 
-SHORTCUT_DEFAULT = MappingProxyType({
+BINDING_GENERAL = MappingProxyType({
     "bind": "",
+})
+BINDING_PRESET = MappingProxyType({
+    "bind": "",
+    "preset": "",
 })
 
 
-def generate_shortcut_setting(source: tuple[str], prefix: str = "") -> dict:
+def generate_shortcut_setting(source: Sequence[str], binding: Mapping, prefix: str = "") -> dict:
     """Generate shortcut setting"""
     if not prefix:
-        return {name: SHORTCUT_DEFAULT.copy() for name in source}
-    return {f"{prefix}_{name}": SHORTCUT_DEFAULT.copy() for name in source}
+        return {name: binding.copy() for name in source}
+    return {f"{prefix}_{name}": binding.copy() for name in source}
 
 
-SHORTCUTS_WIDGET = generate_shortcut_setting(WIDGET_FILENAME, "widget")
-SHORTCUTS_MODULE = generate_shortcut_setting(MODULE_FILENAME)
+SHORTCUTS_WIDGET = generate_shortcut_setting(WIDGET_FILENAME, BINDING_GENERAL, "widget")
+SHORTCUTS_MODULE = generate_shortcut_setting(MODULE_FILENAME, BINDING_GENERAL)
+SHORTCUTS_PRESET = generate_shortcut_setting(
+    [f"preset_{idx}" for idx in range(1, 11)],
+    BINDING_PRESET,
+)
 SHORTCUTS_GENERAL = generate_shortcut_setting(
     (
         "overlay_visibility",
@@ -58,5 +67,6 @@ SHORTCUTS_GENERAL = generate_shortcut_setting(
         "pace_notes_playback",
         "restart_application",
         "quit_application",
-    )
+    ),
+    BINDING_GENERAL,
 )

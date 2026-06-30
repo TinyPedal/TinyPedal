@@ -22,6 +22,8 @@ Hotkey command function
 
 from __future__ import annotations
 
+import logging
+import os
 from functools import partial
 
 from .. import app_signal, loader, overlay_signal, realtime_state
@@ -30,7 +32,10 @@ from ..const_file import ConfigType, FileExt
 from ..module_control import mctrl, wctrl
 from ..setting import cfg
 from ..template.setting_module import MODULE_FILENAME
+from ..template.setting_shortcuts import SHORTCUTS_PRESET
 from ..template.setting_widget import WIDGET_FILENAME
+
+logger = logging.getLogger(__name__)
 
 
 def hotkey_module_toggle(module_name: str):
@@ -107,6 +112,23 @@ def hotkey_select_previous_api():
     cfg.save(config_type=save_type)
     api.restart()
     app_signal.refresh.emit(True)
+
+
+def hotkey_load_preset(preset_key: str):
+    """Command - load preset"""
+    preset_name = cfg.user.shortcuts[preset_key]["preset"]
+    if not preset_name:
+        logger.error("USERDATA: preset not found, abort loading")
+        return
+    filename = f"{preset_name}{FileExt.JSON}"
+    if os.path.exists(f"{cfg.path.settings}{filename}"):
+        cfg.set_next_to_load(filename)
+        app_signal.reload.emit(True)
+    else:
+        logger.error("USERDATA: %s file not found, abort loading", filename)
+        cfg.user.shortcuts[preset_key]["preset"] = ""
+        cfg.save(config_type=ConfigType.SHORTCUTS)
+        app_signal.refresh.emit(True)
 
 
 def hotkey_reload_preset():
@@ -214,6 +236,10 @@ COMMANDS_GENERAL = (
     ("pace_notes_playback", hotkey_pace_notes_playback),
     ("restart_application", hotkey_restart_application),
     ("quit_application", hotkey_quit_application),
+)
+COMMANDS_PRESET = tuple(
+    (preset_key, partial(hotkey_load_preset, preset_key))
+    for preset_key in SHORTCUTS_PRESET
 )
 COMMANDS_MODULE = tuple(
     (hotkey_name, partial(hotkey_module_toggle, hotkey_name))

@@ -20,10 +20,12 @@
 Hotkey list view
 """
 
+import os
 from typing import Callable
 
 from PySide2.QtCore import QBasicTimer, Qt, Slot
 from PySide2.QtWidgets import (
+    QComboBox,
     QDialogButtonBox,
     QHBoxLayout,
     QLabel,
@@ -38,7 +40,7 @@ from PySide2.QtWidgets import (
 
 from .. import app_signal
 from ..const_app import PLATFORM
-from ..const_file import ConfigType
+from ..const_file import ConfigType, FileExt
 from ..formatter import format_option_name
 from ..hotkey.common import (
     format_hotkey_name,
@@ -51,6 +53,7 @@ from ..setting import cfg
 from ..template.setting_shortcuts import (
     SHORTCUTS_GENERAL,
     SHORTCUTS_MODULE,
+    SHORTCUTS_PRESET,
     SHORTCUTS_WIDGET,
 )
 from ._common import BaseDialog, UIScaler
@@ -98,6 +101,27 @@ class HotkeyList(QWidget):
             self.last_enabled = enabled
             self.set_enable_state(enabled)
 
+        # Refresh option name
+        if enabled:
+            self.refresh_preset_name()
+
+    def refresh_preset_name(self):
+        """Refresh preset name"""
+        listbox_hotkey = self.listbox_hotkey
+        for item in self.options_preset:
+            item_config = listbox_hotkey.itemWidget(item)
+            option_name = item_config.option_name
+            preset_name = cfg.user.shortcuts[option_name]["preset"]
+            # Verify if file exists
+            if not preset_name:
+                preset_name = "-"
+            elif not os.path.exists(f"{cfg.path.settings}{preset_name}{FileExt.JSON}"):
+                preset_name = "-"
+                cfg.user.shortcuts[option_name]["preset"] = ""
+                cfg.save(config_type=ConfigType.SHORTCUTS)
+            # Update name
+            item.setText(f"{format_option_name(option_name)}: {preset_name}")
+
     def set_enable_state(self, enabled: bool):
         """Set enable state"""
         self.button_toggle.setChecked(enabled)
@@ -120,19 +144,25 @@ class HotkeyList(QWidget):
         self.listbox_hotkey.addItem(item)
         self.listbox_hotkey.setItemWidget(item, label)
 
-    def add_hotkey_item(self, option_name: str, display_name: str):
+    def add_hotkey_item(self, option_name: str, display_name: str) -> QListWidgetItem:
         """Add hotkey item"""
         item = QListWidgetItem()
         item.setText(format_option_name(display_name))
         module_item = HotkeyConfigItem(self, option_name)
         self.listbox_hotkey.addItem(item)
         self.listbox_hotkey.setItemWidget(item, module_item)
+        return item
 
     def create_list(self):
         """Create hotkey option list"""
         self.add_hotkey_category("General")
         for option_name in SHORTCUTS_GENERAL:
             self.add_hotkey_item(option_name, option_name)
+
+        self.add_hotkey_category("Preset")
+        self.options_preset = []
+        for option_name in SHORTCUTS_PRESET:
+            self.options_preset.append(self.add_hotkey_item(option_name, option_name))
 
         self.add_hotkey_category("Widget")
         for option_name in SHORTCUTS_WIDGET:
@@ -216,33 +246,44 @@ class ConfigHotkey(BaseDialog):
 
     def __init__(self, parent, option_name: str, hotkey_name: str, reload_func: Callable):
         super().__init__(parent)
+        self.setWindowTitle(f"Key Binding - {format_option_name(option_name)}")
+
         self.option_name = option_name
         self.hotkey_name = hotkey_name
         self.temp_hotkey = hotkey_name
         self.reloading = reload_func
 
-        self.setWindowTitle(f"Key Binding - {format_option_name(self.option_name)}")
+        # Layout
+        layout_main = QVBoxLayout()
 
         # Entry box
         self.hotkey_entry = QLineEdit()
         self.hotkey_entry.setReadOnly(True)
         self.hotkey_entry.setAlignment(Qt.AlignCenter)
+        layout_main.addWidget(self.hotkey_entry)
+
+        # Preset selector
+        if self.option_name in SHORTCUTS_PRESET:
+            self.preset_selector = QComboBox()
+            self.preset_selector.addItem("Select a preset ...")
+            self.preset_selector.addItems(cfg.preset_files())
+            self.preset_selector.setCurrentText(cfg.user.shortcuts[self.option_name]["preset"])
+            self.preset_selector.setFocusPolicy(Qt.NoFocus)
+            layout_main.addWidget(self.preset_selector)
 
         # Button
         button_clear = QPushButton("Clear")
         button_clear.clicked.connect(self.reset)
 
         button_confirm = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        button_confirm.accepted.connect(self.accept)
+        button_confirm.accepted.connect(self.saving)
         button_confirm.rejected.connect(self.reject)
 
-        # Layout
-        layout_main = QVBoxLayout()
         layout_button = QHBoxLayout()
         layout_button.addWidget(button_clear)
         layout_button.addWidget(button_confirm)
-        layout_main.addWidget(self.hotkey_entry)
         layout_main.addLayout(layout_button)
+
         self.setLayout(layout_main)
         self.setMinimumWidth(UIScaler.size(21))
         self.setFixedHeight(self.sizeHint().height())
@@ -276,20 +317,37 @@ class ConfigHotkey(BaseDialog):
 
     def reset(self):
         """Reset hotkey"""
+        # Reset key
         self.temp_hotkey = ""
         self.update_text(self.text_placeholder)
+        # Reset preset
+        if self.option_name in SHORTCUTS_PRESET:
+            self.preset_selector.setCurrentIndex(0)
 
     def update_text(self, text: str):
         """Update entry text"""
         self.hotkey_entry.setText(text)
 
-    def accept(self):
+    def saving(self):
         """Saving hotkey"""
+        save = False
+        # Key check
         if self.temp_hotkey != self.hotkey_name:
             if self.check_duplicates(self.temp_hotkey):
                 return
             cfg.user.shortcuts[self.option_name]["bind"] = self.temp_hotkey
+            save = True
+        # Preset check
+        if self.option_name in SHORTCUTS_PRESET:
+            if self.preset_selector.currentIndex() > 0:
+                preset_name = self.preset_selector.currentText()
+            else:
+                preset_name = ""
+            cfg.user.shortcuts[self.option_name]["preset"] = preset_name
+            save = True
+        if save:
             cfg.save(0, config_type=ConfigType.SHORTCUTS)
+            app_signal.refresh.emit(True)
         self.close()
 
     def check_duplicates(self, temp_hotkey: str) -> bool:
@@ -320,5 +378,4 @@ class ConfigHotkey(BaseDialog):
         """Close dialog"""
         self._update_timer.stop()
         self.reloading()
-        self.get_key_state = None
-        self.reloading = None
+        self.__dict__.clear()
