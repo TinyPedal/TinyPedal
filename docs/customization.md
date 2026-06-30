@@ -3221,7 +3221,7 @@ Set nearby vehicle critical overlap detection range multiplier that scales with 
 Set indicator size multiplier that scales with vehicle width.
 
     show_collision_course
-Show highlighted collision course from high speed approaching vehicle. Useful to quickly spot vehicle closing in at dangerous speed.
+Show highlighted collision course from high speed approaching vehicle, or vehicle that caused yellow flag. Useful to quickly spot vehicle closing in at dangerous speed.
 
     collision_course_minimum_speed_difference
 Set minimum speed difference (m/s) between you and opponent for displaying collision course. Default is `4` m/s.
@@ -3236,12 +3236,6 @@ Set nearby collision course detection range multiplier that scales with vehicle 
 
     collision_course_critical_range_multiplier
 Set critical collision course detection range multiplier that scales with vehicle width. Default is `1.5` vehicle-wide.
-
-    show_opposite_course
-Show highlighted collision course from vehicle driving at opposite direction. Useful to quickly spot accidents or spins ahead.
-
-    minimum_opposite_course_angle
-Set minimum opposite course detection angle relative to local player. Default is `80` degrees.
 
     show_center_mark
 Show center mark on radar.
