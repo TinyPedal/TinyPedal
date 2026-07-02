@@ -3600,8 +3600,8 @@ Set prediction pit time for leader or local player.
     ride_height_maximum_range
 Set visualized maximum ride height display range (millimeter).
 
-    rideheight_offset*
-Set ride height offset for bottoming indicator. Value in millimeters, but without decimal place.
+    bottoming_height_*
+Set bottoming ride height (in millimeters). This option is used for vehicle that hits ground before ride height reading reaches zero.
 
 [**`Back to Top`**](#)
 

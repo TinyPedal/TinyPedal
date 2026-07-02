@@ -51,11 +51,11 @@ class Realtime(Overlay):
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
-        ride_height_offset = (
-            self.wcfg["ride_height_offset_front_left"],
-            self.wcfg["ride_height_offset_front_right"],
-            self.wcfg["ride_height_offset_rear_left"],
-            self.wcfg["ride_height_offset_rear_right"],
+        bottoming_height = (
+            self.wcfg["bottoming_height_front_left"],
+            self.wcfg["bottoming_height_front_right"],
+            self.wcfg["bottoming_height_rear_left"],
+            self.wcfg["bottoming_height_rear_right"],
         )
         max_range = max(int(self.wcfg["ride_height_maximum_range"]), 10)
 
@@ -101,7 +101,7 @@ class Realtime(Overlay):
                 right_side=idx % 2,
             ) for idx in range(4)
         )
-        for bar_rideh, offset in zip(self.bars_rideh, ride_height_offset):
+        for bar_rideh, offset in zip(self.bars_rideh, bottoming_height):
             bar_rideh.offset = offset
         self.set_grid_layout_quad(
             layout=layout_inner,
