@@ -823,17 +823,17 @@ def wear_weighted(wear_curr_lap: float, wear_last_lap: float, lap_into: float) -
 
 
 # Wheel
-def rot2radius(speed: float, angular_speed: float) -> float:
+def rotation_radius(v_speed: float, w_rotation: float) -> float:
     """Angular speed to radius"""
-    if angular_speed:
-        return abs(speed / angular_speed)
+    if w_rotation:
+        return abs(v_speed / w_rotation)
     return 0
 
 
-def slip_ratio(w_rot: float, w_radius: float, v_speed: float) -> float:
+def slip_ratio(w_rotation: float, w_radius: float, v_speed: float) -> float:
     """Slip ratio (percentage), speed unit in m/s"""
     if v_speed > 1:
-        return abs(w_rot) * w_radius / v_speed - 1
+        return abs(w_rotation) * w_radius / v_speed - 1
     return 0
 
 

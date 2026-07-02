@@ -81,7 +81,7 @@ class Realtime(Overlay):
 
         # Wheel lock
         if self.show_wheel_lock and not abs_active and api.read.inputs.brake_raw() > 0.02:
-            wheel_lock = min(abs(min(minfo.wheels.slipRatio)), 1) >= self.wheel_lock_threshold
+            wheel_lock = min(minfo.wheels.slipRatio) <= -self.wheel_lock_threshold
         else:
             wheel_lock = False
         if self.wheel_lock != wheel_lock:
@@ -90,7 +90,7 @@ class Realtime(Overlay):
 
         # Wheel slip
         if self.show_wheel_slip and not tc_active and api.read.inputs.throttle_raw() > 0.02:
-            wheel_slip = min(max(minfo.wheels.slipRatio), 1) >= self.wheel_slip_threshold
+            wheel_slip = max(minfo.wheels.slipRatio) >= self.wheel_slip_threshold
         else:
             wheel_slip = False
         if self.wheel_slip != wheel_slip:

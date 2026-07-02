@@ -163,7 +163,7 @@ class Realtime(Overlay):
             wlock = (
                 self.flicker and
                 api.read.inputs.brake_raw() > 0 and
-                min(minfo.wheels.slipRatio) < -self.wcfg["wheel_lock_threshold"]
+                min(minfo.wheels.slipRatio) <= -self.wcfg["wheel_lock_threshold"]
             )
             self.update_wlock(self.bar_wlock, wlock)
 

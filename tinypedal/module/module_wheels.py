@@ -172,10 +172,10 @@ def calc_wheel_rotation(
             d_factor = 2 / max(40 * accel_max, 20)  # scale ema factor with max accel
             # Front average wheel radius
             if rot_axle_f < -min_rot_axle and 0 < rot_bias_f < max_rot_bias_f:
-                radius_front_ema = calc.exp_mov_avg(d_factor, radius_front_ema, calc.rot2radius(speed, rot_axle_f))
+                radius_front_ema = calc.exp_mov_avg(d_factor, radius_front_ema, calc.rotation_radius(speed, rot_axle_f))
             # Rear average wheel radius
             if rot_axle_r < -min_rot_axle and 0 < rot_bias_r < max_rot_bias_r:
-                radius_rear_ema = calc.exp_mov_avg(d_factor, radius_rear_ema, calc.rot2radius(speed, rot_axle_r))
+                radius_rear_ema = calc.exp_mov_avg(d_factor, radius_rear_ema, calc.rotation_radius(speed, rot_axle_r))
 
         # Calculate slip ratio
         slip_ratio[0] = calc.slip_ratio(wheel_rot[0], radius_front_ema, speed)
