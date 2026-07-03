@@ -703,10 +703,9 @@ class Realtime(Overlay):
         """Time interval"""
         if target.last != data:
             target.last = data
-            if self.wcfg["time_interval_align_center"]:
-                text = self.int_to_next(data[0], data[1])[:self.int_width].strip(".")
-            else:
-                text = self.int_to_next(data[0], data[1])[:self.int_width].strip(".").rjust(self.int_width)
+            text = self.int_to_next(data[0], data[1])[:self.int_width].strip(".")
+            if not self.wcfg["time_interval_align_center"]:
+                text = f"{text:>{self.int_width}}"
             target.text = text
             target.fg, target.bg = self.bar_style_int[data[1]]
             self.toggle_visibility(target, data[-1])

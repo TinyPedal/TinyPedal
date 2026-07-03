@@ -835,13 +835,11 @@ class Realtime(Overlay):
                 color_index = 0
             if data[-1]:
                 if self.wcfg["show_time_gap_sign"] and data[0] != 0:
-                    value = f"{-data[0]:+.{self.gap_decimals}f}"
+                    text = f"{-data[0]:+.{self.gap_decimals}f}"[:self.gap_width].strip(".")
                 else:
-                    value = f"{abs(data[0]):.{self.gap_decimals}f}"
-                if self.wcfg["time_gap_align_center"]:
-                    text = value[:self.gap_width].strip(".")
-                else:
-                    text = value[:self.gap_width].strip(".").rjust(self.gap_width)
+                    text = f"{abs(data[0]):.{self.gap_decimals}f}"[:self.gap_width].strip(".")
+                if not self.wcfg["time_gap_align_center"]:
+                    text = f"{text:>{self.gap_width}}"
             else:
                 text = ""
             target.text = text

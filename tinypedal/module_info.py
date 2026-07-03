@@ -241,8 +241,8 @@ class DeltaFuelHistory:
             self._last_lap_start = lap_start
 
 
-class VehicleSpeedTrap:
-    """Vehicle speed trap
+class SpeedTrap:
+    """Speed trap
 
     Attributes:
         speed: Speed(m/s) at speed trap.
@@ -293,8 +293,8 @@ class VehicleSpeedTrap:
             self._record_next = True
 
 
-class VehiclePitTimer:
-    """Vehicle pit timer
+class PitTimer:
+    """Pit timer
 
     Attributes:
         elapsed: Total time spent in pit.
@@ -456,8 +456,8 @@ class VehicleDataSet:
         self.energyRemaining: float = 0.0
         self.estimatedStintLaps: float = 0.0
         self.currentStintLaps: int = 0
-        self.pitTimer: VehiclePitTimer = VehiclePitTimer()
-        self.speedTrap: VehicleSpeedTrap = VehicleSpeedTrap()
+        self.pitTimer: PitTimer = PitTimer()
+        self.speedTrap: SpeedTrap = SpeedTrap()
         self.fuelHistory: DeltaFuelHistory = DeltaFuelHistory()
         self.lapTimeHistory: DeltaLapTimeHistory = DeltaLapTimeHistory("d", (0, 0, 0, 0, 0))
 
