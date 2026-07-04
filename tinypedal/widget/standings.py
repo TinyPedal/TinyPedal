@@ -691,6 +691,36 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_speed_trap"],
                 hide_start=1,
             )
+        # Lift and coast time
+        if self.wcfg["show_lift_and_coast_time"]:
+            self.bar_style_lic = (
+                (
+                    self.wcfg["font_color_lift_and_coast_time"],
+                    self.wcfg["background_color_lift_and_coast_time"],
+                ),
+                (
+                    self.wcfg["font_color_lift_and_coast_highlight"],
+                    self.wcfg["background_color_lift_and_coast_highlight"],
+                ),
+                (
+                    self.wcfg["font_color_player_lift_and_coast_time"],
+                    self.wcfg["background_color_player_lift_and_coast_time"],
+                ),
+            )
+            self.bars_lic = self.set_rawtext(
+                width=4 * font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_lic[0][0],
+                bg_color=self.bar_style_lic[0][1],
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_lic,
+                column=self.wcfg["display_order_lift_and_coast_time"],
+                hide_start=1,
+            )
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -825,6 +855,9 @@ class Realtime(Overlay):
             # Speed trap
             if self.wcfg["show_speed_trap"]:
                 self.update_spd(self.bars_spd[idx], veh_info.speedTrap.speed, hi_player, state)
+            # Lift and coast time
+            if self.wcfg["show_lift_and_coast_time"]:
+                self.update_lic(self.bars_lic[idx], veh_info.licoTimer.elapsed, veh_info.licoTimer.idling, hi_player, state)
 
     # GUI update methods
     def update_pos(self, target, *data):
@@ -1131,6 +1164,30 @@ class Realtime(Overlay):
             target.last = data
             target.text = f"{self.unit_speed(data[0]):.3f}"[:5]
             target.fg, target.bg = self.bar_style_spd[data[1]]
+            self.toggle_visibility(target, data[-1])
+
+    def update_lic(self, target, *data):
+        """Lift and coast time"""
+        if target.last != data:
+            target.last = data
+            if data[1] > self.wcfg["lift_and_coast_reset_threshold"]:
+                lico_time = 0
+            else:
+                lico_time = data[0]
+                if lico_time > 99:
+                    lico_time = 99
+            if data[2]:  # highlighted player
+                color_index = 2
+            elif lico_time > self.wcfg["lift_and_coast_highlight_threshold"]:
+                color_index = 1
+            else:
+                color_index = 0
+            if lico_time < 9.94:
+                text_speed = f"{lico_time:.1f}s"
+            else:
+                text_speed = f"{lico_time:.0f}s"
+            target.text = text_speed
+            target.fg, target.bg = self.bar_style_lic[color_index]
             self.toggle_visibility(target, data[-1])
 
     # Additional methods

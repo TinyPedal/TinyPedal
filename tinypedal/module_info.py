@@ -241,6 +241,61 @@ class DeltaFuelHistory:
             self._last_lap_start = lap_start
 
 
+class LicoTimer:
+    """Lift and coast timer
+
+    Attributes:
+        idling: time since last lico.
+        elapsed: last recorded lico time.
+    """
+
+    __slots__ = (
+        "_last_time",
+        "_cooldown_time",
+        "_warmup_time",
+        "idling",
+        "elapsed",
+    )
+
+    def __init__(self):
+        self._last_time = 0.0
+        self._cooldown_time = 0.0
+        self._warmup_time = 0.0
+        self.idling = 0.0
+        self.elapsed = 0.0
+
+    def update(self, elapsed_time: float, throttle_raw: float, brake_raw: float):
+        """Update lico timer"""
+        braking = brake_raw > 0.01
+        delta_time = elapsed_time - self._last_time
+        self._last_time = elapsed_time
+        if delta_time < 0:
+            delta_time = 0
+        # Always reset on braking
+        if braking:
+            self._cooldown_time = 0
+        # Count 3s continuous throttling
+        elif self._cooldown_time < 3:
+            if throttle_raw >= 0.8:  # workaround network inaccuracy
+                self._cooldown_time += delta_time
+            else:  # reset if released early
+                self._cooldown_time = 0
+        # Lift and coasting
+        if self._cooldown_time >= 3 and not braking and throttle_raw < 0.1:
+            if self._warmup_time < 0.5:  # ignore auto-lift from upshifting
+                self._warmup_time += delta_time
+            else:
+                if self.idling:  # reset
+                    self.elapsed = self._warmup_time
+                    self.idling = 0
+                self.elapsed += delta_time
+        else:
+            if not self.idling:
+                self._cooldown_time = 0
+            self.idling += delta_time
+            self._warmup_time = 0
+
+
 class SpeedTrap:
     """Speed trap
 
@@ -409,6 +464,7 @@ class VehicleDataSet:
         "energyRemaining",
         "estimatedStintLaps",
         "currentStintLaps",
+        "licoTimer",
         "pitTimer",
         "speedTrap",
         "fuelHistory",
@@ -456,6 +512,7 @@ class VehicleDataSet:
         self.energyRemaining: float = 0.0
         self.estimatedStintLaps: float = 0.0
         self.currentStintLaps: int = 0
+        self.licoTimer: LicoTimer = LicoTimer()
         self.pitTimer: PitTimer = PitTimer()
         self.speedTrap: SpeedTrap = SpeedTrap()
         self.fuelHistory: DeltaFuelHistory = DeltaFuelHistory()

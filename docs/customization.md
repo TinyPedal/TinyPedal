@@ -3896,6 +3896,15 @@ Show fastest recorded speed of each driver per lap at user-defined speed trap po
 
 Note, speed trap position is defined in `tracks.json` preset, which can be customized via [Track Info Editor](#track-info-editor). Default speed trap position is set at start/finish line.
 
+    show_lift_and_coast_time
+Show most recent recorded lift and coast time (in seconds) from each driver.
+
+    lift_and_coast_reset_threshold
+Set time threshold (in seconds) for resetting recent recorded lift and coast time. Default is `60` seconds.
+
+    lift_and_coast_highlight_threshold
+Set minimum time threshold (in seconds) for highlighting lift and coast time. Default is `1` seconds.
+
 [**`Back to Top`**](#)
 
 

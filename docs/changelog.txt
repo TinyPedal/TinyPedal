@@ -1,4 +1,4 @@
-WIP
+2.48.0 (2026-07-04)
 -----------------------------
 * Hotkey Tab
   - Added "Preset Keybinding" category, which allows to assign hotkey for loading specific preset (requested by user "elie-debons"). Note, if assigned preset file is not found (such as deleted), it will not be loaded, and its name will be auto unassigned from list.
@@ -24,7 +24,7 @@ WIP
   - Show active, last, best, and delta acceleration time that measured from customizable target speed range. To reset best acceleration time, shift gear into reverse, or reload widget. See User Guide for details.
 
 * Gear Widget
-  - Added "show_consumption_bar" and related options, which visualizes fuel or energy consumption per second in a progression bar. Useful for checking consumption rate for fuel saving.
+  - Added "show_consumption_bar" and related options, which visualizes fuel or energy consumption per second in a progression bar. Useful for checking consumption rate for fuel saving. See User Guide for details.
 
 * Lap time history Widget
   - Added "show_fuel_ratio" option, which shows fuel ratio readings from current and previous laps.
@@ -33,6 +33,7 @@ WIP
   - Now shows collision course from vehicle that caused yellow flag (if within detection range).
 
 * Relative, Rivals, Standings Widget
+  - Added "show_lift_and_coast_time" and related options, which shows most recent recorded lift and coast time (in seconds) from each driver. Useful to check whether opponent is saving fuel. This option is enabled by default for Relative Widget. See User Guide for details.
   - Now hides zero fuel readings (shown as "---") when fuel data is not available from game API.
 
 * Ride height Widget

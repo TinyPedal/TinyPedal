@@ -135,13 +135,15 @@ def update_vehicle_data(
 
         # Update high priority info
         data.isPlayer = api.read.vehicle.is_player(index)
-        data.currentLapProgress = calc.lap_progress_distance(lap_distance, track_length)
-        data.totalLapProgress = laps_completed + data.currentLapProgress
-        data.isYellow = speed < 8
         data.inPit = api.read.vehicle.in_paddock(index)
+        data.isYellow = speed < 8 and data.inPit != 2
         data.pitTimer.update(data.inPit, elapsed_time, laps_completed, speed)
 
-        if not data.inPit:
+        if data.inPit:
+            data.licoTimer.elapsed = 0.0
+            data.speedTrap.speed = 0.0
+        else:
+            data.licoTimer.update(elapsed_time, api.read.inputs.throttle_raw(index), api.read.inputs.brake_raw(index))
             data.speedTrap.update(speed, lap_distance, speedtrap_distance, track_length)
 
         if data.isPlayer:
@@ -186,33 +188,9 @@ def update_vehicle_data(
                     (est_pos_x, est_pos_y)
                 )
 
-                data.isLapped = calc.lap_difference(
-                    data.totalLapProgress, plr_lap_progress_total,
-                    max_lap_diff_ahead, max_lap_diff_behind
-                ) if in_race else 0
-
             # Nearest straight line distance (non local players)
             if nearest_line > data.relativeStraightDistance:
                 nearest_line = data.relativeStraightDistance
-            # Nearest traffic time gap (opponents behind local players)
-            if not data.inPit:
-                opt_time_behind = calc.circular_position_relative(
-                    plr_laptime_est,
-                    plr_timeinto_est,
-                    api.read.timing.estimated_time_into(index),
-                )
-                if 0 > opt_time_behind > nearest_time_behind:
-                    nearest_time_behind = opt_time_behind
-                    if under_blue and (not in_race or data.isLapped > 0):
-                        nearest_blue_class = data.vehicleClass
-            # Nearest yellow flag distance
-            if data.isYellow:
-                opt_rel_distance = calc.circular_position_relative(
-                    track_length, plr_lap_distance, lap_distance)
-                if nearest_yellow_ahead > opt_rel_distance >= 0:
-                    nearest_yellow_ahead = opt_rel_distance
-                if nearest_yellow_behind < opt_rel_distance <= 0:
-                    nearest_yellow_behind = opt_rel_distance
 
         # Update low priority info
         if update_low_priority:
@@ -221,6 +199,13 @@ def update_vehicle_data(
             data.positionInClass = class_pos[1]
             data.classBestLapTime = class_pos[3]
             data.isClassFastestLastLap = class_pos[7]
+
+            data.currentLapProgress = calc.lap_progress_distance(lap_distance, track_length)
+            data.totalLapProgress = laps_completed + data.currentLapProgress
+            data.isLapped = calc.lap_difference(
+                data.totalLapProgress, plr_lap_progress_total,
+                max_lap_diff_ahead, max_lap_diff_behind
+            ) if in_race else 0
 
             data.positionOverall = api.read.vehicle.place(index)
             data.bestLapTime = api.read.timing.best_laptime(index)
@@ -262,26 +247,46 @@ def update_vehicle_data(
             elif data.inPit == 0:  # out pit
                 total_out_pits += 1
                 total_pit_requests += data.pitRequested
+                # Nearest traffic time gap (opponents behind local players)
+                opt_time_behind = calc.circular_position_relative(
+                    plr_laptime_est,
+                    plr_timeinto_est,
+                    api.read.timing.estimated_time_into(index),
+                )
+                if 0 > opt_time_behind > nearest_time_behind:
+                    nearest_time_behind = opt_time_behind
+                    if under_blue and (not in_race or data.isLapped > 0):
+                        nearest_blue_class = data.vehicleClass
+
+            # Nearest yellow flag distance
+            if data.isYellow:
+                opt_rel_distance = calc.circular_position_relative(
+                    track_length, plr_lap_distance, lap_distance)
+                if nearest_yellow_ahead > opt_rel_distance >= 0:
+                    nearest_yellow_ahead = opt_rel_distance
+                if nearest_yellow_behind < opt_rel_distance <= 0:
+                    nearest_yellow_behind = opt_rel_distance
 
             # Save leader info
             if data.positionOverall == 1:
                 output.leaderIndex = index
                 output.leaderBestLapTime = data.bestLapTime
 
-    # Output extra info
-    output.nearestLine = nearest_line
-    output.nearestTraffic = -nearest_time_behind
-    output.nearestYellowAhead = nearest_yellow_ahead
-    output.nearestYellowBehind = nearest_yellow_behind
-    output.nearestBlueClass = nearest_blue_class
-    output.dataSetVersion += 1
-
     if update_low_priority:
+        output.nearestTraffic = -nearest_time_behind
+        output.nearestYellowAhead = nearest_yellow_ahead
+        output.nearestYellowBehind = nearest_yellow_behind
+        output.nearestBlueClass = nearest_blue_class
+
         output.totalOutPits = total_out_pits
         output.totalInPits = total_in_pits
         output.totalStoppedPits = total_stopped_pits
         output.totalPitRequests = total_pit_requests
         output.totalCompletedLaps = total_completed_laps
+
+    # Output extra info
+    output.nearestLine = nearest_line
+    output.dataSetVersion += 1
 
 
 def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> None:
