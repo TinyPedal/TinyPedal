@@ -2818,6 +2818,18 @@ Show your current lap number (lap progression) and total race laps. If total rac
 
 Note, estimated total laps reading is calculated based on local player's lap time pace data from Delta Module, which can be different from in-game HUD reading. This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it.
 
+**So why not show total laps prediction based on race leader's lap time pace?**
+
+The reason is because there are too many variables that are outside of local player's control. Anything can happen to anyone on their last stint and last few laps.
+
+For example, race leader might crash their car, or run out of fuel, or be overtaken by others, or lost connection to server on the last few laps, which means it is not reliable to base prediction on race leader's pace. More over, it can cause unnecessary confusion to user, who might wonder whether an extra final lap is already added (or not) to the total laps based on leader's pace.
+
+Hence the prediction is only based on local player's (your own) pace.
+
+**But how do I know whether there will be an extra final lap before race leader finished his last lap?**
+
+You can determine the chance of an extra final lap by using [Relative Finish Order](#relative-finish-order) widget, which provides additional data for analyzing the chance of extra final lap.
+
     warning_color_maximum_laps
 Set warning color that shows 1 lap before exceeding maximum laps in qualify (or indicates the last lap of a lap-type race).
 
@@ -3720,9 +3732,11 @@ Set clock format string. To show seconds, add `%S`, such as `%H:%M:%S %p`. See [
 Show total remaining session time.
 
     show_estimated_laps
-Show estimated total remaining laps (from current lap position towards finish line) based on total remaining session time and local player's lap time pace. This value can be used for adjusting absolute refueling.
+Show estimated total remaining laps (from current lap position towards finish line) based on total remaining session time and local player's lap time pace.
 
-Note, this is the same value that used for calculating estimated refueling value in Fuel Module. As with estimation, there may be a margin of error of one lap, and may be affected by other variables such as those mentioned in [Relative Finish Order](#relative-finish-order) widget.
+Note, this is the same value that used for calculating estimated refueling value in Fuel Module.
+
+This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it. See [Laps And Position](#laps-and-position) widget for additional info and detailed explanation.
 
 [**`Back to Top`**](#)
 
