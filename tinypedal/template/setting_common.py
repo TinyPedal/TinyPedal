@@ -43,6 +43,7 @@ COMMON_DEFAULT = {
         "temperature_unit": "Celsius",
         "turbo_pressure_unit": "bar",
         "tyre_pressure_unit": "kPa",
+        "weight_unit": "Kilogram",
     },
     "pace_notes_playback": {
         "enable": False,

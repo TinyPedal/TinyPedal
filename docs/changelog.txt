@@ -1,3 +1,8 @@
+WIP
+-----------------------------
+* Units
+  - Added "weight unit" option in "Units" config dialog.
+
 2.48.0 (2026-07-04)
 -----------------------------
 * Hotkey Tab

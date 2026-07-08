@@ -236,6 +236,7 @@ CHOICE_UNITS = MappingProxyType({
     "temperature_unit": ("Celsius", "Fahrenheit"),
     "turbo_pressure_unit": ("bar", "psi", "kPa"),
     "tyre_pressure_unit": ("kPa", "psi", "bar"),
+    "weight_unit": ("Kilogram", "Pound"),
 })
 
 # Misc

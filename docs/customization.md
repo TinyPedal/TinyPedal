@@ -793,28 +793,31 @@ Note, you will still need a third party program (such as `OpenKneeboard`) to pro
 **Units options can be accessed from `Config` menu in main window.**
 
     distance_unit
-2 unit types are available: `Meter`, `Feet`.
+Available units: `Meter`, `Feet`.
 
     fuel_unit
-2 unit types are available: `Liter`, `Gallon`.
+Available units: `Liter`, `Gallon`.
 
     odometer_unit
-3 unit types are available: `Kilometer`, `Mile`, `Meter`.
+Available units: `Kilometer`, `Mile`, `Meter`.
 
     power_unit
-3 unit types are available: `Kilowatt`, `Horsepower`, `Metric Horsepower`.
+Available units: `Kilowatt`, `Horsepower`, `Metric Horsepower`.
 
     speed_unit
-3 unit types are available: `KPH`, `MPH`, `m/s`.
+Available units: `KPH`, `MPH`, `m/s`.
 
     temperature_unit
-2 unit types are available: `Celsius`, `Fahrenheit`.
+Available units: `Celsius`, `Fahrenheit`.
 
     turbo_pressure_unit
-3 unit types are available: `bar`, `psi`, `kPa`.
+Available units: `bar`, `psi`, `kPa`.
 
     tyre_pressure_unit
-3 unit types are available: `kPa`, `psi`, `bar`.
+Available units: `kPa`, `psi`, `bar`.
+
+    weight_unit
+Available units: `Kilogram`, `Pound`.
 
 [**`Back to Top`**](#)
 

@@ -71,6 +71,11 @@ def liter_to_gallon(liter: float) -> float:
     return liter * 0.26417205
 
 
+def kilogram_to_pound(kilogram: float) -> float:
+    """Kilogram to pound"""
+    return kilogram * 2.20462262
+
+
 def kelvin_to_celsius(kelvin: float) -> float:
     """Kelvin to Celsius"""
     return kelvin - 273.15
@@ -98,7 +103,11 @@ def kw_to_ps(kilowatt: float) -> float:
 
 # Set unit conversion function
 def set_unit_distance(unit_name: str = "Meter") -> Callable:
-    """Set unit distance"""
+    """Set unit distance
+
+    Args:
+        unit_name: "Kilometer", "Mile", "Meter".
+    """
     if unit_name == "Feet":
         return meter_to_feet
     if unit_name == "Kilometer":
@@ -109,14 +118,33 @@ def set_unit_distance(unit_name: str = "Meter") -> Callable:
 
 
 def set_unit_fuel(unit_name: str = "Liter") -> Callable:
-    """Set unit fuel"""
+    """Set unit fuel
+
+    Args:
+        unit_name: "Liter", "Gallon".
+    """
     if unit_name == "Gallon":
         return liter_to_gallon
     return pass_value
 
 
+def set_unit_weight(unit_name: str = "Kilogram") -> Callable:
+    """Set unit weight
+
+    Args:
+        unit_name: "Kilogram", "Pound".
+    """
+    if unit_name == "Pound":
+        return kilogram_to_pound
+    return pass_value
+
+
 def set_unit_power(unit_name: str = "Kilowatt") -> Callable:
-    """Set unit power"""
+    """Set unit power
+
+    Args:
+        unit_name: "Kilowatt", "Horsepower", "Metric Horsepower".
+    """
     if unit_name == "Horsepower":
         return kw_to_hp
     if unit_name == "Metric Horsepower":
@@ -125,7 +153,11 @@ def set_unit_power(unit_name: str = "Kilowatt") -> Callable:
 
 
 def set_unit_pressure(unit_name: str = "kPa") -> Callable:
-    """Set unit pressure"""
+    """Set unit pressure
+
+    Args:
+        unit_name: "kPa", "psi", "bar".
+    """
     if unit_name == "psi":
         return kpa_to_psi
     if unit_name == "bar":
@@ -134,7 +166,11 @@ def set_unit_pressure(unit_name: str = "kPa") -> Callable:
 
 
 def set_unit_speed(unit_name: str = "m/s") -> Callable:
-    """Set unit speed"""
+    """Set unit speed
+
+    Args:
+        unit_name: "KPH", "MPH", "m/s".
+    """
     if unit_name == "KPH":
         return mps_to_kph
     if unit_name == "MPH":
@@ -143,7 +179,11 @@ def set_unit_speed(unit_name: str = "m/s") -> Callable:
 
 
 def set_unit_temperature(unit_name: str = "Celsius") -> Callable:
-    """Set unit temperature"""
+    """Set unit temperature
+
+    Args:
+        unit_name: "Celsius", "Fahrenheit".
+    """
     if unit_name == "Fahrenheit":
         return celsius_to_fahrenheit
     return pass_value
@@ -151,7 +191,11 @@ def set_unit_temperature(unit_name: str = "Celsius") -> Callable:
 
 # Set unit symbol string
 def set_symbol_distance(unit_name: str = "Meter") -> str:
-    """Set symbol distance"""
+    """Set symbol distance
+
+    Args:
+        unit_name: "Kilometer", "Mile", "Meter".
+    """
     if unit_name == "Feet":
         return "ft"
     if unit_name == "Kilometer":
@@ -162,14 +206,22 @@ def set_symbol_distance(unit_name: str = "Meter") -> str:
 
 
 def set_symbol_fuel(unit_name: str = "Liter") -> str:
-    """Set symbol fuel"""
+    """Set symbol fuel
+
+    Args:
+        unit_name: "Liter", "Gallon".
+    """
     if unit_name == "Gallon":
         return "gal"
     return "L"
 
 
 def set_symbol_power(unit_name: str = "Kilowatt") -> str:
-    """Set symbol power"""
+    """Set symbol power
+
+    Args:
+        unit_name: "Kilowatt", "Horsepower", "Metric Horsepower".
+    """
     if unit_name == "Horsepower":
         return "hp"
     if unit_name == "Metric Horsepower":
@@ -178,7 +230,11 @@ def set_symbol_power(unit_name: str = "Kilowatt") -> str:
 
 
 def set_symbol_pressure(unit_name: str = "kPa") -> str:
-    """Set symbol pressure"""
+    """Set symbol pressure
+
+    Args:
+        unit_name: "kPa", "psi", "bar".
+    """
     if unit_name == "psi":
         return "psi"
     if unit_name == "bar":
@@ -187,7 +243,11 @@ def set_symbol_pressure(unit_name: str = "kPa") -> str:
 
 
 def set_symbol_speed(unit_name: str = "m/s") -> str:
-    """Set symbol speed"""
+    """Set symbol speed
+
+    Args:
+        unit_name: "KPH", "MPH", "m/s".
+    """
     if unit_name == "KPH":
         return "km/h"
     if unit_name == "MPH":
@@ -196,7 +256,22 @@ def set_symbol_speed(unit_name: str = "m/s") -> str:
 
 
 def set_symbol_temperature(unit_name: str = "Celsius") -> str:
-    """Set symbol temperature"""
+    """Set symbol temperature
+
+    Args:
+        unit_name: "Celsius", "Fahrenheit".
+    """
     if unit_name == "Fahrenheit":
         return "°F"
     return "°C"
+
+
+def set_symbol_weight(unit_name: str = "Kilogram") -> str:
+    """Set symbol weight
+
+    Args:
+        unit_name: "Kilogram", "Pound".
+    """
+    if unit_name == "Pound":
+        return "lb"
+    return "kg"
