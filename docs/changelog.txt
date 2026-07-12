@@ -3,6 +3,10 @@ WIP
 * Units
   - Added "weight unit" option in "Units" config dialog.
 
+* Tyre wear Widget
+  - Now counts flat spot while in pit lane.
+  - Now resets flat spot readings after changed tyres.
+
 2.48.0 (2026-07-04)
 -----------------------------
 * Hotkey Tab

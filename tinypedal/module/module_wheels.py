@@ -188,7 +188,7 @@ def calc_wheel_rotation(
         delta_time = elapsed_time - last_elapsed_time
         last_elapsed_time = elapsed_time
 
-        if api.read.inputs.brake_raw() > 0.1:
+        if api.read.inputs.brake_raw() > 0.02:
             start_time = api.read.timing.start()
             if last_start_time != start_time:
                 last_start_time = start_time
@@ -249,6 +249,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
         laptime_curr = api.read.timing.current_laptime()
         pos_curr = api.read.lap.distance()
         in_pits = api.read.vehicle.in_pits()
+        is_braking = api.read.inputs.brake_raw() > 0.02
         slip_ratio = output.slipRatio
         is_pit_lap |= in_pits
 
@@ -290,20 +291,25 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
         for idx, tread_curr in enumerate(tread_curr_set):
             tread_curr *= 100  # fraction to percent
 
-            # Ignore wear difference while in pit
-            if in_pits:
-                wear_diff = 0.0
-            else:
-                wear_diff = tread_last[idx] - tread_curr
+            # Wear difference
+            wear_diff = tread_last[idx] - tread_curr
             tread_last[idx] = tread_curr
+
+            # Wear under locking
+            if wear_diff > 0 and is_braking and slip_ratio[idx] < lock_threshold:
+                tread_wear_locking[idx] += wear_diff
+
+            # Reset in pit
+            if in_pits:
+                # Reset on tyre change
+                if wear_diff < 0 or wear_diff > 1:
+                    tread_wear_locking[idx] = 0.0
+                # Ignore wear difference while in pit
+                wear_diff = 0.0
+
+            # Current lap wear
             if wear_diff > 0:
                 tread_wear_curr[idx] += wear_diff
-                # Wear under locking
-                if slip_ratio[idx] < lock_threshold:
-                    tread_wear_locking[idx] += wear_diff
-            elif wear_diff < 0:
-                # Reset locking
-                tread_wear_locking[idx] = 0.0
 
             # Delta wear
             if index_higher > 0:

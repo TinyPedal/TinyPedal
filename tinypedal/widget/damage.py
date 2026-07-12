@@ -121,7 +121,7 @@ class Realtime(Overlay):
 
             if self.last_impact_time != impact_time:
                 self.last_impact_time = impact_time
-                self.last_impact_expired = api.read.vehicle.impact_magnitude() < 1
+                self.last_impact_expired = False
                 update_later = True
 
             if (not self.last_impact_expired and
