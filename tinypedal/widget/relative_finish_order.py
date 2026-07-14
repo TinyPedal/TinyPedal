@@ -213,6 +213,8 @@ class Realtime(Overlay):
         player_lap_into = api.read.lap.progress()
 
         leader_laptime_pace = minfo.vehicles.dataSet[leader_index].lapTimeHistory.average
+        if leader_laptime_pace >= MAX_SECONDS:  # fallback to session best
+            leader_laptime_pace = minfo.vehicles.dataSet[leader_index].bestLapTime
         player_laptime_pace = minfo.delta.lapTimePace
 
         leader_valid = 0 < leader_laptime_pace < MAX_SECONDS
@@ -242,10 +244,15 @@ class Realtime(Overlay):
         fuel_in_tank = 0 if self.wcfg["show_absolute_refilling"] else consumption.amountCurrent
         fuel_consumption = consumption.estimatedValidConsumption
 
-        # Update lap progress difference & refill type
+        # Update race & refill type
         self.update_energy_type(self.bars_refill[0], energy_type)
         self.update_race_type(self.bars_pit_leader[0], finish_as_lap)
-        lap_diff = calc.lap_progress_difference(leader_laptime_pace, player_laptime_pace)
+
+        # Update lap progress difference (fraction) between leader and player
+        if MAX_SECONDS > player_laptime_pace > leader_laptime_pace > 0:
+            lap_diff = (player_laptime_pace - leader_laptime_pace) / player_laptime_pace
+        else:
+            lap_diff = 0
         self.update_lap_int(self.bars_lap_player[0], lap_diff)
 
         # Update slots
