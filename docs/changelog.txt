@@ -3,6 +3,10 @@ WIP
 * Units
   - Added "weight unit" option in "Units" config dialog.
 
+* Pit stop estimate Widget
+  - Added "show_estimated_laps_and_minutes" option, which shows estimated total runnable laps and minutes after next pit stop according to refill setting from MFD "Pitstop" page. The estimation is calculated based on player's current consumption per lap and lap time pace.
+    Useful for checking whether there will be enough fuel or energy added for the next stint and remaining time.
+
 * Tyre wear Widget
   - Now counts flat spot while in pit lane.
   - Now resets flat spot readings after changed tyres.

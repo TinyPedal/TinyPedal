@@ -3172,6 +3172,9 @@ Show total relative refilling, as the total additional fuel or virtual energy th
 
 With both `actual` and `total` relative refilling readings, users can determine precisely how much fuel or virtual energy that will be added in next pit stop, and whether the refilling will be enough or more pit stops are required.
 
+    show_estimated_laps_and_minutes
+Show estimated total runnable laps and minutes after next pit stop according to refill setting from MFD `Pitstop` page. The estimation is calculated based on player's current consumption per lap and lap time pace. Useful for checking whether there will be enough fuel or energy added for the next stint and remaining time.
+
     show_pit_occupancy
 Show `pit_occupancy` and `pit_requests` columns.
 

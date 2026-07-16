@@ -216,6 +216,53 @@ class Realtime(Overlay):
                 )
                 layout_lower.addWidget(cap_temp, row_idx_lower, 2)
 
+        if self.wcfg["show_estimated_laps_and_minutes"]:
+            # Estimated laps
+            self.bar_elaps = self.set_rawtext(
+                text=text_def,
+                fixed_width=style_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_estimated_laps"],
+                bg_color=self.wcfg["background_color_estimated_laps"],
+            )
+            self.bar_elaps.decimals = max(self.wcfg["decimal_places_estimated_laps"], 0)
+            layout_upper.addWidget(self.bar_elaps, 1, 3)
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_estimated_laps"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout_upper.addWidget(cap_temp, row_idx_upper, 3)
+
+            # Estimated minutes
+            self.bar_emins = self.set_rawtext(
+                text=text_def,
+                fixed_width=style_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_estimated_minutes"],
+                bg_color=self.wcfg["background_color_estimated_minutes"],
+            )
+            self.bar_emins.decimals = max(self.wcfg["decimal_places_estimated_minutes"], 0)
+            layout_lower.addWidget(self.bar_emins, 1, 3)
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_estimated_minutes"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout_lower.addWidget(cap_temp, row_idx_lower, 3)
+
         if self.wcfg["show_pit_occupancy"]:
             # Pit occupancy
             self.bar_inpit = self.set_rawtext(
@@ -226,7 +273,7 @@ class Realtime(Overlay):
                 fg_color=self.wcfg["font_color_pit_occupancy"],
                 bg_color=self.wcfg["background_color_pit_occupancy"],
             )
-            layout_upper.addWidget(self.bar_inpit, 1, 3)
+            layout_upper.addWidget(self.bar_inpit, 1, 4)
 
             if self.wcfg["show_caption"]:
                 cap_temp = self.set_rawtext(
@@ -237,7 +284,7 @@ class Realtime(Overlay):
                     fg_color=self.wcfg["font_color_caption"],
                     bg_color=self.wcfg["background_color_caption"],
                 )
-                layout_upper.addWidget(cap_temp, row_idx_upper, 3)
+                layout_upper.addWidget(cap_temp, row_idx_upper, 4)
 
             # Number of pit requests
             self.bar_request = self.set_rawtext(
@@ -249,7 +296,7 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_pit_requests"],
                 last=-1,
             )
-            layout_lower.addWidget(self.bar_request, 1, 3)
+            layout_lower.addWidget(self.bar_request, 1, 4)
 
             if self.wcfg["show_caption"]:
                 cap_temp = self.set_rawtext(
@@ -260,7 +307,7 @@ class Realtime(Overlay):
                     fg_color=self.wcfg["font_color_caption"],
                     bg_color=self.wcfg["background_color_caption"],
                 )
-                layout_lower.addWidget(cap_temp, row_idx_lower, 3)
+                layout_lower.addWidget(cap_temp, row_idx_lower, 4)
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -307,6 +354,20 @@ class Realtime(Overlay):
             # Estimated total needed refill
             self.update_refill(self.bar_needed, total_refill)
 
+        if self.wcfg["show_estimated_laps_and_minutes"]:
+            if minfo.energy.available:
+                consumption = minfo.energy.estimatedValidConsumption
+            else:
+                consumption = minfo.fuel.estimatedValidConsumption
+            est_runlaps = calc.end_stint_laps(abs_refill, consumption)
+            est_runmins = calc.end_stint_minutes(est_runlaps, minfo.delta.lapTimePace)
+
+            # Estimated laps
+            self.update_length(self.bar_elaps, est_runlaps)
+
+            # Estimated minutes
+            self.update_length(self.bar_emins, est_runmins)
+
         if self.wcfg["show_pit_occupancy"]:
             # Pit occupancy
             self.update_occupancy(self.bar_inpit, minfo.vehicles.totalStoppedPits, minfo.vehicles.totalInPits)
@@ -329,6 +390,13 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = f"{data:+.{target.decimals}f}"[:self.bar_width].strip(".")
+            target.update()
+
+    def update_length(self, target, data):
+        """Update laps & mins length"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{data:.{target.decimals}f}"[:self.bar_width].strip(".")
             target.update()
 
     def update_occupancy(self, target, *data):
