@@ -886,6 +886,16 @@ class Tyre(_reader.Tyre, DataAdapter):
             rmnan(wheel_data[3].mWear),
         )
 
+    def puncture(self, index: int | None = None, threshold: float = 0.01) -> tuple[bool, ...]:
+        """Tyre puncture state"""
+        wheel_data = self.shmm.lmuTeleVeh(index).mWheels
+        return (
+            wheel_data[0].mWear <= threshold,
+            wheel_data[1].mWear <= threshold,
+            wheel_data[2].mWear <= threshold,
+            wheel_data[3].mWear <= threshold,
+        )
+
     def carcass_temperature(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre carcass temperature (Celsius)"""
         wheel_data = self.shmm.lmuTeleVeh(index).mWheels

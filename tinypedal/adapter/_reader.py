@@ -605,6 +605,10 @@ class Tyre(ABC):
         """Tyre wear (fraction)"""
 
     @abstractmethod
+    def puncture(self, index: int | None = None, threshold: float = 0.01) -> tuple[bool, ...]:
+        """Tyre puncture state"""
+
+    @abstractmethod
     def carcass_temperature(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre carcass temperature (Celsius)"""
 
