@@ -92,6 +92,10 @@ class Realtime(Overlay):
 
         self.pen_text = QPen()
         self.pen_text.setColor(self.wcfg["font_color_integrity"])
+        self.pen_puncture = QPen()
+        self.pen_puncture.setColor(self.wcfg["puncture_outline_color"])
+        self.pen_puncture.setWidth(max(self.wcfg["puncture_outline_width"], 1))
+        self.pen_puncture.setJoinStyle(Qt.MiterJoin)
         self.brush_cone = QBrush(Qt.SolidPattern)
         self.brush_cone.setColor(self.wcfg["last_impact_cone_color"])
 
@@ -107,6 +111,7 @@ class Realtime(Overlay):
         self.damage_aero = -1.0
         self.damage_body = WHEELS_ZERO * 2
         self.damage_wheel = WHEELS_ZERO
+        self.damage_tyre = WHEELS_ZERO
         self.damage_susp = WHEELS_ZERO
         self.last_impact_time = None
         self.last_impact_expired = True
@@ -146,6 +151,12 @@ class Realtime(Overlay):
         temp_damage_wheel = api.read.wheel.is_detached()
         if self.damage_wheel != temp_damage_wheel:
             self.damage_wheel = temp_damage_wheel
+            update_later = True
+
+        # Damage tyre
+        temp_damage_tyre = api.read.tyre.puncture()
+        if self.damage_tyre != temp_damage_tyre:
+            self.damage_tyre = temp_damage_tyre
             update_later = True
 
         # Damage suspension
@@ -190,8 +201,14 @@ class Realtime(Overlay):
 
     def draw_damage_wheel(self, painter):
         """Draw damage wheel"""
-        for rect_wheel, damage_wheel, damage_susp in zip(self.rects_wheels, self.damage_wheel, self.damage_susp):
-            painter.fillRect(rect_wheel, self.color_damage_wheel(damage_wheel, damage_susp))
+        for rect_wheel, damage_wheel, damage_tyre, damage_susp in zip(
+            self.rects_wheels, self.damage_wheel, self.damage_tyre, self.damage_susp
+        ):
+            if damage_tyre and not damage_wheel:
+                painter.setPen(self.pen_puncture)
+                painter.drawRect(rect_wheel)
+            else:
+                painter.fillRect(rect_wheel, self.color_damage_wheel(damage_wheel, damage_susp))
 
     def draw_impact_cone(self, painter):
         """Draw impact cone"""
@@ -225,9 +242,10 @@ class Realtime(Overlay):
             return self.wcfg["body_color_damage_heavy"]
         # body parts detached
         if value >= 3:
-            self.detached_parts = True
-            if self.wcfg["show_detached_warning_flash"] and self.warn_flash.send(True):
-                return self.wcfg["warning_color_detached"]
+            if self.wcfg["show_detached_warning_flash"]:
+                self.detached_parts = True
+                if self.warn_flash.send(True):
+                    return self.wcfg["warning_color_detached"]
             return self.wcfg["body_color_detached"]
         # no damage
         return self.wcfg["body_color"]
@@ -236,9 +254,10 @@ class Realtime(Overlay):
         """Wheel and suspension damage color"""
         # wheel detached
         if wheel_detached:
-            self.detached_parts = True
-            if self.wcfg["show_detached_warning_flash"] and self.warn_flash.send(True):
-                return self.wcfg["warning_color_detached"]
+            if self.wcfg["show_detached_warning_flash"]:
+                self.detached_parts = True
+                if self.warn_flash.send(True):
+                    return self.wcfg["warning_color_detached"]
             return self.wcfg["wheel_color_detached"]
         # no damage
         if susp_damage < self.wcfg["suspension_damage_light_threshold"]:

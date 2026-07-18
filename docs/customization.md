@@ -1970,6 +1970,9 @@ Set maximum body parts width, height in pixels. Minimum value is limited to `4`.
     wheel_width, wheel_height
 Set wheel width, height in pixels. Minimum value is limited to `1`.
 
+    puncture_outline_width
+Set outline width for drawing tyre puncture indication.
+
     show_background
 Show widget background.
 

@@ -363,6 +363,8 @@ WIDGET_DEFAULT = {
         "parts_maximum_height": 22,
         "wheel_width": 10,
         "wheel_height": 16,
+        "puncture_outline_width": 2,
+        "puncture_outline_color": "#FF0000",
         "body_color": "#888888",
         "body_color_damage_light": "#FFFF00",
         "body_color_damage_heavy": "#FF0000",
