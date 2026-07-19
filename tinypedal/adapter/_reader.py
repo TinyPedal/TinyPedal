@@ -707,6 +707,10 @@ class Vehicle(ABC):
         """Absolute refill fuel (liter) or virtual energy (percent)"""
 
     @abstractmethod
+    def repair_time(self) -> float:
+        """Scheduled repair time (seconds)"""
+
+    @abstractmethod
     def stint_usage(self, driver_name: str) -> tuple[float, float, float, float, int]:
         """Stint usage data"""
 

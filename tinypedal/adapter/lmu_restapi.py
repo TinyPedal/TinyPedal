@@ -48,6 +48,7 @@ class RestAPIData:
         "privateQualifying",
         "steeringWheelRange",
         "aeroDamage",
+        "repairTime",
         "pitStopTime",
         "absoluteRefill",
         "maxVirtualEnergy",
@@ -65,6 +66,7 @@ class RestAPIData:
         self.privateQualifying: int = 0
         self.steeringWheelRange: float = 0.0
         self.aeroDamage: float = -1.0
+        self.repairTime: float = 0.0
         self.pitStopTime: float = 0.0
         self.absoluteRefill: float = 0.0
         self.maxVirtualEnergy: float = 0.0
@@ -105,6 +107,7 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
     )
     res_pitstoptime = (
         ResOutput("pitStopTime", 0.0, valid_value_type, ("total",)),
+        ResOutput("repairTime", 0.0, valid_value_type, ("damage",)),
     )
     res_stintusage = (
         ResOutput("stintUsage", EMPTY_DICT, stint_ve_usage),

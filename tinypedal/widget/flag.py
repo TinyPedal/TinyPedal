@@ -222,6 +222,21 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_finish_state"],
             )
 
+        # Scheduled repairs
+        if self.wcfg["show_scheduled_repairs"]:
+            self.bar_repairs = self.set_rawtext(
+                text="REPAIRS",
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_scheduled_repairs"],
+                bg_color=self.wcfg["background_color_scheduled_repairs"],
+            )
+            self.set_primary_orient(
+                target=self.bar_repairs,
+                column=self.wcfg["display_order_scheduled_repairs"],
+            )
+
         # Last data
         self.pit_timer = PitTimer(self.wcfg["pit_time_highlight_duration"])
         self.green_timer = GreenFlagTimer(self.wcfg["green_flag_duration"])
@@ -297,6 +312,11 @@ class Realtime(Overlay):
             finish_state = api.read.vehicle.finish_state()
             self.update_finish_state(self.bar_finish_state, finish_state)
 
+        # Scheduled repairs
+        if self.wcfg["show_scheduled_repairs"]:
+            repair_time = api.read.vehicle.repair_time()
+            self.update_repair_time(self.bar_repairs, repair_time)
+
     # GUI update methods
     def update_pit_timer(self, target, data):
         """Pit timer"""
@@ -305,10 +325,10 @@ class Realtime(Overlay):
             if data != MAX_SECONDS:
                 if data < 0:  # finished pits
                     color_index = 1
-                    state = f"F{-data: >6.2f}"[:7]
+                    state = f"F{-data:>6.2f}"[:7]
                 elif api.read.session.pit_open():
                     color_index = 0
-                    state = f"P{data: >6.2f}"[:7]
+                    state = f"P{data:>6.2f}"[:7]
                 else:  # pit closed
                     color_index = 2
                     state = self.wcfg["pit_closed_text"]
@@ -345,7 +365,7 @@ class Realtime(Overlay):
             if data:
                 if show_speed:
                     if self.prefix_limiter:
-                        text_limiter = f"{self.prefix_limiter}{self.unit_speed(data): >6.{self.decimals_speed}f}"[:7]
+                        text_limiter = f"{self.prefix_limiter}{self.unit_speed(data):>6.{self.decimals_speed}f}"[:7]
                     else:
                         text_limiter = f"{self.unit_speed(data):.{self.decimals_speed}f}"[:7]
                     target.text = text_limiter
@@ -385,7 +405,7 @@ class Realtime(Overlay):
             target.last = data
             if data != MAX_SECONDS:
                 text = f"{self.unit_dist(data):+.0f}{self.symbol_dist}"
-                target.text = f"Y{text: >6}"[:7]
+                target.text = f"Y{text:>6}"[:7]
                 target.update()
                 hidden = False
             else:
@@ -400,7 +420,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data > 0:
-                target.text = f"{self.wcfg['red_lights_text'][:6]: <6}{data}"
+                target.text = f"{self.wcfg['red_lights_text']:<6}{data}"
                 target.bg = self.bar_style_startlights[0]
                 target.update()
                 hidden = False
@@ -421,7 +441,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data != MAX_SECONDS:
-                target.text = f"≥{data: >5.1f}s"[:7]
+                target.text = f"≥{data:>5.1f}s"[:7]
                 target.update()
                 hidden = False
             else:
@@ -467,6 +487,25 @@ class Realtime(Overlay):
                 target.state = hidden
                 target.setHidden(hidden)
 
+    def update_repair_time(self, target, data):
+        """Repair time"""
+        if target.last != data:
+            target.last = data
+            if data > 0:
+                prefix = self.wcfg["scheduled_repairs_text"]
+                if prefix:
+                    target.text = f"{prefix:<3}{data:>3.0f}s"
+                else:
+                    target.text = f"{data:.0f}s"
+                target.update()
+                hidden = False
+            else:
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
+
     # Additional methods
     def is_lowfuel(self, in_race):
         """Is low fuel"""
@@ -488,7 +527,7 @@ class Realtime(Overlay):
 
         if prefix == "LF":
             amount_curr = self.unit_fuel(amount_curr)
-        return f"{prefix}{amount_curr: >5.2f}"[:7]
+        return f"{prefix}{amount_curr:>5.2f}"[:7]
 
     def pit_in_countdown(self) -> str:
         """Pit in countdown (laps)"""
@@ -503,7 +542,7 @@ class Realtime(Overlay):
 
         safe_laps = f"{cd_laps:.2f}"[:3].strip(".")
         est_laps = f"{est_laps:.2f}"[:3].strip(".")
-        return f"{safe_laps: <3}≤{est_laps: >3}"
+        return f"{safe_laps:<3}≤{est_laps:>3}"
 
     def yellow_flag_state(self, in_race: bool) -> float:
         """Yellow flag state"""

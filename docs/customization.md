@@ -2363,6 +2363,9 @@ Show pit request indicator and `pit-in laps countdown` alongside `estimated rema
     show_finish_state
 Show finish or disqualify state.
 
+    show_scheduled_repairs
+Show scheduled repairs notification and estimated repair time when damage repair is turned on. This option only works for `LMU`.
+
 [**`Back to Top`**](#)
 
 

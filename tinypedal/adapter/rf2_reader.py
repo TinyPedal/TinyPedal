@@ -950,6 +950,10 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Absolute refill fuel (liter) or virtual energy (percent)"""
         return self.rest.absoluteRefill
 
+    def repair_time(self) -> float:
+        """Scheduled repair time (seconds)"""
+        return 0.0
+
     def stint_usage(self, driver_name: str) -> tuple[float, float, float, float, int]:
         """Stint usage data"""
         return self.rest.stintUsage.get(driver_name, STINT_USAGE_DEFAULT)
