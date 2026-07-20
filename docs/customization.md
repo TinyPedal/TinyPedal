@@ -2284,8 +2284,8 @@ Show pit timer, and total amount time spent in pit after exit pit.
     pit_time_highlight_duration
 Set highlight duration for total amount time spent in pit after exit pit.
 
-    pit_closed_text
-Set custom pit closed text.
+    pit_in_text, pit_out_text, pit_closed_text
+Set custom text for pit in, out, closed.
 
     font_color_pit_closed, background_color_pit_closed
 Set color indicator on pit timer when pit lane is closed.
@@ -2302,13 +2302,14 @@ Set fuel volume threshold (in Liter) to show low fuel indicator when total amoun
     low_fuel_lap_threshold
 Set amount lap threshold to show low fuel indicator when total completable laps of remaining fuel is equal or less than this value. Default is `2` laps before running out of fuel.
 
+    low_fuel_text, low_energy_text
+Set custom text for low fuel or energy.
+
     show_speed_limiter
 Show speed limiter indicator.
 
     show_current_speed_while_limiter_on
 Show current vehicle speed while speed limiter is on. This option is enabled by default.
-
-Note, while enabled, the first letter of `speed_limiter_text` option will be displayed as prefix beside speed reading. Remove all text from `speed_limiter_text` option will show only speed reading.
 
     speed_limiter_text
 Set custom pit speed limiter text which shows when speed limiter is engaged.
@@ -2324,6 +2325,9 @@ Set maximum range (meters) for displaying yellow flags that ahead of or behind d
 
 Note, yellow flags that ahead of driver take priority over those from behind.
 
+    yellow_flag_text
+Set custom text for yellow flag.
+
     show_blue_flag
 Show blue flag indicator with nearest leading vehicle class name displayed on the left, and total duration (seconds) under blue flag on the right. Note, the class name is limited and trimmed to 4 characters.
 
@@ -2333,11 +2337,8 @@ Only show blue flag indicator during race session.
     show_start_lights
 Show race start lights indicator with light frame number for standing-type start.
 
-    red_lights_text
-Set custom text for red lights.
-
-    green_flag_text
-Set custom text for green flag.
+    red_lights_text, green_flag_text
+Set custom text for red lights and green flag.
 
     green_flag_duration
 Set display duration(seconds) for green flag text before it disappears. Default is `3`.
@@ -2357,14 +2358,23 @@ Set traffic indicator extended duration (seconds) after pitting out, or recently
     traffic_low_speed_threshold
 Set low speed threshold for showing nearest incoming traffic indicator. Default is `8` m/s (roughly 28kph). Set to `0` to disable. This option can be useful to quickly determine nearby traffic situation after a spin or crash.
 
+    traffic_text
+Set custom text for traffic.
+
     show_pit_request
 Show pit request indicator and `pit-in laps countdown` alongside `estimated remaining laps` reading that current fuel or energy can run. Note, `pit-in laps countdown` value is always calculated towards the finish line of current stint's final lap, and thus is always less than or equal to `estimated remaining laps` reading. If countdown drops below 1.0 (laps), it indicates the final lap of current stint, and driver should pit in before the end of current lap to refuel. If countdown reaches zero or negative, there may still be some fuel or energy left in tank, however it will not be enough to complete another full lap.
 
     show_finish_state
 Show finish or disqualify state.
 
+    finish_text, disqualify_text
+Set custom text for finish and disqualify.
+
     show_scheduled_repairs
 Show scheduled repairs notification and estimated repair time when damage repair is turned on. This option only works for `LMU`.
+
+    scheduled_repairs_text
+Set custom text for scheduled repairs.
 
 [**`Back to Top`**](#)
 

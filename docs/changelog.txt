@@ -8,6 +8,7 @@ WIP
 
 * Flag Widget
   - Added "show_scheduled_repairs" option (LMU only), which shows scheduled repairs notification and estimated repair time when damage repair is turned on.
+  - Added additional customizable text options: "pit_in_text, pit_out_text, low_fuel_text, low_energy_text, yellow_flag_text, traffic_text, scheduled_repairs_text".
 
 * Pit stop estimate Widget
   - Added "show_estimated_laps_and_minutes" option, which shows estimated total runnable laps and minutes after next pit stop according to refill setting from MFD "Pitstop" page. The estimation is calculated based on player's current consumption per lap and lap time pace.

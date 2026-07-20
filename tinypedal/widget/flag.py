@@ -103,10 +103,8 @@ class Realtime(Overlay):
         # Speed limiter
         if self.wcfg["show_speed_limiter"]:
             self.decimals_speed = max(self.wcfg["decimal_places_speed"], 0)
-            limiter_text = self.wcfg["speed_limiter_text"]
-            self.prefix_limiter = limiter_text[0] if limiter_text else ""
             self.bar_limiter = self.set_rawtext(
-                text=limiter_text,
+                text=self.wcfg["speed_limiter_text"],
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -325,14 +323,24 @@ class Realtime(Overlay):
             if data != MAX_SECONDS:
                 if data < 0:  # finished pits
                     color_index = 1
-                    state = f"F{-data:>6.2f}"[:7]
+                    timer = f"{-data:.2f}"
+                    prefix = self.wcfg["pit_out_text"]
+                    if prefix:
+                        text_pit = f"{prefix}{timer:>6.6}"
+                    else:
+                        text_pit = timer
                 elif api.read.session.pit_open():
                     color_index = 0
-                    state = f"P{data:>6.2f}"[:7]
+                    timer = f"{data:.2f}"
+                    prefix = self.wcfg["pit_in_text"]
+                    if prefix:
+                        text_pit = f"{prefix}{timer:>6.6}"
+                    else:
+                        text_pit = timer
                 else:  # pit closed
                     color_index = 2
-                    state = self.wcfg["pit_closed_text"]
-                target.text = state
+                    text_pit = self.wcfg["pit_closed_text"]
+                target.text = text_pit
                 target.fg, target.bg = self.bar_style_pit_timer[color_index]
                 target.update()
                 hidden = False
@@ -364,10 +372,12 @@ class Realtime(Overlay):
             target.last = data
             if data:
                 if show_speed:
-                    if self.prefix_limiter:
-                        text_limiter = f"{self.prefix_limiter}{self.unit_speed(data):>6.{self.decimals_speed}f}"[:7]
+                    speed = f"{self.unit_speed(data):.{self.decimals_speed}f}"
+                    prefix = self.wcfg["speed_limiter_text"]
+                    if prefix:
+                        text_limiter = f"{prefix}{speed:>6.6}"
                     else:
-                        text_limiter = f"{self.unit_speed(data):.{self.decimals_speed}f}"[:7]
+                        text_limiter = f"{speed:.7}"
                     target.text = text_limiter
                     target.update()
                 hidden = False
@@ -389,7 +399,7 @@ class Realtime(Overlay):
                     class_name = class_style["alias"]
                 if not class_name:
                     class_name = "BLUE"
-                target.text = f"{class_name:<4.4}{data:3.0f}"[:7]
+                target.text = f"{class_name:<4.4}{data:3.0f}"
                 target.update()
                 hidden = False
             else:
@@ -404,8 +414,13 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data != MAX_SECONDS:
-                text = f"{self.unit_dist(data):+.0f}{self.symbol_dist}"
-                target.text = f"Y{text:>6}"[:7]
+                distance = f"{self.unit_dist(data):+.0f}{self.symbol_dist}"
+                prefix = self.wcfg["yellow_flag_text"]
+                if prefix:
+                    text_yellow = f"{prefix}{distance:>6.6}"
+                else:
+                    text_yellow = distance
+                target.text = text_yellow
                 target.update()
                 hidden = False
             else:
@@ -420,7 +435,12 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data > 0:
-                target.text = f"{self.wcfg['red_lights_text']:<6}{data}"
+                prefix = self.wcfg["red_lights_text"]
+                if prefix:
+                    text_slights = f"{prefix:<6}{data}"
+                else:
+                    text_slights = f"{data}"
+                target.text = text_slights
                 target.bg = self.bar_style_startlights[0]
                 target.update()
                 hidden = False
@@ -441,7 +461,13 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data != MAX_SECONDS:
-                target.text = f"≥{data:>5.1f}s"[:7]
+                time_gap = f"{data:.1f}s"
+                prefix = self.wcfg["traffic_text"]
+                if prefix:
+                    text_traffic = f"{prefix}{time_gap:>6.6}"
+                else:
+                    text_traffic = time_gap
+                target.text = text_traffic
                 target.update()
                 hidden = False
             else:
@@ -455,7 +481,7 @@ class Realtime(Overlay):
         """Pit request"""
         if target.last != data:
             target.last = data
-            if data != "":
+            if data:
                 target.text = data
                 target.update()
                 hidden = False
@@ -492,11 +518,13 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data > 0:
+                duration = f"{data:.0f}s"
                 prefix = self.wcfg["scheduled_repairs_text"]
                 if prefix:
-                    target.text = f"{prefix:<3}{data:>3.0f}s"
+                    text_repair = f"{prefix:<3}{duration:>4.4}"
                 else:
-                    target.text = f"{data:.0f}s"
+                    text_repair = duration
+                target.text = text_repair
                 target.update()
                 hidden = False
             else:
@@ -512,12 +540,13 @@ class Realtime(Overlay):
         if self.wcfg["show_low_fuel_for_race_only"] and not in_race:
             return ""
 
-        if minfo.energy.available and minfo.energy.estimatedLaps < minfo.fuel.estimatedLaps:
-            prefix = "LE"
+        show_energy = minfo.energy.available and minfo.energy.estimatedLaps < minfo.fuel.estimatedLaps
+        if show_energy:
+            prefix = self.wcfg["low_energy_text"]
             amount_curr = minfo.energy.amountCurrent
             est_laps = minfo.energy.estimatedLaps
         else:
-            prefix = "LF"
+            prefix = self.wcfg["low_fuel_text"]
             amount_curr = minfo.fuel.amountCurrent
             est_laps = minfo.fuel.estimatedLaps
 
@@ -525,9 +554,13 @@ class Realtime(Overlay):
             est_laps > self.wcfg["low_fuel_lap_threshold"]):
             return ""  # not low fuel
 
-        if prefix == "LF":
+        if not show_energy:
             amount_curr = self.unit_fuel(amount_curr)
-        return f"{prefix}{amount_curr:>5.2f}"[:7]
+
+        remaining = f"{amount_curr:.2f}"
+        if prefix:
+            return f"{prefix:<2}{remaining:>5.5}"
+        return remaining
 
     def pit_in_countdown(self) -> str:
         """Pit in countdown (laps)"""
