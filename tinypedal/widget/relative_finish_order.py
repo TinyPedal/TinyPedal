@@ -213,8 +213,6 @@ class Realtime(Overlay):
         player_lap_into = api.read.lap.progress()
 
         leader_laptime_pace = minfo.vehicles.dataSet[leader_index].lapTimeHistory.average
-        if leader_laptime_pace >= MAX_SECONDS:  # fallback to session best
-            leader_laptime_pace = minfo.vehicles.dataSet[leader_index].bestLapTime
         player_laptime_pace = minfo.delta.lapTimePace
 
         leader_valid = 0 < leader_laptime_pace < MAX_SECONDS

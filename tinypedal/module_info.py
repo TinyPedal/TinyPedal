@@ -166,7 +166,14 @@ class DeltaLapTimeHistory(array):
                 self[0] = self[1] = self[2] = self[3] = self[4] = 0.0
             self._last_lap_start = lap_start
             # Recalculate once per lap
-            self.best = min(self._filter_laptime(best_valid))
+            if best_valid <= 0:
+                best_recent = MAX_SECONDS
+            else:
+                # Find best time from recent laps
+                best_recent = min(self._filter_laptime(best_valid))
+                if best_recent >= MAX_SECONDS:  # fallback to session best
+                    best_recent = best_valid
+            self.best = best_recent
             self.average = self._average_laptime(self.best)
             self.last = self[4]
 

@@ -325,7 +325,10 @@ class Lap(_reader.Lap, DataAdapter):
         scor = self.shmm.rf2ScorInfo
         scor_veh = self.shmm.rf2ScorVeh(index)
         progress = lap_progress_distance(scor_veh.mLapDist, scor.mLapDist)
-        return rmnan(scor.mMaxLaps - scor_veh.mTotalLaps - progress)
+        laps_left = rmnan(scor.mMaxLaps - scor_veh.mTotalLaps - progress)
+        if laps_left < 0:
+            laps_left = 0.0
+        return laps_left
 
     def sector_index(self, index: int | None = None) -> int:
         """Sector index, 0 = S1, 1 = S2, 2 = S3"""
