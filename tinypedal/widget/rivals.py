@@ -547,16 +547,9 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        classes_list = minfo.relative.classes
-        total_cls_idx = len(classes_list)
-        player_idx = minfo.vehicles.playerIndex
-        plr_veh_info = minfo.vehicles.dataSet[player_idx]
         in_race = api.read.session.in_race()
-
-        if player_idx < total_cls_idx:
-            rivals_list = classes_list[player_idx][4:6]
-        else:
-            rivals_list = -1,-1
+        plr_veh_info = minfo.vehicles.dataSet[minfo.vehicles.playerIndex]
+        rivals_list = plr_veh_info.classAheadIndex, plr_veh_info.classBehindIndex
 
         # Standings update
         for idx, rvl_idx in enumerate(rivals_list):

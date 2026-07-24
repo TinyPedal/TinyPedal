@@ -56,7 +56,7 @@ from ._common import (
 from .track_map_viewer import TrackMapViewer
 
 
-def parse_display_value(key: str, value: int | float) -> str | int | float:
+def parse_display_value(key: str, value: float) -> str | int | float:
     """Parse stats display value"""
     if DriverStats.is_lap_time(key):
         if 0 < value < MAX_SECONDS:
@@ -254,7 +254,7 @@ class DriverStatsViewer(BaseEditor):
 
     def remove_vehicle(self):
         """Remove vehicle and stats"""
-        selected_rows = list(data.row() for data in self.table_stats.selectedIndexes())
+        selected_rows = [data.row() for data in self.table_stats.selectedIndexes()]
         if not selected_rows:
             QMessageBox.warning(self, "Error", "No data selected.")
             return

@@ -127,7 +127,7 @@ def update_vehicle_data(
     plr_ori_yaw = api.read.vehicle.orientation_yaw_radians()
 
     # Update dataset from all vehicles in current session
-    for index, data, class_pos in zip(range(output.totalVehicles), output.dataSet, minfo.relative.classes):
+    for index, data in zip(range(output.totalVehicles), output.dataSet):
         # Temp var only
         laps_completed = api.read.lap.completed_laps(index)
         lap_distance = api.read.lap.distance(index)
@@ -194,12 +194,6 @@ def update_vehicle_data(
 
         # Update low priority info
         if update_low_priority:
-            opt_index_ahead = class_pos[4]
-            opt_index_leader = class_pos[6]
-            data.positionInClass = class_pos[1]
-            data.classBestLapTime = class_pos[3]
-            data.isClassFastestLastLap = class_pos[7]
-
             data.currentLapProgress = calc.lap_progress_distance(lap_distance, track_length)
             data.totalLapProgress = laps_completed + data.currentLapProgress
             data.isLapped = calc.lap_difference(
@@ -222,6 +216,9 @@ def update_vehicle_data(
 
             data.gapBehindNext = calc_gap_behind_next(index)
             data.gapBehindLeader = calc_gap_behind_leader(index)
+
+            opt_index_ahead = data.classAheadIndex
+            opt_index_leader = data.classLeaderIndex
             data.gapBehindNextInClass = calc_time_gap_behind(
                 opt_index_ahead, index, output.dataSet[opt_index_ahead].totalLapProgress - data.totalLapProgress)
             data.gapBehindLeaderInClass = calc_time_gap_behind(

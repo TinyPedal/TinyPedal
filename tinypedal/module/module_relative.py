@@ -38,7 +38,6 @@ REF_PLACES = tuple(range(1, MAX_VEHICLES + 1))
 TEMP_RELATIVE_AHEAD = [(0.0, -1)] * MAX_VEHICLES
 TEMP_RELATIVE_BEHIND = [(0.0, -1)] * MAX_VEHICLES
 TEMP_CLASSES = [("", -1, -1, -1.0, -1.0)] * MAX_VEHICLES
-TEMP_CLASSES_POS = [[0, 1, "", 0.0, -1, -1, -1, False] for _ in range(MAX_VEHICLES)]
 TEMP_DRAW_ORDER = list(range(MAX_VEHICLES))
 
 
@@ -98,32 +97,27 @@ class Realtime(DataModule):
                     veh_total, plr_index, show_in_garage, next(gen_one_second_timer),
                     output.relativeDeltaAhead, output.relativeDeltaBehind)
 
-                # Create vehicle class position list (initially ordered by class name)
-                class_pos_list, plr_class_name, plr_class_place = create_position_in_class(
-                    classes_list, plr_index)
+                # Update vehicle class position info
+                plr_class_name, plr_class_place = update_position_in_class(classes_list, plr_index)
 
                 # Create standings index list
                 if is_exclusive_mode:  # single class exclusive list
                     standings_index_list = standings_index_from_same_class(
-                        min_top_veh, class_pos_list, plr_class_name, plr_class_place,
+                        min_top_veh, classes_list, plr_class_name, plr_class_place,
                         veh_limit_exclusive)
                 elif is_split_mode and is_multi_class:  # multi-class split list
                     standings_index_list = list(chain(*list(standings_index_from_all_classes(
-                        min_top_veh, class_pos_list, plr_class_name, plr_class_place,
+                        min_top_veh, classes_list, plr_class_name, plr_class_place,
                         veh_limit_other, veh_limit_player))))
                 else:  # mixed class list
                     classes_list.sort(key=itemgetter(1))  # sort by overall position
                     standings_index_list = calc_standings_index(
-                        min_top_veh, veh_limit_combined, plr_place, classes_list, 2)
-
-                # Sort vehicle class position list (by player index) for output
-                class_pos_list.sort()
+                        min_top_veh, veh_limit_combined, plr_place, classes_list)
 
                 # Output data
                 output.relativeAhead = relative_ahead
                 output.relativeBehind = relative_behind
                 output.standings = standings_index_list
-                output.classes = class_pos_list
                 output.drawOrder = draw_order_list
 
             else:
@@ -238,8 +232,8 @@ def get_vehicles_info(
     )
 
 
-def create_position_in_class(sorted_veh_class: list, plr_index: int):
-    """Create vehicle position in class list"""
+def update_position_in_class(sorted_veh_class: list, plr_index: int):
+    """Update vehicle position in class"""
     last_class_name = None
     place_in_class = 0
     opt_index_ahead = -1
@@ -247,15 +241,16 @@ def create_position_in_class(sorted_veh_class: list, plr_index: int):
     laptime_class_best = MAX_SECONDS
     last_fastest_laptime = MAX_SECONDS
     last_fastest_index = -1
-    veh_total = len(sorted_veh_class)
     plr_class_name = ""
     plr_class_place = 0
-    slot_index = 0
+    veh_data = minfo.vehicles.dataSet
 
     for class_name, _, opt_index, laptime_best, laptime_last in sorted_veh_class:
+        output_data = veh_data[opt_index]
+
         if last_class_name == class_name:
             place_in_class += 1
-            TEMP_CLASSES_POS[slot_index - 1][5] = opt_index  # set opponent index behind
+            veh_data[opt_index_ahead].classBehindIndex = opt_index
         else:
             last_class_name = class_name  # reset class name
             place_in_class = 1  # reset position counter
@@ -264,7 +259,7 @@ def create_position_in_class(sorted_veh_class: list, plr_index: int):
             laptime_class_best = laptime_best
             last_fastest_laptime = MAX_SECONDS  # reset last fastest
             if last_fastest_index != -1:  # mark fastest last lap
-                TEMP_CLASSES_POS[last_fastest_index][7] = True
+                veh_data[last_fastest_index].isClassFastestLastLap = True
                 last_fastest_index = -1  # reset last fastest index
 
         if opt_index == plr_index:
@@ -273,25 +268,20 @@ def create_position_in_class(sorted_veh_class: list, plr_index: int):
 
         if last_fastest_laptime > laptime_last:
             last_fastest_laptime = laptime_last
-            last_fastest_index = slot_index
+            last_fastest_index = opt_index
 
-        TEMP_CLASSES_POS[slot_index][:] = (
-            opt_index,  # 0 - 2 player index
-            place_in_class,  # 1 - position in class
-            class_name,  # 2 - 0 class name
-            laptime_class_best,  # 3 classes best
-            opt_index_ahead,  # 4 opponent index ahead
-            -1,  # 5 opponent index behind
-            opt_index_leader,  # 6 class leader index
-            False,  # 7 is class fastest last laptime
-        )
+        output_data.classAheadIndex = opt_index_ahead
+        output_data.classBehindIndex = -1
+        output_data.classLeaderIndex = opt_index_leader
+        output_data.positionInClass = place_in_class
+        output_data.classBestLapTime = laptime_class_best
+        output_data.isClassFastestLastLap = False
         opt_index_ahead = opt_index  # store opponent index for next
-        slot_index += 1
 
     if last_fastest_index != -1:  # mark for last class
-        TEMP_CLASSES_POS[last_fastest_index][7] = True
+        veh_data[last_fastest_index].isClassFastestLastLap = True
 
-    return TEMP_CLASSES_POS[:veh_total], plr_class_name, plr_class_place
+    return plr_class_name, plr_class_place
 
 
 def standings_index_from_all_classes(
@@ -300,33 +290,33 @@ def standings_index_from_all_classes(
     """Generate class standings index list from all classes"""
     class_collection = sorted(split_class_list(class_pos_list), key=sort_class_collection)
     for class_list in class_collection:
-        if plr_class_name == class_list[0][2]:  # match class name
+        if plr_class_name == class_list[0][0]:  # match class name
             veh_limit = veh_limit_player
             plr_place = plr_class_place  # 1 position in class
         else:
             veh_limit = veh_limit_other
             plr_place = 0
-        yield calc_standings_index(min_top_veh, veh_limit, plr_place, class_list, 0)
+        yield calc_standings_index(min_top_veh, veh_limit, plr_place, class_list)
 
 
 def standings_index_from_same_class(
     min_top_veh: int, class_pos_list: list, plr_class_name: str, plr_class_place: int, veh_limit_player: int
 ) -> list[int]:
     """Generate class standings index list from same class only"""
-    class_list = list(class_data for class_data in class_pos_list if plr_class_name == class_data[2])
+    class_list = [class_data for class_data in class_pos_list if plr_class_name == class_data[0]]
     if not class_list:
         return [-1]
-    return calc_standings_index(min_top_veh, veh_limit_player, plr_class_place, class_list, 0)
+    return calc_standings_index(min_top_veh, veh_limit_player, plr_class_place, class_list)
 
 
 def calc_standings_index(
-    min_top_veh: int, veh_limit: int, plr_place: int, class_index_list: list, column: int
+    min_top_veh: int, veh_limit: int, plr_place: int, class_index_list: list
 ) -> list[int]:
     """Calculate vehicle standings index list"""
     veh_total = len(class_index_list)
     ref_place_list = create_reference_place(min_top_veh, veh_total, plr_place, veh_limit)
     # Create final standing index list
-    return list(standings_index_from_place_reference(ref_place_list, class_index_list, veh_total, column))
+    return list(standings_index_from_place_reference(ref_place_list, class_index_list, veh_total))
 
 
 @lru_cache(maxsize=20)
@@ -356,11 +346,12 @@ def create_reference_place(
 
 
 def standings_index_from_place_reference(
-    ref_place_list: tuple, class_index_list: list, veh_total: int, column: int):
+    ref_place_list: tuple, class_index_list: list, veh_total: int
+):
     """Match place from reference list to generate standings player index list"""
     for ref_index in ref_place_list:
         if 0 < ref_index <= veh_total:  # prevent out of range
-            yield class_index_list[ref_index - 1][column]  # column - player index
+            yield class_index_list[ref_index - 1][2]  # 2 - player index
         else:
             break
     yield -1  # append an empty index as gap between classes
@@ -368,14 +359,14 @@ def standings_index_from_place_reference(
 
 def split_class_list(class_list: list):
     """Split class list into class collection"""
-    class_name = class_list[0][2]
+    class_name = class_list[0][0]
     index_start = 0
     index_end = 0
     for vehicle in class_list:
-        if vehicle[2] == class_name:
+        if vehicle[0] == class_name:
             index_end +=1
-        elif vehicle[2] != class_name:
-            class_name = vehicle[2]
+        elif vehicle[0] != class_name:
+            class_name = vehicle[0]
             yield class_list[index_start:index_end]
             index_start = index_end
             index_end +=1

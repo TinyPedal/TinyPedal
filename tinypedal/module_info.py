@@ -441,6 +441,9 @@ class VehicleDataSet:
         "driverName",
         "vehicleName",
         "vehicleBrand",
+        "classAheadIndex",
+        "classBehindIndex",
+        "classLeaderIndex",
         "vehicleClass",
         "classBestLapTime",
         "bestLapTime",
@@ -490,6 +493,9 @@ class VehicleDataSet:
         self.vehicleName: str = ""
         self.vehicleBrand: str = ""
         self.vehicleClass: str = ""
+        self.classAheadIndex: int = -1
+        self.classBehindIndex: int = -1
+        self.classLeaderIndex: int = -1
         self.classBestLapTime: float = MAX_SECONDS
         self.bestLapTime: float = MAX_SECONDS
         self.lastLapTime: float = MAX_SECONDS
@@ -774,7 +780,6 @@ class RelativeInfo:
         "relativeAhead",
         "relativeBehind",
         "standings",
-        "classes",
         "drawOrder",
         "relativeDeltaAhead",
         "relativeDeltaBehind",
@@ -784,7 +789,6 @@ class RelativeInfo:
         self.relativeAhead: list[tuple[float, int]] = [REL_TIME_DEFAULT]
         self.relativeBehind: list[tuple[float, int]] = [REL_TIME_DEFAULT]
         self.standings: list[int] = [-1]
-        self.classes: list[list] = [[0, 1, "", 0.0, -1, -1, -1, False]]
         self.drawOrder: list = [0]
         self.relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = tuple(
             DeltaTimeInterval() for _ in range(MAX_VEHICLES)
