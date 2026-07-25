@@ -585,6 +585,7 @@ class ForceInfo:
         "transientMaxBrakingRate",
         "maxBrakingRate",
         "deltaBrakingRate",
+        "estimatedStaticWeight",
     )
 
     def __init__(self):
@@ -600,6 +601,7 @@ class ForceInfo:
         self.transientMaxBrakingRate: float = 0.0
         self.maxBrakingRate: float = 0.0
         self.deltaBrakingRate: float = 0.0
+        self.estimatedStaticWeight: float = 0.0
 
 
 class FuelInfo:

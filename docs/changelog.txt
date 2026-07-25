@@ -10,6 +10,12 @@ WIP
   - Added "show_scheduled_repairs" option (LMU only), which shows scheduled repairs notification and estimated repair time when damage repair is turned on.
   - Added additional customizable text options: "pit_in_text, pit_out_text, low_fuel_text, low_energy_text, yellow_flag_text, traffic_text, scheduled_repairs_text".
 
+* Force Widget
+  - Added "show_estimated_static_weight" option, which shows estimated static weight measured while vehicle is stationary. Note, weight may not be available on some vehicles.
+  - Added "show_minimum_static_weight_without_fuel" option, which shows estimated minimum static weight excluding fuel.
+  - Added "show_acceleration_reduction" option, which shows percentage acceleration reduction due to amount carried fuel weight.
+  - See User Guide for additional info.
+
 * Pit stop estimate Widget
   - Added "show_estimated_laps_and_minutes" option, which shows estimated total runnable laps and minutes after next pit stop according to refill setting from MFD "Pitstop" page. The estimation is calculated based on player's current consumption per lap and lap time pace.
     Useful for checking whether there will be enough fuel or energy added for the next stint and remaining time.

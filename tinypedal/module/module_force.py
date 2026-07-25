@@ -58,6 +58,9 @@ class Realtime(DataModule):
         calc_max_transient_rate = transient_max(3)
         calc_max_braking_rate = transient_max(self.mcfg["maximum_braking_rate_reset_delay"], True)
 
+        last_vehicle_name = ""
+        est_static_weight = 0
+
         while not _event_wait(update_interval):
             if realtime_state.active:
 
@@ -75,6 +78,11 @@ class Realtime(DataModule):
                     max_braking_rate = 0
                     delta_braking_rate = 0
 
+                    vehicle_name = api.read.vehicle.vehicle_name()
+                    if last_vehicle_name != vehicle_name:
+                        last_vehicle_name = vehicle_name
+                        est_static_weight = 0
+
                 # Read telemetry
                 lap_etime = api.read.timing.elapsed()
                 lat_accel = api.read.vehicle.accel_lateral()
@@ -82,6 +90,7 @@ class Realtime(DataModule):
                 dforce_f = api.read.vehicle.downforce_front()
                 dforce_r = api.read.vehicle.downforce_rear()
                 brake_raw = api.read.inputs.brake_raw()
+                speed = api.read.vehicle.speed()
 
                 # G raw
                 lgt_gforce_raw = lgt_accel / g_accel
@@ -114,6 +123,10 @@ class Realtime(DataModule):
                 else:  # Set after reset max_transient_rate
                     max_braking_rate = temp_max_rate
 
+                # Estimated weight
+                if speed < 0.01:
+                    est_static_weight = sum(api.read.tyre.load()) / g_accel
+
                 # Output force data
                 output.lgtGForceRaw = lgt_gforce_raw
                 output.latGForceRaw = lat_gforce_raw
@@ -127,6 +140,7 @@ class Realtime(DataModule):
                 output.transientMaxBrakingRate = max_transient_rate
                 output.maxBrakingRate = max_braking_rate
                 output.deltaBrakingRate = delta_braking_rate
+                output.estimatedStaticWeight = est_static_weight
 
             else:
                 if reset:

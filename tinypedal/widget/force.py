@@ -20,6 +20,7 @@
 Force Widget
 """
 
+from .. import units
 from ..const_common import TEXT_NA
 from ..module_info import minfo
 from ._base import Overlay
@@ -46,6 +47,12 @@ class Realtime(Overlay):
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 6 + bar_padx
+        self.minimum_weight = max(self.wcfg["minimum_weight_without_fuel"], 0.1)
+        self.fuel_density = max(self.wcfg["fuel_density"], 0.1)
+
+        # Config units
+        self.unit_weight = units.set_unit_weight(self.cfg.units["weight_unit"])
+        self.symbol_weight = units.set_symbol_weight(self.cfg.units["weight_unit"])
 
         # Longitudinal g-force
         if self.wcfg["show_longitudinal_g_force"]:
@@ -130,8 +137,46 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_rear_downforce"],
             )
 
+        # Estimated static weight
+        if self.wcfg["show_estimated_static_weight"]:
+            self.bar_weight = self.set_rawtext(
+                text=TEXT_NA,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_estimated_static_weight"],
+                bg_color=self.wcfg["background_color_estimated_static_weight"],
+            )
+            self.set_primary_orient(
+                target=self.bar_weight,
+                column=self.wcfg["display_order_estimated_static_weight"],
+            )
+
+        # Acceleration reduction
+        if self.wcfg["show_acceleration_reduction"]:
+            self.bar_accloss = self.set_rawtext(
+                text=TEXT_NA,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_acceleration_reduction"],
+                bg_color=self.wcfg["background_color_acceleration_reduction"],
+            )
+            self.set_primary_orient(
+                target=self.bar_accloss,
+                column=self.wcfg["display_order_acceleration_reduction"],
+            )
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
+        est_weight = minfo.force.estimatedStaticWeight
+        fuel_weight = self.fuel_density * minfo.fuel.amountCurrent
+        if est_weight > 1:
+            minimum_weight = est_weight - fuel_weight
+        else:
+            minimum_weight = self.minimum_weight
+        total_weight = minimum_weight + fuel_weight
+
         # Longitudinal g-force
         if self.wcfg["show_longitudinal_g_force"]:
             gf_lgt = round(minfo.force.lgtGForceRaw, 2)
@@ -144,7 +189,7 @@ class Realtime(Overlay):
 
         # Downforce ratio
         if self.wcfg["show_downforce_ratio"]:
-            df_ratio = round(minfo.force.downForceRatio, 2)
+            df_ratio = round(minfo.force.downForceRatio * 100, 2)
             self.update_df_ratio(self.bar_df_ratio, df_ratio)
 
         # Front downforce
@@ -156,6 +201,22 @@ class Realtime(Overlay):
         if self.wcfg["show_rear_downforce"]:
             df_rear = round(minfo.force.downForceRear)
             self.update_df_rear(self.bar_df_rear, df_rear)
+
+        # Estimated static weight
+        if self.wcfg["show_estimated_static_weight"]:
+            if self.wcfg["show_minimum_static_weight_without_fuel"]:
+                static_weight = minimum_weight
+            else:
+                static_weight = total_weight
+            self.update_static_weight(self.bar_weight, round(static_weight))
+
+        # Acceleration reduction
+        if self.wcfg["show_acceleration_reduction"]:
+            if total_weight > 0:
+                accel_loss = (1 - minimum_weight / total_weight) * 100
+            else:
+                accel_loss = 0.0
+            self.update_acceleration_reduction(self.bar_accloss, accel_loss)
 
     # GUI update methods
     def update_gf_lgt(self, target, data):
@@ -206,4 +267,23 @@ class Realtime(Overlay):
             target.last = data
             target.text = f"R{abs(data):5.0f}"[:6]
             target.bg = self.bar_style_df_rear[data < 0]
+            target.update()
+
+    def update_static_weight(self, target, data):
+        """Estimated static weight"""
+        if target.last != data:
+            target.last = data
+            if data > 1:
+                text_weight = f"{self.unit_weight(data):.0f}{self.symbol_weight}"
+            else:
+                text_weight = TEXT_NA
+            target.text = text_weight
+            target.update()
+
+    def update_acceleration_reduction(self, target, data):
+        """Acceleration reduction"""
+        if target.last != data:
+            target.last = data
+            text_accel = f"{data:.3f}"
+            target.text = f"{text_accel:.5}%"
             target.update()

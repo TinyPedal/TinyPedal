@@ -2400,6 +2400,21 @@ Show front and rear downforce reading in Newtons.
     warning_color_liftforce
 Set lift force indicator color.
 
+    show_estimated_static_weight
+Show estimated static weight measured while vehicle is stationary. Note, weight may not be available on some vehicles.
+
+    show_minimum_static_weight_without_fuel
+Show estimated minimum static weight excluding fuel.
+
+    minimum_weight_without_fuel
+Set default minimum weight without fuel in case weight is not measurable on some vehicles.
+
+    fuel_density
+Set fuel density, which affects the accuracy of fuel weight calculation. Fuel density may vary depending on the type of fuel used. Default is `0.75`.
+
+    show_acceleration_reduction
+Show percentage acceleration reduction due to amount carried fuel weight. Note, if static weight is not available, make sure to set `minimum_weight_without_fuel` value correctly to get accurate reading.
+
 [**`Back to Top`**](#)
 
 

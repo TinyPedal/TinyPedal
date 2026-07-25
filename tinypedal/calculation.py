@@ -147,7 +147,7 @@ def gforce(value: float, g_accel: float = 9.8) -> float:
 def force_ratio(value1: float, value2: float, min_limit: float = 1) -> float:
     """Force ratio from Newtons"""
     if value2 > min_limit or value2 < -min_limit:
-        return abs(100 * value1 / value2)
+        return abs(value1 / value2)
     return 0
 
 

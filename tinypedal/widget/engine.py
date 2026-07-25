@@ -173,16 +173,15 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         rpm = api.read.engine.rpm()
         torque = api.read.engine.torque()
-        if torque == 0:
+        if torque:
+            power_kw = calc.engine_power(torque, rpm)
+        else:
+            power_kw = 0.0
             # Calculate power & torque based on energy consumption if torque n/a
             max_ve = api.read.engine.max_virtual_energy()
             if max_ve > 0:
                 power_kw = minfo.energy.rateOfConsumption * max_ve / 100_000
                 torque = calc.engine_torque(power_kw, rpm)
-            else:
-                power_kw = 0
-        else:
-            power_kw = calc.engine_power(torque, rpm)
 
         # Oil temperature
         if self.wcfg["show_oil_temperature"]:
