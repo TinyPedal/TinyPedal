@@ -3,6 +3,15 @@ WIP
 * Units
   - Added "weight unit" option in "Units" config dialog.
 
+* Fuel Module
+  - Added "fuel_density" option for fuel weight measurement.
+
+* Force Module
+  - Added "estimated_unsprung_weight, minimum_static_weight_override" options for calculating estimated static weight. See User Guide for details.
+
+* Wheels Module
+  - Added motion ratio calculation. Now calculates suspension travel while in pit lane.
+
 * Damage Widget
   - Now shows a red (default) outline around punctured tyre. Added "puncture_outline_width" & "puncture_outline_color" options.
 
@@ -11,7 +20,7 @@ WIP
   - Added additional customizable text options: "pit_in_text, pit_out_text, low_fuel_text, low_energy_text, yellow_flag_text, traffic_text, scheduled_repairs_text".
 
 * Force Widget
-  - Added "show_estimated_static_weight" option, which shows estimated static weight measured while vehicle is stationary. Note, weight may not be available on some vehicles.
+  - Added "show_estimated_static_weight" option, which shows estimated total vehicle weight measured while vehicle is stationary. Note, the accuracy of static weight measurement depends on game API data, which may not be available on certain vehicles.
   - Added "show_minimum_static_weight_without_fuel" option, which shows estimated minimum static weight excluding fuel.
   - Added "show_acceleration_reduction" option, which shows percentage acceleration reduction due to amount carried fuel weight.
   - See User Guide for additional info.

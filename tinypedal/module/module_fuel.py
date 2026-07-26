@@ -54,6 +54,8 @@ class Realtime(DataModule):
         userpath_fuel_delta = self.cfg.path.fuel_delta
         userpath_energy_delta = self.cfg.path.energy_delta
 
+        fuel_density = max(self.mcfg["fuel_density"], 0.1)
+
         while not _event_wait(update_interval):
             if realtime_state.active:
 
@@ -85,6 +87,7 @@ class Realtime(DataModule):
 
                 # Calculate fuel
                 gen_fuel_usage.send(True)
+                minfo.fuel.weight = fuel_density * minfo.fuel.amountCurrent
 
                 # Calculate virtual energy if available
                 minfo.energy.available = (api.read.engine.virtual_energy() != 0)

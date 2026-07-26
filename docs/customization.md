@@ -1513,6 +1513,14 @@ Set time delay in seconds for resetting maximum average g force. Default is `30`
     maximum_braking_rate_reset_delay
 Set time delay in seconds for resetting maximum braking rate. Default is `60` seconds.
 
+    estimated_unsprung_weight
+Set estimated unsprung weight (in kilograms) for calculating estimated static weight. This option is only used if weight cannot be measured from tyre. Default is `200` kilograms (rough estimate).
+
+    minimum_static_weight_override
+Manually set minimum static weight (in kilograms) excluding fuel, which overrides any estimated static weight measurement. Set to `-1` to disable override.
+
+This option may be used if weight cannot be automatically measured due to lack of weight data from game API.
+
 [**`Back to Top`**](#)
 
 
@@ -1524,6 +1532,9 @@ Enable fuel module.
 
     minimum_delta_distance
 Set minimum recording distance (in meters) between each fuel usage sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
+
+    fuel_density
+Set fuel density (kg/liter), which affects the accuracy of fuel weight calculation. Fuel density may vary depending on the type of fuel used. Default is `0.75` kg/liter.
 
 [**`Back to Top`**](#)
 
@@ -1651,7 +1662,7 @@ Unlike `Time` based race, finish criteria in `Laps & Time` based race is determi
 
 
 ## Wheels module
-**This module provides wheel radius, slip ratio, tyre wear, brake wear data.**
+**This module provides wheel radius, slip ratio, tyre wear, brake wear, suspension travel data.**
 
     minimum_axle_rotation
 Set minimum axle rotation (radians per second) for calculating wheel radius and differential locking percent. Default value is `4`.
@@ -2401,19 +2412,15 @@ Show front and rear downforce reading in Newtons.
 Set lift force indicator color.
 
     show_estimated_static_weight
-Show estimated static weight measured while vehicle is stationary. Note, weight may not be available on some vehicles.
+Show estimated total vehicle weight measured while vehicle is stationary.
+
+Note, the accuracy of static weight measurement depends on game API data, which may not be available on certain vehicles, see [Force Module](#force-module) for details.
 
     show_minimum_static_weight_without_fuel
-Show estimated minimum static weight excluding fuel.
-
-    minimum_weight_without_fuel
-Set default minimum weight without fuel in case weight is not measurable on some vehicles.
-
-    fuel_density
-Set fuel density, which affects the accuracy of fuel weight calculation. Fuel density may vary depending on the type of fuel used. Default is `0.75`.
+Show estimated minimum static weight (in kilograms) excluding fuel.
 
     show_acceleration_reduction
-Show percentage acceleration reduction due to amount carried fuel weight. Note, if static weight is not available, make sure to set `minimum_weight_without_fuel` value correctly to get accurate reading.
+Show percentage acceleration reduction due to amount carried fuel weight.
 
 [**`Back to Top`**](#)
 
@@ -4086,7 +4093,7 @@ Show front and rear third spring position mark relative to each suspension posit
     show_maximum_position_range
 Show a visualized line indicating maximum suspension position range under compression, which can be useful to check suspension travel limits. While this option enabled, the suspension position line will also change its color to match `maximum_position_range_color` when reaching maximum position. The visualized line will not be displayed if maximum position range is negative (such as with too much packers).
 
-Note, maximum suspension position calculation is handled by [Wheels Module](#wheels-module), and is not updated while in pit lane, and resets when exiting pit lane. A minimum of two laps are required to get sensible readings.
+Note, maximum suspension position calculation is handled by [Wheels Module](#wheels-module), and resets after exited garage. A minimum of two laps are required to get sensible readings.
 
 [**`Back to Top`**](#)
 
@@ -4094,7 +4101,7 @@ Note, maximum suspension position calculation is handled by [Wheels Module](#whe
 ## Suspension travel
 **This widget displays suspension travel info.**
 
-Note, suspension travel data calculation is handled by [Wheels Module](#wheels-module), and is not updated while in pit lane, and resets when exiting pit lane.
+Note, suspension travel data calculation is handled by [Wheels Module](#wheels-module), and resets after exited garage.
 
 Static suspension position is measured only while car is stationary on track or in garage stall (neutral gear and no throttle). Measurement is disabled in pit lane, as car can be lifted by pit crew which would result incorrect readings.
 

@@ -43,12 +43,15 @@ MODULE_DEFAULT = {
         "maximum_average_g_force_difference": 0.2,
         "maximum_average_g_force_reset_delay": 30,
         "maximum_braking_rate_reset_delay": 60,
+        "estimated_unsprung_weight": 200,
+        "minimum_static_weight_override": -1,
     },
     "module_fuel": {
         "enable": True,
         "update_interval": 10,
         "idle_update_interval": 400,
         "minimum_delta_distance": 5,
+        "fuel_density": 0.75,
     },
     "module_hybrid": {
         "enable": True,
