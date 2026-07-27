@@ -6,6 +6,9 @@ WIP
 * Fuel Module
   - Added "fuel_density" option for fuel weight measurement.
 
+* Vehicles Module
+  - Added extra laps prediction calculation for time-based race.
+
 * Wheels Module
   - Added motion ratio calculation. Now calculates suspension travel while in pit lane.
   - Added "estimated_unsprung_weight, minimum_static_weight_override" options for calculating estimated vehicle weight. See User Guide for details.
@@ -31,6 +34,11 @@ WIP
 * Pit stop estimate Widget
   - Added "show_estimated_laps_and_minutes" option, which shows estimated total runnable laps and minutes after next pit stop according to refill setting from MFD "Pitstop" page. The estimation is calculated based on player's current consumption per lap and lap time pace.
     Useful for checking whether there will be enough fuel or energy added for the next stint and remaining time.
+
+* Laps and position, Session Widget
+  - Added "show_predicted_extra_laps" option (requested by user "sdmichaels"), which shows number of more (or less) laps prediction on top of total estimated laps in race, based on leader's lap time pace and player's estimated pit stop duration.
+    Predicted extra laps reading is not added to the estimated laps reading, and is not taken into fuel calculation. Positive reading indicates there may be extra final laps on top of total estimated laps; negative reading indicates there may be less final laps on top of total estimated laps. For example, a "12.45(+1)" reading means there are "12.45" total estimated laps, plus "1" predicted final lap, which may result "12.45 + 1" = "13.45" final estimated laps.
+    Note, this option only works for time-based race type, and there is no guarantee that prediction will be 100% accurate, as anything can happen in the last hour of race.
 
 * Suspension travel Widget
   - Added "show_motion_ratio" option, which shows estimated motion ratio between suspension and wheel travel. Note, the accuracy depends on game API data, and may not be available on certain vehicles.

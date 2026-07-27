@@ -1526,7 +1526,7 @@ Enable fuel module.
 Set minimum recording distance (in meters) between each fuel usage sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
 
     fuel_density
-Set fuel density (kg/liter), which affects the accuracy of fuel weight calculation. Fuel density may vary depending on the type of fuel used. Default is `0.75` kg/liter.
+Set fuel density (kg/liter), which affects the accuracy of fuel weight calculation. Fuel density may vary depending on the type of fuel used. Default is `0.75` kg/liter. Note, for pure electric vehicle, set density to `0`, such as Formula E.
 
 [**`Back to Top`**](#)
 
@@ -2863,19 +2863,18 @@ Set percentage threshold for triggering wheel slip warning under acceleration. `
     show_lap_number
 Show your current lap number (lap progression) and total race laps. If total race laps is not available, such as in time-based session, estimated total laps will be displayed instead, and a `~` sign will be displayed before estimated total laps reading, and up to two decimal places will be kept.
 
-Note, estimated total laps reading is calculated based on local player's lap time pace data from Delta Module, which can be different from in-game HUD reading. This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it.
+Note, estimated total laps reading is calculated based on local player's lap time pace, which can be different from in-game HUD reading.
 
-**So why not show total laps prediction based on race leader's lap time pace?**
+This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it. See `show_predicted_extra_laps` option below for extra laps prediction.
 
-The reason is because there are too many variables that are outside of local player's control. Anything can happen to anyone on their last stint and last few laps.
+    show_predicted_extra_laps
+Show number of more (or less) laps prediction on top of total estimated laps in race, based on leader's lap time pace and player's estimated pit stop duration.
 
-For example, race leader might crash their car, or run out of fuel, or be overtaken by others, or lost connection to server on the last few laps, which means it is not reliable to base prediction on race leader's pace. More over, it can cause unnecessary confusion to user, who might wonder whether an extra final lap is already added (or not) to the total laps based on leader's pace.
+Predicted extra laps reading is not added to the estimated laps reading, and is not taken into fuel calculation. Positive reading indicates there may be extra final laps on top of total estimated laps; negative reading indicates there may be less final laps on top of total estimated laps.
 
-Hence the prediction is only based on local player's (your own) pace.
+For example, a `12.45(+1)` reading means there are `12.45` total estimated laps, plus `1` predicted final lap, which may result `12.45 + 1` = `13.45` final estimated laps.
 
-**But how do I know whether there will be an extra final lap before race leader finished his last lap?**
-
-You can determine the chance of an extra final lap by using [Relative Finish Order](#relative-finish-order) widget, which provides additional data for analyzing the chance of extra final lap.
+Note, this option only works for time-based race type, and there is no guarantee that prediction will be 100% accurate, as anything can happen in the last hour of race.
 
     warning_color_maximum_laps
 Set warning color that shows 1 lap before exceeding maximum laps in qualify (or indicates the last lap of a lap-type race).
@@ -3786,7 +3785,16 @@ Show estimated total remaining laps (from current lap position towards finish li
 
 Note, this is the same value that used for calculating estimated refueling value in Fuel Module.
 
-This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it. See [Laps And Position](#laps-and-position) widget for additional info and detailed explanation.
+This reading does not concern about race leader's lap time pace, which means there may be an extra final lap on top of it. See `show_predicted_extra_laps` option below for extra laps prediction.
+
+    show_predicted_extra_laps
+Show number of more (or less) laps prediction on top of total estimated laps in race, based on leader's lap time pace and player's estimated pit stop duration.
+
+Predicted extra laps reading is not added to the estimated laps reading, and is not taken into fuel calculation. Positive reading indicates there may be extra final laps on top of total estimated laps; negative reading indicates there may be less final laps on top of total estimated laps.
+
+For example, a `12.45(+1)` reading means there are `12.45` total estimated laps, plus `1` predicted final lap, which may result `12.45 + 1` = `13.45` final estimated laps.
+
+Note, this option only works for time-based race type, and there is no guarantee that prediction will be 100% accurate, as anything can happen in the last hour of race.
 
 [**`Back to Top`**](#)
 

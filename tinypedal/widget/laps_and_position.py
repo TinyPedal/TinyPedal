@@ -46,54 +46,58 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
+        width_extra_laps = int(self.wcfg["show_predicted_extra_laps"]) * 4
 
-        self.prefix_lap_number = self.wcfg["prefix_lap_number"]
+        self.prefix_laps = self.wcfg["prefix_laps"]
         self.prefix_pos_overall = self.wcfg["prefix_position_overall"]
         self.prefix_pos_inclass = self.wcfg["prefix_position_in_class"]
         self.prefix_cut_points = self.wcfg["prefix_track_limits_points"]
 
         if self.wcfg["layout"] == 0:
             max_width = max(
-                len(self.prefix_lap_number) + 12,
+                len(self.prefix_laps) + 12 + width_extra_laps,
                 len(self.prefix_pos_overall) + 5,
                 len(self.prefix_pos_inclass) + 5,
                 len(self.prefix_cut_points) + 7,
             )
-            self.just_lap_number = max_width - len(self.prefix_lap_number)
+            self.just_laps = max_width - len(self.prefix_laps)
             self.just_pos_overall = max_width - len(self.prefix_pos_overall)
             self.just_pos_inclass = max_width - len(self.prefix_pos_inclass)
             self.just_cut_points = max_width - len(self.prefix_cut_points)
             self.just_pos_change = max_width - 1
         else:
-            self.just_lap_number = 12
+            self.just_laps = 12 + width_extra_laps
             self.just_pos_overall = 5
             self.just_pos_inclass = 5
             self.just_cut_points = 7
             self.just_pos_change = 2
 
         # Lap number
-        if self.wcfg["show_lap_number"]:
-            text_lap_number = f"{self.prefix_lap_number}{'0.00/0.00': >{self.just_lap_number}}"
-            self.bar_style_lap_number = (
-                self.wcfg["background_color_lap_number"],
+        if self.wcfg["show_laps"]:
+            if self.wcfg["show_predicted_extra_laps"]:
+                text_laps = f"{self.prefix_laps}{'0.00/0.00(+0)':>{self.just_laps}}"
+            else:
+                text_laps = f"{self.prefix_laps}{'0.00/0.00':>{self.just_laps}}"
+            self.bar_style_laps = (
+                self.wcfg["background_color_laps"],
                 self.wcfg["warning_color_maximum_laps"],
             )
-            self.bar_lap_number = self.set_rawtext(
-                text=text_lap_number,
-                width=font_m.width * len(text_lap_number) + bar_padx,
+            self.bar_laps = self.set_rawtext(
+                text=text_laps,
+                width=font_m.width * len(text_laps) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_lap_number"],
-                bg_color=self.bar_style_lap_number[0],
+                fg_color=self.wcfg["font_color_laps"],
+                bg_color=self.bar_style_laps[0],
             )
             self.set_primary_orient(
-                target=self.bar_lap_number,
-                column=self.wcfg["display_order_lap_number"],
+                target=self.bar_laps,
+                column=self.wcfg["display_order_laps"],
             )
 
         # Position overall
         if self.wcfg["show_position_overall"]:
-            text_pos_overall = f"{self.prefix_pos_overall}{'00/00': >{self.just_pos_overall}}"
+            text_pos_overall = f"{self.prefix_pos_overall}{'00/00':>{self.just_pos_overall}}"
             self.bar_pos_overall = self.set_rawtext(
                 text=text_pos_overall,
                 width=font_m.width * len(text_pos_overall) + bar_padx,
@@ -109,7 +113,7 @@ class Realtime(Overlay):
 
         # Position in class
         if self.wcfg["show_position_in_class"]:
-            text_pos_inclass = f"{self.prefix_pos_inclass}{'00/00': >{self.just_pos_inclass}}"
+            text_pos_inclass = f"{self.prefix_pos_inclass}{'00/00':>{self.just_pos_inclass}}"
             self.bar_pos_inclass = self.set_rawtext(
                 text=text_pos_inclass,
                 width=font_m.width * len(text_pos_inclass) + bar_padx,
@@ -125,7 +129,7 @@ class Realtime(Overlay):
 
         # Track limits points
         if self.wcfg["show_track_limits_points"]:
-            text_cut_points = f"{self.prefix_cut_points}{'0.000/-': >{self.just_cut_points}}"
+            text_cut_points = f"{self.prefix_cut_points}{'0.000/-':>{self.just_cut_points}}"
             self.bar_cut_points = self.set_rawtext(
                 text=text_cut_points,
                 width=font_m.width * len(text_cut_points) + bar_padx,
@@ -141,7 +145,7 @@ class Realtime(Overlay):
 
         # Position change
         if self.wcfg["show_position_change"]:
-            text_pos_change = f"-{'0': >{self.just_pos_change}}"
+            text_pos_change = f"-{'0':>{self.just_pos_change}}"
             self.bar_style_pos_change = (
                 (
                     self.wcfg["font_color_position_same"],
@@ -176,9 +180,9 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Lap number
-        if self.wcfg["show_lap_number"]:
+        if self.wcfg["show_laps"]:
             lap_into = calc.lap_progress_correction(api.read.lap.progress(), api.read.timing.current_laptime())
-            self.update_lap_number(self.bar_lap_number, lap_into)
+            self.update_laps(self.bar_laps, lap_into)
 
         # Position update
         plr_place = api.read.vehicle.place()
@@ -224,7 +228,7 @@ class Realtime(Overlay):
             self.update_position_change(self.bar_pos_change, pos_diff)
 
     # GUI update methods
-    def update_lap_number(self, target, data):
+    def update_laps(self, target, data):
         """Lap number"""
         if target.last != data:
             target.last = data
@@ -232,28 +236,31 @@ class Realtime(Overlay):
             lap_max = api.read.lap.maximum()
 
             if api.read.session.finish_type(minfo.vehicles.finishAsLap):
-                text_lap_total = f"{lap_max:.2f}"[:6]
+                text_lap_total = f"{lap_max:.2f}"
             else:
                 session_time = api.read.session.remaining() - minfo.vehicles.finishTimeOffset
                 lap_total = lap_num + calc.end_timer_laps_remain(data, minfo.delta.lapTimePace, session_time)
-                text_lap_total = f"~{lap_total:.2f}"[:6]
+                text_lap_total = f"~{lap_total:.2f}"
 
-            text_laps_done = f"{lap_num + data:.2f}"[:5]
-            text_laps = f"{text_laps_done}/{text_lap_total}"[:12]
-            target.text = f"{self.prefix_lap_number}{text_laps: >{self.just_lap_number}}"
-            target.bg = self.bar_style_lap_number[lap_num - lap_max >= -1]
+            text_laps_done = f"{lap_num + data:.2f}"
+            if self.wcfg["show_predicted_extra_laps"]:
+                text_laps = f"{text_laps_done:.5}/{text_lap_total:.6}({minfo.vehicles.finishLapOffset:+.0f})"
+            else:
+                text_laps = f"{text_laps_done:.5}/{text_lap_total:.6}"
+            target.text = f"{self.prefix_laps}{text_laps:>{self.just_laps}.{self.just_laps}}"
+            target.bg = self.bar_style_laps[lap_num - lap_max >= -1]
             target.update()
 
     def update_position_overall(self, target, place, total):
         """Driver place & total vehicles"""
         text_pos = f"{place:02.0f}/{total:02.0f}"
-        target.text = f"{self.prefix_pos_overall}{text_pos: >{self.just_pos_overall}}"
+        target.text = f"{self.prefix_pos_overall}{text_pos:>{self.just_pos_overall}}"
         target.update()
 
     def update_position_inclass(self, target, place, total):
         """Driver place & total vehicles"""
         text_pos = f"{place:02.0f}/{total:02.0f}"
-        target.text = f"{self.prefix_pos_inclass}{text_pos: >{self.just_pos_inclass}}"
+        target.text = f"{self.prefix_pos_inclass}{text_pos:>{self.just_pos_inclass}}"
         target.update()
 
     def update_cut_points(self, target, *data):
@@ -267,7 +274,7 @@ class Realtime(Overlay):
             size = 3 - (len(text_total) > 1)
             text_cut = f"{data[0]:.{size}f}"
             text_points = f"{text_cut:.{size + 2}}/{text_total}"
-            target.text = f"{self.prefix_cut_points}{text_points: >{self.just_cut_points}}"
+            target.text = f"{self.prefix_cut_points}{text_points:>{self.just_cut_points}}"
             target.update()
 
     def update_position_change(self, target, data):
@@ -283,6 +290,6 @@ class Realtime(Overlay):
             else:
                 prefix = "-"
                 color_index = 0
-            target.text = f"{prefix}{abs(data): >{self.just_pos_change}}"
+            target.text = f"{prefix}{abs(data):>{self.just_pos_change}}"
             target.fg, target.bg = self.bar_style_pos_change[color_index]
             target.update()

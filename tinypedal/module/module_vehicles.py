@@ -65,12 +65,14 @@ class Realtime(DataModule):
                 veh_total = output.totalVehicles = api.read.vehicle.total_vehicles()
                 if veh_total > 0:
                     update_low_priority = next(gen_low_priority_timer)
+                    in_race = api.read.session.in_race()
 
                     update_vehicle_data(
                         output,
                         max_lap_diff_ahead,
                         max_lap_diff_behind,
                         update_low_priority,
+                        in_race,
                     )
 
                     if update_low_priority:
@@ -78,7 +80,12 @@ class Realtime(DataModule):
                             last_veh_total = veh_total
                             update_qualify_position(output)
 
-                        update_finish_time(output, max_finish_time_diff)
+                        if in_race:
+                            update_finish_time(output, max_finish_time_diff)
+                        else:
+                            output.finishTimeOffset = 0.0
+                            output.finishAsLap = True
+                            output.finishLapOffset = 0.0
 
             else:
                 if reset:
@@ -88,6 +95,7 @@ class Realtime(DataModule):
         # Must reset on close
         output.finishTimeOffset = 0.0
         output.finishAsLap = True
+        output.finishLapOffset = 0.0
 
 
 def update_vehicle_data(
@@ -95,6 +103,7 @@ def update_vehicle_data(
     max_lap_diff_ahead: float,
     max_lap_diff_behind: float,
     update_low_priority: bool,
+    in_race: bool,
 ) -> None:
     """Update vehicle data"""
     nearest_line = MAX_METERS
@@ -112,7 +121,6 @@ def update_vehicle_data(
 
     # General data
     track_length = api.read.lap.track_length()
-    in_race = api.read.session.in_race()
     under_blue = api.read.session.blue_flag()
     speedtrap_distance = minfo.mapping.speedTrapPosition
 
@@ -289,17 +297,63 @@ def update_vehicle_data(
 def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> None:
     """Estimated finish time & offset based on remaining laps"""
     finish_type = api.read.session.finish_type()
+    remaining_time = api.read.session.remaining()
+    leader_index = output.leaderIndex
+    player_index = output.playerIndex
+    leader_pace = output.dataSet[leader_index].lapTimeHistory.average
+    player_pace = output.dataSet[player_index].lapTimeHistory.average
+
     # Time only
     if finish_type == 0:
+
+        # Final pit stop time offset
+        if minfo.energy.available:
+            est_pits_late = minfo.energy.estimatedNumPitStopsEnd
+        else:
+            est_pits_late = minfo.fuel.estimatedNumPitStopsEnd
+
+        if 0.2 < est_pits_late < 1.2:
+            final_pit_time = minfo.mapping.pitPassTime + api.read.vehicle.pit_stop_time()
+        else:
+            final_pit_time = 0.0
+
+        # Leader time
+        if leader_index == player_index or output.dataSet[leader_index].isFinished:
+            leader_finish_offset = 0.0
+            player_lap_offset = 0.0
+        else:
+            leader_lap_into = api.read.lap.progress(leader_index)
+            player_lap_into = api.read.lap.progress(player_index)
+
+            # Leader finish remaining time
+            leader_lap_remaining = calc.end_timer_laps_remain(leader_lap_into, leader_pace, remaining_time)
+            leader_finish_offset = (1 - leader_lap_remaining % 1) * leader_pace
+            leader_finish_time = remaining_time + leader_finish_offset
+
+            # Player finish remaining time without pit
+            player_lap_remaining = calc.end_timer_laps_remain(player_lap_into, player_pace, remaining_time)
+            player_laps_left_nopit = calc.time_type_laps_remain(calc.ceil(player_lap_remaining), player_lap_into)
+
+            # Player finish remaining time with final pit
+            player_lap_remaining = calc.end_timer_laps_remain(player_lap_into, player_pace, remaining_time - final_pit_time)
+            player_laps_left_pit = calc.time_type_laps_remain(calc.ceil(player_lap_remaining), player_lap_into)
+
+            # Player finish remaining time towards leader
+            to_leader_lap_remaining = calc.end_timer_laps_remain(player_lap_into, player_pace, leader_finish_time)
+            to_leader_laps_left = calc.time_type_laps_remain(calc.ceil(to_leader_lap_remaining), player_lap_into)
+
+            # Laps gain
+            laps_gain_from_pit = player_laps_left_pit - player_laps_left_nopit
+            laps_gain_from_leader = to_leader_laps_left - player_laps_left_nopit
+
+            player_lap_offset = laps_gain_from_leader + laps_gain_from_pit
+
         output.finishTimeOffset = 0.0
         output.finishAsLap = True
+        output.finishLapOffset = player_lap_offset
         return
 
-    remaining_time = api.read.session.remaining()
-
     # Leader time
-    leader_index = output.leaderIndex
-    leader_pace = output.dataSet[leader_index].lapTimeHistory.average
     if leader_index >= 0 and 0 < leader_pace < MAX_SECONDS:
         leader_finish_time = leader_pace * api.read.lap.remaining(leader_index)
         leader_finish_offset = max(remaining_time - leader_finish_time, 0.0)
@@ -308,8 +362,6 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
         leader_finish_offset = 0.1
 
     # Player time
-    player_index = output.playerIndex
-    player_pace = output.dataSet[player_index].lapTimeHistory.average
     if player_index >= 0 and 0 < player_pace < MAX_SECONDS:
         player_finish_time = player_pace * api.read.lap.remaining(player_index)
         player_finish_offset = max(remaining_time - player_finish_time, 0.0)

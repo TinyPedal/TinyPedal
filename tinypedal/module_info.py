@@ -869,6 +869,7 @@ class VehiclesInfo:
         "leaderBestLapTime",
         "finishTimeOffset",
         "finishAsLap",
+        "finishLapOffset",
     )
 
     def __init__(self):
@@ -892,6 +893,7 @@ class VehiclesInfo:
         self.leaderBestLapTime: float = MAX_SECONDS
         self.finishTimeOffset: float = 0.0
         self.finishAsLap: bool = True
+        self.finishLapOffset: float = 0.0
 
 
 class WheelsInfo:

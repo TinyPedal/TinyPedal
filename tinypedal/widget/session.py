@@ -107,7 +107,10 @@ class Realtime(Overlay):
         # Estimated remaining laps
         if self.wcfg["show_estimated_laps"]:
             self.prefix_estimated_laps = self.wcfg["prefix_estimated_laps"]
-            text_estimated_laps = f"{self.prefix_estimated_laps}-.---"
+            if self.wcfg["show_predicted_extra_laps"]:
+                text_estimated_laps = f"{self.prefix_estimated_laps}-.---(+0)"
+            else:
+                text_estimated_laps = f"{self.prefix_estimated_laps}-.---"
             self.bar_estimated_laps = self.set_rawtext(
                 text=text_estimated_laps,
                 width=font_m.width * len(text_estimated_laps) + bar_padx,
@@ -124,6 +127,8 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         remaining_time = api.read.session.remaining()
+        finish_time_offset = minfo.vehicles.finishTimeOffset
+        est_remaining_time = remaining_time - finish_time_offset
 
         # Session name
         if self.wcfg["show_session_name"]:
@@ -137,13 +142,7 @@ class Realtime(Overlay):
 
         # Session time
         if self.wcfg["show_session_time"]:
-            if remaining_time <= 0 and minfo.vehicles.finishTimeOffset < 0:
-                session_time = remaining_time - minfo.vehicles.finishTimeOffset
-                estimated = True
-            else:
-                session_time = remaining_time
-                estimated = False
-            self.update_session_time(self.bar_session_time, session_time, estimated)
+            self.update_session_time(self.bar_session_time, est_remaining_time, finish_time_offset)
 
         # Estimated remaining laps
         if self.wcfg["show_estimated_laps"]:
@@ -151,9 +150,10 @@ class Realtime(Overlay):
                 laps_left = api.read.lap.remaining()
             else:
                 lap_into = api.read.lap.progress()
-                est_time = remaining_time - minfo.vehicles.finishTimeOffset
-                end_timer_laps_left = calc.end_timer_laps_remain(lap_into, minfo.delta.lapTimePace, est_time)
+                lap_pace = minfo.vehicles.dataSet[minfo.vehicles.playerIndex].lapTimeHistory.average
+                end_timer_laps_left = calc.end_timer_laps_remain(lap_into, lap_pace, est_remaining_time)
                 laps_left = calc.time_type_laps_remain(calc.ceil(end_timer_laps_left), lap_into)
+
             self.update_estimated_laps(self.bar_estimated_laps, laps_left)
 
     # GUI update methods
@@ -171,16 +171,14 @@ class Realtime(Overlay):
             target.text = data
             target.update()
 
-    def update_session_time(self, target, data, estimated):
+    def update_session_time(self, target, data, offset):
         """Session time"""
         if target.last != data:
             target.last = data
-            if data < 0:
-                data = 0
-            if estimated:
-                text = f"~{calc.sec2countdown(data):.7}"
+            if offset:
+                text = f"~{calc.sec2countdown(max(data, 0)):.7}"
             else:
-                text = calc.sec2sessiontime(data)
+                text = calc.sec2sessiontime(max(data + offset, 0))
             target.text = text
             target.update()
 
@@ -188,6 +186,10 @@ class Realtime(Overlay):
         """Estimated remaining laps"""
         if target.last != data:
             target.last = data
-            text = f"{data:>5.3f}"[:5]
-            target.text = f"{self.prefix_estimated_laps}{text}"
+            text_laps = f"{data:.3f}"
+            if self.wcfg["show_predicted_extra_laps"]:
+                text_est = f"{self.prefix_estimated_laps}{text_laps:>5.5}({minfo.vehicles.finishLapOffset:+.0f})"
+            else:
+                text_est = f"{self.prefix_estimated_laps}{text_laps:>5.5}"
+            target.text = text_est
             target.update()
