@@ -137,7 +137,7 @@ class Realtime(Overlay):
 
         # Estimated static weight
         if self.wcfg["show_estimated_static_weight"]:
-            self.bar_weight = self.set_rawtext(
+            self.bar_static = self.set_rawtext(
                 text=TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
@@ -146,8 +146,23 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_estimated_static_weight"],
             )
             self.set_primary_orient(
-                target=self.bar_weight,
+                target=self.bar_static,
                 column=self.wcfg["display_order_estimated_static_weight"],
+            )
+
+        # Estimated dynamic weight
+        if self.wcfg["show_estimated_dynamic_weight"]:
+            self.bar_dynamic = self.set_rawtext(
+                text=TEXT_NA,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_estimated_dynamic_weight"],
+                bg_color=self.wcfg["background_color_estimated_dynamic_weight"],
+            )
+            self.set_primary_orient(
+                target=self.bar_dynamic,
+                column=self.wcfg["display_order_estimated_dynamic_weight"],
             )
 
         # Acceleration reduction
@@ -167,10 +182,8 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        min_static_weight = minfo.force.minimumStaticWeight
-        total_weight = min_static_weight
-        if total_weight > 0:
-            total_weight += minfo.fuel.weight
+        min_static_weight = minfo.wheels.minimumStaticWeight
+        total_static_weight = minfo.wheels.totalStaticWeight
 
         # Longitudinal g-force
         if self.wcfg["show_longitudinal_g_force"]:
@@ -202,13 +215,18 @@ class Realtime(Overlay):
             if self.wcfg["show_minimum_static_weight_without_fuel"]:
                 static_weight = min_static_weight
             else:
-                static_weight = total_weight
-            self.update_static_weight(self.bar_weight, round(static_weight))
+                static_weight = total_static_weight
+            self.update_weight(self.bar_static, round(static_weight))
+
+        # Estimated dynamic weight
+        if self.wcfg["show_estimated_dynamic_weight"]:
+            dynamic_weight = minfo.wheels.totalDynamicWeight
+            self.update_weight(self.bar_dynamic, round(dynamic_weight))
 
         # Acceleration reduction
         if self.wcfg["show_acceleration_reduction"]:
-            if total_weight > 0:
-                accel_loss = (1 - min_static_weight / total_weight) * 100
+            if total_static_weight > 0:
+                accel_loss = (1 - min_static_weight / total_static_weight) * 100
             else:
                 accel_loss = 0.0
             self.update_acceleration_reduction(self.bar_accloss, accel_loss)
@@ -264,8 +282,8 @@ class Realtime(Overlay):
             target.bg = self.bar_style_df_rear[data < 0]
             target.update()
 
-    def update_static_weight(self, target, data):
-        """Estimated static weight"""
+    def update_weight(self, target, data):
+        """Estimated weight"""
         if target.last != data:
             target.last = data
             target.text = f"{self.unit_weight(data):.0f}{self.symbol_weight}"

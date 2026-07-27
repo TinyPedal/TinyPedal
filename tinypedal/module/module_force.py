@@ -21,12 +21,10 @@ Force module
 """
 
 from functools import partial
-from operator import mul
 
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import WHEELS_ZERO
 from ..module_info import minfo
 from ..validator import generator_init
 from ._base import DataModule
@@ -49,9 +47,6 @@ class Realtime(DataModule):
         output = minfo.force
         g_accel = max(self.mcfg["gravitational_acceleration"], 0.01)
         max_g_diff = self.mcfg["maximum_average_g_force_difference"]
-        unsprung_weight = max(self.mcfg["estimated_unsprung_weight"], 0)
-        minimum_weight_override = max(self.mcfg["minimum_static_weight_override"], 0)
-
         calc_ema_gforce = partial(
             calc.exp_mov_avg,
             calc.ema_factor(self.mcfg["maximum_average_g_force_samples"], 3)
@@ -62,12 +57,6 @@ class Realtime(DataModule):
         calc_max_avg_lat = transient_max(self.mcfg["maximum_average_g_force_reset_delay"], True)
         calc_max_transient_rate = transient_max(3)
         calc_max_braking_rate = transient_max(self.mcfg["maximum_braking_rate_reset_delay"], True)
-
-        last_vehicle_name = ""
-        load_tyre = WHEELS_ZERO
-        load_susp = WHEELS_ZERO
-        load_fuel = 0.0
-        load_available = False
 
         while not _event_wait(update_interval):
             if realtime_state.active:
@@ -85,17 +74,6 @@ class Realtime(DataModule):
                     avg_lat_gforce_ema = 0
                     max_braking_rate = 0
                     delta_braking_rate = 0
-
-                    min_static_weight = minimum_weight_override
-                    update_static_weight = minimum_weight_override <= 0
-
-                    vehicle_name = api.read.vehicle.vehicle_name()
-                    if last_vehicle_name != vehicle_name:
-                        last_vehicle_name = vehicle_name
-                        load_tyre = WHEELS_ZERO
-                        load_susp = WHEELS_ZERO
-                        load_fuel = 0.0
-                        load_available = False
 
                 # Read telemetry
                 lap_etime = api.read.timing.elapsed()
@@ -136,28 +114,6 @@ class Realtime(DataModule):
                 else:  # Set after reset max_transient_rate
                     max_braking_rate = temp_max_rate
 
-                # Estimated weight
-                if update_static_weight:
-                    if api.read.vehicle.speed() > 0.1:
-                        if api.read.inputs.throttle_raw() > 0.01:
-                            update_static_weight = False
-                    else:
-                        temp_load_susp = api.read.wheel.suspension_force()
-                        if min(temp_load_susp) >= 0:  # lift check
-                            load_tyre = api.read.tyre.load()
-                            load_susp = temp_load_susp
-                            load_fuel = minfo.fuel.weight
-                            load_available = sum(load_tyre) > 0
-
-                if minimum_weight_override <= 0:
-                    if load_available:
-                        total_weight = sum(load_tyre) / g_accel
-                    else:  # recalibrate suspension load with motion ratio
-                        total_weight = sum(map(mul, load_susp, minfo.wheels.motionRatio)) / g_accel
-                        if total_weight > 0:
-                            total_weight += unsprung_weight
-                    min_static_weight = max(total_weight - load_fuel, 0.0)
-
                 # Output force data
                 output.lgtGForceRaw = lgt_gforce_raw
                 output.latGForceRaw = lat_gforce_raw
@@ -171,7 +127,6 @@ class Realtime(DataModule):
                 output.transientMaxBrakingRate = max_transient_rate
                 output.maxBrakingRate = max_braking_rate
                 output.deltaBrakingRate = delta_braking_rate
-                output.minimumStaticWeight = min_static_weight
 
             else:
                 if reset:

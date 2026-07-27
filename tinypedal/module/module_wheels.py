@@ -22,6 +22,7 @@ Wheels module
 
 import logging
 from collections import deque
+from operator import mul
 
 from .. import calculation as calc
 from .. import realtime_state
@@ -76,6 +77,12 @@ class Realtime(DataModule):
             wheel_liftoff=self.mcfg["wheel_lift_off_threshold"],
             enable_offroad=self.mcfg["enable_suspension_measurement_while_offroad"]
         )
+        gen_vehicle_weight = calc_vehicle_weight(
+            output=minfo.wheels,
+            g_accel=max(self.cfg.user.setting["module_force"]["gravitational_acceleration"], 0.1),
+            unsprung_weight=max(self.mcfg["estimated_unsprung_weight"], 0),
+            minimum_weight_override=max(self.mcfg["minimum_static_weight_override"], 0),
+        )
         gen_cornering_radius = calc_cornering_radius(
             output=minfo.wheels,
             sampling_interval=self.mcfg["cornering_radius_sampling_interval"],
@@ -101,6 +108,7 @@ class Realtime(DataModule):
                 gen_tyre_wear.send(in_garage)
                 gen_brake_wear.send(in_garage)
                 gen_susp_travel.send(in_garage)
+                gen_vehicle_weight.send(in_garage)
                 gen_cornering_radius.send(True)
 
             else:
@@ -615,6 +623,87 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
             output.minSuspensionPosition[idx] = min_susp_pos_filtered[idx]
             output.maxSuspensionPosition[idx] = max_susp_pos_filtered[idx]
             output.motionRatio[idx] = motion_ratio
+
+
+@generator_init
+def calc_vehicle_weight(output: WheelsInfo, g_accel: float, unsprung_weight: float, minimum_weight_override: float):
+    """Calculate vehicle weight"""
+    last_reset = None  # reset check
+    update_static_weight = False
+
+    vehicle_name = ""
+    static_load_tyre = WHEELS_ZERO
+    static_load_susp = WHEELS_ZERO
+    static_load_fuel = 0.0
+    load_tyre_available = False
+
+    while True:
+        reset = yield None
+
+        # Reset
+        if last_reset != reset:
+            last_reset = reset
+            update_static_weight = minimum_weight_override <= 0
+            if vehicle_name != api.read.vehicle.vehicle_name():
+                vehicle_name = api.read.vehicle.vehicle_name()
+                static_load_tyre = WHEELS_ZERO
+                static_load_susp = WHEELS_ZERO
+                static_load_fuel = 0.0
+                load_tyre_available = False
+
+        load_tyre = api.read.tyre.load()
+        load_susp = api.read.wheel.suspension_force()
+        load_fuel = minfo.fuel.weight
+
+        # Estimated weight
+        if update_static_weight:
+            if api.read.vehicle.speed() > 0.01:
+                if api.read.inputs.throttle_raw() > 0.01:
+                    update_static_weight = False
+            else:
+                if min(load_susp) >= 0:  # lift check
+                    static_load_tyre = load_tyre
+                    static_load_susp = load_susp
+                    static_load_fuel = load_fuel
+                    load_tyre_available = any(static_load_tyre)
+
+        # Minimum static weight without fuel
+        if minimum_weight_override > 0:
+            min_static_weight = minimum_weight_override
+        else:
+            if load_tyre_available:
+                init_total_weight = sum(static_load_tyre) / g_accel
+            else:  # recalibrate suspension load with motion ratio
+                init_total_weight = sum(map(mul, static_load_susp, output.motionRatio)) / g_accel
+                if init_total_weight > 0:
+                    init_total_weight += unsprung_weight
+            min_static_weight = max(init_total_weight - static_load_fuel, 0.0)
+
+        # Total static weight with fuel
+        if min_static_weight > 0:
+            total_static_weight = min_static_weight + load_fuel
+        else:
+            total_static_weight = 0.0
+
+        # Total dynamic weight with fuel
+        if minimum_weight_override > 0:  # not available for override
+            total_dynamic_weight = 0.0
+        elif any(load_tyre):
+            total_dynamic_weight = sum(load_tyre) / g_accel
+            if total_dynamic_weight < 0:
+                total_dynamic_weight = 0.0
+        elif any(load_susp):
+            total_dynamic_weight = sum(map(mul, load_susp, output.motionRatio)) / g_accel
+            if total_dynamic_weight > 0:
+                total_dynamic_weight += unsprung_weight
+            else:
+                total_dynamic_weight = 0.0
+        else:
+            total_dynamic_weight = 0.0
+
+        output.minimumStaticWeight = min_static_weight
+        output.totalStaticWeight = total_static_weight
+        output.totalDynamicWeight = total_dynamic_weight
 
 
 @generator_init

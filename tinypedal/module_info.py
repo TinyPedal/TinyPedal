@@ -585,7 +585,6 @@ class ForceInfo:
         "transientMaxBrakingRate",
         "maxBrakingRate",
         "deltaBrakingRate",
-        "minimumStaticWeight",
     )
 
     def __init__(self):
@@ -601,7 +600,6 @@ class ForceInfo:
         self.transientMaxBrakingRate: float = 0.0
         self.maxBrakingRate: float = 0.0
         self.deltaBrakingRate: float = 0.0
-        self.minimumStaticWeight: float = 0.0
 
 
 class FuelInfo:
@@ -923,6 +921,9 @@ class WheelsInfo:
         "minSuspensionPosition",
         "maxSuspensionPosition",
         "motionRatio",
+        "minimumStaticWeight",
+        "totalStaticWeight",
+        "totalDynamicWeight",
     )
 
     def __init__(self):
@@ -949,6 +950,9 @@ class WheelsInfo:
         self.minSuspensionPosition: list[float] = list(WHEELS_ZERO)
         self.maxSuspensionPosition: list[float] = list(WHEELS_ZERO)
         self.motionRatio: list[float] = list(WHEELS_ZERO)
+        self.minimumStaticWeight: float = 0.0
+        self.totalStaticWeight: float = 0.0
+        self.totalDynamicWeight: float = 0.0
 
 
 class ModuleInfo:

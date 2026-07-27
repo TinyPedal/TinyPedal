@@ -1513,14 +1513,6 @@ Set time delay in seconds for resetting maximum average g force. Default is `30`
     maximum_braking_rate_reset_delay
 Set time delay in seconds for resetting maximum braking rate. Default is `60` seconds.
 
-    estimated_unsprung_weight
-Set estimated total unsprung weight (in kilograms), which will be added to auto-estimated sprung weight for calculating estimated static weight. This option is only used if weight cannot be measured from tyre load. Default is `200` kilograms (rough estimate).
-
-    minimum_static_weight_override
-Manually set minimum static weight (in kilograms) excluding fuel, which overrides any estimated weight measurement. Set to `-1` to disable override.
-
-This option may be used if weight cannot be automatically measured or inaccurate due to lack of weight data from game API.
-
 [**`Back to Top`**](#)
 
 
@@ -1662,7 +1654,7 @@ Unlike `Time` based race, finish criteria in `Laps & Time` based race is determi
 
 
 ## Wheels module
-**This module provides wheel radius, slip ratio, tyre wear, brake wear, suspension travel data.**
+**This module provides wheel radius, slip ratio, tyre wear, brake wear, suspension travel, vehicle weight data.**
 
     minimum_axle_rotation
 Set minimum axle rotation (radians per second) for calculating wheel radius and differential locking percent. Default value is `4`.
@@ -1690,6 +1682,14 @@ Set additional margin that cannot exceed the sum of previous `average suspension
 
     wheel_lift_off_threshold
 Set millimeter threshold of tyre vertical deflection for detecting lifted wheels. Suspension travel is not calculated from wheel that is lifted off the ground (as below the threshold). Default threshold is `1` millimeter. Set to `-1` to always calculate suspension travel even if wheel is lifted off.
+
+    estimated_unsprung_weight
+Set estimated total unsprung weight (in kilograms), which will be added to auto-estimated sprung weight for calculating estimated weight. This option is only used if weight cannot be measured from tyre load. Default is `200` kilograms (rough estimate).
+
+    minimum_static_weight_override
+Manually set minimum static weight (in kilograms) excluding fuel, which overrides any estimated weight measurement. Set to `-1` to disable override.
+
+This option may be used if weight cannot be automatically measured or inaccurate due to lack of weight data from game API.
 
 [**`Back to Top`**](#)
 
@@ -2417,10 +2417,13 @@ Set lift force indicator color.
     show_estimated_static_weight
 Show estimated total vehicle weight measured while vehicle is stationary.
 
-Note, the accuracy of static weight measurement depends on game API data, and may not be available on certain vehicles, see [Force Module](#force-module) for details.
+Note, it may take a lap or two to calibrate measurement for certain vehicles. The accuracy of static weight measurement depends on game API data, and may not be available on certain vehicles, see [Wheels Module](#wheels-module) for details.
 
     show_minimum_static_weight_without_fuel
 Show estimated minimum static weight (in kilograms) excluding fuel.
+
+    show_estimated_dynamic_weight
+Show estimated total vehicle weight while vehicle is moving.
 
     show_acceleration_reduction
 Show percentage acceleration reduction due to amount carried fuel weight.

@@ -43,8 +43,6 @@ MODULE_DEFAULT = {
         "maximum_average_g_force_difference": 0.2,
         "maximum_average_g_force_reset_delay": 30,
         "maximum_braking_rate_reset_delay": 60,
-        "estimated_unsprung_weight": 200,
-        "minimum_static_weight_override": -1,
     },
     "module_fuel": {
         "enable": True,
@@ -115,6 +113,8 @@ MODULE_DEFAULT = {
         "average_suspension_position_margin": 1,
         "enable_suspension_measurement_while_offroad": False,
         "wheel_lift_off_threshold": 1,
+        "estimated_unsprung_weight": 200,
+        "minimum_static_weight_override": -1,
         "cornering_radius_sampling_interval": 10,
     },
 }

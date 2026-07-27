@@ -239,12 +239,10 @@ class Realtime(Overlay):
 
         # Power to weight ratio
         if self.wcfg["show_power_to_weight_ratio"]:
-            total_weight = minfo.force.minimumStaticWeight
-            if total_weight > 0:
-                total_weight += minfo.fuel.weight
+            total_static_weight = minfo.wheels.totalStaticWeight
             if self.max_power_kw < power_kw:
                 self.max_power_kw += 0.2 * (power_kw - self.max_power_kw)
-            self.update_power_ratio(self.bar_pwratio, self.max_power_kw, total_weight)
+            self.update_power_ratio(self.bar_pwratio, self.max_power_kw, total_static_weight)
 
     # GUI update methods
     def update_oil(self, target, data):
