@@ -168,7 +168,9 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         min_static_weight = minfo.force.minimumStaticWeight
-        total_weight = min_static_weight + minfo.fuel.weight
+        total_weight = min_static_weight
+        if total_weight > 0:
+            total_weight += minfo.fuel.weight
 
         # Longitudinal g-force
         if self.wcfg["show_longitudinal_g_force"]:
@@ -266,11 +268,7 @@ class Realtime(Overlay):
         """Estimated static weight"""
         if target.last != data:
             target.last = data
-            if data > 1:
-                text_weight = f"{self.unit_weight(data):.0f}{self.symbol_weight}"
-            else:
-                text_weight = TEXT_NA
-            target.text = text_weight
+            target.text = f"{self.unit_weight(data):.0f}{self.symbol_weight}"
             target.update()
 
     def update_acceleration_reduction(self, target, data):

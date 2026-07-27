@@ -55,6 +55,7 @@ class Realtime(Overlay):
         self.symbol_power = units.set_symbol_power(self.cfg.units["power_unit"])
         self.unit_pres = units.set_unit_pressure(self.cfg.units["turbo_pressure_unit"])
         self.symbol_pres = units.set_symbol_pressure(self.cfg.units["turbo_pressure_unit"])
+        self.unit_weight = units.set_unit_weight(self.cfg.units["weight_unit"])
 
         # Oil temperature
         if self.wcfg["show_oil_temperature"]:
@@ -169,6 +170,27 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_power"],
             )
 
+        # Power to weight ratio
+        if self.wcfg["show_power_to_weight_ratio"]:
+            self.bar_pwratio = self.set_rawtext(
+                text="PW RATIO",
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_power_to_weight_ratio"],
+                bg_color=self.wcfg["background_color_power_to_weight_ratio"],
+            )
+            self.set_primary_orient(
+                target=self.bar_pwratio,
+                column=self.wcfg["display_order_power_to_weight_ratio"],
+            )
+
+        # Last data
+        self.max_power_kw = 0
+
+    def post_update(self):
+        self.max_power_kw = 0
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
         rpm = api.read.engine.rpm()
@@ -214,6 +236,15 @@ class Realtime(Overlay):
         # Engine power
         if self.wcfg["show_power"]:
             self.update_power(self.bar_power, power_kw)
+
+        # Power to weight ratio
+        if self.wcfg["show_power_to_weight_ratio"]:
+            total_weight = minfo.force.minimumStaticWeight
+            if total_weight > 0:
+                total_weight += minfo.fuel.weight
+            if self.max_power_kw < power_kw:
+                self.max_power_kw += 0.2 * (power_kw - self.max_power_kw)
+            self.update_power_ratio(self.bar_pwratio, self.max_power_kw, total_weight)
 
     # GUI update methods
     def update_oil(self, target, data):
@@ -268,4 +299,16 @@ class Realtime(Overlay):
             target.last = data
             text = f"{self.unit_power(data): >6.2f}"[:6]
             target.text = f"{text}{self.symbol_power}"
+            target.update()
+
+    def update_power_ratio(self, target, *data):
+        """Power to weight ratio"""
+        if target.last != data:
+            target.last = data
+            if data[1] > 0:
+                ratio = self.unit_power(data[0]) / self.unit_weight(data[1])
+            else:
+                ratio = 0.0
+            text = f"{ratio:.3f}"
+            target.text = f"{text:.5}p/w"
             target.update()

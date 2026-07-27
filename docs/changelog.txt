@@ -15,12 +15,15 @@ WIP
 * Damage Widget
   - Now shows a red (default) outline around punctured tyre. Added "puncture_outline_width" & "puncture_outline_color" options.
 
+* Engine Widget
+  - Added "show_power_to_weight_ratio" option, which shows estimated (maximum recorded) power to (current) weight ratio. Final reading is affected by power and weight units setting, and resets after returning to garage. The accuracy depends on game API data, and may not be available on certain vehicles.
+
 * Flag Widget
   - Added "show_scheduled_repairs" option (LMU only), which shows scheduled repairs notification and estimated repair time when damage repair is turned on.
   - Added additional customizable text options: "pit_in_text, pit_out_text, low_fuel_text, low_energy_text, yellow_flag_text, traffic_text, scheduled_repairs_text".
 
 * Force Widget
-  - Added "show_estimated_static_weight" option, which shows estimated total vehicle weight measured while vehicle is stationary. Note, the accuracy of static weight measurement depends on game API data, which may not be available on certain vehicles.
+  - Added "show_estimated_static_weight" option, which shows estimated total vehicle weight measured while vehicle is stationary. Note, the accuracy depends on game API data, and may not be available on certain vehicles.
   - Added "show_minimum_static_weight_without_fuel" option, which shows estimated minimum static weight excluding fuel.
   - Added "show_acceleration_reduction" option, which shows percentage acceleration reduction due to amount carried fuel weight.
   - See User Guide for additional info.
@@ -28,6 +31,9 @@ WIP
 * Pit stop estimate Widget
   - Added "show_estimated_laps_and_minutes" option, which shows estimated total runnable laps and minutes after next pit stop according to refill setting from MFD "Pitstop" page. The estimation is calculated based on player's current consumption per lap and lap time pace.
     Useful for checking whether there will be enough fuel or energy added for the next stint and remaining time.
+
+* Suspension travel Widget
+  - Added "show_motion_ratio" option, which shows estimated motion ratio between suspension and wheel travel. Note, the accuracy depends on game API data, and may not be available on certain vehicles.
 
 * Tyre wear Widget
   - Now counts flat spot while in pit lane.

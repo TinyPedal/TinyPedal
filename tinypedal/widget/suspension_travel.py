@@ -183,6 +183,38 @@ class Realtime(Overlay):
                 )
                 layout_ratio.addWidget(cap_ratio, 0, 0, 1, 0)
 
+        # Motion ratio
+        if self.wcfg["show_motion_ratio"]:
+            layout_motion = self.set_grid_layout()
+            self.bars_motion = self.set_rawtext(
+                text=TEXT_NA,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_motion_ratio"],
+                bg_color=self.wcfg["background_color_motion_ratio"],
+                count=4,
+            )
+            self.set_grid_layout_quad(
+                layout=layout_motion,
+                targets=self.bars_motion,
+            )
+            self.set_primary_orient(
+                target=layout_motion,
+                column=self.wcfg["display_order_motion_ratio"],
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_ratio = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_motion_ratio"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout_motion.addWidget(cap_ratio, 0, 0, 1, 0)
+
         # Minimum position
         if self.wcfg["show_minimum_position"]:
             layout_minpos = self.set_grid_layout()
@@ -285,6 +317,7 @@ class Realtime(Overlay):
             min_pos = minfo.wheels.minSuspensionPosition[idx]
             max_pos = minfo.wheels.maxSuspensionPosition[idx]
             static_pos = minfo.wheels.staticSuspensionPosition[idx]
+            motion_ratio = minfo.wheels.motionRatio[idx]
 
             total_travel = max_pos - min_pos
 
@@ -318,6 +351,10 @@ class Realtime(Overlay):
             # Travel ratio
             if self.wcfg["show_travel_ratio"]:
                 self.update_ratio(self.bars_ratio[idx], travel_ratio)
+
+            # Motion ratio
+            if self.wcfg["show_motion_ratio"]:
+                self.update_travel(self.bars_motion[idx], motion_ratio)
 
             # Minimum position
             if self.wcfg["show_minimum_position"]:

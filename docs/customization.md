@@ -1514,12 +1514,12 @@ Set time delay in seconds for resetting maximum average g force. Default is `30`
 Set time delay in seconds for resetting maximum braking rate. Default is `60` seconds.
 
     estimated_unsprung_weight
-Set estimated unsprung weight (in kilograms) for calculating estimated static weight. This option is only used if weight cannot be measured from tyre. Default is `200` kilograms (rough estimate).
+Set estimated total unsprung weight (in kilograms), which will be added to auto-estimated sprung weight for calculating estimated static weight. This option is only used if weight cannot be measured from tyre load. Default is `200` kilograms (rough estimate).
 
     minimum_static_weight_override
-Manually set minimum static weight (in kilograms) excluding fuel, which overrides any estimated static weight measurement. Set to `-1` to disable override.
+Manually set minimum static weight (in kilograms) excluding fuel, which overrides any estimated weight measurement. Set to `-1` to disable override.
 
-This option may be used if weight cannot be automatically measured due to lack of weight data from game API.
+This option may be used if weight cannot be automatically measured or inaccurate due to lack of weight data from game API.
 
 [**`Back to Top`**](#)
 
@@ -2253,6 +2253,9 @@ Show engine torque.
     show_power
 Show engine power.
 
+    show_power_to_weight_ratio
+Show estimated (maximum recorded) power to (current) weight ratio. Final reading is affected by power and weight units setting, and resets after returning to garage. The accuracy depends on game API data, and may not be available on certain vehicles.
+
 [**`Back to Top`**](#)
 
 
@@ -2414,7 +2417,7 @@ Set lift force indicator color.
     show_estimated_static_weight
 Show estimated total vehicle weight measured while vehicle is stationary.
 
-Note, the accuracy of static weight measurement depends on game API data, which may not be available on certain vehicles, see [Force Module](#force-module) for details.
+Note, the accuracy of static weight measurement depends on game API data, and may not be available on certain vehicles, see [Force Module](#force-module) for details.
 
     show_minimum_static_weight_without_fuel
 Show estimated minimum static weight (in kilograms) excluding fuel.
@@ -4119,6 +4122,9 @@ Show rebound travel (millimeter) between static and minimum recorded suspension 
     show_travel_ratio
 Show travel ratio (percentage) between bump travel and total travel. For example, a `70%` reading indicates 70% of travel is spent in bump, and 30% of travel in rebound. A `50%` reading indicates equal travel in bump and rebound travel.
 
+    show_motion_ratio
+Show estimated motion ratio between suspension and wheel travel. Note, the accuracy depends on game API data, and may not be available on certain vehicles.
+
     show_minimum_position
 Show minimum recorded suspension position (millimeter) where suspension is reaching its maximum extension.
 
@@ -4824,7 +4830,7 @@ Show columns with unavailable weather data. Set `False` to auto hide columns wit
 
 Note, to get accurate static weight distribution readings, test setup on level ground.
 
-Weight distribution is calculated from tyre load data, which may not be available from certain vehicles in game API (such as LMGT3).
+Weight distribution is calculated from tyre load data, and may not be available from certain vehicles in game API (such as LMGT3).
 
 To workaround this limitation, suspension load data, while not entirely the same, will be used for calculation instead.
 
