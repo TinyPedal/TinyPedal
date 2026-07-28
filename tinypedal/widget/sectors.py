@@ -68,7 +68,7 @@ class Realtime(Overlay):
             self.wcfg["font_color_target_time"],
         )
         self.bar_time_target = self.set_rawtext(
-            text=f"{self.prefix_best}{TEXT_NOLAPTIME: >{9 + self.extra_width}}",
+            text=f"{self.prefix_best}{TEXT_NOLAPTIME:>{9 + self.extra_width}}",
             width=font_m.width * (11 + self.extra_width) + bar_padx,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -79,7 +79,7 @@ class Realtime(Overlay):
 
         # Current time
         self.bar_time_curr = self.set_rawtext(
-            text=f"{TEXT_NOLAPTIME: >{11 + self.extra_width}}",
+            text=f"{TEXT_NOLAPTIME:>{11 + self.extra_width}}",
             width=font_m.width * (11 + self.extra_width) + bar_padx,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -207,15 +207,15 @@ class Realtime(Overlay):
         """Current sector time text"""
         if target.last != data:
             target.last = data
-            target.text = f"{SECTOR_ABBR_ID[prev_s_idx]}{calc.sec2laptime(data)[:8 + self.extra_width]: >{9 + self.extra_width}}"
+            target.text = f"{SECTOR_ABBR_ID[prev_s_idx]}{calc.sec2laptime(data)[:8 + self.extra_width]:>{9 + self.extra_width}}"
             target.update()
 
     def update_time_target(self, target, seconds):
         """Target sector time text"""
         if seconds < MAX_SECONDS:  # bypass invalid value
-            text_laptime = f"{self.prefix_best}{calc.sec2laptime(seconds)[:8 + self.extra_width]: >{9 + self.extra_width}}"
+            text_laptime = f"{self.prefix_best}{calc.sec2laptime(seconds)[:8 + self.extra_width]:>{9 + self.extra_width}}"
         else:
-            text_laptime = f"{self.prefix_best}{TEXT_NOLAPTIME: >{9 + self.extra_width}}"
+            text_laptime = f"{self.prefix_best}{TEXT_NOLAPTIME:>{9 + self.extra_width}}"
         target.text = text_laptime
         target.fg = self.bar_style_time_target[2]
         target.update()
@@ -223,7 +223,7 @@ class Realtime(Overlay):
     def update_time_target_gap(self, target, delta_sec, sec_index):
         """Target sector time gap"""
         sector_gap = calc.accumulated_sum(delta_sec, sec_index)
-        target.text = f"{self.prefix_best}{sector_gap: >+{9 + self.extra_width}.3f}"[:11 + self.extra_width]
+        target.text = f"{self.prefix_best}{sector_gap:>+{9 + self.extra_width}.3f}"[:11 + self.extra_width]
         target.fg = self.bar_style_time_target[sector_gap < 0]
         target.update()
 

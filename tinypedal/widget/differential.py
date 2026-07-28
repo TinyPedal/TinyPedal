@@ -179,7 +179,7 @@ class Realtime(Overlay):
         """Format reading"""
         if self.wcfg["show_inverted_locking"]:
             value = 1 - value
-        return f"{value: >{self.max_padding}.{self.decimals}%}"[:self.max_padding]
+        return f"{value:>{self.max_padding}.{self.decimals}%}"[:self.max_padding]
 
 
 class DiffLockingTimer:

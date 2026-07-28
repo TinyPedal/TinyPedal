@@ -571,10 +571,16 @@ class Realtime(Overlay):
             est_laps = min(minfo.fuel.estimatedLaps, minfo.energy.estimatedLaps)
         else:
             est_laps = minfo.fuel.estimatedLaps
-        cd_laps = calc.pit_in_countdown_laps(est_laps, api.read.lap.progress())
+        safe_laps = calc.pit_in_countdown_laps(est_laps, api.read.lap.progress())
 
-        safe_laps = f"{cd_laps:.2f}"[:3].strip(".")
-        est_laps = f"{est_laps:.2f}"[:3].strip(".")
+        if safe_laps > 9.94:
+            safe_laps = f"{safe_laps:.0f}"
+        else:
+            safe_laps = f"{safe_laps:.1f}"
+        if est_laps > 9.94:
+            est_laps = f"{est_laps:.0f}"
+        else:
+            est_laps = f"{est_laps:.1f}"
         return f"{safe_laps:<3}≤{est_laps:>3}"
 
     def yellow_flag_state(self, in_race: bool) -> float:

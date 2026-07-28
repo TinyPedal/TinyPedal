@@ -161,7 +161,7 @@ class Realtime(Overlay):
         """Braking rate (g force)"""
         if target.last != data:
             target.last = data
-            target.text = f"{data: >4.2f}g"[:5]
+            target.text = f"{data:>4.2f}g"
             target.update()
 
     def update_delta_rate(self, target, data):
@@ -177,7 +177,7 @@ class Realtime(Overlay):
                 text = f"{data:+.0%}"
             else:
                 text = f"{data:+.2f}"
-            target.text = text[:5]
+            target.text = text
             target.bg = self.bar_style_delta_rate[data > 0]
             target.update()
 
@@ -185,12 +185,12 @@ class Realtime(Overlay):
         """Front wheel lock duration"""
         if target.last != data:
             target.last = data
-            target.text = f"F{data: >4.1f}"[:5]
+            target.text = f"F{data:>4.1f}"
             target.update()
 
     def update_lock_time_r(self, target, data):
         """Rear wheel lock duration"""
         if target.last != data:
             target.last = data
-            target.text = f"R{data: >4.1f}"[:5]
+            target.text = f"R{data:>4.1f}"
             target.update()

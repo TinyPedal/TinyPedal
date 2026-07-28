@@ -670,10 +670,16 @@ class DeltaLapTime(QWidget):
                 continue
 
             if -999 < delta < 0:  # player time gain
-                text = f"{-delta:.1f}"[:3].strip(".")
+                if delta < -9.94:
+                    text = f"{-delta:.0f}"
+                else:
+                    text = f"{-delta:.1f}"
                 fg_color = self.fg_gain
             elif 0 < delta < 999:  # player time loss
-                text = f"{delta:.1f}"[:3].strip(".")
+                if delta > 9.94:
+                    text = f"{delta:.0f}"
+                else:
+                    text = f"{delta:.1f}"
                 fg_color = self.fg_loss
             elif delta == 0:
                 text = "0.0"

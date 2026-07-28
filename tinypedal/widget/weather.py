@@ -239,9 +239,9 @@ class Realtime(Overlay):
         """Track & ambient temperature"""
         if target.last != data:
             target.last = data
-            track_temp = f"{self.unit_temp(track):{self.temp_digits}}"[:self.temp_cut]
-            air_temp = f"{self.unit_temp(air):{self.temp_digits}}"[:self.temp_cut]
-            target.text = f"{track_temp}({air_temp}){self.symbol_temp}"
+            track_temp = f"{self.unit_temp(track):{self.temp_digits}}"
+            air_temp = f"{self.unit_temp(air):{self.temp_digits}}"
+            target.text = f"{track_temp:.{self.temp_cut}}({air_temp:.{self.temp_cut}}){self.symbol_temp}"
             target.update()
 
     def update_temperature_trend(self, target, data):
@@ -256,8 +256,8 @@ class Realtime(Overlay):
         """Rain percentage"""
         if target.last != data:
             target.last = data
-            percent_rain = f"{data: >3.0%}"[:3]
-            target.text = f"{self.prefix_rain} {percent_rain}"
+            percent_rain = f"{data:>3.0%}"
+            target.text = f"{self.prefix_rain} {percent_rain:.3}"
             target.update()
 
     def update_raininess_trend(self, target, data):
@@ -272,16 +272,16 @@ class Realtime(Overlay):
         """Surface wetness percentage"""
         if target.last != data:
             target.last = data
-            percent_wet = f"{data: >3.0%}"[:3]
-            target.text = f"{self.prefix_wet} {percent_wet}"
+            percent_wet = f"{data:>3.0%}"
+            target.text = f"{self.prefix_wet} {percent_wet:.3}"
             target.update()
 
     def update_rubber(self, target, data):
         """Surface rubber coverage percentage"""
         if target.last != data:
             target.last = data
-            percent_rubber = f"{laps_to_rubber(data, self.rubber_median_laps): >3.0%}"[:3]
-            target.text = f"{self.prefix_dry} {percent_rubber}"
+            percent_rubber = f"{laps_to_rubber(data, self.rubber_median_laps):>3.0%}"
+            target.text = f"{self.prefix_dry} {percent_rubber:.3}"
             target.update()
 
     def update_wetness_trend(self, target, data):

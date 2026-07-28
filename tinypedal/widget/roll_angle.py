@@ -186,10 +186,10 @@ class Realtime(Overlay):
 
     def format_roll(self, angle, prefix):
         """Format roll angle"""
-        roll_angle = f"{angle:+.{self.decimals}f}"[:self.decimals + 3]
-        return f"{prefix}{roll_angle}{self.degree_sign_text}"
+        roll_angle = f"{angle:+.{self.decimals}f}"
+        return f"{prefix}{roll_angle:.{self.decimals + 3}}{self.degree_sign_text}"
 
     def format_ratio(self, angle, prefix):
         """Format roll angle ratio"""
-        roll_angle = f"{angle:.{self.decimals + 1}f}"[:self.decimals + 3]
-        return f"{prefix}{roll_angle}{self.percent_sign_text}"
+        roll_angle = f"{angle:.{self.decimals + 1}f}"
+        return f"{prefix}{roll_angle:.{self.decimals + 3}}{self.percent_sign_text}"

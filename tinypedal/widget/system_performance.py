@@ -120,9 +120,9 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             memory_used = psutil.virtual_memory().used / 1024 / 1024 / 1024
-            cpu = f"{data: >4.2f}"[:4].strip(".")
-            mem = f"{memory_used: >4.2f}"[:4].strip(".")
-            target.text = f"{prefix}{cpu: >4}%{mem: >5}GB"
+            cpu = f"{data:>4.2f}"
+            mem = f"{memory_used:>4.1f}"
+            target.text = f"{prefix}{cpu:>4.4}%{mem:>5.5}GB"
             target.update()
 
     def update_app(self, target, data, prefix):
@@ -130,7 +130,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             memory_used = self.app_info.memory_full_info().uss / 1024 / 1024
-            cpu = f"{data: >4.2f}"[:4].strip(".")
-            mem = f"{memory_used: >4.2f}"[:4].strip(".")
-            target.text = f"{prefix}{cpu: >4}%{mem: >5}MB"
+            cpu = f"{data:>4.2f}"
+            mem = f"{memory_used:>4.1f}"
+            target.text = f"{prefix}{cpu:>4.4}%{mem:>5.5}MB"
             target.update()

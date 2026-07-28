@@ -775,10 +775,10 @@ class Realtime(Overlay):
             if data[-1]:
                 pos_diff = data[0]
                 if pos_diff > 0:
-                    text = f"▲{pos_diff: >2}"
+                    text = f"▲{pos_diff:>2}"
                     color_index = 1
                 elif pos_diff < 0:
-                    text = f"▼{-pos_diff: >2}"
+                    text = f"▼{-pos_diff:>2}"
                     color_index = 2
                 else:
                     text = "- 0"
@@ -810,9 +810,9 @@ class Realtime(Overlay):
                 if self.wcfg["driver_name_uppercase"]:
                     text = text.upper()
                 if self.wcfg["driver_name_align_center"]:
-                    text = text[:self.drv_width]
+                    text = f"{text:.{self.drv_width}}"
                 else:
-                    text = text[:self.drv_width].ljust(self.drv_width)
+                    text = f"{text:<{self.drv_width}.{self.drv_width}}"
             else:
                 text = ""
             target.text = text
@@ -834,9 +834,9 @@ class Realtime(Overlay):
                 if self.wcfg["vehicle_name_uppercase"]:
                     text = text.upper()
                 if self.wcfg["vehicle_name_align_center"]:
-                    text = text[:self.veh_width]
+                    text = f"{text:.{self.veh_width}}"
                 else:
-                    text = text[:self.veh_width].ljust(self.veh_width)
+                    text = f"{text:<{self.veh_width}.{self.veh_width}}"
             else:
                 text = ""
             target.text = text
@@ -1194,7 +1194,7 @@ class Realtime(Overlay):
     def set_pittime(self, inpit, pit_time):
         """Set lap time"""
         if 0 < pit_time < MAX_SECONDS:
-            return f"{'PIT' if inpit else 'OUT'}{pit_time: >5.1f}"
+            return f"{'PIT' if inpit else 'OUT'}{pit_time:>5.1f}"
         return TEXT_NOLAPTIME
 
 

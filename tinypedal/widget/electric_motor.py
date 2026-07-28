@@ -189,7 +189,7 @@ class Realtime(Overlay):
         """Motor temperature"""
         if target.last != data:
             target.last = data
-            target.text = f"M{self.unit_temp(data): >6.1f}°"
+            target.text = f"M{self.unit_temp(data):>6.1f}°"
             target.bg = self.bar_style_motor[data >= self.wcfg["overheat_threshold_motor"]]
             target.update()
 
@@ -197,7 +197,7 @@ class Realtime(Overlay):
         """Water temperature"""
         if target.last != data:
             target.last = data
-            target.text = f"W{self.unit_temp(data): >6.1f}°"
+            target.text = f"W{self.unit_temp(data):>6.1f}°"
             target.bg = self.bar_style_water[data >= self.wcfg["overheat_threshold_water"]]
             target.update()
 
@@ -205,29 +205,29 @@ class Realtime(Overlay):
         """Motor rpm"""
         if target.last != data:
             target.last = data
-            target.text = f"{data: >5}rpm"
+            target.text = f"{data:>5}rpm"
             target.update()
 
     def update_torque(self, target, data):
         """Motor torque"""
         if target.last != data:
             target.last = data
-            text = f"{data: >6.2f}"[:6]
-            target.text = f"{text}Nm"
+            text = f"{data:>6.2f}"
+            target.text = f"{text:.6}Nm"
             target.update()
 
     def update_power(self, target, data):
         """Motor power"""
         if target.last != data:
             target.last = data
-            text = f"{self.unit_power(data): >6.2f}"[:6]
-            target.text = f"{text}{self.symbol_power}"
+            text = f"{self.unit_power(data):>6.2f}"
+            target.text = f"{text:.6}{self.symbol_power}"
             target.update()
 
     def update_regen(self, target, data):
         """Motor regen level"""
         if target.last != data:
             target.last = data
-            text = f"{self.unit_power(data): >+6.2f}"[:6]
-            target.text = f"{text}{self.symbol_power}"
+            text = f"{self.unit_power(data):>+6.2f}"
+            target.text = f"{text:.6}{self.symbol_power}"
             target.update()

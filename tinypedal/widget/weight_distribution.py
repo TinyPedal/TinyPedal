@@ -154,5 +154,5 @@ class Realtime(Overlay):
 
     def format_dist(self, angle, prefix):
         """Format distribution ratio"""
-        ratio = f"{angle:.{self.decimals + 1}f}"[:self.decimals + 3]
-        return f"{prefix}{ratio}{self.percent_sign_text}"
+        ratio = f"{angle:.{self.decimals + 1}f}"
+        return f"{prefix}{ratio:.{self.decimals + 3}}{self.percent_sign_text}"

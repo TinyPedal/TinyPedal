@@ -270,7 +270,7 @@ class Realtime(Overlay):
         """Downforce front"""
         if target.last != data:
             target.last = data
-            target.text = f"F{abs(data):5.0f}"[:6]
+            target.text = f"F{abs(data):5.0f}"
             target.bg = self.bar_style_df_front[data < 0]
             target.update()
 
@@ -278,7 +278,7 @@ class Realtime(Overlay):
         """Downforce rear"""
         if target.last != data:
             target.last = data
-            target.text = f"R{abs(data):5.0f}"[:6]
+            target.text = f"R{abs(data):5.0f}"
             target.bg = self.bar_style_df_rear[data < 0]
             target.update()
 

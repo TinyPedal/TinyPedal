@@ -342,7 +342,7 @@ class Realtime(Overlay):
         """Laps data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:03.0f}"[:3]
+            target.text = f"{data:03.0f}"
             target.update()
 
     def update_time(self, target, data):

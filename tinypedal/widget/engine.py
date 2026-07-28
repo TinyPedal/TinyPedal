@@ -249,7 +249,7 @@ class Realtime(Overlay):
         """Oil temperature"""
         if target.last != data:
             target.last = data
-            target.text = f"O{self.unit_temp(data): >6.1f}°"
+            target.text = f"O{self.unit_temp(data):>6.1f}°"
             target.bg = self.bar_style_oil[data >= self.wcfg["overheat_threshold_oil"]]
             target.update()
 
@@ -257,7 +257,7 @@ class Realtime(Overlay):
         """Water temperature"""
         if target.last != data:
             target.last = data
-            target.text = f"W{self.unit_temp(data): >6.1f}°"
+            target.text = f"W{self.unit_temp(data):>6.1f}°"
             target.bg = self.bar_style_water[data >= self.wcfg["overheat_threshold_water"]]
             target.update()
 
@@ -265,38 +265,38 @@ class Realtime(Overlay):
         """Turbo pressure"""
         if target.last != data:
             target.last = data
-            text = f"{self.unit_pres(data * 0.001):03.3f}"[:5]
-            target.text = f"{text}{self.symbol_pres}"
+            text = f"{self.unit_pres(data * 0.001):03.3f}"
+            target.text = f"{text:.5}{self.symbol_pres}"
             target.update()
 
     def update_rpm(self, target, data):
         """Engine RPM"""
         if target.last != data:
             target.last = data
-            target.text = f"{data: >5}rpm"
+            target.text = f"{data:>5}rpm"
             target.update()
 
     def update_rpm_max(self, target, data):
         """Engine RPM maximum"""
         if target.last != data:
             target.last = data
-            target.text = f"{data: >5}max"
+            target.text = f"{data:>5}max"
             target.update()
 
     def update_torque(self, target, data):
         """Engine torque"""
         if target.last != data:
             target.last = data
-            text = f"{data: >6.2f}"[:6]
-            target.text = f"{text}Nm"
+            text = f"{data:>6.2f}"
+            target.text = f"{text:.6}Nm"
             target.update()
 
     def update_power(self, target, data):
         """Engine power"""
         if target.last != data:
             target.last = data
-            text = f"{self.unit_power(data): >6.2f}"[:6]
-            target.text = f"{text}{self.symbol_power}"
+            text = f"{self.unit_power(data):>6.2f}"
+            target.text = f"{text:.6}{self.symbol_power}"
             target.update()
 
     def update_power_ratio(self, target, *data):

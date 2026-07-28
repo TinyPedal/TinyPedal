@@ -187,7 +187,7 @@ class Realtime(Overlay):
         """Battery charge"""
         if target.last != data:
             target.last = data
-            target.text = f"B{data: >7.2f}"[:8]
+            target.text = f"B{data:>7.2f}"
             target.bg = self.bar_style_charge[color_index]
             target.update()
 
@@ -195,26 +195,26 @@ class Realtime(Overlay):
         """Battery drain"""
         if target.last != data:
             target.last = data
-            target.text = f"-{data: >7.2f}"[:8]
+            target.text = f"-{data:>7.2f}"
             target.update()
 
     def update_regen(self, target, data):
         """Battery regen"""
         if target.last != data:
             target.last = data
-            target.text = f"+{data: >7.2f}"[:8]
+            target.text = f"+{data:>7.2f}"
             target.update()
 
     def update_net(self, target, data):
         """Battery charge net change"""
         if target.last != data:
             target.last = data
-            target.text = f"N{data: >+7.2f}"[:8]
+            target.text = f"N{data:>+7.2f}"
             target.update()
 
     def update_timer(self, target, data):
         """Motor activation timer"""
         if target.last != data:
             target.last = data
-            target.text = f"{data: >7.2f}s"[:8]
+            target.text = f"{data:>7.2f}s"
             target.update()

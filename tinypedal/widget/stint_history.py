@@ -356,7 +356,7 @@ class Realtime(Overlay):
             target.last = data
             if data < 0:
                 data = 0
-            target.text = f"{data:03.0f}"[:3]
+            target.text = f"{data:03.0f}"
             target.update()
 
     def update_time(self, target, data):
@@ -365,7 +365,7 @@ class Realtime(Overlay):
             target.last = data
             if data < 0:
                 data = 0
-            target.text = calc.sec2stinttime(data)[:5]
+            target.text = calc.sec2stinttime(data)
             target.update()
 
     def update_fuel(self, target, data, sign):

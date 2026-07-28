@@ -259,7 +259,12 @@ class Realtime(Overlay):
         """Rate of change"""
         if target.last != data:
             target.last = data
-            target.text = f"{self.unit_temp(abs(data)):.1f}"[:3].strip(".")
+            temp = self.unit_temp(abs(data))
+            if temp > 9.94:
+                text = f"{temp:.0f}"
+            else:
+                text = f"{temp:.1f}"
+            target.text = text
             target.fg = self.bar_style_rate[data > 0]
             target.update()
 
@@ -268,6 +273,11 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             change = data - last
-            target.text = f"{self.unit_temp(abs(change)):.1f}"[:3].strip(".")
+            temp = self.unit_temp(abs(change))
+            if temp > 9.94:
+                text = f"{temp:.0f}"
+            else:
+                text = f"{temp:.1f}"
+            target.text = text
             target.fg = self.bar_style_rate[change > 0]
             target.update()

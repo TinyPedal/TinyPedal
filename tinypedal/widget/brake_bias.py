@@ -171,8 +171,8 @@ class Realtime(Overlay):
 
     def format_brake_migt(self, value: float) -> str:
         """Format brake migration"""
-        reading = f"{value:.{self.decimals_migt}f}"[:2 + self.decimals_migt]
-        return f"{self.prefix_migt}{reading}{self.suffix_migt}"
+        reading = f"{value:.{self.decimals_migt}f}"
+        return f"{self.prefix_migt}{reading:.{2 + self.decimals_migt}}{self.suffix_migt}"
 
 
 @generator_init
@@ -185,7 +185,6 @@ def brake_migration(ebrake_alloc: int):
     bpres_max = 0.0
     bpres_scale = 1.0
     migration = 0.0
-    ebrake_alloc = ebrake_alloc
     auto_detect = bool(ebrake_alloc == -1)
 
     while True:

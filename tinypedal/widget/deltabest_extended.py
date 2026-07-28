@@ -180,6 +180,6 @@ class Realtime(Overlay):
         """Update deltabest"""
         if target.last != data:
             target.last = data
-            text = f"{calc.sym_max(data, self.delta_display_range): >+{self.max_padding}.{self.decimals}f}"[:self.max_padding]
-            target.text = f"{prefix}{text}"
+            text = f"{calc.sym_max(data, self.delta_display_range):>+{self.max_padding}.{self.decimals}f}"
+            target.text = f"{prefix}{text:.{self.max_padding}}"
             target.update()
