@@ -47,6 +47,9 @@ WIP
   - Now counts flat spot while in pit lane.
   - Now resets flat spot readings after changed tyres.
 
+* Hotkey Tab
+  - Added "Cycle Deltabest Source" keybinding (requested by user "naakseli"), which cycles deltabest source for displaying in Deltabest Widget.
+
 2.48.0 (2026-07-04)
 -----------------------------
 * Hotkey Tab

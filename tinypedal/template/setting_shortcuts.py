@@ -65,6 +65,7 @@ SHORTCUTS_GENERAL = generate_shortcut_setting(
         "spectate_next_driver",
         "spectate_previous_driver",
         "pace_notes_playback",
+        "cycle_deltabest_source",
         "restart_application",
         "quit_application",
     ),

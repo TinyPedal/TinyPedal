@@ -30,6 +30,7 @@ from .. import app_signal, loader, overlay_signal, realtime_state
 from ..api_control import api
 from ..const_file import ConfigType, FileExt
 from ..module_control import mctrl, wctrl
+from ..regex_pattern import CFG_DELTABEST_SOURCE, CHOICE_COMMON
 from ..setting import cfg
 from ..template.setting_module import MODULE_FILENAME
 from ..template.setting_shortcuts import SHORTCUTS_PRESET
@@ -218,6 +219,25 @@ def hotkey_quit_application():
     app_signal.quitapp.emit(True)
 
 
+def hotkey_cycle_deltabest_source():
+    """Command - cycle deltabest source"""
+    deltabest_options = cfg.user.setting["deltabest"]
+    current_source = deltabest_options["deltabest_source"]
+    available_sources = CHOICE_COMMON[CFG_DELTABEST_SOURCE]
+    next_source = available_sources[0]
+    break_next = False
+    for name_source in available_sources:
+        if name_source == current_source:
+            break_next = True
+            continue
+        if break_next:
+            next_source = name_source
+            break
+    deltabest_options["deltabest_source"] = next_source
+    wctrl.reload("deltabest")
+    cfg.save()
+
+
 # Define command list:
 # 0 hotkey name, 1 hotkey function
 COMMANDS_GENERAL = (
@@ -234,6 +254,7 @@ COMMANDS_GENERAL = (
     ("spectate_next_driver", hotkey_spectate_next_driver),
     ("spectate_previous_driver", hotkey_spectate_previous_driver),
     ("pace_notes_playback", hotkey_pace_notes_playback),
+    ("cycle_deltabest_source", hotkey_cycle_deltabest_source),
     ("restart_application", hotkey_restart_application),
     ("quit_application", hotkey_quit_application),
 )

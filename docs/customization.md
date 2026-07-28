@@ -898,7 +898,7 @@ To clear key binding, click `Clear` button from `Key Binding` dialog.
 
 To clear all key bindings, click `Clear All` from `Hotkey Tab`.
 
-**Available options:**
+### General keybinding
 
     overlay_visibility
 Show or hide overlay.
@@ -930,17 +930,26 @@ Spectate next or previous driver relative to current driver (by driver's overall
     pace_notes_playback
 Enable or disable pace notes playback.
 
+    cycle_deltabest_source
+Cycle deltabest source for displaying in [Deltabest](#deltabest) Widget.
+
     restart_application
 Restart TinyPedal.
 
     quit_application
 Quit TinyPedal.
 
+### Preset keybinding
+
     preset_*
 Load assigned preset. Note, if assigned preset file is not found (such as deleted), it will not be loaded, and its name will be auto unassigned from list.
 
+### Widget keybinding
+
     widget_*
 Enable or disable widget.
+
+### Module keybinding
 
     module_*
 Enable or disable module.
@@ -2054,7 +2063,7 @@ Set low integrity threshold for displaying warning indication.
 Swap time gain and loss color between font and background color.
 
     deltabest_source
-Set lap time source for deltabest display. Available values are: `Best` = all time best lap time, `Session` = session best lap time, `Stint` = stint best lap time, `Last` = last lap time.
+Set lap time source for deltabest display. Available values are: `Best` = all time best lap time, `Session` = session best lap time, `Stint` = stint best lap time, `Last` = last lap time. This option can be changed on fly via [global hotkey](#hotkey).
 
     show_delta_bar
 Show visualized delta bar.
