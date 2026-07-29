@@ -82,6 +82,17 @@ TinyPedal will automatically create backup file with time stamp suffix if old se
 
 A newer released version will auto-update old setting and add new setting after loading. It may still be a good idea to manually backup files before upgrading to newer version.
 
+### How to restore your preset from backups
+To restore preset from backups, open `Settings` folder, find any preset file that ended with `backup-XXXX` name in the end of file extension, and rename the file extension to `json`.
+
+For example, if a backup file named:
+
+    LMGT3.json.backup-2026-07-29-11-41-12-586471
+
+Just rename it to:
+
+    LMGT3.json
+
 [**`Back to Top`**](#)
 
 
@@ -2869,7 +2880,7 @@ Set percentage threshold for triggering wheel slip warning under acceleration. `
 ## Laps and position
 **This widget displays lap number, driver overall position, position in class info.**
 
-    show_lap_number
+    show_laps
 Show your current lap number (lap progression) and total race laps. If total race laps is not available, such as in time-based session, estimated total laps will be displayed instead, and a `~` sign will be displayed before estimated total laps reading, and up to two decimal places will be kept.
 
 Note, estimated total laps reading is calculated based on local player's lap time pace, which can be different from in-game HUD reading.
