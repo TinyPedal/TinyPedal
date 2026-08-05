@@ -60,11 +60,14 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
                     output.dataSetVersion = -1
-                    last_veh_total = 0
+                    last_veh_total = -1
+                    last_session_elapsed = -1
+                    last_in_race = -1
 
                 veh_total = output.totalVehicles = api.read.vehicle.total_vehicles()
                 if veh_total > 0:
                     update_low_priority = next(gen_low_priority_timer)
+                    session_elapsed = api.read.timing.elapsed()
                     in_race = api.read.session.in_race()
 
                     update_vehicle_data(
@@ -72,20 +75,28 @@ class Realtime(DataModule):
                         max_lap_diff_ahead,
                         max_lap_diff_behind,
                         update_low_priority,
+                        session_elapsed,
                         in_race,
                     )
 
                     if update_low_priority:
-                        if last_veh_total != veh_total:
-                            last_veh_total = veh_total
-                            update_qualify_position(output)
 
                         if in_race:
                             update_finish_time(output, max_finish_time_diff)
-                        else:
+
+                        if (
+                            last_veh_total != veh_total
+                            or last_session_elapsed > session_elapsed
+                            or last_in_race != in_race
+                        ):
+                            update_qualify_position(output)
                             output.finishTimeOffset = 0.0
                             output.finishAsLap = True
                             output.finishLapOffset = 0.0
+
+                        last_veh_total = veh_total
+                        last_session_elapsed = session_elapsed
+                        last_in_race = in_race
 
             else:
                 if reset:
@@ -103,6 +114,7 @@ def update_vehicle_data(
     max_lap_diff_ahead: float,
     max_lap_diff_behind: float,
     update_low_priority: bool,
+    elapsed_time: float,
     in_race: bool,
 ) -> None:
     """Update vehicle data"""
@@ -125,7 +137,6 @@ def update_vehicle_data(
     speedtrap_distance = minfo.mapping.speedTrapPosition
 
     # Local player data
-    elapsed_time = api.read.timing.elapsed()
     plr_lap_distance = api.read.lap.distance()
     plr_lap_progress_total = api.read.lap.completed_laps() + calc.lap_progress_distance(plr_lap_distance, track_length)
     plr_laptime_est = api.read.timing.estimated_laptime()

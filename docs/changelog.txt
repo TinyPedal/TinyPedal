@@ -1,3 +1,8 @@
+WIP
+-----------------------------
+* Relative, Rivals, Standings Widget
+  - Fixed position change value sometimes did not update correctly after switched session (reported by user "JustEmailMe").
+
 2.49.0 (2026-07-28)
 -----------------------------
 * Units
