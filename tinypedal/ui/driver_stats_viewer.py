@@ -56,7 +56,7 @@ from ._common import (
 from .track_map_viewer import TrackMapViewer
 
 
-def parse_display_value(key: str, value: float) -> str | int | float:
+def parse_display_value(key: str, value: float) -> str | float:
     """Parse stats display value"""
     if DriverStats.is_lap_time(key):
         if 0 < value < MAX_SECONDS:

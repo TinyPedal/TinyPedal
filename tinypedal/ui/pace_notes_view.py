@@ -394,7 +394,7 @@ class PaceNotesControl(QWidget):
         self.update_config("enable", checked)
         app_signal.refresh.emit(True)
 
-    def update_config(self, key: str, value: int | float | str) -> bool:
+    def update_config(self, key: str, value: float | str) -> bool:
         """Update pace note playback setting, save if changed"""
         if self.mcfg[key] == value:
             return False

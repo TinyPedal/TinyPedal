@@ -241,7 +241,7 @@ class Base(QWidget):
 class Overlay(Base):
     """Inherit base window, add common GUI methods"""
 
-    def config_font(self, name: str = "", size: int | float = 1, weight: str = "") -> QFont:
+    def config_font(self, name: str = "", size: float = 1, weight: str = "") -> QFont:
         """Config font
 
         Used for draw text in widget that uses QPainter,

@@ -63,9 +63,8 @@ def is_pid_exist() -> bool:
         pid_last = int(pid[0])
         pid_last_create_time = pid[1]
         # Verify if last PID is running and belongs to TinyPedal
-        if psutil.pid_exists(pid_last):
-            if str(psutil.Process(pid_last).create_time()) == pid_last_create_time:
-                return True  # already running
+        if psutil.pid_exists(pid_last) and str(psutil.Process(pid_last).create_time()) == pid_last_create_time:
+            return True  # already running
     except (ProcessLookupError, psutil.NoSuchProcess, ValueError, IndexError, FileNotFoundError):
         logger.info("PID not found or invalid")
     return False  # no running
@@ -95,6 +94,8 @@ def single_instance_check(is_single_instance: bool):
         "Check system tray for hidden icon."
     )
     logger.warning(warning_text)
+    root = QApplication(sys.argv)
+    set_app_icon(root)
     QMessageBox.warning(None, f"{APP_NAME} v{VERSION}", warning_text)
     sys.exit()
 
@@ -123,22 +124,31 @@ def init_gui() -> QApplication:
     root = QApplication(sys.argv)
     root.setQuitOnLastWindowClosed(False)
     root.setApplicationName(APP_NAME)
+    set_app_icon(root)
+    set_app_font(root)
+    # Disable global pixmap cache
+    QPixmapCache.setCacheLimit(0)
+    logger.info("Screen pixel ratio: %s", root.devicePixelRatio())
+    logger.info("Platform plugin: %s", root.platformName())
+    return root
+
+
+def set_app_icon(root: QApplication):
+    """Set APP icon"""
     root.setWindowIcon(QIcon(ImageFile.APP_ICON))
     # Set window icon for X11/Wayland (workaround)
     if not PLATFORM.WINDOWS:
         root.setDesktopFileName("TinyPedal-overlay")
-    # Set default font
+
+
+def set_app_font(root: QApplication):
+    """Set APP default font"""
     font = root.font()
     if os.getenv("PYSIDE_OVERRIDE") != "6":  # don't set family for pyside6
         font.setFamily("sans-serif")
     font.setPointSize(10)
     font.setStyleHint(QFont.SansSerif)
     root.setFont(font)
-    # Disable global pixmap cache
-    QPixmapCache.setCacheLimit(0)
-    logger.info("Screen pixel ratio: %s", root.devicePixelRatio())
-    logger.info("Platform plugin: %s", root.platformName())
-    return root
 
 
 def unset_environment():
@@ -180,6 +190,7 @@ def set_environment():
 
 def start_app(cli_args):
     """Init main window"""
+    single_instance_check(bool(cli_args.single_instance))
     unset_environment()
     set_logging_level(logger, cfg.path.config, LogFile.APP_LOG, log_stream, cli_args.log_level)
     get_version()
@@ -190,7 +201,6 @@ def start_app(cli_args):
     set_environment()
     # Main GUI
     root = init_gui()
-    single_instance_check(bool(cli_args.single_instance))
     # Load core modules
     from . import loader
     loader.start()
