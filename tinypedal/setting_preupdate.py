@@ -45,6 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
+        ((2, 49, 2), _user_prior_2_49_2),  # 2026-08-09
         ((2, 48, 7), _user_prior_2_48_7),  # 2026-07-27
         ((2, 47, 8), _user_prior_2_47_8),  # 2026-07-03
         ((2, 46, 4), _user_prior_2_46_4),  # 2026-05-23
@@ -71,6 +72,15 @@ def _global_prior_2_43_0(dict_user: dict):
 
 
 # User setting update function
+def _user_prior_2_49_2(dict_user: dict):
+    # Update brake_temperature widget
+    brake_temperature = dict_user.get("brake_temperature")
+    if isinstance(brake_temperature, dict):
+        if "inner_gap" in brake_temperature:
+            brake_temperature["horizontal_gap"] = brake_temperature["inner_gap"]
+            brake_temperature["vertical_gap"] = brake_temperature["inner_gap"]
+
+
 def _user_prior_2_48_7(dict_user: dict):
     # Update flag widget
     flag = dict_user.get("flag")

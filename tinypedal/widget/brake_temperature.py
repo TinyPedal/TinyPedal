@@ -55,7 +55,6 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        inner_gap = self.wcfg["inner_gap"]
         self.leading_zero = min(max(self.wcfg["leading_zero"], 1), 3) + 0.0  # no decimal
         self.sign_text = "°" if self.wcfg["show_degree_sign"] else ""
         text_width = 3 + len(self.sign_text) + (self.cfg.units["temperature_unit"] == "Fahrenheit")
@@ -76,7 +75,10 @@ class Realtime(Overlay):
         ]
 
         # Brake temperature
-        layout_btemp = self.set_grid_layout(gap=inner_gap)
+        layout_btemp = self.set_grid_layout(
+            gap_hori=self.wcfg["horizontal_gap"],
+            gap_vert=self.wcfg["vertical_gap"],
+        )
         self.bars_btemp = self.set_rawtext(
             text=TEXT_NA,
             width=font_m.width * text_width + bar_padx,
@@ -98,7 +100,10 @@ class Realtime(Overlay):
 
         # Average brake temperature
         if self.wcfg["show_average"]:
-            layout_btavg = self.set_grid_layout(gap=inner_gap)
+            layout_btavg = self.set_grid_layout(
+                gap_hori=self.wcfg["horizontal_gap"],
+                gap_vert=self.wcfg["vertical_gap"],
+            )
             self.bars_btavg = self.set_rawtext(
                 text=TEXT_NA,
                 width=font_m.width * text_width + bar_padx,
