@@ -3,8 +3,9 @@ WIP
 * Relative, Rivals, Standings Widget
   - Fixed position change value sometimes did not update correctly after switched session (reported by user "JustEmailMe").
 
-* Wheels Module
+* Misc
   - Improved accuracy of motion ratio measurement.
+  - Now uses all time best lap time for lap time pace target (for remaining lap estimate) when lap time pace isn't available initially (such as at the start of race where no lap time has been set yet).
 
 2.49.0 (2026-07-28)
 -----------------------------

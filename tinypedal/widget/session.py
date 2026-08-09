@@ -150,7 +150,7 @@ class Realtime(Overlay):
                 laps_left = api.read.lap.remaining()
             else:
                 lap_into = api.read.lap.progress()
-                lap_pace = minfo.vehicles.dataSet[minfo.vehicles.playerIndex].lapTimeHistory.average
+                lap_pace = minfo.delta.lapTimePace
                 end_timer_laps_left = calc.end_timer_laps_remain(lap_into, lap_pace, est_remaining_time)
                 laps_left = calc.time_type_laps_remain(calc.ceil(end_timer_laps_left), lap_into)
 

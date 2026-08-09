@@ -312,7 +312,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
     leader_index = output.leaderIndex
     player_index = output.playerIndex
     leader_pace = output.dataSet[leader_index].lapTimeHistory.average
-    player_pace = output.dataSet[player_index].lapTimeHistory.average
+    player_pace = minfo.delta.lapTimePace
 
     # Time only
     if finish_type == 0:
