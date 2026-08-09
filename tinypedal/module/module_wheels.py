@@ -575,17 +575,13 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
             wheel_pos = wheel_pos_set[idx]
 
             # Min position raw
-            if min_susp_pos_raw[idx] > susp_pos:
+            if min_susp_pos_raw[idx] > susp_pos and min_wheel_pos_raw[idx] > wheel_pos:
                 min_susp_pos_raw[idx] = susp_pos
-
-            if min_wheel_pos_raw[idx] > wheel_pos:
                 min_wheel_pos_raw[idx] = wheel_pos
 
             # Max position raw
-            if max_susp_pos_raw[idx] < susp_pos:
+            if max_susp_pos_raw[idx] < susp_pos and max_wheel_pos_raw[idx] < wheel_pos:
                 max_susp_pos_raw[idx] = susp_pos
-
-            if max_wheel_pos_raw[idx] < wheel_pos:
                 max_wheel_pos_raw[idx] = wheel_pos
 
             # Motion ratio
