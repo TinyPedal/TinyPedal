@@ -308,7 +308,7 @@ class Realtime(Overlay):
 
         # Current laps data
         if self.wcfg["show_laps"]:
-            self.update_laps(self.bars_laps[0], api.read.lap.number())
+            self.update_laps(self.bars_laps[0], api.read.lap.number() + 1)
         if self.wcfg["show_time"]:
             self.update_time(self.bars_time[0], minfo.delta.lapTimeEstimated)
         if self.wcfg["show_delta"]:

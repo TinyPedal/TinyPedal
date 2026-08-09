@@ -91,7 +91,7 @@ class Realtime(DataModule):
 
 def update_consumption_history():
     """Update consumption history"""
-    lap_number = api.read.lap.completed_laps() - 1
+    lap_number = api.read.lap.number()
     if (
         minfo.history.consumptionDataSet[0].lapTimeLast != minfo.delta.lapTimeLast
         or minfo.history.consumptionDataSet[0].lapNumber != lap_number

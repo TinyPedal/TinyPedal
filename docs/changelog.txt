@@ -3,6 +3,9 @@ WIP
 * Brake temperature Widget
   - Replaced "inner_gap" option with "horizontal_gap, vertical_gap" to allow adjustment separately (requested by user "diegocasillas"). Old setting will be automatically transferred over.
 
+* Lap time history Widget
+  - Now counts lap number (completed) from 1 instead of 0 (requested by user "KyanH06").
+
 * Relative, Rivals, Standings Widget
   - Fixed position change value sometimes did not update correctly after switched session (reported by user "JustEmailMe").
 
