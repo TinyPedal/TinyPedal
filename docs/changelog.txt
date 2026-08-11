@@ -11,7 +11,8 @@ WIP
 
 * Misc
   - Improved accuracy of motion ratio measurement.
-  - Now uses all time best lap time for lap time pace target (for remaining lap estimate) when lap time pace isn't available initially (such as at the start of race where no lap time has been set yet).
+  - Now calculates remaining lap estimate based on all time best lap time when no lap time has been set yet (such as at start of race).
+  - Now verifies driver name before saving delta best & fuel data to avoid incorrect timing data when spectate mode is enabled.
 
 2.49.0 (2026-07-28)
 -----------------------------
