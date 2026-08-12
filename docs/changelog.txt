@@ -1,4 +1,4 @@
-WIP
+2.49.4 (2026-08-12)
 -----------------------------
 * Brake temperature Widget
   - Replaced "inner_gap" option with "horizontal_gap, vertical_gap" to allow adjustment separately (requested by user "diegocasillas"). Old setting will be automatically transferred over.
