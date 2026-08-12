@@ -4,15 +4,18 @@ WIP
   - Replaced "inner_gap" option with "horizontal_gap, vertical_gap" to allow adjustment separately (requested by user "diegocasillas"). Old setting will be automatically transferred over.
 
 * Lap time history Widget
-  - Now counts lap number (completed) from 1 instead of 0 (requested by user "KyanH06").
+  - Counts lap number (completed) from 1 instead of 0 (requested by user "KyanH06").
 
 * Relative, Rivals, Standings Widget
   - Fixed position change value sometimes did not update correctly after switched session (reported by user "JustEmailMe").
 
+* Spectate Mode
+  - Auto refreshes spectate list when driver changes, enters or leaves server.
+  - Avoids data desync when driver enters or leaves server.
+
 * Misc
   - Improved accuracy of motion ratio measurement.
-  - Now calculates remaining lap estimate based on all time best lap time when no lap time has been set yet (such as at start of race).
-  - Now verifies driver name before saving delta best & fuel data to avoid incorrect timing data when spectate mode is enabled.
+  - Calculates remaining lap estimate based on all time best lap time when no lap time has been set yet (such as at start of race).
 
 2.49.0 (2026-07-28)
 -----------------------------

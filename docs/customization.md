@@ -430,7 +430,9 @@ This option overrides local player on-track status check, and updates or stops o
 Set `true` to enable `player index` manual override.
 
     player_index
-Set `player index` override for displaying data from specific player. Valid player index range starts from `0` to maximum number players minus one, and must not exceed `127`. Set value to `-1` for unspecified player, which can be useful for display general standings and trackmap data (ex. broadcasting). This option works only when `enable_player_index_override` enabled.
+Set `player index` override for displaying data from specific player. Set value to `-1` for unspecified player.
+
+Note, this option works only when `enable_player_index_override` enabled. This option is automatically set while [Spectate Mode](#spectate-mode) enabled, and should not be set manually.
 
     character_encoding
 Set character encoding for displaying text in correct encoding. Available encoding: `UTF-8`, `ISO-8859-1`. Default encoding is `UTF-8`.

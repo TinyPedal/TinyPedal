@@ -145,7 +145,7 @@ def calc_consumption(
     output: FuelInfo, telemetry_func: Callable, filepath: str, filename: str, extension: str,
     min_delta_distance: float):
     """Calculate consumption data"""
-    recording = ""
+    recording = False
     delayed_save = False
     validating = 0
     is_pit_lap = 0  # whether pit in or pit out lap
@@ -237,11 +237,7 @@ def calc_consumption(
 
         # Lap start & finish detection
         if lap_stime > last_lap_stime:
-            if (
-                api.read.vehicle.driver_name() == recording
-                and not is_pit_lap
-                and valid_delta_raw(delta_array_raw, used_curr, 1)
-            ):
+            if not is_pit_lap and valid_delta_raw(delta_array_raw, used_curr, 1):
                 delta_array_raw.append((  # set end value
                     round6(pos_last + 10),
                     round6(used_curr),
@@ -253,7 +249,7 @@ def calc_consumption(
             pos_last = pos_recorded = pos_curr
             used_last_raw = used_curr
             used_curr = 0
-            recording = api.read.vehicle.driver_name() if laptime_curr < 1 else ""
+            recording = laptime_curr < 1
             is_pit_lap = 0
         last_lap_stime = lap_stime  # reset
 

@@ -80,7 +80,7 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
-                    recording = ""
+                    recording = False
                     validating = 0
                     is_pit_lap = 0  # whether pit in or pit out lap
 
@@ -138,10 +138,7 @@ class Realtime(DataModule):
                 # Lap start & finish detection
                 if lap_stime > last_lap_stime:
                     laptime_last = lap_stime - last_lap_stime
-                    if (
-                        api.read.vehicle.driver_name() == recording
-                        and valid_delta_raw(delta_array_raw, laptime_last, 1)
-                    ):
+                    if valid_delta_raw(delta_array_raw, laptime_last, 1):
                         delta_array_raw.append((  # set end value
                             round6(pos_last + 10),
                             round6(laptime_last),
@@ -150,7 +147,7 @@ class Realtime(DataModule):
                         validating = api.read.timing.elapsed()
                     delta_array_raw[:] = DELTA_DEFAULT
                     pos_last = pos_recorded = pos_curr
-                    recording = api.read.vehicle.driver_name() if laptime_curr < 1 else ""
+                    recording = laptime_curr < 1
                     is_pit_lap = 0
                 last_lap_stime = lap_stime  # reset
 

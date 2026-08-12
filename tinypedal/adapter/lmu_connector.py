@@ -74,6 +74,18 @@ def local_scoring_index(scor_veh: Sequence[lmu_data.LMUVehicleScoring]) -> int:
     return INVALID_INDEX
 
 
+def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[lmu_data.LMUVehicleScoring]) -> int:
+    """Find local player scoring index by slot id
+
+    Args:
+        scor_veh: scoring array.
+    """
+    for scor_idx, veh_info in enumerate(scor_veh):
+        if veh_info.mID == slot_id:
+            return scor_idx
+    return INVALID_INDEX
+
+
 class LMUResults:
     """LMU results data (extracted from results stream)"""
 
@@ -188,6 +200,7 @@ class SyncData:
         "paused",
         "synced",
         "override_player_index",
+        "player_slot_id",
         "player_scor_index",
         "player_scor",
         "player_tele",
@@ -204,6 +217,7 @@ class SyncData:
         self.paused = False
         self.synced = False
         self.override_player_index = False
+        self.player_slot_id = INVALID_INDEX
         self.player_scor_index = INVALID_INDEX
         self.player_scor = None
         self.player_tele = None
@@ -228,12 +242,14 @@ class SyncData:
             False, if no valid player scoring index found.
             True, set player data.
         """
-        if not self.override_player_index:
-            # Update scoring index
+        # Update scoring index
+        if self.override_player_index:
+            scor_idx = local_scoring_index_by_id(self.player_slot_id, self.dataset.shmm.data.scoring.vehScoringInfo)
+        else:
             scor_idx = local_scoring_index(self.dataset.shmm.data.scoring.vehScoringInfo)
-            if scor_idx == INVALID_INDEX:
-                return False  # index not found, not synced
-            self.player_scor_index = scor_idx
+        if scor_idx == INVALID_INDEX:
+            return False  # index not found, not synced
+        self.player_scor_index = scor_idx
         # Set player data
         self.__sync_player_scor(self.player_scor_index)
         self.__sync_player_tele(self.sync_tele_index(self.player_scor_index))
@@ -434,7 +450,7 @@ class LMUInfo:
 
     def setPlayerIndex(self, index: int = INVALID_INDEX) -> None:
         """Manual override player index"""
-        self._sync.player_scor_index = min(max(index, INVALID_INDEX), MAX_VEHICLES - 1)
+        self._sync.player_slot_id = max(index, INVALID_INDEX)
 
     @property
     def lmuScorInfo(self) -> lmu_data.LMUScoringInfo:

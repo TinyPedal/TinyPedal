@@ -20,9 +20,11 @@
 Spectate list view
 """
 
+from __future__ import annotations
+
 import logging
 
-from PySide2.QtCore import Slot
+from PySide2.QtCore import QBasicTimer, Slot
 from PySide2.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -32,8 +34,9 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal
+from .. import app_signal, realtime_state
 from ..api_control import api
+from ..module_control import mctrl
 from ..setting import cfg
 from ._common import UIScaler
 
@@ -45,7 +48,13 @@ class SpectateList(QWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self._driver_none = "Anonymous"
         self.last_enabled = None
+        self.last_driver_name = ""
+        self.last_total_vehicles = 0
+
+        # Set update timer
+        self._update_timer = QBasicTimer()
 
         # Label
         self.label_spectating = QLabel("")
@@ -87,15 +96,49 @@ class SpectateList(QWidget):
         enabled = cfg.api["enable_player_index_override"]
 
         if enabled:
-            self.update_drivers("Anonymous", cfg.api["player_index"], False)
+            self.update_drivers(selected_slot=cfg.api["player_index"])
         else:
             self.listbox_spectate.clear()
-            self.label_spectating.setText("Spectating: <b>Disabled</b>")
+            self.last_total_vehicles = 0
+            self.reload_data_module("")
 
         # Update button state only if changed
         if self.last_enabled != enabled:
             self.last_enabled = enabled
             self.set_enable_state(enabled)
+
+    def timerEvent(self, event):
+        """Update when data not paused"""
+        if not realtime_state.paused:
+            total_vehicles = api.read.vehicle.total_vehicles()
+            driver_name = api.read.vehicle.driver_name()
+            if not driver_name:
+                driver_name = self._driver_none
+            if (
+                self.last_driver_name != driver_name
+                or self.last_total_vehicles != total_vehicles
+            ):
+                self.last_total_vehicles = total_vehicles
+                self.update_drivers(selected_slot=cfg.api["player_index"])
+                logger.info("Spectating: driver list updated")
+
+    def reload_data_module(self, driver_name: str):
+        """Reload data recording module if driver changed"""
+        if self.last_driver_name == driver_name:
+            return
+
+        self.last_driver_name = driver_name
+        self.label_spectating.setText(f"Spectating: <b>{driver_name}</b>")
+
+        if realtime_state.active:
+            for module_name in (
+                "module_delta",
+                "module_fuel",
+                "module_mapping",
+                "module_sectors",
+                "module_stint",
+            ):
+                mctrl.reload(module_name)
 
     def set_enable_state(self, enabled: bool):
         """Set enable state"""
@@ -106,8 +149,11 @@ class SpectateList(QWidget):
         self.button_refresh.setDisabled(not enabled)
         self.label_spectating.setDisabled(not enabled)
         if enabled:
+            self._update_timer.start(200, self)
             logger.info("ENABLED: spectate mode")
         else:
+            self._update_timer.stop()
+            self.label_spectating.setText("Spectating: <b>Disabled</b>")
             logger.info("DISABLED: spectate mode")
 
     def toggle_spectate(self, checked: bool):
@@ -119,30 +165,32 @@ class SpectateList(QWidget):
 
     def spectate_selected(self):
         """Spectate selected player"""
-        self.update_drivers(self.selected_name(), -1, True)
+        self.update_drivers(selected_name=self.selected_name())
 
-    def update_drivers(self, selected_driver_name: str, selected_index: int, match_name: bool):
+    def update_drivers(self, selected_slot: int = -1, selected_name: str = ""):
         """Update drivers list"""
         listbox = self.listbox_spectate
         driver_list = []
 
         for driver_index in range(api.read.vehicle.total_vehicles()):
             driver_name = api.read.vehicle.driver_name(driver_index)
+            driver_slot = api.read.vehicle.slot_id(driver_index)
             driver_list.append(driver_name)
-            if match_name:
-                if driver_name == selected_driver_name:
-                    selected_index = driver_index
-            else:  # match index
-                if driver_index == selected_index:
-                    selected_driver_name = driver_name
+            if selected_slot != -1:  # match slot
+                if selected_slot == driver_slot:
+                    selected_name = driver_name
+            elif selected_name:  # match name
+                if driver_name == selected_name:
+                    selected_slot = driver_slot
 
         driver_list.sort(key=str.lower)
         listbox.clear()
-        listbox.addItem("Anonymous")
+        listbox.addItem(self._driver_none)
         listbox.addItems(driver_list)
 
-        self.focus_on_selected(selected_driver_name)
-        self.save_selected_index(selected_index)
+        self.focus_on_selected(selected_name)
+        self.save_selected_index(selected_slot)
+        self.reload_data_module(self.selected_name())
 
     def focus_on_selected(self, driver_name: str):
         """Focus on selected driver row"""
@@ -153,13 +201,11 @@ class SpectateList(QWidget):
         else:  # fallback to 0 if name not found
             row_index = 0
         listbox.setCurrentRow(row_index)
-        # Make sure selected name valid
-        self.label_spectating.setText(f"Spectating: <b>{self.selected_name()}</b>")
 
     def selected_name(self) -> str:
         """Selected driver name"""
         selected_item = self.listbox_spectate.currentItem()
-        return "Anonymous" if selected_item is None else selected_item.text()
+        return self._driver_none if selected_item is None else selected_item.text()
 
     @staticmethod
     def save_selected_index(index: int):
