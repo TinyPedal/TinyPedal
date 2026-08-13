@@ -44,6 +44,7 @@ GLOBAL_DEFAULT = {
         "snap_gap": 0,
         "grid_move_size": 8,
         "minimum_update_interval": 10,
+        "maximum_loading_attempts": 5,
         "maximum_saving_attempts": 10,
         "position_x": 0,
         "position_y": 0,

@@ -41,7 +41,6 @@ else:  # run time only
 from pyLMUSharedMemory import lmu_enum
 from pyLMUSharedMemory.lmu_mmap import (
     INVALID_INDEX,
-    MAX_VEHICLES,
     LMUConstants,
     MMapControl,
 )

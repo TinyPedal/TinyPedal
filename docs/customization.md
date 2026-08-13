@@ -675,8 +675,17 @@ Set grid size for grid move, value in pixel. Default is `8` pixel. Minimum value
     minimum_update_interval
 Set minimum refresh rate limit for widget and module in milliseconds. This option is used for preventing extremely low refresh rate that may cause performance issues in case user incorrectly sets `update_interval` and `idle_update_interval` values. Default value is `10`, and should not be modified.
 
+    maximum_loading_attempts
+Set maximum retry attempts for preset loading. Default value is `5`. Minimum value is limited to `1` maximum attempt.
+
+Note, each attempt has a roughly 50ms delay. If all loading attempts failed, a backup copy will be created in `settings` folder, and preset will be reset to default. See [How to restore your preset from backups](#how-to-restore-your-preset-from-backups) for details.
+
+This option does not affect global config preset, which always has `5` maximum loading attempts.
+
     maximum_saving_attempts
-Set maximum retry attempts for preset saving. Default value is `10`. Minimum value is limited to `3` maximum attempts. Note, each attempt has a roughly 50ms delay. If all saving attempts failed, saving will be aborted, and old preset file will be restored to avoid preset file corruption.
+Set maximum retry attempts for preset saving. Default value is `10`. Minimum value is limited to `3` maximum attempts.
+
+Note, each attempt has a roughly 50ms delay. If all saving attempts failed, saving will be aborted, and old preset file will be restored to avoid preset file corruption.
 
     position_x, position_y
 Define main window position on screen in pixels. Those values will be auto updated and saved while `remember_position` option is enabled.

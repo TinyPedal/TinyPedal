@@ -115,6 +115,7 @@ CFG_INTEGER = (
     "^lap_time_history_count$|"
     "^leading_zero$|"
     "^manual_steering_range$|"
+    "^maximum_loading_attempts$|"
     "^maximum_saving_attempts$|"
     "^player_index$|"
     "^parts_width$|"

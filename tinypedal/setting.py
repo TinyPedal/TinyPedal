@@ -296,6 +296,7 @@ class Setting:
 
     def load_user(self):
         """Load user settings, should be called after loaded global setting"""
+        loading_attempts = self.max_loading_attempts
         # Load preset JSON file
         if self._setting_to_load != "":
             filename_setting_temp = self._setting_to_load
@@ -306,6 +307,7 @@ class Setting:
             filename=filename_setting_temp,
             filepath=self.path.settings,
             dict_def=self.default.setting,
+            max_attempts=loading_attempts,
         )
         self.filename.setting = filename_setting_temp
         # Load style JSON file
@@ -314,35 +316,41 @@ class Setting:
             filepath=self.path.settings,
             dict_def=self.default.brakes,
             validator=StyleValidator.brakes,
+            max_attempts=loading_attempts,
         )
         self.user.brands = load_style_json_file(
             filename=self.filename.brands,
             filepath=self.path.settings,
             dict_def=self.default.brands,
+            max_attempts=loading_attempts,
         )
         self.user.classes = load_style_json_file(
             filename=self.filename.classes,
             filepath=self.path.settings,
             dict_def=self.default.classes,
             validator=StyleValidator.classes,
+            max_attempts=loading_attempts,
         )
         self.user.compounds = load_style_json_file(
             filename=self.filename.compounds,
             filepath=self.path.settings,
             dict_def=self.default.compounds,
             validator=StyleValidator.compounds,
+            max_attempts=loading_attempts,
         )
         self.user.heatmap = load_style_json_file(
             filename=self.filename.heatmap,
             filepath=self.path.settings,
             dict_def=self.default.heatmap,
             validator=StyleValidator.heatmap,
+            max_attempts=loading_attempts,
         )
         self.user.tracks = load_style_json_file(
             filename=self.filename.tracks,
             filepath=self.path.settings,
             dict_def=self.default.tracks,
             validator=StyleValidator.tracks,
+            max_attempts=loading_attempts,
         )
 
     @property
@@ -487,6 +495,11 @@ class Setting:
     def max_saving_attempts(self) -> int:
         """Get max saving attempts"""
         return max(self.application["maximum_saving_attempts"], 3)
+
+    @property
+    def max_loading_attempts(self) -> int:
+        """Get max loading attempts"""
+        return max(self.application["maximum_loading_attempts"], 1)
 
 
 # Assign config setting

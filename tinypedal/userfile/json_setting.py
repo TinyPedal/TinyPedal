@@ -58,19 +58,28 @@ def copy_setting(dict_user: dict) -> dict:
 
 def load_setting_json_file(
     filename: str, filepath: str, dict_def: dict, file_info: str = "user preset",
-    validator: Callable[[dict, dict], dict] = PresetValidator.user_preset,
+    validator: Callable[[dict, dict], dict] = PresetValidator.user_preset, max_attempts: int = 5,
 ) -> dict:
     """Load setting json file & verify"""
     filename_source = f"{filepath}{filename}"
-    try:
-        with open(filename_source, "r", encoding="utf-8") as jsonfile:
-            setting_user = json.load(jsonfile)
-        # Verify & assign setting
-        setting_user = validator(setting_user, dict_def)
-    except FileNotFoundError:
-        logger.info("USERDATA: %s not found, fall back to default", filename)
-        setting_user = copy_setting(dict_def)
-    except (AttributeError, IndexError, KeyError, TypeError, ValueError, OSError):
+    # Start loading attempts
+    attempts = max_attempts
+    while attempts > 0:
+        try:
+            with open(filename_source, "r", encoding="utf-8") as jsonfile:
+                setting_user = json.load(jsonfile)
+            # Verify & assign setting
+            setting_user = validator(setting_user, dict_def)
+            break
+        except FileNotFoundError:
+            logger.info("USERDATA: %s not found, fall back to default", filename)
+            setting_user = copy_setting(dict_def)
+            break
+        except (AttributeError, IndexError, KeyError, TypeError, ValueError, OSError):
+            attempts -= 1
+            logger.error("USERDATA: %s failed loading, %s attempt(s) left", filename, attempts)
+            sleep(0.05)
+    else:
         logger.error("USERDATA: %s failed loading, fall back to default", filename)
         create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
         setting_user = copy_setting(dict_def)
@@ -81,24 +90,33 @@ def load_setting_json_file(
 
 def load_style_json_file(
     filename: str, filepath: str, dict_def: dict, file_info: str = "style preset",
-    validator: Callable[[dict], bool] | None = None,
+    validator: Callable[[dict], bool] | None = None, max_attempts: int = 5,
 ) -> dict:
     """Load style json file & verify (optional)"""
     filename_source = f"{filepath}{filename}"
     msg_text = "loaded"
-    try:
-        with open(filename_source, "r", encoding="utf-8") as jsonfile:
-            style_user = json.load(jsonfile)
-        # Whether to validate style
-        if validator is not None:
-            if validator(style_user):
-                create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
-                msg_text = "updated"
-    except FileNotFoundError:
-        logger.info("USERDATA: %s not found, fall back to default", filename)
-        style_user = copy_setting(dict_def)
-        msg_text = "updated"
-    except (AttributeError, IndexError, KeyError, TypeError, ValueError, OSError):
+    # Start loading attempts
+    attempts = max_attempts
+    while attempts > 0:
+        try:
+            with open(filename_source, "r", encoding="utf-8") as jsonfile:
+                style_user = json.load(jsonfile)
+            # Whether to validate style
+            if validator is not None:
+                if validator(style_user):
+                    create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
+                    msg_text = "updated"
+            break
+        except FileNotFoundError:
+            logger.info("USERDATA: %s not found, fall back to default", filename)
+            style_user = copy_setting(dict_def)
+            msg_text = "updated"
+            break
+        except (AttributeError, IndexError, KeyError, TypeError, ValueError, OSError):
+            attempts -= 1
+            logger.error("USERDATA: %s failed loading, %s attempt(s) left", filename, attempts)
+            sleep(0.05)
+    else:
         logger.error("USERDATA: %s failed loading, fall back to default", filename)
         create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
         style_user = copy_setting(dict_def)

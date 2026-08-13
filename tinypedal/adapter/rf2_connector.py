@@ -39,7 +39,6 @@ else:  # run time only
 
 from pyRfactor2SharedMemory.rF2MMap import (
     INVALID_INDEX,
-    MAX_VEHICLES,
     MMapControl,
     rFactor2Constants,
 )
@@ -69,7 +68,7 @@ def local_scoring_index(scor_veh: Sequence[rF2data.rF2VehicleScoring]) -> int:
     return INVALID_INDEX
 
 
-def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[lmu_data.LMUVehicleScoring]) -> int:
+def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[rF2data.LMUVehicleScoring]) -> int:
     """Find local player scoring index by slot id
 
     Args:
