@@ -76,9 +76,9 @@ def load_setting_json_file(
             setting_user = copy_setting(dict_def)
             break
         except (AttributeError, IndexError, KeyError, TypeError, ValueError, OSError):
-            attempts -= 1
-            logger.error("USERDATA: %s failed loading, %s attempt(s) left", filename, attempts)
-            sleep(0.05)
+            logger.error("USERDATA: %s failed loading, %s attempt(s) left", filename, attempts - 1, exc_info=(attempts <= 1))
+        attempts -= 1
+        sleep(0.05)
     else:
         logger.error("USERDATA: %s failed loading, fall back to default", filename)
         create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
@@ -113,9 +113,9 @@ def load_style_json_file(
             msg_text = "updated"
             break
         except (AttributeError, IndexError, KeyError, TypeError, ValueError, OSError):
-            attempts -= 1
-            logger.error("USERDATA: %s failed loading, %s attempt(s) left", filename, attempts)
-            sleep(0.05)
+            logger.error("USERDATA: %s failed loading, %s attempt(s) left", filename, attempts - 1, exc_info=(attempts <= 1))
+        attempts -= 1
+        sleep(0.05)
     else:
         logger.error("USERDATA: %s failed loading, fall back to default", filename)
         create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)

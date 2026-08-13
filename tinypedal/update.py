@@ -138,7 +138,7 @@ class UpdateChecker:
             return "Unable To Find Updates"
         if not self._update_available:
             return "No Updates Available"
-        return "New Updates: v{0}.{1}.{2} ({3}-{4}-{5})".format(
+        return "New Updates: v{}.{}.{} ({}-{}-{})".format(
             *self._last_checked_version,
             *self._last_checked_date,
         )
