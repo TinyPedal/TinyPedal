@@ -1,0 +1,13 @@
+post_install() {
+    cat <<'EOF'
+TinyPedal LMU plugin (rF2SharedMemoryMapPlugin_Wine)
+
+If you use Le Mans Ultimate, you can install the plugin manually from:
+  https://github.com/schlegp/rF2SharedMemoryMapPlugin_Wine/tree/master/build
+
+Copy the DLL into your Steam game install:
+  ~/.steam/steam/steamapps/common/Le Mans Ultimate/Plugins/
+
+If your Steam library is elsewhere, adjust the path accordingly.
+EOF
+}
