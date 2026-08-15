@@ -1,13 +1,16 @@
 # ignore list
 
+/dist/
+__pycache__/
+
+# User data folder
 /brandlogo/
 /deltabest/
-/dist/
-/dist/TinyPedal/
 /settings/
 /trackmap/
-
-__pycache__/
+/pacenotes/
+/tracknotes/
+/carsetups/
 
 # pipenv stuff
 Pipfile
