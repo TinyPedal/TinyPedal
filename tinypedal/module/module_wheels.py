@@ -697,9 +697,24 @@ def calc_vehicle_weight(output: WheelsInfo, g_accel: float, unsprung_weight: flo
         else:
             total_dynamic_weight = 0.0
 
+        # Weight distribution
+        load_fl, load_fr, load_rl, load_rr = load_tyre
+        total_load = load_fl + load_fr + load_rl + load_rr
+        if total_load <= 0:  # use suspension load if tyre load data not avaiable
+            load_fl, load_fr, load_rl, load_rr = load_susp
+            total_load = load_fl + load_fr + load_rl + load_rr
+
+        front_ratio = calc.part_to_whole_ratio((load_fl + load_fr), total_load)
+        left_ratio = calc.part_to_whole_ratio((load_fl + load_rl), total_load)
+        cross_ratio = calc.part_to_whole_ratio((load_fr + load_rl), total_load)
+
+        # Output
         output.minimumStaticWeight = min_static_weight
         output.totalStaticWeight = total_static_weight
         output.totalDynamicWeight = total_dynamic_weight
+        output.frontWeightRatio = front_ratio
+        output.leftWeightRatio = left_ratio
+        output.crossWeightRatio = cross_ratio
 
 
 @generator_init

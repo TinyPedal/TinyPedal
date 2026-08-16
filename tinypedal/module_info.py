@@ -926,6 +926,9 @@ class WheelsInfo:
         "minimumStaticWeight",
         "totalStaticWeight",
         "totalDynamicWeight",
+        "frontWeightRatio",
+        "leftWeightRatio",
+        "crossWeightRatio",
     )
 
     def __init__(self):
@@ -955,6 +958,9 @@ class WheelsInfo:
         self.minimumStaticWeight: float = 0.0
         self.totalStaticWeight: float = 0.0
         self.totalDynamicWeight: float = 0.0
+        self.frontWeightRatio: float = 0.0
+        self.leftWeightRatio: float = 0.0
+        self.crossWeightRatio: float = 0.0
 
 
 class ModuleInfo:

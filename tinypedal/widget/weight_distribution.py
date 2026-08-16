@@ -23,7 +23,7 @@ Weight distribution Widget
 from functools import partial
 
 from .. import calculation as calc
-from ..api_control import api
+from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -121,27 +121,19 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        load_fl, load_fr, load_rl, load_rr = api.read.tyre.load()
-        total_load = load_fl + load_fr + load_rl + load_rr
-
-        # Fallback to suspension load if tyre load data not avaiable
-        if total_load <= 0:
-            load_fl, load_fr, load_rl, load_rr = api.read.wheel.suspension_force()
-            total_load = load_fl + load_fr + load_rl + load_rr
-
         # Front to rear distribution
         if self.wcfg["show_front_to_rear_distribution"]:
-            ema_distf = self.calc_ema_ratio(self.bar_distf.last, calc.part_to_whole_ratio((load_fl + load_fr), total_load))
-            self.update_dist(self.bar_distf, ema_distf, self.prefix_distf)
+            ema_front = self.calc_ema_ratio(self.bar_distf.last, minfo.wheels.frontWeightRatio)
+            self.update_dist(self.bar_distf, ema_front, self.prefix_distf)
 
         # Left to right distribution
         if self.wcfg["show_left_to_right_distribution"]:
-            ema_distl = self.calc_ema_ratio(self.bar_distl.last, calc.part_to_whole_ratio((load_fl + load_rl), total_load))
-            self.update_dist(self.bar_distl, ema_distl, self.prefix_distl)
+            ema_left = self.calc_ema_ratio(self.bar_distl.last, minfo.wheels.leftWeightRatio)
+            self.update_dist(self.bar_distl, ema_left, self.prefix_distl)
 
         # Cross weight
         if self.wcfg["show_cross_weight"]:
-            ema_cross = self.calc_ema_ratio(self.bar_cross.last, calc.part_to_whole_ratio((load_fr + load_rl), total_load))
+            ema_cross = self.calc_ema_ratio(self.bar_cross.last, minfo.wheels.crossWeightRatio)
             self.update_dist(self.bar_cross, ema_cross, self.prefix_cross)
 
     # GUI update methods
