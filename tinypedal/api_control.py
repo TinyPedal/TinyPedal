@@ -31,21 +31,21 @@ logger = logging.getLogger(__name__)
 
 
 def _set_available_api(enable_legacy: bool):
-    """Set available API for specific platform"""
+    """Set available API"""
     if PLATFORM.WINDOWS:
         available_api = (
-            (api_connector.SimLMU, False),  # API, is legacy
-            (api_connector.SimLMULegacy, not enable_legacy),
-            (api_connector.SimRF2, False),
+            api_connector.SimLMU,
+            api_connector.SimLMULegacy,
+            api_connector.SimRF2,
         )
     else:
         available_api = (
-            (api_connector.SimLMU, False),  # API, is legacy
-            (api_connector.SimLMULegacy, not enable_legacy),
-            (api_connector.SimRF2, False),
+            api_connector.SimLMU,
+            api_connector.SimLMULegacy,
+            api_connector.SimRF2,
         )
     # Sort API by name
-    api_gen = (_api for _api, _legacy in available_api if not _legacy)
+    api_gen = (_api for _api in available_api if not _api.LEGACY or enable_legacy)
     return tuple(sorted(api_gen, key=lambda _api:_api.NAME))
 
 
@@ -73,16 +73,18 @@ class APIControl:
         Args:
             name: API full name
         """
+        if not name:
+            name = cfg.api_name
+
         enable_legacy = cfg.telemetry["enable_legacy_api_selection"]
         if not self._available_api or self._enable_legacy != enable_legacy:
             self._enable_legacy = enable_legacy
             self._available_api = _set_available_api(enable_legacy)
+            self._same_api_loaded = False
+        else:
+            # Do not create new instance if same API already loaded
+            self._same_api_loaded = bool(self._api is not None and self._api.NAME == name)
 
-        if not name:
-            name = cfg.api_name
-
-        # Do not create new instance if same API already loaded
-        self._same_api_loaded = bool(self._api is not None and self._api.NAME == name)
         if self._same_api_loaded:
             logger.info("CONNECTING: same API detected, fast restarting")
             return

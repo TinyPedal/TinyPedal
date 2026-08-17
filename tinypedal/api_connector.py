@@ -76,6 +76,7 @@ class SimLMU(Connector):
         "_restapi_dataset",
     )
     NAME = API_LMU_NAME
+    LEGACY = False
 
     def __init__(self):
         self._shmmapi = lmu_connector.LMUInfo()
@@ -129,6 +130,7 @@ class SimRF2(Connector):
         "_restapi_dataset",
     )
     NAME = API_RF2_NAME
+    LEGACY = False
 
     def __init__(self):
         self._shmmapi = rf2_connector.RF2Info()
@@ -184,6 +186,7 @@ class SimLMULegacy(SimRF2):
         "_restapi_dataset",
     )
     NAME = API_LMULEGACY_NAME
+    LEGACY = True
 
     def __init__(self):
         self._shmmapi = rf2_connector.RF2Info()

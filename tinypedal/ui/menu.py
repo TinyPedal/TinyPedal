@@ -429,8 +429,13 @@ class APIMenu(QMenu):
     def __init__(self, title, parent):
         super().__init__(title, parent)
         self._parent = parent
+        self.reset_menu()
+        self.aboutToShow.connect(self.refresh_menu)
 
-        # API selector
+    def reset_menu(self):
+        """Reset menu"""
+        self.clear()
+
         self.actions_api = self.__api_selector()
         self.addSeparator()
 
@@ -452,8 +457,6 @@ class APIMenu(QMenu):
 
         restart_api = self.addAction("Restart API")
         restart_api.triggered.connect(menu_restart_api)
-
-        self.aboutToShow.connect(self.refresh_menu)
 
     def refresh_menu(self):
         """Refresh menu"""
@@ -483,23 +486,10 @@ class APIMenu(QMenu):
     def toggle_legacy_api(self):
         """Toggle legacy API selection"""
         enabled = cfg.telemetry["enable_legacy_api_selection"]
-        if enabled:
-            state = "Disable"
-        else:
-            state = "Enable"
-        msg_text = (
-            f"{state} <b>Legacy API</b> selection and restart <b>TinyPedal</b>?"
-        )
-        restart_msg = QMessageBox.question(
-            self._parent, "Legacy API", msg_text,
-            buttons=QMessageBox.Yes | QMessageBox.No,
-            defaultButton=QMessageBox.No,
-        )
-        if restart_msg != QMessageBox.Yes:
-            return
         cfg.telemetry["enable_legacy_api_selection"] = not enabled
         cfg.save(config_type=ConfigType.CONFIG)
-        loader.restart()
+        menu_restart_api()
+        self.reset_menu()
 
     def open_config_api(self):
         """Config API"""
