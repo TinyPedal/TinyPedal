@@ -30,9 +30,8 @@ from .setting import cfg
 logger = logging.getLogger(__name__)
 
 
-def _set_available_api():
+def _set_available_api(enable_legacy: bool):
     """Set available API for specific platform"""
-    enable_legacy = cfg.telemetry["enable_legacy_api_selection"]
     if PLATFORM.WINDOWS:
         available_api = (
             (api_connector.SimLMU, False),  # API, is legacy
@@ -47,7 +46,7 @@ def _set_available_api():
         )
     # Sort API by name
     api_gen = (_api for _api, _legacy in available_api if not _legacy)
-    return tuple(sorted(api_gen, key=lambda cls:cls.NAME))
+    return tuple(sorted(api_gen, key=lambda _api:_api.NAME))
 
 
 class APIControl:
@@ -56,13 +55,15 @@ class APIControl:
     __slots__ = (
         "_api",
         "_available_api",
+        "_enable_legacy",
         "_same_api_loaded",
         "read",
     )
 
     def __init__(self):
         self._api = None
-        self._available_api = _set_available_api()
+        self._available_api = ()
+        self._enable_legacy = False
         self._same_api_loaded = False
         self.read = None
 
@@ -72,6 +73,11 @@ class APIControl:
         Args:
             name: API full name
         """
+        enable_legacy = cfg.telemetry["enable_legacy_api_selection"]
+        if not self._available_api or self._enable_legacy != enable_legacy:
+            self._enable_legacy = enable_legacy
+            self._available_api = _set_available_api(enable_legacy)
+
         if not name:
             name = cfg.api_name
 

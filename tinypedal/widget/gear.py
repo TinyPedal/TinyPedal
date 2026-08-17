@@ -23,7 +23,7 @@ Gear Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import TEXT_NA
+from ..const_common import GEAR_SEQUENCE, TEXT_NA
 from ..module_info import minfo
 from ._base import Overlay
 from ._painter import GearGaugeBar, ProgressBar
@@ -277,7 +277,7 @@ class Realtime(Overlay):
             target.last = gauge_state
             color_index = self.color_rpm(rpm, gear, speed)
             target.update_input(
-                gear,
+                GEAR_SEQUENCE(gear, "N"),
                 self.unit_speed(speed),
                 color_index,
                 self.gauge_color[color_index],

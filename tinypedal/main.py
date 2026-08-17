@@ -31,11 +31,7 @@ from PySide2.QtGui import QFont, QGuiApplication, QIcon, QPixmapCache
 from PySide2.QtWidgets import QApplication, QMessageBox
 
 from . import realtime_state, version_check
-from .const_app import (
-    APP_NAME,
-    PLATFORM,
-    VERSION,
-)
+from .const_app import APP_NAME, PLATFORM, VERSION
 from .const_file import ConfigType, ImageFile, LogFile
 from .log_handler import set_logging_level
 from .setting import cfg

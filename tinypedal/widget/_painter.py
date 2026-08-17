@@ -28,8 +28,6 @@ from PySide2.QtCore import QRectF, Qt
 from PySide2.QtGui import QFont, QPainter, QPen, QPixmap
 from PySide2.QtWidgets import QWidget
 
-from ..const_common import GEAR_SEQUENCE
-
 
 class WheelGaugeBar(QWidget):
     """Wheel gauge bar"""
@@ -347,9 +345,9 @@ class GearGaugeBar(QWidget):
         self.pen.setColor(fg_color)
         self.setFixedSize(width, height)
 
-    def update_input(self, gear: int, speed: int, color_index: int, bg_color: str):
+    def update_input(self, gear: str, speed: int, color_index: int, bg_color: str):
         """Update input"""
-        self.gear = GEAR_SEQUENCE(gear, "N")
+        self.gear = gear
         self.speed = speed
         self.color_index = color_index
         self.bg_color = bg_color

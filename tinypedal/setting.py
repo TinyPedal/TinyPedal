@@ -35,23 +35,6 @@ from .const_app import APP_NAME
 from .const_common import EMPTY_DICT
 from .const_file import ConfigType, FileExt
 from .setting_validator import PresetValidator, StyleValidator
-from .template.setting_api import API_DEFAULT
-from .template.setting_brakes import BRAKES_DEFAULT
-from .template.setting_classes import CLASSES_DEFAULT
-from .template.setting_common import COMMON_DEFAULT
-from .template.setting_compounds import COMPOUNDS_DEFAULT
-from .template.setting_filelock import FILELOCK_DEFAULT
-from .template.setting_global import GLOBAL_DEFAULT
-from .template.setting_heatmap import HEATMAP_DEFAULT
-from .template.setting_module import MODULE_DEFAULT
-from .template.setting_shortcuts import (
-    SHORTCUTS_GENERAL,
-    SHORTCUTS_MODULE,
-    SHORTCUTS_PRESET,
-    SHORTCUTS_WIDGET,
-)
-from .template.setting_tracks import TRACKS_DEFAULT
-from .template.setting_widget import WIDGET_DEFAULT
 from .userfile import set_global_config_path, set_user_data_path
 from .userfile.json_setting import (
     copy_setting,
@@ -156,9 +139,28 @@ class Preset:
         "tracks",
     )
 
-    def __init__(self, default: bool = False):
-        if not default:
+    def set_default(self):
+        """Set default setting (one time only)"""
+        if hasattr(self, "config"):
             return
+        from .template.setting_api import API_DEFAULT
+        from .template.setting_brakes import BRAKES_DEFAULT
+        from .template.setting_classes import CLASSES_DEFAULT
+        from .template.setting_common import COMMON_DEFAULT
+        from .template.setting_compounds import COMPOUNDS_DEFAULT
+        from .template.setting_filelock import FILELOCK_DEFAULT
+        from .template.setting_global import GLOBAL_DEFAULT
+        from .template.setting_heatmap import HEATMAP_DEFAULT
+        from .template.setting_module import MODULE_DEFAULT
+        from .template.setting_shortcuts import (
+            SHORTCUTS_GENERAL,
+            SHORTCUTS_MODULE,
+            SHORTCUTS_PRESET,
+            SHORTCUTS_WIDGET,
+        )
+        from .template.setting_tracks import TRACKS_DEFAULT
+        from .template.setting_widget import WIDGET_DEFAULT
+
         # Global preset
         self.config = MappingProxyType(GLOBAL_DEFAULT)
         self.filelock = MappingProxyType(FILELOCK_DEFAULT)
@@ -198,7 +200,7 @@ class Setting:
         self.version_update = 0
         # Settings
         self.filename = FileName()
-        self.default = Preset(default=True)
+        self.default = Preset()
         self.user = Preset()
         self.path = FilePath()
 
@@ -255,6 +257,9 @@ class Setting:
 
     def load_global(self):
         """Load global setting, should only done once per launch"""
+        # Delayed init
+        self.default.set_default()
+        # Load setting
         self.user.config = load_setting_json_file(
             filename=self.filename.config,
             filepath=self.path.config,
