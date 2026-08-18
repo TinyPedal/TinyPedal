@@ -3,6 +3,9 @@ WIP
 * Preset
   - Added "maximum_loading_attempts" option in global user config preset, which sets maximum retry attempts for preset loading. This option is useful in case failed to load a "good" preset for some reasons. See User Guide for details.
 
+* Wheel toe Widget
+  - Show color indication for positive or negative total toe angle.
+
 2.49.4 (2026-08-12)
 -----------------------------
 * Brake temperature Widget

@@ -101,13 +101,17 @@ class Realtime(Overlay):
 
         # Total toe angle
         if self.wcfg["show_total_toe_angle"]:
+            self.bar_style_total = (
+                self.wcfg["font_color_total_toe_angle_negative"],
+                self.wcfg["font_color_total_toe_angle_positive"],
+            )
             self.decimals_total = max(self.wcfg["decimal_places_total_toe_angle"], 1)
             self.bars_total = self.set_rawtext(
                 text=TEXT_NA,
                 width=font_m.width * (2 + self.decimals_total) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_total_toe_angle"],
+                fg_color=self.bar_style_total[0],
                 bg_color=self.wcfg["background_color_total_toe_angle"],
                 count=2,
                 last=0,
@@ -146,4 +150,5 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = f"{calc.rad2deg(abs(data)):.{self.decimals_total + 1}f}"[:2 + self.decimals_total]
+            target.fg = self.bar_style_total[data > 0]
             target.update()
