@@ -54,6 +54,7 @@ SHORTCUTS_GENERAL = generate_shortcut_setting(
     (
         "overlay_visibility",
         "overlay_lock",
+        "overlay_auto_hide",
         "vr_compatibility",
         "restart_api",
         "select_next_api",

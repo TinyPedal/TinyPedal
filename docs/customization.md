@@ -950,6 +950,9 @@ Show or hide overlay.
     overlay_lock
 Lock or unlock overlay.
 
+    overlay_auto_hide
+Enable or disable overlay auto hide function.
+
     vr_compatibility
 Enable or disable VR Compatibility.
 

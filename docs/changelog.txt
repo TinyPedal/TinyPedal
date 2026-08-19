@@ -7,6 +7,9 @@ WIP
 * Wheel toe Widget
   - Show color indication for positive or negative total toe angle.
 
+* Hotkey Tab
+  - Added "Overlay Auto Hide" keybinding for enabling or disabling overlay auto hide function.
+
 2.49.4 (2026-08-12)
 -----------------------------
 * Brake temperature Widget

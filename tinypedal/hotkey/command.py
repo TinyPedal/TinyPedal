@@ -64,6 +64,12 @@ def hotkey_overlay_lock():
     overlay_signal.locked.emit(cfg.overlay["fixed_position"])
 
 
+def hotkey_overlay_auto_hide():
+    """Command - overlay auto hide"""
+    cfg.overlay["auto_hide"] = not cfg.overlay["auto_hide"]
+    cfg.save()
+
+
 def hotkey_vr_compatibility():
     """Command - vr compatibility"""
     cfg.overlay["vr_compatibility"] = not cfg.overlay["vr_compatibility"]
@@ -243,6 +249,7 @@ def hotkey_cycle_deltabest_source():
 COMMANDS_GENERAL = (
     ("overlay_visibility", hotkey_overlay_visibility),
     ("overlay_lock", hotkey_overlay_lock),
+    ("overlay_auto_hide", hotkey_overlay_auto_hide),
     ("vr_compatibility", hotkey_vr_compatibility),
     ("restart_api", hotkey_restart_api),
     ("select_next_api", hotkey_select_next_api),
