@@ -21,15 +21,12 @@ Preset list view
 """
 
 import os
-import shutil
 
 from PySide2.QtCore import QPoint, Qt, Slot
 from PySide2.QtWidgets import (
     QCheckBox,
-    QDialogButtonBox,
     QHBoxLayout,
     QLabel,
-    QLineEdit,
     QListWidget,
     QListWidgetItem,
     QMenu,
@@ -42,12 +39,9 @@ from PySide2.QtWidgets import (
 from .. import app_signal
 from ..const_app import VERSION
 from ..const_file import ConfigType, FileExt
-from ..formatter import strip_filename_extension
 from ..setting import cfg
-from ..template.setting_shortcuts import SHORTCUTS_PRESET
-from ..validator import is_allowed_filename
-from ._common import QVAL_FILENAME, BaseDialog, UIScaler
-from .preset_transfer import PresetTransfer
+from ._common import UIScaler
+from .preset_management import CreatePreset, PresetTransfer, RestoreBackup
 
 
 class PresetList(QWidget):
@@ -65,7 +59,10 @@ class PresetList(QWidget):
         button_transfer = QPushButton("Transfer")
         button_transfer.clicked.connect(self.open_preset_transfer)
 
-        button_create = QPushButton("New Preset")
+        button_restore = QPushButton("Restore")
+        button_restore.clicked.connect(self.open_restore_backup)
+
+        button_create = QPushButton("New")
         button_create.clicked.connect(self.open_create_preset)
 
         # Check box
@@ -83,7 +80,9 @@ class PresetList(QWidget):
         layout_button = QHBoxLayout()
         layout_button.addWidget(button_refresh)
         layout_button.addWidget(button_transfer)
+        layout_button.addWidget(button_restore)
         layout_button.addStretch(1)
+        layout_button.addSpacing(20)
         layout_button.addWidget(button_create)
 
         # Layout
@@ -118,13 +117,9 @@ class PresetList(QWidget):
 
     def load_preset(self):
         """Load selected preset"""
-        selected_index = self.listbox_preset.currentRow()
-        if selected_index >= 0:
-            selected_preset_name = self.listbox_preset.item(selected_index).text()
-            cfg.set_next_to_load(f"{selected_preset_name}{FileExt.JSON}")
-            app_signal.reload.emit(True)
-        else:
-            QMessageBox.warning(self, "Error", "No preset selected.")
+        selected_preset_name = self.listbox_preset.currentItem().text()
+        cfg.set_next_to_load(f"{selected_preset_name}{FileExt.JSON}")
+        app_signal.reload.emit(True)
 
     def open_create_preset(self):
         """Create new preset"""
@@ -134,6 +129,11 @@ class PresetList(QWidget):
     def open_preset_transfer(self):
         """Transfer preset"""
         _dialog = PresetTransfer(self)
+        _dialog.open()
+
+    def open_restore_backup(self):
+        """Restore backup"""
+        _dialog = RestoreBackup(self)
         _dialog.open()
 
     @staticmethod
@@ -222,8 +222,9 @@ class PresetList(QWidget):
                 "This cannot be undone!"
             )
             if self.confirm_operation(title="Delete Preset", message=msg_text):
-                if os.path.exists(f"{cfg.path.settings}{selected_filename}"):
-                    os.remove(f"{cfg.path.settings}{selected_filename}")
+                full_path = f"{cfg.path.settings}{selected_filename}"
+                if os.path.exists(full_path):
+                    os.remove(full_path)
         # Refresh
         app_signal.refresh.emit(True)
 
@@ -235,90 +236,6 @@ class PresetList(QWidget):
             defaultButton=QMessageBox.No,
         )
         return confirm == QMessageBox.Yes
-
-
-class CreatePreset(BaseDialog):
-    """Create preset"""
-
-    def __init__(self, parent, title: str = "", mode: str = "", source_filename: str = ""):
-        """Initialize create preset dialog setting
-
-        Args:
-            title: Dialog title string.
-            mode: Edit mode, either "duplicate", "rename", or "" for new preset.
-            source_filename: Source setting filename.
-        """
-        super().__init__(parent)
-        self.edit_mode = mode
-        self.source_filename = source_filename
-
-        self.setWindowTitle(title)
-
-        # Entry box
-        self.preset_entry = QLineEdit()
-        self.preset_entry.setMaxLength(40)
-        self.preset_entry.setPlaceholderText("Enter a new preset name")
-        self.preset_entry.setValidator(QVAL_FILENAME)
-
-        # Button
-        button_create = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        button_create.accepted.connect(self.create)
-        button_create.rejected.connect(self.reject)
-
-        # Layout
-        layout_main = QVBoxLayout()
-        layout_main.addWidget(self.preset_entry)
-        layout_main.addWidget(button_create)
-        self.setLayout(layout_main)
-        self.setMinimumWidth(UIScaler.size(21))
-        self.setFixedHeight(self.sizeHint().height())
-
-    def create(self):
-        """Create & save new preset"""
-        entered_filename = strip_filename_extension(self.preset_entry.text(), FileExt.JSON)
-        source_filename = self.source_filename
-        filepath = cfg.path.settings
-        # Check invalid file name
-        if not is_allowed_filename(entered_filename):
-            QMessageBox.warning(self, "Error", "Invalid preset name.")
-            return
-        # Check existing preset
-        temp_list = cfg.preset_files()
-        for preset in temp_list:
-            if entered_filename.lower() == preset.lower():
-                QMessageBox.warning(self, "Error", "Preset already exists.")
-                return
-        # Duplicate preset
-        if self.edit_mode == "duplicate":
-            shutil.copy(
-                f"{filepath}{source_filename}",
-                f"{filepath}{entered_filename}{FileExt.JSON}"
-            )
-        # Rename preset
-        elif self.edit_mode == "rename":
-            os.rename(
-                f"{filepath}{source_filename}",
-                f"{filepath}{entered_filename}{FileExt.JSON}"
-            )
-            # Rename matching preset shortcut
-            source_name = source_filename[:-5]
-            for option_name in SHORTCUTS_PRESET:
-                preset_name = cfg.user.shortcuts[option_name]["preset"]
-                if source_name == preset_name:
-                    cfg.user.shortcuts[option_name]["preset"] = entered_filename
-                    cfg.save(config_type=ConfigType.SHORTCUTS)
-            # Reload if renamed file was loaded
-            if cfg.is_loaded(source_filename):
-                cfg.set_next_to_load(f"{entered_filename}{FileExt.JSON}")
-                app_signal.reload.emit(True)
-                self.accept()
-                return
-        # Create new preset
-        else:
-            cfg.create(f"{entered_filename}{FileExt.JSON}")
-        # Close window
-        app_signal.refresh.emit(True)
-        self.accept()
 
 
 class PresetTagItem(QWidget):

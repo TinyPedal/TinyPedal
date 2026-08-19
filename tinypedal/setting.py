@@ -414,6 +414,29 @@ class Setting:
             return valid_file_list
         return ["default"]
 
+    def backup_files(self, filepath: str, extension: str = FileExt.BACKUP) -> list[str]:
+        """Get backup filename list
+
+        Arguments:
+            filepath: folder to search backup file.
+            extension: file extension for partial matching backup file.
+
+        Returns:
+            Backup filename list.
+        """
+        date_file_list = (
+            (os.path.getmtime(f"{filepath}{_filename}"), _filename)
+            for _filename in os.listdir(filepath)
+            if extension in _filename.lower()
+        )
+        valid_file_list = [
+            _filename[1]
+            for _filename in sorted(date_file_list, reverse=True)
+        ]
+        if valid_file_list:
+            return valid_file_list
+        return []
+
     def create(self, filename: str):
         """Create default setting"""
         save_and_verify_json_file(

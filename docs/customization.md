@@ -32,7 +32,11 @@ All user preset files, by default, are located in `TinyPedal\settings` folder. T
 
 `Double-Click` on a preset name in `Preset` tab to load selected preset.
 
+Click `New` button to create a new default preset.
+
 Click `Transfer` button to transfer settings from currently loaded preset to another preset. See [Preset Transfer](#preset-transfer) section for details.
+
+Click `Restore` button to restore preset from backups. see [Restore Backup](#restore-backup) section for details.
 
 `Right-Click` on a preset name in `Preset` tab opens up a context menu that provides additional preset file management options:
 
@@ -83,7 +87,11 @@ TinyPedal will automatically create backup file with time stamp suffix if old se
 A newer released version will auto-update old setting and add new setting after loading. It may still be a good idea to manually backup files before upgrading to newer version.
 
 ### How to restore your preset from backups
-To restore preset from backups, open `Settings` folder, find any preset file that ended with `backup-XXXX` name in the end of file extension, and rename the file extension to `json`.
+The recommended way to restore your preset is by using [Restore Backup](#restore-backup) dialog, which can be accessed from `Preset` Tab.
+
+You can also restore backups manually via file explorer:
+
+To restore preset from backups, open `Settings` folder in file explorer, find any preset file that ended with `backup-XXXX` name in the end of file extension, and rename the file extension to `json`.
 
 For example, if a backup file named:
 
@@ -102,8 +110,22 @@ Customization can be done through various configuration dialogs and menus from m
 [**`Back to Top`**](#)
 
 
+## Restore Backup
+**Restore backup dialog is used for restoring preset from backups, which can be accessed from Preset Tab**
+
+Note, only valid backup file can be restored.
+
+File that highlighted in red is invalid and cannot be restored.
+
+File that highlighted in blue is style preset, which can only be restored by overwriting existing style preset. A confirmation dialog will be shown before overwriting.
+
+To restore a backup file, select a backup file from list and click `Restore` button, then enter a new name for this restored preset.
+
+To delete a backup file, select a backup file from list and click `Delete` button.
+
+
 ## Preset Transfer
-**Preset transfer dialog is used for transferring settings from one preset to another.**
+**Preset transfer dialog is used for transferring settings from one preset to another, which can be accessed from Preset Tab**
 
 Note, you can only transfer settings from a currently loaded preset to another preset, this is done to ensure one-way transfer.
 

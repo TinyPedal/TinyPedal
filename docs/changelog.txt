@@ -1,7 +1,8 @@
 WIP
 -----------------------------
-* Preset
+* Preset Management
   - Added "maximum_loading_attempts" option in global user config preset, which sets maximum retry attempts for preset loading. This option is useful in case failed to load a "good" preset for some reasons. See User Guide for details.
+  - Added "Restore" button under "Preset" Tab, which opens "Restore Backup" dialog for managing and restoring backups. See "Restore Backup" section in User Guide for details.
 
 * Wheel toe Widget
   - Show color indication for positive or negative total toe angle.

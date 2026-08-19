@@ -17,37 +17,263 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Preset transfer
+Preset management
 """
 
 from __future__ import annotations
 
 import logging
+import os
 import re
+import shutil
 from types import MappingProxyType
 
+from PySide2.QtGui import QColor
 from PySide2.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QDialogButtonBox,
     QFrame,
     QGridLayout,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QListWidget,
     QListWidgetItem,
     QMessageBox,
+    QVBoxLayout,
 )
 
+from .. import app_signal
 from .. import regex_pattern as rxp
-from ..formatter import format_option_name
+from ..const_file import ConfigType, FileExt
+from ..formatter import format_option_name, strip_filename_extension
 from ..setting import cfg, load_setting_json_file, save_and_verify_json_file
-from ._common import (
-    BaseEditor,
-    CompactButton,
-    UIScaler,
-)
+from ..template.setting_shortcuts import SHORTCUTS_PRESET
+from ..userfile.json_setting import verify_json_file
+from ..validator import is_allowed_filename
+from ._common import QVAL_FILENAME, BaseDialog, BaseEditor, CompactButton, UIScaler
 
 logger = logging.getLogger(__name__)
+
+
+class CreatePreset(BaseDialog):
+    """Create preset"""
+
+    def __init__(self, parent, title: str = "", mode: str = "", source_filename: str = ""):
+        """Initialize create preset dialog setting
+
+        Args:
+            title: Dialog title string.
+            mode: Edit mode, either "duplicate", "restore", "rename", or "" for new preset.
+            source_filename: Source setting filename.
+        """
+        super().__init__(parent)
+        self.edit_mode = mode
+        self.source_filename = source_filename
+
+        self.setWindowTitle(title)
+
+        # Entry box
+        self.preset_entry = QLineEdit()
+        self.preset_entry.setMaxLength(40)
+        self.preset_entry.setPlaceholderText("Enter a new preset name")
+        self.preset_entry.setValidator(QVAL_FILENAME)
+
+        # Button
+        button_create = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
+        button_create.accepted.connect(self.create)
+        button_create.rejected.connect(self.reject)
+
+        # Layout
+        layout_main = QVBoxLayout()
+        layout_main.addWidget(self.preset_entry)
+        layout_main.addWidget(button_create)
+        self.setLayout(layout_main)
+        self.setMinimumWidth(UIScaler.size(21))
+        self.setFixedHeight(self.sizeHint().height())
+
+    def create(self):
+        """Create & save new preset"""
+        entered_filename = strip_filename_extension(self.preset_entry.text(), FileExt.JSON)
+        source_filename = self.source_filename
+        filepath = cfg.path.settings
+        # Check invalid file name
+        if not is_allowed_filename(entered_filename):
+            QMessageBox.warning(self, "Error", "Invalid preset name.")
+            return
+        # Check existing preset
+        temp_list = cfg.preset_files()
+        for preset in temp_list:
+            if entered_filename.lower() == preset.lower():
+                QMessageBox.warning(self, "Error", "Preset already exists.")
+                return
+        # Duplicate preset
+        if self.edit_mode == "duplicate":
+            shutil.copy(
+                f"{filepath}{source_filename}",
+                f"{filepath}{entered_filename}{FileExt.JSON}"
+            )
+        # Restore preset
+        elif self.edit_mode == "restore":
+            os.rename(
+                f"{filepath}{source_filename}",
+                f"{filepath}{entered_filename}{FileExt.JSON}"
+            )
+        # Rename preset
+        elif self.edit_mode == "rename":
+            os.rename(
+                f"{filepath}{source_filename}",
+                f"{filepath}{entered_filename}{FileExt.JSON}"
+            )
+            # Rename matching preset shortcut
+            source_name = source_filename[:-5]
+            for option_name in SHORTCUTS_PRESET:
+                preset_name = cfg.user.shortcuts[option_name]["preset"]
+                if source_name == preset_name:
+                    cfg.user.shortcuts[option_name]["preset"] = entered_filename
+                    cfg.save(config_type=ConfigType.SHORTCUTS)
+            # Reload if renamed file was loaded
+            if cfg.is_loaded(source_filename):
+                cfg.set_next_to_load(f"{entered_filename}{FileExt.JSON}")
+                app_signal.reload.emit(True)
+                self.accept()
+                return
+        # Create new preset
+        else:
+            cfg.create(f"{entered_filename}{FileExt.JSON}")
+        # Close window
+        app_signal.refresh.emit(True)
+        self.accept()
+
+
+class RestoreBackup(BaseEditor):
+    """Restore backup"""
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.set_utility_title("Restore Backup")
+        self.setMinimumSize(UIScaler.size(40), UIScaler.size(20))
+
+        # Backup list
+        self.listbox_backup = QListWidget(self)
+        self.listbox_backup.setAlternatingRowColors(True)
+
+        # Button
+        button_restore = CompactButton("Restore")
+        button_restore.clicked.connect(self.restore)
+
+        button_refresh = CompactButton("Refresh")
+        button_refresh.clicked.connect(self.refresh)
+
+        button_delete = CompactButton("Delete")
+        button_delete.clicked.connect(self.delete)
+
+        button_close = CompactButton("Close")
+        button_close.clicked.connect(self.close)
+
+        layout_button = QHBoxLayout()
+        layout_button.addWidget(button_restore)
+        layout_button.addWidget(button_refresh)
+        layout_button.addWidget(button_delete)
+        layout_button.addStretch(1)
+        layout_button.addWidget(button_close)
+
+        # Set layout
+        layout_main = QGridLayout()
+        layout_main.addWidget(self.listbox_backup, 2, 1)
+        layout_main.addLayout(layout_button, 3, 1)
+        layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
+        self.setLayout(layout_main)
+        self.refresh()
+
+    def refresh(self):
+        """Load backup file list"""
+        self.listbox_backup.clear()
+        backup_list = cfg.backup_files(cfg.path.settings)
+        invalid_color = QColor("#F40")
+        style_color = QColor("#08F")
+
+        for backup_name in backup_list:
+            basename = backup_name[:backup_name.find(FileExt.JSON)]
+            if not basename:  # ignore empty file
+                continue
+            item = QListWidgetItem()
+            item.setText(backup_name)
+            item.is_valid = verify_json_file(None, backup_name, cfg.path.settings)
+            item.is_style = not is_allowed_filename(basename)
+            if not item.is_valid:
+                item.setForeground(invalid_color)
+            elif item.is_style:
+                item.setForeground(style_color)
+            self.listbox_backup.addItem(item)
+
+    def is_selected(self) -> bool:
+        """Is file selected"""
+        if not self.listbox_backup.selectedIndexes():
+            msg_text = "No backup file selected."
+            QMessageBox.warning(self, "Error", msg_text)
+            return False
+        return True
+
+    def delete(self):
+        """Delete backup file"""
+        if not self.is_selected():
+            return
+
+        selected_item = self.listbox_backup.currentItem()
+        selected_filename = selected_item.text()
+        msg_text = (
+            f"Delete <b>{selected_filename}</b> preset permanently?<br><br>"
+            "This cannot be undone!"
+        )
+        if self.confirm_operation(title="Delete Preset", message=msg_text):
+            full_path = f"{cfg.path.settings}{selected_filename}"
+            if os.path.exists(full_path):
+                os.remove(full_path)
+                self.refresh()
+
+    def restore(self):
+        """Restore backup file"""
+        if not self.is_selected():
+            return
+
+        selected_item = self.listbox_backup.currentItem()
+        if not selected_item.is_valid:
+            msg_text = "Selected backup file is invalid and cannot be restored."
+            QMessageBox.warning(self, "Error", msg_text)
+            return
+
+        selected_filename = selected_item.text()
+
+        # Style preset
+        if selected_item.is_style:
+            msg_text = (
+                f"<b>{selected_filename}</b> is a style preset.<br>"
+                "Restoring this backup file will overwrite existing style preset.<br><br>"
+                "Are you sure you want to restore and overwrite existing style preset?<br><br>"
+                "This cannot be undone!"
+            )
+            if self.confirm_operation(title="Restore Style Preset", message=msg_text):
+                basename = selected_filename[:selected_filename.find(FileExt.JSON)]
+                filepath = cfg.path.settings
+                shutil.move(
+                    f"{filepath}{selected_filename}",
+                    f"{filepath}{basename}{FileExt.JSON}"
+                )
+                app_signal.reload.emit(True)
+                self.refresh()
+            return
+
+        # User preset
+        _dialog = CreatePreset(
+            self,
+            title="Restore Backup",
+            mode="restore",
+            source_filename=selected_filename
+        )
+        _dialog.accepted.connect(self.refresh)
+        _dialog.open()
 
 
 class PresetTransfer(BaseEditor):

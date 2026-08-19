@@ -247,16 +247,19 @@ def set_style_window(base_font_pt: int) -> str:
         }}
 
         /* Preset list (tab) */
-        PresetList > QListView {{
+        PresetList > QListView,
+        RestoreBackup > QListView {{
             font-size: {font_pt_item_name}pt;
             outline: none;
         }}
-        PresetList > QListView::item {{
+        PresetList > QListView::item,
+        RestoreBackup > QListView::item {{
             border: none;
             min-height: 1.25em;
             padding: 0.25em 0.25em 0.25em 0;
         }}
-        PresetList > QListView::item:selected {{
+        PresetList > QListView::item:selected,
+        RestoreBackup > QListView::item:selected {{
             selection-color: {color_active_highlighted_text};
             background: {color_active_highlight};
         }}

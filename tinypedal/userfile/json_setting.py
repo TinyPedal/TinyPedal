@@ -142,12 +142,17 @@ def save_json_file(
 
 
 def verify_json_file(
-    dict_user: dict, filename: str, filepath: str, extension: str = ""
+    dict_user: dict | None, filename: str, filepath: str, extension: str = ""
 ) -> bool:
     """Verify saved json file"""
     filename_source = f"{filepath}{filename}{extension}"
     try:
         with open(filename_source, "r", encoding="utf-8") as jsonfile:
+            # Check load only
+            if dict_user is None:
+                json.load(jsonfile)
+                return True
+            # Compare saved data with loaded
             saved = json.dumps(json.load(jsonfile))
             loaded = json.dumps(dict_user)
             return saved == loaded
