@@ -60,7 +60,7 @@ class FileExt:
     CSV = ".csv"
     TXT = ".txt"
     INI = ".ini"
-    BAK = ".bak"
+    BACKUP = ".backup"
     SVM = ".svm"
     JSON = ".json"
     # Image

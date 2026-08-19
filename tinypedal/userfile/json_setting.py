@@ -36,7 +36,7 @@ from ..setting_validator import PresetValidator
 logger = logging.getLogger(__name__)
 
 
-def set_backup_timestamp(prefix: str = ".backup", timestamp: bool = True) -> str:
+def set_backup_timestamp(prefix: str = FileExt.BACKUP, timestamp: bool = True) -> str:
     """Set backup timestamp"""
     if timestamp:
         time_local = strftime("%Y-%m-%d-%H-%M-%S", localtime())
@@ -165,7 +165,7 @@ def copy_and_verify_file(filename_source: str, filename_copied: str) -> bool:
 
 
 def create_backup_file(
-    filename: str, filepath: str, extension: str = FileExt.BAK, show_log: bool = False
+    filename: str, filepath: str, extension: str = FileExt.BACKUP, show_log: bool = False
 ) -> bool:
     """Create backup file before saving"""
     filename_source = f"{filepath}{filename}"
@@ -186,7 +186,7 @@ def create_backup_file(
 
 
 def restore_backup_file(
-    filename: str, filepath: str, extension: str = FileExt.BAK
+    filename: str, filepath: str, extension: str = FileExt.BACKUP
 ) -> bool:
     """Restore backup file if saving failed"""
     filename_backup = f"{filepath}{filename}{extension}"
@@ -206,7 +206,7 @@ def restore_backup_file(
 
 
 def copy_and_rename_backup_file(
-    filename: str, filepath: str, extension: str = FileExt.BAK
+    filename: str, filepath: str, extension: str = FileExt.BACKUP
 ) -> bool:
     """Copy and rename backup file if restoring backup failed"""
     filename_backup = f"{filepath}{filename}{extension}"
@@ -226,7 +226,7 @@ def copy_and_rename_backup_file(
 
 
 def delete_backup_file(
-    filename: str, filepath: str, extension: str = FileExt.BAK
+    filename: str, filepath: str, extension: str = FileExt.BACKUP
 ) -> bool:
     """Delete backup file"""
     filename_backup = f"{filepath}{filename}{extension}"
