@@ -41,6 +41,10 @@ class State(ABC):
         """Is paused"""
 
     @abstractmethod
+    def resets(self) -> int:
+        """Number of player vehicle resets"""
+
+    @abstractmethod
     def desynced(self, index: int | None = None) -> bool:
         """Is player data desynced from others"""
 

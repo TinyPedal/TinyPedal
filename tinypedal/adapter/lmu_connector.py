@@ -65,7 +65,7 @@ def local_scoring_index(scor_veh: Sequence[lmu_data.LMUVehicleScoring]) -> int:
     """Find local player scoring index
 
     Args:
-        scor_veh: scoring array.
+        scor_veh: scoring vehicle array.
     """
     for scor_idx, veh_info in enumerate(scor_veh):
         if veh_info.mIsPlayer:
@@ -95,13 +95,13 @@ class LMUResults:
     })
     __slots__ = (
         "data",
-        "version",
+        "timestamp",
         "_last_stream",
     )
 
     def __init__(self):
         self.data = {}
-        self.version = 0
+        self.timestamp = 0
         self._last_stream = b""
 
     def check_missing(self, driver: bytes):
@@ -184,6 +184,7 @@ class SyncData:
         dataset: mmap data set.
         paused: Is API data paused.
         synced: Is player data synced.
+        resets: Number of player vehicle resets.
         override_player_index: is player index overidden.
         player_scor_index: Local player scoring index.
         player_scor: Local player scoring data.
@@ -198,6 +199,7 @@ class SyncData:
         "_tele_indexes",
         "paused",
         "synced",
+        "resets",
         "override_player_index",
         "player_slot_id",
         "player_scor_index",
@@ -215,6 +217,7 @@ class SyncData:
 
         self.paused = False
         self.synced = False
+        self.resets = 0
         self.override_player_index = False
         self.player_slot_id = INVALID_INDEX
         self.player_scor_index = INVALID_INDEX
@@ -328,12 +331,15 @@ class SyncData:
         """Update synced player data"""
         self.paused = False  # make sure initial pause state is false
         self.synced = False
+        self.resets = 0
 
         _event_wait = self._event.wait
-        freezed_version = 0  # store freezed update version number
-        last_version_update = 0  # store last update version number
+        freezed_timestamp = 0  # store freezed timestamp
+        last_session_timestamp = 0  # store last timestamp
         last_update_time = 0.0
         data_freezed = True  # whether data is freezed
+        last_in_garage = False
+        last_slot_id = INVALID_INDEX
         reset_counter = 0
         update_delay = 0.5  # longer delay while inactive
 
@@ -344,7 +350,7 @@ class SyncData:
                 self.dataset.shmm.data.telemetry,
                 self._tele_indexes,
             )
-            version_update = self.dataset.shmm.data.scoring.scoringInfo.mCurrentET
+            session_timestamp = self.dataset.shmm.data.scoring.scoringInfo.mCurrentET
 
             # Update player data & index
             if not data_freezed:
@@ -363,24 +369,35 @@ class SyncData:
                         self.synced = False
                         logger.info("sharedmemory: UPDATING: player data paused")
                 # Result stream
-                if self.results.version != version_update:
-                    if self.results.version > version_update:
+                if self.results.timestamp != session_timestamp:
+                    if self.results.timestamp > session_timestamp:
                         self.results.data.clear()
-                    self.results.version = version_update
+                    self.results.timestamp = session_timestamp
                     self.results.update(self.dataset.shmm.data.scoring.scoringStream)
 
-            if last_version_update != version_update:
-                last_version_update = version_update
+            if last_session_timestamp != session_timestamp:
+                in_garage = self.player_scor.mInGarageStall
+                slot_id = self.player_scor.mID
+                if (
+                    last_session_timestamp > session_timestamp  # session changed
+                    or last_in_garage < in_garage  # returned to garage
+                    or last_slot_id != slot_id  # changed slot id
+                ):
+                    self.resets += 1
+
                 last_update_time = monotonic()
+                last_session_timestamp = session_timestamp
+                last_in_garage = in_garage
+                last_slot_id = slot_id
 
             if data_freezed:
                 # Check while IN freeze state
-                if freezed_version != last_version_update:
+                if freezed_timestamp != last_session_timestamp:
                     update_delay = 0.01
                     self.paused = data_freezed = False
                     logger.info(
-                        "sharedmemory: UPDATING: resumed, data version %s",
-                        last_version_update,
+                        "sharedmemory: UPDATING: resumed, data timestamp %s",
+                        last_session_timestamp,
                     )
             # Check while NOT IN freeze state
             # Set freeze state if data stopped updating after 2s
@@ -388,10 +405,10 @@ class SyncData:
                 update_delay = 0.5
                 self.paused = data_freezed = True
                 self.synced = False
-                freezed_version = last_version_update
+                freezed_timestamp = last_session_timestamp
                 logger.info(
-                    "sharedmemory: UPDATING: paused, data version %s",
-                    freezed_version,
+                    "sharedmemory: UPDATING: paused, data timestamp %s",
+                    freezed_timestamp,
                 )
 
         logger.info("sharedmemory: UPDATING: thread stopped")
@@ -512,6 +529,11 @@ class LMUInfo:
             self.lmuScorInfo.mInRealtime
             or self.lmuTeleVeh().mIgnitionStarter > 0
         )
+
+    @property
+    def vehicleResets(self) -> int:
+        """Number of player vehicle resets"""
+        return self._sync.resets
 
 
 def test_api():

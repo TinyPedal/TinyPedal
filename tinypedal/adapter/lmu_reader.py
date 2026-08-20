@@ -75,6 +75,10 @@ class State(_reader.State, DataAdapter):
         """Is paused"""
         return self.shmm.isPaused
 
+    def resets(self) -> int:
+        """Number of player vehicle resets"""
+        return self.shmm.vehicleResets
+
     def desynced(self, index: int | None = None) -> bool:
         """Is player data desynced from others"""
         return (
