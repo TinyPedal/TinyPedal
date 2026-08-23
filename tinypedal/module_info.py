@@ -52,6 +52,43 @@ class ConsumptionDataSet(NamedTuple):
     capacityFuel: float = 0.0
 
 
+class MapCoords:
+    """Map coords data"""
+
+    __slots__ = (
+        "coords",
+        "dists",
+        "sectors",
+    )
+
+    def __init__(self, coords=None, dists=None, sectors=None):
+        """
+        Args:
+            coords: x,y coordinates list.
+            dists: distance,elevation list.
+            sectors: sector node index reference list.
+        """
+        self.coords = coords
+        self.dists = dists
+        self.sectors = sectors
+
+    def is_valid(self) -> bool:
+        """Is valid data"""
+        return all((self.coords, self.dists, self.sectors))
+
+    def clear(self):
+        """Clear coords data"""
+        self.coords = None
+        self.dists = None
+        self.sectors = None
+
+    def reset(self):
+        """Reset coords data"""
+        self.coords = []
+        self.dists = []
+        self.sectors = [0, 0]
+
+
 class StintData:
     """Stint data"""
 
@@ -657,33 +694,24 @@ class HistoryInfo:
     """History output data"""
 
     __slots__ = (
-        "consumptionDataName",
         "consumptionDataVersion",
         "consumptionDataSet",
         "stintDataVersion",
-        "stintData",
+        "stintDataCurrent",
         "stintDataSet",
     )
 
     def __init__(self):
-        self.consumptionDataName: str = ""
         self.consumptionDataVersion: int = 0
         self.consumptionDataSet: deque[ConsumptionDataSet] = deque([ConsumptionDataSet()], 100)
         self.stintDataVersion: int = 0
-        self.stintData: StintData = StintData()
+        self.stintDataCurrent: StintData = StintData()
         self.stintDataSet: deque[StintDataSet] = deque([StintDataSet()], 100)
-
-    def reset_consumption(self):
-        """Reset consumption data"""
-        self.consumptionDataName = ""
-        self.consumptionDataVersion = 0
-        self.consumptionDataSet.clear()
-        self.consumptionDataSet.appendleft(ConsumptionDataSet())
 
     def reset_stint(self):
         """Reset stint data"""
         self.stintDataVersion = 0
-        self.stintData.reset()
+        self.stintDataCurrent.reset()
         self.stintDataSet.clear()
         self.stintDataSet.appendleft(StintDataSet())
 
@@ -814,13 +842,17 @@ class SectorData:
     )
 
     def __init__(self):
+        self.reset()
+
+    def reset(self):
+        """Reset"""
         self.noDeltaSector: bool = True
         self.sectorIndex: int = -1
         self.sectorPrev: list[float] = [MAX_SECONDS] * 3
         self.sectorBestTB: list[float] = [MAX_SECONDS] * 3
         self.sectorBestPB: list[float] = [MAX_SECONDS] * 3
-        self.deltaSectorBestPB: list[float] = [MAX_SECONDS] * 3
-        self.deltaSectorBestTB: list[float] = [MAX_SECONDS] * 3
+        self.deltaSectorBestPB: list[float] = [0.0] * 3
+        self.deltaSectorBestTB: list[float] = [0.0] * 3
 
 
 class SectorsInfo:

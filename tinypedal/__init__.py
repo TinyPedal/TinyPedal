@@ -37,6 +37,7 @@ class RealtimeState:
     Attributes:
         active: whether is active (driving or overriding) state.
         paused: whether data stopped updating.
+        resets: number of player vehicle resets.
         hidden: whether overlay is hidden.
         overriding: whether is state override mode enabled.
         spectating: whether is spectate mode enabled.
@@ -46,6 +47,7 @@ class RealtimeState:
     __slots__ = (
         "active",
         "paused",
+        "resets",
         "hidden",
         "overriding",
         "spectating",
@@ -55,6 +57,7 @@ class RealtimeState:
     def __init__(self):
         self.active: bool = False
         self.paused: bool = True
+        self.resets: int = 0
         self.hidden: bool = False
         self.overriding: bool = False
         self.spectating: bool = False

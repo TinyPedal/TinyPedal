@@ -30,7 +30,7 @@ from ..api_control import api
 from ..const_app import PLATFORM, URL_FAQ, URL_USER_GUIDE
 from ..const_file import ConfigType
 from ..formatter import format_option_name
-from ..module_info import minfo
+from ..module_control import mctrl
 from ..overlay_control import octrl
 from ..setting import cfg
 from ..update import update_checker
@@ -197,30 +197,33 @@ class ResetDataMenu(QMenu):
 
     def reset_deltabest(self):
         """Reset deltabest data"""
-        self.__confirmation(
+        if self.__confirmation(
             data_type="delta best",
             extension="csv",
             filepath=cfg.path.delta_best,
             filename=api.read.session.combo_name(),
-        )
+        ):
+            mctrl.reload("module_delta")
 
     def reset_energydelta(self):
         """Reset energy delta data"""
-        self.__confirmation(
+        if self.__confirmation(
             data_type="energy delta",
             extension="energy",
             filepath=cfg.path.energy_delta,
             filename=api.read.session.combo_name(),
-        )
+        ):
+            mctrl.reload("module_fuel")
 
     def reset_fueldelta(self):
         """Reset fuel delta data"""
-        self.__confirmation(
+        if self.__confirmation(
             data_type="fuel delta",
             extension="fuel",
             filepath=cfg.path.fuel_delta,
             filename=api.read.session.combo_name(),
-        )
+        ):
+            mctrl.reload("module_fuel")
 
     def reset_consumption(self):
         """Reset consumption history data"""
@@ -230,36 +233,30 @@ class ResetDataMenu(QMenu):
             filepath=cfg.path.fuel_delta,
             filename=api.read.session.combo_name(),
         ):
-            minfo.history.reset_consumption()
+            mctrl.reload("module_stint")
 
     def reset_sectorbest(self):
         """Reset sector best data"""
-        self.__confirmation(
+        if self.__confirmation(
             data_type="sector best",
             extension="sector",
             filepath=cfg.path.sector_best,
             filename=api.read.session.combo_name(),
-        )
+        ):
+            mctrl.reload("module_sectors")
 
     def reset_trackmap(self):
         """Reset trackmap data"""
-        self.__confirmation(
+        if self.__confirmation(
             data_type="track map",
             extension="svg",
             filepath=cfg.path.track_map,
             filename=api.read.session.track_name(),
-        )
+        ):
+            mctrl.reload("module_mapping")
 
     def __confirmation(self, data_type: str, extension: str, filepath: str, filename: str) -> bool:
         """Message confirmation, returns true if file deleted"""
-        # Check if on track
-        if api.read.state.active():
-            QMessageBox.warning(
-                self._parent,
-                "Error",
-                "Cannot reset data while on track.",
-            )
-            return False
         # Check if file exist
         filename_full = f"{filepath}{filename}.{extension}"
         if not os.path.exists(filename_full):

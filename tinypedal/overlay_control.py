@@ -101,10 +101,12 @@ class OverlayControl:
             # Read state
             active = api.read.state.active()
             paused = api.read.state.paused()
+            resets = api.read.state.resets()
             hidden = cfg.overlay["auto_hide"] and not active
             # Update state
             realtime_state.active = active
             realtime_state.paused = paused
+            realtime_state.resets = resets
             # Auto hide state check
             if self._last_hide_state != hidden:
                 self._last_hide_state = hidden

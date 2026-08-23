@@ -89,8 +89,8 @@ def is_string_number(value: str) -> bool:
 def valid_sectors(sector_time: list | Any, max_time: float = MAX_SECONDS) -> bool:
     """Is valid sector time"""
     if isinstance(sector_time, list):
-        return max_time not in sector_time
-    return max_time != sector_time
+        return all(0 < sec < max_time for sec in sector_time)
+    return 0 < sector_time < max_time
 
 
 def is_same_session(

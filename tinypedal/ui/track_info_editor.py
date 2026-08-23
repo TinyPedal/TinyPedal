@@ -160,7 +160,7 @@ class TrackInfoEditor(BaseEditor):
         column_index = 1
         for key, value in TRACKINFO_DEFAULT.items():
             if isinstance(value, float):
-                item = FloatTableItem(track_data.get(key, value))
+                item = FloatTableItem(round(track_data.get(key, value), 4))
             else:
                 item = ClockTableItem(track_data.get(key, value))
             self.table_tracks.setItem(row_index, column_index, item)

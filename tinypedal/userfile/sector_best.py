@@ -32,7 +32,11 @@ logger = logging.getLogger(__name__)
 
 
 def load_sector_best_file(
-    filepath:str, filename: str, session_id: tuple, defaults: list, extension: str = FileExt.SECTOR
+    filepath: str,
+    filename: str,
+    session_id: tuple[int, int, int],
+    defaults: tuple[float, float, float],
+    extension: str = FileExt.SECTOR,
 ) -> tuple[list, list, list, list]:
     """Load sector best file (*.sector)"""
     try:
@@ -46,8 +50,8 @@ def load_sector_best_file(
             best_s_tb = [temp_list[1][0], temp_list[1][1], temp_list[1][2]]
             best_s_pb = [temp_list[2][0], temp_list[2][1], temp_list[2][2]]
         else:
-            best_s_tb = defaults.copy()
-            best_s_pb = defaults.copy()
+            best_s_tb = list(defaults)
+            best_s_pb = list(defaults)
         # All time best data
         all_best_s_tb = [temp_list[3][0], temp_list[3][1], temp_list[3][2]]
         all_best_s_pb = [temp_list[4][0], temp_list[4][1], temp_list[4][2]]
@@ -56,24 +60,38 @@ def load_sector_best_file(
         logger.info("MISSING: sector best (%s) data", extension)
     except (IndexError, ValueError, TypeError):
         logger.info("MISSING: invalid sector best (%s) data", extension)
-    return defaults.copy(), defaults.copy(), defaults.copy(), defaults.copy()
+    return list(defaults), list(defaults), list(defaults), list(defaults)
 
 
 def save_sector_best_file(
-    filepath: str, filename: str, dataset: tuple, extension: str = FileExt.SECTOR
+    filepath: str,
+    filename: str,
+    session_id: tuple[int, int, int],
+    session_best_tb: list[float, float, float],
+    session_best_pb: list[float, float, float],
+    alltime_best_tb: list[float, float, float],
+    alltime_best_pb: list[float, float, float],
+    extension: str = FileExt.SECTOR,
 ) -> None:
     """Save sector best file (*.sector)
 
-    sector(CSV) file structure:
+    Sector(CSV) file structure:
         Line 0: session stamp, session elapsed time, session total laps
         Line 1: session theoretical best sector time
         Line 2: session personal best sector time
         Line 3: all time theoretical best sector time
         Line 4: all time personal best sector time
     """
-    if len(dataset) != 5 or invalid_save_name(filename):
+    if len(session_id) != 3 or invalid_save_name(filename):
         return
     with open(f"{filepath}{filename}{extension}", "w", newline="", encoding="utf-8") as csvfile:
         data_writer = csv.writer(csvfile)
-        data_writer.writerows(dataset)
+        # Session stamp
+        data_writer.writerow(session_id)
+        # session best sector time
+        data_writer.writerow(session_best_tb)
+        data_writer.writerow(session_best_pb)
+        # All time best sector time
+        data_writer.writerow(alltime_best_tb)
+        data_writer.writerow(alltime_best_pb)
         logger.info("USERDATA: %s%s saved", filename, extension)

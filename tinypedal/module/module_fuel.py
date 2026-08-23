@@ -29,7 +29,7 @@ from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
 from ..const_api import API_RF2_NAME
-from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, POS_XYZ_ZERO
+from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF
 from ..const_file import FileExt
 from ..module_info import FuelInfo, minfo
 from ..userfile.fuel_delta import load_fuel_delta_file, save_fuel_delta_file
@@ -49,50 +49,41 @@ class Realtime(DataModule):
         """Update module data"""
         _event_wait = self._event.wait
         reset = False
+        vehicle_resets = None
         update_interval = self.idle_interval
 
-        userpath_fuel_delta = self.cfg.path.fuel_delta
-        userpath_energy_delta = self.cfg.path.energy_delta
-
-        fuel_density = max(self.mcfg["fuel_density"], 0.1)
+        gen_fuel_usage = calc_consumption(
+            output=minfo.fuel,
+            is_energy=False,
+            filepath=self.cfg.path.fuel_delta,
+            extension=FileExt.FUEL,
+            min_delta_distance=self.mcfg["minimum_delta_distance"],
+            fuel_density=max(self.mcfg["fuel_density"], 0.0),
+        )
+        gen_energy_usage = calc_consumption(
+            output=minfo.energy,
+            is_energy=True,
+            filepath=self.cfg.path.energy_delta,
+            extension=FileExt.ENERGY,
+            min_delta_distance=self.mcfg["minimum_delta_distance"],
+            fuel_density=0.0,
+        )
 
         while not _event_wait(update_interval):
-            if realtime_state.active:
+            if realtime_state.active or vehicle_resets != realtime_state.resets:
+                vehicle_resets = realtime_state.resets
 
                 if not reset:
                     reset = True
                     update_interval = self.active_interval
 
-                    combo_name = api.read.session.combo_name()
-                    gen_fuel_usage = calc_consumption(
-                        output=minfo.fuel,
-                        telemetry_func=detect_consumption_type(),
-                        filepath=userpath_fuel_delta,
-                        filename=combo_name,
-                        extension=FileExt.FUEL,
-                        min_delta_distance=self.mcfg["minimum_delta_distance"],
-                    )
-                    gen_energy_usage = calc_consumption(
-                        output=minfo.energy,
-                        telemetry_func=telemetry_energy,
-                        filepath=userpath_energy_delta,
-                        filename=combo_name,
-                        extension=FileExt.ENERGY,
-                        min_delta_distance=self.mcfg["minimum_delta_distance"],
-                    )
-                    # Reset module output
-                    minfo.energy.reset()
-                    # Reset module output
-                    minfo.fuel.reset()
-
                 # Calculate fuel
-                gen_fuel_usage.send(True)
-                minfo.fuel.weight = fuel_density * minfo.fuel.amountCurrent
+                gen_fuel_usage.send(vehicle_resets)
 
                 # Calculate virtual energy if available
                 minfo.energy.available = (api.read.engine.virtual_energy() != 0)
                 if minfo.energy.available:
-                    gen_energy_usage.send(True)
+                    gen_energy_usage.send(vehicle_resets)
 
                     # Update hybrid info
                     minfo.hybrid.fuelEnergyRatio = calc.fuel_to_energy_ratio(
@@ -107,13 +98,12 @@ class Realtime(DataModule):
                 if reset:
                     reset = False
                     update_interval = self.idle_interval
-                    # Trigger save check
-                    gen_fuel_usage.send(False)
-                    gen_energy_usage.send(False)
 
 
-def detect_consumption_type() -> Callable:
+def detect_consumption_type(is_energy: bool) -> Callable:
     """Detect consumption type, return telemetry function"""
+    if is_energy:
+        return telemetry_energy
     # Pure electric based vehicle
     if (
         api.name == API_RF2_NAME
@@ -142,62 +132,84 @@ def telemetry_energy() -> tuple[float, float]:
 
 @generator_init
 def calc_consumption(
-    output: FuelInfo, telemetry_func: Callable, filepath: str, filename: str, extension: str,
-    min_delta_distance: float):
+    output: FuelInfo,
+    is_energy: bool,
+    filepath: str,
+    extension: str,
+    min_delta_distance: float,
+    fuel_density: float,
+):
     """Calculate consumption data"""
-    recording = False
+    last_reset = None  # reset check
     delayed_save = False
-    validating = 0
-    is_pit_lap = 0  # whether pit in or pit out lap
 
-    delta_array_last, used_last_valid, laptime_pace = load_fuel_delta_file(
-        filepath=filepath,
-        filename=filename,
-        extension=extension,
-        defaults=(DELTA_DEFAULT, 0.0, 0.0)
-    )
-    delta_array_raw = [DELTA_ZERO]  # distance, fuel used, laptime
-    delta_array_temp = DELTA_DEFAULT  # last lap temp
-    delta_fuel = 0.0  # delta fuel consumption compare to last lap
-
-    amount_start = -FLOAT_INF  # start fuel reading
-    amount_last = 0.0  # last fuel reading
-    amount_need_abs = 0.0  # total fuel (absolute) need to finish race
-    amount_need_rel = 0.0  # total additional fuel (relative) need to finish race
-    amount_end = 0.0  # amount fuel left at the end of stint before pitting
-    used_curr = 0.0  # current lap fuel consumption
-    used_last_raw = used_last_valid  # raw usage
-    used_est = 0.0  # estimated fuel consumption, for calculation only
-    est_runlaps = 0.0  # estimate laps current fuel can last
-    est_runmins = 0.0  # estimate minutes current fuel can last
-    est_empty = 0.0  # estimate empty capacity at end of current lap
-    est_pits_late = 0.0  # estimate end-stint pit stop counts
-    est_pits_early = 0.0  # estimate end-lap pit stop counts
-    used_est_less = 0.0  # estimate fuel consumption for one less pit stop
-
-    last_elapsed_time = 0.0
-    last_lap_stime = FLOAT_INF  # last lap start time
-    laps_left = 0.0  # amount laps left at current lap distance
-    end_timer_laps_left = 0.0  # amount laps left from start of current lap to end of race timer
-    pos_recorded = 0.0  # last recorded vehicle position
-    pos_last = 0.0  # last checked vehicle position
-    pos_estimate = 0.0  # estimated vehicle position
-    is_pos_synced = False  # vehicle position synced with API
-    gps_last = POS_XYZ_ZERO  # last global position
+    combo_name = ""
+    delta_array_last = ()
+    used_last_valid = 0.0
+    laptime_pace = 0.0
 
     while True:
-        updating = yield None
+        reset = yield None
 
-        # Save check
-        if not updating:
+        # Reset
+        if last_reset != reset:
+            # Save data
             if delayed_save:
                 save_fuel_delta_file(
                     filepath=filepath,
-                    filename=filename,
+                    filename=combo_name,
                     extension=extension,
                     dataset=delta_array_last,
                 )
-            continue
+                delayed_save = False
+
+            # Delay reset until driving
+            if not realtime_state.active:
+                continue
+            last_reset = reset
+
+            # Load data
+            output.reset()
+            recording = False
+            delayed_save = False
+            validating = 0
+            is_pit_lap = 0  # whether pit in or pit out lap
+
+            telemetry_func = detect_consumption_type(is_energy)
+            combo_name = api.read.session.combo_name()
+
+            delta_array_last, used_last_valid, laptime_pace = load_fuel_delta_file(
+                filepath=filepath,
+                filename=combo_name,
+                extension=extension,
+                defaults=(DELTA_DEFAULT, 0.0, 0.0)
+            )
+            delta_array_raw = [DELTA_ZERO]  # distance, fuel used, laptime
+            delta_array_temp = DELTA_DEFAULT  # last lap temp
+            delta_fuel = 0.0  # delta fuel consumption compare to last lap
+
+            amount_start = -FLOAT_INF  # start fuel reading
+            amount_last = 0.0  # last fuel reading
+            amount_need_abs = 0.0  # total fuel (absolute) need to finish race
+            amount_need_rel = 0.0  # total additional fuel (relative) need to finish race
+            amount_end = 0.0  # amount fuel left at the end of stint before pitting
+            used_curr = 0.0  # current lap fuel consumption
+            used_last_raw = used_last_valid  # raw usage
+            used_est = 0.0  # estimated fuel consumption, for calculation only
+            est_runlaps = 0.0  # estimate laps current fuel can last
+            est_runmins = 0.0  # estimate minutes current fuel can last
+            est_empty = 0.0  # estimate empty capacity at end of current lap
+            est_pits_late = 0.0  # estimate end-stint pit stop counts
+            est_pits_early = 0.0  # estimate end-lap pit stop counts
+            used_est_less = 0.0  # estimate fuel consumption for one less pit stop
+
+            last_elapsed_time = 0.0
+            last_lap_stime = FLOAT_INF  # last lap start time
+            laps_left = 0.0  # amount laps left at current lap distance
+            end_timer_laps_left = 0.0  # amount laps left from start of current lap to end of race timer
+            pos_recorded = 0.0  # last recorded vehicle position
+            pos_last = 0.0  # last checked vehicle position
+            pos_synced_last = 0.0  # estimated vehicle position
 
         # Read telemetry
         capacity, amount_curr = telemetry_func()
@@ -207,11 +219,11 @@ def calc_consumption(
         time_left = api.read.session.remaining()
         in_garage = api.read.vehicle.in_garage()
         pos_curr = api.read.lap.distance()
-        gps_curr = api.read.vehicle.position_xyz()
         laps_done = api.read.lap.completed_laps()
         lap_into = api.read.lap.progress()
         is_pit_lap |= api.read.vehicle.in_pits()
         laptime_pace = minfo.delta.lapTimePace
+        pos_synced = minfo.delta.lapDistance
 
         # Realtime fuel consumption
         if amount_start < amount_curr:
@@ -263,7 +275,6 @@ def calc_consumption(
                 delta_array_raw.append((round6(pos_curr), round6(used_curr)))
                 pos_recorded = pos_curr
             pos_last = pos_curr  # reset last position
-            is_pos_synced = True
 
         # Validating 1s after passing finish line
         if validating:
@@ -279,17 +290,12 @@ def calc_consumption(
                 validating = 0
 
         # Calc delta
-        if gps_last != gps_curr:
-            if is_pos_synced:
-                pos_estimate = pos_curr
-                is_pos_synced = False
-            else:
-                pos_estimate += calc.distance(gps_last, gps_curr)
-            gps_last = gps_curr
+        if pos_synced_last != pos_synced:
+            pos_synced_last = pos_synced
             # Update delta
             delta_fuel = calc.delta_telemetry(
                 delta_array_last,
-                pos_estimate,
+                pos_synced,
                 used_curr,
                 laptime_curr > 0.3 and not in_garage,  # 300ms delay
             )
@@ -353,3 +359,5 @@ def calc_consumption(
         output.estimatedNumPitStopsEarly = est_pits_early
         output.deltaConsumption = delta_fuel
         output.oneLessPitConsumption = used_est_less
+        if not is_energy:
+            output.weight = fuel_density * amount_curr

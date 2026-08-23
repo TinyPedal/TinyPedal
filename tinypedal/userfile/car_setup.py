@@ -64,7 +64,7 @@ def rename_car_setup_file(filepath: str, old_filename: str, new_filename: str, e
         )
         logger.info("USERDATA: %s%s updated", new_filename, extension)
     except (FileNotFoundError, PermissionError, OSError):
-        logger.error("USERDATA: backup not found %s", new_filename)
+        logger.error("USERDATA: car setup not found %s", new_filename)
 
 
 def save_car_setup_file(

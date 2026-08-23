@@ -10,6 +10,9 @@ WIP
 * Hotkey Tab
   - Added "Overlay Auto Hide" keybinding for enabling or disabling overlay auto hide function.
 
+* Misc
+  - User data can be reset while on track.
+
 2.49.4 (2026-08-12)
 -----------------------------
 * Brake temperature Widget

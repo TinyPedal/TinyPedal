@@ -654,7 +654,10 @@ class Timing(_reader.Timing, DataAdapter):
     def current_laptime(self, index: int | None = None) -> float:
         """Current lap time (seconds)"""
         tele_veh = self.shmm.rf2TeleVeh(index)
-        return rmnan(tele_veh.mElapsedTime - tele_veh.mLapStartET)
+        laptime = rmnan(tele_veh.mElapsedTime - tele_veh.mLapStartET)
+        if laptime < 0:
+            return 0.0
+        return laptime
 
     def last_laptime(self, index: int | None = None) -> float:
         """Last lap time (seconds)"""

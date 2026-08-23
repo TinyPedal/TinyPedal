@@ -87,28 +87,21 @@ class Realtime(DataModule):
             output=minfo.wheels,
             sampling_interval=self.mcfg["cornering_radius_sampling_interval"],
         )
-        last_session_elapsed = -1
 
         while not _event_wait(update_interval):
             if realtime_state.active:
+                vehicle_resets = realtime_state.resets
 
                 if not reset:
                     reset = True
                     update_interval = self.active_interval
 
-                # Reset condition
-                session_elapsed = api.read.session.elapsed()
-                is_new_session = (last_session_elapsed > session_elapsed)
-                last_session_elapsed = session_elapsed
-
-                in_garage = api.read.vehicle.in_garage() or is_new_session
-
                 # Run calculate
-                gen_wheel_rotation.send(in_garage)
-                gen_tyre_wear.send(in_garage)
-                gen_brake_wear.send(in_garage)
-                gen_susp_travel.send(in_garage)
-                gen_vehicle_weight.send(in_garage)
+                gen_wheel_rotation.send(vehicle_resets)
+                gen_tyre_wear.send(vehicle_resets)
+                gen_brake_wear.send(vehicle_resets)
+                gen_susp_travel.send(vehicle_resets)
+                gen_vehicle_weight.send(vehicle_resets)
                 gen_cornering_radius.send(True)
 
             else:
@@ -144,7 +137,11 @@ def calc_wheel_rotation(
 
         # Reset
         if last_reset != reset:
+            # Delay reset until driving
+            if not realtime_state.active:
+                continue
             last_reset = reset
+
             last_accel_max = 0.0
             locking_f = 1.0
             locking_r = 1.0
@@ -240,7 +237,11 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
 
         # Reset
         if last_reset != reset:
+            # Delay reset until driving
+            if not realtime_state.active:
+                continue
             last_reset = reset
+
             tread_last[:] = WHEELS_ZERO
             tread_wear_curr[:] = WHEELS_ZERO
             tread_wear_valid[:] = WHEELS_ZERO
@@ -374,7 +375,11 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
 
         # Reset
         if last_reset != reset:
+            # Delay reset until driving
+            if not realtime_state.active:
+                continue
             last_reset = reset
+
             brake_last[:] = WHEELS_ZERO
             brake_wear_curr[:] = WHEELS_ZERO
             brake_wear_valid[:] = WHEELS_ZERO
@@ -524,7 +529,11 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
 
         # Reset
         if last_reset != reset:
+            # Delay reset until driving
+            if not realtime_state.active:
+                continue
             last_reset = reset
+
             update_static_position = True
             min_susp_pos_raw[:] = (FLOAT_INF, FLOAT_INF, FLOAT_INF, FLOAT_INF)
             max_susp_pos_raw[:] = (-FLOAT_INF, -FLOAT_INF, -FLOAT_INF, -FLOAT_INF)
@@ -638,7 +647,11 @@ def calc_vehicle_weight(output: WheelsInfo, g_accel: float, unsprung_weight: flo
 
         # Reset
         if last_reset != reset:
+            # Delay reset until driving
+            if not realtime_state.active:
+                continue
             last_reset = reset
+
             update_static_weight = minimum_weight_override <= 0
             if vehicle_name != api.read.vehicle.vehicle_name():
                 vehicle_name = api.read.vehicle.vehicle_name()

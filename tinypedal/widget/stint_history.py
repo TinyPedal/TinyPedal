@@ -318,7 +318,7 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         energy_type = self.wcfg["show_virtual_energy_if_available"] and minfo.energy.available
-        stint_data = minfo.history.stintData
+        stint_data = minfo.history.stintDataCurrent
 
         # Current stint data
         if self.wcfg["show_laps"]:
