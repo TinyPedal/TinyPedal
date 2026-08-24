@@ -515,6 +515,7 @@ class VehicleDataSet:
         "pitTimer",
         "speedTrap",
         "fuelHistory",
+        "energyHistory",
         "lapTimeHistory",
     )
 
@@ -566,6 +567,7 @@ class VehicleDataSet:
         self.pitTimer: PitTimer = PitTimer()
         self.speedTrap: SpeedTrap = SpeedTrap()
         self.fuelHistory: DeltaFuelHistory = DeltaFuelHistory()
+        self.energyHistory: DeltaFuelHistory = DeltaFuelHistory()
         self.lapTimeHistory: DeltaLapTimeHistory = DeltaLapTimeHistory("d", (0, 0, 0, 0, 0))
 
 

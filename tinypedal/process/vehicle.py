@@ -22,9 +22,6 @@ Vehicle function
 
 from __future__ import annotations
 
-from itertools import islice
-from typing import Mapping
-
 from ..regex_pattern import rex_number_extract
 
 
@@ -75,83 +72,3 @@ def absolute_refilling(dataset: list[dict], default: float) -> float:
     except (AttributeError, TypeError, IndexError, ValueError):
         abs_refill = default
     return abs_refill
-
-
-def stint_ve_usage(dataset: dict, default: Mapping) -> Mapping[str, tuple[float, float, float, float, int]]:
-    """Stint virtual energy usage"""
-    if not isinstance(dataset, dict) or not dataset:
-        return default
-    output = {}
-    for player_name, player_dataset in dataset.items():
-        # Set default
-        ve_remaining = -1.0  # fraction (0.0 to 1.0)
-        ve_used = -1.0
-        total_laps_done = -1.0
-        stint_laps_est = 0.0
-        stint_laps_done = 0
-        # Calculate usage
-        try:
-            ve_prev = 0.0
-            ve_curr = 0.0
-            prev_diff = 0.0
-            skip_pit = False
-            for data in islice(reversed(player_dataset), 6):
-                ve_curr = data["ve"]
-                # Initial check
-                if ve_remaining == -1.0:
-                    if ve_curr == 0:  # ve unavailable
-                        raise ValueError
-                    ve_remaining = ve_curr
-                    ve_prev = ve_curr
-                    total_laps_done = data["lap"]
-                    continue
-                # Skip pit refill
-                if skip_pit:
-                    ve_prev = ve_curr
-                    skip_pit = False
-                    continue
-                # Skip 0 ve
-                if ve_curr == 0 or ve_prev == 0:
-                    ve_prev = ve_curr
-                    continue
-                # Calculate usage
-                diff = ve_curr - ve_prev
-                # Skip pit refill or usage greater than 50% of total capacity
-                if diff <= 0 or diff > 0.5:
-                    ve_prev = ve_curr
-                    skip_pit = True
-                    continue
-                ve_prev = ve_curr
-                # Validate usage
-                if 0 < prev_diff / diff < 2:  # ignore usage twice higher
-                    ve_used = prev_diff
-                    break
-                ve_used = diff  # in case prev_diff is 0
-                prev_diff = diff
-
-            # Calculate completed stint laps
-            ve_prev = 0.0
-            ve_used_min = 1.0
-            min_count = 0
-            if ve_used > 0:
-                ve_used_min = ve_used
-            for data in reversed(player_dataset):
-                ve_curr = data["ve"]
-                if ve_prev == 0:
-                    ve_prev = ve_curr
-                    continue
-                if ve_prev >= ve_curr:  # pit stop
-                    break
-                if min_count < 3:  # least usage of 3 most recent laps
-                    diff = ve_curr - ve_prev
-                    if ve_used_min > diff > 0:
-                        ve_used_min = diff
-                    min_count += 1
-                ve_prev = ve_curr
-                stint_laps_done += 1
-            if 0 < ve_used_min < 1:  # round up 0.9 or higher
-                stint_laps_est = stint_laps_done + (ve_remaining / ve_used_min + 0.1)
-        except (AttributeError, TypeError, IndexError, ValueError):
-            pass
-        output[player_name] = (ve_remaining, ve_used, total_laps_done, stint_laps_est, stint_laps_done)
-    return output

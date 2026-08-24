@@ -33,7 +33,7 @@ from ..calculation import (
     slip_angle,
     vel2speed,
 )
-from ..const_common import MAX_SECONDS, STINT_USAGE_DEFAULT
+from ..const_common import MAX_SECONDS
 from ..formatter import strip_invalid_char
 from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
@@ -1021,10 +1021,6 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def repair_time(self) -> float:
         """Scheduled repair time (seconds)"""
         return self.rest.repairTime
-
-    def stint_usage(self, driver_name: str) -> tuple[float, float, float, float, int]:
-        """Stint usage data"""
-        return self.rest.stintUsage.get(driver_name, STINT_USAGE_DEFAULT)
 
     def finish_state(self, index: int | None = None) -> int:
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""

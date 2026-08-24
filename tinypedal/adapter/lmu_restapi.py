@@ -23,16 +23,10 @@ LMU Rest API task
 from __future__ import annotations
 
 import logging
-from typing import Mapping
 
-from ..const_common import EMPTY_DICT, WHEELS_NA
+from ..const_common import WHEELS_NA
 from ..process.garage import export_lmu_car_setup
-from ..process.vehicle import (
-    absolute_refilling,
-    export_wheels,
-    steerlock_to_number,
-    stint_ve_usage,
-)
+from ..process.vehicle import absolute_refilling, export_wheels, steerlock_to_number
 from ..process.weather import FORECAST_DEFAULT, WeatherNode, forecast_rf2
 from ..validator import valid_value_type
 from .restapi_connector import ResOutput, RestAPITask
@@ -57,7 +51,6 @@ class RestAPIData:
         "forecastRace",
         "brakeWear",
         "suspensionDamage",
-        "stintUsage",
         "lastCarSetup",
     )
 
@@ -75,7 +68,6 @@ class RestAPIData:
         self.forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
         self.brakeWear: tuple[float, float, float, float] = WHEELS_NA
         self.suspensionDamage: tuple[float, float, float, float] = WHEELS_NA
-        self.stintUsage: Mapping[str, tuple[float, float, float, float, int]] = EMPTY_DICT
         self.lastCarSetup: tuple[str, ...] = ()
 
     def __del__(self):
@@ -109,9 +101,6 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
         ResOutput("pitStopTime", 0.0, valid_value_type, ("total",)),
         ResOutput("repairTime", 0.0, valid_value_type, ("damage",)),
     )
-    res_stintusage = (
-        ResOutput("stintUsage", EMPTY_DICT, stint_ve_usage),
-    )
     # Define task set
     return (
         RestAPITask("/rest/sessions/weather", res_weatherforecast, "enable_weather_info", False, 0.1),
@@ -119,5 +108,4 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
         RestAPITask("/rest/garage/getPlayerGarageData", res_garagesetup, "enable_garage_setup_info", False, 0.1),
         RestAPITask("/rest/garage/UIScreen/RepairAndRefuel", res_currentstint, "enable_vehicle_info", True, 0.2),
         RestAPITask("/rest/strategy/pitstop-estimate", res_pitstoptime, "enable_vehicle_info", True, 1.0),
-        RestAPITask("/rest/strategy/usage", res_stintusage, "enable_energy_remaining", True, 1.0),
     )

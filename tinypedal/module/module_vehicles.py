@@ -246,13 +246,15 @@ def update_vehicle_data(
             lap_start_time = api.read.timing.start(index)
             last_laptime = api.read.timing.last_laptime(index)
             fuel_remaining = api.read.engine.fuel_fraction(index)
+            energy_remaining = api.read.engine.virtual_energy(index)
 
             data.lapTimeHistory.update(lap_start_time, elapsed_time, data.bestLapTime)
-            data.fuelHistory.update(lap_start_time, fuel_remaining)
             data.isValidLap = last_laptime > 0
             data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last
 
-            update_stint_usage(data, fuel_remaining)
+            data.fuelHistory.update(lap_start_time, fuel_remaining)
+            data.energyHistory.update(lap_start_time, energy_remaining)
+            update_stint_usage(data, fuel_remaining, energy_remaining)
 
             # Update counter
             total_completed_laps += laps_completed
@@ -454,28 +456,31 @@ def calc_gap_behind_leader(index: int) -> float:
     return api.read.timing.behind_leader(index)
 
 
-def update_stint_usage(data: VehicleDataSet, fuel_remaining: float) -> None:
+def update_stint_usage(
+    data: VehicleDataSet,
+    fuel_remaining: float,
+    energy_remaining: float,
+) -> None:
     """Update stint usage data"""
-    (ve_remaining, ve_used, total_laps_done, stint_laps_est, stint_laps_done
-     ) = api.read.vehicle.stint_usage(data.driverName)
+    if energy_remaining > 0:
+        if fuel_remaining > 0:
+            est_run_laps = min(data.fuelHistory.laps, data.energyHistory.laps)
+        else:
+            est_run_laps = data.energyHistory.laps
+    elif fuel_remaining > 0:
+        est_run_laps = data.fuelHistory.laps
+    else:
+        est_run_laps = 0.0
 
-    # Estimated stint laps
-    if stint_laps_done <= 0:
-        stint_laps_done = data.pitTimer.laps
+    stint_laps_done = data.pitTimer.laps
+    stint_laps_est = (stint_laps_done + est_run_laps) if est_run_laps > 0 else 0.0
 
-    if stint_laps_est <= 0 < fuel_remaining:
-        stint_laps_est = stint_laps_done + data.fuelHistory.laps
+    if energy_remaining != 0:
+        data.energyRemaining = energy_remaining
+    elif fuel_remaining > 0:
+        data.energyRemaining = fuel_remaining
+    else:
+        data.energyRemaining = -1
 
     data.currentStintLaps = stint_laps_done
     data.estimatedStintLaps = stint_laps_est
-
-    # Stint energy usage
-    if ve_remaining <= -1:
-        if fuel_remaining > 0:
-            data.energyRemaining = fuel_remaining
-        else:
-            data.energyRemaining = -1
-    elif ve_used <= 0 or (data.pitTimer.pitting and not data.inPit):
-        data.energyRemaining = ve_remaining
-    else:  # Apply linear interpolation
-        data.energyRemaining = ve_remaining - ve_used * (data.totalLapProgress - total_laps_done)

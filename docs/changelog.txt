@@ -10,6 +10,10 @@ WIP
 * Hotkey Tab
   - Added "Overlay Auto Hide" keybinding for enabling or disabling overlay auto hide function.
 
+* API
+  - Now reads remaining energy data from LMU's native API (which used in Relative, Rivals, Standings Widget).
+  - Removed "enable_energy_remaining" option from LMU RestAPI setting.
+
 * Misc
   - User data can be reset while on track.
   - Pausing game will no longer reset various data from data modules.

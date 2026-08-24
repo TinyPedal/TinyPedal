@@ -715,10 +715,6 @@ class Vehicle(ABC):
         """Scheduled repair time (seconds)"""
 
     @abstractmethod
-    def stint_usage(self, driver_name: str) -> tuple[float, float, float, float, int]:
-        """Stint usage data"""
-
-    @abstractmethod
     def finish_state(self, index: int | None = None) -> int:
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""
 

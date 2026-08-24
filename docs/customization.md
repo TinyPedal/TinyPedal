@@ -484,9 +484,6 @@ Set number of attempts to retry connection for Rest API. Value range in `0` to `
     connection_retry_delay
 Set time delay in seconds to retry connection for Rest API. Value range in `0` to `60`. Default is `1` second.
 
-    enable_energy_remaining
-Enable access to `remaining energy` data from Rest API. This is required for showing remaining energy data in widgets such as Relative, Rivals, Standings. Minimum request interval is hard-limited to `1.0` second (1 request per second) for this data.
-
     enable_garage_setup_info
 Enable access to `garage setup` data from Rest API. This is required for accessing various vehicle setup data. This data is requested `only once` when player exited garage each time.
 
@@ -3983,18 +3980,6 @@ Show remaining virtual energy reading in percentage from each driver, with 4 dif
 - critical: 10% or lower remaining, default color red.
 
 Note, for vehicle without virtual energy, remaining fuel (only if available) will be displayed instead. If fuel data is not available from game API, then nothing will be displayed.
-
-**Known limitation with remaining virtual energy readings**
-
-Currently, remaining virtual energy data from `LMU's Rest API` is updated only when driver completes a lap, which means the data from API will not change during a lap, but only at the moment a lap is done by a driver. And due to this, the data will not tell how much energy was refilled in pit until the driver finished his pit-out lap. This makes the data less useful by itself.
-
-To workaround this API limitation, a special interpolation algorithm is implemented, which enables accurate estimates to remaining energy progressively during a lap for each driver. The average accuracy of estimation is within 1%.
-
-Some cases where interpolation may not be applied:
-- Interpolation may require at least 1 full lap (not counting pit-out lap) done before it can take effect.
-- During pit stop, refilled energy reading may not be updated until driver finishes his pit-out lap (as mentioned earlier), which means old energy reading persists during pit-out lap and would result wrong estimates with interpolation. For this reason, interpolation is disabled during pit-out lap.
-
-In either case, just wait another lap and energy readings will be synchronized.
 
     energy_remaining_decimal_places
 Set additional decimals to be displayed.
