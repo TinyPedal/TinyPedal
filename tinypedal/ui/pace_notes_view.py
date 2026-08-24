@@ -43,7 +43,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal, realtime_state
+from .. import app_signal, overlay_signal, realtime_state
 from ..api_control import api
 from ..const_file import FileFilter
 from ..module_control import mctrl
@@ -69,10 +69,26 @@ class PaceNotesPlayer(QMediaPlayer):
         self._update_timer = QBasicTimer()
 
         # Last data
-        self._checked = False
+        self._vehicle_resets = None
         self._last_notes_index = None
         self._last_pit_notes_index = None
         self._play_queue: list[str] = []
+
+        overlay_signal.paused.connect(self.__toggle_timer)
+
+    @Slot(bool)  # type: ignore[operator]
+    def __toggle_timer(self, paused: bool):
+        """Toggle widget timer state"""
+        if paused:
+            self._update_timer.stop()
+        else:
+            if self._vehicle_resets != realtime_state.resets:
+                self.reset_playback(realtime_state.resets)
+            update_interval = max(
+                self.mcfg["update_interval"],
+                cfg.application["minimum_update_interval"],
+            )
+            self._update_timer.start(update_interval, self)
 
     def set_audio_device(self):
         """Set audio device"""
@@ -84,23 +100,9 @@ class PaceNotesPlayer(QMediaPlayer):
             return audio_device
         return None  # qt5
 
-    def set_playback(self, enabled: bool):
-        """Set playback state"""
-        self.reset_playback()
-        if enabled:
-            update_interval = max(
-                self.mcfg["update_interval"],
-                cfg.application["minimum_update_interval"],
-            )
-            self._update_timer.start(update_interval, self)
-            logger.info("ENABLED: pace notes sounds playback")
-        else:
-            self._update_timer.stop()
-            logger.info("DISABLED: pace notes sounds playback")
-
-    def reset_playback(self):
+    def reset_playback(self, vehicle_resets=None):
         """Reset"""
-        self._checked = False
+        self._vehicle_resets = vehicle_resets
         self._last_notes_index = None
         self._last_pit_notes_index = None
         self._play_queue.clear()
@@ -109,33 +111,23 @@ class PaceNotesPlayer(QMediaPlayer):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        if realtime_state.active:
+        # Out pit notes
+        notes_index = minfo.pacenotes.out.currentIndex
+        if self._last_notes_index != notes_index:
+            self._last_notes_index = notes_index
+            if not api.read.vehicle.in_pits():
+                self.__update_queue(minfo.pacenotes.out.currentNote.get(COLUMN_PACENOTE))
 
-            # Reset switch
-            if not self._checked:
-                self._checked = True
+        # In pit notes
+        notes_index = minfo.pacenotes.pit.currentIndex
+        if self._last_pit_notes_index != notes_index:
+            self._last_pit_notes_index = notes_index
+            if self.mcfg["enable_playback_while_in_pit"] and api.read.vehicle.in_pits() and not api.read.vehicle.in_garage():
+                self.__update_queue(minfo.pacenotes.pit.currentNote.get(COLUMN_PACENOTE))
 
-            # Out pit notes
-            notes_index = minfo.pacenotes.currentIndex
-            if self._last_notes_index != notes_index:
-                self._last_notes_index = notes_index
-                if not api.read.vehicle.in_pits():
-                    self.__update_queue(minfo.pacenotes.currentNote.get(COLUMN_PACENOTE))
-
-            # In pit notes
-            notes_index = minfo.pacenotes_pit.currentIndex
-            if self._last_pit_notes_index != notes_index:
-                self._last_pit_notes_index = notes_index
-                if self.mcfg["enable_playback_while_in_pit"] and api.read.vehicle.in_pits() and not api.read.vehicle.in_garage():
-                    self.__update_queue(minfo.pacenotes_pit.currentNote.get(COLUMN_PACENOTE))
-
-            # Playback
-            if self._play_queue:
-                self.__play_next_in_queue()
-
-        else:
-            if self._checked:
-                self.reset_playback()
+        # Playback
+        if self._play_queue:
+            self.__play_next_in_queue()
 
     def set_source(self) -> None:
         """Set source (compatibility)"""
@@ -327,11 +319,16 @@ class PaceNotesControl(QWidget):
 
     def set_enable_state(self, enabled: bool):
         """Set enabled state"""
-        self.button_toggle.setText("  Playback Enabled  " if enabled else "  Playback Disabled  ")
+        if enabled:
+            self.button_toggle.setText("  Playback Enabled  ")
+            logger.info("ENABLED: pace notes sounds playback")
+        else:
+            self.button_toggle.setText("  Playback Disabled  ")
+            logger.info("DISABLED: pace notes sounds playback")
         self.button_toggle.setChecked(enabled)
         self.button_apply.setDisabled(not enabled)
         self.frame_control.setDisabled(not enabled)
-        self.pace_notes_player.set_playback(enabled)
+        self.pace_notes_player.reset_playback()
 
     def set_notes_path(self):
         """Set pace notes file path"""

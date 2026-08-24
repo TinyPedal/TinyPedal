@@ -782,8 +782,8 @@ class MappingInfo:
         self.sunlightPhases: tuple[tuple[float, int], ...] | None = None
 
 
-class NotesInfo:
-    """Notes output data"""
+class NotesData:
+    """Notes data"""
 
     __slots__ = (
         "currentIndex",
@@ -801,6 +801,19 @@ class NotesInfo:
         self.currentNote: Mapping[str, float | str] = EMPTY_DICT
         self.nextIndex: int = 0
         self.nextNote: Mapping[str, float | str] = EMPTY_DICT
+
+
+class NotesInfo:
+    """Notes output data"""
+
+    __slots__ = (
+        "out",
+        "pit",
+    )
+
+    def __init__(self):
+        self.out: NotesData = NotesData()
+        self.pit: NotesData = NotesData()
 
 
 class RelativeInfo:
@@ -1010,9 +1023,7 @@ class ModuleInfo:
         "sectors",
         "stats",
         "pacenotes",
-        "pacenotes_pit",
         "tracknotes",
-        "tracknotes_pit",
         "vehicles",
         "wheels",
     )
@@ -1029,9 +1040,7 @@ class ModuleInfo:
         self.sectors = SectorsInfo()
         self.stats = StatsInfo()
         self.pacenotes = NotesInfo()
-        self.pacenotes_pit = NotesInfo()
         self.tracknotes = NotesInfo()
-        self.tracknotes_pit = NotesInfo()
         self.vehicles = VehiclesInfo()
         self.wheels = WheelsInfo()
 

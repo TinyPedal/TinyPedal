@@ -120,13 +120,13 @@ class Realtime(Overlay):
         in_pits = api.read.vehicle.in_pits()
 
         if not in_pits:  # out pit
-            notes_current = minfo.tracknotes.currentNote
-            notes_next = minfo.tracknotes.nextNote
-            notes_index = minfo.tracknotes.currentIndex if notes_current else None
+            notes_current = minfo.tracknotes.out.currentNote
+            notes_next = minfo.tracknotes.out.nextNote
+            notes_index = minfo.tracknotes.out.currentIndex if notes_current else None
         elif self.wcfg["show_pit_notes_while_in_pit"]:
-            notes_current = minfo.tracknotes_pit.currentNote
-            notes_next = minfo.tracknotes_pit.nextNote
-            notes_index = minfo.tracknotes_pit.currentIndex
+            notes_current = minfo.tracknotes.pit.currentNote
+            notes_next = minfo.tracknotes.pit.nextNote
+            notes_index = minfo.tracknotes.pit.currentIndex
         else:  # not available
             notes_current = EMPTY_DICT
             notes_next = EMPTY_DICT

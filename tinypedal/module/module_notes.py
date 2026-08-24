@@ -28,7 +28,7 @@ from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
 from ..const_file import FileExt
-from ..module_info import NotesInfo, minfo
+from ..module_info import NotesData, minfo
 from ..userfile.track_notes import (
     COLUMN_DISTANCE,
     COLUMN_TAGS,
@@ -54,14 +54,15 @@ class Realtime(DataModule):
         """Update module data"""
         _event_wait = self._event.wait
         reset = False
+        vehicle_resets = None
         update_interval = self.idle_interval
 
         userpath_pace_notes = self.cfg.path.pace_notes
         userpath_track_notes = self.cfg.path.track_notes
-        output_pacenotes = minfo.pacenotes
-        output_tracknotes = minfo.tracknotes
-        output_pacenotes_pit = minfo.pacenotes_pit
-        output_tracknotes_pit = minfo.tracknotes_pit
+        output_pacenotes_out = minfo.pacenotes.out
+        output_tracknotes_out = minfo.tracknotes.out
+        output_pacenotes_pit = minfo.pacenotes.pit
+        output_tracknotes_pit = minfo.tracknotes.pit
 
         setting_playback = self.cfg.user.setting["pace_notes_playback"]
 
@@ -72,6 +73,17 @@ class Realtime(DataModule):
                     reset = True
                     update_interval = self.active_interval
 
+                # Reset
+                if vehicle_resets != realtime_state.resets:
+                    # Delay reset until driving
+                    if not realtime_state.active:
+                        continue
+                    vehicle_resets = realtime_state.resets
+
+                    output_pacenotes_out.reset()
+                    output_pacenotes_pit.reset()
+                    output_tracknotes_out.reset()
+                    output_tracknotes_pit.reset()
                     track_name = api.read.session.track_name()
 
                     # Load pace notes
@@ -83,8 +95,8 @@ class Realtime(DataModule):
                         parser=parse_csv_notes_only,
                         extension=FileExt.TPPN,
                     )
-                    gen_pacenotes = notes_selector(
-                        output=output_pacenotes,
+                    gen_pacenotes_out = notes_selector(
+                        output=output_pacenotes_out,
                         dataset=filter_notes(pace_notes),
                     )
                     gen_pacenotes_pit = notes_selector(
@@ -100,8 +112,8 @@ class Realtime(DataModule):
                         parser=parse_csv_notes_only,
                         extension=FileExt.TPTN,
                     )
-                    gen_tracknotes = notes_selector(
-                        output=output_tracknotes,
+                    gen_tracknotes_out = notes_selector(
+                        output=output_tracknotes_out,
                         dataset=filter_notes(track_notes),
                     )
                     gen_tracknotes_pit = notes_selector(
@@ -114,14 +126,14 @@ class Realtime(DataModule):
                 pos_offset = pos_synced + setting_playback["pace_notes_global_offset"]
 
                 # Update pace notes
-                if gen_pacenotes:
-                    gen_pacenotes.send(pos_offset)
+                if gen_pacenotes_out:
+                    gen_pacenotes_out.send(pos_offset)
                 if gen_pacenotes_pit:
                     gen_pacenotes_pit.send(pos_offset)
 
                 # Update track notes
-                if gen_tracknotes:
-                    gen_tracknotes.send(pos_synced)
+                if gen_tracknotes_out:
+                    gen_tracknotes_out.send(pos_synced)
                 if gen_tracknotes_pit:
                     gen_tracknotes_pit.send(pos_synced)
 
@@ -129,10 +141,6 @@ class Realtime(DataModule):
                 if reset:
                     reset = False
                     update_interval = self.idle_interval
-                    output_pacenotes.reset()
-                    output_tracknotes.reset()
-                    output_pacenotes_pit.reset()
-                    output_tracknotes_pit.reset()
 
 
 def load_pace_notes_file(
@@ -153,7 +161,7 @@ def load_pace_notes_file(
 
 
 @generator_init
-def notes_selector(output: NotesInfo, dataset: tuple[Mapping, ...]):
+def notes_selector(output: NotesData, dataset: tuple[Mapping, ...]):
     """Notes selector
 
     Args:

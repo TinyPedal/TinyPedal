@@ -12,6 +12,7 @@ WIP
 
 * Misc
   - User data can be reset while on track.
+  - Pausing game will no longer reset various data from data modules.
 
 2.49.4 (2026-08-12)
 -----------------------------
