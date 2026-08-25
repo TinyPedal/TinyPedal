@@ -28,7 +28,7 @@ from ..module_info import MapCoords, MappingInfo, minfo
 from ..userfile.track_info import load_track_info, save_track_info
 from ..userfile.track_map import load_track_map_file, save_track_map_file
 from ..validator import file_last_modified, generator_init
-from ._base import DataModule, round4
+from ._base import DataModule
 
 
 class Realtime(DataModule):
@@ -206,9 +206,11 @@ def record_track_map(output: MappingInfo, filepath: str):
                     raw_coords=output_data.coords,
                     raw_dists=output_data.dists,
                     sector_index=output_data.sectors,
+                    decimals=4,
                 )
-                #logger.info("map saved, stopped map recording")
+                output_data.clear()
                 delayed_save = False
+                #logger.info("map saved, stopped map recording")
 
             # Delay reset until driving
             if not realtime_state.active:
@@ -226,6 +228,7 @@ def record_track_map(output: MappingInfo, filepath: str):
             last_modified = modified
             if map_exist:
                 continue
+
             # Load map file
             output_data.coords, output_data.dists, output_data.sectors = load_track_map_file(
                 filepath=filepath,
@@ -240,10 +243,13 @@ def record_track_map(output: MappingInfo, filepath: str):
                 #logger.info("map exist")
             else:
                 output.reset()
-                output_data.clear()
                 map_exist = False
                 #logger.info("map not exist")
+
             # Reset to defaults
+            output_data.clear()
+            temp_data.clear()
+            recorder_data.clear()
             recording = False
             validating = False
             last_sector_idx = -1
@@ -278,18 +284,15 @@ def record_track_map(output: MappingInfo, filepath: str):
 
         # Validate map data after crossing finish line
         if validating:
-            lap_etime = api.read.timing.elapsed()
-            laptime_valid = api.read.timing.last_laptime()
-            laptime_curr = lap_etime - last_lap_stime
+            laptime_curr = api.read.timing.current_laptime()
             # Save data
-            if 1 < laptime_curr <= 8 and laptime_valid > 0:
+            if 1 < laptime_curr <= 8 and api.read.timing.last_laptime() > 0:
                 output_data.coords = temp_data.coords
                 output_data.dists = temp_data.dists
                 output_data.sectors = temp_data.sectors
                 # Reset
                 temp_data.clear()
                 recorder_data.clear()
-                map_exist = True
                 recording = False
                 validating = False
                 delayed_save = True
@@ -312,12 +315,12 @@ def record_track_map(output: MappingInfo, filepath: str):
 
             # Record driving path
             # Update if position value is different & positive
-            pos_curr = round4(api.read.lap.distance())
+            pos_curr = api.read.lap.distance()
             if 0 <= pos_curr != pos_last:
                 if pos_curr > pos_last:  # position further
-                    gps_curr = (round4(api.read.vehicle.position_longitudinal()),
-                                round4(api.read.vehicle.position_lateral()))
-                    elv_curr = round4(api.read.vehicle.position_vertical())
-                    recorder_data.coords.append(gps_curr)
-                    recorder_data.dists.append((pos_curr, elv_curr))
+                    pos_x = api.read.vehicle.position_longitudinal()
+                    pos_y = api.read.vehicle.position_lateral()
+                    pos_z = api.read.vehicle.position_vertical()
+                    recorder_data.coords.append((pos_x, pos_y))
+                    recorder_data.dists.append((pos_curr, pos_z))
                 pos_last = pos_curr  # reset last position

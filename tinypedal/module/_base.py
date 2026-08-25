@@ -28,7 +28,6 @@ from ..setting import Setting
 
 logger = logging.getLogger(__name__)
 # Function
-round4 = partial(round, ndigits=4)
 round6 = partial(round, ndigits=6)
 
 
