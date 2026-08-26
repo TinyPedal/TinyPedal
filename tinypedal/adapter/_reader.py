@@ -739,15 +739,15 @@ class Vehicle(ABC):
         """Vertical axis position (meters) related to world plane"""
 
     @abstractmethod
-    def accel_lateral(self, index: int | None = None) -> float:
+    def acceleration_lateral(self, index: int | None = None) -> float:
         """Lateral acceleration (m/s^2)"""
 
     @abstractmethod
-    def accel_longitudinal(self, index: int | None = None) -> float:
+    def acceleration_longitudinal(self, index: int | None = None) -> float:
         """Longitudinal acceleration (m/s^2)"""
 
     @abstractmethod
-    def accel_vertical(self, index: int | None = None) -> float:
+    def acceleration_vertical(self, index: int | None = None) -> float:
         """Vertical acceleration (m/s^2)"""
 
     @abstractmethod

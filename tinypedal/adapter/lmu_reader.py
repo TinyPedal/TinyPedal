@@ -1057,15 +1057,15 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Vertical axis position (meters) related to world plane"""
         return rmnan(self.shmm.lmuTeleVeh(index).mPos.y)  # in LMU coord system
 
-    def accel_lateral(self, index: int | None = None) -> float:
+    def acceleration_lateral(self, index: int | None = None) -> float:
         """Lateral acceleration (m/s^2)"""
         return rmnan(self.shmm.lmuTeleVeh(index).mLocalAccel.x)  # X in LMU coord system
 
-    def accel_longitudinal(self, index: int | None = None) -> float:
+    def acceleration_longitudinal(self, index: int | None = None) -> float:
         """Longitudinal acceleration (m/s^2)"""
         return rmnan(self.shmm.lmuTeleVeh(index).mLocalAccel.z)  # Z in LMU coord system
 
-    def accel_vertical(self, index: int | None = None) -> float:
+    def acceleration_vertical(self, index: int | None = None) -> float:
         """Vertical acceleration (m/s^2)"""
         return rmnan(self.shmm.lmuTeleVeh(index).mLocalAccel.y)  # Y in LMU coord system
 

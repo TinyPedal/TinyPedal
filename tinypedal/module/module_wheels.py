@@ -155,8 +155,8 @@ def calc_wheel_rotation(
         wheel_rot = api.read.wheel.rotation()
         speed = api.read.vehicle.speed()
         accel_max = max(
-            abs(api.read.vehicle.accel_lateral()),
-            abs(api.read.vehicle.accel_longitudinal()),
+            abs(api.read.vehicle.acceleration_lateral()),
+            abs(api.read.vehicle.acceleration_longitudinal()),
         )
 
         # Get wheel axle rotation and difference

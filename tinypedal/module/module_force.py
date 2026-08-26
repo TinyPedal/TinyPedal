@@ -150,8 +150,8 @@ def calc_force(
 
         # Read telemetry
         elapsed = api.read.timing.elapsed()
-        lat_accel = api.read.vehicle.accel_lateral()
-        lgt_accel = api.read.vehicle.accel_longitudinal()
+        lat_accel = api.read.vehicle.acceleration_lateral()
+        lgt_accel = api.read.vehicle.acceleration_longitudinal()
         dforce_f = api.read.vehicle.downforce_front()
         dforce_r = api.read.vehicle.downforce_rear()
         brake_raw = api.read.inputs.brake_raw()

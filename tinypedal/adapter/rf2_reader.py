@@ -999,15 +999,15 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Vertical axis position (meters) related to world plane"""
         return rmnan(self.shmm.rf2TeleVeh(index).mPos.y)  # in RF2 coord system
 
-    def accel_lateral(self, index: int | None = None) -> float:
+    def acceleration_lateral(self, index: int | None = None) -> float:
         """Lateral acceleration (m/s^2)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mLocalAccel.x)  # X in RF2 coord system
 
-    def accel_longitudinal(self, index: int | None = None) -> float:
+    def acceleration_longitudinal(self, index: int | None = None) -> float:
         """Longitudinal acceleration (m/s^2)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mLocalAccel.z)  # Z in RF2 coord system
 
-    def accel_vertical(self, index: int | None = None) -> float:
+    def acceleration_vertical(self, index: int | None = None) -> float:
         """Vertical acceleration (m/s^2)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mLocalAccel.y)  # Y in RF2 coord system
 
