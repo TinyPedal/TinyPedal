@@ -115,7 +115,6 @@ MODULE_DEFAULT = {
         "wheel_lift_off_threshold": 1,
         "estimated_unsprung_weight": 200,
         "minimum_static_weight_override": -1,
-        "cornering_radius_sampling_interval": 10,
     },
 }
 

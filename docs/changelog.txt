@@ -14,6 +14,12 @@ WIP
   - Now reads remaining energy data from LMU's native API (which used in Relative, Rivals, Standings Widget).
   - Removed "enable_energy_remaining" option from LMU RestAPI setting.
 
+* Cruise Widget
+  - Removed "show_cornering_radius" option.
+
+* Wheels Module
+  - Removed "cornering_radius_sampling_interval" option.
+
 * Misc
   - User data can be reset while on track.
   - Pausing game will no longer reset various data from data modules.

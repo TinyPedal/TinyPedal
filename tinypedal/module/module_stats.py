@@ -27,7 +27,7 @@ from time import localtime, strftime
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import FLOAT_INF, POS_XYZ_INF
+from ..const_common import FLOAT_INF
 from ..module_info import StatsInfo, minfo
 from ..userfile.brands import select_brand_name
 from ..userfile.car_setup import (
@@ -180,7 +180,7 @@ def record_driver_stats(
             last_num_penalties = 99999
             fuel_last = 0.0
             last_finish_state = 99999
-            gps_last = POS_XYZ_INF
+            gps_last = (FLOAT_INF, FLOAT_INF, FLOAT_INF)
 
         # General
         lap_stime = api.read.timing.start()

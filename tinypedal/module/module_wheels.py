@@ -21,13 +21,12 @@ Wheels module
 """
 
 import logging
-from collections import deque
 from operator import mul
 
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import FLOAT_INF, POS_XY_ZERO, WHEELS_DELTA_DEFAULT, WHEELS_ZERO
+from ..const_common import FLOAT_INF, WHEELS_DELTA_DEFAULT, WHEELS_ZERO
 from ..module_info import WheelsInfo, minfo
 from ..userfile.heatmap import (
     brake_failure_thickness,
@@ -83,10 +82,6 @@ class Realtime(DataModule):
             unsprung_weight=max(self.mcfg["estimated_unsprung_weight"], 0),
             minimum_weight_override=max(self.mcfg["minimum_static_weight_override"], 0),
         )
-        gen_cornering_radius = calc_cornering_radius(
-            output=minfo.wheels,
-            sampling_interval=self.mcfg["cornering_radius_sampling_interval"],
-        )
 
         while not _event_wait(update_interval):
             if realtime_state.active:
@@ -102,7 +97,6 @@ class Realtime(DataModule):
                 gen_brake_wear.send(vehicle_resets)
                 gen_susp_travel.send(vehicle_resets)
                 gen_vehicle_weight.send(vehicle_resets)
-                gen_cornering_radius.send(True)
 
             else:
                 if reset:
@@ -728,24 +722,3 @@ def calc_vehicle_weight(output: WheelsInfo, g_accel: float, unsprung_weight: flo
         output.frontWeightRatio = front_ratio
         output.leftWeightRatio = left_ratio
         output.crossWeightRatio = cross_ratio
-
-
-@generator_init
-def calc_cornering_radius(output: WheelsInfo, sampling_interval: int):
-    """Calculate cornering radius"""
-    gps_last = POS_XY_ZERO
-    min_coords = min(max(sampling_interval, 5), 100)
-    coords_array = deque([POS_XY_ZERO] * min_coords * 2, min_coords * 2)
-
-    while True:
-        yield None
-
-        gps_curr = (api.read.vehicle.position_longitudinal(), api.read.vehicle.position_lateral())
-
-        # Calculate cornering radius based on tri-coordinates position
-        if gps_last != gps_curr:
-            gps_last = gps_curr
-            coords_array.append(gps_curr)
-            arc_center_pos = calc.tri_coords_circle_center(
-                *coords_array[0], *coords_array[min_coords], *coords_array[-1])
-            output.corneringRadius = calc.distance(coords_array[0], arc_center_pos)

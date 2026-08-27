@@ -126,22 +126,6 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_distance_into_lap"],
             )
 
-        # Cornering radius
-        if self.wcfg["show_cornering_radius"]:
-            text_cornering_radius = f"r{self.unit_dist(0):>4.0f}{self.symbol_dist}"
-            self.bar_cornering_radius = self.set_rawtext(
-                text=text_cornering_radius,
-                width=font_m.width * len(text_cornering_radius) + bar_padx,
-                fixed_height=font_m.height,
-                offset_y=font_m.voffset,
-                fg_color=self.wcfg["font_color_cornering_radius"],
-                bg_color=self.wcfg["background_color_cornering_radius"],
-            )
-            self.set_primary_orient(
-                target=self.bar_cornering_radius,
-                column=self.wcfg["display_order_cornering_radius"],
-            )
-
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Compass
@@ -163,11 +147,6 @@ class Realtime(Overlay):
         if self.wcfg["show_distance_into_lap"]:
             lap_distance = minfo.delta.lapDistance
             self.update_lap_distance(self.bar_lap_distance, lap_distance)
-
-        # Cornering radius
-        if self.wcfg["show_cornering_radius"]:
-            cornering_radius = minfo.wheels.corneringRadius
-            self.update_cornering_radius(self.bar_cornering_radius, cornering_radius)
 
     # GUI update methods
     def update_compass(self, target, data):
@@ -197,14 +176,4 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = f"{self.unit_dist(data):>6.0f}{self.symbol_dist}"
-            target.update()
-
-    def update_cornering_radius(self, target, data):
-        """Cornering radius"""
-        if target.last != data:
-            target.last = data
-            meter = self.unit_dist(data)
-            if meter > 9999:
-                meter = 0
-            target.text = f"r{meter:>4.0f}{self.symbol_dist}"
             target.update()

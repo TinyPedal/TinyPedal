@@ -947,7 +947,6 @@ class WheelsInfo:
     """Wheels output data"""
 
     __slots__ = (
-        "corneringRadius",
         "lockingPercentFront",
         "lockingPercentRear",
         "lockingTime",
@@ -979,7 +978,6 @@ class WheelsInfo:
     )
 
     def __init__(self):
-        self.corneringRadius: float = 0.0
         self.lockingPercentFront: float = 0.0
         self.lockingPercentRear: float = 0.0
         self.lockingTime: list[float] = list(WHEELS_ZERO)

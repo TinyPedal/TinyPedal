@@ -1718,9 +1718,6 @@ Set maximum rotation difference between left or right wheel rotation and same ax
     wheel_lock_threshold
 Set percentage threshold for counting wheel lock duration under braking. `0.3` means 30% of tyre slip ratio.
 
-    cornering_radius_sampling_interval
-Set position sampling interval for cornering radius calculation. Value range in `5` to `100`. Default sampling interval is `10`, which is roughly 200ms interval between each recorded position. Higher value may result inaccuracy. Note, this option does not affect position recording interval.
-
     minimum_delta_distance
 Set minimum recording distance (in meters) between each tyre wear sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
 
@@ -1995,9 +1992,6 @@ Set maximum number of display digits.
 
     show_distance_into_lap
 Show distance into current lap.
-
-    show_cornering_radius
-Show cornering radius calculated in real-time.
 
 [**`Back to Top`**](#)
 
