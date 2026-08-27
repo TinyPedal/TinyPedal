@@ -38,37 +38,41 @@ class RestAPIData:
     """Rest API data"""
 
     __slots__ = (
+        # LMU, RF2
         "timeScale",
         "privateQualifying",
+        "forecastPractice",
+        "forecastQualify",
+        "forecastRace",
+        "lastCarSetup",
+        # LMU only
         "steeringWheelRange",
         "aeroDamage",
         "repairTime",
         "pitStopTime",
         "absoluteRefill",
         "maxVirtualEnergy",
-        "forecastPractice",
-        "forecastQualify",
-        "forecastRace",
         "brakeWear",
         "suspensionDamage",
-        "lastCarSetup",
     )
 
     def __init__(self):
+        # LMU, RF2
         self.timeScale: int = 1
         self.privateQualifying: int = 0
+        self.forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
+        self.forecastQualify: tuple[WeatherNode, ...] = FORECAST_DEFAULT
+        self.forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
+        self.lastCarSetup: tuple[str, ...] = ()
+        # LMU only
         self.steeringWheelRange: float = 0.0
         self.aeroDamage: float = -1.0
         self.repairTime: float = 0.0
         self.pitStopTime: float = 0.0
         self.absoluteRefill: float = 0.0
         self.maxVirtualEnergy: float = 0.0
-        self.forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-        self.forecastQualify: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-        self.forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
         self.brakeWear: tuple[float, float, float, float] = WHEELS_NA
         self.suspensionDamage: tuple[float, float, float, float] = WHEELS_NA
-        self.lastCarSetup: tuple[str, ...] = ()
 
     def __del__(self):
         logger.info("RestAPI: GC: RestAPIData")

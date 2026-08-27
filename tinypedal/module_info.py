@@ -260,28 +260,28 @@ class DeltaFuelHistory:
 
     __slots__ = (
         "_last_lap_start",
+        "_last_remaining",
         "used",
-        "last",
         "laps",
     )
 
     def __init__(self):
         self._last_lap_start = 0.0
+        self._last_remaining = 0.0
         self.used = 0.0
-        self.last = 0.0
         self.laps = 0.0
 
-    def update(self, lap_start: float, fuel: float):
+    def update(self, lap_start: float, remaining: float):
         """Update delta lap time history"""
         if self._last_lap_start != lap_start:
             if 0 < self._last_lap_start < lap_start:
-                if self.last > fuel:
-                    self.used = self.last - fuel   # last lap fuel usage
-                self.last = fuel
+                if self._last_remaining > remaining:
+                    self.used = self._last_remaining - remaining
+                self._last_remaining = remaining
                 if self.used > 0:
-                    self.laps = fuel / self.used
+                    self.laps = remaining / self.used
             else:  # reset all laptime on session change
-                self.used = self.laps = self.last = 0.0
+                self.used = self.laps = self._last_remaining = 0.0
             self._last_lap_start = lap_start
 
 

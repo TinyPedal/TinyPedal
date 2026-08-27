@@ -962,7 +962,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def repair_time(self) -> float:
         """Scheduled repair time (seconds)"""
-        return 0.0
+        return self.rest.repairTime
 
     def finish_state(self, index: int | None = None) -> int:
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""
