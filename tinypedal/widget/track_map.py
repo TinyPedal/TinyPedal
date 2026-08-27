@@ -185,7 +185,7 @@ class Realtime(Overlay):
             dist = calc.distance(raw_coords[0], raw_coords[-1])
             angle = max(int(self.wcfg["display_orientation"]), 0)
             angle = angle - angle // 360 * 360
-            self.map_orient = calc.deg2rad(angle)
+            self.map_orient = calc.radians(angle)
             (self.map_scaled, self.map_range, self.map_scale, self.map_offset
              ) = calc.scale_map(raw_coords, self.area_size, self.area_margin, angle)
 
@@ -496,9 +496,9 @@ class Realtime(Overlay):
 
         painter.setBrush(Qt.NoBrush)
 
-        for target_pit_time, auto_prediction in self.get_target_pit_time(target_pit_time, pit_timer, plr_veh_info.inPit):
+        for pit_time, auto_prediction in self.get_target_pit_time(target_pit_time, pit_timer, plr_veh_info.inPit):
             # Calc estimated pitout_time_into based on laptime_pace
-            offset_time_into = pitout_time_extend - target_pit_time
+            offset_time_into = pitout_time_extend - pit_time
             pitout_time_into = (offset_time_into - offset_time_into // laptime_pace * laptime_pace) * laptime_scale
             # Find estimated distance from deltabest_data
             index_higher = calc.binary_search_higher_column(
@@ -524,7 +524,7 @@ class Realtime(Overlay):
             if self.wcfg["show_pitstop_duration"]:
                 painter.fillRect(self.pit_text_shape, self.wcfg["background_color_pitstop_duration"])
                 painter.setPen(self.pen_text["pitstop_duration"])
-                text_time = f"{min(target_pit_time - self.pitout_time_offset, 999):.0f}"
+                text_time = f"{min(pit_time - self.pitout_time_offset, 999):.0f}"
                 painter.drawText(self.pit_text_shape, Qt.AlignCenter, text_time)
 
             painter.resetTransform()

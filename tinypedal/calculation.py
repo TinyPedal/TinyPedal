@@ -22,7 +22,7 @@ Calculation function
 
 from __future__ import annotations
 
-from math import acos, atan, atan2, ceil, cos, degrees, dist, hypot, radians, sin
+from math import acos, atan, atan2, ceil, cos, degrees, dist, hypot, radians, sin, tan
 from statistics import fmean
 from typing import Any, Sequence, Tuple
 
@@ -30,12 +30,10 @@ from .const_common import FLOAT_INF
 
 CoordXY = Tuple[float, float]
 
-distance = dist  # coordinates distance
+distance = dist  # distance between 2 coordinates
+hypotenuse = hypot  # distance from origin point (0) to a point
 mean = fmean
-vel2speed = hypot  # velocity to speed
-rad2deg = degrees  # radians to degrees
-oriyaw2rad = atan2  # orientation yaw to radians
-deg2rad = radians  # degrees to radians
+oriyaw = atan2  # orientation yaw to radians
 
 
 # Common
@@ -308,7 +306,7 @@ def slope_percent(height: float, length: float) -> float:
 def slope_angle(height: float, length: float) -> float:
     """Slope angle (degree)"""
     if length:
-        return rad2deg(atan(height / length))
+        return degrees(atan(height / length))
     return 0
 
 
@@ -363,7 +361,7 @@ def quad_coords_angle(
     end_edge = distance(coords_center, coords_end)
     rad1 = tri_coords_angle(center1_edge, start_edge, mid_edge)
     rad2 = tri_coords_angle(center2_edge, mid_edge, end_edge)
-    return rad2deg(rad1 + rad2)
+    return degrees(rad1 + rad2)
 
 
 def turning_direction(yaw_rad: float, x1: float, y1: float, x2: float, y2: float) -> int:
@@ -575,7 +573,7 @@ def zoom_map(coords: Sequence[CoordXY], map_scale: float, margin: int = 0):
 
 def rotate_map(coords: Sequence[CoordXY], angle: int):
     """Rotate map coordinates"""
-    rot_rad = deg2rad(angle)
+    rot_rad = radians(angle)
     for x, y in coords:
         yield rotate_coordinate(rot_rad, x, y)
 
@@ -648,7 +646,7 @@ def line_intersect_coords(
     rad: amount rotation (radians) to apply
     length: length between coordinates
     """
-    yaw_rad = oriyaw2rad(
+    yaw_rad = oriyaw(
         coord_b[1] - coord_a[1],
         coord_b[0] - coord_a[0]
     )

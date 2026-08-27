@@ -120,11 +120,11 @@ class Realtime(Overlay):
                     api.read.vehicle.position_lateral())
 
         # Vehicle orientation yaw
-        temp_veh_ori_yaw = calc.rad2deg(api.read.vehicle.orientation_yaw_radians()) + 180
+        temp_veh_ori_yaw = calc.degrees(api.read.vehicle.orientation_yaw_radians()) + 180
 
         # Direction of travel yaw angle
         if self.last_pos != pos_curr and speed > 1:
-            self.yaw_angle = temp_veh_ori_yaw - calc.rad2deg(calc.oriyaw2rad(
+            self.yaw_angle = temp_veh_ori_yaw - calc.degrees(calc.oriyaw(
                 pos_curr[0] - self.last_pos[0], pos_curr[1] - self.last_pos[1])) + 180
             self.last_pos = pos_curr
         elif speed <= 1:
@@ -133,7 +133,7 @@ class Realtime(Overlay):
 
         # Slip angle
         if speed > 1:
-            self.slip_angle = calc.rad2deg(
+            self.slip_angle = calc.degrees(
                 (api.read.wheel.slip_angle_fl() + api.read.wheel.slip_angle_fr()) * 0.5)
         else:
             self.slip_angle = 0

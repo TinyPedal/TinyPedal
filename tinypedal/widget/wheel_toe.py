@@ -142,13 +142,13 @@ class Realtime(Overlay):
         """Toe in data"""
         if target.last != data:
             target.last = data
-            target.text = f"{calc.rad2deg(data):+.{self.decimals_toe_in + 1}f}"[:3 + self.decimals_toe_in]
+            target.text = f"{calc.degrees(data):+.{self.decimals_toe_in + 1}f}"[:3 + self.decimals_toe_in]
             target.update()
 
     def update_total(self, target, data):
         """Total toe angle data"""
         if target.last != data:
             target.last = data
-            target.text = f"{calc.rad2deg(abs(data)):.{self.decimals_total + 1}f}"[:2 + self.decimals_total]
+            target.text = f"{calc.degrees(abs(data)):.{self.decimals_total + 1}f}"[:2 + self.decimals_total]
             target.fg = self.bar_style_total[data > 0]
             target.update()

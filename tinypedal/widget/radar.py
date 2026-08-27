@@ -365,7 +365,7 @@ class Realtime(Overlay):
                     raw_pos_y * self.global_scale + self.area_center,
                 )
                 if self.wcfg["show_vehicle_orientation"]:
-                    painter.rotate(calc.rad2deg(-veh_info.relativeOrientationRadians))
+                    painter.rotate(calc.degrees(-veh_info.relativeOrientationRadians))
 
                 # Draw vehicle
                 if self.wcfg["show_collision_course"]:

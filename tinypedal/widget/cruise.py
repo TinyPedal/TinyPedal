@@ -174,7 +174,7 @@ class Realtime(Overlay):
         """Compass"""
         if target.last != data:
             target.last = data
-            degree = 180 - calc.rad2deg(data)
+            degree = 180 - calc.degrees(data)
             target.text = f"{degree:03.0f}°{calc.select_grade(COMPASS_BEARINGS, degree):>2}"
             target.update()
 

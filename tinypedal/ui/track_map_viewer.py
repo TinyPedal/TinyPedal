@@ -484,7 +484,7 @@ class MapView(QWidget):
         arc_radius = calc.distance(point_one, arc_center_pos)
         arc_angle = calc.quad_coords_angle(
             arc_center_pos, point_one, point_mid, point_end)
-        yaw_radians = calc.oriyaw2rad(
+        yaw_radians = calc.oriyaw(
             point_sec[1] - point_one[1], point_sec[0] - point_one[0])
         turn_direct = calc.turning_direction(
             yaw_radians, *point_one, *point_end)
@@ -620,7 +620,7 @@ class MapView(QWidget):
 
             center_mark_radius = self.ecfg["center_mark_radius"]
             painter.translate(self.center_x, self.center_y)
-            painter.rotate(calc.rad2deg(yaw_radians))
+            painter.rotate(calc.degrees(yaw_radians))
             painter.drawLine(-center_mark_radius, 0, center_mark_radius, 0)
             painter.drawLine(0, -center_mark_radius, 0, center_mark_radius)
             painter.resetTransform()

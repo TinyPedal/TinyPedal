@@ -138,12 +138,12 @@ class Realtime(Overlay):
         """Camber data"""
         if target.last != data:
             target.last = data
-            target.text = f"{calc.rad2deg(data):+.{self.decimals_camber}f}"[:3 + self.decimals_camber]
+            target.text = f"{calc.degrees(data):+.{self.decimals_camber}f}"[:3 + self.decimals_camber]
             target.update()
 
     def update_cdiff(self, target, data):
         """Camber difference data"""
         if target.last != data:
             target.last = data
-            target.text = f"{calc.rad2deg(data):+.{self.decimals_cdiff}f}"[:3 + self.decimals_cdiff]
+            target.text = f"{calc.degrees(data):+.{self.decimals_cdiff}f}"[:3 + self.decimals_cdiff]
             target.update()

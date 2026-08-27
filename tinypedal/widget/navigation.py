@@ -237,7 +237,7 @@ class Realtime(Overlay):
         )
         # Apply center offset & rotation
         painter.translate(self.area_center - rot_pos_x, self.veh_offset_y - rot_pos_y)
-        painter.rotate(calc.rad2deg(plr_ori_rad))
+        painter.rotate(calc.degrees(plr_ori_rad))
 
         if self.map_path:
             # Draw map outline
@@ -292,7 +292,7 @@ class Realtime(Overlay):
                 painter.translate(pos_x, pos_y)
 
                 if not self.wcfg["show_circle_vehicle_shape"]:
-                    painter.rotate(calc.rad2deg(-data.relativeOrientationRadians))
+                    painter.rotate(calc.degrees(-data.relativeOrientationRadians))
 
                 painter.setPen(self.pen_outline["opponent"])
                 painter.setBrush(self.color_vehicle(data))

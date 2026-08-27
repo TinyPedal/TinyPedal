@@ -26,12 +26,12 @@ Notes:
 from __future__ import annotations
 
 from ..calculation import (
+    hypotenuse,
     lap_progress_distance,
     mean,
     min_nonzero,
-    oriyaw2rad,
+    oriyaw,
     slip_angle,
-    vel2speed,
 )
 from ..const_common import MAX_SECONDS
 from ..formatter import strip_invalid_char
@@ -980,7 +980,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def orientation_yaw_radians(self, index: int | None = None) -> float:
         """Orientation yaw (radians)"""
         ori = self.shmm.rf2TeleVeh(index).mOri[2]
-        return rmnan(oriyaw2rad(ori.x, ori.z))
+        return rmnan(oriyaw(ori.x, ori.z))
 
     def position_xyz(self, index: int | None = None) -> tuple[float, float, float]:
         """Raw x,y,z position (meters)"""
@@ -1026,7 +1026,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def speed(self, index: int | None = None) -> float:
         """Speed (m/s)"""
         vel = self.shmm.rf2TeleVeh(index).mLocalVel
-        return rmnan(vel2speed(vel.x, vel.y, vel.z))
+        return rmnan(hypotenuse(vel.x, vel.y, vel.z))
 
     def downforce_front(self, index: int | None = None) -> float:
         """Downforce front (Newtons)"""

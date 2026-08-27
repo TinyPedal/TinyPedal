@@ -215,7 +215,7 @@ class Realtime(Overlay):
         painter.setRenderHint(QPainter.Antialiasing, True)
         painter.setPen(Qt.NoPen)
         painter.setBrush(self.brush_cone)
-        raw_angle = calc.rad2deg(calc.oriyaw2rad(*api.read.vehicle.impact_position()))
+        raw_angle = calc.degrees(calc.oriyaw(*api.read.vehicle.impact_position()))
         start_angle = 16 * (raw_angle - 90 - self.impact_cone_angle * 0.5)
         length_angle = 16 * self.impact_cone_angle
         painter.drawPie(self.rect_impact_cone, start_angle, length_angle)
