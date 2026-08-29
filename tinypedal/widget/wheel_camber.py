@@ -76,6 +76,10 @@ class Realtime(Overlay):
             gap_vert=self.wcfg["vertical_gap"],
         )
         self.decimals_camber = max(self.wcfg["decimal_places_camber"], 1)
+        self.bar_style_camber = (
+            self.wcfg["font_color_camber"],
+            self.wcfg["font_color_positive_camber"],
+        )
         self.bars_camber = self.set_rawtext(
             text=TEXT_NA,
             width=font_m.width * (3 + self.decimals_camber) + bar_padx,
@@ -139,6 +143,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.text = f"{calc.degrees(data):+.{self.decimals_camber}f}"[:3 + self.decimals_camber]
+            target.fg = self.bar_style_camber[data >= self.wcfg["positive_camber_threshold"]]
             target.update()
 
     def update_cdiff(self, target, data):

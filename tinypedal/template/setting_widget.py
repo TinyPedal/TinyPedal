@@ -3845,6 +3845,8 @@ WIDGET_DEFAULT = {
         "vertical_gap": 0,
         "decimal_places_camber": 2,
         "camber_smoothing_samples": 10,
+        "positive_camber_threshold": 0,
+        "font_color_positive_camber": "#FF6600",
         "font_color_camber": "#FFFFFF",
         "background_color_camber": "#222222",
         "show_camber_difference": True,

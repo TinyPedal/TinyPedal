@@ -4932,9 +4932,12 @@ Set number of samples for reducing data fluctuation. Lower value may result more
 
 
 ## Wheel camber
-**This widget displays wheel camber info.**
+**This widget displays wheel camber angle info.**
 
 Note, all camber readings are in degrees.
+
+    positive_camber_threshold
+Set positive camber threshold for highlighting positive camber angle.
 
     show_camber_difference
 Show camber difference between left and right wheel on the same axle, useful for quickly checking misalignment while driving.
@@ -4946,7 +4949,7 @@ Set number of samples for reducing data fluctuation. Lower value may result more
 
 
 ## Wheel toe
-**This widget displays wheel toe info.**
+**This widget displays wheel toe angle info.**
 
 Note, all toe readings are in degrees. Positive reading indicates toe-in; negative indicates toe-out.
 

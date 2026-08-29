@@ -4,9 +4,6 @@ WIP
   - Added "maximum_loading_attempts" option in global user config preset, which sets maximum retry attempts for preset loading. This option is useful in case failed to load a "good" preset for some reasons. See User Guide for details.
   - Added "Restore" button under "Preset" Tab, which opens "Restore Backup" dialog for managing and restoring backups. See "Restore Backup" section in User Guide for details.
 
-* Wheel toe Widget
-  - Show color indication for positive or negative total toe angle.
-
 * Hotkey Tab
   - Added "Overlay Auto Hide" keybinding for enabling or disabling overlay auto hide function.
 
@@ -28,6 +25,12 @@ WIP
 * Steering meter Widget
   - Renamed old "Steering" widget to "Steering meter". Old setting will be automatically transferred over.
 
+* Wheel camber Widget
+  - Show color indication for positive camber angle. Added "positive_camber_threshold, font_color_positive_camber" options.
+
+* Wheel toe Widget
+  - Show color indication for positive or negative total toe angle.
+
 * Wheels Module
   - Removed "cornering_radius_sampling_interval" option.
 
@@ -35,6 +38,7 @@ WIP
   - User data can be reset while on track.
   - Pausing game will no longer reset various data from data modules.
   - Adjusted default "wheel track" value to "1800" (mm) in Roll Angle Widget. Existing setting won't be changed.
+  - Optimized pace notes playback.
 
 2.49.4 (2026-08-12)
 -----------------------------
