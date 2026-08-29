@@ -3,6 +3,7 @@ WIP
 * Preset Management
   - Added "maximum_loading_attempts" option in global user config preset, which sets maximum retry attempts for preset loading. This option is useful in case failed to load a "good" preset for some reasons. See User Guide for details.
   - Added "Restore" button under "Preset" Tab, which opens "Restore Backup" dialog for managing and restoring backups. See "Restore Backup" section in User Guide for details.
+  - Added "Backup Preset" option to right-click context menu in "Preset" Tab, which allows to manually create a backup file for selected preset that can be restored later via "Restore Backup" dialog.
 
 * Hotkey Tab
   - Added "Overlay Auto Hide" keybinding for enabling or disabling overlay auto hide function.

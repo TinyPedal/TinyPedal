@@ -40,6 +40,7 @@ from .. import app_signal
 from ..const_app import VERSION
 from ..const_file import ConfigType, FileExt
 from ..setting import cfg
+from ..userfile.json_setting import create_backup_file, set_backup_timestamp
 from ._common import UIScaler
 from .preset_management import CreatePreset, PresetTransfer, RestoreBackup
 
@@ -155,6 +156,7 @@ class PresetList(QWidget):
         # Create context menu
         menu = QMenu()  # no parent for temp menu
         menu.addAction("Unlock Preset" if is_locked else "Lock Preset")
+        menu.addAction("Backup Preset")
         menu.addSeparator()
 
         menu_class = menu.addMenu("Set Primary for Class")
@@ -197,6 +199,20 @@ class PresetList(QWidget):
             if self.confirm_operation(title="Unlock Preset", message=msg_text):
                 if cfg.user.filelock.pop(selected_filename, None):
                     cfg.save(config_type=ConfigType.FILELOCK)
+        # Backup preset
+        elif action == "Backup Preset":
+            msg_text = (
+                f"Create a backup file for <b>{selected_filename}</b> preset?<br><br>"
+                "Backup file can be restored by click 'Restore' button."
+            )
+            if self.confirm_operation(title="Backup Preset", message=msg_text):
+                backup_extension = set_backup_timestamp()
+                if create_backup_file(selected_filename, cfg.path.settings, backup_extension, show_log=True):
+                    msg_text = f"Backup saved as:<br><b>{selected_filename}{backup_extension}</b>"
+                    QMessageBox.information(self, "Backup Preset", msg_text)
+                else:
+                    msg_text = "Failed to create backup, please try again."
+                    QMessageBox.warning(self, "Backup Preset", msg_text)
         # Duplicate preset
         elif action == "Duplicate":
             _dialog = CreatePreset(

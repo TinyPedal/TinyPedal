@@ -50,6 +50,10 @@ Click `Restore` button to restore preset from backups. see [Restore Backup](#res
 
     Unlock selected preset.
 
+* Backup Preset
+
+    Create a backup file for selected preset, which can be restored later via [Restore Backup](#restore-backup) dialog.
+
 * Set Primary for Class
 
     Add primary `class` tag to selected preset, which will be auto loaded by `Auto load preset` system. Class tags and colors are defined in `classes.json` file, which can be modified in [Vehicle Class Editor](#vehicle-class-editor).
