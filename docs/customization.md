@@ -2050,7 +2050,7 @@ Set minimum time interval between each warning flash. Default is `0.5` seconds. 
 Show cone indicator towards last known impact (collision) position.
 
     last_impact_cone_angle
-Set cone angle (size) in degree. Value range in `2` to `90`. Default is `15`.
+Set cone angle (size) in degrees. Value range in `2` to `90`. Default is `15`.
 
     last_impact_cone_duration
 Set cone indicator display duration (seconds) for last known impact. Default is `15` seconds.
@@ -2818,10 +2818,10 @@ Show fuel or energy consumption per second reading.
 Set widget size in pixels.
 
     show_yaw_angle_reading
-Show yaw angle reading in degree.
+Show yaw angle reading in degrees.
 
     show_slip_angle_reading
-Show slip angle reading in degree.
+Show slip angle reading in degrees.
 
     show_degree_sign
 Set `true` to show degree sign for yaw angle reading.
@@ -3403,7 +3403,7 @@ The three values define an invisible rectangle area(unit meter) that hides any v
 **This widget displays vehicle rake angle info.**
 
     wheelbase
-Set wheelbase in millimeters, for used in rake angle calculation.
+Set wheelbase in millimeters. Default is `2800` millimeters. This option affects `rake angle` calculation accuracy.
 
     rake_angle_smoothing_samples
 Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
@@ -3735,7 +3735,7 @@ Set custom time interval color of opponent ahead and behind.
 Set `true` to show degree and percentage sign.
 
     wheel_track_front, wheel_track_rear
-Set front and rear wheel track in millimeters, for used in roll angle calculation. Default is `2000` millimeters.
+Set front and rear wheel track in millimeters. Default is `1800` millimeters. This option affects `roll angle` calculation accuracy.
 
     roll_angle_smoothing_samples, roll_angle_ratio_smoothing_samples
 Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
@@ -4015,26 +4015,62 @@ Set minimum time threshold (in seconds) for highlighting lift and coast time. De
 [**`Back to Top`**](#)
 
 
-## Steering
+## Steering angle
+**This widget displays steering and wheel angle info.**
+
+    wheel_track_front
+Set front wheel track in millimeters. Default is `1800` millimeters. This option affects `Ackermann percentage` calculation accuracy.
+
+    wheelbase
+Set wheelbase in millimeters. Default is `2800` millimeters. This option affects `Ackermann percentage` and `turning radius` calculation accuracy.
+
+    minimum_vehicle_speed
+Set minimum vehicle speed threshold (in meters per second) for calculating `yaw rate`.
+
+    show_steering_angle
+Show steering angle in degrees.
+
+    manual_steering_range
+Manually set steering display range in degrees. Set to `0` to read physical steering range from API. This option may be useful when steering range value is not provided by some vehicles.
+
+    show_front_wheel_angle
+Show average front wheel angle in degrees.
+
+    show_steering_ratio
+Show steering ratio between steering wheel angle and average front wheel angle.
+
+    show_ackermann_percentage
+Show Ackermann percentage of inner and outer wheel angle during cornering. `0` percent indicates parallel steering. `100` percent indicates true Ackermann steering. Negative percent indicates Anti-Ackermann steering.
+
+    show_yaw_rate
+Show yaw rate in degrees per second.
+
+    show_turning_radius
+Show turning radius based on average front wheel angle.
+
+[**`Back to Top`**](#)
+
+
+## Steering meter
 **This widget displays steering input info.**
 
     bar_width, bar_height
-Set steering bar width and height in pixels.
+Set steering meter bar width and height in pixels.
 
     bar_edge_width
 Set left and right edge boundary width.
 
     manual_steering_range
-Manually set steering display range in degree. Set to `0` to read physical steering range from API. This option may be useful when steering range value is not provided by some vehicles.
+Manually set steering display range in degrees. Set to `0` to read physical steering range from API. This option may be useful when steering range value is not provided by some vehicles.
 
     show_steering_angle
-Show steering angle text in degree.
+Show steering angle in degrees.
 
     show_scale_mark
-This enables scale marks on steering bar.
+This enables scale marks on steering meter bar.
 
     scale_mark_degree
-Set gap between each scale mark in degree. Default is `90` degree. Minimum value is limited to `10` degree.
+Set gap between each scale mark in degrees. Default is `90` degrees. Minimum value is limited to `10` degrees.
 
 [**`Back to Top`**](#)
 
@@ -4057,10 +4093,10 @@ Set widget display size in pixels.
 Set widget display margin in pixels.
 
     show_steering_angle
-Show steering angle text in degree.
+Show steering angle in degrees.
 
     manual_steering_range
-Manually set steering display range in degree. Set to `0` to read physical steering range from API. This option may be useful when steering range value is not provided by some vehicles.
+Manually set steering display range in degrees. Set to `0` to read physical steering range from API. This option may be useful when steering range value is not provided by some vehicles.
 
     show_rotation_line
 Show steering rotation reference line, which can be useful to see if physical steering wheel is misaligned.

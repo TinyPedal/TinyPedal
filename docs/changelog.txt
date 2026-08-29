@@ -15,7 +15,18 @@ WIP
   - Removed "enable_energy_remaining" option from LMU RestAPI setting.
 
 * Cruise Widget
-  - Removed "show_cornering_radius" option.
+  - Removed "show_cornering_radius" option (now available as "show_turning_radius" in Steering angle Widget).
+
+* [New]Steering angle Widget
+  - Show steering angle in degrees.
+  - Show average front wheel angle in degrees.
+  - Show steering ratio between steering wheel angle and average front wheel angle.
+  - Show Ackermann percentage of inner and outer wheel angle during cornering. "0" percent indicates parallel steering. "100" percent indicates true Ackermann steering. Negative percent indicates Anti-Ackermann steering.
+  - Show yaw rate in degrees per second.
+  - Show turning radius based on average front wheel angle.
+
+* Steering meter Widget
+  - Renamed old "Steering" widget to "Steering meter". Old setting will be automatically transferred over.
 
 * Wheels Module
   - Removed "cornering_radius_sampling_interval" option.
@@ -23,6 +34,7 @@ WIP
 * Misc
   - User data can be reset while on track.
   - Pausing game will no longer reset various data from data modules.
+  - Adjusted default "wheel track" value to "1800" (mm) in Roll Angle Widget. Existing setting won't be changed.
 
 2.49.4 (2026-08-12)
 -----------------------------
