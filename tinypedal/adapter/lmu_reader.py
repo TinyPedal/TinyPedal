@@ -926,6 +926,16 @@ class Tyre(_reader.Tyre, DataAdapter):
             rmnan(wheel_data[3].mVerticalTireDeflection) * 1000,
         )
 
+    def slip_angle(self, index: int | None = None) -> tuple[float, ...]:
+        """Tyre slip angle (radians)"""
+        wheel_data = self.shmm.lmuTeleVeh(index).mWheels
+        return (
+            rmnan(slip_angle(wheel_data[0].mLateralGroundVel, wheel_data[0].mLongitudinalGroundVel)),
+            rmnan(slip_angle(wheel_data[1].mLateralGroundVel, wheel_data[1].mLongitudinalGroundVel)),
+            rmnan(slip_angle(wheel_data[2].mLateralGroundVel, wheel_data[2].mLongitudinalGroundVel)),
+            rmnan(slip_angle(wheel_data[3].mLateralGroundVel, wheel_data[3].mLongitudinalGroundVel)),
+        )
+
 
 class Vehicle(_reader.Vehicle, DataAdapter):
     """Vehicle"""
@@ -1174,7 +1184,7 @@ class Wheel(_reader.Wheel, DataAdapter):
         )
 
     def rotation(self, index: int | None = None) -> tuple[float, ...]:
-        """Wheel rotation (radians per second)"""
+        """Wheel rotation (radians per second), or angular velocity"""
         wheel_data = self.shmm.lmuTeleVeh(index).mWheels
         return (
             rmnan(wheel_data[0].mRotation),
@@ -1202,34 +1212,6 @@ class Wheel(_reader.Wheel, DataAdapter):
             rmnan(wheel_data[2].mLongitudinalGroundVel),
             rmnan(wheel_data[3].mLongitudinalGroundVel),
         )
-
-    def slip_angle_fl(self, index: int | None = None) -> float:
-        """Slip angle (radians) front left"""
-        wheel_data = self.shmm.lmuTeleVeh(index).mWheels[0]
-        return rmnan(slip_angle(
-            wheel_data.mLateralGroundVel,
-            wheel_data.mLongitudinalGroundVel))
-
-    def slip_angle_fr(self, index: int | None = None) -> float:
-        """Slip angle (radians) front right"""
-        wheel_data = self.shmm.lmuTeleVeh(index).mWheels[1]
-        return rmnan(slip_angle(
-            wheel_data.mLateralGroundVel,
-            wheel_data.mLongitudinalGroundVel))
-
-    def slip_angle_rl(self, index: int | None = None) -> float:
-        """Slip angle (radians) rear left"""
-        wheel_data = self.shmm.lmuTeleVeh(index).mWheels[2]
-        return rmnan(slip_angle(
-            wheel_data.mLateralGroundVel,
-            wheel_data.mLongitudinalGroundVel))
-
-    def slip_angle_rr(self, index: int | None = None) -> float:
-        """Slip angle (radians) rear right"""
-        wheel_data = self.shmm.lmuTeleVeh(index).mWheels[3]
-        return rmnan(slip_angle(
-            wheel_data.mLateralGroundVel,
-            wheel_data.mLongitudinalGroundVel))
 
     def ride_height(self, index: int | None = None) -> tuple[float, ...]:
         """Ride height (convert meters to millimeters)"""

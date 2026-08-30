@@ -140,21 +140,21 @@ def gforce(value: float, g_accel: float = 9.8) -> float:
     return 0
 
 
-def force_ratio(value1: float, value2: float, min_limit: float = 1) -> float:
-    """Force ratio from Newtons"""
-    if value2 > min_limit or value2 < -min_limit:
-        return abs(value1 / value2)
+def force_ratio(side: float, total: float, min_limit: float = 1) -> float:
+    """Force ratio (fraction) from Newtons"""
+    if total > min_limit or total < -min_limit:
+        return abs(side / total)
     return 0
 
 
 def part_to_whole_ratio(part: float, whole: float, median: float = 0) -> float:
-    """Part to whole ratio"""
+    """Part to whole ratio (fraction) - range 0.0 to 1.0"""
     abs_part = abs(part)
     abs_whole = abs(whole)
     if abs_whole > 0:
         if abs_part < abs_whole:
-            return 100 * part / whole
-        return 100
+            return part / whole
+        return 1.0
     return median
 
 
@@ -819,11 +819,25 @@ def wear_weighted(wear_curr_lap: float, wear_last_lap: float, lap_into: float) -
 
 
 # Wheel
-def rotation_radius(v_speed: float, w_rotation: float) -> float:
-    """Angular speed to radius"""
-    if w_rotation:
-        return abs(v_speed / w_rotation)
+def rotation_radius(linear_velocity: float, angular_velocity: float) -> float:
+    """Wheel radius (meters) = linear velocity (m/s) / angular speed (rad/s)"""
+    if angular_velocity:
+        return abs(linear_velocity / angular_velocity)
     return 0
+
+
+def angular_velocity(linear_velocity: float, radius: float) -> float:
+    """Angular speed (radians per second) = linear velocity (m/s) / radius (m)"""
+    if radius:
+        return linear_velocity / radius
+    return 0
+
+
+def yaw_rate(lateral_accel: float, speed: float, min_speed: float = 8) -> float:
+    """Yaw rate (radians per second) = Lateral acceleration (m/s^2) / speed (m/s)"""
+    if speed > min_speed:
+        return lateral_accel / speed
+    return 0.0
 
 
 def slip_ratio(w_rotation: float, w_radius: float, v_speed: float) -> float:
@@ -837,6 +851,15 @@ def slip_angle(v_lat: float, v_lgt: float) -> float:
     """Slip angle (radians)"""
     if v_lgt:
         return atan(v_lat / v_lgt)
+    return 0
+
+
+def slip_angle_difference(angle_fl: float, angle_fr: float, angle_rl: float, angle_rr: float) -> float:
+    """Slip angle difference (radians)"""
+    front_average = (angle_fl + angle_fr) / 2
+    rear_average = (angle_rl + angle_rr) / 2
+    if front_average >= 0 <= rear_average or front_average <= 0 >= rear_average:
+        return abs(front_average) - abs(rear_average)
     return 0
 
 
@@ -911,23 +934,13 @@ def ackermann_percentage(
 
 def turning_radius(wheel_angle: float, wheelbase: float, min_angle: float = 0) -> float:
     """Turning radius, unit based on wheelbase"""
-    if wheelbase <= 0:
+    if wheelbase <= 0 or -min_angle <= wheel_angle <= min_angle:
         return 0.0
-    abs_angle = abs(wheel_angle)
-    if abs_angle > min_angle:
-        return wheelbase / tan(radians(abs_angle))
-    return 0.0
+    return wheelbase / tan(radians(wheel_angle))
 
 
 def steering_ratio(steer_angle: float, wheel_angle: float) -> float:
     """Steering ratio"""
     if wheel_angle:
         return steer_angle / wheel_angle
-    return 0.0
-
-
-def yaw_rate(lateral_accel: float, speed: float, min_speed: float = 8) -> float:
-    """Yaw rate (degrees per second)"""
-    if speed > min_speed:
-        return degrees(lateral_accel / speed)
     return 0.0

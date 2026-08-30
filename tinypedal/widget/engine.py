@@ -186,9 +186,10 @@ class Realtime(Overlay):
             )
 
         # Last data
-        self.max_power_kw = 0
+        self.post_update()
 
     def post_update(self):
+        self.ema_power = 0
         self.max_power_kw = 0
 
     def timerEvent(self, event):
@@ -240,8 +241,9 @@ class Realtime(Overlay):
         # Power to weight ratio
         if self.wcfg["show_power_to_weight_ratio"]:
             total_static_weight = minfo.wheels.totalStaticWeight
-            if self.max_power_kw < power_kw:
-                self.max_power_kw += 0.2 * (power_kw - self.max_power_kw)
+            self.ema_power += 0.2 * (power_kw - self.ema_power)
+            if self.max_power_kw < self.ema_power:
+                self.max_power_kw = self.ema_power
             self.update_power_ratio(self.bar_pwratio, self.max_power_kw, total_static_weight)
 
     # GUI update methods

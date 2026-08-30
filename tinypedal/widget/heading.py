@@ -133,8 +133,8 @@ class Realtime(Overlay):
 
         # Slip angle
         if speed > 1:
-            self.slip_angle = calc.degrees(
-                (api.read.wheel.slip_angle_fl() + api.read.wheel.slip_angle_fr()) * 0.5)
+            slip_angle_set = api.read.tyre.slip_angle()
+            self.slip_angle = calc.degrees(calc.mean(slip_angle_set[:2]))
         else:
             self.slip_angle = 0
 

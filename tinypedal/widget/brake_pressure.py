@@ -92,8 +92,8 @@ class Realtime(Overlay):
                 input_color=self.wcfg["highlight_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["background_color"],
-                maxrange_color=brake_input_color,
                 maxrange_height=max(self.wcfg["brake_input_size"], 0),
+                maxrange_color=brake_input_color,
                 right_side=idx % 2,
                 top_side=idx < 2,
             ) for idx in range(4)

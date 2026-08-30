@@ -4029,7 +4029,7 @@ Set front wheel track in millimeters. Default is `1800` millimeters. This option
 Set wheelbase in millimeters. Default is `2800` millimeters. This option affects `Ackermann percentage` and `turning radius` calculation accuracy.
 
     minimum_vehicle_speed
-Set minimum vehicle speed threshold (in meters per second) for calculating `yaw rate`.
+Set minimum vehicle speed threshold (in meters per second) for calculating `yaw rate` and `slip angle difference`.
 
     show_steering_angle
 Show steering angle in degrees.
@@ -4046,11 +4046,22 @@ Show steering ratio between steering wheel angle and average front wheel angle.
     show_ackermann_percentage
 Show Ackermann percentage of inner and outer wheel angle during cornering. `0` percent indicates parallel steering. `100` percent indicates true Ackermann steering. Negative percent indicates Anti-Ackermann steering.
 
+    show_neutral_steer
+Show neutral steer tendency from front and rear slip angle difference (in degrees). Positive slip angle difference indicates understeer (orange color); negative indicates oversteer (blue color).
+
+    minimum_oversteer_slip_angle_difference, minimum_understeer_slip_angle_difference
+Set minimum slip angle difference threshold (in degrees) for neutral steer, oversteer and understeer color indication.
+
+Note, value should be set as negative angle for oversteer, and positive angle for understeer.
+
     show_yaw_rate
 Show yaw rate in degrees per second.
 
     show_turning_radius
 Show turning radius based on average front wheel angle.
+
+    show_turning_radius_under_slip_angle
+Show turning radius affected by slip angle.
 
 [**`Back to Top`**](#)
 

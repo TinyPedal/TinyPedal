@@ -141,7 +141,7 @@ class Realtime(Overlay):
         """Weight distribution ratio"""
         if target.last != data:
             target.last = data
-            target.text = self.format_dist(data, prefix)
+            target.text = self.format_dist(data * 100, prefix)
             target.update()
 
     def format_dist(self, angle, prefix):

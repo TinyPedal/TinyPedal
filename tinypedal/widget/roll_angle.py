@@ -160,12 +160,10 @@ class Realtime(Overlay):
 
         # Roll angle ratio
         if self.wcfg["show_roll_angle_ratio"]:
-            rollf_deg = int(rollf_deg * 100)
-            rollr_deg = int(rollr_deg * 100)
             if rollf_deg < 0 > rollr_deg or rollf_deg > 0 < rollr_deg:
-                ratio = calc.part_to_whole_ratio(abs(rollf_deg), abs(rollf_deg + rollr_deg), 50)
+                ratio = calc.part_to_whole_ratio(rollf_deg, rollf_deg + rollr_deg, 0.5)
             else:
-                ratio = 50
+                ratio = 0.5
             ema_ratio = self.calc_ema_ratio(self.bar_ratio.last, ratio)
             self.update_ratio(self.bar_ratio, ema_ratio, self.prefix_ratio)
 
@@ -181,7 +179,7 @@ class Realtime(Overlay):
         """Roll angle ratio"""
         if target.last != data:
             target.last = data
-            target.text = self.format_ratio(data, prefix)
+            target.text = self.format_ratio(data * 100, prefix)
             target.update()
 
     def format_roll(self, angle, prefix):

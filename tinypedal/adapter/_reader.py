@@ -620,6 +620,10 @@ class Tyre(ABC):
     def vertical_deflection(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre vertical deflection (millimeters)"""
 
+    @abstractmethod
+    def slip_angle(self, index: int | None = None) -> tuple[float, ...]:
+        """Tyre slip angle (radians)"""
+
 
 class Vehicle(ABC):
     """Vehicle"""
@@ -826,7 +830,7 @@ class Wheel(ABC):
 
     @abstractmethod
     def rotation(self, index: int | None = None) -> tuple[float, ...]:
-        """Wheel rotation (radians per second)"""
+        """Wheel rotation (radians per second), or angular velocity"""
 
     @abstractmethod
     def velocity_lateral(self, index: int | None = None) -> tuple[float, ...]:
@@ -835,22 +839,6 @@ class Wheel(ABC):
     @abstractmethod
     def velocity_longitudinal(self, index: int | None = None) -> tuple[float, ...]:
         """Longitudinal velocity (m/s) y"""
-
-    @abstractmethod
-    def slip_angle_fl(self, index: int | None = None) -> float:
-        """Slip angle (radians) front left"""
-
-    @abstractmethod
-    def slip_angle_fr(self, index: int | None = None) -> float:
-        """Slip angle (radians) front right"""
-
-    @abstractmethod
-    def slip_angle_rl(self, index: int | None = None) -> float:
-        """Slip angle (radians) rear left"""
-
-    @abstractmethod
-    def slip_angle_rr(self, index: int | None = None) -> float:
-        """Slip angle (radians) rear right"""
 
     @abstractmethod
     def ride_height(self, index: int | None = None) -> tuple[float, ...]:

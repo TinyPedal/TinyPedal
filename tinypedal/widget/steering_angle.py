@@ -49,6 +49,8 @@ class Realtime(Overlay):
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 6 + bar_padx
         self.min_speed = max(self.wcfg["minimum_vehicle_speed"], 0)
+        self.wheeltrack_front = max(self.wcfg["wheel_track_front"], 1)
+        self.wheelbase = max(self.wcfg["wheelbase"], 1)
 
         # Config units
         self.unit_dist = units.set_unit_distance(self.cfg.units["distance_unit"])
@@ -114,6 +116,36 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_ackermann_percentage"],
             )
 
+        # Neutral steer
+        if self.wcfg["show_neutral_steer"]:
+            self.bar_style_neutral_steer = (
+                (
+                    self.wcfg["font_color_neutral_steer"],
+                    self.wcfg["background_color_neutral_steer"],
+                ),
+                (
+                    self.wcfg["font_color_oversteer"],
+                    self.wcfg["background_color_oversteer"],
+                ),
+                (
+                    self.wcfg["font_color_understeer"],
+                    self.wcfg["background_color_understeer"],
+                ),
+            )
+            self.bar_neutral_steer = self.set_rawtext(
+                text=TEXT_NA,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_neutral_steer[0][0],
+                bg_color=self.bar_style_neutral_steer[0][1],
+            )
+            self.set_primary_orient(
+                target=self.bar_neutral_steer,
+                column=self.wcfg["display_order_neutral_steer"],
+            )
+            self.ema_neutral_steer = 0.0
+
         # Yaw rate
         if self.wcfg["show_yaw_rate"]:
             self.bar_yaw_rate = self.set_rawtext(
@@ -144,6 +176,21 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_turning_radius"],
             )
 
+        # Turning radius under slip angle
+        if self.wcfg["show_turning_radius_under_slip_angle"]:
+            self.bar_slip_radius = self.set_rawtext(
+                text=TEXT_NA,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_turning_radius_under_slip_angle"],
+                bg_color=self.wcfg["background_color_turning_radius_under_slip_angle"],
+            )
+            self.set_primary_orient(
+                target=self.bar_slip_radius,
+                column=self.wcfg["display_order_turning_radius_under_slip_angle"],
+            )
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Steering wheel rotation
@@ -152,11 +199,17 @@ class Realtime(Overlay):
         else:
             steering_range = api.read.inputs.steering_range_physical()
 
+        speed = api.read.vehicle.speed()
         toe_angle = api.read.wheel.toe()
         steer_angle = api.read.inputs.steering_raw() * steering_range * 0.5
         wheel_angle_left = calc.degrees(toe_angle[0])
         wheel_angle_right = calc.degrees(toe_angle[1])
         wheel_angle_front_average = (wheel_angle_left + wheel_angle_right) * 0.5
+
+        if self.min_speed < speed:
+            diff_slip_angle = calc.degrees(calc.slip_angle_difference(*api.read.tyre.slip_angle()))
+        else:
+            diff_slip_angle = 0.0
 
         # Steering angle
         if self.wcfg["show_steering_angle"]:
@@ -176,16 +229,21 @@ class Realtime(Overlay):
             ackermann_percent = calc.ackermann_percentage(
                 wheel_angle_left,
                 wheel_angle_right,
-                self.wcfg["wheel_track_front"],
-                self.wcfg["wheelbase"],
+                self.wheeltrack_front,
+                self.wheelbase,
             )
             self.update_ackermann_percentage(self.bar_ackermann_percentage, ackermann_percent)
+
+        # Neutral steer
+        if self.wcfg["show_neutral_steer"]:
+            self.ema_neutral_steer += 0.2 * (diff_slip_angle - self.ema_neutral_steer)
+            self.update_neutral_steer(self.bar_neutral_steer, self.ema_neutral_steer)
 
         # Yaw rate
         if self.wcfg["show_yaw_rate"]:
             yaw_rate = calc.yaw_rate(
                 api.read.vehicle.acceleration_lateral(),
-                api.read.vehicle.speed(),
+                speed,
                 self.min_speed,
             )
             self.update_yaw_rate(self.bar_yaw_rate, yaw_rate)
@@ -194,9 +252,17 @@ class Realtime(Overlay):
         if self.wcfg["show_turning_radius"]:
             turning_radius = calc.turning_radius(
                 wheel_angle_front_average,
-                self.wcfg["wheelbase"],
+                self.wheelbase,
             )
             self.update_turning_radius(self.bar_turning_radius, turning_radius)
+
+        # Turning radius under slip angle
+        if self.wcfg["show_turning_radius_under_slip_angle"]:
+            slip_radius = calc.turning_radius(
+                abs(wheel_angle_front_average) - diff_slip_angle,
+                self.wheelbase,
+            )
+            self.update_turning_radius(self.bar_slip_radius, slip_radius)
 
     # GUI update methods
     def update_steering_angle(self, target, data):
@@ -230,11 +296,25 @@ class Realtime(Overlay):
             target.text = f"{data:+.0%}"
             target.update()
 
+    def update_neutral_steer(self, target, data):
+        """Neutral steer"""
+        if target.last != data:
+            target.last = data
+            if data > self.wcfg["minimum_understeer_slip_angle_difference"]:
+                color_index = 2
+            elif data < self.wcfg["minimum_oversteer_slip_angle_difference"]:
+                color_index = 1
+            else:
+                color_index = 0
+            target.text = f"{data:+.1f}°"
+            target.fg, target.bg = self.bar_style_neutral_steer[color_index]
+            target.update()
+
     def update_yaw_rate(self, target, data):
         """Yaw rate"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:+.0f}°/s"
+            target.text = f"{calc.degrees(data):+.0f}°/s"
             target.update()
 
     def update_turning_radius(self, target, data):
