@@ -117,9 +117,9 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_ackermann_percentage"],
             )
 
-        # Neutral steer
-        if self.wcfg["show_neutral_steer"]:
-            self.bar_style_neutral_steer = (
+        # Slip angle difference
+        if self.wcfg["show_slip_angle_difference"]:
+            self.bar_style_diff_slip_angle = (
                 (
                     self.wcfg["font_color_neutral_steer"],
                     self.wcfg["background_color_neutral_steer"],
@@ -133,19 +133,19 @@ class Realtime(Overlay):
                     self.wcfg["background_color_understeer"],
                 ),
             )
-            self.bar_neutral_steer = self.set_rawtext(
+            self.bar_diff_slip_angle = self.set_rawtext(
                 text=TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
-                fg_color=self.bar_style_neutral_steer[0][0],
-                bg_color=self.bar_style_neutral_steer[0][1],
+                fg_color=self.bar_style_diff_slip_angle[0][0],
+                bg_color=self.bar_style_diff_slip_angle[0][1],
             )
             self.set_primary_orient(
-                target=self.bar_neutral_steer,
-                column=self.wcfg["display_order_neutral_steer"],
+                target=self.bar_diff_slip_angle,
+                column=self.wcfg["display_order_slip_angle_difference"],
             )
-            self.ema_neutral_steer = 0.0
+            self.ema_diff_slip_angle = 0.0
 
         # Yaw rate
         if self.wcfg["show_yaw_rate"]:
@@ -228,10 +228,10 @@ class Realtime(Overlay):
             )
             self.update_ackermann_percentage(self.bar_ackermann_percentage, ackermann_percent)
 
-        # Neutral steer
-        if self.wcfg["show_neutral_steer"]:
-            self.ema_neutral_steer += 0.2 * (diff_slip_angle - self.ema_neutral_steer)
-            self.update_neutral_steer(self.bar_neutral_steer, self.ema_neutral_steer)
+        # Slip angle difference
+        if self.wcfg["show_slip_angle_difference"]:
+            self.ema_diff_slip_angle += 0.2 * (diff_slip_angle - self.ema_diff_slip_angle)
+            self.update_slip_angle_difference(self.bar_diff_slip_angle, self.ema_diff_slip_angle)
 
         # Yaw rate
         if self.wcfg["show_yaw_rate"]:
@@ -290,8 +290,8 @@ class Realtime(Overlay):
             target.text = f"{data:+.0%}"
             target.update()
 
-    def update_neutral_steer(self, target, data):
-        """Neutral steer"""
+    def update_slip_angle_difference(self, target, data):
+        """Slip angle difference"""
         if target.last != data:
             target.last = data
             if data > self.wcfg["minimum_understeer_slip_angle_difference"]:
@@ -301,7 +301,7 @@ class Realtime(Overlay):
             else:
                 color_index = 0
             target.text = f"{data:+.1f}°"
-            target.fg, target.bg = self.bar_style_neutral_steer[color_index]
+            target.fg, target.bg = self.bar_style_diff_slip_angle[color_index]
             target.update()
 
     def update_yaw_rate(self, target, data):

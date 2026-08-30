@@ -4060,8 +4060,10 @@ Show steering ratio between steering wheel angle and average front wheel angle.
     show_ackermann_percentage
 Show Ackermann percentage of inner and outer wheel angle during cornering. `0` percent indicates parallel steering. `100` percent indicates true Ackermann steering. Negative percent indicates Anti-Ackermann steering.
 
-    show_neutral_steer
-Show neutral steer tendency from front and rear slip angle difference (in degrees). Positive slip angle difference indicates understeer (orange color); negative indicates oversteer (blue color).
+    show_slip_angle_difference
+Show slip angle difference (in degrees) between average front and rear slip angle, with neutral steer, oversteer and understeer color indication.
+
+Positive reading indicates understeer tendency (default orange color). Negative reading indicates oversteer tendency (default blue color). Reading close to zero indicates neutral steer (default white color).
 
     minimum_oversteer_slip_angle_difference, minimum_understeer_slip_angle_difference
 Set minimum slip angle difference threshold (in degrees) for neutral steer, oversteer and understeer color indication.
@@ -4613,6 +4615,12 @@ Show wheel slip (slip ratio) plot under acceleration when slip ratio has exceede
 
     wheel_slip_threshold
 Set percentage threshold for triggering wheel slip warning under acceleration. `0.1` means 10% of tyre slip ratio.
+
+    show_slip_angle_difference
+Show slip angle difference plot (difference between average front and rear slip angle). Plot line that draws above the center reference line indicates understeer tendency; while below the center reference line indicates oversteer tendency.
+
+    maximum_slip_angle_difference
+Set maximum display range (in degrees) for slip angle difference plot. Default is `5` degrees.
 
     show_reference_line
 Show reference line.
