@@ -975,6 +975,18 @@ class WheelsInfo:
         "frontWeightRatio",
         "leftWeightRatio",
         "crossWeightRatio",
+        "slipAngle",
+        "averageFrontSlipAngle",
+        "averageRearSlipAngle",
+        "slipAngleDifference",
+        "toeAngle",
+        "averageFrontToeAngle",
+        "averageRearToeAngle",
+        "frontToeAngleDifference",
+        "rearToeAngleDifference",
+        "camberAngle",
+        "frontCamberAngleDifference",
+        "rearCamberAngleDifference",
     )
 
     def __init__(self):
@@ -1006,6 +1018,18 @@ class WheelsInfo:
         self.frontWeightRatio: float = 0.0
         self.leftWeightRatio: float = 0.0
         self.crossWeightRatio: float = 0.0
+        self.slipAngle: list[float] = list(WHEELS_ZERO)
+        self.averageFrontSlipAngle: float = 0.0
+        self.averageRearSlipAngle: float = 0.0
+        self.slipAngleDifference: float = 0.0
+        self.toeAngle: list[float] = list(WHEELS_ZERO)
+        self.averageFrontToeAngle: float = 0.0
+        self.averageRearToeAngle: float = 0.0
+        self.frontToeAngleDifference: float = 0.0
+        self.rearToeAngleDifference: float = 0.0
+        self.camberAngle: list[float] = list(WHEELS_ZERO)
+        self.frontCamberAngleDifference: float = 0.0
+        self.rearCamberAngleDifference: float = 0.0
 
 
 class ModuleInfo:

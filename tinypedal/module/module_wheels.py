@@ -82,6 +82,9 @@ class Realtime(DataModule):
             unsprung_weight=max(self.mcfg["estimated_unsprung_weight"], 0),
             minimum_weight_override=max(self.mcfg["minimum_static_weight_override"], 0),
         )
+        gen_wheel_angle = calc_wheel_angle(
+            output=minfo.wheels,
+        )
 
         while not _event_wait(update_interval):
             if realtime_state.active:
@@ -97,6 +100,7 @@ class Realtime(DataModule):
                 gen_brake_wear.send(vehicle_resets)
                 gen_susp_travel.send(vehicle_resets)
                 gen_vehicle_weight.send(vehicle_resets)
+                gen_wheel_angle.send(vehicle_resets)
 
             else:
                 if reset:
@@ -722,3 +726,63 @@ def calc_vehicle_weight(output: WheelsInfo, g_accel: float, unsprung_weight: flo
         output.frontWeightRatio = front_ratio
         output.leftWeightRatio = left_ratio
         output.crossWeightRatio = cross_ratio
+
+
+@generator_init
+def calc_wheel_angle(output: WheelsInfo):
+    """Calculate wheel(tyre) angle"""
+    last_reset = None  # reset check
+
+    raw_slip_angle = list(WHEELS_ZERO)
+    raw_toe_angle = list(WHEELS_ZERO)
+    raw_camber_angle = list(WHEELS_ZERO)
+
+    while True:
+        reset = yield None
+
+        # Reset
+        if last_reset != reset:
+            # Delay reset until driving
+            if not realtime_state.active:
+                continue
+            last_reset = reset
+
+        # Slip angle
+        if 1 < api.read.vehicle.speed():
+            raw_slip_angle[:] = map(calc.degrees, api.read.tyre.slip_angle())
+        else:
+            raw_slip_angle[:] = WHEELS_ZERO
+
+        average_slip_angle_front = (raw_slip_angle[0] + raw_slip_angle[1]) / 2
+        average_slip_angle_rear = (raw_slip_angle[2] + raw_slip_angle[3]) / 2
+
+        slip_angle_difference = calc.slip_angle_difference(average_slip_angle_front, average_slip_angle_rear)
+
+        # Toe angle
+        raw_toe_angle[:] = map(calc.degrees, api.read.wheel.toe())
+
+        average_toe_angle_front = (raw_toe_angle[0] + raw_toe_angle[1]) / 2
+        average_toe_angle_rear = (raw_toe_angle[2] + raw_toe_angle[3]) / 2
+
+        toe_angle_difference_front = raw_toe_angle[0] - raw_toe_angle[1]
+        toe_angle_difference_rear = raw_toe_angle[2] - raw_toe_angle[3]
+
+        # Camber angle
+        raw_camber_angle[:] = map(calc.degrees, api.read.wheel.camber())
+
+        camber_angle_difference_front = raw_camber_angle[0] - raw_camber_angle[1]
+        camber_angle_difference_rear = raw_camber_angle[2] - raw_camber_angle[3]
+
+        # Output
+        output.slipAngle[:] = raw_slip_angle
+        output.toeAngle[:] = raw_toe_angle
+        output.camberAngle[:] = raw_camber_angle
+        output.averageFrontSlipAngle = average_slip_angle_front
+        output.averageRearSlipAngle = average_slip_angle_rear
+        output.slipAngleDifference = slip_angle_difference
+        output.averageFrontToeAngle = average_toe_angle_front
+        output.averageRearToeAngle = average_toe_angle_rear
+        output.frontToeAngleDifference = toe_angle_difference_front
+        output.rearToeAngleDifference = toe_angle_difference_rear
+        output.frontCamberAngleDifference = camber_angle_difference_front
+        output.rearCamberAngleDifference = camber_angle_difference_rear

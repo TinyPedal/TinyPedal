@@ -17,11 +17,10 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Tyre load Widget
+Slip angle Widget
 """
 
-from .. import calculation as calc
-from ..api_control import api
+from ..module_info import minfo
 from ._base import Overlay
 from ._painter import WheelGaugeBar
 
@@ -52,7 +51,7 @@ class Realtime(Overlay):
         pady = round(font_m.capital * self.wcfg["bar_padding_vertical"])
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
-        self.threshold_lowload = self.wcfg["low_load_threshold"]
+        max_range = max(int(self.wcfg["slip_angle_maximum_range"]), 1)
 
         # Caption
         if self.wcfg["show_caption"]:
@@ -76,29 +75,32 @@ class Realtime(Overlay):
                 column=0,
             )
 
-        # Tyre load
+        # Slip angle
         layout_inner = self.set_grid_layout(gap_hori=bar_gap_hori, gap_vert=bar_gap_vert)
-        self.tload_color = (
-            self.wcfg["background_color"],
-            self.wcfg["warning_color_low_load"],
+        self.slip_angle_color = (
+            self.wcfg["neutral_slip_angle_color"],
+            self.wcfg["oversteer_slip_angle_color"],
+            self.wcfg["understeer_slip_angle_color"],
         )
-        self.bars_tload = tuple(
+        self.bars_slip_angle = tuple(
             WheelGaugeBar(
                 self,
                 padding_x=padx,
                 bar_width=bar_width,
                 bar_height=bar_height,
                 offset_y=font_m.voffset,
+                display_range=max_range,
                 decimals=self.wcfg["decimal_places"],
-                input_color=self.wcfg["highlight_color"],
+                input_color=self.wcfg["neutral_slip_angle_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["background_color"],
                 right_side=idx % 2,
+                top_side=idx < 2,
             ) for idx in range(4)
         )
         self.set_grid_layout_quad(
             layout=layout_inner,
-            targets=self.bars_tload,
+            targets=self.bars_slip_angle,
         )
         self.set_primary_orient(
             target=layout_inner,
@@ -107,18 +109,23 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        tload_set = api.read.tyre.load()
-        sum_load = sum(tload_set)
-        for tload, bar_tload in zip(tload_set, self.bars_tload):
-            tratio = calc.part_to_whole_ratio(tload, sum_load) * 100
-            if self.wcfg["show_tyre_load_ratio"]:
-                tload = tratio
-            self.update_tload(bar_tload, tload, tratio)
+        slip_angle_set = minfo.wheels.slipAngle
+        diff_slip_angle = minfo.wheels.slipAngleDifference
+
+        if diff_slip_angle > self.wcfg["minimum_understeer_slip_angle_difference"]:
+            color_index = 2
+        elif diff_slip_angle < self.wcfg["minimum_oversteer_slip_angle_difference"]:
+            color_index = 1
+        else:
+            color_index = 0
+
+        for idx, bar_slip_angle in enumerate(self.bars_slip_angle):
+            self.update_slip_angle(bar_slip_angle, abs(slip_angle_set[idx]), color_index)
 
     # GUI update methods
-    def update_tload(self, target, data, ratio):
-        """Tyre load & ratio"""
+    def update_slip_angle(self, target, data, color_index):
+        """Slip angle"""
         if target.last != data:
             target.last = data
-            target.bg_color = self.tload_color[data <= self.threshold_lowload]
-            target.update_input(ratio)
+            target.input_color = self.slip_angle_color[color_index]
+            target.update_input(abs(data))

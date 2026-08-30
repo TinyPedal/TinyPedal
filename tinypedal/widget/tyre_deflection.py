@@ -90,6 +90,7 @@ class Realtime(Overlay):
                 bar_height=bar_height,
                 offset_y=font_m.voffset,
                 display_range=max_range,
+                decimals=self.wcfg["decimal_places"],
                 input_color=self.wcfg["highlight_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["background_color"],

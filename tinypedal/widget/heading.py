@@ -26,6 +26,7 @@ from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap
 from .. import calculation as calc
 from ..api_control import api
 from ..const_file import ImageFile
+from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -116,8 +117,10 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         # Read speed, position data
         speed = api.read.vehicle.speed()
-        pos_curr = (api.read.vehicle.position_longitudinal(),
-                    api.read.vehicle.position_lateral())
+        pos_curr = (
+            api.read.vehicle.position_longitudinal(),
+            api.read.vehicle.position_lateral(),
+        )
 
         # Vehicle orientation yaw
         temp_veh_ori_yaw = calc.degrees(api.read.vehicle.orientation_yaw_radians()) + 180
@@ -133,8 +136,7 @@ class Realtime(Overlay):
 
         # Slip angle
         if speed > 1:
-            slip_angle_set = api.read.tyre.slip_angle()
-            self.slip_angle = calc.degrees(calc.mean(slip_angle_set[:2]))
+            self.slip_angle = minfo.wheels.averageFrontSlipAngle
         else:
             self.slip_angle = 0
 

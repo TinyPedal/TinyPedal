@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 49, 8), _user_prior_2_49_8),  # 2026-08-29
+        ((2, 49, 9), _user_prior_2_49_9),  # 2026-08-30
         ((2, 49, 2), _user_prior_2_49_2),  # 2026-08-09
         ((2, 48, 7), _user_prior_2_48_7),  # 2026-07-27
         ((2, 47, 8), _user_prior_2_47_8),  # 2026-07-03
@@ -73,11 +73,17 @@ def _global_prior_2_43_0(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_49_8(dict_user: dict):
+def _user_prior_2_49_9(dict_user: dict):
     # Rename steering widget to steering_meter
     steering = dict_user.get("steering")
     if isinstance(steering, dict):
         dict_user["steering_meter"] = steering.copy()
+    # Update wheel_toe widget
+    wheel_toe = dict_user.get("wheel_toe")
+    if isinstance(wheel_toe, dict):
+        _rename_key(wheel_toe, "toe_in", "toe_angle")
+        if wheel_toe.get("caption_text") == "toe in":
+            wheel_toe["caption_text"] = "toe angle"
 
 
 def _user_prior_2_49_2(dict_user: dict):

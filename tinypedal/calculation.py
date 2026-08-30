@@ -847,17 +847,15 @@ def slip_ratio(w_rotation: float, w_radius: float, v_speed: float) -> float:
     return 0
 
 
-def slip_angle(v_lat: float, v_lgt: float) -> float:
+def slip_angle(lateral_velocity: float, longitudinal_velocity: float) -> float:
     """Slip angle (radians)"""
-    if v_lgt:
-        return atan(v_lat / v_lgt)
+    if longitudinal_velocity:
+        return atan(lateral_velocity / longitudinal_velocity)
     return 0
 
 
-def slip_angle_difference(angle_fl: float, angle_fr: float, angle_rl: float, angle_rr: float) -> float:
-    """Slip angle difference (radians)"""
-    front_average = (angle_fl + angle_fr) / 2
-    rear_average = (angle_rl + angle_rr) / 2
+def slip_angle_difference(front_average: float, rear_average: float) -> float:
+    """Slip angle difference, unit based on input (radians or degrees)"""
     if front_average >= 0 <= rear_average or front_average <= 0 >= rear_average:
         return abs(front_average) - abs(rear_average)
     return 0

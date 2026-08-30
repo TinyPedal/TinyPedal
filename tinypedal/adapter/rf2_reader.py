@@ -1113,16 +1113,6 @@ class Wheel(_reader.Wheel, DataAdapter):
             rmnan(wheel_data[3].mToe),
         )
 
-    def toe_symmetric(self, index: int | None = None) -> tuple[float, ...]:
-        """Wheel toe symmetric (radians)"""
-        wheel_data = self.shmm.rf2TeleVeh(index).mWheels
-        return (
-            rmnan(wheel_data[0].mToe),
-            -rmnan(wheel_data[1].mToe),
-            rmnan(wheel_data[2].mToe),
-            -rmnan(wheel_data[3].mToe),
-        )
-
     def rotation(self, index: int | None = None) -> tuple[float, ...]:
         """Wheel rotation (radians per second), or angular velocity"""
         wheel_data = self.shmm.rf2TeleVeh(index).mWheels

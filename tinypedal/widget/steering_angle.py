@@ -24,6 +24,7 @@ from .. import calculation as calc
 from .. import units
 from ..api_control import api
 from ..const_common import TEXT_NA
+from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -200,16 +201,9 @@ class Realtime(Overlay):
             steering_range = api.read.inputs.steering_range_physical()
 
         speed = api.read.vehicle.speed()
-        toe_angle = api.read.wheel.toe()
         steer_angle = api.read.inputs.steering_raw() * steering_range * 0.5
-        wheel_angle_left = calc.degrees(toe_angle[0])
-        wheel_angle_right = calc.degrees(toe_angle[1])
-        wheel_angle_front_average = (wheel_angle_left + wheel_angle_right) * 0.5
-
-        if self.min_speed < speed:
-            diff_slip_angle = calc.degrees(calc.slip_angle_difference(*api.read.tyre.slip_angle()))
-        else:
-            diff_slip_angle = 0.0
+        wheel_angle_front_average = minfo.wheels.averageFrontToeAngle
+        diff_slip_angle = minfo.wheels.slipAngleDifference
 
         # Steering angle
         if self.wcfg["show_steering_angle"]:
@@ -227,8 +221,8 @@ class Realtime(Overlay):
         # Ackermann percentage
         if self.wcfg["show_ackermann_percentage"]:
             ackermann_percent = calc.ackermann_percentage(
-                wheel_angle_left,
-                wheel_angle_right,
+                minfo.wheels.toeAngle[0],
+                minfo.wheels.toeAngle[1],
                 self.wheeltrack_front,
                 self.wheelbase,
             )

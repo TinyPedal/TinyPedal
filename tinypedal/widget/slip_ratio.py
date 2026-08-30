@@ -78,11 +78,11 @@ class Realtime(Overlay):
 
         # Slip ratio
         layout_inner = self.set_grid_layout(gap_hori=bar_gap_hori, gap_vert=bar_gap_vert)
-        self.slip_color = (
+        self.slip_ratio_color = (
             self.wcfg["optimal_slip_ratio_color"],
             self.wcfg["critical_slip_ratio_color"],
         )
-        self.bars_slip = tuple(
+        self.bars_slip_ratio = tuple(
             WheelGaugeBar(
                 self,
                 padding_x=padx,
@@ -90,6 +90,7 @@ class Realtime(Overlay):
                 bar_height=bar_height,
                 offset_y=font_m.voffset,
                 display_range=max_range,
+                decimals=self.wcfg["decimal_places"],
                 input_color=self.wcfg["optimal_slip_ratio_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["background_color"],
@@ -98,7 +99,7 @@ class Realtime(Overlay):
         )
         self.set_grid_layout_quad(
             layout=layout_inner,
-            targets=self.bars_slip,
+            targets=self.bars_slip_ratio,
         )
         self.set_primary_orient(
             target=layout_inner,
@@ -107,14 +108,14 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        slip_set = minfo.wheels.slipRatio
-        for slip, bar_slip in zip(slip_set, self.bars_slip):
-            self.update_slip(bar_slip, min(abs(slip * 100), 100))
+        slip_ratio_set = minfo.wheels.slipRatio
+        for slip_ratio, bar_slip in zip(slip_ratio_set, self.bars_slip_ratio):
+            self.update_slip_ratio(bar_slip, min(abs(slip_ratio * 100), 100))
 
     # GUI update methods
-    def update_slip(self, target, data):
+    def update_slip_ratio(self, target, data):
         """Slip ratio"""
         if target.last != data:
             target.last = data
-            target.input_color = self.slip_color[data > self.opt_range]
+            target.input_color = self.slip_ratio_color[data > self.opt_range]
             target.update_input(data)

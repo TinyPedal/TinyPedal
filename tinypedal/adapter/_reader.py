@@ -825,10 +825,6 @@ class Wheel(ABC):
         """Wheel toe (radians)"""
 
     @abstractmethod
-    def toe_symmetric(self, index: int | None = None) -> tuple[float, ...]:
-        """Wheel toe symmetric (radians)"""
-
-    @abstractmethod
     def rotation(self, index: int | None = None) -> tuple[float, ...]:
         """Wheel rotation (radians per second), or angular velocity"""
 

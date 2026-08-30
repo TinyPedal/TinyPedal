@@ -2825,7 +2825,7 @@ Set widget size in pixels.
 Show yaw angle reading in degrees.
 
     show_slip_angle_reading
-Show slip angle reading in degrees.
+Show average front tyre slip angle reading in degrees.
 
     show_degree_sign
 Set `true` to show degree sign for yaw angle reading.
@@ -3850,6 +3850,20 @@ Note, this option only works for time-based race type, and there is no guarantee
 [**`Back to Top`**](#)
 
 
+## Slip angle
+**This widget displays visualized slip angle info.**
+
+    slip_angle_maximum_range
+Set visualized maximum slip angle display range (degrees). Default is `15` degrees.
+
+    minimum_oversteer_slip_angle_difference, minimum_understeer_slip_angle_difference
+Set minimum slip angle difference threshold (in degrees) for neutral steer, oversteer and understeer color indication.
+
+Note, value should be set as negative angle for oversteer, and positive angle for understeer.
+
+[**`Back to Top`**](#)
+
+
 ## Slip ratio
 **This widget displays visualized slip ratio info.**
 
@@ -4029,7 +4043,7 @@ Set front wheel track in millimeters. Default is `1800` millimeters. This option
 Set wheelbase in millimeters. Default is `2800` millimeters. This option affects `Ackermann percentage` and `turning radius` calculation accuracy.
 
     minimum_vehicle_speed
-Set minimum vehicle speed threshold (in meters per second) for calculating `yaw rate` and `slip angle difference`.
+Set minimum vehicle speed threshold (in meters per second) for calculating `yaw rate`.
 
     show_steering_angle
 Show steering angle in degrees.
@@ -4966,7 +4980,10 @@ Set number of samples for reducing data fluctuation. Lower value may result more
 ## Wheel toe
 **This widget displays wheel toe angle info.**
 
-Note, all toe readings are in degrees. Positive reading indicates toe-in; negative indicates toe-out.
+Note, all toe readings are in degrees.
+
+    enable_symmetric_toe_angle
+Enable this option to show symmetric toe angle, where positive reading indicates toe-in (inward), negative indicates toe-out (outward). Disable this option to show each wheel's toe angle with reference to vehicle's heading (positive to right side of vehicle, negative to left side). This option is enabled by default.
 
     show_total_toe_angle
 Show total toe angle between left and right wheel on the same axle, useful for quickly checking amount total toe angle while driving.

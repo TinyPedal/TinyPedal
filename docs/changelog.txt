@@ -15,6 +15,10 @@ WIP
 * Cruise Widget
   - Removed "show_cornering_radius" option (now available as "show_turning_radius" in Steering angle Widget).
 
+* [New]Slip angle Widget
+  - Show visualized slip angle in degrees.
+  - Show neutral steer, oversteer and understeer color indication.
+
 * [New]Steering angle Widget
   - Show steering angle in degrees.
   - Show average front wheel angle in degrees.
@@ -33,14 +37,17 @@ WIP
 
 * Wheel toe Widget
   - Show color indication for positive or negative total toe angle.
+  - Added "enable_symmetric_toe_angle" option.
 
 * Wheels Module
+  - Added wheel angle calculation.
   - Removed "cornering_radius_sampling_interval" option.
 
 * Misc
   - User data can be reset while on track.
   - Pausing game will no longer reset various data from data modules.
   - Adjusted default "wheel track" value to "1800" (mm) in Roll Angle Widget. Existing setting won't be changed.
+  - Added "decimal_places" option to "Brake pressure, Ride height, Slip ratio, Suspension force, Suspension position, Tyre deflection, Tyre load" widgets.
   - Optimized pace notes playback.
 
 2.49.4 (2026-08-12)

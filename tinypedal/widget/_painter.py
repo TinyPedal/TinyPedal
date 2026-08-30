@@ -39,6 +39,7 @@ class WheelGaugeBar(QWidget):
         bar_width: int,
         bar_height: int,
         offset_y: int = 0,
+        decimals: int = 0,
         display_range: int = 100,
         input_color: str = "",
         fg_color: str = "",
@@ -53,6 +54,7 @@ class WheelGaugeBar(QWidget):
         super().__init__(parent)
         self.last = -1
         self.display_range = display_range
+        self.decimals = max(decimals, 0)
         self.width_scale = bar_width / self.display_range
         self.input_color = input_color
         self.bg_color = bg_color
@@ -121,7 +123,7 @@ class WheelGaugeBar(QWidget):
         if self.maxrange_color:
             painter.fillRect(self.rect_max, self.maxrange_color)
         painter.setPen(self.pen)
-        painter.drawText(self.rect_text, self.align, f"{self.last:.0f}")
+        painter.drawText(self.rect_text, self.align, f"{self.last:.{self.decimals}f}")
 
 
 class PedalInputBar(QWidget):
