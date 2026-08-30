@@ -22,9 +22,10 @@ Calculation function
 
 from __future__ import annotations
 
+from functools import partial
 from math import acos, atan, atan2, ceil, cos, degrees, dist, hypot, radians, sin, tan
 from statistics import fmean
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 
 from .const_common import FLOAT_INF
 
@@ -463,6 +464,11 @@ def exp_mov_avg(factor: float, ema_last: float, source: float) -> float:
 def ema_factor(samples: int, min_samples: int = 1) -> float:
     """Calculate smoothing factor for exponential moving average"""
     return 2 / (max(samples, min_samples) + 1)
+
+
+def ema_filter(samples: int, min_samples: int = 1) -> Callable[[float, float], float]:
+    """Partial EMA filter function"""
+    return partial(exp_mov_avg, ema_factor(samples, min_samples))
 
 
 def accumulated_sum(data: list, end_index: int) -> float:

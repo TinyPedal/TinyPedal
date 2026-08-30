@@ -20,17 +20,10 @@
 Delta module
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import (
-    DELTA_DEFAULT,
-    DELTA_ZERO,
-    FLOAT_INF,
-    MAX_SECONDS,
-)
+from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, MAX_SECONDS
 from ..module_info import DeltaInfo, minfo
 from ..userfile.delta_best import load_delta_best_file, save_delta_best_file
 from ..validator import (
@@ -168,14 +161,8 @@ def calc_delta_time(
     laptime_session_best = MAX_SECONDS
     laptime_stint_best = MAX_SECONDS
 
-    calc_ema_delta = partial(
-        calc.exp_mov_avg,
-        calc.ema_factor(delta_smoothing_samples)
-    )
-    calc_ema_laptime = partial(
-        calc.exp_mov_avg,
-        calc.ema_factor(laptime_pace_samples)
-    )
+    calc_ema_delta = calc.ema_filter(delta_smoothing_samples)
+    calc_ema_laptime = calc.ema_filter(laptime_pace_samples)
 
     while True:
         reset = yield None

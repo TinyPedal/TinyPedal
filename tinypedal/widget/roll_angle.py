@@ -20,8 +20,6 @@
 Roll angle Widget
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from ..api_control import api
 from ._base import Overlay
@@ -98,10 +96,7 @@ class Realtime(Overlay):
             column=self.wcfg["display_order_roll_angle_rear"],
         )
 
-        self.calc_ema_roll = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(self.wcfg["roll_angle_smoothing_samples"])
-        )
+        self.calc_ema_roll = calc.ema_filter(self.wcfg["roll_angle_smoothing_samples"])
 
         # Roll angle difference
         if self.wcfg["show_roll_angle_difference"]:
@@ -135,10 +130,7 @@ class Realtime(Overlay):
                 target=self.bar_ratio,
                 column=self.wcfg["display_order_roll_angle_ratio"],
             )
-            self.calc_ema_ratio = partial(
-                calc.exp_mov_avg,
-                calc.ema_factor(self.wcfg["roll_angle_ratio_smoothing_samples"])
-            )
+            self.calc_ema_ratio = calc.ema_filter(self.wcfg["roll_angle_ratio_smoothing_samples"])
 
     def timerEvent(self, event):
         """Update when vehicle on track"""

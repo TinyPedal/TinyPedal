@@ -20,8 +20,6 @@
 Weight distribution Widget
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from ..module_info import minfo
 from ._base import Overlay
@@ -114,10 +112,7 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_cross_weight"],
             )
 
-        self.calc_ema_ratio = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(self.wcfg["smoothing_samples"])
-        )
+        self.calc_ema_ratio = calc.ema_filter(self.wcfg["smoothing_samples"])
 
     def timerEvent(self, event):
         """Update when vehicle on track"""

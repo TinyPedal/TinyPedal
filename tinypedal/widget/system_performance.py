@@ -21,7 +21,6 @@ System performance Widget
 """
 
 import os
-from functools import partial
 
 import psutil
 
@@ -95,10 +94,7 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_tinypedal"],
             )
 
-        self.calc_ema = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(self.wcfg["average_samples"])
-        )
+        self.calc_ema = calc.ema_filter(self.wcfg["average_samples"])
 
         # Last data
         self.app_info = psutil.Process(os.getpid())

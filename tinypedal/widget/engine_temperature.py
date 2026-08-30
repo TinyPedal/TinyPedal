@@ -20,8 +20,6 @@
 Engine temperature Widget
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
@@ -68,10 +66,7 @@ class Realtime(Overlay):
             self.wcfg["font_color_rate_gain"],
             self.wcfg["font_color_rate_of_change"],
         )
-        self.calc_ema_rdiff = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(self.wcfg["rate_of_change_smoothing_samples"])
-        )
+        self.calc_ema_rdiff = calc.ema_filter(self.wcfg["rate_of_change_smoothing_samples"])
 
         # Oil temperature
         if self.wcfg["show_oil_temperature"]:

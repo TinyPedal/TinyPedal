@@ -20,8 +20,6 @@
 Wheel toe Widget
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from ..const_common import TEXT_NA
 from ..module_info import minfo
@@ -94,10 +92,7 @@ class Realtime(Overlay):
             target=layout_toe,
             column=1,
         )
-        self.calc_ema_toe = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(self.wcfg["toe_angle_smoothing_samples"])
-        )
+        self.calc_ema_toe = calc.ema_filter(self.wcfg["toe_angle_smoothing_samples"])
 
         # Total toe angle
         if self.wcfg["show_total_toe_angle"]:
@@ -120,10 +115,7 @@ class Realtime(Overlay):
                 layout=layout_toe,
                 targets=self.bars_total,
             )
-            self.calc_ema_total = partial(
-                calc.exp_mov_avg,
-                calc.ema_factor(self.wcfg["total_toe_angle_smoothing_samples"])
-            )
+            self.calc_ema_total = calc.ema_filter(self.wcfg["total_toe_angle_smoothing_samples"])
 
     def timerEvent(self, event):
         """Update when vehicle on track"""

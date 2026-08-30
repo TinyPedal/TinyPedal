@@ -520,7 +520,7 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
     max_susp_pos_filtered = [-FLOAT_INF] * 4
     min_susp_pos_ema = list(WHEELS_ZERO)
     max_susp_pos_ema = list(WHEELS_ZERO)
-    d_factor = calc.ema_factor(average_samples, 3)
+    calc_ema_susp_pos = calc.ema_filter(average_samples, 3)
 
     while True:
         reset = yield None
@@ -604,7 +604,7 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
                 min_susp_pos_ema[idx] = susp_pos
 
             min_susp_pos_ema[idx] = max(
-                calc.exp_mov_avg(d_factor, min_susp_pos_ema[idx], susp_pos),
+                calc_ema_susp_pos(min_susp_pos_ema[idx], susp_pos),
                 min_susp_pos_ema[idx] - average_margin,
             )
             if min_susp_pos_filtered[idx] > min_susp_pos_ema[idx]:
@@ -615,7 +615,7 @@ def calc_suspension_travel(output: WheelsInfo, average_samples: int, average_mar
                 max_susp_pos_ema[idx] = susp_pos
 
             max_susp_pos_ema[idx] = min(
-                calc.exp_mov_avg(d_factor, max_susp_pos_ema[idx], susp_pos),
+                calc_ema_susp_pos(max_susp_pos_ema[idx], susp_pos),
                 max_susp_pos_ema[idx] + average_margin,
             )
 

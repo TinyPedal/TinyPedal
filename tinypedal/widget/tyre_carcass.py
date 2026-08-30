@@ -20,8 +20,6 @@
 Tyre carcass temperature Widget
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
@@ -159,10 +157,7 @@ class Realtime(Overlay):
             for idx, inner in enumerate(layout_inner):
                 inner.addWidget(self.bars_rdiff[idx], base_row, 2 * (idx % 2))
 
-            self.calc_ema_rdiff = partial(
-                calc.exp_mov_avg,
-                calc.ema_factor(self.wcfg["rate_of_change_smoothing_samples"])
-            )
+            self.calc_ema_rdiff = calc.ema_filter(self.wcfg["rate_of_change_smoothing_samples"])
 
         # Last data
         self.last_in_pits = -1

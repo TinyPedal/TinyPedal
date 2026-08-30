@@ -165,7 +165,6 @@ class Realtime(Overlay):
                 self.wcfg["consumption_color_normal"],
                 self.wcfg["consumption_color_high"],
             )
-            self.max_cons_factor = calc.ema_factor(self.wcfg["maximum_average_consumption_samples"])
             self.cons_exp = min(max(self.wcfg["consumption_progression_exponential_scale"], 1), 10)
             self.bar_consbar = ProgressBar(
                 self,
@@ -186,6 +185,7 @@ class Realtime(Overlay):
                 target=self.bar_consbar,
                 column=self.wcfg["display_order_consumption"],
             )
+            self.calc_ema_fuel_rate = calc.ema_filter(self.wcfg["maximum_average_consumption_samples"])
 
         # Speed limiter
         if self.wcfg["show_speed_limiter"]:
@@ -324,8 +324,9 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             # Filter out fluctuation & calculate average max rate
-            if self.max_fuel_rate < data:
-                self.max_fuel_rate += self.max_cons_factor * (data - self.max_fuel_rate)
+            self.ema_fuel_rate = self.calc_ema_fuel_rate(self.ema_fuel_rate, data)
+            if self.max_fuel_rate < self.ema_fuel_rate:
+                self.max_fuel_rate = self.ema_fuel_rate
             if target.show_reading:
                 target.text = f"{data:.{self.decimals_cons}f}"
             rate = data / self.max_fuel_rate if self.max_fuel_rate else 0

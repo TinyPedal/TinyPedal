@@ -20,8 +20,6 @@
 Force module
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
@@ -120,7 +118,7 @@ def calc_force(
     """Calculate force data"""
     last_reset = None  # reset check
 
-    calc_ema_gforce = partial(calc.exp_mov_avg, calc.ema_factor(max_avg_g_samples, 3))
+    calc_ema_gforce = calc.ema_filter(max_avg_g_samples, 3)
     calc_max_lgt = transient_max(max_g_reset_delay)
     calc_max_lat = transient_max(max_g_reset_delay)
     calc_max_avg_lat = transient_max(max_avg_g_reset_delay, True)

@@ -20,8 +20,6 @@
 Brake temperature Widget
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
@@ -124,7 +122,7 @@ class Realtime(Overlay):
             )
             update_interval = max(self.wcfg["update_interval"], 0.01)
             average_samples = int(min(max(self.wcfg["average_sampling_duration"], 1), 600) / (update_interval * 0.001))
-            self.calc_ema_btemp = partial(calc.exp_mov_avg, calc.ema_factor(average_samples))
+            self.calc_ema_btemp = calc.ema_filter(average_samples)
 
         # Last data
         self.last_in_pits = -1

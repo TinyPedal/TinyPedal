@@ -20,8 +20,6 @@
 Wheel camber Widget
 """
 
-from functools import partial
-
 from .. import calculation as calc
 from ..const_common import TEXT_NA
 from ..module_info import minfo
@@ -98,10 +96,7 @@ class Realtime(Overlay):
             target=layout_camber,
             column=1,
         )
-        self.calc_ema_camber = partial(
-            calc.exp_mov_avg,
-            calc.ema_factor(self.wcfg["camber_smoothing_samples"])
-        )
+        self.calc_ema_camber = calc.ema_filter(self.wcfg["camber_smoothing_samples"])
 
         # Camber difference
         if self.wcfg["show_camber_difference"]:
@@ -120,10 +115,7 @@ class Realtime(Overlay):
                 layout=layout_camber,
                 targets=self.bars_cdiff,
             )
-            self.calc_ema_cdiff = partial(
-                calc.exp_mov_avg,
-                calc.ema_factor(self.wcfg["camber_difference_smoothing_samples"])
-            )
+            self.calc_ema_cdiff = calc.ema_filter(self.wcfg["camber_difference_smoothing_samples"])
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
