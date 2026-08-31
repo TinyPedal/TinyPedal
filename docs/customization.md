@@ -4068,7 +4068,10 @@ Set minimum slip angle difference threshold (in degrees) for neutral steer, over
 Note, value should be set as negative angle for oversteer, and positive angle for understeer.
 
     show_yaw_rate
-Show yaw rate in degrees per second.
+Show yaw rate (angular velocity) in degrees per second.
+
+    show_inverted_yaw_rate_sign
+Show inverted plus and minus signs for yaw rate. This option is disabled by default.
 
     show_turning_radius
 Show turning radius based on front wheel angle (average of left and right front wheel).
@@ -4564,6 +4567,11 @@ Note, when `high DPI scaling` mode is enabled on high resolution (2k or 4k) scre
 Set plot time scale. When time scale is `1` (default), plot will be synchronized with `update_interval`.
 
 Note, value less than `1` draws plot slower; higher than `1` draws plot faster. Setting this value too high or too low may result plot stuttering.
+
+    maximum_paused_frames
+Set maximum number of paused frames to keep plotting. This option is disabled by default.
+
+Set value to `1` or higher will keep plotting for maximum number of frames while game data desynced or stopped updating. Set to `0` to disable this option, which plots only when data synced. Note, it's generally not required to enable this option.
 
     show_inverted_pedal
 Invert pedal range display.

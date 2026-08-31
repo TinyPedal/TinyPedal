@@ -301,6 +301,8 @@ class Realtime(Overlay):
         """Yaw rate"""
         if target.last != data:
             target.last = data
+            if self.wcfg["show_inverted_yaw_rate_sign"]:
+                data = -data
             target.text = f"{calc.degrees(data):+.0f}°/s"
             target.update()
 

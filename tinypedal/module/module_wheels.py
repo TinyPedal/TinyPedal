@@ -156,7 +156,7 @@ def calc_wheel_rotation(
         accel_longitudinal = api.read.vehicle.acceleration_longitudinal()
 
         # Yaw rate
-        yaw_rate = calc.yaw_rate(-accel_lateral, speed, 1)
+        yaw_rate = calc.yaw_rate(accel_lateral, speed, 1)
 
         # Get wheel axle rotation and difference
         rot_axle_f = calc.wheel_axle_rotation(wheel_rot[0], wheel_rot[1])

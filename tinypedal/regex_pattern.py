@@ -152,6 +152,7 @@ CFG_INTEGER = (
     "inner_gap|"
     "double_side_led_gap|"
     "layout|"
+    "maximum_paused_frames|"
     "maximum_queue|"
     "number_of|"
     "samples|"

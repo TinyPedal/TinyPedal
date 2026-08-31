@@ -267,7 +267,10 @@ class Realtime(Overlay):
         """Net change per lap"""
         if target.last != data:
             target.last = data
-            change = data - last
+            if data > 0 < last:
+                change = data - last
+            else:
+                change = 0
             temp = self.unit_temp(abs(change))
             if temp > 9.94:
                 text = f"{temp:.0f}"
