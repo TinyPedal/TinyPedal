@@ -860,13 +860,6 @@ def slip_angle(lateral_velocity: float, longitudinal_velocity: float) -> float:
     return 0
 
 
-def slip_angle_difference(front_average: float, rear_average: float) -> float:
-    """Slip angle difference, unit based on input (radians or degrees)"""
-    if front_average >= 0 <= rear_average or front_average <= 0 >= rear_average:
-        return abs(front_average) - abs(rear_average)
-    return 0
-
-
 def wheel_axle_rotation(rot_left: float, rot_right: float) -> float:
     """Wheel axle rotation"""
     # Make sure both wheels rotate towards same direction

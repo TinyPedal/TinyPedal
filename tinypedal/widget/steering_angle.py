@@ -49,7 +49,6 @@ class Realtime(Overlay):
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 6 + bar_padx
-        self.min_speed = max(self.wcfg["minimum_vehicle_speed"], 0)
         self.wheeltrack_front = max(self.wcfg["wheel_track_front"], 1)
         self.wheelbase = max(self.wcfg["wheelbase"], 1)
 
@@ -200,7 +199,6 @@ class Realtime(Overlay):
         else:
             steering_range = api.read.inputs.steering_range_physical()
 
-        speed = api.read.vehicle.speed()
         steer_angle = api.read.inputs.steering_raw() * steering_range * 0.5
         wheel_angle_front_average = minfo.wheels.averageFrontToeAngle
         diff_slip_angle = minfo.wheels.slipAngleDifference
@@ -235,12 +233,7 @@ class Realtime(Overlay):
 
         # Yaw rate
         if self.wcfg["show_yaw_rate"]:
-            yaw_rate = calc.yaw_rate(
-                api.read.vehicle.acceleration_lateral(),
-                speed,
-                self.min_speed,
-            )
-            self.update_yaw_rate(self.bar_yaw_rate, yaw_rate)
+            self.update_yaw_rate(self.bar_yaw_rate, minfo.wheels.yawRate)
 
         # Turning radius
         if self.wcfg["show_turning_radius"]:
@@ -253,7 +246,7 @@ class Realtime(Overlay):
         # Turning radius under slip angle
         if self.wcfg["show_turning_radius_under_slip_angle"]:
             slip_radius = calc.turning_radius(
-                abs(wheel_angle_front_average) - diff_slip_angle,
+                wheel_angle_front_average + (minfo.wheels.averageFrontSlipAngle - minfo.wheels.averageRearSlipAngle),
                 self.wheelbase,
             )
             self.update_turning_radius(self.bar_slip_radius, slip_radius)
@@ -315,8 +308,6 @@ class Realtime(Overlay):
         """Turning radius"""
         if target.last != data:
             target.last = data
-            radius = self.unit_dist(abs(data * 0.001))
-            if radius > 9999:
-                radius = 9999
-            target.text = f"{radius:.0f}{self.symbol_dist}"
+            radius = calc.sym_max(self.unit_dist(data * 0.001), 9999)
+            target.text = f"{radius:+.0f}{self.symbol_dist}"
             target.update()

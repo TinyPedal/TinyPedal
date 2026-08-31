@@ -2743,7 +2743,6 @@ WIDGET_DEFAULT = {
         "bar_gap": 2,
         "wheel_track_front": 1800,
         "wheelbase": 2800,
-        "minimum_vehicle_speed": 8,
         "show_steering_angle": True,
         "manual_steering_range": 0,
         "font_color_steering_angle": "#FFFFFF",

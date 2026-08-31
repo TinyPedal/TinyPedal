@@ -950,7 +950,7 @@ class WheelsInfo:
         "lockingPercentFront",
         "lockingPercentRear",
         "lockingTime",
-        "slipRatio",
+        "yawRate",
         "currentTreadDepth",
         "currentLapTreadWear",
         "lastLapTreadWear",
@@ -975,6 +975,7 @@ class WheelsInfo:
         "frontWeightRatio",
         "leftWeightRatio",
         "crossWeightRatio",
+        "slipRatio",
         "slipAngle",
         "averageFrontSlipAngle",
         "averageRearSlipAngle",
@@ -990,16 +991,19 @@ class WheelsInfo:
     )
 
     def __init__(self):
+        # Rotation
         self.lockingPercentFront: float = 0.0
         self.lockingPercentRear: float = 0.0
         self.lockingTime: list[float] = list(WHEELS_ZERO)
-        self.slipRatio: list[float] = list(WHEELS_ZERO)
+        self.yawRate: float = 0.0
+        # Tyre wear
         self.currentTreadDepth: list[float] = list(WHEELS_ZERO)
         self.currentLapTreadWear: list[float] = list(WHEELS_ZERO)
         self.lastLapTreadWear: list[float] = list(WHEELS_ZERO)
         self.estimatedTreadWear: list[float] = list(WHEELS_ZERO)
         self.estimatedValidTreadWear: list[float] = list(WHEELS_ZERO)
         self.lockingTreadWear: list[float] = list(WHEELS_ZERO)
+        # Brake wear
         self.maxBrakeThickness: list[float] = list(WHEELS_ZERO)
         self.failureBrakeThickness: list[float] = list(WHEELS_ZERO)
         self.currentBrakeThickness: list[float] = list(WHEELS_ZERO)
@@ -1007,26 +1011,33 @@ class WheelsInfo:
         self.lastLapBrakeWear: list[float] = list(WHEELS_ZERO)
         self.estimatedBrakeWear: list[float] = list(WHEELS_ZERO)
         self.estimatedValidBrakeWear: list[float] = list(WHEELS_ZERO)
+        # Suspension
         self.currentSuspensionPosition: list[float] = list(WHEELS_ZERO)
         self.staticSuspensionPosition: list[float] = list(WHEELS_ZERO)
         self.minSuspensionPosition: list[float] = list(WHEELS_ZERO)
         self.maxSuspensionPosition: list[float] = list(WHEELS_ZERO)
         self.motionRatio: list[float] = list(WHEELS_ZERO)
+        # Weight
         self.minimumStaticWeight: float = 0.0
         self.totalStaticWeight: float = 0.0
         self.totalDynamicWeight: float = 0.0
         self.frontWeightRatio: float = 0.0
         self.leftWeightRatio: float = 0.0
         self.crossWeightRatio: float = 0.0
+        # Slip ratio
+        self.slipRatio: list[float] = list(WHEELS_ZERO)
+        # Slip angle
         self.slipAngle: list[float] = list(WHEELS_ZERO)
         self.averageFrontSlipAngle: float = 0.0
         self.averageRearSlipAngle: float = 0.0
         self.slipAngleDifference: float = 0.0
+        # Toe angle
         self.toeAngle: list[float] = list(WHEELS_ZERO)
         self.averageFrontToeAngle: float = 0.0
         self.averageRearToeAngle: float = 0.0
         self.frontToeAngleDifference: float = 0.0
         self.rearToeAngleDifference: float = 0.0
+        # Camber angle
         self.camberAngle: list[float] = list(WHEELS_ZERO)
         self.frontCamberAngleDifference: float = 0.0
         self.rearCamberAngleDifference: float = 0.0

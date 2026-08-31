@@ -26,12 +26,12 @@ WIP
   - Show Ackermann percentage of inner and outer wheel angle during cornering. "0" percent indicates parallel steering. "100" percent indicates true Ackermann steering. Negative percent indicates Anti-Ackermann steering.
   - Show slip angle difference (in degrees) between average front and rear slip angle, with neutral steer, oversteer and understeer color indication.
   - Show yaw rate in degrees per second.
-  - Show turning radius based on average front wheel angle.
+  - Show turning radius based on front wheel angle (average of left and right front wheel).
   - Show turning radius affected by slip angle.
   - See User Guide for details.
 
 * Steering meter Widget
-  - Renamed old "Steering" widget to "Steering meter". Old setting will be automatically transferred over.
+  - Renamed "Steering" widget to "Steering meter". Old setting will be automatically transferred over.
 
 * Trailing Widget
   - Added "show_slip_angle_difference" option, which shows slip angle difference plot. Plot line that draws above the center reference line indicates understeer tendency; while below the center reference line indicates oversteer tendency. This option is disabled by default.

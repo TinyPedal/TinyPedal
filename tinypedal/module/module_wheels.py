@@ -152,10 +152,11 @@ def calc_wheel_rotation(
 
         wheel_rot = api.read.wheel.rotation()
         speed = api.read.vehicle.speed()
-        accel_max = max(
-            abs(api.read.vehicle.acceleration_lateral()),
-            abs(api.read.vehicle.acceleration_longitudinal()),
-        )
+        accel_lateral = api.read.vehicle.acceleration_lateral()
+        accel_longitudinal = api.read.vehicle.acceleration_longitudinal()
+
+        # Yaw rate
+        yaw_rate = calc.yaw_rate(-accel_lateral, speed, 1)
 
         # Get wheel axle rotation and difference
         rot_axle_f = calc.wheel_axle_rotation(wheel_rot[0], wheel_rot[1])
@@ -169,6 +170,7 @@ def calc_wheel_rotation(
             locking_r = calc.differential_locking_percent(rot_axle_r, wheel_rot[2])
 
         # Record wheel radius value within max rotation difference
+        accel_max = max(abs(accel_lateral), abs(accel_longitudinal))
         if last_accel_max != accel_max:  # check if game paused
             last_accel_max = accel_max
             d_factor = 2 / max(40 * accel_max, 20)  # scale ema factor with max accel
@@ -206,6 +208,7 @@ def calc_wheel_rotation(
                     locking_time[3] += delta_time
 
         # Output wheels data
+        output.yawRate = yaw_rate
         output.lockingPercentFront = locking_f
         output.lockingPercentRear = locking_r
         output.slipRatio[:] = slip_ratio
@@ -756,7 +759,7 @@ def calc_wheel_angle(output: WheelsInfo):
         average_slip_angle_front = (raw_slip_angle[0] + raw_slip_angle[1]) / 2
         average_slip_angle_rear = (raw_slip_angle[2] + raw_slip_angle[3]) / 2
 
-        slip_angle_difference = calc.slip_angle_difference(average_slip_angle_front, average_slip_angle_rear)
+        slip_angle_difference = abs(average_slip_angle_front) - abs(average_slip_angle_rear)
 
         # Toe angle
         raw_toe_angle[:] = map(calc.degrees, api.read.wheel.toe())
