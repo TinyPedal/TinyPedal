@@ -79,35 +79,29 @@ class PaceNotesPlayer(QMediaPlayer):
     @Slot(bool)  # type: ignore[operator]
     def __toggle_timer(self, paused: bool):
         """Toggle widget timer state"""
-        if paused:
+        if paused or not self.mcfg["enable"]:
             self._update_timer.stop()
         else:
             if self._vehicle_resets != realtime_state.resets:
-                self.reset_playback(realtime_state.resets)
+                self._vehicle_resets = realtime_state.resets
+                self.reset_playback()
             update_interval = max(
                 self.mcfg["update_interval"],
                 cfg.application["minimum_update_interval"],
             )
             self._update_timer.start(update_interval, self)
 
-    def set_audio_device(self):
-        """Set audio device"""
-        if self.is_pyside6:
-            from PySide6.QtMultimedia import QAudioOutput
-
-            audio_device = QAudioOutput()
-            self.setAudioOutput(audio_device)  # qt6 only
-            return audio_device
-        return None  # qt5
-
-    def reset_playback(self, vehicle_resets=None):
+    def reset_playback(self, toggle_timer: bool = False):
         """Reset"""
-        self._vehicle_resets = vehicle_resets
-        self._last_notes_index = None
-        self._last_pit_notes_index = None
-        self._play_queue.clear()
-        self.stop()
-        self.set_volume(self.mcfg["pace_notes_sound_volume"])
+        if toggle_timer:
+            self._vehicle_resets = None
+            self.__toggle_timer(not realtime_state.active)
+        else:
+            self._last_notes_index = None
+            self._last_pit_notes_index = None
+            self._play_queue.clear()
+            self.stop()
+            self.set_volume(self.mcfg["pace_notes_sound_volume"])
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -128,6 +122,16 @@ class PaceNotesPlayer(QMediaPlayer):
         # Playback
         if self._play_queue:
             self.__play_next_in_queue()
+
+    def set_audio_device(self):
+        """Set audio device"""
+        if self.is_pyside6:
+            from PySide6.QtMultimedia import QAudioOutput
+
+            audio_device = QAudioOutput()
+            self.setAudioOutput(audio_device)  # qt6 only
+            return audio_device
+        return None  # qt5
 
     def set_source(self) -> None:
         """Set source (compatibility)"""
@@ -328,7 +332,7 @@ class PaceNotesControl(QWidget):
         self.button_toggle.setChecked(enabled)
         self.button_apply.setDisabled(not enabled)
         self.frame_control.setDisabled(not enabled)
-        self.pace_notes_player.reset_playback()
+        self.pace_notes_player.reset_playback(toggle_timer=True)
 
     def set_notes_path(self):
         """Set pace notes file path"""
