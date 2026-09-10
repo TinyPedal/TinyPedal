@@ -104,7 +104,7 @@ class Brake(_reader.Brake, DataAdapter):
 
     def migration(self, index: int | None = None) -> float:
         """Brake migration (percent)"""
-        return -1.0
+        return 0.0
 
     def pressure(self, index: int | None = None, scale: float = 1) -> tuple[float, ...]:
         """Brake pressure (fraction)"""

@@ -156,7 +156,6 @@ WIDGET_DEFAULT = {
         "suffix_brake_migration": "F",
         "font_color_brake_migration": "#FFFFFF",
         "background_color_brake_migration": "#222222",
-        "electric_braking_allocation": -1,
         "display_order_brake_bias": 1,
         "display_order_baseline_bias_delta": 2,
         "display_order_brake_migration": 3,

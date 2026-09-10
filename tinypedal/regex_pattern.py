@@ -110,7 +110,6 @@ CFG_INTEGER = (
     # Exact match
     "^access_mode$|"
     "^display_orientation$|"
-    "^electric_braking_allocation$|"
     "^grid_move_size$|"
     "^lap_time_history_count$|"
     "^leading_zero$|"

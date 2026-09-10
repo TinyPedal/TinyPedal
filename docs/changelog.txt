@@ -2,6 +2,7 @@ WIP
 -----------------------------
 * General
   - Fixed pace notes playback kept active even when disabled.
+  - Removed unused "electric_braking_allocation" option from Brake bias Widget.
 
 2.50.0 (2026-08-31)
 -----------------------------

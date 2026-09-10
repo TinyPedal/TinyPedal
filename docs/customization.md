@@ -1837,20 +1837,7 @@ Set `true` to show percentage sign for brake bias value.
 Show delta between current and baseline brake bias, which can be useful for keeping track of brake bias changes easier during a long race. Baseline brake bias is automatically set (and reset) while vehicle is stationary in pit lane or stationary during formation lap.
 
     show_brake_migration
-Show real-time brake migration change, as commonly seen in LMH and LMDh classes.
-
-Note, brake migration is calculated based on brake input and brake pressure telemetry data, and is affected by pedal force setting from car setup and electric braking allocation of specific vehicle.
-
-To get accurate brake migration reading, it is necessary for brake pedal to reach fully pressed state for at least once while entering track to recalibrate brake pressure scaling for brake migration calculation. It is normally not required to do manually, as game's auto-hold brake assist is on by default. However if auto-hold brake assist is off, or the APP was reloaded while player was already on track, then it is required to do a full braking for at least once to get accurate brake migration reading.
-
-    electric_braking_allocation
-Set allocation for calculating brake migration under different electric braking allocation from specific vehicle. Note, vehicle that has not electric braking, or has disabled regeneration, is not affected by this option. Incorrect allocation value will result wrong brake migration reading from vehicle that has electric braking activated.
-
-Set value to `-1` to enable auto-detection, which automatically checks whether electric braking is activated on either axles while braking, and sets allocation accordingly. This is enabled by default. Note, it may take a few brakes to detect correct allocation.
-
-Set value to `0` to manual override and use front allocation, which is commonly seen in LMH class.
-
-Set value to `1` to manual override and use rear allocation, which is commonly seen in LMDh class.
+Show brake migration change in percentage, as commonly available on LMH and LMDh classes.
 
 [**`Back to Top`**](#)
 
