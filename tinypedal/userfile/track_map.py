@@ -76,7 +76,9 @@ def coords_to_points(coords: tuple | list, decimals: int = -1) -> str:
     return " ".join(list_pair_to_string(xy, decimals) for xy in coords)
 
 
-def load_track_map_file(filepath: str, filename: str, extension: str = FileExt.SVG):
+def load_track_map_file(
+    filepath: str, filename: str, extension: str = FileExt.SVG
+) -> tuple[tuple, ...]:
     """Load svg track map file (*.svg)"""
     try:
         dom = xml.dom.minidom.parse(f"{filepath}{filename}{extension}")
@@ -103,12 +105,17 @@ def load_track_map_file(filepath: str, filename: str, extension: str = FileExt.S
         logger.info("MISSING: track map (%s) data", extension)
     except (AttributeError, IndexError, ValueError, xml.parsers.expat.ExpatError):
         logger.info("MISSING: invalid track map (%s) data", extension)
-    return None, None, None
+    return (), (), ()
 
 
 def save_track_map_file(
-    filepath: str, filename: str, view_box: str,
-    raw_coords: tuple, raw_dists: tuple, sector_index: tuple, decimals: int,
+    filepath: str,
+    filename: str,
+    view_box: str,
+    raw_coords: tuple,
+    raw_dists: tuple,
+    sector_index: tuple,
+    decimals: int,
     extension: str = FileExt.SVG,
 ) -> None:
     """Save track map file (*.svg)"""

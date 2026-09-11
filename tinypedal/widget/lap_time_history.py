@@ -24,7 +24,7 @@ from .. import calculation as calc
 from .. import units
 from ..api_control import api
 from ..const_common import TEXT_NOLAPTIME
-from ..module_info import ConsumptionDataSet, minfo
+from ..module_info import ConsumptionData, minfo
 from ._base import Overlay
 
 
@@ -297,7 +297,7 @@ class Realtime(Overlay):
                 layout.addWidget(cap_temp, row_caption, self.wcfg["display_order_wear"])
 
         # Last data
-        self.empty_data = ConsumptionDataSet()
+        self.empty_data = ConsumptionData()
         self.last_data_version = -1
         self.last_energy_type = None
         self.update_laps_history(())

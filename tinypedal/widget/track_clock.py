@@ -140,7 +140,7 @@ class Realtime(Overlay):
         if self.wcfg["show_sunlight_phase_countdown"]:
             sun_phases = minfo.mapping.sunlightPhases
 
-            if sun_phases is None:
+            if not sun_phases:
                 countdown = 0
                 next_phase_index = 0
             else:

@@ -77,7 +77,6 @@ class Realtime(Overlay):
         self.map_path = None
         self.sfinish_path = None
         self.sector_path = None
-        self.create_map_path()
 
         # Config canvas
         self.resize(self.area_size, self.area_size)
@@ -130,11 +129,14 @@ class Realtime(Overlay):
             self.update()
 
     # GUI update methods
-    def update_map(self, data):
+    def update_map(self, modified):
         """Map update"""
-        if self.last_modified != data:
-            self.last_modified = data
-            self.create_map_path(minfo.mapping.coordinates)
+        if self.last_modified != modified:
+            self.last_modified = modified
+            self.create_map_path(
+                minfo.mapping.coordinates,
+                minfo.mapping.sectors,
+            )
 
     def paintEvent(self, event):
         """Draw"""
@@ -183,9 +185,9 @@ class Realtime(Overlay):
                 (self.area_center - self.wcfg["circle_outline_width"]) * 2
             )
 
-    def create_map_path(self, raw_coords=None):
+    def create_map_path(self, raw_coords, raw_sectors):
         """Create map path"""
-        if raw_coords:
+        if raw_coords and raw_sectors:
             map_path = QPainterPath()
             dist = calc.distance(raw_coords[0], raw_coords[-1])
             (self.map_scaled, self.map_size, self.map_offset
@@ -201,17 +203,14 @@ class Realtime(Overlay):
             # Create start/finish path
             sfinish_path = QPainterPath()
             self.create_sector_path(
-                sfinish_path, self.map_scaled, 0, self.wcfg["start_line_length"])
+                sfinish_path, self.map_scaled, 0, self.wcfg["start_line_length"]
+            )
             # Create sectors paths
-            sectors_index = minfo.mapping.sectors
-            if isinstance(sectors_index, tuple):
-                sector_path = QPainterPath()
-                for index in sectors_index:
-                    self.create_sector_path(
-                        sector_path, self.map_scaled, index, self.wcfg["sector_line_length"]
-                    )
-            else:
-                sector_path = None
+            sector_path = QPainterPath()
+            for index in raw_sectors:
+                self.create_sector_path(
+                    sector_path, self.map_scaled, index, self.wcfg["sector_line_length"]
+                )
         else:
             self.map_scaled = None
             self.map_size = 1,1

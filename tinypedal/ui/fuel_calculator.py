@@ -53,7 +53,7 @@ from .. import units
 from ..api_control import api
 from ..const_file import ConfigType, FileFilter
 from ..formatter import laptime_string_to_seconds
-from ..module_info import ConsumptionDataSet, minfo
+from ..module_info import ConsumptionData, minfo
 from ..setting import cfg
 from ..userfile.consumption_history import load_consumption_history_file
 from ._common import BaseDialog, UIScaler
@@ -359,7 +359,7 @@ class HistoryPanel(QWidget):
 
         self.table_history.setFixedWidth(UIScaler.size(3 + 5.1 * (base_column_count - hidden_column_count)))
 
-    def refresh(self, dataset: deque[ConsumptionDataSet]):
+    def refresh(self, dataset: deque[ConsumptionData]):
         """Refresh history data table"""
         self.table_history.setRowCount(0)
         invalid_color = QColor("#F40")
@@ -444,7 +444,7 @@ class CalculatorPanel(QWidget):
         layout_panel.addLayout(layout_calculator)
         self.setLayout(layout_panel)
 
-    def fill_in_data(self, dataset: deque[ConsumptionDataSet]):
+    def fill_in_data(self, dataset: deque[ConsumptionData]):
         """Fill in history data to edit"""
         latest_history = dataset[0]
         # Load laptime from last valid lap

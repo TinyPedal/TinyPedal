@@ -20,14 +20,46 @@
 Decorator
 """
 
+from collections import deque
 from functools import wraps
-from typing import Callable
+from typing import Any, Callable
 
 
-# Function
-def dwrap(gen: Callable):
-    """Wrapper for default (mutable) data generator"""
-    return gen
+# Default factory
+def df_wrap(obj: Callable):
+    """Wrapper for callable (class or function)"""
+    return obj
+
+
+def df_tuple(value: Any, count: int = 1):
+    """Default factory for tuple data"""
+    if value is None:
+        return tuple
+    if callable(value):
+        return lambda: tuple(value() for _ in range(count))
+    return lambda: tuple(value for _ in range(count))
+
+
+def df_list(value: Any, count: int = 1):
+    """Default factory for list data"""
+    if value is None:
+        return list
+    if callable(value):
+        if count <= 1:
+            return lambda: [value()]
+        return lambda: [value() for _ in range(count)]
+    if count <= 1:
+        return lambda: [value]
+    return lambda: [value] * count
+
+
+def df_deque(value: Any, count: int = 1):
+    """Default factory for deque data"""
+    if value is None:
+        return deque([], count)
+    if callable(value):
+        return lambda: deque([value()], count)
+    return lambda: deque([value], count)
 
 
 # Function decorator

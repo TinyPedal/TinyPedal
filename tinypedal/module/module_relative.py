@@ -126,6 +126,8 @@ class Realtime(DataModule):
                     update_interval = self.idle_interval
                     create_reference_place.cache_clear()
 
+        create_reference_place.cache_clear()
+
 
 def get_vehicles_info(
     veh_total: int, plr_index: int, show_in_garage: bool, update_relative_delta: bool,

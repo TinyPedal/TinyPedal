@@ -178,7 +178,6 @@ def record_track_info(output: MappingInfo):
 def record_track_map(output: MappingInfo, filepath: str):
     """Record map data"""
     last_reset = None  # reset check
-    delayed_save = False
 
     recording = False
     validating = False
@@ -190,7 +189,6 @@ def record_track_map(output: MappingInfo, filepath: str):
     last_modified = 0.0
     filename = ""
     # Map data
-    output_data = MapCoords()
     recorder_data = MapCoords()
     temp_data = MapCoords()
 
@@ -199,21 +197,6 @@ def record_track_map(output: MappingInfo, filepath: str):
 
         # Reset
         if last_reset != reset:
-            # Save data
-            if delayed_save:
-                save_track_map_file(
-                    filepath=filepath,
-                    filename=filename,
-                    view_box=calc.svg_view_box(output_data.coords, 20),
-                    raw_coords=output_data.coords,
-                    raw_dists=output_data.dists,
-                    sector_index=output_data.sectors,
-                    decimals=4,
-                )
-                output_data.clear()
-                delayed_save = False
-                #logger.info("map saved, stopped map recording")
-
             # Delay reset until driving
             if not realtime_state.active:
                 continue
@@ -232,14 +215,14 @@ def record_track_map(output: MappingInfo, filepath: str):
                 continue
 
             # Load map file
-            output_data.coords, output_data.dists, output_data.sectors = load_track_map_file(
+            temp_data.coords, temp_data.dists, temp_data.sectors = load_track_map_file(
                 filepath=filepath,
                 filename=filename,
             )
-            if output_data.is_valid():
-                output.coordinates = output_data.coords
-                output.elevations = output_data.dists
-                output.sectors = output_data.sectors
+            if temp_data.is_valid():
+                output.coordinates = temp_data.coords
+                output.elevations = temp_data.dists
+                output.sectors = temp_data.sectors
                 output.lastModified = last_modified
                 map_exist = True
                 #logger.info("map exist")
@@ -249,7 +232,6 @@ def record_track_map(output: MappingInfo, filepath: str):
                 #logger.info("map not exist")
 
             # Reset to defaults
-            output_data.clear()
             temp_data.clear()
             recorder_data.clear()
             recording = False
@@ -266,7 +248,7 @@ def record_track_map(output: MappingInfo, filepath: str):
         lap_stime = api.read.timing.start()
         if lap_stime > last_lap_stime:
             # End recording
-            if recorder_data.coords:
+            if recorder_data.is_valid():
                 temp_data.coords = tuple(recorder_data.coords)
                 temp_data.dists = tuple(recorder_data.dists)
                 temp_data.sectors = tuple(recorder_data.sectors)
@@ -283,15 +265,21 @@ def record_track_map(output: MappingInfo, filepath: str):
             laptime_curr = api.read.timing.current_laptime()
             # Save data
             if 1 < laptime_curr <= 8 and api.read.timing.last_laptime() > 0:
-                output_data.coords = temp_data.coords
-                output_data.dists = temp_data.dists
-                output_data.sectors = temp_data.sectors
+                save_track_map_file(
+                    filepath=filepath,
+                    filename=filename,
+                    view_box=calc.svg_view_box(temp_data.coords, 20),
+                    raw_coords=temp_data.coords,
+                    raw_dists=temp_data.dists,
+                    sector_index=temp_data.sectors,
+                    decimals=4,
+                )
+                #logger.info("map saved, stopped map recording")
                 # Reset
                 temp_data.clear()
                 recorder_data.clear()
                 recording = False
                 validating = False
-                delayed_save = True
                 last_reset = None  # load recorded map in next loop
             # Switch off validating after 8s
             elif 8 < laptime_curr < 10:

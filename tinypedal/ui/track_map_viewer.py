@@ -364,7 +364,7 @@ class MapView(QWidget):
             filename=filename,
         )
 
-        if self.raw_coords and len(self.raw_coords) > 9:
+        if len(self.raw_coords) > 9 and self.raw_dists and sector_index:
             self.map_length = self.raw_dists[-1][0]
             self.map_nodes = len(self.raw_coords)
             self.map_filename = filename

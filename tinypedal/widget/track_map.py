@@ -144,12 +144,14 @@ class Realtime(Overlay):
             self.update()
 
     # GUI update methods
-    def update_map(self, data):
+    def update_map(self, modified):
         """Map update"""
-        if self.last_modified != data:
-            self.last_modified = data
-            raw_data = minfo.mapping.coordinates if data != -1 else None
-            map_sector_paths, map_full_path = self.create_map_path(raw_data)
+        if self.last_modified != modified:
+            self.last_modified = modified
+            map_sector_paths, map_full_path = self.create_map_path(
+                minfo.mapping.coordinates,
+                minfo.mapping.sectors,
+            )
             self.draw_map_image(map_sector_paths, map_full_path, self.circular_map)
             if self.wcfg["show_proximity_circle"]:
                 self.update_proximity_rect()
@@ -177,11 +179,10 @@ class Realtime(Overlay):
                 minfo.vehicles.dataSet[minfo.vehicles.playerIndex],
             )
 
-    def create_map_path(self, raw_coords=None):
+    def create_map_path(self, raw_coords, raw_sectors):
         """Create map path"""
         map_sector_paths = []
-        sectors_index = minfo.mapping.sectors
-        if raw_coords and isinstance(sectors_index, tuple):
+        if raw_coords and raw_sectors:
             dist = calc.distance(raw_coords[0], raw_coords[-1])
             angle = max(int(self.wcfg["display_orientation"]), 0)
             angle = angle - angle // 360 * 360
@@ -193,11 +194,11 @@ class Realtime(Overlay):
             skip_node = calc.skip_map_nodes(total_nodes, self.temp_map_size * 3, self.display_detail_level)
             last_skip = 0
 
-            sectors_indexes = (0, *sectors_index)
+            sectors_index = (0, *raw_sectors)
             map_sector_path = None
             # Map sector path
             for index, coords in enumerate(self.map_scaled):
-                if index in sectors_indexes:
+                if index in sectors_index:
                     last_skip = 0
                     if map_sector_path:  # close previous sector path
                         map_sector_path.lineTo(*coords)
@@ -216,7 +217,7 @@ class Realtime(Overlay):
             # Map full path
             map_full_path = QPainterPath()
             for index, coords in enumerate(self.map_scaled):
-                if index in sectors_indexes:
+                if index in sectors_index:
                     last_skip = 0
                     if index == 0:
                         map_full_path.moveTo(*coords)
@@ -312,7 +313,7 @@ class Realtime(Overlay):
 
             # Sector lines
             sectors_index = minfo.mapping.sectors
-            if self.wcfg["show_sector_line"] and isinstance(sectors_index, tuple):
+            if self.wcfg["show_sector_line"] and sectors_index:
                 pen.setWidth(self.wcfg["sector_line_width"])
                 pen.setColor(self.wcfg["sector_line_color"])
                 painter.setPen(pen)

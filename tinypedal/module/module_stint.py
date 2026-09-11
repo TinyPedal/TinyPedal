@@ -27,7 +27,7 @@ from .. import realtime_state
 from ..api_control import api
 from ..const_common import FLOAT_INF, MAX_SECONDS
 from ..decorator import generator_init
-from ..module_info import ConsumptionDataSet, HistoryInfo, minfo
+from ..module_info import ConsumptionData, HistoryInfo, minfo
 from ..userfile.consumption_history import (
     load_consumption_history_file,
     save_consumption_history_file,
@@ -132,7 +132,7 @@ def record_consumption_history(output: HistoryInfo, filepath: str):
             or output.consumptionDataSet[0].lapNumber != lap_number
         ):
             output.consumptionDataSet.appendleft(
-                ConsumptionDataSet(
+                ConsumptionData(
                     lapNumber=lap_number,
                     isValidLap=int(minfo.delta.isValidLap),
                     lapTimeLast=minfo.delta.lapTimeLast,

@@ -33,26 +33,13 @@ from .const_common import (
     MAX_SECONDS,
     MAX_VEHICLES,
     REL_TIME_DEFAULT,
-    WHEELS_ZERO,
 )
-from .decorator import dwrap, slotclass
-
-
-# Init function
-def _init_wheels() -> list[float]:
-    """Init (4) wheels data"""
-    return list(WHEELS_ZERO)
-
-
-def _init_dataset(cls, count: int):
-    """Init data set"""
-    return tuple(cls() for _ in range(count))
-
+from .decorator import df_deque, df_list, df_tuple, df_wrap, slotclass
 
 # Class
 
-class ConsumptionDataSet(NamedTuple):
-    """Consumption history data set"""
+class ConsumptionData(NamedTuple):
+    """Consumption history data"""
 
     lapNumber: int = 0
     isValidLap: int = 0
@@ -75,9 +62,9 @@ class MapCoords:
         sectors: sector node index reference list.
     """
 
-    coords: list[tuple[float, float]] | None = None
-    dists: list[tuple[float, float]] | None = None
-    sectors: list[int] | None = None
+    coords: tuple[tuple[float, float], ...] = ()
+    dists: tuple[tuple[float, float], ...] = ()
+    sectors: tuple[int, ...] = ()
 
     def is_valid(self) -> bool:
         """Is valid data"""
@@ -221,7 +208,7 @@ class DeltaLapTimeHistory:
         average: Average lap time from recent laps.
     """
 
-    data: list[float] = dwrap(lambda: [0.0] * 5)
+    data: list[float] = df_list(0.0, 5)
     start: float = 0.0
     best: float = 0.0
     last: float = 0.0
@@ -503,12 +490,12 @@ class VehicleDataSet:
     energyRemaining: float = 0.0
     estimatedStintLaps: float = 0.0
     currentStintLaps: int = 0
-    licoTimer: LicoTimer = dwrap(LicoTimer)
-    pitTimer: PitTimer = dwrap(PitTimer)
-    speedTrap: SpeedTrap = dwrap(SpeedTrap)
-    fuelHistory: DeltaFuelHistory = dwrap(DeltaFuelHistory)
-    energyHistory: DeltaFuelHistory = dwrap(DeltaFuelHistory)
-    lapTimeHistory: DeltaLapTimeHistory = dwrap(DeltaLapTimeHistory)
+    licoTimer: LicoTimer = df_wrap(LicoTimer)
+    pitTimer: PitTimer = df_wrap(PitTimer)
+    speedTrap: SpeedTrap = df_wrap(SpeedTrap)
+    fuelHistory: DeltaFuelHistory = df_wrap(DeltaFuelHistory)
+    energyHistory: DeltaFuelHistory = df_wrap(DeltaFuelHistory)
+    lapTimeHistory: DeltaLapTimeHistory = df_wrap(DeltaLapTimeHistory)
 
 
 @slotclass
@@ -583,10 +570,10 @@ class HistoryInfo:
     """History output data"""
 
     consumptionDataVersion: int = 0
-    consumptionDataSet: deque[ConsumptionDataSet] = dwrap(lambda: deque([ConsumptionDataSet()], 100))
+    consumptionDataSet: deque[ConsumptionData] = df_deque(ConsumptionData, 100)
     stintDataVersion: int = 0
-    stintDataCurrent: StintData = dwrap(StintData)
-    stintDataSet: deque[StintData] = dwrap(lambda: deque([StintData()], 100))
+    stintDataCurrent: StintData = df_wrap(StintData)
+    stintDataSet: deque[StintData] = df_deque(StintData, 100)
 
     def reset_stint(self):
         """Reset stint data"""
@@ -617,17 +604,19 @@ class HybridInfo:
 class MappingInfo:
     """Mapping output data"""
 
-    coordinates: tuple[tuple[float, float], ...] | None = None
-    elevations: tuple[tuple[float, float], ...] | None = None
-    sectors: tuple[int, int] | None = None
+    # Map data
+    coordinates: tuple[tuple[float, float], ...] = ()
+    elevations: tuple[tuple[float, float], ...] = ()
+    sectors: tuple[int, ...] = ()
     lastModified: float = 0.0
+    # Track info
     speedTrapPosition: float = 0.0
     pitEntryPosition: float = 0.0
     pitExitPosition: float = 0.0
     pitLaneLength: float = 0.0
     pitSpeedLimit: float = 0.0
     pitPassTime: float = 0.0
-    sunlightPhases: tuple[tuple[float, int], ...] | None = None
+    sunlightPhases: tuple[tuple[float, int], ...] = ()
 
     def reset(self):
         """Reset"""
@@ -659,20 +648,20 @@ class NotesData:
 class NotesInfo:
     """Notes output data"""
 
-    out: NotesData = dwrap(NotesData)
-    pit: NotesData = dwrap(NotesData)
+    out: NotesData = df_wrap(NotesData)
+    pit: NotesData = df_wrap(NotesData)
 
 
 @slotclass
 class RelativeInfo:
     """Relative output data"""
 
-    relativeAhead: list[tuple[float, int]] = dwrap(lambda: [REL_TIME_DEFAULT])
-    relativeBehind: list[tuple[float, int]] = dwrap(lambda: [REL_TIME_DEFAULT])
-    standings: list[int] = dwrap(lambda: [-1])
-    drawOrder: list[int] = dwrap(lambda: [0])
-    relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = dwrap(lambda: _init_dataset(DeltaTimeInterval, MAX_VEHICLES))
-    relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = dwrap(lambda: _init_dataset(DeltaTimeInterval, MAX_VEHICLES))
+    relativeAhead: list[tuple[float, int]] = df_list(REL_TIME_DEFAULT)
+    relativeBehind: list[tuple[float, int]] = df_list(REL_TIME_DEFAULT)
+    standings: list[int] = df_list(-1)
+    drawOrder: list[int] = df_list(0)
+    relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, MAX_VEHICLES)
+    relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, MAX_VEHICLES)
 
 
 @slotclass
@@ -681,11 +670,11 @@ class SectorData:
 
     noDeltaSector: bool = True
     sectorIndex: int = -1
-    sectorPrev: list[float] = dwrap(lambda: [MAX_SECONDS] * 3)
-    sectorBestTB: list[float] = dwrap(lambda: [MAX_SECONDS] * 3)
-    sectorBestPB: list[float] = dwrap(lambda: [MAX_SECONDS] * 3)
-    deltaSectorBestPB: list[float] = dwrap(lambda: [0.0] * 3)
-    deltaSectorBestTB: list[float] = dwrap(lambda: [0.0] * 3)
+    sectorPrev: list[float] = df_list(MAX_SECONDS, 3)
+    sectorBestTB: list[float] = df_list(MAX_SECONDS, 3)
+    sectorBestPB: list[float] = df_list(MAX_SECONDS, 3)
+    deltaSectorBestPB: list[float] = df_list(0.0, 3)
+    deltaSectorBestTB: list[float] = df_list(0.0, 3)
 
     def reset(self):
         """Reset"""
@@ -696,8 +685,8 @@ class SectorData:
 class SectorsInfo:
     """Sectors output data"""
 
-    allTimeBest: SectorData = dwrap(SectorData)
-    sessionBest: SectorData = dwrap(SectorData)
+    allTimeBest: SectorData = df_wrap(SectorData)
+    sessionBest: SectorData = df_wrap(SectorData)
 
 
 @slotclass
@@ -711,7 +700,7 @@ class StatsInfo:
 class VehiclesInfo:
     """Vehicles output data"""
 
-    dataSet: tuple[VehicleDataSet, ...] = dwrap(lambda: _init_dataset(VehicleDataSet, MAX_VEHICLES))
+    dataSet: tuple[VehicleDataSet, ...] = df_tuple(VehicleDataSet, MAX_VEHICLES)
     dataSetVersion: int = -1
     leaderIndex: int = 0
     playerIndex: int = -1
@@ -739,29 +728,29 @@ class WheelsInfo:
     # Rotation
     lockingPercentFront: float = 0.0
     lockingPercentRear: float = 0.0
-    lockingTime: list[float] = dwrap(_init_wheels)
+    lockingTime: list[float] = df_list(0.0, 4)
     yawRate: float = 0.0
     # Tyre wear
-    currentTreadDepth: list[float] = dwrap(_init_wheels)
-    currentLapTreadWear: list[float] = dwrap(_init_wheels)
-    lastLapTreadWear: list[float] = dwrap(_init_wheels)
-    estimatedTreadWear: list[float] = dwrap(_init_wheels)
-    estimatedValidTreadWear: list[float] = dwrap(_init_wheels)
-    lockingTreadWear: list[float] = dwrap(_init_wheels)
+    currentTreadDepth: list[float] = df_list(0.0, 4)
+    currentLapTreadWear: list[float] = df_list(0.0, 4)
+    lastLapTreadWear: list[float] = df_list(0.0, 4)
+    estimatedTreadWear: list[float] = df_list(0.0, 4)
+    estimatedValidTreadWear: list[float] = df_list(0.0, 4)
+    lockingTreadWear: list[float] = df_list(0.0, 4)
     # Brake wear
-    maxBrakeThickness: list[float] = dwrap(_init_wheels)
-    failureBrakeThickness: list[float] = dwrap(_init_wheels)
-    currentBrakeThickness: list[float] = dwrap(_init_wheels)
-    currentlapBrakeWear: list[float] = dwrap(_init_wheels)
-    lastLapBrakeWear: list[float] = dwrap(_init_wheels)
-    estimatedBrakeWear: list[float] = dwrap(_init_wheels)
-    estimatedValidBrakeWear: list[float] = dwrap(_init_wheels)
+    maxBrakeThickness: list[float] = df_list(0.0, 4)
+    failureBrakeThickness: list[float] = df_list(0.0, 4)
+    currentBrakeThickness: list[float] = df_list(0.0, 4)
+    currentlapBrakeWear: list[float] = df_list(0.0, 4)
+    lastLapBrakeWear: list[float] = df_list(0.0, 4)
+    estimatedBrakeWear: list[float] = df_list(0.0, 4)
+    estimatedValidBrakeWear: list[float] = df_list(0.0, 4)
     # Suspension
-    currentSuspensionPosition: list[float] = dwrap(_init_wheels)
-    staticSuspensionPosition: list[float] = dwrap(_init_wheels)
-    minSuspensionPosition: list[float] = dwrap(_init_wheels)
-    maxSuspensionPosition: list[float] = dwrap(_init_wheels)
-    motionRatio: list[float] = dwrap(_init_wheels)
+    currentSuspensionPosition: list[float] = df_list(0.0, 4)
+    staticSuspensionPosition: list[float] = df_list(0.0, 4)
+    minSuspensionPosition: list[float] = df_list(0.0, 4)
+    maxSuspensionPosition: list[float] = df_list(0.0, 4)
+    motionRatio: list[float] = df_list(0.0, 4)
     # Weight
     minimumStaticWeight: float = 0.0
     totalStaticWeight: float = 0.0
@@ -770,20 +759,20 @@ class WheelsInfo:
     leftWeightRatio: float = 0.0
     crossWeightRatio: float = 0.0
     # Slip ratio
-    slipRatio: list[float] = dwrap(_init_wheels)
+    slipRatio: list[float] = df_list(0.0, 4)
     # Slip angle
-    slipAngle: list[float] = dwrap(_init_wheels)
+    slipAngle: list[float] = df_list(0.0, 4)
     averageFrontSlipAngle: float = 0.0
     averageRearSlipAngle: float = 0.0
     slipAngleDifference: float = 0.0
     # Toe angle
-    toeAngle: list[float] = dwrap(_init_wheels)
+    toeAngle: list[float] = df_list(0.0, 4)
     averageFrontToeAngle: float = 0.0
     averageRearToeAngle: float = 0.0
     frontToeAngleDifference: float = 0.0
     rearToeAngleDifference: float = 0.0
     # Camber angle
-    camberAngle: list[float] = dwrap(_init_wheels)
+    camberAngle: list[float] = df_list(0.0, 4)
     frontCamberAngleDifference: float = 0.0
     rearCamberAngleDifference: float = 0.0
 
@@ -792,20 +781,20 @@ class WheelsInfo:
 class ModuleInfo:
     """Modules output data"""
 
-    delta: DeltaInfo = dwrap(DeltaInfo)
-    energy: FuelInfo = dwrap(FuelInfo)
-    force: ForceInfo = dwrap(ForceInfo)
-    fuel: FuelInfo = dwrap(FuelInfo)
-    history: HistoryInfo = dwrap(HistoryInfo)
-    hybrid: HybridInfo = dwrap(HybridInfo)
-    mapping: MappingInfo = dwrap(MappingInfo)
-    relative: RelativeInfo = dwrap(RelativeInfo)
-    sectors: SectorsInfo = dwrap(SectorsInfo)
-    stats: StatsInfo = dwrap(StatsInfo)
-    pacenotes: NotesInfo = dwrap(NotesInfo)
-    tracknotes: NotesInfo = dwrap(NotesInfo)
-    vehicles: VehiclesInfo = dwrap(VehiclesInfo)
-    wheels: WheelsInfo = dwrap(WheelsInfo)
+    delta: DeltaInfo = df_wrap(DeltaInfo)
+    energy: FuelInfo = df_wrap(FuelInfo)
+    force: ForceInfo = df_wrap(ForceInfo)
+    fuel: FuelInfo = df_wrap(FuelInfo)
+    history: HistoryInfo = df_wrap(HistoryInfo)
+    hybrid: HybridInfo = df_wrap(HybridInfo)
+    mapping: MappingInfo = df_wrap(MappingInfo)
+    relative: RelativeInfo = df_wrap(RelativeInfo)
+    sectors: SectorsInfo = df_wrap(SectorsInfo)
+    stats: StatsInfo = df_wrap(StatsInfo)
+    pacenotes: NotesInfo = df_wrap(NotesInfo)
+    tracknotes: NotesInfo = df_wrap(NotesInfo)
+    vehicles: VehiclesInfo = df_wrap(VehiclesInfo)
+    wheels: WheelsInfo = df_wrap(WheelsInfo)
 
 
 minfo = ModuleInfo()
