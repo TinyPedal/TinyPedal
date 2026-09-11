@@ -44,7 +44,9 @@ def set_car_setup_filename(*names: str) -> str:
     return rex_special_char.sub("", " - ".join(n for n in names if n))
 
 
-def remove_car_setup_file(filepath: str, filename: str, extension: str = FileExt.SVM):
+def remove_car_setup_file(
+    filepath: str, filename: str, extension: str = FileExt.SVM
+) -> None:
     """Remove car setup file"""
     try:
         full_path = f"{filepath}{filename}{extension}"
@@ -55,7 +57,9 @@ def remove_car_setup_file(filepath: str, filename: str, extension: str = FileExt
         logger.error("USERDATA: %s not found", filename)
 
 
-def rename_car_setup_file(filepath: str, old_filename: str, new_filename: str, extension: str = FileExt.SVM):
+def rename_car_setup_file(
+    filepath: str, old_filename: str, new_filename: str, extension: str = FileExt.SVM
+) -> None:
     """Rename car setup file"""
     try:
         os.rename(
@@ -68,8 +72,7 @@ def rename_car_setup_file(filepath: str, old_filename: str, new_filename: str, e
 
 
 def save_car_setup_file(
-    filepath: str, filename: str, dataset: tuple[str],
-    extension: str = FileExt.SVM
+    filepath: str, filename: str, dataset: tuple[str], extension: str = FileExt.SVM
 ) -> None:
     """Save car setup file"""
     if len(dataset) < 2:

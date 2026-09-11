@@ -36,13 +36,9 @@ from ..api_control import api
 from ..const_common import EMPTY_DICT
 from ..const_file import ConfigType
 from ..formatter import random_color_class
-from ..setting import cfg, copy_setting
-from ._common import (
-    QVAL_COLOR,
-    BaseEditor,
-    CompactButton,
-    UIScaler,
-)
+from ..setting import cfg
+from ..userfile.json_setting import copy_setting
+from ._common import QVAL_COLOR, BaseEditor, CompactButton, UIScaler
 from ._option import ColorEdit
 
 HEADER_CLASSES = "Class name","Alias name","Color"

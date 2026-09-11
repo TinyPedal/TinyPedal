@@ -26,7 +26,7 @@ from collections import deque
 
 from .. import calculation as calc
 from .. import units
-from ..module_info import StintData, StintDataSet, minfo
+from ..module_info import StintData, minfo
 from ._base import Overlay
 
 
@@ -421,7 +421,7 @@ class Realtime(Overlay):
             target.text = f"{text_consist}{self.sign_consist}"
             target.update()
 
-    def update_stint_history(self, dataset: deque[StintDataSet]):
+    def update_stint_history(self, dataset: deque[StintData]):
         """Stint history data"""
         show_energy = self.wcfg["show_virtual_energy_if_available"]
         for index in range(self.stint_slot):

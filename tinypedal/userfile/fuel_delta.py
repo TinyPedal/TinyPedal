@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 def load_fuel_delta_file(
     filepath: str, filename: str, extension: str, defaults: tuple
-) -> tuple[tuple, float, float]:
+) -> tuple[tuple, float]:
     """Load fuel/energy delta file (*.fuel, *.energy)"""
     try:
         with open(f"{filepath}{filename}{extension}", newline="", encoding="utf-8") as csvfile:
@@ -41,8 +41,7 @@ def load_fuel_delta_file(
         # Validate data
         lastlist = valid_delta_set(temp_list)
         used_last = lastlist[-1][1]
-        laptime_last = lastlist[-1][2]
-        return lastlist, used_last, laptime_last
+        return lastlist, used_last
     except FileNotFoundError:
         logger.info("MISSING: consumption delta (%s) data", extension)
     except (IndexError, ValueError, TypeError):

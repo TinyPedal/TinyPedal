@@ -36,15 +36,10 @@ from PySide2.QtWidgets import (
 
 from ..api_control import api
 from ..const_file import ConfigType
-from ..setting import cfg, copy_setting
+from ..setting import cfg
 from ..template.setting_tracks import TRACKINFO_DEFAULT
-from ._common import (
-    BaseEditor,
-    ClockTableItem,
-    CompactButton,
-    FloatTableItem,
-    UIScaler,
-)
+from ..userfile.json_setting import copy_setting
+from ._common import BaseEditor, ClockTableItem, CompactButton, FloatTableItem, UIScaler
 
 HEADER_TRACKS = (
     "Track name",

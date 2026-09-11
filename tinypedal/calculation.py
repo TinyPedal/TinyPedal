@@ -27,7 +27,7 @@ from math import acos, atan, atan2, ceil, cos, degrees, dist, hypot, radians, si
 from statistics import fmean
 from typing import Any, Callable, Sequence
 
-from .const_common import FLOAT_INF
+from .const_common import FLOAT_INF, MAX_SECONDS
 
 distance = dist  # distance between 2 coordinates
 hypotenuse = hypot  # distance from origin point (0) to a point
@@ -437,7 +437,7 @@ def sec2stinttime(seconds: float) -> str:
 
 
 def delta_telemetry(
-    dataset: list, position: float, target: float,
+    dataset: Sequence[tuple[float, float]], position: float, target: float,
     condition: bool = True, position_column: int = 0, target_column: int = 1) -> float:
     """Calculate delta telemetry data"""
     if not condition:
@@ -454,6 +454,16 @@ def delta_telemetry(
             dataset[index_higher][target_column],
         )
     return 0
+
+
+def delta_laptime(opt_data: list, plr_data: list, max_output: int, max_record: int = 5) -> tuple[float, ...]:
+    """Generate delta from target player's lap time data set"""
+    return tuple(
+        plr_data[index] - opt_data[index]
+        if plr_data[index] > 0 < opt_data[index]  # check invalid lap time
+        else MAX_SECONDS
+        for index in range(max_record - max_output, max_record)
+    )
 
 
 def exp_mov_avg(factor: float, ema_last: float, source: float) -> float:

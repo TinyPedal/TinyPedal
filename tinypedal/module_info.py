@@ -22,9 +22,8 @@ Module info
 
 from __future__ import annotations
 
-from array import array
 from collections import deque
-from typing import Mapping, NamedTuple
+from typing import KeysView, Mapping, NamedTuple
 
 from .calculation import circular_position_relative, linear_interp
 from .const_common import (
@@ -36,7 +35,21 @@ from .const_common import (
     REL_TIME_DEFAULT,
     WHEELS_ZERO,
 )
+from .decorator import dwrap, slotclass
 
+
+# Init function
+def _init_wheels() -> list[float]:
+    """Init (4) wheels data"""
+    return list(WHEELS_ZERO)
+
+
+def _init_dataset(cls, count: int):
+    """Init data set"""
+    return tuple(cls() for _ in range(count))
+
+
+# Class
 
 class ConsumptionDataSet(NamedTuple):
     """Consumption history data set"""
@@ -52,25 +65,19 @@ class ConsumptionDataSet(NamedTuple):
     capacityFuel: float = 0.0
 
 
+@slotclass
 class MapCoords:
-    """Map coords data"""
+    """Map coords data
 
-    __slots__ = (
-        "coords",
-        "dists",
-        "sectors",
-    )
+    Attributes:
+        coords: x,y coordinates list.
+        dists: distance,elevation list.
+        sectors: sector node index reference list.
+    """
 
-    def __init__(self, coords=None, dists=None, sectors=None):
-        """
-        Args:
-            coords: x,y coordinates list.
-            dists: distance,elevation list.
-            sectors: sector node index reference list.
-        """
-        self.coords = coords
-        self.dists = dists
-        self.sectors = sectors
+    coords: list[tuple[float, float]] | None = None
+    dists: list[tuple[float, float]] | None = None
+    sectors: list[int] | None = None
 
     def is_valid(self) -> bool:
         """Is valid data"""
@@ -78,48 +85,76 @@ class MapCoords:
 
     def clear(self):
         """Clear coords data"""
-        self.coords = None
-        self.dists = None
-        self.sectors = None
+        self.__init__()
 
-    def reset(self):
-        """Reset coords data"""
+    def new(self):
+        """Set new coords data"""
         self.coords = []
         self.dists = []
         self.sectors = [0, 0]
 
 
-class StintData:
-    """Stint data"""
+@slotclass
+class DriverStats:
+    """Driver stats data
 
-    __slots__ = (
-        "totalLaps",
-        "totalTime",
-        "totalFuel",
-        "totalEnergy",
-        "totalTyreWear",
-        "lapTimeDelta",
-        "lapTimeConsistency",
-        "tyreCompound",
-    )
+    Attributes:
+        pb: personal best lap time.
+        qb: qualifying best lap time.
+        rb: race best lap time.
+        meters: meters driven.
+        seconds: seconds spent driving.
+        liters: liters of fuel consumed.
+        valid: valid laps.
+        invalid: invalid laps.
+        penalties: penalties recieved in race.
+        races: number of races completed.
+        wins: number of wins.
+        podiums: number of podiums.
+    """
 
-    def __init__(self):
-        self.reset()
+    pb: float = MAX_SECONDS
+    qb: float = MAX_SECONDS
+    rb: float = MAX_SECONDS
+    meters: float = 0.0
+    seconds: float = 0.0
+    liters: float = 0.0
+    valid: int = 0
+    invalid: int = 0
+    penalties: int = 0
+    races: int = 0
+    wins: int = 0
+    podiums: int = 0
 
     def reset(self):
         """Reset"""
-        self.totalLaps: int = 0
-        self.totalTime: float = 0
-        self.totalFuel: float = 0.0
-        self.totalEnergy: float = 0.0
-        self.totalTyreWear: float = 0.0
-        self.lapTimeDelta: float = 0.0
-        self.lapTimeConsistency: float = 0.0
-        self.tyreCompound: str = "----"
+        self.__init__()
+
+    @classmethod
+    def keys(cls) -> KeysView[str]:
+        """Get key name list"""
+        return cls.__annotations__.keys()
+
+    @staticmethod
+    def is_lap_time(key: str) -> bool:
+        """Is lap time"""
+        return key in ("pb", "qb", "rb")
+
+    def update(self, data: dict) -> None:
+        """Update with new values"""
+        for key in self.__annotations__:
+            new_value = data.get(key)
+            if new_value is not None:
+                setattr(self, key, new_value)
+
+    def output(self) -> dict:
+        """Output data as dict"""
+        return {k: getattr(self, k) for k in self.__annotations__}
 
 
-class StintDataSet(NamedTuple):
-    """Stint history data set"""
+@slotclass
+class StintData:
+    """Stint data"""
 
     totalLaps: int = 0
     totalTime: float = 0
@@ -130,7 +165,19 @@ class StintDataSet(NamedTuple):
     lapTimeConsistency: float = 0.0
     tyreCompound: str = "----"
 
+    def reset(self):
+        """Reset"""
+        self.__init__()
 
+    def copy(self) -> StintData:
+        """Create a copy of this stint data"""
+        new_data = StintData()
+        for key in self.__annotations__:
+            setattr(new_data, key, getattr(self, key))
+        return new_data
+
+
+@slotclass
 class DeltaTimeInterval:
     """Delta time interval data
 
@@ -141,18 +188,10 @@ class DeltaTimeInterval:
         short: Average time interval (short duration).
     """
 
-    __slots__ = (
-        "last",
-        "long",
-        "normal",
-        "short",
-    )
-
-    def __init__(self):
-        self.last = 0.0
-        self.long = 0.0
-        self.normal = 0.0
-        self.short = 0.0
+    last: float = 0.0
+    long: float = 0.0
+    normal: float = 0.0
+    short: float = 0.0
 
     def update(self, time_interval: float):
         """Update delta time interval"""
@@ -170,38 +209,34 @@ class DeltaTimeInterval:
             self.last = time_interval
 
 
-class DeltaLapTimeHistory(array):
+@slotclass
+class DeltaLapTimeHistory:
     """Delta lap time history data
 
     Attributes:
+        data: Lap time array.
+        start: Last updated lap start timestamp.
         best: Best lap time from recent laps.
         last: Last lap time, can be invalid.
         average: Average lap time from recent laps.
     """
 
-    __slots__ = (
-        "_last_lap_start",
-        "best",
-        "last",
-        "average",
-    )
-
-    def __init__(self, typecode, initializer):
-        array.__init__(typecode, initializer)
-        self._last_lap_start = 0.0
-        self.best = 0.0
-        self.last = 0.0
-        self.average = 0.0
+    data: list[float] = dwrap(lambda: [0.0] * 5)
+    start: float = 0.0
+    best: float = 0.0
+    last: float = 0.0
+    average: float = 0.0
 
     def update(self, lap_start: float, elapsed_time: float, best_valid: float):
         """Update delta lap time history"""
-        if self._last_lap_start != lap_start and elapsed_time - lap_start > 1:
-            if 0 < self._last_lap_start < lap_start:
-                self[0], self[1], self[2], self[3] = self[1], self[2], self[3], self[4]
-                self[4] = lap_start - self._last_lap_start  # last lap time
+        if self.start != lap_start and elapsed_time - lap_start > 1:
+            data = self.data
+            if 0 < self.start < lap_start:
+                data[0], data[1], data[2], data[3] = data[1], data[2], data[3], data[4]
+                data[4] = lap_start - self.start  # last lap time
             else:  # reset all laptime on session change
-                self[0] = self[1] = self[2] = self[3] = self[4] = 0.0
-            self._last_lap_start = lap_start
+                data[0] = data[1] = data[2] = data[3] = data[4] = 0.0
+            self.start = lap_start
             # Recalculate once per lap
             if best_valid <= 0:
                 best_recent = MAX_SECONDS
@@ -212,15 +247,7 @@ class DeltaLapTimeHistory(array):
                     best_recent = best_valid
             self.best = best_recent
             self.average = self._average_laptime(self.best)
-            self.last = self[4]
-
-    def delta(self, target: DeltaLapTimeHistory, max_output: int):
-        """Generate delta from target player's lap time data set"""
-        for index in range(5 - max_output, 5):  # max 5 records
-            if target[index] > 0 < self[index]:  # check invalid lap time
-                yield target[index] - self[index]
-            else:
-                yield MAX_SECONDS
+            self.last = data[4]
 
     def _average_laptime(self, laptime_best: float) -> float:
         """Calculate average lap time"""
@@ -241,7 +268,7 @@ class DeltaLapTimeHistory(array):
     def _filter_laptime(self, best_valid: float):
         """Filter invalid lap time"""
         best_valid -= 0.01  # compensate precision
-        for laptime in self:
+        for laptime in self.data:
             # Make sure lap time is not lower than session best valid lap time
             if laptime >= best_valid > 0:
                 yield laptime
@@ -249,27 +276,19 @@ class DeltaLapTimeHistory(array):
                 yield MAX_SECONDS
 
 
+@slotclass
 class DeltaFuelHistory:
     """Delta fuel history data
 
     Attributes:
         used: Last lap used fuel.
-        last: Last lap remaining fuel.
         laps: Last lap remaining laps.
     """
 
-    __slots__ = (
-        "_last_lap_start",
-        "_last_remaining",
-        "used",
-        "laps",
-    )
-
-    def __init__(self):
-        self._last_lap_start = 0.0
-        self._last_remaining = 0.0
-        self.used = 0.0
-        self.laps = 0.0
+    _last_lap_start: float = 0.0
+    _last_remaining: float = 0.0
+    used: float = 0.0
+    laps: float = 0.0
 
     def update(self, lap_start: float, remaining: float):
         """Update delta lap time history"""
@@ -285,6 +304,7 @@ class DeltaFuelHistory:
             self._last_lap_start = lap_start
 
 
+@slotclass
 class LicoTimer:
     """Lift and coast timer
 
@@ -293,20 +313,11 @@ class LicoTimer:
         elapsed: last recorded lico time.
     """
 
-    __slots__ = (
-        "_last_time",
-        "_cooldown_time",
-        "_warmup_time",
-        "idling",
-        "elapsed",
-    )
-
-    def __init__(self):
-        self._last_time = 0.0
-        self._cooldown_time = 0.0
-        self._warmup_time = 0.0
-        self.idling = 0.0
-        self.elapsed = 0.0
+    _last_time: float = 0.0
+    _cooldown_time: float = 0.0
+    _warmup_time: float = 0.0
+    idling: float = 0.0
+    elapsed: float = 0.0
 
     def update(self, elapsed_time: float, throttle_raw: float, brake_raw: float):
         """Update lico timer"""
@@ -340,6 +351,7 @@ class LicoTimer:
             self._warmup_time = 0
 
 
+@slotclass
 class SpeedTrap:
     """Speed trap
 
@@ -347,20 +359,11 @@ class SpeedTrap:
         speed: Speed(m/s) at speed trap.
     """
 
-    __slots__ = (
-        "_record_next",
-        "_speed_before",
-        "_distance_last",
-        "_distance_before",
-        "speed",
-    )
-
-    def __init__(self):
-        self._record_next = False
-        self._speed_before = 0.0
-        self._distance_last = 0.0
-        self._distance_before = 0.0
-        self.speed = 0.0
+    _record_next: bool = False
+    _speed_before: float = 0.0
+    _distance_last: float = 0.0
+    _distance_before: float = 0.0
+    speed: float = 0.0
 
     def update(self, speed: float, distance_into: float, speedtrap_distance: float, track_length: float):
         """Update speed trap data"""
@@ -392,6 +395,7 @@ class SpeedTrap:
             self._record_next = True
 
 
+@slotclass
 class PitTimer:
     """Pit timer
 
@@ -402,26 +406,14 @@ class PitTimer:
         laps: Total laps done since last pit stop.
     """
 
-    __slots__ = (
-        "elapsed",
-        "stopped",
-        "pitting",
-        "laps",
-        "_pitin_time",
-        "_pitstop_time",
-        "_last_state",
-        "_last_pit_lap",
-    )
-
-    def __init__(self):
-        self.elapsed: float = 0.0
-        self.stopped: float = 0.0
-        self.pitting: bool = False
-        self.laps: int = 0
-        self._pitin_time: float = 0.0
-        self._pitstop_time: float = 0.0
-        self._last_state: int = 0
-        self._last_pit_lap: int = 99999
+    _last_pit_lap: int = 99999
+    _last_state: int = 0
+    _pitin_time: float = 0.0
+    _pitstop_time: float = 0.0
+    elapsed: float = 0.0
+    stopped: float = 0.0
+    pitting: bool = False
+    laps: int = 0
 
     def update(self, in_pit: int, elapsed_time: float, laps_done: int, speed: float):
         """Calculate pit time
@@ -464,620 +456,356 @@ class PitTimer:
         self.laps = laps_done - self._last_pit_lap
 
 
+@slotclass
 class VehicleDataSet:
     """Vehicle data set"""
 
-    __slots__ = (
-        "isPlayer",
-        "elapsedTime",
-        "speed",
-        "positionOverall",
-        "positionInClass",
-        "qualifyOverall",
-        "qualifyInClass",
-        "driverName",
-        "vehicleName",
-        "vehicleBrand",
-        "classAheadIndex",
-        "classBehindIndex",
-        "classLeaderIndex",
-        "vehicleClass",
-        "classBestLapTime",
-        "bestLapTime",
-        "lastLapTime",
-        "currentLapProgress",
-        "totalLapProgress",
-        "gapBehindNext",
-        "gapBehindNextInClass",
-        "gapBehindLeader",
-        "gapBehindLeaderInClass",
-        "isLapped",
-        "isYellow",
-        "isValidLap",
-        "isFinished",
-        "inPit",
-        "isClassFastestLastLap",
-        "numPitStops",
-        "pitRequested",
-        "tireCompoundName",
-        "relativeOrientationRadians",
-        "relativeStraightDistance",
-        "worldPositionX",
-        "worldPositionY",
-        "relativeRotatedPositionX",
-        "relativeRotatedPositionY",
-        "vehicleIntegrity",
-        "incidents",
-        "energyRemaining",
-        "estimatedStintLaps",
-        "currentStintLaps",
-        "licoTimer",
-        "pitTimer",
-        "speedTrap",
-        "fuelHistory",
-        "energyHistory",
-        "lapTimeHistory",
-    )
-
-    def __init__(self):
-        self.isPlayer: bool = False
-        self.elapsedTime: float = 0.0
-        self.speed: float = 0.0
-        self.positionOverall: int = 0
-        self.positionInClass: int = 0
-        self.qualifyOverall: int = 0
-        self.qualifyInClass: int = 0
-        self.driverName: str = ""
-        self.vehicleName: str = ""
-        self.vehicleBrand: str = ""
-        self.vehicleClass: str = ""
-        self.classAheadIndex: int = -1
-        self.classBehindIndex: int = -1
-        self.classLeaderIndex: int = -1
-        self.classBestLapTime: float = MAX_SECONDS
-        self.bestLapTime: float = MAX_SECONDS
-        self.lastLapTime: float = MAX_SECONDS
-        self.currentLapProgress: float = 0.0
-        self.totalLapProgress: float = 0.0
-        self.gapBehindNext: float = 0.0
-        self.gapBehindNextInClass: float = 0.0
-        self.gapBehindLeader: float = 0.0
-        self.gapBehindLeaderInClass: float = 0.0
-        self.isLapped: float = 0.0
-        self.isYellow: bool = False
-        self.isValidLap: bool = False
-        self.isFinished: bool = False
-        self.inPit: int = 0
-        self.isClassFastestLastLap: bool = False
-        self.numPitStops: int = 0
-        self.pitRequested: bool = False
-        self.tireCompoundName: tuple[str, ...] = ("", "", "", "")
-        self.relativeOrientationRadians: float = 0.0
-        self.relativeStraightDistance: float = 0.0
-        self.worldPositionX: float = 0.0
-        self.worldPositionY: float = 0.0
-        self.relativeRotatedPositionX: float = 0.0
-        self.relativeRotatedPositionY: float = 0.0
-        self.vehicleIntegrity: float = 0.0
-        self.incidents: int = 0
-        self.energyRemaining: float = 0.0
-        self.estimatedStintLaps: float = 0.0
-        self.currentStintLaps: int = 0
-        self.licoTimer: LicoTimer = LicoTimer()
-        self.pitTimer: PitTimer = PitTimer()
-        self.speedTrap: SpeedTrap = SpeedTrap()
-        self.fuelHistory: DeltaFuelHistory = DeltaFuelHistory()
-        self.energyHistory: DeltaFuelHistory = DeltaFuelHistory()
-        self.lapTimeHistory: DeltaLapTimeHistory = DeltaLapTimeHistory("d", (0, 0, 0, 0, 0))
+    isPlayer: bool = False
+    elapsedTime: float = 0.0
+    speed: float = 0.0
+    positionOverall: int = 0
+    positionInClass: int = 0
+    qualifyOverall: int = 0
+    qualifyInClass: int = 0
+    driverName: str = ""
+    vehicleName: str = ""
+    vehicleBrand: str = ""
+    vehicleClass: str = ""
+    classAheadIndex: int = -1
+    classBehindIndex: int = -1
+    classLeaderIndex: int = -1
+    classBestLapTime: float = MAX_SECONDS
+    bestLapTime: float = MAX_SECONDS
+    lastLapTime: float = MAX_SECONDS
+    currentLapProgress: float = 0.0
+    totalLapProgress: float = 0.0
+    gapBehindNext: float = 0.0
+    gapBehindNextInClass: float = 0.0
+    gapBehindLeader: float = 0.0
+    gapBehindLeaderInClass: float = 0.0
+    isLapped: float = 0.0
+    isYellow: bool = False
+    isValidLap: bool = False
+    isFinished: bool = False
+    inPit: int = 0
+    isClassFastestLastLap: bool = False
+    numPitStops: int = 0
+    pitRequested: bool = False
+    tireCompoundName: tuple[str, ...] = ("", "", "", "")
+    relativeOrientationRadians: float = 0.0
+    relativeStraightDistance: float = 0.0
+    worldPositionX: float = 0.0
+    worldPositionY: float = 0.0
+    relativeRotatedPositionX: float = 0.0
+    relativeRotatedPositionY: float = 0.0
+    vehicleIntegrity: float = 0.0
+    incidents: int = 0
+    energyRemaining: float = 0.0
+    estimatedStintLaps: float = 0.0
+    currentStintLaps: int = 0
+    licoTimer: LicoTimer = dwrap(LicoTimer)
+    pitTimer: PitTimer = dwrap(PitTimer)
+    speedTrap: SpeedTrap = dwrap(SpeedTrap)
+    fuelHistory: DeltaFuelHistory = dwrap(DeltaFuelHistory)
+    energyHistory: DeltaFuelHistory = dwrap(DeltaFuelHistory)
+    lapTimeHistory: DeltaLapTimeHistory = dwrap(DeltaLapTimeHistory)
 
 
+@slotclass
 class DeltaInfo:
     """Delta output data"""
 
-    __slots__ = (
-        "deltaBestData",
-        "deltaBest",
-        "deltaLast",
-        "deltaSession",
-        "deltaStint",
-        "isValidLap",
-        "lapTimeCurrent",
-        "lapTimeLast",
-        "lapTimeBest",
-        "lapTimeEstimated",
-        "lapTimeSession",
-        "lapTimeStint",
-        "lapTimePace",
-        "lapDistance",
-    )
-
-    def __init__(self):
-        self.deltaBestData: tuple[tuple[float, float], ...] = DELTA_DEFAULT
-        self.deltaBest: float = 0.0
-        self.deltaLast: float = 0.0
-        self.deltaSession: float = 0.0
-        self.deltaStint: float = 0.0
-        self.isValidLap: bool = False
-        self.lapTimeCurrent: float = 0.0
-        self.lapTimeLast: float = 0.0
-        self.lapTimeBest: float = 0.0
-        self.lapTimeEstimated: float = 0.0
-        self.lapTimeSession: float = 0.0
-        self.lapTimeStint: float = 0.0
-        self.lapTimePace: float = 0.0
-        self.lapDistance: float = 0.0
+    deltaBestData: tuple[tuple[float, float], ...] = DELTA_DEFAULT
+    deltaBest: float = 0.0
+    deltaLast: float = 0.0
+    deltaSession: float = 0.0
+    deltaStint: float = 0.0
+    isValidLap: bool = False
+    lapTimeCurrent: float = 0.0
+    lapTimeLast: float = 0.0
+    lapTimeBest: float = 0.0
+    lapTimeEstimated: float = 0.0
+    lapTimeSession: float = 0.0
+    lapTimeStint: float = 0.0
+    lapTimePace: float = 0.0
+    lapDistance: float = 0.0
 
 
+@slotclass
 class ForceInfo:
     """Force output data"""
 
-    __slots__ = (
-        "lgtGForceRaw",
-        "latGForceRaw",
-        "maxAvgLatGForce",
-        "maxLgtGForce",
-        "maxLatGForce",
-        "downForceFront",
-        "downForceRear",
-        "downForceRatio",
-        "brakingRate",
-        "transientMaxBrakingRate",
-        "maxBrakingRate",
-        "deltaBrakingRate",
-    )
-
-    def __init__(self):
-        self.lgtGForceRaw: float = 0.0
-        self.latGForceRaw: float = 0.0
-        self.maxAvgLatGForce: float = 0.0
-        self.maxLgtGForce: float = 0.0
-        self.maxLatGForce: float = 0.0
-        self.downForceFront: float = 0.0
-        self.downForceRear: float = 0.0
-        self.downForceRatio: float = 0.0
-        self.brakingRate: float = 0.0
-        self.transientMaxBrakingRate: float = 0.0
-        self.maxBrakingRate: float = 0.0
-        self.deltaBrakingRate: float = 0.0
+    lgtGForceRaw: float = 0.0
+    latGForceRaw: float = 0.0
+    maxAvgLatGForce: float = 0.0
+    maxLgtGForce: float = 0.0
+    maxLatGForce: float = 0.0
+    downForceFront: float = 0.0
+    downForceRear: float = 0.0
+    downForceRatio: float = 0.0
+    brakingRate: float = 0.0
+    transientMaxBrakingRate: float = 0.0
+    maxBrakingRate: float = 0.0
+    deltaBrakingRate: float = 0.0
 
 
+@slotclass
 class FuelInfo:
     """Fuel output data"""
 
-    __slots__ = (
-        "available",
-        "capacity",
-        "amountStart",
-        "amountCurrent",
-        "amountUsedCurrent",
-        "amountEndStint",
-        "neededRelative",
-        "neededAbsolute",
-        "lastLapConsumption",
-        "estimatedConsumption",
-        "estimatedValidConsumption",
-        "estimatedLaps",
-        "estimatedMinutes",
-        "estimatedNumPitStopsEnd",
-        "estimatedNumPitStopsEarly",
-        "deltaConsumption",
-        "oneLessPitConsumption",
-        "rateOfConsumption",
-        "weight",
-    )
-
-    def __init__(self):
-        self.reset()
+    available: bool = False
+    capacity: float = 0.0
+    amountStart: float = 0.0
+    amountCurrent: float = 0.0
+    amountUsedCurrent: float = 0.0
+    amountEndStint: float = 0.0
+    neededRelative: float = 0.0
+    neededAbsolute: float = 0.0
+    lastLapConsumption: float = 0.0
+    estimatedConsumption: float = 0.0
+    estimatedValidConsumption: float = 0.0
+    estimatedLaps: float = 0.0
+    estimatedMinutes: float = 0.0
+    estimatedNumPitStopsEnd: float = 0.0
+    estimatedNumPitStopsEarly: float = 0.0
+    deltaConsumption: float = 0.0
+    oneLessPitConsumption: float = 0.0
+    rateOfConsumption: float = 0.0
+    weight: float = 0.0
 
     def reset(self):
         """Reset"""
-        self.available: bool = False
-        self.capacity: float = 0.0
-        self.amountStart: float = 0.0
-        self.amountCurrent: float = 0.0
-        self.amountUsedCurrent: float = 0.0
-        self.amountEndStint: float = 0.0
-        self.neededRelative: float = 0.0
-        self.neededAbsolute: float = 0.0
-        self.lastLapConsumption: float = 0.0
-        self.estimatedConsumption: float = 0.0
-        self.estimatedValidConsumption: float = 0.0
-        self.estimatedLaps: float = 0.0
-        self.estimatedMinutes: float = 0.0
-        self.estimatedNumPitStopsEnd: float = 0.0
-        self.estimatedNumPitStopsEarly: float = 0.0
-        self.deltaConsumption: float = 0.0
-        self.oneLessPitConsumption: float = 0.0
-        self.rateOfConsumption: float = 0.0
-        self.weight: float = 0.0
+        self.__init__()
 
 
+@slotclass
 class HistoryInfo:
     """History output data"""
 
-    __slots__ = (
-        "consumptionDataVersion",
-        "consumptionDataSet",
-        "stintDataVersion",
-        "stintDataCurrent",
-        "stintDataSet",
-    )
-
-    def __init__(self):
-        self.consumptionDataVersion: int = 0
-        self.consumptionDataSet: deque[ConsumptionDataSet] = deque([ConsumptionDataSet()], 100)
-        self.stintDataVersion: int = 0
-        self.stintDataCurrent: StintData = StintData()
-        self.stintDataSet: deque[StintDataSet] = deque([StintDataSet()], 100)
+    consumptionDataVersion: int = 0
+    consumptionDataSet: deque[ConsumptionDataSet] = dwrap(lambda: deque([ConsumptionDataSet()], 100))
+    stintDataVersion: int = 0
+    stintDataCurrent: StintData = dwrap(StintData)
+    stintDataSet: deque[StintData] = dwrap(lambda: deque([StintData()], 100))
 
     def reset_stint(self):
         """Reset stint data"""
         self.stintDataVersion = 0
         self.stintDataCurrent.reset()
         self.stintDataSet.clear()
-        self.stintDataSet.appendleft(StintDataSet())
+        self.stintDataSet.appendleft(StintData())
 
 
+@slotclass
 class HybridInfo:
     """Hybrid output data"""
 
-    __slots__ = (
-        "batteryCharge",
-        "batteryDrain",
-        "batteryRegen",
-        "batteryDrainLast",
-        "batteryRegenLast",
-        "batteryNetChange",
-        "motorActiveTimer",
-        "motorInactiveTimer",
-        "motorState",
-        "fuelEnergyRatio",
-        "fuelEnergyBias",
-    )
-
-    def __init__(self):
-        self.batteryCharge: float = 0.0
-        self.batteryDrain: float = 0.0
-        self.batteryRegen: float = 0.0
-        self.batteryDrainLast: float = 0.0
-        self.batteryRegenLast: float = 0.0
-        self.batteryNetChange: float = 0.0
-        self.motorActiveTimer: float = 0.0
-        self.motorInactiveTimer: float = 0.0
-        self.motorState: int = 0
-        self.fuelEnergyRatio: float = 0.0
-        self.fuelEnergyBias: float = 0.0
+    batteryCharge: float = 0.0
+    batteryDrain: float = 0.0
+    batteryRegen: float = 0.0
+    batteryDrainLast: float = 0.0
+    batteryRegenLast: float = 0.0
+    batteryNetChange: float = 0.0
+    motorActiveTimer: float = 0.0
+    motorInactiveTimer: float = 0.0
+    motorState: int = 0
+    fuelEnergyRatio: float = 0.0
+    fuelEnergyBias: float = 0.0
 
 
+@slotclass
 class MappingInfo:
     """Mapping output data"""
 
-    __slots__ = (
-        "coordinates",
-        "elevations",
-        "sectors",
-        "lastModified",
-        "speedTrapPosition",
-        "pitEntryPosition",
-        "pitExitPosition",
-        "pitLaneLength",
-        "pitSpeedLimit",
-        "pitPassTime",
-        "sunlightPhases",
-    )
-
-    def __init__(self):
-        self.reset()
+    coordinates: tuple[tuple[float, float], ...] | None = None
+    elevations: tuple[tuple[float, float], ...] | None = None
+    sectors: tuple[int, int] | None = None
+    lastModified: float = 0.0
+    speedTrapPosition: float = 0.0
+    pitEntryPosition: float = 0.0
+    pitExitPosition: float = 0.0
+    pitLaneLength: float = 0.0
+    pitSpeedLimit: float = 0.0
+    pitPassTime: float = 0.0
+    sunlightPhases: tuple[tuple[float, int], ...] | None = None
 
     def reset(self):
         """Reset"""
-        self.coordinates: tuple[tuple[float, float], ...] | None = None
-        self.elevations: tuple[tuple[float, float], ...] | None = None
-        self.sectors: tuple[int, int] | None = None
-        self.lastModified: float = 0.0
-        self.speedTrapPosition: float = 0.0
-        self.pitEntryPosition: float = 0.0
-        self.pitExitPosition: float = 0.0
-        self.pitLaneLength: float = 0.0
-        self.pitSpeedLimit: float = 0.0
-        self.pitPassTime: float = 0.0
-        self.sunlightPhases: tuple[tuple[float, int], ...] | None = None
+        self.__init__()
 
 
+@slotclass
 class NotesData:
-    """Notes data"""
+    """Notes data
 
-    __slots__ = (
-        "currentIndex",
-        "currentNote",
-        "nextIndex",
-        "nextNote",
-    )
+    Attributes:
+        currentIndex: notes index.
+        currentNote: notes data[notes column name, value].
+        nextIndex: notes index.
+        nextNote: notes data[notes column name, value].
+    """
 
-    def __init__(self):
-        self.reset()
+    currentIndex: int = 0
+    currentNote: Mapping[str, float | str] = EMPTY_DICT
+    nextIndex: int = 0
+    nextNote: Mapping[str, float | str] = EMPTY_DICT
 
     def reset(self):
         """Reset"""
-        self.currentIndex: int = 0
-        self.currentNote: Mapping[str, float | str] = EMPTY_DICT
-        self.nextIndex: int = 0
-        self.nextNote: Mapping[str, float | str] = EMPTY_DICT
+        self.__init__()
 
 
+@slotclass
 class NotesInfo:
     """Notes output data"""
 
-    __slots__ = (
-        "out",
-        "pit",
-    )
-
-    def __init__(self):
-        self.out: NotesData = NotesData()
-        self.pit: NotesData = NotesData()
+    out: NotesData = dwrap(NotesData)
+    pit: NotesData = dwrap(NotesData)
 
 
+@slotclass
 class RelativeInfo:
     """Relative output data"""
 
-    __slots__ = (
-        "relativeAhead",
-        "relativeBehind",
-        "standings",
-        "drawOrder",
-        "relativeDeltaAhead",
-        "relativeDeltaBehind",
-    )
-
-    def __init__(self):
-        self.relativeAhead: list[tuple[float, int]] = [REL_TIME_DEFAULT]
-        self.relativeBehind: list[tuple[float, int]] = [REL_TIME_DEFAULT]
-        self.standings: list[int] = [-1]
-        self.drawOrder: list = [0]
-        self.relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = tuple(
-            DeltaTimeInterval() for _ in range(MAX_VEHICLES)
-        )
-        self.relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = tuple(
-            DeltaTimeInterval() for _ in range(MAX_VEHICLES)
-        )
+    relativeAhead: list[tuple[float, int]] = dwrap(lambda: [REL_TIME_DEFAULT])
+    relativeBehind: list[tuple[float, int]] = dwrap(lambda: [REL_TIME_DEFAULT])
+    standings: list[int] = dwrap(lambda: [-1])
+    drawOrder: list[int] = dwrap(lambda: [0])
+    relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = dwrap(lambda: _init_dataset(DeltaTimeInterval, MAX_VEHICLES))
+    relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = dwrap(lambda: _init_dataset(DeltaTimeInterval, MAX_VEHICLES))
 
 
+@slotclass
 class SectorData:
     """Sector data set"""
 
-    __slots__ = (
-        "noDeltaSector",
-        "sectorIndex",
-        "sectorPrev",
-        "sectorBestTB",
-        "sectorBestPB",
-        "deltaSectorBestPB",
-        "deltaSectorBestTB",
-    )
-
-    def __init__(self):
-        self.reset()
+    noDeltaSector: bool = True
+    sectorIndex: int = -1
+    sectorPrev: list[float] = dwrap(lambda: [MAX_SECONDS] * 3)
+    sectorBestTB: list[float] = dwrap(lambda: [MAX_SECONDS] * 3)
+    sectorBestPB: list[float] = dwrap(lambda: [MAX_SECONDS] * 3)
+    deltaSectorBestPB: list[float] = dwrap(lambda: [0.0] * 3)
+    deltaSectorBestTB: list[float] = dwrap(lambda: [0.0] * 3)
 
     def reset(self):
         """Reset"""
-        self.noDeltaSector: bool = True
-        self.sectorIndex: int = -1
-        self.sectorPrev: list[float] = [MAX_SECONDS] * 3
-        self.sectorBestTB: list[float] = [MAX_SECONDS] * 3
-        self.sectorBestPB: list[float] = [MAX_SECONDS] * 3
-        self.deltaSectorBestPB: list[float] = [0.0] * 3
-        self.deltaSectorBestTB: list[float] = [0.0] * 3
+        self.__init__()
 
 
+@slotclass
 class SectorsInfo:
     """Sectors output data"""
 
-    __slots__ = (
-        "allTimeBest",
-        "sessionBest",
-    )
-
-    def __init__(self):
-        self.allTimeBest: SectorData = SectorData()
-        self.sessionBest: SectorData = SectorData()
+    allTimeBest: SectorData = dwrap(SectorData)
+    sessionBest: SectorData = dwrap(SectorData)
 
 
+@slotclass
 class StatsInfo:
     """Stats output data"""
 
-    __slots__ = (
-        "metersDriven",
-    )
-
-    def __init__(self):
-        self.metersDriven: float = 0.0
+    metersDriven: float = 0.0
 
 
+@slotclass
 class VehiclesInfo:
     """Vehicles output data"""
 
-    __slots__ = (
-        "dataSet",
-        "dataSetVersion",
-        "leaderIndex",
-        "playerIndex",
-        "totalOutPits",
-        "totalInPits",
-        "totalStoppedPits",
-        "totalPitRequests",
-        "totalCompletedLaps",
-        "totalVehicles",
-        "nearestLine",
-        "nearestTraffic",
-        "nearestYellowAhead",
-        "nearestYellowBehind",
-        "nearestBlueClass",
-        "leaderBestLapTime",
-        "finishTimeOffset",
-        "finishAsLap",
-        "finishLapOffset",
-    )
-
-    def __init__(self):
-        self.dataSet: tuple[VehicleDataSet, ...] = tuple(
-            VehicleDataSet() for _ in range(MAX_VEHICLES)
-        )
-        self.dataSetVersion: int = -1
-        self.leaderIndex: int = 0
-        self.playerIndex: int = -1
-        self.totalOutPits: int = 0
-        self.totalInPits: int = 0
-        self.totalStoppedPits: int = 0
-        self.totalPitRequests: int = 0
-        self.totalCompletedLaps: int = 0
-        self.totalVehicles: int = 0
-        self.nearestLine: float = MAX_METERS
-        self.nearestTraffic: float = MAX_SECONDS
-        self.nearestYellowAhead: float = MAX_METERS
-        self.nearestYellowBehind: float = -MAX_METERS
-        self.nearestBlueClass: str = ""
-        self.leaderBestLapTime: float = MAX_SECONDS
-        self.finishTimeOffset: float = 0.0
-        self.finishAsLap: bool = True
-        self.finishLapOffset: float = 0.0
+    dataSet: tuple[VehicleDataSet, ...] = dwrap(lambda: _init_dataset(VehicleDataSet, MAX_VEHICLES))
+    dataSetVersion: int = -1
+    leaderIndex: int = 0
+    playerIndex: int = -1
+    totalOutPits: int = 0
+    totalInPits: int = 0
+    totalStoppedPits: int = 0
+    totalPitRequests: int = 0
+    totalCompletedLaps: int = 0
+    totalVehicles: int = 0
+    nearestLine: float = MAX_METERS
+    nearestTraffic: float = MAX_SECONDS
+    nearestYellowAhead: float = MAX_METERS
+    nearestYellowBehind: float = -MAX_METERS
+    nearestBlueClass: str = ""
+    leaderBestLapTime: float = MAX_SECONDS
+    finishTimeOffset: float = 0.0
+    finishAsLap: bool = True
+    finishLapOffset: float = 0.0
 
 
+@slotclass
 class WheelsInfo:
     """Wheels output data"""
 
-    __slots__ = (
-        "lockingPercentFront",
-        "lockingPercentRear",
-        "lockingTime",
-        "yawRate",
-        "currentTreadDepth",
-        "currentLapTreadWear",
-        "lastLapTreadWear",
-        "estimatedTreadWear",
-        "estimatedValidTreadWear",
-        "lockingTreadWear",
-        "maxBrakeThickness",
-        "failureBrakeThickness",
-        "currentBrakeThickness",
-        "currentlapBrakeWear",
-        "lastLapBrakeWear",
-        "estimatedBrakeWear",
-        "estimatedValidBrakeWear",
-        "currentSuspensionPosition",
-        "staticSuspensionPosition",
-        "minSuspensionPosition",
-        "maxSuspensionPosition",
-        "motionRatio",
-        "minimumStaticWeight",
-        "totalStaticWeight",
-        "totalDynamicWeight",
-        "frontWeightRatio",
-        "leftWeightRatio",
-        "crossWeightRatio",
-        "slipRatio",
-        "slipAngle",
-        "averageFrontSlipAngle",
-        "averageRearSlipAngle",
-        "slipAngleDifference",
-        "toeAngle",
-        "averageFrontToeAngle",
-        "averageRearToeAngle",
-        "frontToeAngleDifference",
-        "rearToeAngleDifference",
-        "camberAngle",
-        "frontCamberAngleDifference",
-        "rearCamberAngleDifference",
-    )
-
-    def __init__(self):
-        # Rotation
-        self.lockingPercentFront: float = 0.0
-        self.lockingPercentRear: float = 0.0
-        self.lockingTime: list[float] = list(WHEELS_ZERO)
-        self.yawRate: float = 0.0
-        # Tyre wear
-        self.currentTreadDepth: list[float] = list(WHEELS_ZERO)
-        self.currentLapTreadWear: list[float] = list(WHEELS_ZERO)
-        self.lastLapTreadWear: list[float] = list(WHEELS_ZERO)
-        self.estimatedTreadWear: list[float] = list(WHEELS_ZERO)
-        self.estimatedValidTreadWear: list[float] = list(WHEELS_ZERO)
-        self.lockingTreadWear: list[float] = list(WHEELS_ZERO)
-        # Brake wear
-        self.maxBrakeThickness: list[float] = list(WHEELS_ZERO)
-        self.failureBrakeThickness: list[float] = list(WHEELS_ZERO)
-        self.currentBrakeThickness: list[float] = list(WHEELS_ZERO)
-        self.currentlapBrakeWear: list[float] = list(WHEELS_ZERO)
-        self.lastLapBrakeWear: list[float] = list(WHEELS_ZERO)
-        self.estimatedBrakeWear: list[float] = list(WHEELS_ZERO)
-        self.estimatedValidBrakeWear: list[float] = list(WHEELS_ZERO)
-        # Suspension
-        self.currentSuspensionPosition: list[float] = list(WHEELS_ZERO)
-        self.staticSuspensionPosition: list[float] = list(WHEELS_ZERO)
-        self.minSuspensionPosition: list[float] = list(WHEELS_ZERO)
-        self.maxSuspensionPosition: list[float] = list(WHEELS_ZERO)
-        self.motionRatio: list[float] = list(WHEELS_ZERO)
-        # Weight
-        self.minimumStaticWeight: float = 0.0
-        self.totalStaticWeight: float = 0.0
-        self.totalDynamicWeight: float = 0.0
-        self.frontWeightRatio: float = 0.0
-        self.leftWeightRatio: float = 0.0
-        self.crossWeightRatio: float = 0.0
-        # Slip ratio
-        self.slipRatio: list[float] = list(WHEELS_ZERO)
-        # Slip angle
-        self.slipAngle: list[float] = list(WHEELS_ZERO)
-        self.averageFrontSlipAngle: float = 0.0
-        self.averageRearSlipAngle: float = 0.0
-        self.slipAngleDifference: float = 0.0
-        # Toe angle
-        self.toeAngle: list[float] = list(WHEELS_ZERO)
-        self.averageFrontToeAngle: float = 0.0
-        self.averageRearToeAngle: float = 0.0
-        self.frontToeAngleDifference: float = 0.0
-        self.rearToeAngleDifference: float = 0.0
-        # Camber angle
-        self.camberAngle: list[float] = list(WHEELS_ZERO)
-        self.frontCamberAngleDifference: float = 0.0
-        self.rearCamberAngleDifference: float = 0.0
+    # Rotation
+    lockingPercentFront: float = 0.0
+    lockingPercentRear: float = 0.0
+    lockingTime: list[float] = dwrap(_init_wheels)
+    yawRate: float = 0.0
+    # Tyre wear
+    currentTreadDepth: list[float] = dwrap(_init_wheels)
+    currentLapTreadWear: list[float] = dwrap(_init_wheels)
+    lastLapTreadWear: list[float] = dwrap(_init_wheels)
+    estimatedTreadWear: list[float] = dwrap(_init_wheels)
+    estimatedValidTreadWear: list[float] = dwrap(_init_wheels)
+    lockingTreadWear: list[float] = dwrap(_init_wheels)
+    # Brake wear
+    maxBrakeThickness: list[float] = dwrap(_init_wheels)
+    failureBrakeThickness: list[float] = dwrap(_init_wheels)
+    currentBrakeThickness: list[float] = dwrap(_init_wheels)
+    currentlapBrakeWear: list[float] = dwrap(_init_wheels)
+    lastLapBrakeWear: list[float] = dwrap(_init_wheels)
+    estimatedBrakeWear: list[float] = dwrap(_init_wheels)
+    estimatedValidBrakeWear: list[float] = dwrap(_init_wheels)
+    # Suspension
+    currentSuspensionPosition: list[float] = dwrap(_init_wheels)
+    staticSuspensionPosition: list[float] = dwrap(_init_wheels)
+    minSuspensionPosition: list[float] = dwrap(_init_wheels)
+    maxSuspensionPosition: list[float] = dwrap(_init_wheels)
+    motionRatio: list[float] = dwrap(_init_wheels)
+    # Weight
+    minimumStaticWeight: float = 0.0
+    totalStaticWeight: float = 0.0
+    totalDynamicWeight: float = 0.0
+    frontWeightRatio: float = 0.0
+    leftWeightRatio: float = 0.0
+    crossWeightRatio: float = 0.0
+    # Slip ratio
+    slipRatio: list[float] = dwrap(_init_wheels)
+    # Slip angle
+    slipAngle: list[float] = dwrap(_init_wheels)
+    averageFrontSlipAngle: float = 0.0
+    averageRearSlipAngle: float = 0.0
+    slipAngleDifference: float = 0.0
+    # Toe angle
+    toeAngle: list[float] = dwrap(_init_wheels)
+    averageFrontToeAngle: float = 0.0
+    averageRearToeAngle: float = 0.0
+    frontToeAngleDifference: float = 0.0
+    rearToeAngleDifference: float = 0.0
+    # Camber angle
+    camberAngle: list[float] = dwrap(_init_wheels)
+    frontCamberAngleDifference: float = 0.0
+    rearCamberAngleDifference: float = 0.0
 
 
+@slotclass
 class ModuleInfo:
     """Modules output data"""
 
-    __slots__ = (
-        "delta",
-        "energy",
-        "force",
-        "fuel",
-        "history",
-        "hybrid",
-        "mapping",
-        "relative",
-        "sectors",
-        "stats",
-        "pacenotes",
-        "tracknotes",
-        "vehicles",
-        "wheels",
-    )
-
-    def __init__(self):
-        self.delta = DeltaInfo()
-        self.energy = FuelInfo()
-        self.force = ForceInfo()
-        self.fuel = FuelInfo()
-        self.history = HistoryInfo()
-        self.hybrid = HybridInfo()
-        self.mapping = MappingInfo()
-        self.relative = RelativeInfo()
-        self.sectors = SectorsInfo()
-        self.stats = StatsInfo()
-        self.pacenotes = NotesInfo()
-        self.tracknotes = NotesInfo()
-        self.vehicles = VehiclesInfo()
-        self.wheels = WheelsInfo()
+    delta: DeltaInfo = dwrap(DeltaInfo)
+    energy: FuelInfo = dwrap(FuelInfo)
+    force: ForceInfo = dwrap(ForceInfo)
+    fuel: FuelInfo = dwrap(FuelInfo)
+    history: HistoryInfo = dwrap(HistoryInfo)
+    hybrid: HybridInfo = dwrap(HybridInfo)
+    mapping: MappingInfo = dwrap(MappingInfo)
+    relative: RelativeInfo = dwrap(RelativeInfo)
+    sectors: SectorsInfo = dwrap(SectorsInfo)
+    stats: StatsInfo = dwrap(StatsInfo)
+    pacenotes: NotesInfo = dwrap(NotesInfo)
+    tracknotes: NotesInfo = dwrap(NotesInfo)
+    vehicles: VehiclesInfo = dwrap(VehiclesInfo)
+    wheels: WheelsInfo = dwrap(WheelsInfo)
 
 
 minfo = ModuleInfo()

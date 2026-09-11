@@ -25,9 +25,10 @@ from __future__ import annotations
 from .. import realtime_state
 from ..api_control import api
 from ..const_common import MAX_SECONDS
+from ..decorator import generator_init
 from ..module_info import SectorData, minfo
 from ..userfile.sector_best import load_sector_best_file, save_sector_best_file
-from ..validator import generator_init, valid_sectors
+from ..validator import valid_sectors
 from ._base import DataModule
 
 
@@ -77,7 +78,7 @@ def record_sectors(output_session: SectorData, output_alltime: SectorData, filep
 
     last_sector_idx = -1  # previous recorded sector index value
     combo_name = ""
-    session_id = ()
+    session_id = (-1, -1, -1)
 
     while True:
         reset = yield None

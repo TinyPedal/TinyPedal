@@ -199,7 +199,7 @@ def validate_tyre_strategy(user_data: dict) -> dict:
 
 
 # Create, load, save, export file function
-def create_tyre_strategy():
+def create_tyre_strategy() -> dict:
     """Create new tyre strategy data"""
     return {
         "file_version": TYRE_STRATEGY_FILE_VERSION,
@@ -210,7 +210,7 @@ def create_tyre_strategy():
     }
 
 
-def load_tyre_strategy_file(filename: str, filepath: str, extension: str = ""):
+def load_tyre_strategy_file(filename: str, filepath: str, extension: str = "") -> dict | None:
     """Load tyre strategy file (*.tyres)"""
     filename_source = f"{filepath}{filename}{extension}"
     try:
@@ -226,7 +226,7 @@ def load_tyre_strategy_file(filename: str, filepath: str, extension: str = ""):
     return None
 
 
-def save_tyre_strategy_file(dict_user: dict, filename: str, filepath: str, extension: str = ""):
+def save_tyre_strategy_file(dict_user: dict, filename: str, filepath: str, extension: str = "") -> None:
     """Save tyre strategy file (*.tyres)"""
     filename_source = f"{filepath}{filename}{extension}"
     with open(filename_source, "w", encoding="utf-8") as jsonfile:

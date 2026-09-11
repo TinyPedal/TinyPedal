@@ -43,14 +43,10 @@ from ..api_control import api
 from ..async_request import get_response, resolve_hostname, set_header_get
 from ..const_api import API_LMU_ALIAS, API_LMU_CONFIG, API_RF2_ALIAS, API_RF2_CONFIG
 from ..const_file import ConfigType, FileFilter
-from ..setting import cfg, copy_setting
+from ..setting import cfg
 from ..userfile.brands import extract_lmu_brand_name
-from ._common import (
-    BaseEditor,
-    CompactButton,
-    TableBatchReplace,
-    UIScaler,
-)
+from ..userfile.json_setting import copy_setting
+from ._common import BaseEditor, CompactButton, TableBatchReplace, UIScaler
 
 HEADER_BRANDS = "Vehicle name","Brand name"
 

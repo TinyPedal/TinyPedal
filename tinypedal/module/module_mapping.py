@@ -23,11 +23,13 @@ Mapping module
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
+from ..const_common import FLOAT_INF
 from ..const_file import FileExt
+from ..decorator import generator_init
 from ..module_info import MapCoords, MappingInfo, minfo
 from ..userfile.track_info import load_track_info, save_track_info
 from ..userfile.track_map import load_track_map_file, save_track_map_file
-from ..validator import file_last_modified, generator_init
+from ..validator import file_last_modified
 from ._base import DataModule
 
 
@@ -253,7 +255,7 @@ def record_track_map(output: MappingInfo, filepath: str):
             recording = False
             validating = False
             last_sector_idx = -1
-            last_lap_stime = -1.0
+            last_lap_stime = FLOAT_INF
             pos_last = 0.0
 
         # Recording map data
@@ -261,13 +263,7 @@ def record_track_map(output: MappingInfo, filepath: str):
             continue
 
         # Lap start & finish detection
-        # Init reset
         lap_stime = api.read.timing.start()
-        if last_lap_stime == -1:
-            recorder_data.reset()
-            last_lap_stime = lap_stime
-
-        # New lap
         if lap_stime > last_lap_stime:
             # End recording
             if recorder_data.coords:
@@ -276,11 +272,11 @@ def record_track_map(output: MappingInfo, filepath: str):
                 temp_data.sectors = tuple(recorder_data.sectors)
                 validating = True
             # Reset
-            recorder_data.reset()
-            last_lap_stime = lap_stime
+            recorder_data.new()
             pos_last = 0
             recording = True
             #logger.info("map recording")
+        last_lap_stime = lap_stime
 
         # Validate map data after crossing finish line
         if validating:

@@ -25,6 +25,7 @@ from __future__ import annotations
 import logging
 
 from ..const_common import WHEELS_NA
+from ..decorator import slotclass
 from ..process.garage import export_lmu_car_setup
 from ..process.vehicle import absolute_refilling, export_wheels, steerlock_to_number
 from ..process.weather import FORECAST_DEFAULT, WeatherNode, forecast_rf2
@@ -34,45 +35,26 @@ from .restapi_connector import ResOutput, RestAPITask
 logger = logging.getLogger(__name__)
 
 
+@slotclass
 class RestAPIData:
     """Rest API data"""
 
-    __slots__ = (
-        # LMU, RF2
-        "timeScale",
-        "privateQualifying",
-        "forecastPractice",
-        "forecastQualify",
-        "forecastRace",
-        "lastCarSetup",
-        # LMU only
-        "steeringWheelRange",
-        "aeroDamage",
-        "repairTime",
-        "pitStopTime",
-        "absoluteRefill",
-        "maxVirtualEnergy",
-        "brakeWear",
-        "suspensionDamage",
-    )
-
-    def __init__(self):
-        # LMU, RF2
-        self.timeScale: int = 1
-        self.privateQualifying: int = 0
-        self.forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-        self.forecastQualify: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-        self.forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-        self.lastCarSetup: tuple[str, ...] = ()
-        # LMU only
-        self.steeringWheelRange: float = 0.0
-        self.aeroDamage: float = -1.0
-        self.repairTime: float = 0.0
-        self.pitStopTime: float = 0.0
-        self.absoluteRefill: float = 0.0
-        self.maxVirtualEnergy: float = 0.0
-        self.brakeWear: tuple[float, float, float, float] = WHEELS_NA
-        self.suspensionDamage: tuple[float, float, float, float] = WHEELS_NA
+    # LMU, RF2
+    timeScale: int = 1
+    privateQualifying: int = 0
+    forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
+    forecastQualify: tuple[WeatherNode, ...] = FORECAST_DEFAULT
+    forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
+    lastCarSetup: tuple[str, ...] = ()
+    # LMU only
+    steeringWheelRange: float = 0.0
+    aeroDamage: float = -1.0
+    repairTime: float = 0.0
+    pitStopTime: float = 0.0
+    absoluteRefill: float = 0.0
+    maxVirtualEnergy: float = 0.0
+    brakeWear: tuple[float, float, float, float] = WHEELS_NA
+    suspensionDamage: tuple[float, float, float, float] = WHEELS_NA
 
     def __del__(self):
         logger.info("RestAPI: GC: RestAPIData")

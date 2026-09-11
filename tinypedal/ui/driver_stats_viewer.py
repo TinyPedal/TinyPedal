@@ -40,19 +40,14 @@ from .. import units
 from ..api_control import api
 from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME
 from ..formatter import strip_invalid_char
+from ..module_info import DriverStats
 from ..setting import cfg
 from ..userfile.driver_stats import (
-    DriverStats,
     load_stats_json_file,
     save_stats_json_file,
-    validate_stats_file,
+    validate_stats_json_file,
 )
-from ._common import (
-    BaseEditor,
-    CompactButton,
-    NumericTableItem,
-    UIScaler,
-)
+from ._common import BaseEditor, CompactButton, NumericTableItem, UIScaler
 from .track_map_viewer import TrackMapViewer
 
 
@@ -178,7 +173,7 @@ class DriverStatsViewer(BaseEditor):
         if stats_user is None:
             return
 
-        self.stats_temp = validate_stats_file(stats_user)
+        self.stats_temp = validate_stats_json_file(stats_user)
 
         if self.selected_stats_key:
             last_selected_stats_key = self.selected_stats_key
@@ -277,8 +272,8 @@ class DriverStatsViewer(BaseEditor):
             )
             self.reload_stats()
 
-    def reset_stat(self, row: int, column: int):
-        """Reset stat"""
+    def reset_laptime(self, row: int, column: int):
+        """Reset lap time"""
         selected_vehicle = self.table_stats.item(row, 0).text()
         selected_column = self.table_header_key[column]
         best_laptime = self.table_stats.item(row, column).text()
@@ -290,8 +285,7 @@ class DriverStatsViewer(BaseEditor):
             "This cannot be undone!"
         )
         if self.confirm_operation(message=msg_text):
-            default_value = DriverStats.__dict__[selected_column]
-            self.stats_temp[self.selected_stats_key][selected_vehicle][selected_column] = default_value
+            self.stats_temp[self.selected_stats_key][selected_vehicle][selected_column] = MAX_SECONDS
             save_stats_json_file(
                 stats_user=self.stats_temp,
                 filepath=cfg.path.config,
@@ -326,7 +320,7 @@ class DriverStatsViewer(BaseEditor):
         if action == "Remove Vehicle":
             self.remove_vehicle()
         elif action == "Reset Lap Time":
-            self.reset_stat(item_row, item_column)
+            self.reset_laptime(item_row, item_column)
 
     def open_trackmap(self):
         """Open trackmap, make sure to strip off invalid char from key name"""

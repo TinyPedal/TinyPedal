@@ -28,6 +28,7 @@ from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
 from ..const_file import FileExt
+from ..decorator import generator_init
 from ..module_info import NotesData, minfo
 from ..userfile.track_notes import (
     COLUMN_DISTANCE,
@@ -38,7 +39,6 @@ from ..userfile.track_notes import (
     load_notes_file,
     parse_csv_notes_only,
 )
-from ..validator import generator_init
 from ._base import DataModule
 
 
@@ -211,7 +211,7 @@ def filter_tags(dataset: list[Mapping], tag_name: str) -> tuple[Mapping, ...]:
     return tuple(_note for _note in dataset if tag_name in _note.get(COLUMN_TAGS, ""))
 
 
-def reference_position(dataset: tuple[Mapping]) -> tuple[float, ...]:
+def reference_position(dataset: tuple[Mapping, ...]) -> tuple[float, ...]:
     """Reference notes position list"""
     if not dataset:
         return ()

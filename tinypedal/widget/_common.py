@@ -28,7 +28,7 @@ from typing import NamedTuple
 from PySide2.QtCore import QPoint
 from PySide2.QtWidgets import QApplication, QWidget
 
-from ..validator import generator_init
+from ..decorator import generator_init
 
 
 class FontMetrics(NamedTuple):
@@ -146,27 +146,29 @@ class MousePosition:
         self._last_x = new_x
         self._last_y = new_y
         # Horizontal snap
-        if self._delta_x < 0:  # moving left
-            x_left = new_x
-            for x_pos_other in self._grid_x:
-                if abs(x_left - x_pos_other) < self._snap_distance:
-                    new_x = x_pos_other + self._snap_gap
-        elif self._delta_x > 0:  # moving right
-            x_right = new_x + widget_width
-            for x_pos_other in self._grid_x:
-                if abs(x_right - x_pos_other) < self._snap_distance:
-                    new_x = x_pos_other - widget_width - self._snap_gap
+        if self._grid_x:
+            if self._delta_x < 0:  # moving left
+                x_left = new_x
+                for x_pos_other in self._grid_x:
+                    if abs(x_left - x_pos_other) < self._snap_distance:
+                        new_x = x_pos_other + self._snap_gap
+            elif self._delta_x > 0:  # moving right
+                x_right = new_x + widget_width
+                for x_pos_other in self._grid_x:
+                    if abs(x_right - x_pos_other) < self._snap_distance:
+                        new_x = x_pos_other - widget_width - self._snap_gap
         # Vertical snap
-        if self._delta_y < 0:  # moving up
-            y_top = new_y
-            for y_pos_other in self._grid_y:
-                if abs(y_top - y_pos_other) < self._snap_distance:
-                    new_y = y_pos_other + self._snap_gap
-        elif self._delta_y > 0:  # moving down
-            y_bottom = new_y + widget_height
-            for y_pos_other in self._grid_y:
-                if abs(y_bottom - y_pos_other) < self._snap_distance:
-                    new_y = y_pos_other - widget_height - self._snap_gap
+        if self._grid_y:
+            if self._delta_y < 0:  # moving up
+                y_top = new_y
+                for y_pos_other in self._grid_y:
+                    if abs(y_top - y_pos_other) < self._snap_distance:
+                        new_y = y_pos_other + self._snap_gap
+            elif self._delta_y > 0:  # moving down
+                y_bottom = new_y + widget_height
+                for y_pos_other in self._grid_y:
+                    if abs(y_bottom - y_pos_other) < self._snap_distance:
+                        new_y = y_pos_other - widget_height - self._snap_gap
         # Update pos
         pos.setX(new_x)
         pos.setY(new_y)

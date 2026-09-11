@@ -24,8 +24,8 @@ from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
 from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, MAX_SECONDS
+from ..decorator import generator_init
 from ..module_info import HybridInfo, minfo
-from ..validator import generator_init
 from ._base import DataModule
 
 

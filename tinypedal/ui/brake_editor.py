@@ -35,15 +35,10 @@ from PySide2.QtWidgets import (
 
 from ..api_control import api
 from ..const_file import ConfigType
-from ..setting import cfg, copy_setting
+from ..setting import cfg
 from ..userfile.heatmap import HEATMAP_DEFAULT_BRAKE, set_predefined_brake_name
-from ._common import (
-    BaseEditor,
-    CompactButton,
-    FloatTableItem,
-    UIScaler,
-    #TableBatchReplace,
-)
+from ..userfile.json_setting import copy_setting
+from ._common import BaseEditor, CompactButton, FloatTableItem, UIScaler
 
 HEADER_BRAKES = "Brake name","Failure (mm)","Heatmap name"
 

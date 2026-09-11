@@ -28,7 +28,8 @@ from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
 from ..const_common import FLOAT_INF
-from ..module_info import StatsInfo, minfo
+from ..decorator import generator_init
+from ..module_info import DriverStats, StatsInfo, minfo
 from ..userfile.brands import select_brand_name
 from ..userfile.car_setup import (
     rename_car_setup_file,
@@ -36,8 +37,7 @@ from ..userfile.car_setup import (
     set_car_setup_filename,
     set_car_setup_laptime,
 )
-from ..userfile.driver_stats import DriverStats, load_driver_stats, save_driver_stats
-from ..validator import generator_init
+from ..userfile.driver_stats import load_driver_stats, save_driver_stats
 from ._base import DataModule
 
 
@@ -141,9 +141,7 @@ def record_driver_stats(
     last_reset = None  # reset check
     delayed_save = False
 
-    default_stats = DriverStats()
     driver_stats = DriverStats()
-    loaded_stats = default_stats
 
     while True:
         reset = yield None
@@ -165,7 +163,7 @@ def record_driver_stats(
             last_reset = reset
 
             # Load driver stats
-            driver_stats = DriverStats()
+            driver_stats.reset()
             loaded_stats = load_driver_stats(
                 key_list=stats_keys(vehicle_classification),
                 filepath=filepath,

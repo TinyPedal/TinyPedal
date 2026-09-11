@@ -67,10 +67,10 @@ def save_sector_best_file(
     filepath: str,
     filename: str,
     session_id: tuple[int, int, int],
-    session_best_tb: list[float, float, float],
-    session_best_pb: list[float, float, float],
-    alltime_best_tb: list[float, float, float],
-    alltime_best_pb: list[float, float, float],
+    session_best_tb: list[float],
+    session_best_pb: list[float],
+    alltime_best_tb: list[float],
+    alltime_best_pb: list[float],
     extension: str = FileExt.SECTOR,
 ) -> None:
     """Save sector best file (*.sector)

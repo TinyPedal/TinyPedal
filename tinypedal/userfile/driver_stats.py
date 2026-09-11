@@ -24,13 +24,12 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass
 from time import sleep
-from typing import KeysView, get_type_hints
 
 from ..const_common import MAX_SECONDS
 from ..const_file import FileExt, StatsFile
-from ..validator import convert_value_type, purge_data_key
+from ..module_info import DriverStats
+from ..validator import convert_value_type
 from .json_setting import (
     create_backup_file,
     save_and_verify_json_file,
@@ -39,65 +38,6 @@ from .json_setting import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class DriverStats:
-    """Driver stats data
-
-    Attributes:
-        pb: personal best lap time.
-        qb: qualifying best lap time.
-        rb: race best lap time.
-        meters: meters driven.
-        seconds: seconds spent driving.
-        liters: liters of fuel consumed.
-        valid: valid laps.
-        invalid: invalid laps.
-        penalties: penalties recieved in race.
-        races: number of races completed.
-        wins: number of wins.
-        podiums: number of podiums.
-    """
-
-    pb: float = MAX_SECONDS
-    qb: float = MAX_SECONDS
-    rb: float = MAX_SECONDS
-    meters: float = 0.0
-    seconds: float = 0.0
-    liters: float = 0.0
-    valid: int = 0
-    invalid: int = 0
-    penalties: int = 0
-    races: int = 0
-    wins: int = 0
-    podiums: int = 0
-
-    @classmethod
-    def keys(cls) -> KeysView[str]:
-        """Get key name list"""
-        return cls.__annotations__.keys()
-
-    @staticmethod
-    def is_lap_time(key: str) -> bool:
-        """Is lap time"""
-        return key in ("pb", "qb", "rb")
-
-
-def validate_stats_file(stats_user: dict) -> dict:
-    """Validate stats file
-
-    Full validation for every primary key (track name) and secondary key (vehicle name),
-    Only required for loading file in Driver Stats Viewer.
-    """
-    for key in stats_user:
-        if not isinstance(stats_user[key], dict):
-            stats_user[key] = {}
-        sub_value = stats_user[key]
-        for sub_key in sub_value:
-            if not isinstance(sub_value[sub_key], dict):
-                sub_value[sub_key] = {}
-    return stats_user
 
 
 def get_sub_dict(source: dict, key_name: str) -> dict:
@@ -113,24 +53,23 @@ def load_driver_stats(
     key_list: tuple[str, str], filepath: str, filename: str = StatsFile.DRIVER
 ) -> DriverStats:
     """Load driver stats"""
+    stats_temp = DriverStats()
     stats_user = load_stats_json_file(
         filepath=filepath,
         filename=filename,
     )
     if stats_user is None:
-        return DriverStats()
+        return stats_temp
     # Get data from matching key
     loaded_dict = stats_user
     for key in key_list:
         temp_dict = loaded_dict.get(key)
         if not isinstance(temp_dict, dict):  # not exist, set to default
-            return DriverStats()
+            return stats_temp
         loaded_dict = temp_dict
     # Add data to DriverStats
-    try:
-        return DriverStats(**purge_data_key(loaded_dict, DriverStats.keys()))
-    except (AttributeError, TypeError, KeyError, ValueError):
-        return DriverStats()
+    stats_temp.update(loaded_dict)
+    return stats_temp
 
 
 def save_driver_stats(
@@ -163,15 +102,16 @@ def save_driver_stats(
     for key in key_list:
         loaded_dict = get_sub_dict(loaded_dict, key)
     # Verify and update new data
-    default_dict = DriverStats.__dict__
-    default_type = get_type_hints(DriverStats)
-    for key, value in stats_update.__dict__.items():
+    default_dict = DriverStats().output()
+    for key, value in stats_update.output().items():
+        default_value = default_dict[key]
+        default_type = type(default_value)
         # Add new default value if not exists
         if key not in loaded_dict:
-            loaded_dict[key] = default_dict[key]
+            loaded_dict[key] = default_value
         # Check value type, auto correct if mismatch
-        if not isinstance(loaded_dict[key], default_type[key]):
-            loaded_dict[key] = convert_value_type(loaded_dict[key], default_dict[key], default_type[key])
+        if not isinstance(loaded_dict[key], default_type):
+            loaded_dict[key] = convert_value_type(loaded_dict[key], default_value, default_type)
         # Update laptime value faster than old value
         if DriverStats.is_lap_time(key):
             if loaded_dict[key] <= 0:  # reset invalid time
@@ -187,6 +127,22 @@ def save_driver_stats(
         filepath=filepath,
         filename=filename,
     )
+
+
+def validate_stats_json_file(stats_user: dict) -> dict:
+    """Validate stats json file
+
+    Full validation for every primary key (track name) and secondary key (vehicle name),
+    Only required for loading file in Driver Stats Viewer.
+    """
+    for key in stats_user:
+        if not isinstance(stats_user[key], dict):
+            stats_user[key] = {}
+        sub_value = stats_user[key]
+        for sub_key in sub_value:
+            if not isinstance(sub_value[sub_key], dict):
+                sub_value[sub_key] = {}
+    return stats_user
 
 
 def load_stats_json_file(

@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import csv
 import logging
+from typing import Sequence
 
 from ..const_file import FileExt
 from ..module_info import ConsumptionDataSet
@@ -55,7 +56,7 @@ def load_consumption_history_file(
 
 
 def save_consumption_history_file(
-    dataset: tuple, filepath: str, filename: str, extension: str = FileExt.CONSUMPTION
+    dataset: Sequence[ConsumptionDataSet], filepath: str, filename: str, extension: str = FileExt.CONSUMPTION
 ) -> None:
     """Save fuel/energy consumption history file (*.consumption)"""
     if len(dataset) < 2 or invalid_save_name(filename):

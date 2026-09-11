@@ -31,9 +31,10 @@ from ..api_control import api
 from ..const_api import API_RF2_NAME
 from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF
 from ..const_file import FileExt
+from ..decorator import generator_init
 from ..module_info import FuelInfo, minfo
 from ..userfile.fuel_delta import load_fuel_delta_file, save_fuel_delta_file
-from ..validator import generator_init, valid_delta_raw
+from ..validator import valid_delta_raw
 from ._base import DataModule, round6
 
 
@@ -178,11 +179,11 @@ def calc_consumption(
             telemetry_func = detect_consumption_type(is_energy)
             combo_name = api.read.session.combo_name()
 
-            delta_array_last, used_last_valid, laptime_pace = load_fuel_delta_file(
+            delta_array_last, used_last_valid = load_fuel_delta_file(
                 filepath=filepath,
                 filename=combo_name,
                 extension=extension,
-                defaults=(DELTA_DEFAULT, 0.0, 0.0)
+                defaults=(DELTA_DEFAULT, 0.0)
             )
             delta_array_raw = [DELTA_ZERO]  # distance, fuel used, laptime
             delta_array_temp = DELTA_DEFAULT  # last lap temp
@@ -253,7 +254,6 @@ def calc_consumption(
                 delta_array_raw.append((  # set end value
                     round6(pos_last + 10),
                     round6(used_curr),
-                    round6(lap_stime - last_lap_stime)
                 ))
                 delta_array_temp = tuple(delta_array_raw)
                 validating = elapsed_time

@@ -35,15 +35,10 @@ from PySide2.QtWidgets import (
 
 from ..api_control import api
 from ..const_file import ConfigType
-from ..setting import cfg, copy_setting
+from ..setting import cfg
 from ..userfile.heatmap import HEATMAP_DEFAULT_TYRE, set_predefined_compound_symbol
-from ._common import (
-    QVAL_COLOR,
-    BaseEditor,
-    CompactButton,
-    TableBatchReplace,
-    UIScaler,
-)
+from ..userfile.json_setting import copy_setting
+from ._common import QVAL_COLOR, BaseEditor, CompactButton, TableBatchReplace, UIScaler
 from ._option import ColorEdit
 
 HEADER_COMPOUNDS = "Compound name", "Symbol", "Color", "Heatmap name"

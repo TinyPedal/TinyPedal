@@ -37,7 +37,6 @@ from .const_file import ConfigType, FileExt
 from .setting_validator import PresetValidator, StyleValidator
 from .userfile import set_global_config_path, set_user_data_path
 from .userfile.json_setting import (
-    copy_setting,
     load_setting_json_file,
     load_style_json_file,
     save_and_verify_json_file,
@@ -440,7 +439,7 @@ class Setting:
     def create(self, filename: str):
         """Create default setting"""
         save_and_verify_json_file(
-            dict_user=copy_setting(self.default.setting),
+            dict_user=dict(self.default.setting),
             filename=filename,
             filepath=self.path.settings,
             max_attempts=self.max_saving_attempts,

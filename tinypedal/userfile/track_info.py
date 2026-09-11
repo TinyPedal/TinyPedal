@@ -44,7 +44,7 @@ def load_track_info(track_name: str, info_name: str):
     return value
 
 
-def save_track_info(track_name: str, **track_info: dict) -> None:
+def save_track_info(track_name: str, **track_info: float) -> None:
     """Save track info to tracks preset"""
     if invalid_save_name(track_name):
         return

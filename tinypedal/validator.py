@@ -26,30 +26,16 @@ import logging
 import os
 import re
 import time
-from functools import wraps
 from math import isfinite
 from time import monotonic
-from typing import Any, Iterable
+from typing import Any
 
 from .const_common import MAX_SECONDS
 from .const_file import FileExt
+from .decorator import generator_init
 from .regex_pattern import CFG_INVALID_FILENAME, rex_hex_color
 
 logger = logging.getLogger(__name__)
-
-
-# Decorator
-def generator_init(func):
-    """Initialize generator for send() method, returns None if StopIteration"""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        generator = func(*args, **kwargs)
-        try:
-            next(generator)
-        except StopIteration:
-            generator = None
-        return generator
-    return wrapper
 
 
 # Value validate
@@ -103,14 +89,6 @@ def is_same_session(
         last_session_id[2] <= session_id[1] and  # session elapsed time
         last_session_id[3] <= session_id[2]  # total completed laps
     )
-
-
-def purge_data_key(loaded_dict: dict, ref_keys: Iterable[str]) -> dict:
-    """Purge unwanted key from dict"""
-    for key in tuple(loaded_dict):
-        if key not in ref_keys:
-            loaded_dict.pop(key)
-    return loaded_dict
 
 
 # File validate

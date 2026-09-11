@@ -23,8 +23,8 @@ Force module
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
+from ..decorator import generator_init
 from ..module_info import ForceInfo, minfo
-from ..validator import generator_init
 from ._base import DataModule
 
 

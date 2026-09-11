@@ -34,7 +34,8 @@ from PySide2.QtWidgets import (
 )
 
 from ..const_file import ConfigType
-from ..setting import cfg, copy_setting
+from ..setting import cfg
+from ..userfile.json_setting import copy_setting
 from ._common import (
     QVAL_COLOR,
     QVAL_HEATMAP,

@@ -27,13 +27,13 @@ from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
 from ..const_common import FLOAT_INF, WHEELS_DELTA_DEFAULT, WHEELS_ZERO
+from ..decorator import generator_init
 from ..module_info import WheelsInfo, minfo
 from ..userfile.heatmap import (
     brake_failure_thickness,
     save_brake_failure_thickness,
     set_predefined_brake_name,
 )
-from ..validator import generator_init
 from ._base import DataModule
 
 logger = logging.getLogger(__name__)

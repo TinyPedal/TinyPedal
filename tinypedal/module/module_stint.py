@@ -26,13 +26,13 @@ from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
 from ..const_common import FLOAT_INF, MAX_SECONDS
-from ..module_info import ConsumptionDataSet, HistoryInfo, StintDataSet, minfo
+from ..decorator import generator_init
+from ..module_info import ConsumptionDataSet, HistoryInfo, minfo
 from ..userfile.consumption_history import (
     load_consumption_history_file,
     save_consumption_history_file,
 )
 from ..userfile.heatmap import select_compound_symbol
-from ..validator import generator_init
 from ._base import DataModule
 
 
@@ -167,15 +167,15 @@ def record_stint_history(
     update_stint_history = False
 
     start_laps = 0
-    start_time = 0
-    start_fuel = 0
-    start_energy = 0
-    start_wear = 0
+    start_time = 0.0
+    start_fuel = 0.0
+    start_energy = 0.0
+    start_wear = 0.0
 
-    last_wear_avg = 0
-    last_fuel_curr = 0
-    last_energy_curr = 0
-    last_time_stop = 0
+    last_wear_avg = 0.0
+    last_fuel_curr = 0.0
+    last_energy_curr = 0.0
+    last_time_stop = 0.0
 
     # Stint consistency
     pitting = 1
@@ -226,18 +226,7 @@ def record_stint_history(
 
         if update_stint_history:
             update_stint_history = False
-            history_data.appendleft(
-                StintDataSet(
-                    totalLaps=stint_data.totalLaps,
-                    totalTime=stint_data.totalTime,
-                    totalFuel=stint_data.totalFuel,
-                    totalEnergy=stint_data.totalEnergy,
-                    totalTyreWear=stint_data.totalTyreWear,
-                    lapTimeDelta=stint_data.lapTimeDelta,
-                    lapTimeConsistency=stint_data.lapTimeConsistency,
-                    tyreCompound=stint_data.tyreCompound,
-                )
-            )
+            history_data.appendleft(stint_data.copy())
             output.stintDataVersion += 1
 
         if reset_stint:
