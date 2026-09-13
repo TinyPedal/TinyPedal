@@ -98,10 +98,11 @@ def restart():
             time.sleep(0.01)
     # 2 set restart env for skipping single instance check
     os.environ["TINYPEDAL_RESTART"] = "TRUE"
-    if "tinypedal.exe" in sys.executable:  # if run as exe
-        os.execl(sys.executable, *sys.argv)
-    else:  # if run as script
+    # 3 restart
+    if os.getenv("RUN_FROM_SOURCE"):  # run as script
         os.execl(sys.executable, sys.executable, *sys.argv)
+    else:  # run as exe
+        os.execl(sys.executable, *sys.argv)
 
 
 def reload(reload_preset: bool = False):

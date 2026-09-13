@@ -74,7 +74,7 @@ def single_instance_check(is_single_instance: bool):
         return
     logger.info("Single instance mode: ON")
     # Skip if restarted
-    if os.getenv("TINYPEDAL_RESTART") == "TRUE":
+    if os.getenv("TINYPEDAL_RESTART"):
         os.environ.pop("TINYPEDAL_RESTART", None)
         save_pid_file()
         return

@@ -2,6 +2,7 @@
 
 /dist/
 __pycache__/
+.mypy_cache/
 
 # User data folder
 /brandlogo/

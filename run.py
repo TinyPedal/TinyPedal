@@ -58,7 +58,7 @@ def get_cli_argument() -> argparse.Namespace:
         ),
     )
     # Disallow version override if run as compiled exe
-    if "tinypedal.exe" not in sys.executable:
+    if os.getenv("RUN_FROM_SOURCE"):
         parse.add_argument(
             "-p",
             "--pyside",
@@ -94,6 +94,14 @@ def override_module(original: str, override: str):
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+
+    # Check whether running from source
+    if "tinypedal.exe" not in sys.executable:
+        os.environ["RUN_FROM_SOURCE"] = "TRUE"
+
+    # Add search path for third party modules
+    if os.getenv("RUN_FROM_SOURCE"):
+        sys.path.append("thirdparty")
 
     # Load command line arguments
     cli_args = get_cli_argument()

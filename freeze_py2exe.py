@@ -189,6 +189,9 @@ def build_exe(dist_path: str) -> None:
 
 def build_start() -> None:
     """Start building"""
+    # Add search path for third party modules
+    sys.path.append("thirdparty")
+
     cli_args = get_cli_argument()
     dist_path = check_dist(cli_args.path)
     if not dist_path:
