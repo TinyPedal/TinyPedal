@@ -3,6 +3,7 @@ WIP
 * General
   - Fixed pace notes playback kept active even when disabled.
   - Removed unused "electric_braking_allocation" option from Brake bias Widget.
+  - Moved all submodules to "thirdparty" folder. If you are running the APP from source, make sure to run "git submodule update --init" command to sync submodule.
 
 2.50.0 (2026-08-31)
 -----------------------------

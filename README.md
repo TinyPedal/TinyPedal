@@ -114,7 +114,7 @@ Download submodule source code from following links:
 - pyLMUSharedMemory: https://github.com/TinyPedal/pyLMUSharedMemory
 - pyRfactor2SharedMemory: https://github.com/TinyPedal/pyRfactor2SharedMemory
 
-Extract TinyPedal source code ZIP file. Then extract submodule ZIP files and put them in corresponding folder in the root folder of TinyPedal.
+Extract TinyPedal source code ZIP file. Then extract submodule ZIP files and put them in corresponding folder inside `TinyPedal/thirdparty` folder.
 
 #### Method 2
 
