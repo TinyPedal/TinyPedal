@@ -25,7 +25,7 @@ from __future__ import annotations
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import MAX_METERS, MAX_SECONDS
+from ..constant import DATA
 from ..module_info import VehicleDataSet, VehiclesInfo, minfo
 from ..userfile.brands import select_brand_name
 from ..validator import state_timer
@@ -118,10 +118,10 @@ def update_vehicle_data(
     in_race: bool,
 ) -> None:
     """Update vehicle data"""
-    nearest_line = MAX_METERS
-    nearest_time_behind = -MAX_SECONDS
-    nearest_yellow_ahead = MAX_METERS
-    nearest_yellow_behind = -MAX_METERS
+    nearest_line = DATA.MAX_METERS
+    nearest_time_behind = -DATA.MAX_SECONDS
+    nearest_yellow_ahead = DATA.MAX_METERS
+    nearest_yellow_behind = -DATA.MAX_METERS
     nearest_blue_class = ""
 
     # Counter
@@ -367,7 +367,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
         return
 
     # Leader time
-    if leader_index >= 0 and 0 < leader_pace < MAX_SECONDS:
+    if leader_index >= 0 and 0 < leader_pace < DATA.MAX_SECONDS:
         leader_finish_time = leader_pace * api.read.lap.remaining(leader_index)
         leader_finish_offset = max(remaining_time - leader_finish_time, 0.0)
     else:  # default to lap if unavailable
@@ -375,7 +375,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
         leader_finish_offset = 0.1
 
     # Player time
-    if player_index >= 0 and 0 < player_pace < MAX_SECONDS:
+    if player_index >= 0 and 0 < player_pace < DATA.MAX_SECONDS:
         player_finish_time = player_pace * api.read.lap.remaining(player_index)
         player_finish_offset = max(remaining_time - player_finish_time, 0.0)
     else:  # default to lap if unavailable

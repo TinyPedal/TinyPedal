@@ -50,7 +50,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from ..const_file import ConfigType, FileFilter
+from ..constant import CONFIG, FILE
 from ..formatter import format_option_name
 from ..setting import cfg
 from ..userfile.tyre_strategy import (
@@ -90,7 +90,7 @@ def save_tyre_strategy_file_path(filepath: str):
     """Save file path"""
     if filepath != cfg.user.config["tyre_strategy_planner"]["last_file_path"]:
         cfg.user.config["tyre_strategy_planner"]["last_file_path"] = filepath
-        cfg.save(config_type=ConfigType.CONFIG)
+        cfg.save(config_type=CONFIG.TYPE_CONFIG)
 
 
 class TyreNameListItem(QListWidgetItem):
@@ -919,7 +919,7 @@ class TyreStrategyPlanner(BaseEditor):
         filename_full, file_filter = QFileDialog.getOpenFileName(
             self,
             dir=set_tyre_strategy_file_path(),
-            filter=FileFilter.TYRESTRATEGY,
+            filter=FILE.FILTER_TYRESTRATEGY,
         )
         if not filename_full:
             return
@@ -949,7 +949,7 @@ class TyreStrategyPlanner(BaseEditor):
         filename_full, file_filter = QFileDialog.getSaveFileName(
             self,
             dir=set_tyre_strategy_file_path(filename),
-            filter=FileFilter.TYRESTRATEGY,
+            filter=FILE.FILTER_TYRESTRATEGY,
         )
         if not filename_full:  # save canceled
             return
@@ -983,7 +983,7 @@ class TyreStrategyPlanner(BaseEditor):
         filename_full, file_filter = QFileDialog.getSaveFileName(
             self,
             dir=set_tyre_strategy_file_path(filename),
-            filter=FileFilter.CSV,
+            filter=FILE.FILTER_CSV,
         )
         if not filename_full:  # save canceled
             return

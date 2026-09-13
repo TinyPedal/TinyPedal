@@ -24,7 +24,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap
 
 from ..api_control import api
-from ..const_file import ImageFile
+from ..constant import FILE
 from ..module_info import minfo
 from ..userfile.custom_image import split_pixmap_image
 from ._base import Overlay
@@ -43,7 +43,7 @@ class Realtime(Overlay):
         icon_size = max(self.wcfg["icon_size"], 16) // 2 * 2
 
         # Config canvas
-        pixmap_icon = QPixmap(ImageFile.INSTRUMENT).scaledToWidth(
+        pixmap_icon = QPixmap(FILE.IMAGE_INSTRUMENT).scaledToWidth(
             icon_size * 2, mode=Qt.SmoothTransformation)
         # 0 = enabled icon state, 1 = disabled icon state.
         self.pixmap_headlights = create_icon_set(pixmap_icon, icon_size, 0)

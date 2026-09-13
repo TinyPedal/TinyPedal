@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-from ..const_common import ABS_ZERO_CELSIUS
+from ..constant import DATA
 
 
 class WeatherNode(NamedTuple):
@@ -39,7 +39,7 @@ class WeatherNode(NamedTuple):
 
     start: float = 1.0
     sky_type: int = -1
-    temperature: float = ABS_ZERO_CELSIUS
+    temperature: float = DATA.ABS_ZERO_CELSIUS
     rain_chance: float = 0.0
 
 

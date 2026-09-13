@@ -33,7 +33,7 @@ from ..calculation import (
     oriyaw,
     slip_angle,
 )
-from ..const_common import MAX_SECONDS
+from ..constant import DATA
 from ..formatter import strip_invalid_char
 from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
@@ -669,20 +669,20 @@ class Timing(_reader.Timing, DataAdapter):
 
     def reference_laptime(self, index: int | None = None, laptime: float = 0) -> float:
         """Reference lap time (seconds)"""
-        if 0 < laptime < MAX_SECONDS:
+        if 0 < laptime < DATA.MAX_SECONDS:
             return laptime
         init_time = min_nonzero((
             self.best_laptime(index),
             self.last_laptime(index),
-            MAX_SECONDS,
+            DATA.MAX_SECONDS,
         ))
-        if 0 < init_time < MAX_SECONDS:
+        if 0 < init_time < DATA.MAX_SECONDS:
             return init_time
         # Set to estimated laptime only if other laptime not available
         # as estimated laptime can be faster than other laptime
         return min_nonzero((
             self.estimated_laptime(index),
-            MAX_SECONDS,
+            DATA.MAX_SECONDS,
         ))
 
     def estimated_laptime(self, index: int | None = None) -> float:

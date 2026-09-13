@@ -26,7 +26,7 @@ import logging
 import xml.dom.minidom
 import xml.parsers.expat
 
-from ..const_file import FileExt
+from ..constant import FILE
 from ..validator import invalid_save_name
 
 logger = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ def coords_to_points(coords: tuple | list, decimals: int = -1) -> str:
 
 
 def load_track_map_file(
-    filepath: str, filename: str, extension: str = FileExt.SVG
+    filepath: str, filename: str, extension: str = FILE.EXT_SVG
 ) -> tuple[tuple, ...]:
     """Load svg track map file (*.svg)"""
     try:
@@ -116,7 +116,7 @@ def save_track_map_file(
     raw_dists: tuple,
     sector_index: tuple,
     decimals: int,
-    extension: str = FileExt.SVG,
+    extension: str = FILE.EXT_SVG,
 ) -> None:
     """Save track map file (*.svg)"""
     if invalid_save_name(filename):

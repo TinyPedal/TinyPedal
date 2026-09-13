@@ -25,8 +25,7 @@ from __future__ import annotations
 import logging
 import os
 
-from ..const_common import CRLF, FLOAT_INF
-from ..const_file import FileExt
+from ..constant import DATA, FILE
 from ..regex_pattern import rex_special_char
 
 logger = logging.getLogger(__name__)
@@ -34,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 def set_car_setup_laptime(seconds: float) -> str:
     """Set car setup lap time"""
-    if seconds >= FLOAT_INF:
+    if seconds >= DATA.FLOAT_INF:
         seconds = 0
     return f"{seconds // 60:.0f}-{seconds % 60 - seconds % 1:02.0f}-{seconds % 1 * 1000:03.0f}"
 
@@ -45,7 +44,7 @@ def set_car_setup_filename(*names: str) -> str:
 
 
 def remove_car_setup_file(
-    filepath: str, filename: str, extension: str = FileExt.SVM
+    filepath: str, filename: str, extension: str = FILE.EXT_SVM
 ) -> None:
     """Remove car setup file"""
     try:
@@ -58,7 +57,7 @@ def remove_car_setup_file(
 
 
 def rename_car_setup_file(
-    filepath: str, old_filename: str, new_filename: str, extension: str = FileExt.SVM
+    filepath: str, old_filename: str, new_filename: str, extension: str = FILE.EXT_SVM
 ) -> None:
     """Rename car setup file"""
     try:
@@ -72,7 +71,7 @@ def rename_car_setup_file(
 
 
 def save_car_setup_file(
-    filepath: str, filename: str, dataset: tuple[str], extension: str = FileExt.SVM
+    filepath: str, filename: str, dataset: tuple[str], extension: str = FILE.EXT_SVM
 ) -> None:
     """Save car setup file"""
     if len(dataset) < 2:
@@ -80,5 +79,5 @@ def save_car_setup_file(
     with open(f"{filepath}{filename}{extension}", "w", newline="", encoding="utf-8") as temp_file:
         for line in dataset:
             temp_file.write(line)
-            temp_file.write(CRLF)
+            temp_file.write(DATA.CRLF)
         logger.info("USERDATA: %s%s saved", filename, extension)

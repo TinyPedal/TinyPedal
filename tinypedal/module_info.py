@@ -26,14 +26,7 @@ from collections import deque
 from typing import KeysView, Mapping, NamedTuple
 
 from .calculation import circular_position_relative, linear_interp
-from .const_common import (
-    DELTA_DEFAULT,
-    EMPTY_DICT,
-    MAX_METERS,
-    MAX_SECONDS,
-    MAX_VEHICLES,
-    REL_TIME_DEFAULT,
-)
+from .constant import DATA
 from .decorator import df_deque, df_list, df_tuple, df_wrap, slotclass
 
 # Class
@@ -100,9 +93,9 @@ class DriverStats:
         podiums: number of podiums.
     """
 
-    pb: float = MAX_SECONDS
-    qb: float = MAX_SECONDS
-    rb: float = MAX_SECONDS
+    pb: float = DATA.MAX_SECONDS
+    qb: float = DATA.MAX_SECONDS
+    rb: float = DATA.MAX_SECONDS
     meters: float = 0.0
     seconds: float = 0.0
     liters: float = 0.0
@@ -226,11 +219,11 @@ class DeltaLapTimeHistory:
             self.start = lap_start
             # Recalculate once per lap
             if best_valid <= 0:
-                best_recent = MAX_SECONDS
+                best_recent = DATA.MAX_SECONDS
             else:
                 # Find best time from recent laps
                 best_recent = min(self._filter_laptime(best_valid))
-                if best_recent >= MAX_SECONDS:  # fallback to session best
+                if best_recent >= DATA.MAX_SECONDS:  # fallback to session best
                     best_recent = best_valid
             self.best = best_recent
             self.average = self._average_laptime(self.best)
@@ -238,8 +231,8 @@ class DeltaLapTimeHistory:
 
     def _average_laptime(self, laptime_best: float) -> float:
         """Calculate average lap time"""
-        if laptime_best >= MAX_SECONDS:
-            return MAX_SECONDS
+        if laptime_best >= DATA.MAX_SECONDS:
+            return DATA.MAX_SECONDS
         laptime_sum = 0
         count = 0
         margin = laptime_best * 1.2
@@ -260,7 +253,7 @@ class DeltaLapTimeHistory:
             if laptime >= best_valid > 0:
                 yield laptime
             else:
-                yield MAX_SECONDS
+                yield DATA.MAX_SECONDS
 
 
 @slotclass
@@ -461,9 +454,9 @@ class VehicleDataSet:
     classAheadIndex: int = -1
     classBehindIndex: int = -1
     classLeaderIndex: int = -1
-    classBestLapTime: float = MAX_SECONDS
-    bestLapTime: float = MAX_SECONDS
-    lastLapTime: float = MAX_SECONDS
+    classBestLapTime: float = DATA.MAX_SECONDS
+    bestLapTime: float = DATA.MAX_SECONDS
+    lastLapTime: float = DATA.MAX_SECONDS
     currentLapProgress: float = 0.0
     totalLapProgress: float = 0.0
     gapBehindNext: float = 0.0
@@ -502,7 +495,7 @@ class VehicleDataSet:
 class DeltaInfo:
     """Delta output data"""
 
-    deltaBestData: tuple[tuple[float, float], ...] = DELTA_DEFAULT
+    deltaBestData: tuple[tuple[float, float], ...] = DATA.DELTA_DEFAULT
     deltaBest: float = 0.0
     deltaLast: float = 0.0
     deltaSession: float = 0.0
@@ -635,9 +628,9 @@ class NotesData:
     """
 
     currentIndex: int = 0
-    currentNote: Mapping[str, float | str] = EMPTY_DICT
+    currentNote: Mapping[str, float | str] = DATA.EMPTY_DICT
     nextIndex: int = 0
-    nextNote: Mapping[str, float | str] = EMPTY_DICT
+    nextNote: Mapping[str, float | str] = DATA.EMPTY_DICT
 
     def reset(self):
         """Reset"""
@@ -656,12 +649,12 @@ class NotesInfo:
 class RelativeInfo:
     """Relative output data"""
 
-    relativeAhead: list[tuple[float, int]] = df_list(REL_TIME_DEFAULT)
-    relativeBehind: list[tuple[float, int]] = df_list(REL_TIME_DEFAULT)
+    relativeAhead: list[tuple[float, int]] = df_list(DATA.RELATIVE_NA)
+    relativeBehind: list[tuple[float, int]] = df_list(DATA.RELATIVE_NA)
     standings: list[int] = df_list(-1)
     drawOrder: list[int] = df_list(0)
-    relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, MAX_VEHICLES)
-    relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, MAX_VEHICLES)
+    relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, DATA.MAX_VEHICLES)
+    relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, DATA.MAX_VEHICLES)
 
 
 @slotclass
@@ -670,9 +663,9 @@ class SectorData:
 
     noDeltaSector: bool = True
     sectorIndex: int = -1
-    sectorPrev: list[float] = df_list(MAX_SECONDS, 3)
-    sectorBestTB: list[float] = df_list(MAX_SECONDS, 3)
-    sectorBestPB: list[float] = df_list(MAX_SECONDS, 3)
+    sectorPrev: list[float] = df_list(DATA.MAX_SECONDS, 3)
+    sectorBestTB: list[float] = df_list(DATA.MAX_SECONDS, 3)
+    sectorBestPB: list[float] = df_list(DATA.MAX_SECONDS, 3)
     deltaSectorBestPB: list[float] = df_list(0.0, 3)
     deltaSectorBestTB: list[float] = df_list(0.0, 3)
 
@@ -700,7 +693,7 @@ class StatsInfo:
 class VehiclesInfo:
     """Vehicles output data"""
 
-    dataSet: tuple[VehicleDataSet, ...] = df_tuple(VehicleDataSet, MAX_VEHICLES)
+    dataSet: tuple[VehicleDataSet, ...] = df_tuple(VehicleDataSet, DATA.MAX_VEHICLES)
     dataSetVersion: int = -1
     leaderIndex: int = 0
     playerIndex: int = -1
@@ -710,12 +703,12 @@ class VehiclesInfo:
     totalPitRequests: int = 0
     totalCompletedLaps: int = 0
     totalVehicles: int = 0
-    nearestLine: float = MAX_METERS
-    nearestTraffic: float = MAX_SECONDS
-    nearestYellowAhead: float = MAX_METERS
-    nearestYellowBehind: float = -MAX_METERS
+    nearestLine: float = DATA.MAX_METERS
+    nearestTraffic: float = DATA.MAX_SECONDS
+    nearestYellowAhead: float = DATA.MAX_METERS
+    nearestYellowBehind: float = -DATA.MAX_METERS
     nearestBlueClass: str = ""
-    leaderBestLapTime: float = MAX_SECONDS
+    leaderBestLapTime: float = DATA.MAX_SECONDS
     finishTimeOffset: float = 0.0
     finishAsLap: bool = True
     finishLapOffset: float = 0.0

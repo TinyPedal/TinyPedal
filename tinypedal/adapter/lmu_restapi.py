@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import logging
 
-from ..const_common import WHEELS_NA
+from ..constant import DATA
 from ..decorator import slotclass
 from ..process.garage import export_lmu_car_setup
 from ..process.vehicle import absolute_refilling, export_wheels, steerlock_to_number
@@ -53,8 +53,8 @@ class RestAPIData:
     pitStopTime: float = 0.0
     absoluteRefill: float = 0.0
     maxVirtualEnergy: float = 0.0
-    brakeWear: tuple[float, float, float, float] = WHEELS_NA
-    suspensionDamage: tuple[float, float, float, float] = WHEELS_NA
+    brakeWear: tuple[float, float, float, float] = DATA.WHEELS_NA
+    suspensionDamage: tuple[float, float, float, float] = DATA.WHEELS_NA
 
     def __del__(self):
         logger.info("RestAPI: GC: RestAPIData")
@@ -70,8 +70,8 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
     )
     res_currentstint = (
         ResOutput("aeroDamage", -1.0, valid_value_type, ("wearables", "body", "aero")),
-        ResOutput("brakeWear", WHEELS_NA, export_wheels, ("wearables", "brakes")),
-        ResOutput("suspensionDamage", WHEELS_NA, export_wheels, ("wearables", "suspension")),
+        ResOutput("brakeWear", DATA.WHEELS_NA, export_wheels, ("wearables", "brakes")),
+        ResOutput("suspensionDamage", DATA.WHEELS_NA, export_wheels, ("wearables", "suspension")),
         ResOutput("absoluteRefill", 0.0, absolute_refilling, ("pitMenu", "pitMenu")),
         ResOutput("maxVirtualEnergy", 0.0, valid_value_type, ("fuelInfo", "maxVirtualEnergy")),
     )

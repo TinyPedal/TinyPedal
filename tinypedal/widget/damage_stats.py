@@ -21,7 +21,7 @@ Damage stats Widget
 """
 
 from ..api_control import api
-from ..const_common import TEXT_NA
+from ..constant import DATA
 from ._base import Overlay
 
 
@@ -73,7 +73,7 @@ class Realtime(Overlay):
                 self.wcfg["warning_color_low_aero_integrity"],
             )
             self.bar_aero = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -104,7 +104,7 @@ class Realtime(Overlay):
                 self.wcfg["warning_color_low_body_integrity"],
             )
             self.bar_body = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -135,7 +135,7 @@ class Realtime(Overlay):
                 self.wcfg["warning_color_low_suspension_integrity"],
             )
             self.bar_susp = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -166,7 +166,7 @@ class Realtime(Overlay):
                 self.wcfg["warning_color_low_tyre_integrity"],
             )
             self.bar_tyre = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -224,7 +224,7 @@ class Realtime(Overlay):
                 text = f"{data:.{self.decimals}%}"[:self.width_integrity]
                 color = style[data <= threshold]
             else:
-                text = TEXT_NA
+                text = DATA.TEXT_NA
                 color = style[0]
             target.text = text
             target.bg = color

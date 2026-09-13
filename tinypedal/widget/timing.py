@@ -22,7 +22,7 @@ Timing Widget
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -73,7 +73,7 @@ class Realtime(Overlay):
 
         # Session best laptime
         if self.wcfg["show_session_best"]:
-            text_sbst = f"{self.prefix_sbst}{TEXT_NOLAPTIME}"
+            text_sbst = f"{self.prefix_sbst}{DATA.TEXT_NOLAPTIME}"
             self.bar_sbst = self.set_rawtext(
                 text=text_sbst,
                 width=font_m.width * len(text_sbst) + bar_padx,
@@ -89,7 +89,7 @@ class Realtime(Overlay):
 
         # Personal best laptime
         if self.wcfg["show_best"]:
-            text_best = f"{self.prefix_best}{TEXT_NOLAPTIME}"
+            text_best = f"{self.prefix_best}{DATA.TEXT_NOLAPTIME}"
             self.bar_best = self.set_rawtext(
                 text=text_best,
                 width=font_m.width * len(text_best) + bar_padx,
@@ -105,7 +105,7 @@ class Realtime(Overlay):
 
         # Last laptime
         if self.wcfg["show_last"]:
-            text_last = f"{self.prefix_last}{TEXT_NOLAPTIME}"
+            text_last = f"{self.prefix_last}{DATA.TEXT_NOLAPTIME}"
             self.bar_style_last = (
                 self.wcfg["font_color_invalid_last"],
                 self.wcfg["font_color_last"],
@@ -125,7 +125,7 @@ class Realtime(Overlay):
 
         # Current laptime
         if self.wcfg["show_current"]:
-            text_curr = f"{self.prefix_curr}{TEXT_NOLAPTIME}"
+            text_curr = f"{self.prefix_curr}{DATA.TEXT_NOLAPTIME}"
             self.bar_curr = self.set_rawtext(
                 text=text_curr,
                 width=font_m.width * len(text_curr) + bar_padx,
@@ -141,7 +141,7 @@ class Realtime(Overlay):
 
         # Estimated laptime
         if self.wcfg["show_estimated"]:
-            text_esti = f"{self.prefix_esti}{TEXT_NOLAPTIME}"
+            text_esti = f"{self.prefix_esti}{DATA.TEXT_NOLAPTIME}"
             self.bar_esti = self.set_rawtext(
                 text=text_esti,
                 width=font_m.width * len(text_esti) + bar_padx,
@@ -157,7 +157,7 @@ class Realtime(Overlay):
 
         # Session personal best laptime
         if self.wcfg["show_session_personal_best"]:
-            text_spbt = f"{self.prefix_spbt}{TEXT_NOLAPTIME}"
+            text_spbt = f"{self.prefix_spbt}{DATA.TEXT_NOLAPTIME}"
             self.bar_spbt = self.set_rawtext(
                 text=text_spbt,
                 width=font_m.width * len(text_spbt) + bar_padx,
@@ -173,7 +173,7 @@ class Realtime(Overlay):
 
         # Stint personal best laptime
         if self.wcfg["show_stint_best"]:
-            text_stbt = f"{self.prefix_stbt}{TEXT_NOLAPTIME}"
+            text_stbt = f"{self.prefix_stbt}{DATA.TEXT_NOLAPTIME}"
             self.bar_stbt = self.set_rawtext(
                 text=text_stbt,
                 width=font_m.width * len(text_stbt) + bar_padx,
@@ -189,7 +189,7 @@ class Realtime(Overlay):
 
         # Average pace laptime
         if self.wcfg["show_average_pace"]:
-            text_avpc = f"{self.prefix_avpc}{TEXT_NOLAPTIME}"
+            text_avpc = f"{self.prefix_avpc}{DATA.TEXT_NOLAPTIME}"
             self.bar_avpc = self.set_rawtext(
                 text=text_avpc,
                 width=font_m.width * len(text_avpc) + bar_padx,
@@ -205,10 +205,10 @@ class Realtime(Overlay):
 
         # Last data
         self.player_index = 0
-        self.laptime_sbst = MAX_SECONDS
+        self.laptime_sbst = DATA.MAX_SECONDS
 
     def post_update(self):
-        self.laptime_sbst = MAX_SECONDS  # reset laptime
+        self.laptime_sbst = DATA.MAX_SECONDS  # reset laptime
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -270,10 +270,10 @@ class Realtime(Overlay):
         """Update laptime"""
         if target.last != data:
             target.last = data
-            if 0 < data < MAX_SECONDS:
+            if 0 < data < DATA.MAX_SECONDS:
                 text = f"{prefix}{calc.sec2laptime(data):>8.8}"
             else:
-                text = f"{prefix}{TEXT_NOLAPTIME}"
+                text = f"{prefix}{DATA.TEXT_NOLAPTIME}"
             target.text = text
             target.update()
 
@@ -283,9 +283,9 @@ class Realtime(Overlay):
             target.last = data
             target.fg = self.bar_style_last[data > 0]
             data = abs(data)
-            if 0 < data < MAX_SECONDS:
+            if 0 < data < DATA.MAX_SECONDS:
                 text = f"{prefix}{calc.sec2laptime(data):>8.8}"
             else:
-                text = f"{prefix}{TEXT_NOLAPTIME}"
+                text = f"{prefix}{DATA.TEXT_NOLAPTIME}"
             target.text = text
             target.update()

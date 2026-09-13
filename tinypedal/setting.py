@@ -30,10 +30,7 @@ from time import sleep
 from types import MappingProxyType
 from typing import Any
 
-from .const_api import API_MAP_CONFIG
-from .const_app import APP_NAME
-from .const_common import EMPTY_DICT
-from .const_file import ConfigType, FileExt
+from .constant import API, CONFIG, DATA, FILE
 from .setting_validator import PresetValidator, StyleValidator
 from .userfile import set_global_config_path, set_user_data_path
 from .userfile.json_setting import (
@@ -64,18 +61,18 @@ class FileName:
 
     def __init__(self):
         # Global preset
-        self.config = f"config{FileExt.JSON}"
-        self.filelock = f"config{FileExt.LOCK}"
-        self.shortcuts = f"shortcuts{FileExt.JSON}"
+        self.config = f"config{FILE.EXT_JSON}"
+        self.filelock = f"config{FILE.EXT_LOCK}"
+        self.shortcuts = f"shortcuts{FILE.EXT_JSON}"
         # User preset
-        self.setting = f"default{FileExt.JSON}"
+        self.setting = f"default{FILE.EXT_JSON}"
         # Style preset
-        self.brakes = f"brakes{FileExt.JSON}"
-        self.brands = f"brands{FileExt.JSON}"
-        self.classes = f"classes{FileExt.JSON}"
-        self.compounds = f"compounds{FileExt.JSON}"
-        self.heatmap = f"heatmap{FileExt.JSON}"
-        self.tracks = f"tracks{FileExt.JSON}"
+        self.brakes = f"brakes{FILE.EXT_JSON}"
+        self.brands = f"brands{FILE.EXT_JSON}"
+        self.classes = f"classes{FILE.EXT_JSON}"
+        self.compounds = f"compounds{FILE.EXT_JSON}"
+        self.heatmap = f"heatmap{FILE.EXT_JSON}"
+        self.tracks = f"tracks{FILE.EXT_JSON}"
 
 
 class FilePath:
@@ -97,7 +94,7 @@ class FilePath:
 
     def __init__(self):
         # Global path, should not be modified
-        self.config = set_global_config_path(APP_NAME)
+        self.config = set_global_config_path()
         # User setting path
         self.settings = ""
         # User data path
@@ -168,7 +165,7 @@ class Preset:
         self.setting = MappingProxyType(ChainMap(WIDGET_DEFAULT, MODULE_DEFAULT, API_DEFAULT, COMMON_DEFAULT))
         # Style preset
         self.brakes = MappingProxyType(BRAKES_DEFAULT)
-        self.brands = EMPTY_DICT
+        self.brands = DATA.EMPTY_DICT
         self.classes = MappingProxyType(CLASSES_DEFAULT)
         self.compounds = MappingProxyType(COMPOUNDS_DEFAULT)
         self.heatmap = MappingProxyType(HEATMAP_DEFAULT)
@@ -249,7 +246,7 @@ class Setting:
     def get_primary_preset_name(self, preset_name: str) -> str:
         """Get primary preset name and verify"""
         if is_allowed_filename(preset_name):
-            full_preset_name = f"{preset_name}{FileExt.JSON}"
+            full_preset_name = f"{preset_name}{FILE.EXT_JSON}"
             if os.path.exists(f"{self.path.settings}{full_preset_name}"):
                 return full_preset_name
         return ""
@@ -296,7 +293,7 @@ class Setting:
         new_settings_path = os.path.abspath(self.path.settings)
         # Update preset name if settings path changed
         if new_settings_path != old_settings_path:
-            self.set_next_to_load(f"{self.preset_files()[0]}{FileExt.JSON}")
+            self.set_next_to_load(f"{self.preset_files()[0]}{FILE.EXT_JSON}")
 
     def load_user(self):
         """Load user settings, should be called after loaded global setting"""
@@ -375,7 +372,7 @@ class Setting:
     @property
     def api_key(self) -> str:
         """Get selected api config key name"""
-        return API_MAP_CONFIG[self.api_name]
+        return API.MAP_CONFIG[self.api_name]
 
     def preset_files(self, by_date: bool = True, reverse: bool = True) -> list[str]:
         """Get user preset JSON filename list
@@ -391,7 +388,7 @@ class Setting:
             date_file_list = (
                 (os.path.getmtime(f"{self.path.settings}{_filename}"), _filename[:-5])
                 for _filename in os.listdir(self.path.settings)
-                if _filename.lower().endswith(FileExt.JSON)
+                if _filename.lower().endswith(FILE.EXT_JSON)
             )
             valid_file_list = [
                 _filename[1]
@@ -402,7 +399,7 @@ class Setting:
             name_file_list = (
                 _filename[:-5]
                 for _filename in os.listdir(self.path.settings)
-                if _filename.lower().endswith(FileExt.JSON)
+                if _filename.lower().endswith(FILE.EXT_JSON)
             )
             valid_file_list = [
                 _filename
@@ -413,7 +410,7 @@ class Setting:
             return valid_file_list
         return ["default"]
 
-    def backup_files(self, filepath: str, extension: str = FileExt.BACKUP) -> list[str]:
+    def backup_files(self, filepath: str, extension: str = FILE.EXT_BACKUP) -> list[str]:
         """Get backup filename list
 
         Arguments:
@@ -445,7 +442,7 @@ class Setting:
             max_attempts=self.max_saving_attempts,
         )
 
-    def save(self, delay: int = 66, config_type: str = ConfigType.SETTING, next_task: bool = False):
+    def save(self, delay: int = 66, config_type: str = CONFIG.TYPE_SETTING, next_task: bool = False):
         """Save trigger, limit to one save operation for a given period.
 
         Args:
@@ -476,9 +473,9 @@ class Setting:
         elif filename not in self._save_queue:
             # Save to global config path
             if config_type in (
-                ConfigType.CONFIG,
-                ConfigType.FILELOCK,
-                ConfigType.SHORTCUTS,
+                CONFIG.TYPE_CONFIG,
+                CONFIG.TYPE_FILELOCK,
+                CONFIG.TYPE_SHORTCUTS,
             ):
                 filepath = self.path.config
             # Save to settings (preset) path

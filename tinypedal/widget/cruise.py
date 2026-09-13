@@ -23,7 +23,7 @@ Cruise Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import COMPASS_BEARINGS
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -64,7 +64,7 @@ class Realtime(Overlay):
 
         # Compass
         if self.wcfg["show_compass"]:
-            text_compass = f"{180:03.0f}°{calc.select_grade(COMPASS_BEARINGS, 180):>2}"
+            text_compass = f"{180:03.0f}°{calc.select_grade(DATA.COMPASS_BEARINGS, 180):>2}"
             self.bar_compass = self.set_rawtext(
                 text=text_compass,
                 width=font_m.width * len(text_compass) + bar_padx,
@@ -154,7 +154,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             degree = 180 - calc.degrees(data)
-            target.text = f"{degree:03.0f}°{calc.select_grade(COMPASS_BEARINGS, degree):>2}"
+            target.text = f"{degree:03.0f}°{calc.select_grade(DATA.COMPASS_BEARINGS, degree):>2}"
             target.update()
 
     def update_elevation(self, target, data):

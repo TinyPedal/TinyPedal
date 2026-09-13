@@ -20,7 +20,7 @@
 Suspension travel Widget
 """
 
-from ..const_common import TEXT_NA
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -59,7 +59,7 @@ class Realtime(Overlay):
         if self.wcfg["show_total_travel"]:
             layout_total = self.set_grid_layout()
             self.bars_total = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -91,7 +91,7 @@ class Realtime(Overlay):
         if self.wcfg["show_bump_travel"]:
             layout_bump = self.set_grid_layout()
             self.bars_bump = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -123,7 +123,7 @@ class Realtime(Overlay):
         if self.wcfg["show_rebound_travel"]:
             layout_rebound = self.set_grid_layout()
             self.bars_rebound = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -155,7 +155,7 @@ class Realtime(Overlay):
         if self.wcfg["show_travel_ratio"]:
             layout_ratio = self.set_grid_layout()
             self.bars_ratio = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -187,7 +187,7 @@ class Realtime(Overlay):
         if self.wcfg["show_motion_ratio"]:
             layout_motion = self.set_grid_layout()
             self.bars_motion = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -219,7 +219,7 @@ class Realtime(Overlay):
         if self.wcfg["show_minimum_position"]:
             layout_minpos = self.set_grid_layout()
             self.bars_minpos = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -251,7 +251,7 @@ class Realtime(Overlay):
         if self.wcfg["show_maximum_position"]:
             layout_maxpos = self.set_grid_layout()
             self.bars_maxpos = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -283,7 +283,7 @@ class Realtime(Overlay):
         if self.wcfg["show_live_position"]:
             layout_live = self.set_grid_layout()
             self.bars_live = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

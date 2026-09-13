@@ -23,7 +23,7 @@ Default keyboard shortcuts template
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Mapping, Sequence
+from typing import Iterable, Mapping
 
 from ..template.setting_module import MODULE_FILENAME
 from ..template.setting_widget import WIDGET_FILENAME
@@ -37,17 +37,24 @@ BINDING_PRESET = MappingProxyType({
 })
 
 
-def generate_shortcut_setting(source: Sequence[str], binding: Mapping, prefix: str = "") -> dict:
+def generate_shortcut_setting(source: Iterable[str], binding: Mapping, prefix: str = "") -> dict:
     """Generate shortcut setting"""
     if not prefix:
         return {name: binding.copy() for name in source}
     return {f"{prefix}_{name}": binding.copy() for name in source}
 
 
-SHORTCUTS_WIDGET = generate_shortcut_setting(WIDGET_FILENAME, BINDING_GENERAL, "widget")
-SHORTCUTS_MODULE = generate_shortcut_setting(MODULE_FILENAME, BINDING_GENERAL)
+SHORTCUTS_WIDGET = generate_shortcut_setting(
+    WIDGET_FILENAME,
+    BINDING_GENERAL,
+    "widget",
+)
+SHORTCUTS_MODULE = generate_shortcut_setting(
+    MODULE_FILENAME,
+    BINDING_GENERAL,
+)
 SHORTCUTS_PRESET = generate_shortcut_setting(
-    [f"preset_{idx}" for idx in range(1, 11)],
+    (f"preset_{idx}" for idx in range(1, 11)),
     BINDING_PRESET,
 )
 SHORTCUTS_GENERAL = generate_shortcut_setting(

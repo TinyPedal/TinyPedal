@@ -25,7 +25,7 @@ from __future__ import annotations
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import FLOAT_INF, MAX_SECONDS
+from ..constant import DATA
 from ..decorator import generator_init
 from ..module_info import ConsumptionData, HistoryInfo, minfo
 from ..userfile.consumption_history import (
@@ -179,10 +179,10 @@ def record_stint_history(
 
     # Stint consistency
     pitting = 1
-    last_lap_stime = FLOAT_INF
+    last_lap_stime = DATA.FLOAT_INF
     stint_laps = 0
     stint_time = 0.0
-    stint_fastest = MAX_SECONDS
+    stint_fastest = DATA.MAX_SECONDS
     consistency = 1.0
     delta = 0.0
 
@@ -240,10 +240,10 @@ def record_stint_history(
             start_wear = wear_avg
             # Reset consistency
             pitting = 1
-            last_lap_stime = FLOAT_INF
+            last_lap_stime = DATA.FLOAT_INF
             stint_laps = 0
             stint_time = 0.0
-            stint_fastest = MAX_SECONDS
+            stint_fastest = DATA.MAX_SECONDS
             consistency = 1.0
             delta = 0.0
             # Update compound info once per stint

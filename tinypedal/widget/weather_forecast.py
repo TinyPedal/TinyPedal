@@ -27,13 +27,7 @@ from PySide2.QtGui import QPixmap
 
 from .. import units
 from ..api_control import api
-from ..const_common import (
-    ABS_ZERO_CELSIUS,
-    MAX_FORECAST_MINUTES,
-    MAX_FORECASTS,
-    TEXT_NA,
-)
-from ..const_file import ImageFile
+from ..constant import DATA, FILE
 from ..process.weather import WeatherNode
 from ..userfile.custom_image import split_pixmap_image
 from ._base import Overlay
@@ -62,7 +56,7 @@ class Realtime(Overlay):
         layout_reversed = self.wcfg["layout"] != 0
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         icon_size = max(self.wcfg["icon_size"], 16) // 2 * 2
-        self.total_slot = min(max(self.wcfg["number_of_forecasts"], 1), MAX_FORECASTS - 1) + 1
+        self.total_slot = min(max(self.wcfg["number_of_forecasts"], 1), DATA.MAX_FORECASTS - 1) + 1
         self.bar_width = max(font_m.width * 4 + bar_padx, icon_size)
         self.bar_rain_height = max(self.wcfg["rain_chance_bar_height"], 1)
 
@@ -76,7 +70,7 @@ class Realtime(Overlay):
         # Estimated time
         if self.wcfg["show_estimated_time"]:
             self.bars_time = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 fixed_width=self.bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -95,7 +89,7 @@ class Realtime(Overlay):
         # Ambient temperature
         if self.wcfg["show_ambient_temperature"]:
             self.bars_temp = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 fixed_width=self.bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -116,7 +110,7 @@ class Realtime(Overlay):
                 ProgressBar(
                     self,
                     font=font,
-                    text=TEXT_NA,
+                    text=DATA.TEXT_NA,
                     width=self.bar_width,
                     height=self.bar_rain_height,
                     offset_x=0.5,
@@ -150,14 +144,14 @@ class Realtime(Overlay):
         )
 
         # Last data
-        self.estimated_time = [MAX_FORECAST_MINUTES] * MAX_FORECASTS
+        self.estimated_time = [DATA.MAX_FORECAST_MINUTES] * DATA.MAX_FORECASTS
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Read weather data
         finish_as_lap = api.read.session.finish_type() == 1
         forecast_info = api.read.session.weather_forecast()
-        forecast_count = min(len(forecast_info), MAX_FORECASTS)
+        forecast_count = min(len(forecast_info), DATA.MAX_FORECASTS)
 
         if forecast_count < 1:
             return
@@ -183,15 +177,15 @@ class Realtime(Overlay):
                 icon_index = forecast_info[index_bias].sky_type
                 estimated_temp = forecast_info[index_bias].temperature
                 if finish_as_lap:
-                    estimated_time = MAX_FORECAST_MINUTES
+                    estimated_time = DATA.MAX_FORECAST_MINUTES
                 else:
                     estimated_time = self.estimated_time[index_bias]
             # Update slot with unavailable forecast
             else:
                 rain_chance = 0
                 icon_index = -1
-                estimated_temp = ABS_ZERO_CELSIUS
-                estimated_time = MAX_FORECAST_MINUTES
+                estimated_temp = DATA.ABS_ZERO_CELSIUS
+                estimated_time = DATA.MAX_FORECAST_MINUTES
 
             self.update_weather_icon(self.bars_icon[index], icon_index, index)
 
@@ -209,8 +203,8 @@ class Realtime(Overlay):
         """Estimated time"""
         if target.last != data:
             target.last = data
-            if data >= MAX_FORECAST_MINUTES or data < 0:
-                time_text = TEXT_NA
+            if data >= DATA.MAX_FORECAST_MINUTES or data < 0:
+                time_text = DATA.TEXT_NA
             elif data >= 60:
                 time_text = f"{data / 60:.1f}h"
             else:
@@ -222,10 +216,10 @@ class Realtime(Overlay):
         """Estimated temperature"""
         if target.last != data:
             target.last = data
-            if data > ABS_ZERO_CELSIUS:
+            if data > DATA.ABS_ZERO_CELSIUS:
                 temp_text = f"{self.unit_temp(data):.0f}°"
             else:
-                temp_text = TEXT_NA
+                temp_text = DATA.TEXT_NA
             target.text = temp_text
             target.update()
 
@@ -275,7 +269,7 @@ class Realtime(Overlay):
 
 def create_weather_icon_set(icon_size: int):
     """Create weather icon set"""
-    icon_source = QPixmap(ImageFile.WEATHER)
+    icon_source = QPixmap(FILE.IMAGE_WEATHER)
     pixmap_icon = icon_source.scaledToWidth(icon_size * 12, mode=Qt.SmoothTransformation)
     return tuple(
         split_pixmap_image(pixmap_icon, icon_size, h_offset)

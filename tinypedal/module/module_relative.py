@@ -29,16 +29,16 @@ from operator import itemgetter
 from .. import realtime_state
 from ..api_control import api
 from ..calculation import asym_max
-from ..const_common import MAX_SECONDS, MAX_VEHICLES
+from ..constant import DATA
 from ..module_info import minfo
 from ..validator import state_timer
 from ._base import DataModule
 
-REF_PLACES = tuple(range(1, MAX_VEHICLES + 1))
-TEMP_RELATIVE_AHEAD = [(0.0, -1)] * MAX_VEHICLES
-TEMP_RELATIVE_BEHIND = [(0.0, -1)] * MAX_VEHICLES
-TEMP_CLASSES = [("", -1, -1, -1.0, -1.0)] * MAX_VEHICLES
-TEMP_DRAW_ORDER = list(range(MAX_VEHICLES))
+REF_PLACES = tuple(range(1, DATA.MAX_VEHICLES + 1))
+TEMP_RELATIVE_AHEAD = [(0.0, -1)] * DATA.MAX_VEHICLES
+TEMP_RELATIVE_BEHIND = [(0.0, -1)] * DATA.MAX_VEHICLES
+TEMP_CLASSES = [("", -1, -1, -1.0, -1.0)] * DATA.MAX_VEHICLES
+TEMP_DRAW_ORDER = list(range(DATA.MAX_VEHICLES))
 
 
 class Realtime(DataModule):
@@ -180,12 +180,12 @@ def get_vehicles_info(
         if laptime_last > 0 and not in_pitlane:
             laptime_personal_last = laptime_last
         else:
-            laptime_personal_last = MAX_SECONDS
+            laptime_personal_last = DATA.MAX_SECONDS
 
         if laptime_best > 0:
             laptime_personal_best = laptime_best
         else:
-            laptime_personal_best = MAX_SECONDS
+            laptime_personal_best = DATA.MAX_SECONDS
 
         TEMP_CLASSES[index] = (
             class_name,  # 0 vehicle class name
@@ -240,8 +240,8 @@ def update_position_in_class(sorted_veh_class: list, plr_index: int):
     place_in_class = 0
     opt_index_ahead = -1
     opt_index_leader = -1
-    laptime_class_best = MAX_SECONDS
-    last_fastest_laptime = MAX_SECONDS
+    laptime_class_best = DATA.MAX_SECONDS
+    last_fastest_laptime = DATA.MAX_SECONDS
     last_fastest_index = -1
     plr_class_name = ""
     plr_class_place = 0
@@ -259,7 +259,7 @@ def update_position_in_class(sorted_veh_class: list, plr_index: int):
             opt_index_ahead = -1  # no opponent ahead of class leader
             opt_index_leader = opt_index
             laptime_class_best = laptime_best
-            last_fastest_laptime = MAX_SECONDS  # reset last fastest
+            last_fastest_laptime = DATA.MAX_SECONDS  # reset last fastest
             if last_fastest_index != -1:  # mark fastest last lap
                 veh_data[last_fastest_index].isClassFastestLastLap = True
                 last_fastest_index = -1  # reset last fastest index

@@ -23,7 +23,7 @@ Brake temperature Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import TEXT_NA, TEXT_PLACEHOLDER
+from ..constant import DATA
 from ..userfile.heatmap import (
     HEATMAP_DEFAULT_BRAKE,
     load_heatmap_color,
@@ -78,7 +78,7 @@ class Realtime(Overlay):
             gap_vert=self.wcfg["vertical_gap"],
         )
         self.bars_btemp = self.set_rawtext(
-            text=TEXT_NA,
+            text=DATA.TEXT_NA,
             width=font_m.width * text_width + bar_padx,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -103,7 +103,7 @@ class Realtime(Overlay):
                 gap_vert=self.wcfg["vertical_gap"],
             )
             self.bars_btavg = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=font_m.width * text_width + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -173,7 +173,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data < -100:
-                target.text = TEXT_PLACEHOLDER
+                target.text = DATA.TEXT_PLACEHOLDER
             else:
                 target.text = f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}"
             target.fg, target.bg = calc.select_grade(self.heatmap_styles[index], data)
@@ -184,7 +184,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data < -100:
-                target.text = TEXT_PLACEHOLDER
+                target.text = DATA.TEXT_PLACEHOLDER
             else:
                 target.text = f"{self.unit_temp(data):0{self.leading_zero}f}{self.sign_text}"
             target.update()

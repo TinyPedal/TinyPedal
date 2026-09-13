@@ -38,7 +38,7 @@ from PySide2.QtWidgets import (
     QMenu,
 )
 
-from ..const_file import FileFilter
+from ..constant import FILE
 from ..userfile import set_relative_path, set_user_data_path
 from ..validator import image_exists, is_clock_format, is_hex_color, is_string_number
 
@@ -325,7 +325,7 @@ class ImagePathEdit(BaseLineEdit):
 
     def open_dialog_image(self):
         """Open image file path dialog"""
-        path_selected = QFileDialog.getOpenFileName(self, dir=self.init_value, filter=FileFilter.PNG)[0]
+        path_selected = QFileDialog.getOpenFileName(self, dir=self.init_value, filter=FILE.FILTER_PNG)[0]
         if image_exists(path_selected):
             self.setText(path_selected)
             self.init_value = path_selected

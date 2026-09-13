@@ -22,7 +22,7 @@ Track info preset function
 
 from __future__ import annotations
 
-from ..const_file import ConfigType
+from ..constant import CONFIG
 from ..setting import cfg
 from ..template.setting_tracks import TRACKINFO_DEFAULT
 from ..validator import invalid_save_name
@@ -52,4 +52,4 @@ def save_track_info(track_name: str, **track_info: float) -> None:
     if not isinstance(track, dict):
         track = add_missing_track(track_name)
     track.update(track_info)
-    cfg.save(config_type=ConfigType.TRACKS)
+    cfg.save(config_type=CONFIG.TYPE_TRACKS)

@@ -27,7 +27,7 @@ from typing import Callable, Mapping
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_file import FileExt
+from ..constant import FILE
 from ..decorator import generator_init
 from ..module_info import NotesData, minfo
 from ..userfile.track_notes import (
@@ -93,7 +93,7 @@ class Realtime(DataModule):
                         filename=track_name,
                         table_header=HEADER_PACE_NOTES,
                         parser=parse_csv_notes_only,
-                        extension=FileExt.TPPN,
+                        extension=FILE.EXT_TPPN,
                     )
                     gen_pacenotes_out = notes_selector(
                         output=output_pacenotes_out,
@@ -110,7 +110,7 @@ class Realtime(DataModule):
                         filename=track_name,
                         table_header=HEADER_TRACK_NOTES,
                         parser=parse_csv_notes_only,
-                        extension=FileExt.TPTN,
+                        extension=FILE.EXT_TPTN,
                     )
                     gen_tracknotes_out = notes_selector(
                         output=output_tracknotes_out,

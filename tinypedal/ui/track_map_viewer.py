@@ -41,7 +41,7 @@ from PySide2.QtWidgets import (
 )
 
 from .. import calculation as calc
-from ..const_file import ConfigType, FileExt, FileFilter
+from ..constant import CONFIG, FILE
 from ..setting import cfg
 from ..userfile.track_map import load_track_map_file
 from ._common import BaseDialog, CompactButton, UIScaler
@@ -326,7 +326,7 @@ class MapView(QWidget):
         if action:
             name = "show_" + action.text().replace(" ", "_").lower()
             self.ecfg[name] = not self.ecfg[name]
-            cfg.save(config_type=ConfigType.CONFIG)
+            cfg.save(config_type=CONFIG.TYPE_CONFIG)
             self.update()
 
     def open_config_dialog(self):
@@ -335,7 +335,7 @@ class MapView(QWidget):
             parent=self,
             key_name="track_map_viewer",
             preset_name=cfg.filename.config,
-            config_type=ConfigType.CONFIG,
+            config_type=CONFIG.TYPE_CONFIG,
             user_setting=cfg.user.config,
             default_setting=cfg.default.config,
             reload_func=self.load_config,
@@ -344,7 +344,7 @@ class MapView(QWidget):
 
     def open_trackmap(self):
         """Open trackmap"""
-        filename_full = QFileDialog.getOpenFileName(self, dir=cfg.path.track_map, filter=FileFilter.SVG)[0]
+        filename_full = QFileDialog.getOpenFileName(self, dir=cfg.path.track_map, filter=FILE.FILTER_SVG)[0]
         if not filename_full:
             return
 
@@ -354,7 +354,7 @@ class MapView(QWidget):
 
     def load_trackmap(self, filepath: str, filename: str):
         """Load trackmap"""
-        if not os.path.exists(f"{filepath}{filename}{FileExt.SVG}"):
+        if not os.path.exists(f"{filepath}{filename}{FILE.EXT_SVG}"):
             msg_text = f"Cannot find track map for<br><b>{filename}</b><br>"
             QMessageBox.warning(self, "Error", msg_text)
             return
@@ -375,7 +375,7 @@ class MapView(QWidget):
             self.map_filename = ""
             msg_text = (
                 "Unable to load track map file from<br>"
-                f"<b>{filepath}{filename}{FileExt.SVG}</b><br><br>"
+                f"<b>{filepath}{filename}{FILE.EXT_SVG}</b><br><br>"
                 "Only support SVG file that generated with TinyPedal."
             )
             QMessageBox.warning(self, "Error", msg_text)

@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import sys
 
-from .const_common import VERSION_NA
+from .constant import DATA
 
 
 def parse_version_string(ver: str) -> tuple[int, int, int]:
@@ -33,7 +33,7 @@ def parse_version_string(ver: str) -> tuple[int, int, int]:
         version = ver.split(".")
         return int(version[0]), int(version[1]), int(version[2])
     except (AttributeError, ValueError, TypeError, IndexError):
-        return VERSION_NA
+        return DATA.VERSION_NA
 
 
 def is_new_version(
@@ -43,7 +43,7 @@ def is_new_version(
 ) -> bool:
     """Is new version"""
     # Invalid version
-    if checked_version == VERSION_NA:
+    if checked_version == DATA.VERSION_NA:
         return False
     # New version
     if checked_version > current_version:
@@ -53,13 +53,6 @@ def is_new_version(
         return True
     # Same version
     return False
-
-
-def tinypedal() -> str:
-    from . import version
-
-    ver_number = (version.__version__, version.DEVELOPMENT)
-    return "-".join(ver for ver in ver_number if ver != "")
 
 
 def python() -> str:

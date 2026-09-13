@@ -22,7 +22,7 @@ Weather Widget
 
 from .. import units
 from ..api_control import api
-from ..const_common import TEXT_TREND_SIGN
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -107,7 +107,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_trend"]:
                 self.bar_temp_trend = self.set_rawtext(
-                    text=TEXT_TREND_SIGN[0],
+                    text=DATA.TEXT_TREND_SIGN[0],
                     width=font_m.width + bar_padx,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
@@ -140,7 +140,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_trend"]:
                 self.bar_raininess_trend = self.set_rawtext(
-                    text=TEXT_TREND_SIGN[0],
+                    text=DATA.TEXT_TREND_SIGN[0],
                     width=font_m.width + bar_padx,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
@@ -173,7 +173,7 @@ class Realtime(Overlay):
 
             if self.wcfg["show_trend"]:
                 self.bar_wetness_trend = self.set_rawtext(
-                    text=TEXT_TREND_SIGN[0],
+                    text=DATA.TEXT_TREND_SIGN[0],
                     width=font_m.width + bar_padx,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
@@ -248,7 +248,7 @@ class Realtime(Overlay):
         """Temperature trend"""
         if target.last != data:
             target.last = data
-            target.text = TEXT_TREND_SIGN[data]
+            target.text = DATA.TEXT_TREND_SIGN[data]
             target.fg = self.bar_style_trend[data]
             target.update()
 
@@ -264,7 +264,7 @@ class Realtime(Overlay):
         """Raininess trend"""
         if target.last != data:
             target.last = data
-            target.text = TEXT_TREND_SIGN[data]
+            target.text = DATA.TEXT_TREND_SIGN[data]
             target.fg = self.bar_style_trend[data]
             target.update()
 
@@ -288,7 +288,7 @@ class Realtime(Overlay):
         """Surface wetness trend"""
         if target.last != data:
             target.last = data
-            target.text = TEXT_TREND_SIGN[data]
+            target.text = DATA.TEXT_TREND_SIGN[data]
             target.fg = self.bar_style_trend[data]
             target.update()
 

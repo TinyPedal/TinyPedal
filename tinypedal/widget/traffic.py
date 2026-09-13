@@ -22,7 +22,7 @@ Traffic Widget
 
 from .. import units
 from ..api_control import api
-from ..const_common import MAX_SECONDS, TEXT_PLACEHOLDER
+from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ._base import Overlay
@@ -88,7 +88,7 @@ class Realtime(Overlay):
         # Class name
         if self.wcfg["show_class"]:
             self.bar_classes = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -112,7 +112,7 @@ class Realtime(Overlay):
                 ),
             )
             self.bar_laps = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -126,7 +126,7 @@ class Realtime(Overlay):
         if self.wcfg["show_time_interval"]:
             self.decimals_time = max(self.wcfg["decimal_places_time_interval"], 0)
             self.bar_time = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -142,11 +142,11 @@ class Realtime(Overlay):
         player_index = minfo.vehicles.playerIndex
         player_laptime = api.read.timing.estimated_laptime()
 
-        ahead_overtake_laps = MAX_SECONDS
+        ahead_overtake_laps = DATA.MAX_SECONDS
         ahead_overtake_timegap = 0.0
         ahead_overtake_index = -1
 
-        behind_overtake_laps = MAX_SECONDS
+        behind_overtake_laps = DATA.MAX_SECONDS
         behind_overtake_timegap = 0.0
         behind_overtake_index = -1
 
@@ -177,7 +177,7 @@ class Realtime(Overlay):
                     ahead_overtake_timegap = ahead_timegap
                     ahead_overtake_index = ahead_index
 
-            if ahead_overtake_laps >= MAX_SECONDS:
+            if ahead_overtake_laps >= DATA.MAX_SECONDS:
                 ahead_overtake_laps = 0.0
 
             # Behind
@@ -201,7 +201,7 @@ class Realtime(Overlay):
                     leader_overtake_laps = behind_laps
                     leader_overtake_timegap = behind_timegap
 
-            if behind_overtake_laps >= MAX_SECONDS:
+            if behind_overtake_laps >= DATA.MAX_SECONDS:
                 behind_overtake_laps = 0.0
 
         if self.wcfg["show_class"]:
@@ -243,7 +243,7 @@ class Realtime(Overlay):
                 text = f"{laps:.{self.decimals_laps}f}"[:self.lap_width].strip(".")
                 text = f"{text}L"
             else:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             target.text = text
             if self.wcfg["enable_traffic_highlight_from_current_lap"]:
                 target.fg, target.bg = self.bar_style_laps[0 < laps <= data[1]]
@@ -257,7 +257,7 @@ class Realtime(Overlay):
                 text = f"{abs(data):.{self.decimals_time}f}"[:self.lap_width].strip(".")
                 text = f"{text}s"
             else:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             target.text = text
             target.update()
 
@@ -269,7 +269,7 @@ class Realtime(Overlay):
             if self.wcfg["show_driver_name_instead_of_class"]:
                 text = data[1]
                 if not text:
-                    text = TEXT_PLACEHOLDER
+                    text = DATA.TEXT_PLACEHOLDER
                 elif self.wcfg["driver_name_shorten"]:
                     text = shorten_driver_name(text)
                 if self.wcfg["driver_name_uppercase"]:
@@ -285,7 +285,7 @@ class Realtime(Overlay):
             return style["alias"], style["color"]
         if class_name:
             return class_name, random_color_class(class_name)
-        return TEXT_PLACEHOLDER, self.wcfg["background_color_class"]
+        return DATA.TEXT_PLACEHOLDER, self.wcfg["background_color_class"]
 
     def add_column(self, layout, bar_temp, row_index):
         """Add column"""

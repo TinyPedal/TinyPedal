@@ -28,7 +28,7 @@ from types import MappingProxyType
 from typing import Any, KeysView
 
 from . import module, widget
-from .const_file import ConfigType
+from .constant import CONFIG
 from .setting import cfg
 
 logger = logging.getLogger(__name__)
@@ -158,5 +158,5 @@ class ModuleControl:
         return self._imported_modules.keys()
 
 
-mctrl = ModuleControl(target=module, type_id=ConfigType.MODULE)
-wctrl = ModuleControl(target=widget, type_id=ConfigType.WIDGET)
+mctrl = ModuleControl(target=module, type_id=CONFIG.TYPE_MODULE)
+wctrl = ModuleControl(target=widget, type_id=CONFIG.TYPE_WIDGET)

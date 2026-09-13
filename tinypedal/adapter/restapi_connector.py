@@ -31,7 +31,7 @@ from typing import Any, Callable, NamedTuple
 
 from .. import realtime_state
 from ..async_request import http_get, resolve_hostname, set_header_get
-from ..const_common import TYPE_JSON
+from ..validator import is_json_data
 
 logger = logging.getLogger(__name__)
 json_decoder = json.JSONDecoder()
@@ -258,7 +258,7 @@ class RestAPIConnector:
         while not self._task_cancel and retry >= 0:
             resource_output = await get_resource(request_header, http)
             # Verify & retry
-            if not isinstance(resource_output, TYPE_JSON):
+            if not is_json_data(resource_output):
                 logger.info("RestAPI: %s: %s (%s/%s retries left)",
                     resource_output, uri_path, retry, total_retry)
                 retry -= 1

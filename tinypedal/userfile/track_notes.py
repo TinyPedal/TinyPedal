@@ -28,8 +28,7 @@ import os
 from operator import itemgetter
 from typing import Any, Callable, Iterable
 
-from ..const_common import CRLF
-from ..const_file import FileFilter
+from ..constant import DATA, FILE
 
 NOTESTYPE_PACE = "Pace Notes"
 NOTESTYPE_TRACK = "Track Notes"
@@ -54,21 +53,21 @@ def set_notes_filter(notes_type: str) -> str:
     """Set notes file filter"""
     if notes_type == NOTESTYPE_PACE:
         filter_set = (  # pace notes filters
-            FileFilter.TPPN,
-            FileFilter.TPTN,
-            FileFilter.GPLINI,
-            FileFilter.CSV,
-            FileFilter.INI,
-            FileFilter.ALL,
+            FILE.FILTER_TPPN,
+            FILE.FILTER_TPTN,
+            FILE.FILTER_GPLINI,
+            FILE.FILTER_CSV,
+            FILE.FILTER_INI,
+            FILE.FILTER_ALL,
         )
     else:
         filter_set = (  # track notes filters
-            FileFilter.TPTN,
-            FileFilter.TPPN,
-            FileFilter.GPLINI,
-            FileFilter.CSV,
-            FileFilter.INI,
-            FileFilter.ALL,
+            FILE.FILTER_TPTN,
+            FILE.FILTER_TPPN,
+            FILE.FILTER_GPLINI,
+            FILE.FILTER_CSV,
+            FILE.FILTER_INI,
+            FILE.FILTER_ALL,
         )
     return ";;".join(filter_set)
 
@@ -82,25 +81,25 @@ def set_notes_header(notes_type: str) -> tuple[str, ...]:
 
 def set_notes_header_by_filter(file_filter: str) -> tuple[str, ...]:
     """Set notes header by file filter"""
-    if file_filter == FileFilter.TPTN:
+    if file_filter == FILE.FILTER_TPTN:
         return HEADER_TRACK_NOTES
-    if file_filter == FileFilter.TPPN:
+    if file_filter == FILE.FILTER_TPPN:
         return HEADER_PACE_NOTES
-    if file_filter == FileFilter.GPLINI:
+    if file_filter == FILE.FILTER_GPLINI:
         return HEADER_PACE_NOTES
     return ()
 
 
 def set_notes_parser(file_filter: str) -> Callable:
     """Set notes parser"""
-    if file_filter == FileFilter.GPLINI:
+    if file_filter == FILE.FILTER_GPLINI:
         return parse_gpl_notes
     return parse_csv_notes
 
 
 def set_notes_writer(file_filter: str) -> Callable:
     """Set notes writer"""
-    if file_filter == FileFilter.GPLINI:
+    if file_filter == FILE.FILTER_GPLINI:
         return write_gpl_notes
     return write_csv_notes
 
@@ -213,11 +212,11 @@ def write_csv_notes(
     """Write TinyPedal notes format to file"""
     # Write TinyPedal file version
     notes_file.write(f"TINYPEDAL {table_header[1].upper()}S FILE VERSION,2")
-    notes_file.write(CRLF * 2)
+    notes_file.write(DATA.CRLF * 2)
     # Write metadata
-    meta_output = CRLF.join(f"{key},\"{value}\"" for key, value in metadata.items())
+    meta_output = DATA.CRLF.join(f"{key},\"{value}\"" for key, value in metadata.items())
     notes_file.write(meta_output)
-    notes_file.write(CRLF * 2)
+    notes_file.write(DATA.CRLF * 2)
     # Write notes
     notes_writer = csv.DictWriter(
         notes_file, fieldnames=table_header, extrasaction="ignore", quoting=csv.QUOTE_MINIMAL
@@ -233,37 +232,37 @@ def write_gpl_notes(
     Pace notes formatting follows GPL pace notes 'Version 3' specification by Lee Bowden.
     """
     # Write metadata
-    meta_output = CRLF.join(f";{key}: {value}" for key, value in metadata.items())
-    line_separator = f";{'*' * 27}{CRLF}"
+    meta_output = DATA.CRLF.join(f";{key}: {value}" for key, value in metadata.items())
+    line_separator = f";{'*' * 27}{DATA.CRLF}"
     notes_file.write(line_separator)
-    notes_file.write(f";GPL PACE NOTES .INI FILE  Version 3{CRLF}")
-    notes_file.write(f";{filename[:-4]}{CRLF}")
+    notes_file.write(f";GPL PACE NOTES .INI FILE  Version 3{DATA.CRLF}")
+    notes_file.write(f";{filename[:-4]}{DATA.CRLF}")
     notes_file.write(line_separator)
-    notes_file.write(CRLF)
+    notes_file.write(DATA.CRLF)
     notes_file.write(meta_output)
-    notes_file.write(CRLF * 2)
+    notes_file.write(DATA.CRLF * 2)
     notes_file.write(line_separator)
-    notes_file.write(CRLF)
-    notes_file.write(f";Any line beginning with a ; is a comment and is ignored{CRLF}")
-    notes_file.write(f";Any information to the right of a ; is a comment and is ignored{CRLF}")
-    notes_file.write(f";Any line beginning with a space is ignored{CRLF}")
-    notes_file.write(CRLF)
+    notes_file.write(DATA.CRLF)
+    notes_file.write(f";Any line beginning with a ; is a comment and is ignored{DATA.CRLF}")
+    notes_file.write(f";Any information to the right of a ; is a comment and is ignored{DATA.CRLF}")
+    notes_file.write(f";Any line beginning with a space is ignored{DATA.CRLF}")
+    notes_file.write(DATA.CRLF)
     notes_file.write(line_separator)
-    notes_file.write(CRLF)
-    notes_file.write(f";This section contains the sound entries with:{CRLF}")
-    notes_file.write(f";1) Sound filename including the .mp3 suffix{CRLF}")
-    notes_file.write(f";2) Distance in meters from the track start point to play the sound{CRLF}")
-    notes_file.write(CRLF)
+    notes_file.write(DATA.CRLF)
+    notes_file.write(f";This section contains the sound entries with:{DATA.CRLF}")
+    notes_file.write(f";1) Sound filename including the .mp3 suffix{DATA.CRLF}")
+    notes_file.write(f";2) Distance in meters from the track start point to play the sound{DATA.CRLF}")
+    notes_file.write(DATA.CRLF)
     notes_file.write(line_separator)
-    notes_file.write(CRLF)
+    notes_file.write(DATA.CRLF)
     # Write notes
     for note_line in dataset:
         notes_file.write(
             f"{note_line[table_header[1]]}.mp3, "  # sound file name
             f"{note_line[table_header[0]]:.0f}; "  # distance integer
-            f"{note_line[table_header[2]]}{CRLF}"  # comment
+            f"{note_line[table_header[2]]}{DATA.CRLF}"  # comment
         )
-    notes_file.write(CRLF)
+    notes_file.write(DATA.CRLF)
 
 
 def save_notes_file(

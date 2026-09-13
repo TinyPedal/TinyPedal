@@ -27,7 +27,7 @@ from typing import Any, Mapping
 
 from . import regex_pattern as rxp
 from . import version
-from .const_common import VERSION_NA
+from .constant import DATA
 from .hotkey.common import validate_hotkey
 from .setting_preupdate import preupdate_global_setting, preupdate_user_setting
 from .validator import is_clock_format, is_hex_color
@@ -277,7 +277,7 @@ class PresetValidator:
         # Pre update global preset, run before validation
         preset_version = _get_preset_version(dict_user, version.__version__)
         build_version = parse_version_string(version.__version__)
-        if preset_version == VERSION_NA or preset_version < build_version:
+        if preset_version == DATA.VERSION_NA or preset_version < build_version:
             preupdate_global_setting(preset_version, dict_user)
         # Validate preset
         return cls._validate(dict_user, dict_def)
@@ -288,7 +288,7 @@ class PresetValidator:
         # Pre update user preset, run before validation
         preset_version = _get_preset_version(dict_user, version.__version__)
         build_version = parse_version_string(version.__version__)
-        if preset_version == VERSION_NA or preset_version < build_version:
+        if preset_version == DATA.VERSION_NA or preset_version < build_version:
             preupdate_user_setting(preset_version, dict_user)
         # Validate preset
         return cls._validate(dict_user, dict_def)

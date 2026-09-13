@@ -24,7 +24,7 @@ from PySide2.QtCore import QRect, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen
 
 from ..api_control import api
-from ..const_common import FLOAT_INF
+from ..constant import DATA
 from ._base import Overlay
 from ._common import warning_flash
 
@@ -84,7 +84,7 @@ class Realtime(Overlay):
             self.warn_flash = warning_flash(
                 self.wcfg["speed_limiter_flash_interval"],
                 self.wcfg["speed_limiter_flash_interval"],
-                FLOAT_INF,
+                DATA.FLOAT_INF,
             )
 
         # Last data

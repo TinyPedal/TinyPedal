@@ -30,7 +30,7 @@ from PySide2.QtGui import QFont, QFontMetrics, QPalette, QPixmap
 from PySide2.QtWidgets import QGridLayout, QLayout, QMenu, QWidget
 
 from .. import app_signal, overlay_signal, realtime_state
-from ..const_app import APP_NAME
+from ..constant import APP
 from ..formatter import format_module_name
 from ..regex_pattern import FONT_WEIGHT_MAP
 from ..setting import Setting
@@ -55,7 +55,7 @@ class Base(QWidget):
         self.wcfg = validate_option(self.cfg.user.setting[widget_name])
 
         # Base setting
-        self.setWindowTitle(f"{APP_NAME} - {widget_name.capitalize()}")
+        self.setWindowTitle(f"{APP.TINYPEDAL} - {widget_name.capitalize()}")
         self.move(self.wcfg["position_x"], self.wcfg["position_y"])
 
         # Set update timer

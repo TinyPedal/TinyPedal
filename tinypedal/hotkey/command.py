@@ -28,7 +28,8 @@ from functools import partial
 
 from .. import app_signal, loader, overlay_signal, realtime_state
 from ..api_control import api
-from ..const_file import ConfigType, FileExt
+from ..constant import CONFIG, FILE
+from ..decorator import constantclass
 from ..module_control import mctrl, wctrl
 from ..regex_pattern import CFG_DELTABEST_SOURCE, CHOICE_COMMON
 from ..setting import cfg
@@ -94,9 +95,9 @@ def hotkey_select_next_api():
             next_index = 0
     cfg.api_name = api_list[next_index]
     if cfg.telemetry["enable_api_selection_from_preset"]:
-        save_type = ConfigType.SETTING
+        save_type = CONFIG.TYPE_SETTING
     else:
-        save_type = ConfigType.CONFIG
+        save_type = CONFIG.TYPE_CONFIG
     cfg.save(config_type=save_type)
     api.restart()
     app_signal.refresh.emit(True)
@@ -113,9 +114,9 @@ def hotkey_select_previous_api():
             next_index = max(len(api_list) - 1, 0)
     cfg.api_name = api_list[next_index]
     if cfg.telemetry["enable_api_selection_from_preset"]:
-        save_type = ConfigType.SETTING
+        save_type = CONFIG.TYPE_SETTING
     else:
-        save_type = ConfigType.CONFIG
+        save_type = CONFIG.TYPE_CONFIG
     cfg.save(config_type=save_type)
     api.restart()
     app_signal.refresh.emit(True)
@@ -127,14 +128,14 @@ def hotkey_load_preset(preset_key: str):
     if not preset_name:
         logger.error("USERDATA: preset not found, abort loading")
         return
-    filename = f"{preset_name}{FileExt.JSON}"
+    filename = f"{preset_name}{FILE.EXT_JSON}"
     if os.path.exists(f"{cfg.path.settings}{filename}"):
         cfg.set_next_to_load(filename)
         app_signal.reload.emit(True)
     else:
         logger.error("USERDATA: %s file not found, abort loading", filename)
         cfg.user.shortcuts[preset_key]["preset"] = ""
-        cfg.save(config_type=ConfigType.SHORTCUTS)
+        cfg.save(config_type=CONFIG.TYPE_SHORTCUTS)
         app_signal.refresh.emit(True)
 
 
@@ -152,7 +153,7 @@ def hotkey_load_next_preset():
         next_index = preset_list.index(loaded_preset) + 1
         if next_index >= len(preset_list):
             next_index = 0
-    cfg.set_next_to_load(f"{preset_list[next_index]}{FileExt.JSON}")
+    cfg.set_next_to_load(f"{preset_list[next_index]}{FILE.EXT_JSON}")
     app_signal.reload.emit(True)
 
 
@@ -165,7 +166,7 @@ def hotkey_load_previous_preset():
         next_index = preset_list.index(loaded_preset) - 1
         if next_index < 0:
             next_index = max(len(preset_list) - 1, 0)
-    cfg.set_next_to_load(f"{preset_list[next_index]}{FileExt.JSON}")
+    cfg.set_next_to_load(f"{preset_list[next_index]}{FILE.EXT_JSON}")
     app_signal.reload.emit(True)
 
 
@@ -244,36 +245,38 @@ def hotkey_cycle_deltabest_source():
     cfg.save()
 
 
-# Define command list:
-# 0 hotkey name, 1 hotkey function
-COMMANDS_GENERAL = (
-    ("overlay_visibility", hotkey_overlay_visibility),
-    ("overlay_lock", hotkey_overlay_lock),
-    ("overlay_auto_hide", hotkey_overlay_auto_hide),
-    ("vr_compatibility", hotkey_vr_compatibility),
-    ("restart_api", hotkey_restart_api),
-    ("select_next_api", hotkey_select_next_api),
-    ("select_previous_api", hotkey_select_previous_api),
-    ("reload_preset", hotkey_reload_preset),
-    ("load_next_preset", hotkey_load_next_preset),
-    ("load_previous_preset", hotkey_load_previous_preset),
-    ("spectate_mode", hotkey_spectate_mode),
-    ("spectate_next_driver", hotkey_spectate_next_driver),
-    ("spectate_previous_driver", hotkey_spectate_previous_driver),
-    ("pace_notes_playback", hotkey_pace_notes_playback),
-    ("cycle_deltabest_source", hotkey_cycle_deltabest_source),
-    ("restart_application", hotkey_restart_application),
-    ("quit_application", hotkey_quit_application),
-)
-COMMANDS_PRESET = tuple(
-    (preset_key, partial(hotkey_load_preset, preset_key))
-    for preset_key in SHORTCUTS_PRESET
-)
-COMMANDS_MODULE = tuple(
-    (hotkey_name, partial(hotkey_module_toggle, hotkey_name))
-    for hotkey_name in MODULE_FILENAME
-)
-COMMANDS_WIDGET = tuple(
-    (f"widget_{hotkey_name}", partial(hotkey_widget_toggle, hotkey_name))
-    for hotkey_name in WIDGET_FILENAME
-)
+@constantclass
+class COMMANDS:
+    """Command list constants - 0 hotkey name, 1 hotkey function"""
+
+    GENERAL = (
+        ("overlay_visibility", hotkey_overlay_visibility),
+        ("overlay_lock", hotkey_overlay_lock),
+        ("overlay_auto_hide", hotkey_overlay_auto_hide),
+        ("vr_compatibility", hotkey_vr_compatibility),
+        ("restart_api", hotkey_restart_api),
+        ("select_next_api", hotkey_select_next_api),
+        ("select_previous_api", hotkey_select_previous_api),
+        ("reload_preset", hotkey_reload_preset),
+        ("load_next_preset", hotkey_load_next_preset),
+        ("load_previous_preset", hotkey_load_previous_preset),
+        ("spectate_mode", hotkey_spectate_mode),
+        ("spectate_next_driver", hotkey_spectate_next_driver),
+        ("spectate_previous_driver", hotkey_spectate_previous_driver),
+        ("pace_notes_playback", hotkey_pace_notes_playback),
+        ("cycle_deltabest_source", hotkey_cycle_deltabest_source),
+        ("restart_application", hotkey_restart_application),
+        ("quit_application", hotkey_quit_application),
+    )
+    PRESET = tuple(
+        (preset_key, partial(hotkey_load_preset, preset_key))
+        for preset_key in SHORTCUTS_PRESET
+    )
+    MODULE = tuple(
+        (hotkey_name, partial(hotkey_module_toggle, hotkey_name))
+        for hotkey_name in MODULE_FILENAME
+    )
+    WIDGET = tuple(
+        (f"widget_{hotkey_name}", partial(hotkey_widget_toggle, hotkey_name))
+        for hotkey_name in WIDGET_FILENAME
+    )

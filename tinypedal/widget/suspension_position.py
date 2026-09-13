@@ -21,7 +21,7 @@ Suspension position Widget
 """
 
 from ..api_control import api
-from ..const_common import WHEELS_NA
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 from ._painter import WheelGaugeBar
@@ -125,8 +125,8 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         susp_pos = minfo.wheels.currentSuspensionPosition
-        third_pos = WHEELS_NA
-        max_pos = WHEELS_NA
+        third_pos = DATA.WHEELS_NA
+        max_pos = DATA.WHEELS_NA
 
         if self.wcfg["show_third_spring_position_mark"]:
             third_pos = api.read.wheel.third_spring_deflection()

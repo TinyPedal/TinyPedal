@@ -30,8 +30,7 @@ from math import isfinite
 from time import monotonic
 from typing import Any
 
-from .const_common import MAX_SECONDS
-from .const_file import FileExt
+from .constant import DATA, FILE
 from .decorator import generator_init
 from .regex_pattern import CFG_INVALID_FILENAME, rex_hex_color
 
@@ -72,7 +71,7 @@ def is_string_number(value: str) -> bool:
         return False
 
 
-def valid_sectors(sector_time: list | Any, max_time: float = MAX_SECONDS) -> bool:
+def valid_sectors(sector_time: list | Any, max_time: float = DATA.MAX_SECONDS) -> bool:
     """Is valid sector time"""
     if isinstance(sector_time, list):
         return all(0 < sec < max_time for sec in sector_time)
@@ -100,13 +99,18 @@ def file_last_modified(filepath: str = "", filename: str = "", extension: str = 
     return 0
 
 
-def image_exists(filepath: str, extension: str = FileExt.PNG, max_size: int = 10_240_000) -> bool:
+def image_exists(filepath: str, extension: str = FILE.EXT_PNG, max_size: int = 10_240_000) -> bool:
     """Validate image file path, file format (default PNG), max file size (default < 10MB)"""
     return (
         os.path.exists(filepath) and
         os.path.getsize(filepath) < max_size and
         filepath.lower().endswith(extension)
     )
+
+
+def is_json_data(data: Any) -> bool:
+    """Is valid json data"""
+    return isinstance(data, (dict, list))
 
 
 # Delta list validate

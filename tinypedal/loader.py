@@ -29,7 +29,7 @@ import sys
 import time
 
 from .api_control import api
-from .const_file import FileExt
+from .constant import FILE
 from .hotkey_control import kctrl
 from .module_control import mctrl, wctrl
 from .overlay_control import octrl
@@ -50,7 +50,7 @@ def start():
     logger.info("STARTING............")
     signal.signal(signal.SIGINT, int_signal_handler)
     # 1 load user preset
-    cfg.set_next_to_load(f"{cfg.preset_files()[0]}{FileExt.JSON}")
+    cfg.set_next_to_load(f"{cfg.preset_files()[0]}{FILE.EXT_JSON}")
     cfg.load_user()
     cfg.save()
     # 2 start api

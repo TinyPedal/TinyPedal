@@ -21,7 +21,7 @@ Track notes Widget
 """
 
 from ..api_control import api
-from ..const_common import EMPTY_DICT, TEXT_NOTAVAILABLE
+from ..constant import DATA
 from ..module_info import minfo
 from ..userfile.track_notes import COLUMN_COMMENT, COLUMN_DISTANCE, COLUMN_TRACKNOTE
 from ._base import Overlay
@@ -128,8 +128,8 @@ class Realtime(Overlay):
             notes_next = minfo.tracknotes.pit.nextNote
             notes_index = minfo.tracknotes.pit.currentIndex
         else:  # not available
-            notes_current = EMPTY_DICT
-            notes_next = EMPTY_DICT
+            notes_current = DATA.EMPTY_DICT
+            notes_next = DATA.EMPTY_DICT
             notes_index = None
 
         if api.read.vehicle.in_garage():
@@ -154,14 +154,14 @@ class Realtime(Overlay):
             if in_pits:
                 notes = notes_current.get(COLUMN_TRACKNOTE, self.wcfg["pit_notes_text"])
             else:
-                notes = notes_current.get(COLUMN_TRACKNOTE, TEXT_NOTAVAILABLE)
+                notes = notes_current.get(COLUMN_TRACKNOTE, DATA.TEXT_NOTAVAILABLE)
             self.update_notes(self.bar_notes, notes)
 
         if self.wcfg["show_comments"]:
             if in_pits:
                 comments = notes_current.get(COLUMN_COMMENT, self.wcfg["pit_comments_text"])
             else:
-                comments = notes_current.get(COLUMN_COMMENT, TEXT_NOTAVAILABLE)
+                comments = notes_current.get(COLUMN_COMMENT, DATA.TEXT_NOTAVAILABLE)
             self.update_comments(self.bar_comments, comments)
 
         if self.wcfg["show_debugging"]:

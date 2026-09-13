@@ -27,7 +27,7 @@ from math import acos, atan, atan2, ceil, cos, degrees, dist, hypot, radians, si
 from statistics import fmean
 from typing import Any, Callable, Sequence
 
-from .const_common import FLOAT_INF, MAX_SECONDS
+from .constant import DATA
 
 distance = dist  # distance between 2 coordinates
 hypotenuse = hypot  # distance from origin point (0) to a point
@@ -461,7 +461,7 @@ def delta_laptime(opt_data: list, plr_data: list, max_output: int, max_record: i
     return tuple(
         plr_data[index] - opt_data[index]
         if plr_data[index] > 0 < opt_data[index]  # check invalid lap time
-        else MAX_SECONDS
+        else DATA.MAX_SECONDS
         for index in range(max_record - max_output, max_record)
     )
 
@@ -498,7 +498,7 @@ def linear_search_higher(data: Sequence, target: float, column: int | None = Non
     """linear search nearest value higher index from unordered list"""
     #key = lambda x:x[column] if column >= 0 else x
     end = len(data) - 1
-    nearest = FLOAT_INF
+    nearest = DATA.FLOAT_INF
     for index, data_row in enumerate(data):
         if target <= search_column_key(data_row, column) < nearest:
             nearest = search_column_key(data_row, column)

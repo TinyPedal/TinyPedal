@@ -23,7 +23,7 @@ Hybrid module
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, MAX_SECONDS
+from ..constant import DATA
 from ..decorator import generator_init
 from ..module_info import HybridInfo, minfo
 from ._base import DataModule
@@ -90,15 +90,15 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
             alt_motor_state_debounce = 0  # alternative state reset debounce counter
             motor_active_timer = 0
             motor_active_timer_start = False
-            motor_inactive_timer = MAX_SECONDS
+            motor_inactive_timer = DATA.MAX_SECONDS
             motor_inactive_timer_start = False
             lap_etime_last = 0
-            last_lap_stime = FLOAT_INF  # last lap start time
+            last_lap_stime = DATA.FLOAT_INF  # last lap start time
 
             delta_reset = False
             delta_recording = False
-            delta_array_raw = [DELTA_ZERO]  # distance, battery net change
-            delta_array_last = DELTA_DEFAULT
+            delta_array_raw = [DATA.DELTA_ZERO]  # distance, battery net change
+            delta_array_last = DATA.DELTA_DEFAULT
             pos_last = 0.0  # last checked vehicle position
             net_change_last = 0.0
             est_net_change = 0.0  # estimated battery charge net change
@@ -159,7 +159,7 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
             motor_inactive_timer = lap_etime - motor_inactive_timer_start
             if motor_state == 2:
                 motor_inactive_timer_start = False
-                motor_inactive_timer = MAX_SECONDS
+                motor_inactive_timer = DATA.MAX_SECONDS
 
         # Battery charge delta calculation
         if motor_state != 0:
@@ -171,7 +171,7 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
                 delta_reset = False
                 if len(delta_array_raw) > 1 and not is_pit_lap:
                     delta_array_last = tuple(delta_array_raw)
-                delta_array_raw[:] = DELTA_DEFAULT
+                delta_array_raw[:] = DATA.DELTA_DEFAULT
                 pos_last = pos_curr
                 delta_recording = laptime_curr < 1
                 net_change_last = battery_regen_last - battery_drain_last

@@ -41,8 +41,7 @@ from PySide2.QtWidgets import (
 
 from ..api_control import api
 from ..async_request import get_response, resolve_hostname, set_header_get
-from ..const_api import API_LMU_ALIAS, API_LMU_CONFIG, API_RF2_ALIAS, API_RF2_CONFIG
-from ..const_file import ConfigType, FileFilter
+from ..constant import API, CONFIG, FILE
 from ..setting import cfg
 from ..userfile.brands import extract_lmu_brand_name
 from ..userfile.json_setting import copy_setting
@@ -153,9 +152,9 @@ class VehicleBrandEditor(BaseEditor):
 
     def import_from_rf2(self):
         """Import brand from RF2"""
-        setting_api = cfg.user.setting[API_RF2_CONFIG]
+        setting_api = cfg.user.setting[API.CONFIG_RF2]
         self.import_from_restapi(
-            API_RF2_ALIAS,
+            API.ALIAS_RF2,
             setting_api["url_host"],
             setting_api["url_port"],
             "/rest/race/car",
@@ -163,9 +162,9 @@ class VehicleBrandEditor(BaseEditor):
 
     def import_from_lmu(self):
         """Import brand from LMU (primary source)"""
-        setting_api = cfg.user.setting[API_LMU_CONFIG]
+        setting_api = cfg.user.setting[API.CONFIG_LMU]
         self.import_from_restapi(
-            API_LMU_ALIAS,
+            API.ALIAS_LMU,
             setting_api["url_host"],
             setting_api["url_port"],
             "/rest/race/car",
@@ -173,9 +172,9 @@ class VehicleBrandEditor(BaseEditor):
 
     def import_from_lmu_alt(self):
         """Import brand from LMU (alternative source)"""
-        setting_api = cfg.user.setting[API_LMU_CONFIG]
+        setting_api = cfg.user.setting[API.CONFIG_LMU]
         self.import_from_restapi(
-            API_LMU_ALIAS,
+            API.ALIAS_LMU,
             setting_api["url_host"],
             setting_api["url_port"],
             "/rest/sessions/getAllVehicles",
@@ -200,7 +199,7 @@ class VehicleBrandEditor(BaseEditor):
 
     def import_from_file(self):
         """Import brand from file"""
-        filename_full = QFileDialog.getOpenFileName(self, filter=FileFilter.JSON)[0]
+        filename_full = QFileDialog.getOpenFileName(self, filter=FILE.FILTER_JSON)[0]
         if not filename_full:
             return
 
@@ -322,7 +321,7 @@ class VehicleBrandEditor(BaseEditor):
         """Save setting"""
         self.update_brands_temp()
         cfg.user.brands = copy_setting(self.brands_temp)
-        cfg.save(0, config_type=ConfigType.BRANDS)
+        cfg.save(0, config_type=CONFIG.TYPE_BRANDS)
         while cfg.is_saving:  # wait saving finish
             time.sleep(0.01)
         self.reloading()

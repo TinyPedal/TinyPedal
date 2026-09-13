@@ -31,8 +31,7 @@ from PySide2.QtGui import QFont, QGuiApplication, QIcon, QPixmapCache
 from PySide2.QtWidgets import QApplication, QMessageBox
 
 from . import realtime_state, version_check
-from .const_app import APP_NAME, PLATFORM, VERSION
-from .const_file import ConfigType, ImageFile, LogFile
+from .constant import APP, CONFIG, FILE, PLATFORM
 from .log_handler import set_logging_level
 from .setting import cfg
 
@@ -42,7 +41,7 @@ log_stream = io.StringIO()
 
 def save_pid_file():
     """Save PID info to file"""
-    with open(f"{cfg.path.config}{LogFile.PID}", "w", encoding="utf-8") as f:
+    with open(f"{cfg.path.config}{FILE.LOG_PID}", "w", encoding="utf-8") as f:
         current_pid = os.getpid()
         pid_create_time = psutil.Process(current_pid).create_time()
         pid_str = f"{current_pid},{pid_create_time}"
@@ -53,7 +52,7 @@ def is_pid_exist() -> bool:
     """Check and verify PID existence"""
     try:
         # Load last recorded PID and creation time from pid log file
-        with open(f"{cfg.path.config}{LogFile.PID}", "r", encoding="utf-8") as f:
+        with open(f"{cfg.path.config}{FILE.LOG_PID}", "r", encoding="utf-8") as f:
             pid_read = f.readline()
         pid = pid_read.split(",")
         pid_last = int(pid[0])
@@ -92,13 +91,13 @@ def single_instance_check(is_single_instance: bool):
     logger.warning(warning_text)
     root = QApplication(sys.argv)
     set_app_icon(root)
-    QMessageBox.warning(None, f"{APP_NAME} v{VERSION}", warning_text)
+    QMessageBox.warning(None, f"{APP.TINYPEDAL} v{APP.VERSION}", warning_text)
     sys.exit()
 
 
 def get_version():
     """Get version info"""
-    logger.info("TinyPedal: %s", VERSION)
+    logger.info("TinyPedal: %s", APP.VERSION)
     logger.info("Python: %s", version_check.python())
     logger.info("Qt: %s", version_check.qt())
     logger.info("PySide: %s", version_check.pyside())
@@ -119,7 +118,7 @@ def init_gui() -> QApplication:
     QApplication.setStyle("Fusion")
     root = QApplication(sys.argv)
     root.setQuitOnLastWindowClosed(False)
-    root.setApplicationName(APP_NAME)
+    root.setApplicationName(APP.TINYPEDAL)
     set_app_icon(root)
     set_app_font(root)
     # Disable global pixmap cache
@@ -131,7 +130,7 @@ def init_gui() -> QApplication:
 
 def set_app_icon(root: QApplication):
     """Set APP icon"""
-    root.setWindowIcon(QIcon(ImageFile.APP_ICON))
+    root.setWindowIcon(QIcon(FILE.IMAGE_TINYPEDAL))
     # Set window icon for X11/Wayland (workaround)
     if not PLATFORM.WINDOWS:
         root.setDesktopFileName("TinyPedal-overlay")
@@ -188,12 +187,12 @@ def start_app(cli_args):
     """Init main window"""
     single_instance_check(bool(cli_args.single_instance))
     unset_environment()
-    set_logging_level(logger, cfg.path.config, LogFile.APP_LOG, log_stream, cli_args.log_level)
+    set_logging_level(logger, cfg.path.config, FILE.LOG_APP, log_stream, cli_args.log_level)
     get_version()
     # load global config
     cfg.load_global()
-    cfg.save(config_type=ConfigType.CONFIG)
-    cfg.save(config_type=ConfigType.SHORTCUTS)
+    cfg.save(config_type=CONFIG.TYPE_CONFIG)
+    cfg.save(config_type=CONFIG.TYPE_SHORTCUTS)
     set_environment()
     # Main GUI
     root = init_gui()

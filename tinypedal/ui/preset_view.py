@@ -37,8 +37,7 @@ from PySide2.QtWidgets import (
 )
 
 from .. import app_signal
-from ..const_app import VERSION
-from ..const_file import ConfigType, FileExt
+from ..constant import APP, CONFIG, FILE
 from ..setting import cfg
 from ..userfile.json_setting import create_backup_file, set_backup_timestamp
 from ._common import UIScaler
@@ -119,7 +118,7 @@ class PresetList(QWidget):
     def load_preset(self):
         """Load selected preset"""
         selected_preset_name = self.listbox_preset.currentItem().text()
-        cfg.set_next_to_load(f"{selected_preset_name}{FileExt.JSON}")
+        cfg.set_next_to_load(f"{selected_preset_name}{FILE.EXT_JSON}")
         app_signal.reload.emit(True)
 
     def open_create_preset(self):
@@ -141,7 +140,7 @@ class PresetList(QWidget):
     def toggle_autoload(checked: bool):
         """Toggle auto load preset"""
         cfg.application["enable_auto_load_preset"] = checked
-        cfg.save(config_type=ConfigType.CONFIG)
+        cfg.save(config_type=CONFIG.TYPE_CONFIG)
 
     def open_context_menu(self, position: QPoint):
         """Open context menu"""
@@ -150,7 +149,7 @@ class PresetList(QWidget):
 
         selected_index = self.listbox_preset.currentRow()
         selected_preset_name = self.listbox_preset.item(selected_index).text()
-        selected_filename = f"{selected_preset_name}{FileExt.JSON}"
+        selected_filename = f"{selected_preset_name}{FILE.EXT_JSON}"
         is_locked = (selected_filename in cfg.user.filelock)
 
         # Create context menu
@@ -178,13 +177,13 @@ class PresetList(QWidget):
         # Set primary preset Class
         if action in cfg.user.classes:
             cfg.user.classes[action]["preset"] = selected_preset_name
-            cfg.save(config_type=ConfigType.CLASSES)
+            cfg.save(config_type=CONFIG.TYPE_CLASSES)
         # Clear primary preset tag
         elif action == "Clear Primary Tag":
             for class_name, class_data in cfg.user.classes.items():
                 if selected_preset_name == class_data["preset"]:
                     class_data["preset"] = ""
-                    cfg.save(config_type=ConfigType.CLASSES)
+                    cfg.save(config_type=CONFIG.TYPE_CLASSES)
         # Lock/unlock preset
         elif action == "Lock Preset":
             msg_text = (
@@ -192,13 +191,13 @@ class PresetList(QWidget):
                 "Changes to locked preset will not be saved."
             )
             if self.confirm_operation(title="Lock Preset", message=msg_text):
-                cfg.user.filelock[selected_filename] = {"version": VERSION}
-                cfg.save(config_type=ConfigType.FILELOCK)
+                cfg.user.filelock[selected_filename] = {"version": APP.VERSION}
+                cfg.save(config_type=CONFIG.TYPE_FILELOCK)
         elif action == "Unlock Preset":
             msg_text = f"Unlock <b>{selected_filename}</b> preset?"
             if self.confirm_operation(title="Unlock Preset", message=msg_text):
                 if cfg.user.filelock.pop(selected_filename, None):
-                    cfg.save(config_type=ConfigType.FILELOCK)
+                    cfg.save(config_type=CONFIG.TYPE_FILELOCK)
         # Backup preset
         elif action == "Backup Preset":
             msg_text = (
@@ -272,7 +271,7 @@ class PresetTagItem(QWidget):
                 layout_item.addWidget(label_class_name)
 
         # File lock tag
-        preset_filename = f"{preset_name}{FileExt.JSON}"
+        preset_filename = f"{preset_name}{FILE.EXT_JSON}"
         if preset_filename in cfg.user.filelock:
             label_locked = QLabel(f"{cfg.user.filelock[preset_filename]['version']}")
             label_locked.setStyleSheet("background: #777;")

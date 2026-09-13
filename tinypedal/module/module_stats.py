@@ -27,7 +27,7 @@ from time import localtime, strftime
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import FLOAT_INF
+from ..constant import DATA
 from ..decorator import generator_init
 from ..module_info import DriverStats, StatsInfo, minfo
 from ..userfile.brands import select_brand_name
@@ -171,14 +171,14 @@ def record_driver_stats(
             delayed_save = True
 
             is_pit_lap = 0
-            last_lap_stime = FLOAT_INF
-            last_lap_etime = FLOAT_INF
-            last_best_laptime = FLOAT_INF
-            last_raw_laptime = FLOAT_INF
+            last_lap_stime = DATA.FLOAT_INF
+            last_lap_etime = DATA.FLOAT_INF
+            last_best_laptime = DATA.FLOAT_INF
+            last_raw_laptime = DATA.FLOAT_INF
             last_num_penalties = 99999
             fuel_last = 0.0
             last_finish_state = 99999
-            gps_last = (FLOAT_INF, FLOAT_INF, FLOAT_INF)
+            gps_last = (DATA.FLOAT_INF, DATA.FLOAT_INF, DATA.FLOAT_INF)
 
         # General
         lap_stime = api.read.timing.start()
@@ -273,7 +273,7 @@ def auto_backup_car_setup(filepath: str):
     last_reset = None  # reset check
     data_available = False
 
-    best_laptime = FLOAT_INF
+    best_laptime = DATA.FLOAT_INF
     temp_data = ()
     data_hash = 0
     last_data_hash = 0
@@ -300,7 +300,7 @@ def auto_backup_car_setup(filepath: str):
                 continue
             last_reset = reset
 
-            best_laptime = FLOAT_INF
+            best_laptime = DATA.FLOAT_INF
             temp_filename = ""
 
         # Get setup data while not in pits

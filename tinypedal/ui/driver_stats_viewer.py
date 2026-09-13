@@ -38,7 +38,7 @@ from PySide2.QtWidgets import (
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME
+from ..constant import DATA
 from ..formatter import strip_invalid_char
 from ..module_info import DriverStats
 from ..setting import cfg
@@ -54,9 +54,9 @@ from .track_map_viewer import TrackMapViewer
 def parse_display_value(key: str, value: float) -> str | float:
     """Parse stats display value"""
     if DriverStats.is_lap_time(key):
-        if 0 < value < MAX_SECONDS:
+        if 0 < value < DATA.MAX_SECONDS:
             return calc.sec2laptime_full(value)
-        return TEXT_NOLAPTIME
+        return DATA.TEXT_NOLAPTIME
     if key == "meters":
         if cfg.units["odometer_unit"] == "Kilometer":
             return round(units.meter_to_kilometer(value), 1)
@@ -213,7 +213,7 @@ class DriverStatsViewer(BaseEditor):
             # Vehicle stats
             value_raw = veh_data.get(header_key, 0)
             if DriverStats.is_lap_time(header_key) and value_raw <= 0:
-                value_raw = MAX_SECONDS  # correct invalid lap time
+                value_raw = DATA.MAX_SECONDS  # correct invalid lap time
             item = NumericTableItem(value_raw, str(parse_display_value(header_key, value_raw)))
             item.setFlags(flag_selectable)
             item.setTextAlignment(Qt.AlignCenter)
@@ -277,7 +277,7 @@ class DriverStatsViewer(BaseEditor):
         selected_vehicle = self.table_stats.item(row, 0).text()
         selected_column = self.table_header_key[column]
         best_laptime = self.table_stats.item(row, column).text()
-        if best_laptime == TEXT_NOLAPTIME:
+        if best_laptime == DATA.TEXT_NOLAPTIME:
             QMessageBox.warning(self, "Error", "No lap time found.")
             return
         msg_text = (
@@ -285,7 +285,7 @@ class DriverStatsViewer(BaseEditor):
             "This cannot be undone!"
         )
         if self.confirm_operation(message=msg_text):
-            self.stats_temp[self.selected_stats_key][selected_vehicle][selected_column] = MAX_SECONDS
+            self.stats_temp[self.selected_stats_key][selected_vehicle][selected_column] = DATA.MAX_SECONDS
             save_stats_json_file(
                 stats_user=self.stats_temp,
                 filepath=cfg.path.config,

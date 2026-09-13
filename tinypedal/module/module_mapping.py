@@ -23,8 +23,7 @@ Mapping module
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import FLOAT_INF
-from ..const_file import FileExt
+from ..constant import DATA, FILE
 from ..decorator import generator_init
 from ..module_info import MapCoords, MappingInfo, minfo
 from ..userfile.track_info import load_track_info, save_track_info
@@ -207,7 +206,7 @@ def record_track_map(output: MappingInfo, filepath: str):
             modified = file_last_modified(
                 filepath=filepath,
                 filename=filename,
-                extension=FileExt.SVG,
+                extension=FILE.EXT_SVG,
             )
             map_exist = (last_modified == modified > 0)
             last_modified = modified
@@ -237,7 +236,7 @@ def record_track_map(output: MappingInfo, filepath: str):
             recording = False
             validating = False
             last_sector_idx = -1
-            last_lap_stime = FLOAT_INF
+            last_lap_stime = DATA.FLOAT_INF
             pos_last = 0.0
 
         # Recording map data

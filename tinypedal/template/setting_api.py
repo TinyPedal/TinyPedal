@@ -20,10 +20,10 @@
 Default API setting template
 """
 
-from ..const_api import API_LMU_CONFIG, API_RF2_CONFIG
+from ..constant import API
 
 API_DEFAULT = {
-    API_LMU_CONFIG: {
+    API.CONFIG_LMU: {
         "access_mode": 0,
         "character_encoding": "UTF-8",
         "enable_active_state_override": False,
@@ -42,7 +42,7 @@ API_DEFAULT = {
         "enable_vehicle_info": True,
         "enable_weather_info": True,
     },
-    API_RF2_CONFIG: {
+    API.CONFIG_RF2: {
         "access_mode": 0,
         "process_id": "",
         "character_encoding": "UTF-8",

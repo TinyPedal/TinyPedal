@@ -25,7 +25,7 @@ from PySide2.QtGui import QBrush, QPainter, QPen
 
 from .. import calculation as calc
 from ..api_control import api
-from ..const_common import FLOAT_INF, WHEELS_ZERO
+from ..constant import DATA
 from ._base import Overlay
 from ._common import warning_flash
 
@@ -103,16 +103,16 @@ class Realtime(Overlay):
             self.warn_flash = warning_flash(
                 self.wcfg["warning_flash_highlight_duration"],
                 self.wcfg["warning_flash_interval"],
-                FLOAT_INF,
+                DATA.FLOAT_INF,
             )
 
         # Last data
         self.detached_parts = False
         self.damage_aero = -1.0
-        self.damage_body = WHEELS_ZERO * 2
-        self.damage_wheel = WHEELS_ZERO
-        self.damage_tyre = WHEELS_ZERO
-        self.damage_susp = WHEELS_ZERO
+        self.damage_body = DATA.WHEELS_ZERO * 2
+        self.damage_wheel = DATA.WHEELS_ZERO
+        self.damage_tyre = DATA.WHEELS_ZERO
+        self.damage_susp = DATA.WHEELS_ZERO
         self.last_impact_time = None
         self.last_impact_expired = True
 

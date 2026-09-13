@@ -25,7 +25,7 @@ from types import MappingProxyType
 
 from PySide2.QtGui import QFont
 
-from .const_api import API_MAP_ALIAS
+from .constant import API
 
 # Compiled regex function
 rex_hex_color = re.compile(r"^#[0-9A-F]{3}$|^#[0-9A-F]{6}$|^#[0-9A-F]{8}$", flags=re.IGNORECASE)
@@ -218,7 +218,7 @@ FONT_WEIGHT_MAP = MappingProxyType({
 
 # Choice dictionary
 CHOICE_COMMON = MappingProxyType({
-    CFG_API_NAME: tuple(API_MAP_ALIAS),
+    CFG_API_NAME: API.MAP_ALIAS.keys(),
     CFG_CHARACTER_ENCODING: ("UTF-8", "ISO-8859-1"),
     CFG_DELTABEST_SOURCE: ("Best", "Session", "Stint", "Last"),
     CFG_FONT_WEIGHT: tuple(FONT_WEIGHT_MAP),

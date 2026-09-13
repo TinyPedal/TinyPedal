@@ -21,7 +21,7 @@ Onboard setting Widget
 """
 
 from ..api_control import api
-from ..const_common import TEXT_PLACEHOLDER
+from ..constant import DATA
 from ._base import Overlay
 
 
@@ -64,7 +64,7 @@ class Realtime(Overlay):
                 self.wcfg["abs_activation_color"],
             )
             self.bars_abs = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -96,7 +96,7 @@ class Realtime(Overlay):
                 self.wcfg["tc_activation_color"],
             )
             self.bars_tc = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -124,7 +124,7 @@ class Realtime(Overlay):
         if self.wcfg["show_tc_cut"]:
             layout_tc_cut = self.set_grid_layout()
             self.bars_tc_cut = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -152,7 +152,7 @@ class Realtime(Overlay):
         if self.wcfg["show_tc_slip"]:
             layout_tc_slip = self.set_grid_layout()
             self.bars_tc_slip = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -180,7 +180,7 @@ class Realtime(Overlay):
         if self.wcfg["show_front_arb"]:
             layout_farb = self.set_grid_layout()
             self.bars_farb = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -208,7 +208,7 @@ class Realtime(Overlay):
         if self.wcfg["show_rear_arb"]:
             layout_rarb = self.set_grid_layout()
             self.bars_rarb = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -236,7 +236,7 @@ class Realtime(Overlay):
         if self.wcfg["show_brake_migration"]:
             layout_bmig = self.set_grid_layout()
             self.bars_bmig = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -264,7 +264,7 @@ class Realtime(Overlay):
         if self.wcfg["show_motor_map"]:
             layout_mmap = self.set_grid_layout()
             self.bars_mmap = self.set_rawtext(
-                text=TEXT_PLACEHOLDER,
+                text=DATA.TEXT_PLACEHOLDER,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -330,7 +330,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data[0] < 0:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             else:
                 text = f"{data[0]}"
             target.text = text
@@ -342,7 +342,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data[0] < 0:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             else:
                 text = f"{data[0]}"
             target.text = text
@@ -354,7 +354,7 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             if data < 0:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             else:
                 text = f"{data}"
             target.text = text

@@ -51,7 +51,7 @@ from PySide2.QtWidgets import (
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_file import ConfigType, FileFilter
+from ..constant import CONFIG, FILE
 from ..formatter import laptime_string_to_seconds
 from ..module_info import ConsumptionData, minfo
 from ..setting import cfg
@@ -150,7 +150,7 @@ class FuelCalculator(BaseDialog):
         filename_full = QFileDialog.getOpenFileName(
             self,
             dir=cfg.path.fuel_delta,
-            filter=";;".join((FileFilter.CONSUMPTION, FileFilter.CSV))
+            filter=";;".join((FILE.FILTER_CONSUMPTION, FILE.FILTER_CSV))
         )[0]
         if not filename_full:
             return
@@ -196,7 +196,7 @@ class FuelCalculator(BaseDialog):
         config = cfg.user.config["fuel_calculator"]
         if checked != config["show_consumption_history"]:
             config["show_consumption_history"] = checked
-            cfg.save(config_type=ConfigType.CONFIG)
+            cfg.save(config_type=CONFIG.TYPE_CONFIG)
 
     def table_header_menu(self, position: QPoint):
         """Open table header context menu"""
@@ -222,7 +222,7 @@ class FuelCalculator(BaseDialog):
                 config[option_name] = not config[option_name]
                 self.panel_history.toggle_column()
                 self.toggle_history_panel(config["show_consumption_history"])
-                cfg.save(config_type=ConfigType.CONFIG)
+                cfg.save(config_type=CONFIG.TYPE_CONFIG)
                 break
 
 

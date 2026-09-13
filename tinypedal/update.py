@@ -28,8 +28,7 @@ import threading
 
 from . import app_signal, version
 from .async_request import get_response, set_header_get
-from .const_app import APP_NAME, REPO_NAME
-from .const_common import DATE_NA, VERSION_NA
+from .constant import APP, DATA
 from .version_check import is_new_version, parse_version_string
 
 logger = logging.getLogger(__name__)
@@ -37,11 +36,11 @@ logger = logging.getLogger(__name__)
 
 def request_latest_release():
     """Setup request for latest release data from github Rest API"""
-    uri_path = f"/repos/{REPO_NAME}/releases/latest"
+    uri_path = f"/repos/{APP.REPOSITORY}/releases/latest"
     host = "api.github.com"
     port = 443
     timeout = 5
-    user_agent = f"User-Agent: {APP_NAME}/{version.__version__}"
+    user_agent = f"User-Agent: {APP.TINYPEDAL}/{version.__version__}"
     request_header = set_header_get(
         uri_path,
         host,
@@ -64,7 +63,7 @@ def parse_version(data: bytes) -> tuple[int, int, int]:
             return int(ver_split[0]), int(ver_split[1]), int(ver_split[2])
     except (AttributeError, TypeError, IndexError, ValueError):
         logger.error("UPDATES: error while fetching latest release version info")
-    return VERSION_NA
+    return DATA.VERSION_NA
 
 
 def parse_date(data: bytes) -> tuple[int, int, int]:
@@ -79,7 +78,7 @@ def parse_date(data: bytes) -> tuple[int, int, int]:
             return int(date_split[0]), int(date_split[1]), int(date_split[2])
     except (AttributeError, TypeError, IndexError, ValueError):
         logger.error("UPDATES: error while fetching latest release date info")
-    return DATE_NA
+    return DATA.DATE_NA
 
 
 class UpdateChecker:
@@ -97,8 +96,8 @@ class UpdateChecker:
         self._is_checking = False
         self._update_available = False
         self._manual_checking = False
-        self._last_checked_version = VERSION_NA
-        self._last_checked_date = DATE_NA
+        self._last_checked_version = DATA.VERSION_NA
+        self._last_checked_date = DATA.DATE_NA
 
     def is_manual(self) -> bool:
         """Is manual checking"""
@@ -134,7 +133,7 @@ class UpdateChecker:
 
     def message(self) -> str:
         """Get message"""
-        if self._last_checked_version == VERSION_NA:
+        if self._last_checked_version == DATA.VERSION_NA:
             return "Unable To Find Updates"
         if not self._update_available:
             return "No Updates Available"

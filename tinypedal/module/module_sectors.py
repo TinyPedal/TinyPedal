@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import MAX_SECONDS
+from ..constant import DATA
 from ..decorator import generator_init
 from ..module_info import SectorData, minfo
 from ..userfile.sector_best import load_sector_best_file, save_sector_best_file
@@ -117,7 +117,7 @@ def record_sectors(output_session: SectorData, output_alltime: SectorData, filep
                 filepath=filepath,
                 filename=combo_name,
                 session_id=session_id,
-                defaults=(MAX_SECONDS, MAX_SECONDS, MAX_SECONDS),
+                defaults=(DATA.MAX_SECONDS, DATA.MAX_SECONDS, DATA.MAX_SECONDS),
             )
 
         # Update previous & best sector time

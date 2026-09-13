@@ -21,7 +21,7 @@ Wheel camber Widget
 """
 
 from .. import calculation as calc
-from ..const_common import TEXT_NA
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -79,7 +79,7 @@ class Realtime(Overlay):
             self.wcfg["font_color_positive_camber"],
         )
         self.bars_camber = self.set_rawtext(
-            text=TEXT_NA,
+            text=DATA.TEXT_NA,
             width=font_m.width * (3 + self.decimals_camber) + bar_padx,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -102,7 +102,7 @@ class Realtime(Overlay):
         if self.wcfg["show_camber_difference"]:
             self.decimals_cdiff = max(self.wcfg["decimal_places_camber_difference"], 1)
             self.bars_cdiff = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=font_m.width * (3 + self.decimals_cdiff) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

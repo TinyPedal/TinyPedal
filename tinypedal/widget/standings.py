@@ -23,7 +23,7 @@ Standings Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import MAX_SECONDS, TEXT_NOLAPTIME, TEXT_PLACEHOLDER
+from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ..userfile.custom_image import load_brand_logo_image
@@ -1069,7 +1069,7 @@ class Realtime(Overlay):
             else:
                 color_index = 0
             if data[0] == 0:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             else:
                 text = f"{data[0]}"
             target.text = text
@@ -1113,7 +1113,7 @@ class Realtime(Overlay):
             else:  # low
                 color_index = 2
             if hp >= 10:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             else:
                 if hp < 0:
                     hp = 0
@@ -1230,17 +1230,17 @@ class Realtime(Overlay):
 
     def set_laptime(self, laptime, valid: bool = True):
         """Set lap time"""
-        if 0 < laptime < MAX_SECONDS:
+        if 0 < laptime < DATA.MAX_SECONDS:
             if valid:
                 return calc.sec2laptime_full(laptime)
             return f"*{calc.sec2laptime_full(laptime)}"
-        return TEXT_NOLAPTIME
+        return DATA.TEXT_NOLAPTIME
 
     def set_pittime(self, inpit, pit_time):
         """Set lap time"""
-        if 0 < pit_time < MAX_SECONDS:
+        if 0 < pit_time < DATA.MAX_SECONDS:
             return f"{'PIT' if inpit else 'OUT'}{pit_time:>5.1f}"
-        return TEXT_NOLAPTIME
+        return DATA.TEXT_NOLAPTIME
 
     def gap_to_leader_best(self, player_best, leader_best):
         """Gap to leader's best laptime"""

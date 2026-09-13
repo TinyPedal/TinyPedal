@@ -50,7 +50,7 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..const_app import APP_NAME
+from ..constant import APP
 from ..validator import is_string_number
 from . import UIScaler
 
@@ -153,8 +153,7 @@ class CompactButton(QPushButton):
     def __init__(self, text, parent=None, has_menu=False):
         super().__init__(text, parent)
         self.setFixedWidth(
-            self.fontMetrics().boundingRect(text).width()
-            + UIScaler.FONT_PIXEL_SCALED * (1 + has_menu)
+            self.fontMetrics().boundingRect(text).width() + UIScaler.size(1 + has_menu)
         )
 
 
@@ -178,7 +177,7 @@ class BaseDialog(QDialog):
 
     def set_utility_title(self, name: str):
         """Set utility dialog title"""
-        self.setWindowTitle(f"{name} - {APP_NAME}")
+        self.setWindowTitle(f"{name} - {APP.TINYPEDAL}")
 
     def confirm_operation(self, title: str = "Confirm", message: str = "") -> bool:
         """Confirm operation"""

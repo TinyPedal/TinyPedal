@@ -22,7 +22,7 @@ Acceleration Widget
 
 from .. import units
 from ..api_control import api
-from ..const_common import MAX_SECONDS, TEXT_PLACEHOLDER
+from ..constant import DATA
 from ._base import Overlay
 
 
@@ -69,14 +69,14 @@ class Realtime(Overlay):
         # Speed range
         self.bars_speed_range = self.set_rawtext(
             font=font_cap,
-            text=TEXT_PLACEHOLDER,
+            text=DATA.TEXT_PLACEHOLDER,
             width=bar_width,
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
             fg_color=self.wcfg["font_color_speed_range"],
             bg_color=self.wcfg["background_color_speed_range"],
             count=total_slot,
-            last=-MAX_SECONDS,
+            last=-DATA.MAX_SECONDS,
         )
         self.set_grid_layout_table_row(
             layout=layout,
@@ -97,13 +97,13 @@ class Realtime(Overlay):
             ),
         )
         self.bars_timer_last = self.set_rawtext(
-            text=TEXT_PLACEHOLDER,
+            text=DATA.TEXT_PLACEHOLDER,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.timer_color[0][0],
             bg_color=self.timer_color[0][1],
-            last=MAX_SECONDS,
+            last=DATA.MAX_SECONDS,
             count=total_slot,
         )
         self.set_grid_layout_table_row(
@@ -115,13 +115,13 @@ class Realtime(Overlay):
 
         # Best timer
         self.bars_timer_best = self.set_rawtext(
-            text=TEXT_PLACEHOLDER,
+            text=DATA.TEXT_PLACEHOLDER,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_best_timer"],
             bg_color=self.wcfg["background_color_best_timer"],
-            last=MAX_SECONDS,
+            last=DATA.MAX_SECONDS,
             count=total_slot,
         )
         self.set_grid_layout_table_row(
@@ -138,14 +138,14 @@ class Realtime(Overlay):
             self.wcfg["font_color_delta_time"],
         )
         self.bars_timer_delta = self.set_rawtext(
-            text=TEXT_PLACEHOLDER,
+            text=DATA.TEXT_PLACEHOLDER,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.delta_color[2],
             bg_color=self.wcfg["background_color_delta_time"],
             count=total_slot,
-            last=MAX_SECONDS,
+            last=DATA.MAX_SECONDS,
         )
         self.set_grid_layout_table_row(
             layout=layout,
@@ -182,10 +182,10 @@ class Realtime(Overlay):
         if target.last != data:
             target.last = data
             target.fg, target.bg = self.timer_color[is_active]
-            if MAX_SECONDS > data > 0:
+            if DATA.MAX_SECONDS > data > 0:
                 text = f"{data:.{self.decimals_timer}f}"[:self.char_width]
             else:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             target.text = text
             target.update()
 
@@ -193,10 +193,10 @@ class Realtime(Overlay):
         """Best acceleration time"""
         if target.last != data:
             target.last = data
-            if MAX_SECONDS > data > 0:
+            if DATA.MAX_SECONDS > data > 0:
                 text = f"{data:.{self.decimals_timer}f}"[:self.char_width]
             else:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             target.text = text
             target.update()
 
@@ -246,9 +246,9 @@ class AccelTimer:
         self.speed_max = 0.0
         self.start_time = 0.0
         self.timer = 0.0
-        self.valid = MAX_SECONDS
+        self.valid = DATA.MAX_SECONDS
         self.delta = 0.0
-        self.best = MAX_SECONDS
+        self.best = DATA.MAX_SECONDS
 
     def update(self, speed: float, elapsed_time: float):
         """Update timer"""
@@ -261,7 +261,7 @@ class AccelTimer:
                 self.start_time = 0.0
                 self.valid = self.timer
 
-                if MAX_SECONDS > self.best and MAX_SECONDS > self.valid:
+                if DATA.MAX_SECONDS > self.best and DATA.MAX_SECONDS > self.valid:
                     self.delta = self.valid - self.best
                 else:
                     self.delta = 0.0

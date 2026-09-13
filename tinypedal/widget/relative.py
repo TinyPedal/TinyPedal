@@ -23,12 +23,7 @@ Relative Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import (
-    MAX_SECONDS,
-    REL_TIME_DEFAULT,
-    TEXT_NOLAPTIME,
-    TEXT_PLACEHOLDER,
-)
+from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
 from ..module_info import minfo
 from ..userfile.custom_image import load_brand_logo_image
@@ -1009,7 +1004,7 @@ class Realtime(Overlay):
             if not data[-1]:
                 text = ""
             elif data[0] == 0:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             else:
                 text = f"{data[0]}"
             target.text = text
@@ -1057,7 +1052,7 @@ class Realtime(Overlay):
             if not data[-1]:
                 text = ""
             elif hp >= 10:
-                text = TEXT_PLACEHOLDER
+                text = DATA.TEXT_PLACEHOLDER
             else:
                 if hp < 0:
                     hp = 0
@@ -1185,17 +1180,17 @@ class Realtime(Overlay):
 
     def set_laptime(self, laptime, valid: bool = True):
         """Set lap time"""
-        if 0 < laptime < MAX_SECONDS:
+        if 0 < laptime < DATA.MAX_SECONDS:
             if valid:
                 return calc.sec2laptime_full(laptime)
             return f"*{calc.sec2laptime_full(laptime)}"
-        return TEXT_NOLAPTIME
+        return DATA.TEXT_NOLAPTIME
 
     def set_pittime(self, inpit, pit_time):
         """Set lap time"""
-        if 0 < pit_time < MAX_SECONDS:
+        if 0 < pit_time < DATA.MAX_SECONDS:
             return f"{'PIT' if inpit else 'OUT'}{pit_time:>5.1f}"
-        return TEXT_NOLAPTIME
+        return DATA.TEXT_NOLAPTIME
 
 
 def lap_difference_index(is_lapped, offset=2):
@@ -1213,7 +1208,7 @@ def relative_data(ahead_list: list, behind_list: list, player_index: int, max_ah
     ahead_count = len(ahead_list)
     while ahead_count < max_ahead:
         ahead_count += 1
-        yield REL_TIME_DEFAULT
+        yield DATA.RELATIVE_NA
     for ahead_data in ahead_list:
         if ahead_count > max_ahead:
             ahead_count -= 1
@@ -1231,4 +1226,4 @@ def relative_data(ahead_list: list, behind_list: list, player_index: int, max_ah
             break
     while behind_count < max_behind:
         behind_count += 1
-        yield REL_TIME_DEFAULT
+        yield DATA.RELATIVE_NA

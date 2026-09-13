@@ -21,7 +21,7 @@ Wheel toe Widget
 """
 
 from .. import calculation as calc
-from ..const_common import TEXT_NA
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -75,7 +75,7 @@ class Realtime(Overlay):
         )
         self.decimals_toe = max(self.wcfg["decimal_places_toe_angle"], 1)
         self.bars_toe = self.set_rawtext(
-            text=TEXT_NA,
+            text=DATA.TEXT_NA,
             width=font_m.width * (3 + self.decimals_toe) + bar_padx,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -102,7 +102,7 @@ class Realtime(Overlay):
             )
             self.decimals_total = max(self.wcfg["decimal_places_total_toe_angle"], 1)
             self.bars_total = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=font_m.width * (2 + self.decimals_total) + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

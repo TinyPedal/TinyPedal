@@ -25,13 +25,13 @@ from __future__ import annotations
 from itertools import chain
 from typing import Callable, Iterable, Mapping
 
-from ..const_app import PLATFORM
-from .keymap import KEYMAP_GENERAL, KEYMAP_MODIFIER
+from ..constant import PLATFORM
+from .keymap import KEYMAP
 
 
 def sort_key_codes(
     available_commands: Iterable[tuple[int, ...]],
-    key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
+    key_modifier: Mapping[str, int] = KEYMAP.MODIFIER,
 ) -> tuple[int, ...]:
     """Sort available key codes in order - modifiers > keys"""
     all_keys = set(chain(*(_keys for _keys in available_commands)))
@@ -79,8 +79,8 @@ def refresh_keystate(get_key_state: Callable[[int], int]) -> None:
 
 def validate_hotkey(
     key_string: str,
-    key_general: Mapping[str, int] = KEYMAP_GENERAL,
-    key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
+    key_general: Mapping[str, int] = KEYMAP.GENERAL,
+    key_modifier: Mapping[str, int] = KEYMAP.MODIFIER,
     delimiter: str = "+",
 ) -> str:
     """Validate hotkey from string - ex. 'ctrl+alt+space' is valid"""
@@ -102,8 +102,8 @@ def validate_hotkey(
 
 def load_hotkey(
     key_string: str,
-    key_general: Mapping[str, int] = KEYMAP_GENERAL,
-    key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
+    key_general: Mapping[str, int] = KEYMAP.GENERAL,
+    key_modifier: Mapping[str, int] = KEYMAP.MODIFIER,
     delimiter: str = "+",
 ) -> tuple[int, ...]:
     """Load hotkey string and export as key code sequence"""
@@ -127,8 +127,8 @@ def load_hotkey(
 
 def set_hotkey_win(
     get_key_state: Callable[[int], int],
-    key_general: Mapping[str, int] = KEYMAP_GENERAL,
-    key_modifier: Mapping[str, int] = KEYMAP_MODIFIER,
+    key_general: Mapping[str, int] = KEYMAP.GENERAL,
+    key_modifier: Mapping[str, int] = KEYMAP.MODIFIER,
 ) -> tuple[str, ...]:
     """Set hotkey string"""
     key_combo = [""] * 4  # Ctrl, Alt, Shift, Key
@@ -162,4 +162,3 @@ def _refresh_keystate_win(get_key_state: Callable[[int], int]) -> None:
 
 def _refresh_keystate_linux(get_key_state: Callable[[int], int]) -> None:
     """Refresh and clean up key state - Linux (placeholder)"""
-    pass

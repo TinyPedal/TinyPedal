@@ -35,7 +35,7 @@ from PySide2.QtWidgets import (
 )
 
 from ..api_control import api
-from ..const_file import ConfigType
+from ..constant import CONFIG
 from ..setting import cfg
 from ..template.setting_tracks import TRACKINFO_DEFAULT
 from ..userfile.json_setting import copy_setting
@@ -278,7 +278,7 @@ class TrackInfoEditor(BaseEditor):
         """Save setting"""
         self.update_tracks_temp()
         cfg.user.tracks = copy_setting(self.tracks_temp)
-        cfg.save(0, config_type=ConfigType.TRACKS)
+        cfg.save(0, config_type=CONFIG.TYPE_TRACKS)
         while cfg.is_saving:  # wait saving finish
             time.sleep(0.01)
         self.reloading()

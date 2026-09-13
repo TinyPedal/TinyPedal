@@ -23,7 +23,7 @@ Delta module
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF, MAX_SECONDS
+from ..constant import DATA
 from ..decorator import generator_init
 from ..module_info import DeltaInfo, minfo
 from ..userfile.delta_best import load_delta_best_file, save_delta_best_file
@@ -152,10 +152,10 @@ def calc_delta_time(
     last_reset = None  # reset check
 
     last_session_id = ("",-1,-1,-1)
-    delta_array_session = DELTA_DEFAULT
-    delta_array_stint = DELTA_DEFAULT
-    laptime_session_best = MAX_SECONDS
-    laptime_stint_best = MAX_SECONDS
+    delta_array_session = DATA.DELTA_DEFAULT
+    delta_array_stint = DATA.DELTA_DEFAULT
+    laptime_session_best = DATA.MAX_SECONDS
+    laptime_stint_best = DATA.MAX_SECONDS
 
     calc_ema_delta = calc.ema_filter(delta_smoothing_samples)
     calc_ema_laptime = calc.ema_filter(laptime_pace_samples)
@@ -180,18 +180,18 @@ def calc_delta_time(
 
             # Reset delta session best if not same session
             if not is_same_session(combo_name, session_id, last_session_id):
-                delta_array_session = DELTA_DEFAULT
-                laptime_session_best = MAX_SECONDS
+                delta_array_session = DATA.DELTA_DEFAULT
+                laptime_session_best = DATA.MAX_SECONDS
                 last_session_id = (combo_name, *session_id)
 
             delta_array_best, laptime_best = load_delta_best_file(
                 filepath=filepath,
                 filename=combo_name,
-                defaults=(DELTA_DEFAULT, MAX_SECONDS)
+                defaults=(DATA.DELTA_DEFAULT, DATA.MAX_SECONDS)
             )
             output.deltaBestData = delta_array_best
-            delta_array_raw = [DELTA_ZERO]  # distance, laptime
-            delta_array_last = DELTA_DEFAULT  # last lap
+            delta_array_raw = [DATA.DELTA_ZERO]  # distance, laptime
+            delta_array_last = DATA.DELTA_DEFAULT  # last lap
 
             delta_ema_best = 0.0
             delta_ema_last = 0.0
@@ -202,7 +202,7 @@ def calc_delta_time(
             laptime_last = 0.0  # last laptime
             laptime_pace = api.read.timing.reference_laptime(laptime=laptime_best)
 
-            last_lap_stime = FLOAT_INF  # last lap start time
+            last_lap_stime = DATA.FLOAT_INF  # last lap start time
             pos_recorded = 0.0  # last recorded vehicle position
             pos_last = 0.0  # last checked vehicle position
             pos_synced_last = 0.0  # last synced estimated vehicle position
@@ -217,9 +217,9 @@ def calc_delta_time(
         pos_synced = output.lapDistance
 
         # Reset delta stint best if in pit and stopped
-        if in_pits and laptime_stint_best != MAX_SECONDS and api.read.vehicle.speed() < 0.1:
-            delta_array_stint = DELTA_DEFAULT
-            laptime_stint_best = MAX_SECONDS
+        if in_pits and laptime_stint_best != DATA.MAX_SECONDS and api.read.vehicle.speed() < 0.1:
+            delta_array_stint = DATA.DELTA_DEFAULT
+            laptime_stint_best = DATA.MAX_SECONDS
 
         # Lap start & finish detection
         if lap_stime > last_lap_stime:
@@ -231,7 +231,7 @@ def calc_delta_time(
                 ))
                 delta_array_last = tuple(delta_array_raw)
                 validating = api.read.timing.elapsed()
-            delta_array_raw[:] = DELTA_DEFAULT
+            delta_array_raw[:] = DATA.DELTA_DEFAULT
             pos_last = pos_recorded = pos_curr
             recording = laptime_curr < 1
             is_pit_lap = 0
@@ -260,7 +260,7 @@ def calc_delta_time(
                 # Update laptime pace
                 if not is_pit_lap:
                     # Set initial laptime if invalid, or align to faster laptime
-                    if not 0 < laptime_pace < MAX_SECONDS or laptime_valid < laptime_pace:
+                    if not 0 < laptime_pace < DATA.MAX_SECONDS or laptime_valid < laptime_pace:
                         laptime_pace = laptime_valid
                     else:
                         laptime_pace = min(
@@ -330,11 +330,11 @@ def calc_delta_time(
 
         # Estimated laptime
         laptime_est = laptime_stint_best + delta_ema_stint  # from stint
-        if not 0 < laptime_est < MAX_SECONDS:
+        if not 0 < laptime_est < DATA.MAX_SECONDS:
             laptime_est = laptime_session_best + delta_ema_session  # fallback to session
-            if not 0 < laptime_est < MAX_SECONDS:
+            if not 0 < laptime_est < DATA.MAX_SECONDS:
                 laptime_est = laptime_best + delta_ema_best  # fallback to best
-                if not 0 < laptime_est < MAX_SECONDS:
+                if not 0 < laptime_est < DATA.MAX_SECONDS:
                     laptime_est = 0
 
         # Output delta time data

@@ -45,7 +45,7 @@ from PySide2.QtWidgets import (
 
 from .. import app_signal, overlay_signal, realtime_state
 from ..api_control import api
-from ..const_file import FileFilter
+from ..constant import FILE
 from ..module_control import mctrl
 from ..module_info import minfo
 from ..setting import cfg
@@ -337,7 +337,7 @@ class PaceNotesControl(QWidget):
     def set_notes_path(self):
         """Set pace notes file path"""
         filepath = self.mcfg["pace_notes_file_name"]
-        filename_full = QFileDialog.getOpenFileName(self, dir=filepath, filter=FileFilter.TPPN)[0]
+        filename_full = QFileDialog.getOpenFileName(self, dir=filepath, filter=FILE.FILTER_TPPN)[0]
         if not filename_full:
             return
         self.file_selector.setText(filename_full)

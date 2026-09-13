@@ -31,7 +31,7 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..const_file import FileFilter
+from ..constant import FILE
 from ..main import log_stream
 from ._common import BaseDialog, CompactButton, UIScaler, singleton_dialog
 
@@ -129,7 +129,7 @@ class LogInfo(BaseDialog):
         filename_full = QFileDialog.getSaveFileName(
             self,
             dir="log",
-            filter=";;".join((FileFilter.TXT, FileFilter.LOG, FileFilter.ALL)),
+            filter=";;".join((FILE.FILTER_TXT, FILE.FILTER_LOG, FILE.FILTER_ALL)),
         )[0]
         if not filename_full:
             return

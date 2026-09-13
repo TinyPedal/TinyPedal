@@ -28,9 +28,7 @@ from typing import Callable
 from .. import calculation as calc
 from .. import realtime_state
 from ..api_control import api
-from ..const_api import API_RF2_NAME
-from ..const_common import DELTA_DEFAULT, DELTA_ZERO, FLOAT_INF
-from ..const_file import FileExt
+from ..constant import API, DATA, FILE
 from ..decorator import generator_init
 from ..module_info import FuelInfo, minfo
 from ..userfile.fuel_delta import load_fuel_delta_file, save_fuel_delta_file
@@ -57,7 +55,7 @@ class Realtime(DataModule):
             output=minfo.fuel,
             is_energy=False,
             filepath=self.cfg.path.fuel_delta,
-            extension=FileExt.FUEL,
+            extension=FILE.EXT_FUEL,
             min_delta_distance=self.mcfg["minimum_delta_distance"],
             fuel_density=max(self.mcfg["fuel_density"], 0.0),
         )
@@ -65,7 +63,7 @@ class Realtime(DataModule):
             output=minfo.energy,
             is_energy=True,
             filepath=self.cfg.path.energy_delta,
-            extension=FileExt.ENERGY,
+            extension=FILE.EXT_ENERGY,
             min_delta_distance=self.mcfg["minimum_delta_distance"],
             fuel_density=0.0,
         )
@@ -107,7 +105,7 @@ def detect_consumption_type(is_energy: bool) -> Callable:
         return telemetry_energy
     # Pure electric based vehicle
     if (
-        api.name == API_RF2_NAME
+        api.name == API.NAME_RF2
         and api.read.emotor.battery_charge() > 0
         and (api.read.engine.tank_capacity() == 1 or api.read.engine.tank_capacity() == 0)
     ):
@@ -183,13 +181,13 @@ def calc_consumption(
                 filepath=filepath,
                 filename=combo_name,
                 extension=extension,
-                defaults=(DELTA_DEFAULT, 0.0)
+                defaults=(DATA.DELTA_DEFAULT, 0.0)
             )
-            delta_array_raw = [DELTA_ZERO]  # distance, fuel used, laptime
-            delta_array_temp = DELTA_DEFAULT  # last lap temp
+            delta_array_raw = [DATA.DELTA_ZERO]  # distance, fuel used, laptime
+            delta_array_temp = DATA.DELTA_DEFAULT  # last lap temp
             delta_fuel = 0.0  # delta fuel consumption compare to last lap
 
-            amount_start = -FLOAT_INF  # start fuel reading
+            amount_start = -DATA.FLOAT_INF  # start fuel reading
             amount_last = 0.0  # last fuel reading
             amount_need_abs = 0.0  # total fuel (absolute) need to finish race
             amount_need_rel = 0.0  # total additional fuel (relative) need to finish race
@@ -205,7 +203,7 @@ def calc_consumption(
             used_est_less = 0.0  # estimate fuel consumption for one less pit stop
 
             last_elapsed_time = 0.0
-            last_lap_stime = FLOAT_INF  # last lap start time
+            last_lap_stime = DATA.FLOAT_INF  # last lap start time
             laps_left = 0.0  # amount laps left at current lap distance
             end_timer_laps_left = 0.0  # amount laps left from start of current lap to end of race timer
             pos_recorded = 0.0  # last recorded vehicle position
@@ -257,7 +255,7 @@ def calc_consumption(
                 ))
                 delta_array_temp = tuple(delta_array_raw)
                 validating = elapsed_time
-            delta_array_raw[:] = DELTA_DEFAULT
+            delta_array_raw[:] = DATA.DELTA_DEFAULT
             pos_last = pos_recorded = pos_curr
             used_last_raw = used_curr
             used_curr = 0
@@ -285,7 +283,7 @@ def calc_consumption(
                 api.read.timing.last_laptime() > 0):  # is valid laptime
                 used_last_valid = used_last_raw
                 delta_array_last = delta_array_temp
-                delta_array_temp = DELTA_DEFAULT
+                delta_array_temp = DATA.DELTA_DEFAULT
                 delayed_save = True
                 validating = 0
 

@@ -21,7 +21,7 @@ Tyre Wear Widget
 """
 
 from .. import calculation as calc
-from ..const_common import TEXT_NA
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -64,7 +64,7 @@ class Realtime(Overlay):
                 self.wcfg["font_color_warning"],
             )
             self.bars_remain = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -101,7 +101,7 @@ class Realtime(Overlay):
                 self.wcfg["font_color_warning"],
             )
             self.bars_diff = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -137,7 +137,7 @@ class Realtime(Overlay):
                 self.wcfg["font_color_warning"],
             )
             self.bars_live = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -173,7 +173,7 @@ class Realtime(Overlay):
                 self.wcfg["font_color_warning"],
             )
             self.bars_lock = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -209,7 +209,7 @@ class Realtime(Overlay):
                 self.wcfg["font_color_warning"],
             )
             self.bars_laps = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -245,7 +245,7 @@ class Realtime(Overlay):
                 self.wcfg["font_color_warning"],
             )
             self.bars_mins = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -281,7 +281,7 @@ class Realtime(Overlay):
                 self.wcfg["font_color_warning"],
             )
             self.bars_end = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

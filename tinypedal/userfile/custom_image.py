@@ -23,7 +23,7 @@ Custom image file function
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPainter, QPixmap
 
-from ..const_file import FileExt
+from ..constant import FILE
 from ..validator import image_exists
 
 
@@ -46,7 +46,7 @@ def exceeded_max_logo_width(
 
 
 def load_brand_logo_image(
-    filepath:str, filename: str, max_width: int, max_height: int, extension: str = FileExt.PNG
+    filepath:str, filename: str, max_width: int, max_height: int, extension: str = FILE.EXT_PNG
 ) -> QPixmap:
     """Load brand logo image (*.png)"""
     filename_full = f"{filepath}{filename}{extension}"
@@ -63,7 +63,7 @@ def load_brand_logo_image(
 
 
 def load_custom_image(
-    user_file: str, default_file: str, width: int = 0, height: int = 0, extension: str = FileExt.PNG
+    user_file: str, default_file: str, width: int = 0, height: int = 0, extension: str = FILE.EXT_PNG
 ) -> QPixmap:
     """Load custom image (*.png)
 

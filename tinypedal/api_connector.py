@@ -34,7 +34,7 @@ from .adapter import (
     rf2_reader,
     rf2_restapi,
 )
-from .const_api import API_LMU_NAME, API_LMULEGACY_NAME, API_RF2_NAME
+from .constant import API
 from .validator import bytes_to_str
 
 
@@ -75,7 +75,7 @@ class SimLMU(Connector):
         "_restapi",
         "_restapi_dataset",
     )
-    NAME = API_LMU_NAME
+    NAME = API.NAME_LMU
     LEGACY = False
 
     def __init__(self):
@@ -129,7 +129,7 @@ class SimRF2(Connector):
         "_restapi",
         "_restapi_dataset",
     )
-    NAME = API_RF2_NAME
+    NAME = API.NAME_RF2
     LEGACY = False
 
     def __init__(self):
@@ -164,7 +164,7 @@ class SimRF2(Connector):
         )
 
     def setup(self, config: dict):
-        if self.NAME == API_RF2_NAME:
+        if self.NAME == API.NAME_RF2:
             self._shmmapi.setPID(config["process_id"])
         self._shmmapi.setMode(config["access_mode"])
         self._shmmapi.setStateOverride(config["enable_active_state_override"])
@@ -185,7 +185,7 @@ class SimLMULegacy(SimRF2):
         "_restapi",
         "_restapi_dataset",
     )
-    NAME = API_LMULEGACY_NAME
+    NAME = API.NAME_LMULEGACY
     LEGACY = True
 
     def __init__(self):

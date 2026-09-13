@@ -23,8 +23,7 @@ API control
 import logging
 
 from . import api_connector, realtime_state
-from .const_api import API_MAP_ALIAS
-from .const_app import PLATFORM
+from .constant import API, PLATFORM
 from .setting import cfg
 
 logger = logging.getLogger(__name__)
@@ -152,7 +151,7 @@ class APIControl:
     @property
     def alias(self) -> str:
         """API alias name"""
-        return API_MAP_ALIAS[self._api.NAME]
+        return API.MAP_ALIAS[self._api.NAME]
 
 
 api = APIControl()

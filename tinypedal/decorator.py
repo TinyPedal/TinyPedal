@@ -118,8 +118,8 @@ def constantclass(cls):
     """Create immutable read-only constant class"""
 
     def wrap(cls):
-        if "__annotations__" not in cls.__dict__:
-            raise TypeError("missing __annotations__")
+        #if "__annotations__" not in cls.__dict__:
+        #    raise TypeError("missing __annotations__")
 
         cls_attrs = dict(cls.__dict__)
         # Add empty slots

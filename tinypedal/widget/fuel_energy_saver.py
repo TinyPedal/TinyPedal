@@ -25,7 +25,7 @@ from math import floor
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import ENERGY_TYPE_ID, MAX_SECONDS, TEXT_PLACEHOLDER
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -80,14 +80,14 @@ class Realtime(Overlay):
         # Target lap row
         self.bars_target_lap = self.set_rawtext(
             font=font_cap,
-            text=TEXT_PLACEHOLDER,
+            text=DATA.TEXT_PLACEHOLDER,
             width=bar_width,
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
             fg_color=self.wcfg["font_color_target_laps"],
             bg_color=self.wcfg["background_color_target_laps"],
             count=self.total_slot,
-            last=-MAX_SECONDS,
+            last=-DATA.MAX_SECONDS,
         )
 
         self.bars_target_lap[self.column_index_rate].text = "RATE"
@@ -105,13 +105,13 @@ class Realtime(Overlay):
 
         # Target consumption row
         self.bars_target_use = self.set_rawtext(
-            text=TEXT_PLACEHOLDER,
+            text=DATA.TEXT_PLACEHOLDER,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_target_consumption"],
             bg_color=self.wcfg["background_color_target_consumption"],
-            last=-MAX_SECONDS,
+            last=-DATA.MAX_SECONDS,
             count=self.total_slot,
         )
         self.set_grid_layout_table_row(
@@ -128,14 +128,14 @@ class Realtime(Overlay):
             self.wcfg["font_color_delta_consumption"],
         )
         self.bars_delta = self.set_rawtext(
-            text=TEXT_PLACEHOLDER,
+            text=DATA.TEXT_PLACEHOLDER,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.delta_color[2],
             bg_color=self.wcfg["background_color_delta_consumption"],
             count=self.total_slot,
-            last=-MAX_SECONDS,
+            last=-DATA.MAX_SECONDS,
         )
         self.set_grid_layout_table_row(
             layout=layout,
@@ -238,8 +238,8 @@ class Realtime(Overlay):
                 target_use = total_fuel_remaining / total_laps_target
                 delta = fuel_est - target_use
             else:
-                target_use = -MAX_SECONDS
-                delta = -MAX_SECONDS
+                target_use = -DATA.MAX_SECONDS
+                delta = -DATA.MAX_SECONDS
             self.update_target_use(self.bars_target_use[index], target_use, energy_type)
             self.update_delta(self.bars_delta[index], delta, energy_type)
 
@@ -248,12 +248,12 @@ class Realtime(Overlay):
         """Target consumption"""
         if target.last != data:
             target.last = data
-            if data > -MAX_SECONDS:
+            if data > -DATA.MAX_SECONDS:
                 if not energy_type:
                     data = self.unit_fuel(data)
                 use_text = f"{data:.{self.decimals_consumption}f}"[:self.char_width]
             else:
-                use_text = TEXT_PLACEHOLDER
+                use_text = DATA.TEXT_PLACEHOLDER
             target.text = use_text
             target.update()
 
@@ -261,13 +261,13 @@ class Realtime(Overlay):
         """Delta consumption between target & current"""
         if target.last != data:
             target.last = data
-            if data > -MAX_SECONDS:
+            if data > -DATA.MAX_SECONDS:
                 if not energy_type:
                     data = self.unit_fuel(data)
                 delta_text = f"{data:+.{self.decimals_delta}f}"[:self.char_width]
                 color_index = (data >= 0)
             else:
-                delta_text = TEXT_PLACEHOLDER
+                delta_text = DATA.TEXT_PLACEHOLDER
                 color_index = 2
             target.text = delta_text
             target.fg = self.delta_color[color_index]
@@ -284,7 +284,7 @@ class Realtime(Overlay):
         """Energy type"""
         if target.last != data:
             target.last = data
-            target.text = ENERGY_TYPE_ID[data > 0]
+            target.text = DATA.TYPE_ENERGY[data > 0]
             target.update()
 
     def update_pit_bias(self, target, data):

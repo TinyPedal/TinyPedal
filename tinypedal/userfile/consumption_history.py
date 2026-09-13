@@ -26,7 +26,7 @@ import csv
 import logging
 from typing import Sequence
 
-from ..const_file import FileExt
+from ..constant import FILE
 from ..module_info import ConsumptionData
 from ..validator import dict_value_type, invalid_save_name
 
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 def load_consumption_history_file(
-    filepath: str, filename: str, extension: str = FileExt.CONSUMPTION
+    filepath: str, filename: str, extension: str = FILE.EXT_CONSUMPTION
 ) -> tuple[ConsumptionData, ...]:
     """Load fuel/energy consumption history file (*.consumption)"""
     try:
@@ -56,7 +56,7 @@ def load_consumption_history_file(
 
 
 def save_consumption_history_file(
-    dataset: Sequence[ConsumptionData], filepath: str, filename: str, extension: str = FileExt.CONSUMPTION
+    dataset: Sequence[ConsumptionData], filepath: str, filename: str, extension: str = FILE.EXT_CONSUMPTION
 ) -> None:
     """Save fuel/energy consumption history file (*.consumption)"""
     if len(dataset) < 2 or invalid_save_name(filename):

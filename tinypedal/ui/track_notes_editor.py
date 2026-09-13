@@ -44,7 +44,7 @@ from PySide2.QtWidgets import (
 )
 
 from ..api_control import api
-from ..const_common import EMPTY_DICT
+from ..constant import DATA
 from ..setting import cfg
 from ..userfile.track_notes import (
     COLUMN_DISTANCE,
@@ -346,7 +346,7 @@ class TrackNotesEditor(BaseEditor):
             self.add_table_row(row_index, note_line)
         self._verify_enabled = True
 
-    def add_table_row(self, row_index: int, note_data: dict = EMPTY_DICT):
+    def add_table_row(self, row_index: int, note_data: dict = DATA.EMPTY_DICT):
         """Add new table row"""
         self.table_notes.insertRow(row_index)
         for column_index, fieldname in enumerate(self.notes_header):

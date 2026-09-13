@@ -23,7 +23,7 @@ Lap time history Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import TEXT_NOLAPTIME
+from ..constant import DATA
 from ..module_info import ConsumptionData, minfo
 from ._base import Overlay
 
@@ -112,7 +112,7 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_time = self.set_rawtext(
-                text=TEXT_NOLAPTIME,
+                text=DATA.TEXT_NOLAPTIME,
                 width=font_m.width * 8 + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

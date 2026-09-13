@@ -23,7 +23,7 @@ User file access function
 import logging
 import os
 
-from ..const_app import APP_NAME, PLATFORM
+from ..constant import APP, PLATFORM
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ def set_relative_path(filepath: str) -> str:
     return output_path
 
 
-def set_global_config_path(filepath: str) -> str:
+def set_global_config_path(filepath: str = APP.TINYPEDAL) -> str:
     """Set path for global configurable user files, create if not exist
 
     Default to APPDATA folder (AppData/Roaming) on Windows.
@@ -68,6 +68,7 @@ def set_global_config_path(filepath: str) -> str:
         return set_user_data_path(f"{os.getenv('APPDATA', '.')}\\{filepath}\\")
     # Linux
     from xdg import BaseDirectory as BD
+
     return BD.save_config_path(filepath) + "/"
 
 
@@ -81,7 +82,8 @@ def set_default_config_path(filepath: str) -> str:
         return filepath
     # Linux
     from xdg import BaseDirectory as BD
-    return BD.save_config_path(APP_NAME, filepath)
+
+    return BD.save_config_path(APP.TINYPEDAL, filepath)
 
 
 def set_default_data_path(filepath: str) -> str:
@@ -94,4 +96,5 @@ def set_default_data_path(filepath: str) -> str:
         return filepath
     # Linux
     from xdg import BaseDirectory as BD
-    return BD.save_data_path(APP_NAME, filepath)
+
+    return BD.save_data_path(APP.TINYPEDAL, filepath)

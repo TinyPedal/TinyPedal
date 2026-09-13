@@ -46,7 +46,7 @@ from PySide2.QtWidgets import (
 )
 
 from .. import regex_pattern as rxp
-from ..const_file import ConfigType
+from ..constant import CONFIG
 from ..formatter import format_option_name
 from ..setting import cfg
 from ._common import (
@@ -83,7 +83,7 @@ def get_font_list() -> list[str]:
     return QFontDatabase().families()
 
 
-@singleton_dialog(ConfigType.CONFIG)
+@singleton_dialog(CONFIG.TYPE_CONFIG)
 class FontConfig(BaseDialog):
     """Config global font setting"""
 
@@ -205,7 +205,7 @@ class FontConfig(BaseDialog):
         self.reloading()
 
 
-@singleton_dialog(ConfigType.CONFIG)
+@singleton_dialog(CONFIG.TYPE_CONFIG)
 class UserConfig(BaseDialog):
     """User configuration"""
 
@@ -224,7 +224,7 @@ class UserConfig(BaseDialog):
         Args:
             key_name: config key name.
             preset_name: preset name, can be file name.
-            config_type: config type name from "ConfigType"; set to "" for non-preset config type (apply only, without save button).
+            config_type: config type name from "CONFIG.TYPE*" constants; set to "" for non-preset config type (apply only, without save button).
             user_setting: user setting dictionary, ex. cfg.user.setting.
             default_setting: default setting dictionary, ex. cfg.default.setting.
             reload_func: config reload (callback) function.
@@ -274,7 +274,7 @@ class UserConfig(BaseDialog):
         layout_search.addWidget(button_clearsearch)
 
         # Button
-        has_display_order = (config_type == ConfigType.WIDGET and self.has_display_order())
+        has_display_order = (config_type == CONFIG.TYPE_WIDGET and self.has_display_order())
         if has_display_order:
             button_display_order = QPushButton("Configure Display Order")
             button_display_order.clicked.connect(self.open_display_order)
@@ -380,9 +380,9 @@ class UserConfig(BaseDialog):
         # Check saving type
         if self.config_type:
             # Save global settings
-            if self.config_type == ConfigType.CONFIG:
+            if self.config_type == CONFIG.TYPE_CONFIG:
                 cfg.update_path()
-                cfg.save(0, config_type=ConfigType.CONFIG)
+                cfg.save(0, config_type=CONFIG.TYPE_CONFIG)
             # Save user preset settings
             else:
                 cfg.save(0)
@@ -591,7 +591,7 @@ class UserConfig(BaseDialog):
 
 def set_preset_name(preset_name: str, config_type: str) -> str:
     """Set preset name"""
-    if config_type == ConfigType.CONFIG:
+    if config_type == CONFIG.TYPE_CONFIG:
         preset_name += " (global)"
     return preset_name
 

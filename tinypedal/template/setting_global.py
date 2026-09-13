@@ -20,8 +20,7 @@
 Default global (config) setting template
 """
 
-from ..const_api import API_DEFAULT_NAME
-from ..const_app import PLATFORM
+from ..constant import API, PLATFORM
 from ..userfile import set_default_config_path, set_default_data_path
 from ..version import __version__
 
@@ -61,7 +60,7 @@ GLOBAL_DEFAULT = {
         "multimedia_plugin_on_windows": "WMF",
     },
     "telemetry": {
-        "api_name": API_DEFAULT_NAME,
+        "api_name": API.NAME_LMU,
         "enable_api_selection_from_preset": True,
         "enable_auto_backup_car_setup": False,
         "enable_legacy_api_selection": False,

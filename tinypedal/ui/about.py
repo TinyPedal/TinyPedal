@@ -34,8 +34,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from ..const_app import APP_NAME, COPYRIGHT, DESCRIPTION, LICENSE, URL_WEBSITE, VERSION
-from ..const_file import ImageFile
+from ..constant import APP, FILE
 from ._common import BaseDialog, UIScaler, singleton_dialog
 
 logger = logging.getLogger(__name__)
@@ -50,7 +49,7 @@ class About(BaseDialog):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.setWindowTitle(f"About {APP_NAME}")
+        self.setWindowTitle(f"About {APP.TINYPEDAL}")
 
         # Tab
         main_tab = self.add_tabs()
@@ -73,9 +72,9 @@ class About(BaseDialog):
     def add_tabs(self):
         """Add tabs"""
         info_tab = self.new_about_tab()
-        ctrb_tab = self.new_text_tab(self.load_text_files("docs/contributors.md"))
-        lics_tab = self.new_text_tab(self.load_text_files("LICENSE.txt"))
-        tpan_tab = self.new_text_tab(self.load_text_files("docs/licenses/THIRDPARTYNOTICES.txt"))
+        ctrb_tab = self.new_text_tab(self.load_text_files(FILE.DOC_CONTRIBUTORS))
+        lics_tab = self.new_text_tab(self.load_text_files(FILE.DOC_LICENSE))
+        tpan_tab = self.new_text_tab(self.load_text_files(FILE.DOC_THIRDPARTYNOTICES))
         main_tab = QTabWidget(self)
         main_tab.addTab(info_tab, "About")
         main_tab.addTab(ctrb_tab, "Contributors")
@@ -92,8 +91,7 @@ class About(BaseDialog):
         except FileNotFoundError:
             logger.error("MISSING: %s file not found", filepath)
             error_text = "Error: file not found."
-            link_text = f"See link: {URL_WEBSITE}/blob/master/"
-            return f"{error_text} \n{link_text}{filepath}"
+            return f"{error_text} \nSee link: {APP.URL_SOURCECODE}{filepath}"
 
     def new_text_tab(self, text: str):
         """New text tab"""
@@ -107,7 +105,7 @@ class About(BaseDialog):
         new_tab = QWidget(self)
 
         # Logo
-        logo_image = QPixmap(ImageFile.APP_ICON)
+        logo_image = QPixmap(FILE.IMAGE_TINYPEDAL)
         logo_image = logo_image.scaledToHeight(UIScaler.size(9), mode=Qt.SmoothTransformation)
 
         label_logo = QLabel()
@@ -115,16 +113,16 @@ class About(BaseDialog):
         label_logo.setAlignment(Qt.AlignCenter)
 
         # Description
-        label_name = QLabel(APP_NAME)
+        label_name = QLabel(APP.TINYPEDAL)
         label_name.setObjectName("labelAppName")
         label_name.setAlignment(Qt.AlignCenter)
 
-        label_version = QLabel(f"Version {VERSION}")
+        label_version = QLabel(f"Version {APP.VERSION}")
         label_version.setAlignment(Qt.AlignCenter)
 
         label_desc = QLabel(
-            f"<p>{COPYRIGHT}</p><p>{DESCRIPTION}</p><p>{LICENSE}</p>"
-            f"<p><a href={URL_WEBSITE}>{URL_WEBSITE}</a></p>"
+            f"<p>{APP.COPYRIGHT}</p><p>{APP.DESCRIPTION}</p><p>{APP.LICENSE}</p>"
+            f"<p><a href={APP.URL_WEBSITE}>{APP.URL_WEBSITE}</a></p>"
         )
         label_desc.setAlignment(Qt.AlignCenter)
         label_desc.setOpenExternalLinks(True)

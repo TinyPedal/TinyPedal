@@ -23,7 +23,7 @@ Steering angle Widget
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
-from ..const_common import TEXT_NA
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 
@@ -59,7 +59,7 @@ class Realtime(Overlay):
         # Steering angle
         if self.wcfg["show_steering_angle"]:
             self.bar_steer_angle = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -74,7 +74,7 @@ class Realtime(Overlay):
         # Front wheel angle
         if self.wcfg["show_front_wheel_angle"]:
             self.bar_wheel_angle = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -89,7 +89,7 @@ class Realtime(Overlay):
         # Steering ratio
         if self.wcfg["show_steering_ratio"]:
             self.bar_steer_ratio = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -104,7 +104,7 @@ class Realtime(Overlay):
         # Ackermann percentage
         if self.wcfg["show_ackermann_percentage"]:
             self.bar_ackermann_percentage = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -133,7 +133,7 @@ class Realtime(Overlay):
                 ),
             )
             self.bar_diff_slip_angle = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -149,7 +149,7 @@ class Realtime(Overlay):
         # Yaw rate
         if self.wcfg["show_yaw_rate"]:
             self.bar_yaw_rate = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -164,7 +164,7 @@ class Realtime(Overlay):
         # Turning radius
         if self.wcfg["show_turning_radius"]:
             self.bar_turning_radius = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -179,7 +179,7 @@ class Realtime(Overlay):
         # Turning radius under slip angle
         if self.wcfg["show_turning_radius_under_slip_angle"]:
             self.bar_slip_radius = self.set_rawtext(
-                text=TEXT_NA,
+                text=DATA.TEXT_NA,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

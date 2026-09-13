@@ -31,7 +31,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from ..const_app import URL_RELEASE
+from ..constant import APP
 from ..setting import cfg
 from ..update import update_checker
 
@@ -143,7 +143,7 @@ class UpdatesNotifyButton(QPushButton):
 
     def open_release(self):
         """Open release link"""
-        QDesktopServices.openUrl(URL_RELEASE)
+        QDesktopServices.openUrl(APP.URL_RELEASE)
 
     @Slot(bool)  # type: ignore[operator]
     def checking(self, checking: bool):

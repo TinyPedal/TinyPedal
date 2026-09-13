@@ -39,8 +39,7 @@ from PySide2.QtWidgets import (
 )
 
 from .. import app_signal
-from ..const_app import PLATFORM
-from ..const_file import ConfigType, FileExt
+from ..constant import CONFIG, FILE, PLATFORM
 from ..formatter import format_option_name
 from ..hotkey.common import (
     format_hotkey_name,
@@ -115,10 +114,10 @@ class HotkeyList(QWidget):
             # Verify if file exists
             if not preset_name:
                 preset_name = "-"
-            elif not os.path.exists(f"{cfg.path.settings}{preset_name}{FileExt.JSON}"):
+            elif not os.path.exists(f"{cfg.path.settings}{preset_name}{FILE.EXT_JSON}"):
                 preset_name = "-"
                 cfg.user.shortcuts[option_name]["preset"] = ""
-                cfg.save(config_type=ConfigType.SHORTCUTS)
+                cfg.save(config_type=CONFIG.TYPE_SHORTCUTS)
             # Update name
             item.setText(f"{format_option_name(option_name)}: {preset_name}")
 
@@ -132,7 +131,7 @@ class HotkeyList(QWidget):
     def toggle_hotkey(self, checked: bool):
         """Toggle hotkey mode"""
         cfg.application["enable_global_hotkey"] = checked
-        cfg.save(config_type=ConfigType.CONFIG)
+        cfg.save(config_type=CONFIG.TYPE_CONFIG)
         kctrl.reload()
         app_signal.refresh.emit(True)
 
@@ -186,7 +185,7 @@ class HotkeyList(QWidget):
             # Clear all shortcuts
             for options in cfg.user.shortcuts.values():
                 options["bind"] = ""
-            cfg.save(0, config_type=ConfigType.SHORTCUTS)
+            cfg.save(0, config_type=CONFIG.TYPE_SHORTCUTS)
             # Refresh button
             listbox_hotkey = self.listbox_hotkey
             for row_index in range(listbox_hotkey.count()):
@@ -346,7 +345,7 @@ class ConfigHotkey(BaseDialog):
             cfg.user.shortcuts[self.option_name]["preset"] = preset_name
             save = True
         if save:
-            cfg.save(0, config_type=ConfigType.SHORTCUTS)
+            cfg.save(0, config_type=CONFIG.TYPE_SHORTCUTS)
             app_signal.refresh.emit(True)
         self.close()
 
