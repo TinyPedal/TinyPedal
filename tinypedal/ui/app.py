@@ -214,6 +214,7 @@ class AppWindow(QMainWindow):
         self.setWindowTitle(f"{APP.TINYPEDAL} v{APP.VERSION}")
         self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.last_style = None
+        self.closing = False
 
         # Status bar
         self.setStatusBar(StatusButtonBar(self))
@@ -370,6 +371,9 @@ class AppWindow(QMainWindow):
     @Slot(bool)  # type: ignore[operator]
     def quit_app(self):
         """Quit manager"""
+        if self.closing:  # one-time quit only
+            return
+        self.closing = True
         loader.close()  # must close this first
         self.save_window_state()
         self.__break_signal()
