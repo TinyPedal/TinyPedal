@@ -33,7 +33,7 @@ if __name__ == "__main__":  # local import check
     sys.path.append(".")
 
 if TYPE_CHECKING:  # for type checker only
-    from pyRfactor2SharedMemory import rf2_type as rf2_data
+    from thirdparty.pyRfactor2SharedMemory import rf2_type as rf2_data
 else:  # run time only
     from pyRfactor2SharedMemory import rf2_data
 

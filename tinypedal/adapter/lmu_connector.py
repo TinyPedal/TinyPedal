@@ -34,7 +34,7 @@ if __name__ == "__main__":  # local import check
     sys.path.append(".")
 
 if TYPE_CHECKING:  # for type checker only
-    from pyLMUSharedMemory import lmu_type as lmu_data
+    from thirdparty.pyLMUSharedMemory import lmu_type as lmu_data
 else:  # run time only
     from pyLMUSharedMemory import lmu_data
 
