@@ -33,11 +33,11 @@ if __name__ == "__main__":  # local import check
     sys.path.append(".")
 
 if TYPE_CHECKING:  # for type checker only
-    from pyRfactor2SharedMemory import rF2Type as rF2data
+    from pyRfactor2SharedMemory import rf2_type as rf2_data
 else:  # run time only
-    from pyRfactor2SharedMemory import rF2data
+    from pyRfactor2SharedMemory import rf2_data
 
-from pyRfactor2SharedMemory.rF2MMap import (
+from pyRfactor2SharedMemory.rf2_mmap import (
     INVALID_INDEX,
     MMapControl,
     rFactor2Constants,
@@ -56,7 +56,7 @@ def copy_struct(struct_data):
     )
 
 
-def local_scoring_index(scor_veh: Sequence[rF2data.rF2VehicleScoring]) -> int:
+def local_scoring_index(scor_veh: Sequence[rf2_data.rF2VehicleScoring]) -> int:
     """Find local player scoring index
 
     Args:
@@ -68,7 +68,7 @@ def local_scoring_index(scor_veh: Sequence[rF2data.rF2VehicleScoring]) -> int:
     return INVALID_INDEX
 
 
-def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[rF2data.LMUVehicleScoring]) -> int:
+def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[rf2_data.LMUVehicleScoring]) -> int:
     """Find local player scoring index by slot id
 
     Args:
@@ -92,11 +92,11 @@ class MMapDataSet:
     )
 
     def __init__(self) -> None:
-        self.scor = MMapControl(rFactor2Constants.MM_SCORING_FILE_NAME, rF2data.rF2Scoring)
-        self.tele = MMapControl(rFactor2Constants.MM_TELEMETRY_FILE_NAME, rF2data.rF2Telemetry)
-        self.ext = MMapControl(rFactor2Constants.MM_EXTENDED_FILE_NAME, rF2data.rF2Extended)
-        self.ffb = MMapControl(rFactor2Constants.MM_FORCE_FEEDBACK_FILE_NAME, rF2data.rF2ForceFeedback)
-        self.rule = MMapControl(rFactor2Constants.MM_RULES_FILE_NAME, rF2data.rF2Rules)
+        self.scor = MMapControl(rFactor2Constants.MM_SCORING_FILE_NAME, rf2_data.rF2Scoring)
+        self.tele = MMapControl(rFactor2Constants.MM_TELEMETRY_FILE_NAME, rf2_data.rF2Telemetry)
+        self.ext = MMapControl(rFactor2Constants.MM_EXTENDED_FILE_NAME, rf2_data.rF2Extended)
+        self.ffb = MMapControl(rFactor2Constants.MM_FORCE_FEEDBACK_FILE_NAME, rf2_data.rF2ForceFeedback)
+        self.rule = MMapControl(rFactor2Constants.MM_RULES_FILE_NAME, rf2_data.rF2Rules)
 
     def __del__(self):
         logger.info("sharedmemory: GC: MMapDataSet")
@@ -206,7 +206,7 @@ class SyncData:
         return True  # found index, synced
 
     @staticmethod
-    def __update_tele_indexes(veh_total: int, tele_data: rF2data.rF2Telemetry, tele_indexes: dict) -> None:
+    def __update_tele_indexes(veh_total: int, tele_data: rf2_data.rF2Telemetry, tele_indexes: dict) -> None:
         """Update telemetry player index dictionary for quick reference
 
         Telemetry index can be different from scoring index.
@@ -427,11 +427,11 @@ class RF2Info:
         self._sync.player_slot_id = max(index, INVALID_INDEX)
 
     @property
-    def rf2ScorInfo(self) -> rF2data.rF2ScoringInfo:
+    def rf2ScorInfo(self) -> rf2_data.rF2ScoringInfo:
         """rF2 scoring info data"""
         return self._scor.data.mScoringInfo
 
-    def rf2ScorVeh(self, index: int | None = None) -> rF2data.rF2VehicleScoring:
+    def rf2ScorVeh(self, index: int | None = None) -> rf2_data.rF2VehicleScoring:
         """rF2 scoring vehicle data
 
         Specify index for specific player.
@@ -443,7 +443,7 @@ class RF2Info:
             return self._sync.player_scor
         return self._scor.data.mVehicles[index]
 
-    def rf2TeleVeh(self, index: int | None = None) -> rF2data.rF2VehicleTelemetry:
+    def rf2TeleVeh(self, index: int | None = None) -> rf2_data.rF2VehicleTelemetry:
         """rF2 telemetry vehicle data
 
         Specify index for specific player.
@@ -456,17 +456,17 @@ class RF2Info:
         return self._tele.data.mVehicles[self._sync.sync_tele_index(index)]
 
     @property
-    def rf2Ext(self) -> rF2data.rF2Extended:
+    def rf2Ext(self) -> rf2_data.rF2Extended:
         """rF2 extended data"""
         return self._ext.data
 
     @property
-    def rf2Ffb(self) -> rF2data.rF2ForceFeedback:
+    def rf2Ffb(self) -> rf2_data.rF2ForceFeedback:
         """rF2 force feedback data"""
         return self._ffb.data
 
     @property
-    def rf2Rule(self) -> rF2data.rF2Rules:
+    def rf2Rule(self) -> rf2_data.rF2Rules:
         """rF2 Rules info data"""
         return self._rule.data
 
