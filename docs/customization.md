@@ -2924,7 +2924,7 @@ Show your current overall position against all drivers in a session.
 Show your current position in class against all drivers from the same class.
 
     show_track_limits_points
-Show current track cut points against total track limits points per penalty.
+Show current track cut points against total track limits points per penalty. This option only works for `LMU`.
 
     show_position_change
 Show overall driver position change relative to overall qualification position.
@@ -4002,6 +4002,9 @@ Note, incidents are counted from vehicle contacts and track cuts only for each i
 
     incidents_high_threshold, incidents_extreme_threshold
 Set threshold for showing color indication when number of incidents are equal or above.
+
+    show_track_limits_points
+Show driver's current track limits points. This option only works for `LMU`.
 
     show_speed_trap
 Show fastest recorded speed of each driver per lap at user-defined speed trap position on track. This option can be useful to keep track of each driver's straight line performance from most recent lap.

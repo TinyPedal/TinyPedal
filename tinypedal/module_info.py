@@ -483,6 +483,7 @@ class VehicleDataSet:
     energyRemaining: float = 0.0
     estimatedStintLaps: float = 0.0
     currentStintLaps: int = 0
+    trackLimitsPoints: float = 0.0
     licoTimer: LicoTimer = df_wrap(LicoTimer)
     pitTimer: PitTimer = df_wrap(PitTimer)
     speedTrap: SpeedTrap = df_wrap(SpeedTrap)

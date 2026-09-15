@@ -638,6 +638,32 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_incidents"],
                 hide_start=1,
             )
+        # Track limits points
+        if self.wcfg["show_track_limits_points"]:
+            self.bar_style_tlp = (
+                (
+                    self.wcfg["font_color_track_limits_points"],
+                    self.wcfg["background_color_track_limits_points"],
+                ),
+                (
+                    self.wcfg["font_color_player_track_limits_points"],
+                    self.wcfg["background_color_player_track_limits_points"],
+                ),
+            )
+            self.bars_tlp = self.set_rawtext(
+                width=4 * font_m.width + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_tlp[0][0],
+                bg_color=self.bar_style_tlp[0][1],
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_tlp,
+                column=self.wcfg["display_order_track_limits_points"],
+                hide_start=1,
+            )
         # Stint laps
         if self.wcfg["show_stint_laps"]:
             self.bar_style_stl = (
@@ -852,6 +878,9 @@ class Realtime(Overlay):
             # Incidents
             if self.wcfg["show_incidents"]:
                 self.update_icd(self.bars_icd[idx], veh_info.incidents, hi_player, state)
+            # Track limits points
+            if self.wcfg["show_track_limits_points"]:
+                self.update_tlp(self.bars_tlp[idx], veh_info.trackLimitsPoints, hi_player, state)
             # Stint laps
             if self.wcfg["show_stint_laps"]:
                 self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, hi_player, state)
@@ -1141,6 +1170,14 @@ class Realtime(Overlay):
                 text = f"x{score:d}"
             target.text = text
             target.fg, target.bg = self.bar_style_icd[color_index]
+            self.toggle_visibility(target, data[-1])
+
+    def update_tlp(self, target, *data):
+        """Track limits points"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{data[0]:.2f}"[:4]
+            target.fg, target.bg = self.bar_style_tlp[data[1]]
             self.toggle_visibility(target, data[-1])
 
     def update_stl(self, target, *data):
