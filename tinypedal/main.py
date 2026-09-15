@@ -96,7 +96,7 @@ def single_instance_check(is_single_instance: bool):
 
 
 def get_version():
-    """Get version info"""
+    """Get app & library version info"""
     logger.info("TinyPedal: %s", APP.VERSION)
     logger.info("Python: %s", version_check.python())
     logger.info("Qt: %s", version_check.qt())
@@ -185,11 +185,14 @@ def set_environment():
 
 def start_app(cli_args):
     """Init main window"""
-    single_instance_check(bool(cli_args.single_instance))
     unset_environment()
+    # Initialize logger
     set_logging_level(logger, cfg.path.config, FILE.LOG_APP, log_stream, cli_args.log_level)
+    # Check single instance
+    single_instance_check(bool(cli_args.single_instance))
+    # Version info
     get_version()
-    # load global config
+    # Load global config
     cfg.load_global()
     cfg.save(config_type=CONFIG.TYPE_CONFIG)
     cfg.save(config_type=CONFIG.TYPE_SHORTCUTS)
