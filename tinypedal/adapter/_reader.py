@@ -45,10 +45,6 @@ class State(ABC):
         """Number of player vehicle resets"""
 
     @abstractmethod
-    def desynced(self, index: int | None = None) -> bool:
-        """Is player data desynced from others"""
-
-    @abstractmethod
     def version(self) -> str:
         """Identify API version"""
 
@@ -219,10 +215,6 @@ class Inputs(ABC):
     @abstractmethod
     def steering_range_physical(self, index: int | None = None) -> float:
         """Steering physical rotation range (degrees)"""
-
-    @abstractmethod
-    def steering_range_visual(self, index: int | None = None) -> float:
-        """Steering visual rotation range (degrees)"""
 
     @abstractmethod
     def force_feedback(self) -> float:
@@ -569,10 +561,6 @@ class Tyre(ABC):
     __slots__ = ()
 
     @abstractmethod
-    def compound_index(self, index: int | None = None) -> tuple[int, ...]:
-        """Tyre compound index set"""
-
-    @abstractmethod
     def compound_name(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set"""
 
@@ -723,7 +711,7 @@ class Vehicle(ABC):
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""
 
     @abstractmethod
-    def orientation_yaw_radians(self, index: int | None = None) -> float:
+    def orientation_yaw(self, index: int | None = None) -> float:
         """Orientation yaw (radians)"""
 
     @abstractmethod
@@ -797,10 +785,6 @@ class Vehicle(ABC):
     @abstractmethod
     def impact_time(self, index: int | None = None) -> float:
         """Last impact time stamp (seconds)"""
-
-    @abstractmethod
-    def impact_magnitude(self, index: int | None = None) -> float:
-        """Last impact magnitude"""
 
     @abstractmethod
     def impact_position(self, index: int | None = None) -> tuple[float, float]:

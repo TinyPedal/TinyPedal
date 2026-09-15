@@ -79,14 +79,6 @@ class State(_reader.State, DataAdapter):
         """Number of player vehicle resets"""
         return self.shmm.vehicleResets
 
-    def desynced(self, index: int | None = None) -> bool:
-        """Is player data desynced from others"""
-        return (
-            abs(self.shmm.rf2TeleVeh().mElapsedTime
-            - self.shmm.rf2TeleVeh(index).mElapsedTime)
-            >= 0.01
-        )
-
     def version(self) -> str:
         """Identify API version"""
         version = tostr(self.shmm.rf2Ext.mVersion)
@@ -283,10 +275,6 @@ class Inputs(_reader.Inputs, DataAdapter):
         if rot_range <= 0:
             rot_range = self.rest.steeringWheelRange
         return rot_range
-
-    def steering_range_visual(self, index: int | None = None) -> float:
-        """Steering visual rotation range (degrees)"""
-        return rmnan(self.shmm.rf2TeleVeh(index).mVisualSteeringWheelRange)
 
     def force_feedback(self) -> float:
         """Steering force feedback (fraction)"""
@@ -731,13 +719,6 @@ class Tyre(_reader.Tyre, DataAdapter):
 
     __slots__ = ()
 
-    def compound_index(self, index: int | None = None) -> tuple[int, ...]:
-        """Tyre compound index set"""
-        tele_veh = self.shmm.rf2TeleVeh(index)
-        front = tele_veh.mFrontTireCompoundIndex
-        rear = tele_veh.mRearTireCompoundIndex
-        return front, front, rear, rear
-
     def compound_name(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set"""
         tele_veh = self.shmm.rf2TeleVeh(index)
@@ -987,7 +968,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
             return 3
         return 0
 
-    def orientation_yaw_radians(self, index: int | None = None) -> float:
+    def orientation_yaw(self, index: int | None = None) -> float:
         """Orientation yaw (radians)"""
         ori = self.shmm.rf2TeleVeh(index).mOri[2]
         return rmnan(oriyaw(ori.x, ori.z))
@@ -1073,10 +1054,6 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def impact_time(self, index: int | None = None) -> float:
         """Last impact time stamp (seconds)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mLastImpactET)
-
-    def impact_magnitude(self, index: int | None = None) -> float:
-        """Last impact magnitude"""
-        return rmnan(self.shmm.rf2TeleVeh(index).mLastImpactMagnitude)
 
     def impact_position(self, index: int | None = None) -> tuple[float, float]:
         """Last impact position x,y coordinates"""

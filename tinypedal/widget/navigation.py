@@ -227,7 +227,7 @@ class Realtime(Overlay):
         """Draw map image"""
         # Transform map coordinates
         # Player vehicle orientation yaw radians + 180 deg rotation correction
-        plr_ori_rad = api.read.vehicle.orientation_yaw_radians() + 3.14159265
+        plr_ori_rad = api.read.vehicle.orientation_yaw() + 3.14159265
         # x, y position & offset relative to player
         rot_pos_x, rot_pos_y = calc.rotate_coordinate(
             plr_ori_rad,   # plr_ori_rad, rotate view

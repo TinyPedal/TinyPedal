@@ -123,7 +123,7 @@ class Realtime(Overlay):
         )
 
         # Vehicle orientation yaw
-        temp_veh_ori_yaw = calc.degrees(api.read.vehicle.orientation_yaw_radians()) + 180
+        temp_veh_ori_yaw = calc.degrees(api.read.vehicle.orientation_yaw()) + 180
 
         # Direction of travel yaw angle
         if self.last_pos != pos_curr and speed > 1:

@@ -143,7 +143,7 @@ def update_vehicle_data(
     plr_timeinto_est = api.read.timing.estimated_time_into()
     plr_pos_x = api.read.vehicle.position_longitudinal()
     plr_pos_y = api.read.vehicle.position_lateral()
-    plr_ori_yaw = api.read.vehicle.orientation_yaw_radians()
+    plr_ori_yaw = api.read.vehicle.orientation_yaw()
 
     # Update dataset from all vehicles in current session
     for index, data in zip(range(output.totalVehicles), output.dataSet):
@@ -179,7 +179,7 @@ def update_vehicle_data(
             if data.elapsedTime != opt_etime:
                 opt_pos_x = api.read.vehicle.position_longitudinal(index)
                 opt_pos_y = api.read.vehicle.position_lateral(index)
-                opt_ori_yaw = api.read.vehicle.orientation_yaw_radians(index)
+                opt_ori_yaw = api.read.vehicle.orientation_yaw(index)
                 # Player data update rate may be (twice) higher than opponents
                 # Interpolate coordinates to avoid desync
                 est_pos_x, est_pos_y = calc.time_interp_coordinate(

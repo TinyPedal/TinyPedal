@@ -130,7 +130,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         # Compass
         if self.wcfg["show_compass"]:
-            orientation = api.read.vehicle.orientation_yaw_radians()
+            orientation = api.read.vehicle.orientation_yaw()
             self.update_compass(self.bar_compass, orientation)
 
         # Elevation
