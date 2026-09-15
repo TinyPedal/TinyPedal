@@ -92,7 +92,7 @@ def slotclass(cls):
     """Generate __slots__ from __annotations__ for custom data class"""
 
     def wrap(cls):
-        if "__annotations__" not in cls.__dict__:
+        if not hasattr(cls, "__annotations__"):
             raise TypeError("missing __annotations__")
 
         cls_attrs = dict(cls.__dict__)
@@ -118,7 +118,7 @@ def constantclass(cls):
     """Create immutable read-only constant class"""
 
     def wrap(cls):
-        #if "__annotations__" not in cls.__dict__:
+        #if not hasattr(cls, "__annotations__"):
         #    raise TypeError("missing __annotations__")
 
         cls_attrs = dict(cls.__dict__)

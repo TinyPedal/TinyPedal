@@ -31,19 +31,22 @@ from typing import TYPE_CHECKING, Sequence
 
 if __name__ == "__main__":  # local import check
     import sys
-    sys.path.append(".")
+    sys.path.append("thirdparty")
 
 if TYPE_CHECKING:  # for type checker only
-    from thirdparty.pyLMUSharedMemory import lmu_type as lmu_data
+    from thirdparty.pyLMUSharedMemory import lmu_data, lmu_enum
+    from thirdparty.pyLMUSharedMemory.lmu_mmap import (
+        INVALID_INDEX,
+        LMUConstants,
+        MMapControl,
+    )
 else:  # run time only
-    from pyLMUSharedMemory import lmu_data
-
-from pyLMUSharedMemory import lmu_enum
-from pyLMUSharedMemory.lmu_mmap import (
-    INVALID_INDEX,
-    LMUConstants,
-    MMapControl,
-)
+    from pyLMUSharedMemory import lmu_data, lmu_enum
+    from pyLMUSharedMemory.lmu_mmap import (
+        INVALID_INDEX,
+        LMUConstants,
+        MMapControl,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -473,7 +476,7 @@ class LMUInfo:
         """LMU scoring info data"""
         return self._shmm.data.scoring.scoringInfo
 
-    def lmuResults(self, index: int = INVALID_INDEX) -> dict[str, float]:
+    def lmuResults(self, index: int | None = INVALID_INDEX) -> dict[str, float]:
         """LMU results data"""
         if index is None:
             data = self._sync.player_scor

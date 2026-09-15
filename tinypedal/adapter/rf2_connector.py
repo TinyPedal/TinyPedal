@@ -30,18 +30,22 @@ from typing import TYPE_CHECKING, Sequence
 
 if __name__ == "__main__":  # local import check
     import sys
-    sys.path.append(".")
+    sys.path.append("thirdparty")
 
 if TYPE_CHECKING:  # for type checker only
-    from thirdparty.pyRfactor2SharedMemory import rf2_type as rf2_data
+    from thirdparty.pyRfactor2SharedMemory import rf2_data
+    from thirdparty.pyRfactor2SharedMemory.rf2_mmap import (
+        INVALID_INDEX,
+        MMapControl,
+        rFactor2Constants,
+    )
 else:  # run time only
     from pyRfactor2SharedMemory import rf2_data
-
-from pyRfactor2SharedMemory.rf2_mmap import (
-    INVALID_INDEX,
-    MMapControl,
-    rFactor2Constants,
-)
+    from pyRfactor2SharedMemory.rf2_mmap import (
+        INVALID_INDEX,
+        MMapControl,
+        rFactor2Constants,
+    )
 
 logger = logging.getLogger(__name__)
 
