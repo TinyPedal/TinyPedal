@@ -103,7 +103,7 @@ class Realtime(Overlay):
                 self.wcfg["font_color_phase_night"],
             )
             self.bar_phase_sign = self.set_rawtext(
-                text=DATA.TEXT_TREND_SIGN[0],
+                text=DATA.TREND_SIGN[0],
                 width=font_m.width + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -202,6 +202,6 @@ class Realtime(Overlay):
             elif data == 3:  # midnight
                 sign_index = 2
                 color_index = 1
-            target.text = DATA.TEXT_TREND_SIGN[sign_index]
+            target.text = DATA.TREND_SIGN[sign_index]
             target.fg = self.bar_style_phase[color_index]
             target.update()

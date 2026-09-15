@@ -150,7 +150,6 @@ class DATA:
     TEXT_NA = "n/a"
     TEXT_NOTAVAILABLE = "NOT AVAILABLE"
     TEXT_NOLAPTIME = "-:--.---"
-    TEXT_TREND_SIGN = "●▲▼"  # 0 = constant, 1 = increasing, -1 = decreasing
     CRLF = "\r\n"
 
     # Data set
@@ -165,6 +164,11 @@ class DATA:
     DATE_NA = (0, 0, 0)  # year, month, day
 
     # ID selector
+    TREND_SIGN = (
+        "●",  # 0 = constant
+        "▲",  # 1 = increasing
+        "▼",  # -1 = decreasing
+    )
     TYPE_ENERGY = (
         "FUEL",  # fuel
         "NRG",  # virtual energy
