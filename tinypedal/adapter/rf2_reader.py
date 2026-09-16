@@ -39,8 +39,8 @@ from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
 from . import _reader
-from .rf2_connector import RF2Info
 from .rf2_restapi import RestAPIData
+from .rf2_sharedmemory import RF2Info
 
 
 class DataAdapter:

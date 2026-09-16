@@ -17,5 +17,36 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-API data adapter
+API connector (abstract class)
 """
+
+from abc import ABC, abstractmethod
+
+from ._reader import APIDataReader
+
+
+class Connector(ABC):
+    """API Connector"""
+
+    __slots__ = ()
+
+    @abstractmethod
+    def start(self):
+        """Start API & load info access function"""
+
+    @abstractmethod
+    def stop(self):
+        """Stop API"""
+
+    @abstractmethod
+    def reader(self) -> APIDataReader:
+        """Data reader"""
+
+    @abstractmethod
+    def setup(self, config: dict):
+        """Setup API parameters"""
+
+    def close(self):
+        """Dereference all instances"""
+        for var in self.__slots__:
+            setattr(self, var, None)

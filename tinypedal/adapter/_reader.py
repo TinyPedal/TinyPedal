@@ -23,8 +23,41 @@ API data reader (abstract class)
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import NamedTuple
 
 from ..process.weather import WeatherNode
+
+
+class APIDataReader(NamedTuple):
+    """API data reader
+
+    Attributes:
+        state: State
+        brake: Brake
+        emotor: Electric motor
+        engine: Engine
+        inputs: Inputs
+        lap: Lap
+        session: Session
+        switch: Switch
+        timing: Timing
+        tyre: Tyre (front left, front right, rear left, rear right)
+        vehicle: Vehicle
+        wheel: Wheel & suspension (front left, front right, rear left, rear right)
+    """
+
+    state: State
+    brake: Brake
+    emotor: ElectricMotor
+    engine: Engine
+    inputs: Inputs
+    lap: Lap
+    session: Session
+    switch: Switch
+    timing: Timing
+    tyre: Tyre
+    vehicle: Vehicle
+    wheel: Wheel
 
 
 class State(ABC):

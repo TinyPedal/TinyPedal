@@ -39,8 +39,8 @@ from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
 from . import _reader
-from .lmu_connector import LMU_COMPOUND_TYPE, LMUInfo
 from .lmu_restapi import RestAPIData
+from .lmu_sharedmemory import LMU_COMPOUND_TYPE, LMUInfo
 
 
 class DataAdapter:

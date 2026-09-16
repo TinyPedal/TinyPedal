@@ -30,7 +30,7 @@ from ..process.garage import export_lmu_car_setup
 from ..process.vehicle import absolute_refilling, export_wheels, steerlock_to_number
 from ..process.weather import FORECAST_DEFAULT, WeatherNode, forecast_rf2
 from ..validator import valid_value_type
-from .restapi_connector import ResOutput, RestAPITask
+from ._restapi import ResOutput, RestAPITask
 
 logger = logging.getLogger(__name__)
 

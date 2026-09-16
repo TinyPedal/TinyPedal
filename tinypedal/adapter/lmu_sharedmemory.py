@@ -1,0 +1,581 @@
+#  TinyPedal is an open-source overlay application for racing simulation.
+#  Copyright (C) 2022-2026 TinyPedal developers, see contributors.md file
+#
+#  This file is part of TinyPedal.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+"""
+LMU sharedmemory API connector
+"""
+
+from __future__ import annotations
+
+import ctypes
+import logging
+import threading
+from time import monotonic, sleep
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Sequence
+
+if __name__ == "__main__":  # local import check
+    import sys
+    sys.path.append("thirdparty")
+
+if TYPE_CHECKING:  # for type checker only
+    from thirdparty.pyLMUSharedMemory import lmu_data, lmu_enum
+    from thirdparty.pyLMUSharedMemory.lmu_mmap import (
+        INVALID_INDEX,
+        LMUConstants,
+        MMapControl,
+    )
+else:  # run time only
+    from pyLMUSharedMemory import lmu_data, lmu_enum
+    from pyLMUSharedMemory.lmu_mmap import (
+        INVALID_INDEX,
+        LMUConstants,
+        MMapControl,
+    )
+
+logger = logging.getLogger(__name__)
+
+# Enum map
+LMU_COMPOUND_TYPE = lmu_enum.enum_map(lmu_enum.LMUCompoundType)
+
+
+def copy_struct(struct_data):
+    """Allow to copy ctypes struct data with __slots__"""
+    return type(struct_data).from_buffer_copy(
+        ctypes.string_at(
+            ctypes.byref(struct_data),
+            ctypes.sizeof(struct_data),
+        )
+    )
+
+
+def local_scoring_index(scor_veh: Sequence[lmu_data.LMUVehicleScoring]) -> int:
+    """Find local player scoring index
+
+    Args:
+        scor_veh: scoring vehicle array.
+    """
+    for scor_idx, veh_info in enumerate(scor_veh):
+        if veh_info.mIsPlayer:
+            return scor_idx
+    return INVALID_INDEX
+
+
+def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[lmu_data.LMUVehicleScoring]) -> int:
+    """Find local player scoring index by slot id
+
+    Args:
+        scor_veh: scoring array.
+    """
+    for scor_idx, veh_info in enumerate(scor_veh):
+        if veh_info.mID == slot_id:
+            return scor_idx
+    return INVALID_INDEX
+
+
+class LMUResults:
+    """LMU results data (extracted from results stream)"""
+
+    DEFAULT = MappingProxyType({
+        "contact_vehicle": 0,
+        "contact_immovable": 0,
+        "track_cut": 0,
+    })
+    __slots__ = (
+        "data",
+        "timestamp",
+        "_last_stream",
+    )
+
+    def __init__(self):
+        self.data = {}
+        self.timestamp = 0
+        self._last_stream = b""
+
+    def check_missing(self, driver: bytes):
+        """Check & add missing driver"""
+        if driver not in self.data:
+            self.data[driver] = self.DEFAULT.copy()
+
+    def update(self, stream: bytes):
+        """Update results data"""
+        # Check stream
+        if self._last_stream == stream:
+            return
+        self._last_stream = stream
+        if not stream:
+            return
+        # Parse stream
+        results_data = self.data
+        for line in stream.split(b"\n"):
+            if not line:
+                continue
+            # Log incidents
+            if line.startswith(b"<Incident"):
+                pos_beg = line.find(b">")
+                if pos_beg > 8:
+                    pos_beg += 1
+                    pos_end = line.find(b"(", pos_beg)
+                    driver = line[pos_beg:pos_end]
+                    self.check_missing(driver)
+                    if b"with another vehicle" in line:
+                        results_data[driver]["contact_vehicle"] += 1
+                    else:
+                        results_data[driver]["contact_immovable"] += 1
+                continue
+            # Log track cuts
+            if line.startswith(b"<TrackLimits"):
+                if b"No Further Action" not in line:
+                    pos_beg = line.find(b"Driver=")
+                    if pos_beg > 11:
+                        pos_beg += 8
+                        pos_end = line.find(b'"', pos_beg)
+                        driver = line[pos_beg:pos_end]
+                        self.check_missing(driver)
+                        results_data[driver]["track_cut"] += 1
+
+
+class MMapDataSet:
+    """Create mmap data set"""
+
+    __slots__ = (
+        "shmm",
+    )
+
+    def __init__(self) -> None:
+        self.shmm = MMapControl(LMUConstants.LMU_SHARED_MEMORY_FILE, lmu_data.LMUObjectOut)
+
+    def __del__(self):
+        logger.info("sharedmemory: GC: MMapDataSet")
+
+    def create_mmap(self, access_mode: int) -> None:
+        """Create mmap instance
+
+        Args:
+            access_mode: 0 = copy access, 1 = direct access.
+        """
+        self.shmm.create(access_mode)
+
+    def close_mmap(self) -> None:
+        """Close mmap instance"""
+        self.shmm.close()
+
+    def update_mmap(self) -> None:
+        """Update mmap data"""
+        self.shmm.update()
+
+
+class SyncData:
+    """Synchronize data with player ID
+
+    Attributes:
+        dataset: mmap data set.
+        paused: Is API data paused.
+        synced: Is player data synced.
+        resets: Number of player vehicle resets.
+        override_player_index: is player index overidden.
+        player_scor_index: Local player scoring index.
+        player_scor: Local player scoring data.
+        player_tele: Local player telemetry data.
+        results: data from result stream.
+    """
+
+    __slots__ = (
+        "_updating",
+        "_update_thread",
+        "_event",
+        "_tele_indexes",
+        "paused",
+        "synced",
+        "resets",
+        "override_player_index",
+        "player_slot_id",
+        "player_scor_index",
+        "player_scor",
+        "player_tele",
+        "dataset",
+        "results",
+    )
+
+    def __init__(self) -> None:
+        self._updating = False
+        self._update_thread = None
+        self._event = threading.Event()
+        self._tele_indexes = {_index: _index for _index in range(128)}
+
+        self.paused = False
+        self.synced = False
+        self.resets = 0
+        self.override_player_index = False
+        self.player_slot_id = INVALID_INDEX
+        self.player_scor_index = INVALID_INDEX
+        self.player_scor = None
+        self.player_tele = None
+        self.dataset = MMapDataSet()
+        self.results = LMUResults()
+
+    def __del__(self):
+        logger.info("sharedmemory: GC: SyncData")
+
+    def __sync_player_scor(self, scor_index: int = INVALID_INDEX) -> None:
+        """Sync local player vehicle scoring data"""
+        self.player_scor = self.dataset.shmm.data.scoring.vehScoringInfo[scor_index]
+
+    def __sync_player_tele(self, tele_index: int = INVALID_INDEX) -> None:
+        """Sync local player vehicle telemetry data"""
+        self.player_tele = self.dataset.shmm.data.telemetry.telemInfo[tele_index]
+
+    def __sync_player_data(self) -> bool:
+        """Sync local player data
+
+        Returns:
+            False, if no valid player scoring index found.
+            True, set player data.
+        """
+        # Update scoring index
+        if self.override_player_index:
+            scor_idx = local_scoring_index_by_id(self.player_slot_id, self.dataset.shmm.data.scoring.vehScoringInfo)
+        else:
+            scor_idx = local_scoring_index(self.dataset.shmm.data.scoring.vehScoringInfo)
+        if scor_idx == INVALID_INDEX:
+            return False  # index not found, not synced
+        self.player_scor_index = scor_idx
+        # Set player data
+        self.__sync_player_scor(self.player_scor_index)
+        self.__sync_player_tele(self.sync_tele_index(self.player_scor_index))
+        return True  # found index, synced
+
+    @staticmethod
+    def __update_tele_indexes(veh_total: int, tele_data: lmu_data.LMUTelemetryData, tele_indexes: dict) -> None:
+        """Update telemetry player index dictionary for quick reference
+
+        Telemetry index can be different from scoring index.
+        Use mID matching to match telemetry index.
+
+        Args:
+            tele_data: Telemetry data.
+            tele_indexes: Telemetry mID:index reference dictionary.
+        """
+        for tele_idx, veh_info in zip(range(veh_total), tele_data.telemInfo):
+            tele_indexes[veh_info.mID] = tele_idx
+
+    def sync_tele_index(self, scor_idx: int) -> int:
+        """Sync telemetry index
+
+        Use scoring index to find scoring mID,
+        then match with telemetry mID in reference dictionary
+        to find telemetry index.
+
+        Args:
+            scor_idx: Player scoring index.
+
+        Returns:
+            Player telemetry index.
+        """
+        return self._tele_indexes.get(
+            self.dataset.shmm.data.scoring.vehScoringInfo[scor_idx].mID, INVALID_INDEX)
+
+    def start(self, access_mode: int) -> None:
+        """Update & sync mmap data copy in separate thread
+
+        Args:
+            access_mode: 0 = copy access, 1 = direct access.
+        """
+        if self._updating:
+            logger.warning("sharedmemory: UPDATING: already started")
+        else:
+            self._updating = True
+            # Initialize mmap data
+            self.dataset.create_mmap(access_mode)
+            self.__update_tele_indexes(
+                self.dataset.shmm.data.scoring.scoringInfo.mNumVehicles,
+                self.dataset.shmm.data.telemetry,
+                self._tele_indexes,
+            )
+            if not self.__sync_player_data():
+                self.__sync_player_scor()
+                self.__sync_player_tele()
+            # Setup updating thread
+            self._event.clear()
+            self._update_thread = threading.Thread(target=self.__update, daemon=True)
+            self._update_thread.start()
+            logger.info("sharedmemory: UPDATING: thread started")
+            logger.info("sharedmemory: player index override: %s", self.override_player_index)
+
+    def stop(self) -> None:
+        """Join and stop updating thread, close mmap"""
+        if self._updating:
+            self._event.set()
+            self._updating = False
+            self._update_thread.join()
+            # Make final copy before close, otherwise mmap won't close if using direct access
+            self.player_scor = copy_struct(self.player_scor)
+            self.player_tele = copy_struct(self.player_tele)
+            self.dataset.close_mmap()
+        else:
+            logger.warning("sharedmemory: UPDATING: already stopped")
+
+    def __update(self) -> None:
+        """Update synced player data"""
+        self.paused = False  # make sure initial pause state is false
+        self.synced = False
+        self.resets = 0
+
+        _event_wait = self._event.wait
+        freezed_timestamp = 0  # store freezed timestamp
+        last_session_timestamp = 0  # store last timestamp
+        last_update_time = 0.0
+        data_freezed = True  # whether data is freezed
+        last_in_garage = False
+        last_slot_id = INVALID_INDEX
+        reset_counter = 0
+        update_delay = 0.5  # longer delay while inactive
+
+        while not _event_wait(update_delay):
+            self.dataset.update_mmap()
+            self.__update_tele_indexes(
+                self.dataset.shmm.data.scoring.scoringInfo.mNumVehicles,
+                self.dataset.shmm.data.telemetry,
+                self._tele_indexes,
+            )
+            session_timestamp = self.dataset.shmm.data.scoring.scoringInfo.mCurrentET
+
+            # Update player data & index
+            if not data_freezed:
+                # Get player data
+                data_synced = self.__sync_player_data()
+                # Pause if local player index no longer exists, 5 tries
+                if data_synced:
+                    reset_counter = 0
+                    self.synced = True
+                elif reset_counter < 6:
+                    reset_counter += 1
+                    if reset_counter == 5:
+                        self.player_scor_index = INVALID_INDEX
+                        self.__sync_player_scor()
+                        self.__sync_player_tele()
+                        self.synced = False
+                        logger.info("sharedmemory: UPDATING: player data paused")
+                # Result stream
+                if self.results.timestamp != session_timestamp:
+                    if self.results.timestamp > session_timestamp:
+                        self.results.data.clear()
+                    self.results.timestamp = session_timestamp
+                    self.results.update(self.dataset.shmm.data.scoring.scoringStream)
+
+            if last_session_timestamp != session_timestamp:
+                in_garage = self.player_scor.mInGarageStall
+                slot_id = self.player_scor.mID
+                if (
+                    last_session_timestamp > session_timestamp  # session changed
+                    or last_in_garage < in_garage  # returned to garage
+                    or last_slot_id != slot_id  # changed slot id
+                ):
+                    self.resets += 1
+
+                last_update_time = monotonic()
+                last_session_timestamp = session_timestamp
+                last_in_garage = in_garage
+                last_slot_id = slot_id
+
+            if data_freezed:
+                # Check while IN freeze state
+                if freezed_timestamp != last_session_timestamp:
+                    update_delay = 0.01
+                    self.paused = data_freezed = False
+                    logger.info(
+                        "sharedmemory: UPDATING: resumed, data timestamp %s",
+                        last_session_timestamp,
+                    )
+            # Check while NOT IN freeze state
+            # Set freeze state if data stopped updating after 2s
+            elif monotonic() - last_update_time > 2:
+                update_delay = 0.5
+                self.paused = data_freezed = True
+                self.synced = False
+                freezed_timestamp = last_session_timestamp
+                logger.info(
+                    "sharedmemory: UPDATING: paused, data timestamp %s",
+                    freezed_timestamp,
+                )
+
+        logger.info("sharedmemory: UPDATING: thread stopped")
+
+
+class LMUInfo:
+    """LMU shared memory data output"""
+
+    __slots__ = (
+        "_sync",
+        "_access_mode",
+        "_state_override",
+        "_active_state",
+        "_shmm",
+    )
+
+    def __init__(self) -> None:
+        self._sync = SyncData()
+        self._access_mode = 0
+        self._state_override = False
+        self._active_state = False
+        # Assign mmap instance
+        self._shmm = self._sync.dataset.shmm
+
+    def __del__(self):
+        logger.info("sharedmemory: GC: LMUInfo")
+
+    def start(self) -> None:
+        """Start data updating thread"""
+        self._sync.start(self._access_mode)
+
+    def stop(self) -> None:
+        """Stop data updating thread"""
+        self._sync.stop()
+
+    def setMode(self, mode: int = 0) -> None:
+        """Set LMU mmap access mode
+
+        Args:
+            mode: 0 = copy access, 1 = direct access
+        """
+        self._access_mode = mode
+
+    def setStateOverride(self, state: bool = False) -> None:
+        """Enable state override"""
+        self._state_override = state
+
+    def setActiveState(self, state: bool = False) -> None:
+        """Set state override"""
+        self._active_state = state
+
+    def setPlayerOverride(self, state: bool = False) -> None:
+        """Enable player index override state"""
+        self._sync.override_player_index = state
+
+    def setPlayerIndex(self, index: int = INVALID_INDEX) -> None:
+        """Manual override player index"""
+        self._sync.player_slot_id = max(index, INVALID_INDEX)
+
+    @property
+    def lmuScorInfo(self) -> lmu_data.LMUScoringInfo:
+        """LMU scoring info data"""
+        return self._shmm.data.scoring.scoringInfo
+
+    def lmuResults(self, index: int | None = INVALID_INDEX) -> dict[str, float]:
+        """LMU results data"""
+        if index is None:
+            data = self._sync.player_scor
+        else:
+            data = self._shmm.data.scoring.vehScoringInfo[index]
+        return self._sync.results.data.get(data.mDriverName, LMUResults.DEFAULT)
+
+    def lmuScorVeh(self, index: int | None = None) -> lmu_data.LMUVehicleScoring:
+        """LMU scoring vehicle data
+
+        Specify index for specific player.
+
+        Args:
+            index: None for local player.
+        """
+        if index is None:
+            return self._sync.player_scor
+        return self._shmm.data.scoring.vehScoringInfo[index]
+
+    def lmuTeleVeh(self, index: int | None = None) -> lmu_data.LMUVehicleTelemetry:
+        """LMU telemetry vehicle data
+
+        Specify index for specific player.
+
+        Args:
+            index: None for local player.
+        """
+        if index is None:
+            return self._sync.player_tele
+        return self._shmm.data.telemetry.telemInfo[self._sync.sync_tele_index(index)]
+
+    @property
+    def lmuGeneric(self) -> lmu_data.LMUGeneric:
+        """LMU generic data"""
+        return self._shmm.data.generic
+
+    @property
+    def playerIndex(self) -> int:
+        """Local player's scoring index"""
+        return self._sync.player_scor_index
+
+    @property
+    def isPaused(self) -> bool:
+        """Check whether data stopped updating"""
+        return self._sync.paused #or self._sync.player_scor_index < 0
+
+    @property
+    def isActive(self) -> bool:
+        """Check whether in active (driving or overriding) state"""
+        if self._state_override:
+            return self._active_state
+        return self._sync.synced and self._sync.player_scor_index >= 0 and (
+            self.lmuScorInfo.mInRealtime
+            or self.lmuTeleVeh().mIgnitionStarter > 0
+        )
+
+    @property
+    def vehicleResets(self) -> int:
+        """Number of player vehicle resets"""
+        return self._sync.resets
+
+
+def test_api():
+    """API test run"""
+    # Add logger
+    test_handler = logging.StreamHandler()
+    logger.setLevel(logging.INFO)
+    logger.addHandler(test_handler)
+
+    # Test run
+    SEPARATOR = "=" * 50
+    print("Test API - Start")
+    info = LMUInfo()
+    info.setMode(1)  # set direct access
+    info.setPlayerOverride(True)  # enable player override
+    info.setPlayerIndex(0)  # set player index to 0
+    info.start()
+    sleep(0.2)
+
+    print(SEPARATOR)
+    print("Test API - Restart")
+    info.stop()
+    info.setMode()  # set copy access
+    info.setPlayerOverride()  # disable player override
+    info.start()
+
+    print(SEPARATOR)
+    print("Test API - Read")
+    version = info.lmuGeneric.gameVersion
+    driver = info.lmuScorVeh(0).mDriverName.decode()
+    track = info.lmuScorInfo.mTrackName.decode()
+    print(f"version: {version if version else 'not running'}")
+    print(f"driver name   : {driver if version else 'not running'}")
+    print(f"track name    : {track if version else 'not running'}")
+
+    print(SEPARATOR)
+    print("Test API - Close")
+    info.stop()
+
+
+if __name__ == "__main__":
+    test_api()

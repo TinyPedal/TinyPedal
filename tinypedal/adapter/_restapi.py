@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-RestAPI module
+RestAPI connector
 """
 
 from __future__ import annotations

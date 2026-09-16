@@ -22,8 +22,12 @@ API control
 
 import logging
 
-from . import api_connector, realtime_state
-from .constant import API, PLATFORM
+from . import realtime_state
+from .adapter import (
+    lmu_connector,
+    rf2_connector,
+)
+from .constant import API
 from .setting import cfg
 
 logger = logging.getLogger(__name__)
@@ -31,21 +35,14 @@ logger = logging.getLogger(__name__)
 
 def _set_available_api(enable_legacy: bool):
     """Set available API"""
-    if PLATFORM.WINDOWS:
-        available_api = (
-            api_connector.SimLMU,
-            api_connector.SimLMULegacy,
-            api_connector.SimRF2,
-        )
-    else:
-        available_api = (
-            api_connector.SimLMU,
-            api_connector.SimLMULegacy,
-            api_connector.SimRF2,
-        )
+    available_api = (
+        lmu_connector.SimLMU,
+        rf2_connector.SimLMULegacy,
+        rf2_connector.SimRF2,
+    )
     # Sort API by name
     api_gen = (_api for _api in available_api if not _api.LEGACY or enable_legacy)
-    return tuple(sorted(api_gen, key=lambda _api:_api.NAME))
+    return tuple(sorted(api_gen, key=lambda _api: _api.NAME))
 
 
 class APIControl:

@@ -27,8 +27,8 @@ import logging
 from ..process.garage import export_rf2_car_setup
 from ..process.weather import FORECAST_DEFAULT, forecast_rf2
 from ..validator import valid_value_type
+from ._restapi import ResOutput, RestAPITask
 from .lmu_restapi import RestAPIData as RestAPIData
-from .restapi_connector import ResOutput, RestAPITask
 
 logger = logging.getLogger(__name__)
 
