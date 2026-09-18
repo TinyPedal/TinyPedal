@@ -242,11 +242,7 @@ class Inputs(ABC):
         """Steering raw (fraction)"""
 
     @abstractmethod
-    def steering_shaft_torque(self, index: int | None = None) -> float:
-        """Steering shaft torque (Nm)"""
-
-    @abstractmethod
-    def steering_range_physical(self, index: int | None = None) -> float:
+    def steering_range(self, index: int | None = None) -> float:
         """Steering physical rotation range (degrees)"""
 
     @abstractmethod
@@ -398,20 +394,8 @@ class Session(ABC):
         """
 
     @abstractmethod
-    def wetness_minimum(self) -> float:
-        """Road minimum wetness (fraction)"""
-
-    @abstractmethod
-    def wetness_maximum(self) -> float:
-        """Road maximum wetness (fraction)"""
-
-    @abstractmethod
-    def wetness_average(self) -> float:
-        """Road average wetness (fraction)"""
-
-    @abstractmethod
-    def wetness(self) -> tuple[float, float, float]:
-        """Road wetness set (fraction)"""
+    def wetness(self) -> float:
+        """Road wetness set (fraction), range 0.0 - 1.0"""
 
     @abstractmethod
     def weather_forecast(self) -> tuple[WeatherNode, ...]:

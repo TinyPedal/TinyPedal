@@ -265,11 +265,7 @@ class Inputs(_reader.Inputs, DataAdapter):
         """Steering raw (fraction)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mUnfilteredSteering)
 
-    def steering_shaft_torque(self, index: int | None = None) -> float:
-        """Steering shaft torque (Nm)"""
-        return rmnan(self.shmm.rf2TeleVeh(index).mSteeringShaftTorque)
-
-    def steering_range_physical(self, index: int | None = None) -> float:
+    def steering_range(self, index: int | None = None) -> float:
         """Steering physical rotation range (degrees)"""
         rot_range = rmnan(self.shmm.rf2TeleVeh(index).mPhysicalSteeringWheelRange)
         if rot_range <= 0:
@@ -476,24 +472,10 @@ class Session(_reader.Session, DataAdapter):
         """
         return rmnan(self.shmm.rf2ScorInfo.mRaining)
 
-    def wetness_minimum(self) -> float:
-        """Road minimum wetness (fraction)"""
-        return rmnan(self.shmm.rf2ScorInfo.mMinPathWetness)
-
-    def wetness_maximum(self) -> float:
-        """Road maximum wetness (fraction)"""
-        return rmnan(self.shmm.rf2ScorInfo.mMaxPathWetness)
-
-    def wetness_average(self) -> float:
-        """Road average wetness (fraction)"""
-        return rmnan(self.shmm.rf2ScorInfo.mAvgPathWetness)
-
-    def wetness(self) -> tuple[float, float, float]:
-        """Road wetness set (fraction)"""
+    def wetness(self) -> float:
+        """Road wetness set (fraction), range 0.0 - 1.0"""
         scor = self.shmm.rf2ScorInfo
-        return (rmnan(scor.mMinPathWetness),
-                rmnan(scor.mMaxPathWetness),
-                rmnan(scor.mAvgPathWetness))
+        return rmnan(scor.mAvgPathWetness + (scor.mMinPathWetness + scor.mMaxPathWetness) * 0.001)
 
     def weather_forecast(self) -> tuple[WeatherNode, ...]:
         """Weather forecast nodes"""

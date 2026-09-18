@@ -216,10 +216,10 @@ class Realtime(Overlay):
 
         # Surface wetness
         if self.wcfg["show_wetness"]:
-            wet_min, wet_max, wet_avg = api.read.session.wetness()
+            wetness = api.read.session.wetness()
             # Wetness percentage
-            if wet_avg >= 0.01 or not self.wcfg["show_rubber_coverage_while_dry"]:
-                self.update_wetness(self.bar_wetness, wet_avg)
+            if wetness >= 0.01 or not self.wcfg["show_rubber_coverage_while_dry"]:
+                self.update_wetness(self.bar_wetness, wetness)
             # Rubber coverage percentage
             else:
                 session_type = api.read.session.session_type()
@@ -230,7 +230,6 @@ class Realtime(Overlay):
                 self.update_rubber(self.bar_wetness, laps_session)
             # Wet trend
             if self.wcfg["show_trend"]:
-                wetness = wet_min + wet_max + wet_avg
                 wet_trend = self.wet_trend.update(wetness, lap_etime)
                 self.update_wetness_trend(self.bar_wetness_trend, wet_trend)
 

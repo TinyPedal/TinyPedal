@@ -197,7 +197,7 @@ class Realtime(Overlay):
         if self.wcfg["manual_steering_range"] > 0:
             steering_range = self.wcfg["manual_steering_range"]
         else:
-            steering_range = api.read.inputs.steering_range_physical()
+            steering_range = api.read.inputs.steering_range()
 
         steer_angle = api.read.inputs.steering_raw() * steering_range * 0.5
         wheel_angle_front_average = minfo.wheels.averageFrontToeAngle

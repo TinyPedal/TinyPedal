@@ -88,7 +88,7 @@ class Realtime(Overlay):
         if self.wcfg["manual_steering_range"] > 0:
             temp_rot_range = self.wcfg["manual_steering_range"]
         else:
-            temp_rot_range = api.read.inputs.steering_range_physical()
+            temp_rot_range = api.read.inputs.steering_range()
 
         # Recalculate scale mark
         if self.wcfg["show_scale_mark"] and self.rot_range != temp_rot_range:
