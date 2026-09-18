@@ -203,6 +203,10 @@ class Engine(ABC):
     def max_virtual_energy(self) -> float:
         """Maximum virtual energy (joule)"""
 
+    @abstractmethod
+    def absolute_refill(self) -> float:
+        """Absolute refill fuel (liter) or virtual energy (percent)"""
+
 
 class Inputs(ABC):
     """Inputs"""
@@ -714,10 +718,6 @@ class Vehicle(ABC):
     @abstractmethod
     def pit_stop_time(self) -> float:
         """Estimated pit stop time (seconds)"""
-
-    @abstractmethod
-    def absolute_refill(self) -> float:
-        """Absolute refill fuel (liter) or virtual energy (percent)"""
 
     @abstractmethod
     def repair_time(self) -> float:

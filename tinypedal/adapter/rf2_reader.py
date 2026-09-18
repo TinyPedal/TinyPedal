@@ -213,6 +213,11 @@ class Engine(_reader.Engine, DataAdapter):
 
     def fuel_fraction(self, index: int | None = None) -> float:
         """Remaining fuel (fraction)"""
+        data = self.shmm.rf2TeleVeh(index)
+        fuel = data.mFuel
+        capacity = data.mFuelCapacity
+        if fuel > 0 < capacity:
+            return fuel / capacity
         return self.shmm.rf2ScorVeh(index).mFuelFraction / 255
 
     def tank_capacity(self, index: int | None = None) -> float:
@@ -226,6 +231,10 @@ class Engine(_reader.Engine, DataAdapter):
     def max_virtual_energy(self) -> float:
         """Maximum virtual energy (joule)"""
         return 0.0
+
+    def absolute_refill(self) -> float:
+        """Absolute refill fuel (liter) or virtual energy (percent)"""
+        return self.rest.absoluteRefill
 
 
 class Inputs(_reader.Inputs, DataAdapter):
@@ -929,10 +938,6 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def pit_stop_time(self) -> float:
         """Estimated pit stop time (seconds)"""
         return self.rest.pitStopTime
-
-    def absolute_refill(self) -> float:
-        """Absolute refill fuel (liter) or virtual energy (percent)"""
-        return self.rest.absoluteRefill
 
     def repair_time(self) -> float:
         """Scheduled repair time (seconds)"""
