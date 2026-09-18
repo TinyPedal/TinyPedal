@@ -171,37 +171,36 @@ def record_driver_stats(
             delayed_save = True
 
             is_pit_lap = 0
-            last_lap_stime = DATA.FLOAT_INF
-            last_lap_etime = DATA.FLOAT_INF
-            last_best_laptime = DATA.FLOAT_INF
-            last_raw_laptime = DATA.FLOAT_INF
+            last_lap_number = DATA.MAX_LAPS
+            last_elapsed_time = DATA.FLOAT_INF
+            laptime_best = DATA.FLOAT_INF
             last_num_penalties = 99999
             fuel_last = 0.0
             last_finish_state = 99999
             gps_last = (DATA.FLOAT_INF, DATA.FLOAT_INF, DATA.FLOAT_INF)
 
         # General
-        lap_stime = api.read.timing.start()
-        lap_etime = api.read.timing.elapsed()
+        lap_number = api.read.lap.completed()
+        elapsed_time = api.read.timing.elapsed()
         is_pit_lap |= api.read.vehicle.in_pits()
         session_type = api.read.session.session_type()
+        laptime_curr = api.read.timing.current_laptime()
 
         # Best lap time
-        last_valid_laptime = api.read.timing.last_laptime()
-        if (last_best_laptime > last_valid_laptime > 1 and
-            abs(last_valid_laptime - last_raw_laptime) < 0.001):  # validate lap time
-            last_best_laptime = last_valid_laptime
+        laptime_last = api.read.timing.last_laptime()
+        if laptime_curr < 2 and laptime_best > laptime_last > 1:  # validate lap time
+            laptime_best = laptime_last
             # Personal best (any session)
-            if driver_stats.pb > last_valid_laptime:
-                driver_stats.pb = last_valid_laptime
+            if driver_stats.pb > laptime_last:
+                driver_stats.pb = laptime_last
             # Qualifying best
             if session_type == 2:
-                if driver_stats.qb > last_valid_laptime:
-                    driver_stats.qb = last_valid_laptime
+                if driver_stats.qb > laptime_last:
+                    driver_stats.qb = laptime_last
             # Race best
             elif session_type == 4:
-                if driver_stats.rb > last_valid_laptime:
-                    driver_stats.rb = last_valid_laptime
+                if driver_stats.rb > laptime_last:
+                    driver_stats.rb = laptime_last
 
         # Driven distance
         gps_curr = api.read.vehicle.position_xyz()
@@ -212,24 +211,23 @@ def record_driver_stats(
             gps_last = gps_curr
 
         # Laps complete
-        if last_lap_stime > lap_stime:
-            last_lap_stime = lap_stime
-        elif last_lap_stime < lap_stime and lap_etime - lap_stime > 2:
-            last_raw_laptime = lap_stime - last_lap_stime
-            if last_valid_laptime > 0: # valid lap check
+        if last_lap_number > lap_number:
+            last_lap_number = lap_number
+        elif last_lap_number < lap_number and laptime_curr > 2:
+            if laptime_last > 0: # valid lap check
                 driver_stats.valid += 1  # 1 lap at a time
             elif not is_pit_lap:  # only count non-pit invalid lap
                 driver_stats.invalid += 1
             is_pit_lap = 0
-            last_lap_stime = lap_stime
+            last_lap_number = lap_number
 
         # Seconds spent
-        if last_lap_etime > lap_etime:
-            last_lap_etime = lap_etime
-        elif last_lap_etime < lap_etime:
+        if last_elapsed_time > elapsed_time:
+            last_elapsed_time = elapsed_time
+        elif last_elapsed_time < elapsed_time:
             if api.read.vehicle.speed() > 1:  # while speed > 1m/s
-                driver_stats.seconds += lap_etime - last_lap_etime
-            last_lap_etime = lap_etime
+                driver_stats.seconds += elapsed_time - last_elapsed_time
+            last_elapsed_time = elapsed_time
 
         # Fuel consumed (liter)
         fuel_curr = api.read.engine.fuel()

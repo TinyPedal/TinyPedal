@@ -282,13 +282,10 @@ class Lap(_reader.Lap, DataAdapter):
 
     __slots__ = ()
 
-    def number(self, index: int | None = None) -> int:
-        """Current lap number"""
-        return self.shmm.rf2TeleVeh(index).mLapNumber
-
-    def completed_laps(self, index: int | None = None) -> int:
+    def completed(self, index: int | None = None) -> int:
         """Total completed laps"""
-        return self.shmm.rf2ScorVeh(index).mTotalLaps
+        # mLapNumber updates at higher rate than mTotalLaps, pick highest
+        return max(self.shmm.rf2TeleVeh(index).mLapNumber, self.shmm.rf2ScorVeh(index).mTotalLaps)
 
     def track_length(self) -> float:
         """Full lap or track length (meters)"""
@@ -613,13 +610,17 @@ class Timing(_reader.Timing, DataAdapter):
 
     __slots__ = ()
 
-    def start(self, index: int | None = None) -> float:
-        """Current lap start time (seconds)"""
+    def timestamp(self, index: int | None = None) -> float:
+        """Lap start timestamp (seconds)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mLapStartET)
 
     def elapsed(self, index: int | None = None) -> float:
-        """Current lap elapsed time (seconds)"""
+        """Current elapsed time (seconds)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mElapsedTime)
+
+    def is_last_valid(self, index: int | None = None) -> bool:
+        """Is last lap time valid"""
+        return self.shmm.rf2ScorVeh(index).mLastLapTime > 0
 
     def current_laptime(self, index: int | None = None) -> float:
         """Current lap time (seconds)"""

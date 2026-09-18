@@ -195,39 +195,48 @@ class DeltaLapTimeHistory:
 
     Attributes:
         data: Lap time array.
-        start: Last updated lap start timestamp.
+        start: Lap start timestamp.
+        laps: Last completed laps.
         best: Best lap time from recent laps.
         last: Last lap time, can be invalid.
         average: Average lap time from recent laps.
     """
 
     data: list[float] = df_list(0.0, 5)
-    start: float = 0.0
+    start: float = DATA.FLOAT_INF
+    laps: int = 0
     best: float = 0.0
     last: float = 0.0
     average: float = 0.0
 
-    def update(self, lap_start: float, elapsed_time: float, best_valid: float):
+    def update(self, timestamp: float, lap_number: int, best_valid: float):
         """Update delta lap time history"""
-        if self.start != lap_start and elapsed_time - lap_start > 1:
-            data = self.data
-            if 0 < self.start < lap_start:
-                data[0], data[1], data[2], data[3] = data[1], data[2], data[3], data[4]
-                data[4] = lap_start - self.start  # last lap time
-            else:  # reset all laptime on session change
-                data[0] = data[1] = data[2] = data[3] = data[4] = 0.0
-            self.start = lap_start
-            # Recalculate once per lap
-            if best_valid <= 0:
-                best_recent = DATA.MAX_SECONDS
-            else:
-                # Find best time from recent laps
-                best_recent = min(self._filter_laptime(best_valid))
-                if best_recent >= DATA.MAX_SECONDS:  # fallback to session best
-                    best_recent = best_valid
-            self.best = best_recent
-            self.average = self._average_laptime(self.best)
-            self.last = data[4]
+        if self.start == timestamp:
+            return
+        # Record laptime difference
+        laptime_last = timestamp - self.start
+        if laptime_last < 0:
+            laptime_last = DATA.MAX_SECONDS
+        # Update lap history
+        data = self.data
+        if 0 < self.laps < lap_number:
+            data[0], data[1], data[2], data[3] = data[1], data[2], data[3], data[4]
+            data[4] = laptime_last  # last lap time
+        else:  # reset all laptime on session change
+            data[0] = data[1] = data[2] = data[3] = data[4] = 0.0
+        self.laps = lap_number
+        self.start = timestamp
+        # Recalculate once per lap
+        if best_valid <= 0:
+            best_recent = DATA.MAX_SECONDS
+        else:
+            # Find best time from recent laps
+            best_recent = min(self._filter_laptime(best_valid))
+            if best_recent >= DATA.MAX_SECONDS:  # fallback to session best
+                best_recent = best_valid
+        self.best = best_recent
+        self.average = self._average_laptime(self.best)
+        self.last = data[4]
 
     def _average_laptime(self, laptime_best: float) -> float:
         """Calculate average lap time"""
@@ -265,15 +274,15 @@ class DeltaFuelHistory:
         laps: Last lap remaining laps.
     """
 
-    _last_lap_start: float = 0.0
+    _last_lap_number: int = -1
     _last_remaining: float = 0.0
     used: float = 0.0
     laps: float = 0.0
 
-    def update(self, lap_start: float, remaining: float):
+    def update(self, lap_number: int, remaining: float):
         """Update delta lap time history"""
-        if self._last_lap_start != lap_start:
-            if 0 < self._last_lap_start < lap_start:
+        if self._last_lap_number != lap_number:
+            if -1 < self._last_lap_number < lap_number:
                 if self._last_remaining > remaining:
                     self.used = self._last_remaining - remaining
                 self._last_remaining = remaining
@@ -281,7 +290,7 @@ class DeltaFuelHistory:
                     self.laps = remaining / self.used
             else:  # reset all laptime on session change
                 self.used = self.laps = self._last_remaining = 0.0
-            self._last_lap_start = lap_start
+            self._last_lap_number = lap_number
 
 
 @slotclass

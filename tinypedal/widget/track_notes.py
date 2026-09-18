@@ -113,7 +113,7 @@ class Realtime(Overlay):
         # Last data
         self.last_notes_index = None
         self.last_auto_hide = False
-        self.last_etime = 0
+        self.last_elapsed_time = 0
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -138,14 +138,14 @@ class Realtime(Overlay):
             if self.wcfg["maximum_display_duration"] <= 0:
                 self.update_auto_hide(False)
             else:
-                etime = api.read.timing.elapsed()
+                elapsed_time = api.read.timing.elapsed()
                 if self.last_notes_index != notes_index:
                     self.last_notes_index = notes_index
-                    self.last_etime = etime
-                if self.last_etime > etime:
-                    self.last_etime = etime
+                    self.last_elapsed_time = elapsed_time
+                if self.last_elapsed_time > elapsed_time:
+                    self.last_elapsed_time = elapsed_time
                 self.update_auto_hide(
-                    etime - self.last_etime > self.wcfg["maximum_display_duration"])
+                    elapsed_time - self.last_elapsed_time > self.wcfg["maximum_display_duration"])
         elif self.wcfg["enable_auto_hide_if_not_available"]:
             self.update_auto_hide(True)
             return

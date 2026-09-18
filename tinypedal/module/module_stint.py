@@ -126,7 +126,7 @@ def record_consumption_history(output: HistoryInfo, filepath: str):
             continue
 
         # Update consumption history
-        lap_number = api.read.lap.number()
+        lap_number = api.read.lap.completed()
         if (
             output.consumptionDataSet[0].lapTimeLast != minfo.delta.lapTimeLast
             or output.consumptionDataSet[0].lapNumber != lap_number
@@ -178,10 +178,11 @@ def record_stint_history(
     last_time_stop = 0.0
 
     # Stint consistency
-    pitting = 1
-    last_lap_stime = DATA.FLOAT_INF
-    stint_laps = 0
-    stint_time = 0.0
+    pitting = True
+    last_lap_number = DATA.FLOAT_INF
+    consistency_laps = 0
+    consistency_start = 0.0
+    consistency_time = 0.0
     stint_fastest = DATA.MAX_SECONDS
     consistency = 1.0
     delta = 0.0
@@ -190,8 +191,7 @@ def record_stint_history(
         reset = yield None
 
         # Read stint data
-        lap_stime = api.read.timing.start()
-        lap_number = api.read.lap.number()
+        lap_number = api.read.lap.completed()
         elapsed_time = api.read.session.elapsed()
         in_pits = api.read.vehicle.in_pits()
         wear_avg = 100 - sum(api.read.tyre.wear()) * 25
@@ -239,10 +239,11 @@ def record_stint_history(
             start_energy = energy_curr
             start_wear = wear_avg
             # Reset consistency
-            pitting = 1
-            last_lap_stime = DATA.FLOAT_INF
-            stint_laps = 0
-            stint_time = 0.0
+            pitting = True
+            last_lap_number = DATA.FLOAT_INF
+            consistency_laps = 0
+            consistency_start = 0.0
+            consistency_time = 0.0
             stint_fastest = DATA.MAX_SECONDS
             consistency = 1.0
             delta = 0.0
@@ -260,25 +261,22 @@ def record_stint_history(
         # Stint delta & consistency
         pitting |= in_pits
 
-        if last_lap_stime != lap_stime:
-            last_laptime = lap_stime - last_lap_stime
-            if (
-                not pitting
-                and last_laptime > 0
-                and max(api.read.tyre.carcass_temperature()) > minimum_tyre_temperature
-            ):
-                stint_laps += 1
-                stint_time += last_laptime
-                if stint_fastest > last_laptime:
-                    stint_fastest = last_laptime
-                if stint_laps > 1:
-                    stint_average = (stint_time - stint_fastest) / (stint_laps - 1)
+        if last_lap_number != lap_number and api.read.timing.current_laptime() > 2:
+            last_lap_number = lap_number
+            laptime_temp = elapsed_time - consistency_start
+            if not pitting and laptime_temp > 0 and max(api.read.tyre.carcass_temperature()) > minimum_tyre_temperature:
+                consistency_laps += 1
+                consistency_time += laptime_temp
+                laptime_last = api.read.timing.last_laptime()
+                if stint_fastest > laptime_last > 1:
+                    stint_fastest = laptime_last
+                if consistency_laps > 1:
+                    stint_average = (consistency_time - stint_fastest) / (consistency_laps - 1)
                     if stint_average > 0:
                         consistency = stint_fastest / stint_average
                         delta = stint_average - stint_fastest
-            # Reset
-            pitting = (last_laptime <= 0)
-            last_lap_stime = lap_stime
+            consistency_start = elapsed_time
+            pitting = in_pits
 
         # Current stint data
         stint_data.totalLaps = lap_number - start_laps

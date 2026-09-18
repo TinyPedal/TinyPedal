@@ -256,11 +256,7 @@ class Lap(ABC):
     __slots__ = ()
 
     @abstractmethod
-    def number(self, index: int | None = None) -> int:
-        """Current lap number"""
-
-    @abstractmethod
-    def completed_laps(self, index: int | None = None) -> int:
+    def completed(self, index: int | None = None) -> int:
         """Total completed laps"""
 
     @abstractmethod
@@ -508,12 +504,16 @@ class Timing(ABC):
     __slots__ = ()
 
     @abstractmethod
-    def start(self, index: int | None = None) -> float:
-        """Current lap start time (seconds)"""
+    def timestamp(self, index: int | None = None) -> float:
+        """Lap start timestamp (seconds)"""
 
     @abstractmethod
     def elapsed(self, index: int | None = None) -> float:
-        """Current lap elapsed time (seconds)"""
+        """Current elapsed time (seconds)"""
+
+    @abstractmethod
+    def is_last_valid(self, index: int | None = None) -> bool:
+        """Is last lap time valid"""
 
     @abstractmethod
     def current_laptime(self, index: int | None = None) -> float:

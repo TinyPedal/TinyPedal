@@ -203,7 +203,7 @@ def calc_consumption(
             used_est_less = 0.0  # estimate fuel consumption for one less pit stop
 
             last_elapsed_time = 0.0
-            last_lap_stime = DATA.FLOAT_INF  # last lap start time
+            last_lap_number = DATA.MAX_LAPS
             laps_left = 0.0  # amount laps left at current lap distance
             end_timer_laps_left = 0.0  # amount laps left from start of current lap to end of race timer
             pos_recorded = 0.0  # last recorded vehicle position
@@ -212,13 +212,12 @@ def calc_consumption(
 
         # Read telemetry
         capacity, amount_curr = telemetry_func()
-        lap_stime = api.read.timing.start()
+        lap_number = api.read.lap.completed()
         elapsed_time = api.read.timing.elapsed()
         laptime_curr = api.read.timing.current_laptime()
         time_left = api.read.session.remaining()
         in_garage = api.read.vehicle.in_garage()
         pos_curr = api.read.lap.distance()
-        laps_done = api.read.lap.completed_laps()
         lap_into = api.read.lap.progress()
         is_pit_lap |= api.read.vehicle.in_pits()
         laptime_pace = minfo.delta.lapTimePace
@@ -247,7 +246,7 @@ def calc_consumption(
                 output.rateOfConsumption = amount_diff / time_diff
 
         # Lap start & finish detection
-        if lap_stime > last_lap_stime:
+        if last_lap_number < lap_number:
             if not is_pit_lap and valid_delta_raw(delta_array_raw, used_curr, 1):
                 delta_array_raw.append((  # set end value
                     round6(pos_last + 10),
@@ -261,7 +260,7 @@ def calc_consumption(
             used_curr = 0
             recording = laptime_curr < 1
             is_pit_lap = 0
-        last_lap_stime = lap_stime  # reset
+        last_lap_number = lap_number  # reset
 
         # Distance desync check at start of new lap, reset if higher than normal distance
         if 0 < laptime_curr < 1 and pos_curr > 300:
@@ -279,8 +278,7 @@ def calc_consumption(
             timer = elapsed_time - validating
             if timer > 3:  # switch off after 3s
                 validating = 0
-            elif (timer > 0.3 and  # compare current time
-                api.read.timing.last_laptime() > 0):  # is valid laptime
+            elif timer > 0.3 and api.read.timing.is_last_valid():
                 used_last_valid = used_last_raw
                 delta_array_last = delta_array_temp
                 delta_array_temp = DATA.DELTA_DEFAULT
@@ -300,12 +298,12 @@ def calc_consumption(
 
         # Exclude first lap & pit in/out lap
         used_est = calc.end_lap_consumption(
-            used_last_valid, delta_fuel, 0 == is_pit_lap < laps_done)
+            used_last_valid, delta_fuel, 0 == is_pit_lap < lap_number)
 
         # Total refuel = laps left * last consumption - remaining fuel
         if api.read.session.finish_type(minfo.vehicles.finishAsLap):  # lap-type
             full_laps_left = calc.lap_type_full_laps_remain(
-                api.read.lap.maximum(), laps_done)
+                api.read.lap.maximum(), lap_number)
             laps_left = calc.lap_type_laps_remain(
                 full_laps_left, lap_into)
         elif laptime_pace > 0:  # time-type race

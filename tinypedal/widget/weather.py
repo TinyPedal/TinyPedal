@@ -190,7 +190,7 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        lap_etime = api.read.timing.elapsed()
+        elapsed_time = api.read.timing.elapsed()
 
         # Track temperature
         if self.wcfg["show_temperature"]:
@@ -201,7 +201,7 @@ class Realtime(Overlay):
             self.update_temperature(self.bar_temp, temperature, temp_track, temp_air)
             # Temperature trend
             if self.wcfg["show_trend"]:
-                temp_trend = self.temp_trend.update(round(temperature, 1), lap_etime)
+                temp_trend = self.temp_trend.update(round(temperature, 1), elapsed_time)
                 self.update_temperature_trend(self.bar_temp_trend, temp_trend)
 
         # Rain precipitation
@@ -211,7 +211,7 @@ class Realtime(Overlay):
             self.update_raininess(self.bar_rain, raininess)
             # Rain trend
             if self.wcfg["show_trend"]:
-                rain_trend = self.rain_trend.update(raininess, lap_etime)
+                rain_trend = self.rain_trend.update(raininess, elapsed_time)
                 self.update_raininess_trend(self.bar_raininess_trend, rain_trend)
 
         # Surface wetness
@@ -230,7 +230,7 @@ class Realtime(Overlay):
                 self.update_rubber(self.bar_wetness, laps_session)
             # Wet trend
             if self.wcfg["show_trend"]:
-                wet_trend = self.wet_trend.update(wetness, lap_etime)
+                wet_trend = self.wet_trend.update(wetness, elapsed_time)
                 self.update_wetness_trend(self.bar_wetness_trend, wet_trend)
 
     # GUI update methods
@@ -341,7 +341,7 @@ class TrendTimer:
 
         Args:
             reading: value.
-            elapsed_time: current lap elapsed time.
+            elapsed_time: current elapsed time.
 
         Returns:
             Trend, 0 = constant, 1 = increasing, -1 = decreasing.

@@ -157,7 +157,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         in_pits = api.read.vehicle.in_pits()
         tyre_life = sum(api.read.tyre.wear())
-        lap_num = api.read.lap.number()
+        lap_number = api.read.lap.completed()
         energy_type = minfo.energy.available
         pit_bias = 0.0
 
@@ -193,9 +193,9 @@ class Realtime(Overlay):
 
         if self.reset_stint:
             self.reset_stint = False
-            self.start_laps = lap_num
+            self.start_laps = lap_number
 
-        laps_done = max(lap_num - self.start_laps, 0)
+        laps_done = max(lap_number - self.start_laps, 0)
         # Total fuel remaining count from start of current lap
         total_fuel_remaining = max(fuel_curr + fuel_used_curr - self.min_reserve + pit_bias * fuel_est, 0)
         # Estimate laps current fuel can last, minus center slot offset

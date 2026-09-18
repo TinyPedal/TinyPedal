@@ -127,7 +127,7 @@ class Realtime(Overlay):
         # Last data
         self.last_in_pits = -1
         self.last_vehicle_name = None
-        self.last_lap_etime = 0
+        self.last_elapsed_time = 0
         self.off_brake_timer = 0
 
     def timerEvent(self, event):
@@ -151,18 +151,18 @@ class Realtime(Overlay):
 
         # Brake average temperature
         if self.wcfg["show_average"]:
-            lap_etime = api.read.timing.elapsed()
-            if self.last_lap_etime != lap_etime:
-                self.last_lap_etime = lap_etime
+            elapsed_time = api.read.timing.elapsed()
+            if self.last_elapsed_time != elapsed_time:
+                self.last_elapsed_time = elapsed_time
 
-                if self.off_brake_timer > lap_etime:
-                    self.off_brake_timer = lap_etime
+                if self.off_brake_timer > elapsed_time:
+                    self.off_brake_timer = elapsed_time
 
                 if api.read.inputs.brake_raw() > 0.01:
-                    self.off_brake_timer = lap_etime
+                    self.off_brake_timer = elapsed_time
 
                 # Update if braked in the past 1 second
-                if lap_etime - self.off_brake_timer <= self.off_brake_duration:
+                if elapsed_time - self.off_brake_timer <= self.off_brake_duration:
                     for brake_idx, bar_btavg in enumerate(self.bars_btavg):
                         btavg = self.calc_ema_btemp(bar_btavg.last, btemp[brake_idx])
                         self.update_btavg(bar_btavg, btavg)

@@ -127,9 +127,8 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Read Sector data
-        lap_stime = api.read.timing.start()
-        lap_etime = api.read.timing.elapsed()
-        laptime_curr = max(lap_etime - lap_stime, 0)
+        elapsed_time = api.read.timing.elapsed()
+        laptime_curr = api.read.timing.current_laptime()
 
         if self.wcfg["enable_all_time_best_sectors"]:
             data = minfo.sectors.allTimeBest
@@ -140,7 +139,7 @@ class Realtime(Overlay):
         if self.last_sector_idx != data.sectorIndex:
 
             # Activate freeze timer, reset sector index
-            self.freeze_timer_start = lap_etime
+            self.freeze_timer_start = elapsed_time
             self.last_sector_idx = data.sectorIndex
 
             # Previous sector index
@@ -175,7 +174,7 @@ class Realtime(Overlay):
         if self.freeze_timer_start:
             # Stop freeze timer after duration
             freeze_time = self.freeze_duration(data.sectorPrev[data.sectorIndex])
-            if lap_etime - self.freeze_timer_start >= freeze_time:
+            if elapsed_time - self.freeze_timer_start >= freeze_time:
                 self.freeze_timer_start = 0  # stop timer
                 # Update target time
                 self.update_time_target(self.bar_time_target, self.last_target_time)

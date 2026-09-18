@@ -177,27 +177,25 @@ class Realtime(Overlay):
             )
 
         # Last data
-        self.last_lap_etime = 0
-        self.last_lap_stime = 0
-        self.last_temp_oil = 0
-        self.last_temp_water = 0
+        self.last_elapsed_time = 0.0
+        self.last_lap_number = -1
+        self.last_temp_oil = 0.0
+        self.last_temp_water = 0.0
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        lap_stime = api.read.timing.start()
-        lap_etime = api.read.timing.elapsed()
+        lap_number = api.read.lap.completed()
+        elapsed_time = api.read.timing.elapsed()
+
+        new_lap = self.last_lap_number != lap_number
+        self.last_lap_number = lap_number
 
         interval = 0
-        if self.last_lap_etime > lap_etime:
-            self.last_lap_etime = lap_etime
-        elif lap_etime - self.last_lap_etime >= 0.1:
-            interval = self.rate_interval / (lap_etime - self.last_lap_etime)
-            self.last_lap_etime = lap_etime
-
-        new_lap = False
-        if self.last_lap_stime != lap_stime:
-            self.last_lap_stime = lap_stime
-            new_lap = True
+        if self.last_elapsed_time > elapsed_time:
+            self.last_elapsed_time = elapsed_time
+        elif elapsed_time - self.last_elapsed_time >= 0.1:
+            interval = self.rate_interval / (elapsed_time - self.last_elapsed_time)
+            self.last_elapsed_time = elapsed_time
 
         # Oil temperature
         if self.wcfg["show_oil_temperature"]:

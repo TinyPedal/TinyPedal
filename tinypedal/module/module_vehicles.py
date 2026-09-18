@@ -138,7 +138,7 @@ def update_vehicle_data(
 
     # Local player data
     plr_lap_distance = api.read.lap.distance()
-    plr_lap_progress_total = api.read.lap.completed_laps() + calc.lap_progress_distance(plr_lap_distance, track_length)
+    plr_lap_progress_total = api.read.lap.completed() + calc.lap_progress_distance(plr_lap_distance, track_length)
     plr_laptime_est = api.read.timing.estimated_laptime()
     plr_timeinto_est = api.read.timing.estimated_time_into()
     plr_pos_x = api.read.vehicle.position_longitudinal()
@@ -148,7 +148,7 @@ def update_vehicle_data(
     # Update dataset from all vehicles in current session
     for index, data in zip(range(output.totalVehicles), output.dataSet):
         # Temp var only
-        laps_completed = api.read.lap.completed_laps(index)
+        laps_completed = api.read.lap.completed(index)
         lap_distance = api.read.lap.distance(index)
         data.speed = speed = api.read.vehicle.speed(index)
 
@@ -157,6 +157,8 @@ def update_vehicle_data(
         data.inPit = api.read.vehicle.in_paddock(index)
         data.isYellow = speed < 8 and data.inPit != 2
         data.pitTimer.update(data.inPit, elapsed_time, laps_completed, speed)
+        if data.lapTimeHistory.laps != laps_completed:
+            data.lapTimeHistory.update(api.read.timing.timestamp(index), laps_completed, data.bestLapTime)
 
         if data.inPit:
             data.licoTimer.elapsed = 0.0
@@ -175,8 +177,8 @@ def update_vehicle_data(
                 nearest_yellow_behind = 0.0
         else:
             # Relative position & orientation
-            opt_etime = api.read.timing.elapsed(index)
-            if data.elapsedTime != opt_etime:
+            opt_elapsed_time = api.read.timing.elapsed(index)
+            if data.elapsedTime != opt_elapsed_time:
                 opt_pos_x = api.read.vehicle.position_longitudinal(index)
                 opt_pos_y = api.read.vehicle.position_lateral(index)
                 opt_ori_yaw = api.read.vehicle.orientation_yaw(index)
@@ -187,13 +189,13 @@ def update_vehicle_data(
                     data.worldPositionX,
                     opt_pos_y,
                     data.worldPositionY,
-                    opt_etime,
+                    opt_elapsed_time,
                     data.elapsedTime,
                     elapsed_time,
                 )
                 data.worldPositionX = opt_pos_x
                 data.worldPositionY = opt_pos_y
-                data.elapsedTime = opt_etime
+                data.elapsedTime = opt_elapsed_time
 
                 data.relativeOrientationRadians = opt_ori_yaw - plr_ori_yaw
                 data.relativeRotatedPositionX, data.relativeRotatedPositionY = calc.rotate_coordinate(
@@ -244,17 +246,13 @@ def update_vehicle_data(
             data.gapBehindLeaderInClass = calc_time_gap_behind(
                 opt_index_leader, index, output.dataSet[opt_index_leader].totalLapProgress - data.totalLapProgress)
 
-            lap_start_time = api.read.timing.start(index)
-            last_laptime = api.read.timing.last_laptime(index)
+            data.isValidLap = api.read.timing.is_last_valid()
+            data.lastLapTime = api.read.timing.last_laptime(index) if data.isValidLap else data.lapTimeHistory.last
             fuel_remaining = api.read.engine.fuel_fraction(index)
             energy_remaining = api.read.engine.virtual_energy(index)
 
-            data.lapTimeHistory.update(lap_start_time, elapsed_time, data.bestLapTime)
-            data.isValidLap = last_laptime > 0
-            data.lastLapTime = last_laptime if data.isValidLap else data.lapTimeHistory.last
-
-            data.fuelHistory.update(lap_start_time, fuel_remaining)
-            data.energyHistory.update(lap_start_time, energy_remaining)
+            data.fuelHistory.update(laps_completed, fuel_remaining)
+            data.energyHistory.update(laps_completed, energy_remaining)
             update_stint_usage(data, fuel_remaining, energy_remaining)
 
             # Update counter

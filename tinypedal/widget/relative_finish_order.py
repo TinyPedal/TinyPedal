@@ -217,8 +217,8 @@ class Realtime(Overlay):
 
         if finish_as_lap and leader_valid and player_valid:
             laps_total = api.read.lap.maximum()
-            leader_laps_left = laps_total - api.read.lap.completed_laps(leader_index) - leader_lap_into
-            player_laps_left = laps_total - api.read.lap.completed_laps() - player_lap_into
+            leader_laps_left = laps_total - api.read.lap.completed(leader_index) - leader_lap_into
+            player_laps_left = laps_total - api.read.lap.completed() - player_lap_into
             time_left = min(leader_laptime_pace, player_laptime_pace) * leader_laps_left
             laps_diff = player_laps_left - (time_left / player_laptime_pace)
         else:

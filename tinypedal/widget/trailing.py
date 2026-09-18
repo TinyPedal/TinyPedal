@@ -110,16 +110,16 @@ class Realtime(Overlay):
         self.draw_background()
 
         # Last data
-        self.last_lap_etime = -1
+        self.last_elapsed_time = -1
         self.update_plot = 0
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Use elapsed time to determine whether data paused
         # Add 1 extra update compensation
-        lap_etime = api.read.timing.elapsed()
-        if self.last_lap_etime != lap_etime:
-            self.last_lap_etime = lap_etime
+        elapsed_time = api.read.timing.elapsed()
+        if self.last_elapsed_time != elapsed_time:
+            self.last_elapsed_time = elapsed_time
             self.update_plot = self.max_paused_frames
 
         if self.update_plot >= 0:

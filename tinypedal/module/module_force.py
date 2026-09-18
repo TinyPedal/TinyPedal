@@ -147,7 +147,7 @@ def calc_force(
             delta_braking_rate = 0
 
         # Read telemetry
-        elapsed = api.read.timing.elapsed()
+        elapsed_time = api.read.timing.elapsed()
         lat_accel = api.read.vehicle.acceleration_lateral()
         lgt_accel = api.read.vehicle.acceleration_longitudinal()
         dforce_f = api.read.vehicle.downforce_front()
@@ -159,27 +159,27 @@ def calc_force(
         lat_gforce_raw = lat_accel / g_accel
 
         # Max G
-        max_lgt_gforce = calc_max_lgt.send((abs(lgt_gforce_raw), elapsed))
-        max_lat_gforce = calc_max_lat.send((abs(lat_gforce_raw), elapsed))
+        max_lgt_gforce = calc_max_lgt.send((abs(lgt_gforce_raw), elapsed_time))
+        max_lat_gforce = calc_max_lat.send((abs(lat_gforce_raw), elapsed_time))
 
         # Max average lateral G
         avg_lat_gforce_ema = calc_ema_gforce(
             avg_lat_gforce_ema,
             min(abs(lat_gforce_raw), avg_lat_gforce_ema + max_g_diff)
         )
-        max_avg_lat_gforce = calc_max_avg_lat.send((avg_lat_gforce_ema, elapsed))
+        max_avg_lat_gforce = calc_max_avg_lat.send((avg_lat_gforce_ema, elapsed_time))
 
         # Downforce
         dforce_ratio = calc.force_ratio(dforce_f, dforce_f + dforce_r)
 
         # Braking rate (longitudinal G force)
-        if brake_raw > 0.02 and elapsed - api.read.vehicle.impact_time() > 2:
+        if brake_raw > 0.02 and elapsed_time - api.read.vehicle.impact_time() > 2:
             braking_rate = lgt_gforce_raw
         else:
             braking_rate = 0.0
 
-        max_transient_rate = calc_max_transient_rate.send((braking_rate, elapsed))
-        temp_max_rate = calc_max_braking_rate.send((max_transient_rate, elapsed))
+        max_transient_rate = calc_max_transient_rate.send((braking_rate, elapsed_time))
+        temp_max_rate = calc_max_braking_rate.send((max_transient_rate, elapsed_time))
         if max_transient_rate > 0:
             delta_braking_rate = max_transient_rate - max_braking_rate
         else:  # Set after reset max_transient_rate

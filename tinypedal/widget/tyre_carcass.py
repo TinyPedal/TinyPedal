@@ -163,7 +163,7 @@ class Realtime(Overlay):
         self.last_in_pits = -1
         self.last_compounds = ("", "", "", "")
         self.last_rtemp = list(DATA.WHEELS_ZERO)
-        self.last_lap_etime = 0
+        self.last_elapsed_time = 0
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -192,13 +192,13 @@ class Realtime(Overlay):
 
         # Rate of change
         if self.wcfg["show_rate_of_change"]:
-            lap_etime = api.read.timing.elapsed()
+            elapsed_time = api.read.timing.elapsed()
 
-            if self.last_lap_etime > lap_etime:
-                self.last_lap_etime = lap_etime
-            elif lap_etime - self.last_lap_etime >= 0.1:
-                interval = self.rate_interval / (lap_etime - self.last_lap_etime)
-                self.last_lap_etime = lap_etime
+            if self.last_elapsed_time > elapsed_time:
+                self.last_elapsed_time = elapsed_time
+            elif elapsed_time - self.last_elapsed_time >= 0.1:
+                interval = self.rate_interval / (elapsed_time - self.last_elapsed_time)
+                self.last_elapsed_time = elapsed_time
 
                 for tyre_idx, bar_rdiff in enumerate(self.bars_rdiff):
                     rdiff = self.calc_ema_rdiff(

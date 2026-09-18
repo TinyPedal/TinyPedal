@@ -121,7 +121,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         # Read speed data
         speed = api.read.vehicle.speed()
-        lap_etime = api.read.timing.elapsed()
+        elapsed_time = api.read.timing.elapsed()
         raw_throttle = api.read.inputs.throttle_raw()
 
         # Update current speed
@@ -132,22 +132,22 @@ class Realtime(Overlay):
         if self.wcfg["show_speed_minimum"] and raw_throttle < self.wcfg["off_throttle_threshold"]:
             if speed < self.speed_min:
                 self.speed_min = speed
-                self.off_throttle_timer_start = lap_etime
+                self.off_throttle_timer_start = elapsed_time
                 self.update_speed(self.bar_speed_min, speed)
-            if self.off_throttle_timer_start > lap_etime:
-                self.off_throttle_timer_start = lap_etime
-            if lap_etime - self.off_throttle_timer_start > self.wcfg["speed_minimum_reset_cooldown"]:
+            if self.off_throttle_timer_start > elapsed_time:
+                self.off_throttle_timer_start = elapsed_time
+            if elapsed_time - self.off_throttle_timer_start > self.wcfg["speed_minimum_reset_cooldown"]:
                 self.speed_min = speed
 
         # Update maximum speed on throttle
         if self.wcfg["show_speed_maximum"] and raw_throttle > self.wcfg["on_throttle_threshold"]:
             if speed > self.speed_max:
                 self.speed_max = speed
-                self.on_throttle_timer_start = lap_etime
+                self.on_throttle_timer_start = elapsed_time
                 self.update_speed(self.bar_speed_max, speed)
-            if self.on_throttle_timer_start > lap_etime:
-                self.on_throttle_timer_start = lap_etime
-            if lap_etime - self.on_throttle_timer_start > self.wcfg["speed_maximum_reset_cooldown"]:
+            if self.on_throttle_timer_start > elapsed_time:
+                self.on_throttle_timer_start = elapsed_time
+            if elapsed_time - self.on_throttle_timer_start > self.wcfg["speed_maximum_reset_cooldown"]:
                 self.speed_max = speed
 
         # Update fastest speed

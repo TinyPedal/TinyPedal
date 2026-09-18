@@ -435,16 +435,16 @@ class Realtime(Overlay):
         if self.wcfg["enable_radar_fade"]:
             return is_nearby
         # Start auto hide timer
-        lap_etime = api.read.timing.elapsed()
+        elapsed_time = api.read.timing.elapsed()
         if is_nearby:
-            self.autohide_timer_start = lap_etime
+            self.autohide_timer_start = elapsed_time
             return True
         # Update auto hide timer
         if not self.autohide_timer_start:
             return False
-        if self.autohide_timer_start > lap_etime:
-            self.autohide_timer_start = lap_etime
-        if lap_etime - self.autohide_timer_start > self.wcfg["auto_hide_time_threshold"]:
+        if self.autohide_timer_start > elapsed_time:
+            self.autohide_timer_start = elapsed_time
+        if elapsed_time - self.autohide_timer_start > self.wcfg["auto_hide_time_threshold"]:
             self.autohide_timer_start = 0
             return False
         return True

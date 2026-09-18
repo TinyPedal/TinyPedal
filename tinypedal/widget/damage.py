@@ -129,9 +129,11 @@ class Realtime(Overlay):
                 self.last_impact_expired = False
                 update_later = True
 
-            if (not self.last_impact_expired and
-                api.read.timing.elapsed() - self.last_impact_time
-                > self.wcfg["last_impact_cone_duration"]):
+            if (
+                not self.last_impact_expired
+                and api.read.timing.elapsed() - self.last_impact_time
+                > self.wcfg["last_impact_cone_duration"]
+            ):
                 self.last_impact_expired = True
                 update_later = True
 

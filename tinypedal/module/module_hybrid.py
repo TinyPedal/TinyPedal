@@ -80,20 +80,20 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
                 continue
             last_reset = reset
 
-            battery_drain = 0
-            battery_regen = 0
-            battery_drain_last = 0
-            battery_regen_last = 0
-            last_battery_charge = 0
+            battery_drain = 0.0
+            battery_regen = 0.0
+            battery_drain_last = 0.0
+            battery_regen_last = 0.0
+            last_battery_charge = 0.0
             last_motor_state = 0
             alt_motor_state = 1  # alternative state in case motor state not available
             alt_motor_state_debounce = 0  # alternative state reset debounce counter
-            motor_active_timer = 0
+            motor_active_timer = 0.0
             motor_active_timer_start = False
             motor_inactive_timer = DATA.MAX_SECONDS
             motor_inactive_timer_start = False
-            lap_etime_last = 0
-            last_lap_stime = DATA.FLOAT_INF  # last lap start time
+            last_elapsed_time = 0.0
+            last_lap_number = DATA.MAX_LAPS
 
             delta_reset = False
             delta_recording = False
@@ -106,20 +106,20 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
             is_valid_delta = False
 
         # Read telemetry
-        lap_stime = api.read.timing.start()
-        lap_etime = api.read.timing.elapsed()
+        lap_number = api.read.lap.completed()
+        elapsed_time = api.read.timing.elapsed()
         battery_charge = api.read.emotor.battery_charge() * 100
         motor_state = api.read.emotor.state()
 
         # Lap start & finish detection
-        if lap_stime > last_lap_stime:
+        if last_lap_number < lap_number:
             battery_drain_last = battery_drain
             battery_regen_last = battery_regen
             battery_drain = 0
             battery_regen = 0
             motor_active_timer = 0
             delta_reset = True
-        last_lap_stime = lap_stime  # reset
+        last_lap_number = lap_number  # reset
 
         # Battery charge consumption
         if last_battery_charge:
@@ -144,19 +144,19 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
         # Active timer
         if last_motor_state != motor_state and motor_state == 2:
             motor_active_timer_start = True
-            lap_etime_last = lap_etime
+            last_elapsed_time = elapsed_time
             last_motor_state = motor_state
 
         if motor_active_timer_start:
-            motor_active_timer += lap_etime - lap_etime_last
-            lap_etime_last = lap_etime
+            motor_active_timer += elapsed_time - last_elapsed_time
+            last_elapsed_time = elapsed_time
             if motor_state != 2:
                 motor_active_timer_start = False
-                motor_inactive_timer_start = lap_etime
+                motor_inactive_timer_start = elapsed_time
                 last_motor_state = motor_state
 
         if motor_inactive_timer_start:
-            motor_inactive_timer = lap_etime - motor_inactive_timer_start
+            motor_inactive_timer = elapsed_time - motor_inactive_timer_start
             if motor_state == 2:
                 motor_inactive_timer_start = False
                 motor_inactive_timer = DATA.MAX_SECONDS

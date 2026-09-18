@@ -178,13 +178,7 @@ def record_track_map(output: MappingInfo, filepath: str):
     """Record map data"""
     last_reset = None  # reset check
 
-    recording = False
-    validating = False
-    last_sector_idx = -1
-    last_lap_stime = -1.0  # last lap start time
-    pos_last = 0.0  # last checked player vehicle position
     # File info
-    map_exist = False
     last_modified = 0.0
     filename = ""
     # Map data
@@ -236,16 +230,16 @@ def record_track_map(output: MappingInfo, filepath: str):
             recording = False
             validating = False
             last_sector_idx = -1
-            last_lap_stime = DATA.FLOAT_INF
-            pos_last = 0.0
+            last_lap_number = DATA.MAX_LAPS
+            pos_last = 0.0  # last checked player vehicle position
 
         # Recording map data
         if map_exist:
             continue
 
         # Lap start & finish detection
-        lap_stime = api.read.timing.start()
-        if lap_stime > last_lap_stime:
+        lap_number = api.read.lap.completed()
+        if last_lap_number < lap_number:
             # End recording
             if recorder_data.is_valid():
                 temp_data.coords = tuple(recorder_data.coords)
@@ -257,13 +251,13 @@ def record_track_map(output: MappingInfo, filepath: str):
             pos_last = 0
             recording = True
             #logger.info("map recording")
-        last_lap_stime = lap_stime
+        last_lap_number = lap_number
 
         # Validate map data after crossing finish line
         if validating:
             laptime_curr = api.read.timing.current_laptime()
             # Save data
-            if 1 < laptime_curr <= 8 and api.read.timing.last_laptime() > 0:
+            if 1 < laptime_curr <= 8 and api.read.timing.is_last_valid():
                 save_track_map_file(
                     filepath=filepath,
                     filename=filename,

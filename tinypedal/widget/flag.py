@@ -255,7 +255,7 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Read state data
-        lap_etime = api.read.timing.elapsed()
+        elapsed_time = api.read.timing.elapsed()
         in_pits = api.read.vehicle.in_pits()
         in_race = api.read.session.in_race()
 
@@ -264,7 +264,7 @@ class Realtime(Overlay):
             if in_pits and api.read.vehicle.in_garage():
                 pitting_state = DATA.MAX_SECONDS
             else:
-                pitting_state = self.pit_timer.update(in_pits, lap_etime)
+                pitting_state = self.pit_timer.update(in_pits, elapsed_time)
             self.update_pit_timer(self.bar_pit_timer, pitting_state)
 
         # Low fuel update
@@ -282,7 +282,7 @@ class Realtime(Overlay):
 
         # Blue flag
         if self.wcfg["show_blue_flag"]:
-            blue_state = self.blue_timer.update(in_race, lap_etime)
+            blue_state = self.blue_timer.update(in_race, elapsed_time)
             self.update_blueflag(self.bar_blueflag, blue_state)
 
         # Yellow flag
@@ -292,12 +292,12 @@ class Realtime(Overlay):
 
         # Start lights
         if self.wcfg["show_start_lights"]:
-            green_state = self.green_timer.update(lap_etime)
+            green_state = self.green_timer.update(elapsed_time)
             self.update_startlights(self.bar_startlights, green_state)
 
         # Incoming traffic
         if self.wcfg["show_traffic"]:
-            traffic = self.traffic_timer.update(in_pits, lap_etime)
+            traffic = self.traffic_timer.update(in_pits, elapsed_time)
             self.update_traffic(self.bar_traffic, traffic)
 
         # Pit request
