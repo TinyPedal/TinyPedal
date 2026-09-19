@@ -8,6 +8,9 @@ WIP
 * Relative, Rivals, Standings Widget
   - Added "show_track_limits_points" option (requested by user "paulndale79-png"), which shows driver's current track limits points (LMU only). This option is disabled by default.
 
+* Onboard setting Widget
+  - Added "show_wiper_state" option.
+
 2.50.0 (2026-08-31)
 -----------------------------
 * General

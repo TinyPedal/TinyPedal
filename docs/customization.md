@@ -3133,6 +3133,9 @@ Show current front anti-roll bar level.
     show_rear_arb
 Show current rear anti-roll bar level.
 
+    show_wiper_state
+Show wiper state.
+
 [**`Back to Top`**](#)
 
 

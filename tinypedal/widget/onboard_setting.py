@@ -288,6 +288,34 @@ class Realtime(Overlay):
                 )
                 layout_mmap.addWidget(cap_temp, row_caption, 0)
 
+        # Wiper state
+        if self.wcfg["show_wiper_state"]:
+            layout_wiper = self.set_grid_layout()
+            self.bars_wiper = self.set_rawtext(
+                text=DATA.TEXT_PLACEHOLDER,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_wiper_state"],
+                bg_color=self.wcfg["background_color_wiper_state"],
+            )
+            layout_wiper.addWidget(self.bars_wiper, 1, 0)
+            self.set_primary_orient(
+                target=layout_wiper,
+                column=self.wcfg["display_order_wiper_state"],
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_temp = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_wiper_state"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout_wiper.addWidget(cap_temp, row_caption, 0)
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
         if self.wcfg["show_abs"]:
@@ -323,6 +351,10 @@ class Realtime(Overlay):
         if self.wcfg["show_rear_arb"]:
             rear_arb_level = api.read.switch.rear_arb_level()
             self.update_level(self.bars_rarb, rear_arb_level)
+
+        if self.wcfg["show_wiper_state"]:
+            wiper_state = api.read.switch.wipers()
+            self.update_level(self.bars_wiper, wiper_state)
 
     # GUI update methods
     def update_tc(self, target, *data):
