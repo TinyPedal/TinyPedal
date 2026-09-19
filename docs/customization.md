@@ -4874,22 +4874,12 @@ Show rain precipitation in percentage.
 Show average surface wetness in percentage.
 
     show_rubber_coverage_while_dry
-Show rough estimate of rubber coverage (percent) based on total number of laps done by all drivers while road surface is dry.
+Show rubber coverage (grip level) in percentage while road surface is dry.
 
-Note, rubber coverage reading may not be accurate during `practice session` in multiplayer, as some API data will be lost or reset while people joining or leaving server. This does not affect `qualifying` and `race` session.
-
-| Rubber Coverage | Equivalent Grip | Equivalent Laps (LMU) | Equivalent Laps (RF2) |
-|:-:|:-:|:-:|:-:|
-| 0.0 (0%) | Green | 0+ | 0+ |
-| 0.25 (25%) | Light | 600+ | 300+ |
-| 0.5 (50%) | Medium |  1200+ | 600+ |
-| 0.75 (75%) | Heavy (High) | 2000+ (Median) | 1000+ (Median) |
-| 1.0 (100%) | Saturated | 4000+ | 2000+ |
-
-**Note, all data from above table are rough estimate based on testing.*
+Note, if grip level data is not available from game API, rubber coverage will be calculated based on total number of laps done by all drivers, which may not be accurate during `practice session` in multiplayer, as some API data will be lost or reset while people joining or leaving server. This does not affect `qualifying` and `race` session. See Wiki Appendix `Rubber Coverage Table` section for reference.
 
     rubber_median_laps
-Set median laps at the point when grip becomes `Heavy (High)` for calculating accurate rubber coverage. Default median laps is `2000`. This value may vary from different games, see above table for reference.
+Set median laps at the point when grip becomes `Heavy (High)` for calculating accurate rubber coverage. Default median laps is `2000`. This value may vary from different games, see `Rubber Coverage Table` for reference.
 
     rubber_time_scale_*
 Set time scale multiplier for calculating rubber coverage in corresponding sessions (practice, qualifying, race). This value should match `Realroad Time Scale` session setting from game. For `static` rubber, set time scale to `0`.

@@ -222,12 +222,15 @@ class Realtime(Overlay):
                 self.update_wetness(self.bar_wetness, wetness)
             # Rubber coverage percentage
             else:
-                session_type = api.read.session.session_type()
-                rubber_scale = self.rubber_time_scale[session_type]
-                laps_session = rubber_to_laps(self.rubber_starting[session_type], self.rubber_median_laps)
-                if rubber_scale > 0:  # time-scaled coverage
-                    laps_session += (minfo.vehicles.totalCompletedLaps * rubber_scale)
-                self.update_rubber(self.bar_wetness, laps_session)
+                grip_level = api.read.session.grip_level()
+                if grip_level < 0:
+                    session_type = api.read.session.session_type()
+                    rubber_scale = self.rubber_time_scale[session_type]
+                    laps_session = rubber_to_laps(self.rubber_starting[session_type], self.rubber_median_laps)
+                    if rubber_scale > 0:  # time-scaled coverage
+                        laps_session += (minfo.vehicles.totalCompletedLaps * rubber_scale)
+                    grip_level = laps_to_rubber(laps_session, self.rubber_median_laps)
+                self.update_rubber(self.bar_wetness, grip_level)
             # Wet trend
             if self.wcfg["show_trend"]:
                 wet_trend = self.wet_trend.update(wetness, elapsed_time)
@@ -279,7 +282,7 @@ class Realtime(Overlay):
         """Surface rubber coverage percentage"""
         if target.last != data:
             target.last = data
-            percent_rubber = f"{laps_to_rubber(data, self.rubber_median_laps):>3.0%}"
+            percent_rubber = f"{data:>3.0%}"
             target.text = f"{self.prefix_dry} {percent_rubber:.3}"
             target.update()
 

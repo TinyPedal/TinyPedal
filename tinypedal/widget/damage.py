@@ -236,19 +236,19 @@ class Realtime(Overlay):
     # Additional methods
     def color_damage_body(self, value: int) -> str:
         """Body damage color"""
-        # light body damage
-        if value == 1:
-            return self.wcfg["body_color_damage_light"]
-        # heavy body damage
-        if value == 2:
-            return self.wcfg["body_color_damage_heavy"]
         # body parts detached
-        if value >= 3:
+        if value > 2:
             if self.wcfg["show_detached_warning_flash"]:
                 self.detached_parts = True
                 if self.warn_flash.send(True):
                     return self.wcfg["warning_color_detached"]
             return self.wcfg["body_color_detached"]
+        # heavy body damage
+        if value > 1:
+            return self.wcfg["body_color_damage_heavy"]
+        # light body damage
+        if value > 0:
+            return self.wcfg["body_color_damage_light"]
         # no damage
         return self.wcfg["body_color"]
 

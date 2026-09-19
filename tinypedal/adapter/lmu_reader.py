@@ -530,13 +530,13 @@ class Session(_reader.Session, DataAdapter):
         """Track base grip level, convert to fraction 0.0 to 1.0"""
         grip = self.shmm.lmuScorInfo.mTrackGripLevel
         if grip == 1:
-            return 0.25
+            return 0.3
         if grip == 2:
-            return 0.5
+            return 0.6
         if grip == 3:
-            return 0.75
-        if grip == 4:
             return 0.9
+        if grip == 4:
+            return 1.0
         return 0.0
 
     def track_time(self) -> float:
