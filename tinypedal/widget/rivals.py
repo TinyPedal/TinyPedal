@@ -655,7 +655,7 @@ class Realtime(Overlay):
                 self.update_dlt(
                     self.bars_dlt[idx],
                     veh_info.lapTimeHistory.data, plr_veh_info.lapTimeHistory.data,
-                    veh_info.lapTimeHistory.start, plr_veh_info.lapTimeHistory.start, state,
+                    veh_info.lapTimeHistory.last, plr_veh_info.lapTimeHistory.last, state,
                 )
             # Remaining energy
             if self.wcfg["show_energy_remaining"]:

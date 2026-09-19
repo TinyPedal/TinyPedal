@@ -305,9 +305,9 @@ def auto_backup_car_setup(filepath: str):
         if not api.read.vehicle.in_pits():
             # Stint best time
             if data_available:
-                last_valid_laptime = api.read.timing.last_laptime()
-                if 0 < last_valid_laptime < best_laptime:
-                    best_laptime = last_valid_laptime
+                last_laptime = api.read.timing.last_laptime()
+                if 0 < last_laptime < best_laptime:
+                    best_laptime = last_laptime
             else:
                 temp_data = api.read.vehicle.setup()
                 if temp_data:

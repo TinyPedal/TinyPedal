@@ -157,8 +157,6 @@ def update_vehicle_data(
         data.inPit = api.read.vehicle.in_paddock(index)
         data.isYellow = speed < 8 and data.inPit != 2
         data.pitTimer.update(data.inPit, elapsed_time, laps_completed, speed)
-        if data.lapTimeHistory.laps != laps_completed:
-            data.lapTimeHistory.update(api.read.timing.timestamp(index), laps_completed, data.bestLapTime)
 
         if data.inPit:
             data.licoTimer.elapsed = 0.0
@@ -246,11 +244,13 @@ def update_vehicle_data(
             data.gapBehindLeaderInClass = calc_time_gap_behind(
                 opt_index_leader, index, output.dataSet[opt_index_leader].totalLapProgress - data.totalLapProgress)
 
-            data.isValidLap = api.read.timing.is_last_valid()
-            data.lastLapTime = api.read.timing.last_laptime(index) if data.isValidLap else data.lapTimeHistory.last
+            last_laptime = api.read.timing.last_laptime(index)
+            data.isValidLap = last_laptime > 0
+            data.lastLapTime = abs(last_laptime)
+            data.lapTimeHistory.update(last_laptime, laps_completed, data.bestLapTime)
+
             fuel_remaining = api.read.engine.fuel_fraction(index)
             energy_remaining = api.read.engine.virtual_energy(index)
-
             data.fuelHistory.update(laps_completed, fuel_remaining)
             data.energyHistory.update(laps_completed, energy_remaining)
             update_stint_usage(data, fuel_remaining, energy_remaining)

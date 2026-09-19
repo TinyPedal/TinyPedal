@@ -508,10 +508,6 @@ class Timing(ABC):
     __slots__ = ()
 
     @abstractmethod
-    def timestamp(self, index: int | None = None) -> float:
-        """Lap start timestamp (seconds)"""
-
-    @abstractmethod
     def elapsed(self, index: int | None = None) -> float:
         """Current elapsed time (seconds)"""
 
@@ -525,7 +521,7 @@ class Timing(ABC):
 
     @abstractmethod
     def last_laptime(self, index: int | None = None) -> float:
-        """Last lap time (seconds)"""
+        """Last lap time (seconds), positive=valid, negative=invalid"""
 
     @abstractmethod
     def best_laptime(self, index: int | None = None) -> float:
@@ -558,14 +554,6 @@ class Timing(ABC):
     @abstractmethod
     def last_sector2(self, index: int | None = None) -> float:
         """Last lap sector 1+2 time (seconds)"""
-
-    @abstractmethod
-    def best_sector1(self, index: int | None = None) -> float:
-        """Best lap sector 1 time (seconds)"""
-
-    @abstractmethod
-    def best_sector2(self, index: int | None = None) -> float:
-        """Best lap sector 1+2 time (seconds)"""
 
     @abstractmethod
     def behind_leader(self, index: int | None = None) -> float:

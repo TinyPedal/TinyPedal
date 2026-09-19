@@ -619,10 +619,6 @@ class Timing(_reader.Timing, DataAdapter):
 
     __slots__ = ()
 
-    def timestamp(self, index: int | None = None) -> float:
-        """Lap start timestamp (seconds)"""
-        return rmnan(self.shmm.rf2TeleVeh(index).mLapStartET)
-
     def elapsed(self, index: int | None = None) -> float:
         """Current elapsed time (seconds)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mElapsedTime)
@@ -640,8 +636,12 @@ class Timing(_reader.Timing, DataAdapter):
         return laptime
 
     def last_laptime(self, index: int | None = None) -> float:
-        """Last lap time (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mLastLapTime)
+        """Last lap time (seconds), positive=valid, negative=invalid"""
+        last_raw = self.shmm.rf2LastLapTime(index)
+        last_valid = self.shmm.rf2ScorVeh(index).mLastLapTime
+        if last_valid > 0:
+            return last_valid
+        return -rmnan(last_raw)
 
     def best_laptime(self, index: int | None = None) -> float:
         """Best lap time (seconds)"""
@@ -688,14 +688,6 @@ class Timing(_reader.Timing, DataAdapter):
     def last_sector2(self, index: int | None = None) -> float:
         """Last lap sector 1+2 time (seconds)"""
         return rmnan(self.shmm.rf2ScorVeh(index).mLastSector2)
-
-    def best_sector1(self, index: int | None = None) -> float:
-        """Best lap sector 1 time (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mBestSector1)
-
-    def best_sector2(self, index: int | None = None) -> float:
-        """Best lap sector 1+2 time (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mBestSector2)
 
     def behind_leader(self, index: int | None = None) -> float:
         """Time behind leader (seconds)"""

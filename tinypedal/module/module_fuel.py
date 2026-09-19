@@ -273,10 +273,10 @@ def calc_consumption(
                 pos_recorded = pos_curr
             pos_last = pos_curr  # reset last position
 
-        # Validating 1s after passing finish line
+        # Validating 0.3s after passing finish line
         if validating:
             timer = elapsed_time - validating
-            if timer > 3:  # switch off after 3s
+            if timer > 8:  # switch off after 8s
                 validating = 0
             elif timer > 0.3 and api.read.timing.is_last_valid():
                 used_last_valid = used_last_raw

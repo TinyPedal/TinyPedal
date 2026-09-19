@@ -84,6 +84,29 @@ def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[rf2_data.rF2Vehic
     return INVALID_INDEX
 
 
+class LapTimeData:
+    """Unverified lap time data"""
+
+    __slots__ = (
+        "last",
+        "timestamp",
+    )
+
+    def __init__(self):
+        self.last = 0.0
+        self.timestamp = 0.0
+
+    def update(self, timestamp: float) -> float:
+        """Update unverified lap time based on lap start time"""
+        if self.timestamp != timestamp:
+            if 0 < self.timestamp < timestamp:
+                self.last = timestamp - self.timestamp
+            else:
+                self.last = 0.0
+            self.timestamp = timestamp
+        return self.last
+
+
 class MMapDataSet:
     """Create mmap data set"""
 
@@ -371,6 +394,7 @@ class RF2Info:
         "_rf2_pid",
         "_state_override",
         "_active_state",
+        "_laptime_last",
         "_scor",
         "_tele",
         "_ext",
@@ -384,6 +408,7 @@ class RF2Info:
         self._rf2_pid = ""
         self._state_override = False
         self._active_state = False
+        self._laptime_last = tuple(LapTimeData() for _ in range(rFactor2Constants.MAX_MAPPED_VEHICLES))
         # Assign mmap instance
         self._scor = self._sync.dataset.scor
         self._tele = self._sync.dataset.tele
@@ -434,6 +459,18 @@ class RF2Info:
     def rf2ScorInfo(self) -> rf2_data.rF2ScoringInfo:
         """rF2 scoring info data"""
         return self._scor.data.mScoringInfo
+
+    def rf2LastLapTime(self, index: int | None = None) -> float:
+        """rF2 unverified last lap time data
+
+        Specify index for specific player.
+
+        Args:
+            index: None for local player.
+        """
+        if index is None:
+            index = self._sync.player_scor_index
+        return self._laptime_last[index].update(self.rf2TeleVeh(index).mLapStartET)
 
     def rf2ScorVeh(self, index: int | None = None) -> rf2_data.rF2VehicleScoring:
         """rF2 scoring vehicle data

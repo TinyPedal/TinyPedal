@@ -228,7 +228,7 @@ def record_track_map(output: MappingInfo, filepath: str):
             temp_data.clear()
             recorder_data.clear()
             recording = False
-            validating = False
+            validating = 0
             last_sector_idx = -1
             last_lap_number = DATA.MAX_LAPS
             pos_last = 0.0  # last checked player vehicle position
@@ -245,7 +245,7 @@ def record_track_map(output: MappingInfo, filepath: str):
                 temp_data.coords = tuple(recorder_data.coords)
                 temp_data.dists = tuple(recorder_data.dists)
                 temp_data.sectors = tuple(recorder_data.sectors)
-                validating = True
+                validating = api.read.timing.elapsed()
             # Reset
             recorder_data.new()
             pos_last = 0
@@ -255,9 +255,12 @@ def record_track_map(output: MappingInfo, filepath: str):
 
         # Validate map data after crossing finish line
         if validating:
-            laptime_curr = api.read.timing.current_laptime()
-            # Save data
-            if 1 < laptime_curr <= 8 and api.read.timing.is_last_valid():
+            timer = api.read.timing.elapsed() - validating
+            if timer > 8:  # switch off after 8s
+                temp_data.clear()
+                validating = 0
+            elif timer > 1 and api.read.timing.is_last_valid():
+                # Save data
                 save_track_map_file(
                     filepath=filepath,
                     filename=filename,
@@ -272,12 +275,8 @@ def record_track_map(output: MappingInfo, filepath: str):
                 temp_data.clear()
                 recorder_data.clear()
                 recording = False
-                validating = False
+                validating = 0
                 last_reset = None  # load recorded map in next loop
-            # Switch off validating after 8s
-            elif 8 < laptime_curr < 10:
-                temp_data.clear()
-                validating = False
 
         # Record map coords
         if recording:

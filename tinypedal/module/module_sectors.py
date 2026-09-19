@@ -124,7 +124,7 @@ def record_sectors(output_session: SectorData, output_alltime: SectorData, filep
         sector_idx = api.read.lap.sector_index() 
         if last_sector_idx != sector_idx:  # keep checking until conditions met
 
-            laptime_valid = api.read.timing.last_laptime()
+            last_laptime = api.read.timing.last_laptime()
             curr_sector1 = api.read.timing.current_sector1()
             curr_sector2 = api.read.timing.current_sector2()
             last_sector2 = api.read.timing.last_sector2()
@@ -134,7 +134,7 @@ def record_sectors(output_session: SectorData, output_alltime: SectorData, filep
                 output=output_session,
                 sector_idx=sector_idx,
                 last_sector_idx=last_sector_idx,
-                laptime_valid=laptime_valid,
+                last_laptime=last_laptime,
                 curr_sector1=curr_sector1,
                 curr_sector2=curr_sector2,
                 last_sector2=last_sector2,
@@ -145,7 +145,7 @@ def record_sectors(output_session: SectorData, output_alltime: SectorData, filep
                 output=output_alltime,
                 sector_idx=sector_idx,
                 last_sector_idx=last_sector_idx,
-                laptime_valid=laptime_valid,
+                last_laptime=last_laptime,
                 curr_sector1=curr_sector1,
                 curr_sector2=curr_sector2,
                 last_sector2=last_sector2,
@@ -160,7 +160,7 @@ def calc_sector_time(
     output: SectorData,
     sector_idx: int,
     last_sector_idx: int,
-    laptime_valid: float,
+    last_laptime: float,
     curr_sector1: float,
     curr_sector2: float,
     last_sector2: float,
@@ -175,10 +175,10 @@ def calc_sector_time(
     best_s_pb = output.sectorBestPB
 
     # While vehicle in S1, update S3 data
-    if sector_idx == 0 and laptime_valid > 0 and last_sector2 > 0:
+    if sector_idx == 0 and last_laptime > 0 and last_sector2 > 0:
         last_sector_idx = sector_idx  # reset & stop checking
 
-        prev_s[2] = laptime_valid - last_sector2
+        prev_s[2] = last_laptime - last_sector2
 
         # Update (time gap) deltabest bestlap sector 3
         if valid_sectors(best_s_pb[2]):
@@ -196,7 +196,7 @@ def calc_sector_time(
             best_s_tb[2] = prev_s[2]
 
         # Save sector time from personal best laptime
-        if laptime_valid < sum(best_s_pb) and valid_sectors(prev_s):
+        if last_laptime < sum(best_s_pb) and valid_sectors(prev_s):
             best_s_pb[:] = prev_s
 
     # While vehicle in S2, update S1 data

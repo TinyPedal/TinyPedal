@@ -88,6 +88,29 @@ def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[lmu_data.LMUVehic
     return INVALID_INDEX
 
 
+class LapTimeData:
+    """Unverified lap time data"""
+
+    __slots__ = (
+        "last",
+        "timestamp",
+    )
+
+    def __init__(self):
+        self.last = 0.0
+        self.timestamp = 0.0
+
+    def update(self, timestamp: float) -> float:
+        """Update unverified lap time based on lap start time"""
+        if self.timestamp != timestamp:
+            if 0 < self.timestamp < timestamp:
+                self.last = timestamp - self.timestamp
+            else:
+                self.last = 0.0
+            self.timestamp = timestamp
+        return self.last
+
+
 class LMUResults:
     """LMU results data (extracted from results stream)"""
 
@@ -425,6 +448,7 @@ class LMUInfo:
         "_access_mode",
         "_state_override",
         "_active_state",
+        "_laptime_last",
         "_shmm",
     )
 
@@ -433,6 +457,7 @@ class LMUInfo:
         self._access_mode = 0
         self._state_override = False
         self._active_state = False
+        self._laptime_last = tuple(LapTimeData() for _ in range(LMUConstants.MAX_MAPPED_VEHICLES))
         # Assign mmap instance
         self._shmm = self._sync.dataset.shmm
 
@@ -475,6 +500,18 @@ class LMUInfo:
     def lmuScorInfo(self) -> lmu_data.LMUScoringInfo:
         """LMU scoring info data"""
         return self._shmm.data.scoring.scoringInfo
+
+    def lmuLastLapTime(self, index: int | None = None) -> float:
+        """LMU unverified last lap time data
+
+        Specify index for specific player.
+
+        Args:
+            index: None for local player.
+        """
+        if index is None:
+            index = self._sync.player_scor_index
+        return self._laptime_last[index].update(self.lmuTeleVeh(index).mLapStartET)
 
     def lmuResults(self, index: int | None = INVALID_INDEX) -> dict[str, float]:
         """LMU results data"""

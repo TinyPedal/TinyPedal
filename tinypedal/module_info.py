@@ -195,7 +195,6 @@ class DeltaLapTimeHistory:
 
     Attributes:
         data: Lap time array.
-        start: Lap start timestamp.
         laps: Last completed laps.
         best: Best lap time from recent laps.
         last: Last lap time, can be invalid.
@@ -203,20 +202,19 @@ class DeltaLapTimeHistory:
     """
 
     data: list[float] = df_list(0.0, 5)
-    start: float = DATA.FLOAT_INF
     laps: int = 0
     best: float = 0.0
     last: float = 0.0
     average: float = 0.0
 
-    def update(self, timestamp: float, lap_number: int, best_valid: float):
+    def update(self, laptime_last: float, lap_number: int, best_valid: float):
         """Update delta lap time history"""
-        if self.start == timestamp:
+        if self.laps == lap_number:
             return
-        # Record laptime difference
-        laptime_last = timestamp - self.start
-        if laptime_last < 0:
+        if laptime_last == 0:
             laptime_last = DATA.MAX_SECONDS
+        elif laptime_last < 0:
+            laptime_last = -laptime_last
         # Update lap history
         data = self.data
         if 0 < self.laps < lap_number:
@@ -225,7 +223,6 @@ class DeltaLapTimeHistory:
         else:  # reset all laptime on session change
             data[0] = data[1] = data[2] = data[3] = data[4] = 0.0
         self.laps = lap_number
-        self.start = timestamp
         # Recalculate once per lap
         if best_valid <= 0:
             best_recent = DATA.MAX_SECONDS
