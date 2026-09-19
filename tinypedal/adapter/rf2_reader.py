@@ -1080,26 +1080,6 @@ class Wheel(_reader.Wheel, DataAdapter):
             rmnan(wheel_data[3].mRotation),
         )
 
-    def velocity_lateral(self, index: int | None = None) -> tuple[float, ...]:
-        """Lateral velocity (m/s) x"""
-        wheel_data = self.shmm.rf2TeleVeh(index).mWheels
-        return (
-            rmnan(wheel_data[0].mLateralGroundVel),
-            rmnan(wheel_data[1].mLateralGroundVel),
-            rmnan(wheel_data[2].mLateralGroundVel),
-            rmnan(wheel_data[3].mLateralGroundVel),
-        )
-
-    def velocity_longitudinal(self, index: int | None = None) -> tuple[float, ...]:
-        """Longitudinal velocity (m/s) y"""
-        wheel_data = self.shmm.rf2TeleVeh(index).mWheels
-        return (
-            rmnan(wheel_data[0].mLongitudinalGroundVel),
-            rmnan(wheel_data[1].mLongitudinalGroundVel),
-            rmnan(wheel_data[2].mLongitudinalGroundVel),
-            rmnan(wheel_data[3].mLongitudinalGroundVel),
-        )
-
     def ride_height(self, index: int | None = None) -> tuple[float, ...]:
         """Ride height (convert meters to millimeters)"""
         wheel_data = self.shmm.rf2TeleVeh(index).mWheels

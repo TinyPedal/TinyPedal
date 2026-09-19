@@ -818,14 +818,6 @@ class Wheel(ABC):
         """Wheel rotation (radians per second), or angular velocity"""
 
     @abstractmethod
-    def velocity_lateral(self, index: int | None = None) -> tuple[float, ...]:
-        """Lateral velocity (m/s) x"""
-
-    @abstractmethod
-    def velocity_longitudinal(self, index: int | None = None) -> tuple[float, ...]:
-        """Longitudinal velocity (m/s) y"""
-
-    @abstractmethod
     def ride_height(self, index: int | None = None) -> tuple[float, ...]:
         """Ride height (convert meters to millimeters)"""
 

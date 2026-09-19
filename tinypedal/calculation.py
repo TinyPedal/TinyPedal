@@ -882,7 +882,7 @@ def wheel_rotation_bias(rot_axle: float, rot_left: float, rot_right: float) -> f
     """Wheel rotation bias (difference) against axle rotation"""
     if rot_axle:
         return abs((rot_left - rot_right) / rot_axle)
-    return 0
+    return -1
 
 
 def wheel_rotation_ratio(rot_axle: float, rot_left: float) -> float:
