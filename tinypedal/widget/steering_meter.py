@@ -101,7 +101,7 @@ class Realtime(Overlay):
             self.draw_scale_mark(mark_gap, mark_num)
 
         # Steering
-        temp_raw_steering = api.read.inputs.steering_raw()
+        temp_raw_steering = api.read.inputs.steering()
         if self.raw_steering != temp_raw_steering:
             self.raw_steering = temp_raw_steering
             self.update()

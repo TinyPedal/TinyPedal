@@ -199,7 +199,7 @@ class Realtime(Overlay):
         else:
             steering_range = api.read.inputs.steering_range()
 
-        steer_angle = api.read.inputs.steering_raw() * steering_range * 0.5
+        steer_angle = api.read.inputs.steering() * steering_range * 0.5
         wheel_angle_front_average = minfo.wheels.averageFrontToeAngle
         diff_slip_angle = minfo.wheels.slipAngleDifference
 

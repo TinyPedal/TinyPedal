@@ -72,9 +72,10 @@ class Realtime(Overlay):
         # Baseline bias delta
         if self.wcfg["show_baseline_bias_delta"]:
             text_delta = self.format_bias_delta(0)
+            self.width_delta = len(text_delta)
             self.bar_delta = self.set_rawtext(
                 text=text_delta,
-                width=font_m.width * len(text_delta) + bar_padx,
+                width=font_m.width * self.width_delta + bar_padx,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_baseline_bias_delta"],
@@ -138,7 +139,7 @@ class Realtime(Overlay):
         """Baseline bias delta"""
         if target.last != data:
             target.last = data
-            target.text = self.format_bias_delta(data)
+            target.text = self.format_bias_delta(data)[:self.width_delta]
             target.update()
 
     def update_bmigt(self, target, data):

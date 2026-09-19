@@ -267,11 +267,7 @@ class Inputs(_reader.Inputs, DataAdapter):
         return rmnan(self.shmm.rf2TeleVeh(index).mUnfilteredClutch)
 
     def steering(self, index: int | None = None) -> float:
-        """Steering filtered (fraction)"""
-        return rmnan(self.shmm.rf2TeleVeh(index).mFilteredSteering)
-
-    def steering_raw(self, index: int | None = None) -> float:
-        """Steering raw (fraction)"""
+        """Steering (fraction)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mUnfilteredSteering)
 
     def steering_range(self, index: int | None = None) -> float:

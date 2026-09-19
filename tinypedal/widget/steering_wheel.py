@@ -109,7 +109,7 @@ class Realtime(Overlay):
             temp_rot_range = api.read.inputs.steering_range()
 
         # Steering
-        temp_steering_angle = api.read.inputs.steering_raw() * temp_rot_range * 0.5
+        temp_steering_angle = api.read.inputs.steering() * temp_rot_range * 0.5
         if self.steering_angle != temp_steering_angle:
             self.steering_angle = temp_steering_angle
             self.update()

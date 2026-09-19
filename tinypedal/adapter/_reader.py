@@ -239,11 +239,7 @@ class Inputs(ABC):
 
     @abstractmethod
     def steering(self, index: int | None = None) -> float:
-        """Steering filtered (fraction)"""
-
-    @abstractmethod
-    def steering_raw(self, index: int | None = None) -> float:
-        """Steering raw (fraction)"""
+        """Steering (fraction)"""
 
     @abstractmethod
     def steering_range(self, index: int | None = None) -> float:
