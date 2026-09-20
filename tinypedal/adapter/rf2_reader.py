@@ -55,8 +55,8 @@ class DataAdapter:
         """Initialize API setting
 
         Args:
-            shmm: shared memory API connector.
-            rest: rest API connector.
+            shmm: shared memory API data.
+            rest: rest API data.
         """
         self.shmm = shmm
         self.rest = rest
@@ -870,13 +870,13 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Driver name"""
         return tostr(self.shmm.rf2ScorVeh(index).mDriverName)
 
-    def vehicle_name(self, index: int | None = None) -> str:
-        """Vehicle name"""
+    def team_name(self, index: int | None = None) -> str:
+        """Team name"""
         return tostr(self.shmm.rf2ScorVeh(index).mVehicleName)
 
     def vehicle_model(self, index: int | None = None) -> str:
         """Vehicle model name (brand name + model ID)"""
-        return ""
+        return tostr(self.shmm.rf2ScorVeh(index).mVehicleName)
 
     def class_name(self, index: int | None = None) -> str:
         """Vehicle class name"""

@@ -139,7 +139,7 @@ class Realtime(Overlay):
 
             # Heatmap style
             if self.wcfg["enable_heatmap_auto_matching"]:
-                vehicle_name = api.read.vehicle.vehicle_name()
+                vehicle_name = api.read.vehicle.vehicle_model()
                 if self.last_vehicle_name != vehicle_name:
                     self.last_vehicle_name = vehicle_name
                     self.update_heatmap(api.read.vehicle.class_name(), vehicle_name)

@@ -140,8 +140,8 @@ def calc_wheel_rotation(
             locking_r = 1.0
             last_elapsed_time = 0.0
             last_lap_number = DATA.MAX_LAPS
-            if vehicle_name != api.read.vehicle.vehicle_name():
-                vehicle_name = api.read.vehicle.vehicle_name()
+            if vehicle_name != api.read.vehicle.vehicle_model():
+                vehicle_name = api.read.vehicle.vehicle_model()
                 radius_front_ema = 0.0
                 radius_rear_ema = 0.0
 
@@ -378,7 +378,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             output.lastLapBrakeWear[:] = DATA.WHEELS_ZERO
             output.failureBrakeThickness[:] = brake_failure_thickness(
                 api.read.vehicle.class_name(),
-                api.read.vehicle.vehicle_name(),
+                api.read.vehicle.vehicle_model(),
             )
             delta_recording = False
             is_valid_delta = False
@@ -446,14 +446,14 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
                 save_brake_failure_thickness(
                     brake_name=set_predefined_brake_name(
                         api.read.vehicle.class_name(),
-                        api.read.vehicle.vehicle_name(),
+                        api.read.vehicle.vehicle_model(),
                         idx < 2,
                     ),
                     failure=round(failure_record[idx], 2),
                 )
                 output.failureBrakeThickness[:] = brake_failure_thickness(
                     api.read.vehicle.class_name(),
-                    api.read.vehicle.vehicle_name(),
+                    api.read.vehicle.vehicle_model(),
                 )
                 failure_record[idx] = 0
 
@@ -645,8 +645,8 @@ def calc_vehicle_weight(output: WheelsInfo, g_accel: float, unsprung_weight: flo
             last_reset = reset
 
             update_static_weight = minimum_weight_override <= 0
-            if vehicle_name != api.read.vehicle.vehicle_name():
-                vehicle_name = api.read.vehicle.vehicle_name()
+            if vehicle_name != api.read.vehicle.vehicle_model():
+                vehicle_name = api.read.vehicle.vehicle_model()
                 static_load_tyre = DATA.WHEELS_ZERO
                 static_load_susp = DATA.WHEELS_ZERO
                 static_load_fuel = 0.0

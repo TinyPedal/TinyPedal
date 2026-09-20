@@ -648,8 +648,8 @@ class Vehicle(ABC):
         """Driver name"""
 
     @abstractmethod
-    def vehicle_name(self, index: int | None = None) -> str:
-        """Vehicle name"""
+    def team_name(self, index: int | None = None) -> str:
+        """Team name"""
 
     @abstractmethod
     def vehicle_model(self, index: int | None = None) -> str:

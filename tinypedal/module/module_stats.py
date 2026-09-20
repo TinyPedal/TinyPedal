@@ -99,14 +99,14 @@ def stats_keys(vehicle_classification: str) -> tuple[str, str]:
     if vehicle_classification == "Class":
         name = api.read.vehicle.class_name()
     elif vehicle_classification == "Class - Brand":
-        brand_name = select_brand_name(vehicle_name=api.read.vehicle.vehicle_name())
+        brand_name = select_brand_name(api.read.vehicle.vehicle_model())
         class_name = api.read.vehicle.class_name()
         if brand_name:
             name = f"{class_name} - {brand_name}"
         else:  # fallback to class name
             name = class_name
     else:
-        name = api.read.vehicle.vehicle_name()
+        name = api.read.vehicle.vehicle_model()
     return api.read.session.track_name(), name
 
 
@@ -320,7 +320,7 @@ def auto_backup_car_setup(filepath: str):
                             strftime("%Y-%m-%d %H-%M-%S", localtime()),
                             api.read.session.track_name(),
                             api.read.vehicle.class_name(),
-                            select_brand_name(vehicle_name=api.read.vehicle.vehicle_name()),
+                            select_brand_name(api.read.vehicle.vehicle_model()),
                         )
                         save_car_setup_file(
                             filepath=filepath,

@@ -598,13 +598,13 @@ class Realtime(Overlay):
             # Vehicle name
             if self.wcfg["show_vehicle_name"]:
                 if self.wcfg["show_vehicle_brand_as_name"]:
-                    vehicle_name = veh_info.vehicleBrand
+                    vehicle_name = veh_info.brandName
                 else:
                     vehicle_name = veh_info.vehicleName
                 self.update_veh(self.bars_veh[idx], vehicle_name, state)
             # Brand logo
             if self.wcfg["show_brand_logo"]:
-                self.update_brd(self.bars_brd[idx], veh_info.vehicleBrand, state)
+                self.update_brd(self.bars_brd[idx], veh_info.brandName, state)
             # Time interval
             if self.wcfg["show_time_interval"]:
                 is_ahead = veh_info.positionOverall < plr_veh_info.positionOverall

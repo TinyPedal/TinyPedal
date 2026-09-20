@@ -306,7 +306,7 @@ class SyncData:
 
     def __update(self) -> None:
         """Update synced player data"""
-        self.paused = False  # make sure initial pause state is false
+        self.paused = True
         self.synced = False
         self.resets = 0
 
@@ -315,6 +315,7 @@ class SyncData:
         last_session_timestamp = 0  # store last timestamp
         last_update_time = 0.0
         data_freezed = True  # whether data is freezed
+
         last_in_garage = False
         last_slot_id = INVALID_INDEX
         reset_counter = 0

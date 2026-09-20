@@ -703,13 +703,13 @@ class Realtime(Overlay):
             # Vehicle name
             if self.wcfg["show_vehicle_name"]:
                 if self.wcfg["show_vehicle_brand_as_name"]:
-                    vehicle_name = veh_info.vehicleBrand
+                    vehicle_name = veh_info.brandName
                 else:
                     vehicle_name = veh_info.vehicleName
                 self.update_veh(self.bars_veh[idx], vehicle_name, is_lapped, hi_player, state)
             # Brand logo
             if self.wcfg["show_brand_logo"]:
-                self.update_brd(self.bars_brd[idx], veh_info.vehicleBrand, hi_player, state)
+                self.update_brd(self.bars_brd[idx], veh_info.brandName, hi_player, state)
             # Time gap
             if self.wcfg["show_time_gap"]:
                 self.update_gap(self.bars_gap[idx], rel_time_gap, hi_player, state)

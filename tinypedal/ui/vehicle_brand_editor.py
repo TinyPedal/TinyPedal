@@ -43,7 +43,7 @@ from ..api_control import api
 from ..async_request import get_response, resolve_hostname, set_header_get
 from ..constant import API, CONFIG, FILE
 from ..setting import cfg
-from ..userfile.brands import extract_lmu_brand_name
+from ..userfile.brands import extract_brand_name
 from ..userfile.json_setting import copy_setting
 from ._common import BaseEditor, CompactButton, TableBatchReplace, UIScaler
 
@@ -252,8 +252,8 @@ class VehicleBrandEditor(BaseEditor):
         # Add all missing vehicle name from active session
         veh_total = api.read.vehicle.total_vehicles()
         for index in range(veh_total):
-            veh_name = api.read.vehicle.vehicle_name(index)
-            brand_name = extract_lmu_brand_name(api.read.vehicle.vehicle_model(index), "Unknown")
+            veh_name = api.read.vehicle.vehicle_model(index)
+            brand_name = extract_brand_name(api.read.vehicle.vehicle_model(index), "Unknown")
             if not self.is_value_in_table(veh_name, self.table_brands):
                 self.add_vehicle_entry(row_index, veh_name, brand_name)
                 row_index += 1

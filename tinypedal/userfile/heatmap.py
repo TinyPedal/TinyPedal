@@ -62,7 +62,7 @@ def set_predefined_brake_name(class_name: str, vehicle_name: str, is_front: bool
     if class_name == "":
         return ""
     suffix_name = "Front Brake" if is_front else "Rear Brake"
-    brand_name = select_brand_name(vehicle_name=vehicle_name)
+    brand_name = select_brand_name(vehicle_name)
     if brand_name != "":
         return f"{class_name} - {brand_name} {suffix_name}"
     return f"{class_name} - {suffix_name}"
