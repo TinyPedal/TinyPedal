@@ -57,15 +57,14 @@ def save_brake_failure_thickness(brake_name: str, failure: float) -> None:
     cfg.save(config_type=CONFIG.TYPE_BRAKES)
 
 
-def set_predefined_brake_name(class_name: str, vehicle_name: str, is_front: bool) -> str:
+def set_predefined_brake_name(class_name: str, vehicle_name: str, compound_name: str, is_front: bool) -> str:
     """Set common brake name"""
     if class_name == "":
         return ""
-    suffix_name = "Front Brake" if is_front else "Rear Brake"
     brand_name = select_brand_name(vehicle_name)
-    if brand_name != "":
-        return f"{class_name} - {brand_name} {suffix_name}"
-    return f"{class_name} - {suffix_name}"
+    disc_name = "Front Brake" if is_front else "Rear Brake"
+    brake_name = " ".join(n for n in (brand_name, disc_name, compound_name) if n != "")
+    return f"{class_name} - {brake_name}"
 
 
 def select_brake_failure_thickness(brake_name: str) -> float:
@@ -88,14 +87,10 @@ def select_brake_heatmap_name(brake_name: str) -> str:
     return brake.get("heatmap", HEATMAP_DEFAULT_BRAKE)
 
 
-def brake_failure_thickness(class_name: str, vehicle_name: str) -> tuple[float, float, float, float]:
+def brake_failure_thickness(brake_name_front: str, brake_name_rear: str) -> tuple[float, float, float, float]:
     """Get failure thickness"""
-    failure_thickness_f = select_brake_failure_thickness(
-        set_predefined_brake_name(class_name, vehicle_name, True)
-    )
-    failure_thickness_r = select_brake_failure_thickness(
-        set_predefined_brake_name(class_name, vehicle_name, False)
-    )
+    failure_thickness_f = select_brake_failure_thickness(brake_name_front)
+    failure_thickness_r = select_brake_failure_thickness(brake_name_rear)
     return (
         failure_thickness_f,
         failure_thickness_f,

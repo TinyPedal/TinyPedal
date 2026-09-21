@@ -88,6 +88,10 @@ class Brake(ABC):
     __slots__ = ()
 
     @abstractmethod
+    def compound_name(self, index: int | None = None) -> tuple[str, str]:
+        """Brake compound name, front, rear"""
+
+    @abstractmethod
     def bias_front(self, index: int | None = None) -> float:
         """Brake bias front (fraction)"""
 
@@ -628,7 +632,7 @@ class Vehicle(ABC):
         """Number of incidents"""
 
     @abstractmethod
-    def is_player(self, index: int=0) -> bool:
+    def is_player(self, index: int = 0) -> bool:
         """Is local player"""
 
     @abstractmethod

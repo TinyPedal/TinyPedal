@@ -378,11 +378,16 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             brake_max_thickness[:] = DATA.WHEELS_ZERO
             delta_array_raw[:] = (DATA.WHEELS_DELTA_DEFAULT,)
             delta_array_last = (DATA.WHEELS_DELTA_DEFAULT,)
+
+            class_name = api.read.vehicle.class_name()
+            vehicle_name = api.read.vehicle.vehicle_model()
+            compound_front, compound_rear = api.read.brake.compound_name()
+            brake_name_front = set_predefined_brake_name(class_name, vehicle_name, compound_front, True)
+            brake_name_rear = set_predefined_brake_name(class_name, vehicle_name, compound_rear, False)
+
             output.lastLapBrakeWear[:] = DATA.WHEELS_ZERO
-            output.failureBrakeThickness[:] = brake_failure_thickness(
-                api.read.vehicle.class_name(),
-                api.read.vehicle.vehicle_model(),
-            )
+            output.failureBrakeThickness[:] = brake_failure_thickness(brake_name_front, brake_name_rear)
+
             delta_recording = False
             is_valid_delta = False
             is_pit_lap = 0  # whether pit in or pit out lap
@@ -447,17 +452,10 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
                     failure_record[idx],
                 )
                 save_brake_failure_thickness(
-                    brake_name=set_predefined_brake_name(
-                        api.read.vehicle.class_name(),
-                        api.read.vehicle.vehicle_model(),
-                        idx < 2,
-                    ),
+                    brake_name=brake_name_front if idx < 2 else brake_name_rear,
                     failure=round(failure_record[idx], 2),
                 )
-                output.failureBrakeThickness[:] = brake_failure_thickness(
-                    api.read.vehicle.class_name(),
-                    api.read.vehicle.vehicle_model(),
-                )
+                output.failureBrakeThickness[:] = brake_failure_thickness(brake_name_front, brake_name_rear)
                 failure_record[idx] = 0
 
             # Calibrate max thickness

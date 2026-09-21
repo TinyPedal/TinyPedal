@@ -90,6 +90,10 @@ class Brake(_reader.Brake, DataAdapter):
 
     __slots__ = ()
 
+    def compound_name(self, index: int | None = None) -> tuple[str, str]:
+        """Brake compound name, front, rear"""
+        return "", ""
+
     def bias_front(self, index: int | None = None) -> float:
         """Brake bias front (fraction)"""
         return 1 - rmnan(self.shmm.rf2TeleVeh(index).mRearBrakeBias)
@@ -850,7 +854,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Number of incidents"""
         return 0
 
-    def is_player(self, index: int=0) -> bool:
+    def is_player(self, index: int = 0) -> bool:
         """Is local player"""
         return self.shmm.playerIndex == index
 

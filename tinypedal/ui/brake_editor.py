@@ -156,9 +156,10 @@ class BrakeEditor(BaseEditor):
         for index in range(veh_total):
             class_name = api.read.vehicle.class_name(index)
             vehicle_name = api.read.vehicle.vehicle_model(index)
+            compound_front, compound_rear = api.read.brake.compound_name()
             brake_names = (
-                set_predefined_brake_name(class_name, vehicle_name, True),
-                set_predefined_brake_name(class_name, vehicle_name, False),
+                set_predefined_brake_name(class_name, vehicle_name, compound_front, True),
+                set_predefined_brake_name(class_name, vehicle_name, compound_rear, False),
             )
             for brake in brake_names:
                 if not self.is_value_in_table(brake, self.table_brakes):

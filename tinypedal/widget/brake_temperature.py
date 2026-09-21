@@ -142,7 +142,9 @@ class Realtime(Overlay):
                 vehicle_name = api.read.vehicle.vehicle_model()
                 if self.last_vehicle_name != vehicle_name:
                     self.last_vehicle_name = vehicle_name
-                    self.update_heatmap(api.read.vehicle.class_name(), vehicle_name)
+                    class_name = api.read.vehicle.class_name()
+                    compound_front, compound_rear = api.read.brake.compound_name()
+                    self.update_heatmap(class_name, vehicle_name, compound_front, compound_rear)
 
         # Brake temperature
         btemp = api.read.brake.temperature()
@@ -190,14 +192,12 @@ class Realtime(Overlay):
             target.update()
 
     # Additional methods
-    def update_heatmap(self, class_name: str, vehicle_name: str):
+    def update_heatmap(self, class_name: str, vehicle_name: str, compound_front: str, compound_rear: str):
         """Update heatmap"""
-        heatmap_f = select_brake_heatmap_name(
-            set_predefined_brake_name(class_name, vehicle_name, True)
-        )
-        heatmap_r = select_brake_heatmap_name(
-            set_predefined_brake_name(class_name, vehicle_name, False)
-        )
+        brake_name_front = set_predefined_brake_name(class_name, vehicle_name, compound_front, True)
+        brake_name_rear = set_predefined_brake_name(class_name, vehicle_name, compound_rear, False)
+        heatmap_f = select_brake_heatmap_name(brake_name_front)
+        heatmap_r = select_brake_heatmap_name(brake_name_rear)
         heatmap_style_f = load_heatmap_color(
             heatmap_name=heatmap_f,
             default_name=HEATMAP_DEFAULT_BRAKE,
