@@ -22,7 +22,8 @@ Brands preset function
 
 from __future__ import annotations
 
-from ..constant import CONFIG
+from ..api_control import api
+from ..constant import API, CONFIG
 from ..regex_pattern import rex_lmu_brand_extract
 from ..setting import cfg
 
@@ -36,6 +37,8 @@ def extract_brand_name(value: str, default: str) -> str:
         - Minimum of 2 letters for first word.
         - Minimum of 3 letters for second word (optional), must be in title case.
     """
+    if api.name == API.NAME_RF2:  # disable extraction for listed game
+        return default
     try:
         match_obj = rex_lmu_brand_extract.search(value)
         assert match_obj is not None

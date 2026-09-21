@@ -91,12 +91,6 @@ class VehicleBrandEditor(BaseEditor):
         import_rf2 = import_menu.addAction("RF2 Rest API")
         import_rf2.triggered.connect(self.import_from_rf2)
 
-        import_lmu = import_menu.addAction("LMU Rest API (Primary)")
-        import_lmu.triggered.connect(self.import_from_lmu)
-
-        import_lmu_alt = import_menu.addAction("LMU Rest API (Alternative)")
-        import_lmu_alt.triggered.connect(self.import_from_lmu_alt)
-
         import_json = import_menu.addAction("JSON file")
         import_json.triggered.connect(self.import_from_file)
 
@@ -160,26 +154,6 @@ class VehicleBrandEditor(BaseEditor):
             "/rest/race/car",
         )
 
-    def import_from_lmu(self):
-        """Import brand from LMU (primary source)"""
-        setting_api = cfg.user.setting[API.CONFIG_LMU]
-        self.import_from_restapi(
-            API.ALIAS_LMU,
-            setting_api["url_host"],
-            setting_api["url_port"],
-            "/rest/race/car",
-        )
-
-    def import_from_lmu_alt(self):
-        """Import brand from LMU (alternative source)"""
-        setting_api = cfg.user.setting[API.CONFIG_LMU]
-        self.import_from_restapi(
-            API.ALIAS_LMU,
-            setting_api["url_host"],
-            setting_api["url_port"],
-            "/rest/sessions/getAllVehicles",
-        )
-
     def import_from_restapi(self, sim_name: str, url_host: str, url_port: int, resource_name: str):
         """Import brand from Rest API"""
         try:
@@ -219,13 +193,7 @@ class VehicleBrandEditor(BaseEditor):
 
     def parse_brand_data(self, vehicles: dict):
         """Parse brand data"""
-        if vehicles[0].get("desc"):
-            # Match LMU data format
-            brands_db = {
-                veh["desc"]: veh["manufacturer"]
-                for veh in vehicles
-            }
-        elif vehicles[0].get("name"):
+        if vehicles[0].get("name"):
             # Match RF2 data format
             brands_db = {
                 parse_vehicle_name(veh): veh["manufacturer"]

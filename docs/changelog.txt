@@ -11,6 +11,9 @@ WIP
 * Onboard setting Widget
   - Added "show_wiper_state" option.
 
+* Vehicle Brand Editor
+  - Removed "import from LMU Rest API" option, which no longer required.
+
 2.50.0 (2026-08-31)
 -----------------------------
 * General
@@ -990,11 +993,11 @@ Thanks to everyone supporting the development, have fun.
 * Tyre Wear Widget
   - [New]Add "show_end_stint_remaining" option, which shows estimated total remaining tyre tread at the end of current stint. This option helps to determine whether there is enough tread for current or more stints. Negative reading indicates that there will not be enough tyre tread remaining at the end of current stint.
   - "show_wear_difference" option now shows estimated tyre wear difference per lap (at least one valid lap is required).
-  - Removed "show_live_wear_difference", "freeze_duration" options. 
+  - Removed "show_live_wear_difference", "freeze_duration" options.
 
 * Brake Wear Widget
   - "show_wear_difference" option now shows estimated brake wear difference per lap (at least one valid lap is required).
-  - Removed "show_live_wear_difference", "freeze_duration" options. 
+  - Removed "show_live_wear_difference", "freeze_duration" options.
 
 * Fuel, Virtual Energy Widget
   - [New]Add "show_low_fuel_warning_flash" and "show_low_energy_warning_flash" options (requested by users "ebeninca"), which show warning flash effect while on low fuel or low virtual energy. This option is enabled by default.
@@ -3656,7 +3659,7 @@ Thanks to @DanRZ for suggestions and testing feedback.
   - Add "show_player_highlighted" option,
     which highlights player row with customizable specific color.
   - Add "show_lap_difference" option,
-    which shows different font color based on lap difference between player and opponents. 
+    which shows different font color based on lap difference between player and opponents.
   - Add "show_position", "show_driver_name", "show_time_gap" options,
     which can be turned on or off individually.
   - Add "driver_name_uppercase" option,
@@ -3686,7 +3689,7 @@ Thanks to @DanRZ for suggestions and testing feedback.
     "enable_multi_class_split_mode" is enabled.
     If total vehicle number is above this value,
     any extra vehicles will not be shown.
-    Default value is "50", which is sufficient in most case. 
+    Default value is "50", which is sufficient in most case.
   - Reworked "show_time_gap" option.
     For race session, this option shows time gap between leader and all other drivers.
     For other none race sessions, this option shows the time gap
@@ -4095,7 +4098,7 @@ Thanks to @DanRZ for suggestions and testing feedback.
 * Preset manager
   - [New]Add menu bar with same functionality as tray icon menu for all platform,
     which substitutes tray icon for none-windows platform.
-  - Now handles all underlaying widget & module & APP control. 
+  - Now handles all underlaying widget & module & APP control.
 
 * Sectors Widget
   - Properly saves current session fastest top speed from valid lap.
@@ -4178,7 +4181,7 @@ Thanks to @DanRZ for suggestions and testing feedback.
   - [New]Added fuel consumption recording & delta calculation functions to Fuel module.
   - [New]Fuel delta consumption file is now saved in "TinyPedal\deltabest" folder with *.fuel extension,
     Note: For accuracy purpose, only the fuel delta consumption data from most recent complete lap
-          will be recorded and used for delta consumption calculation. 
+          will be recorded and used for delta consumption calculation.
           This includes full laps that have exceeded track limits, but excludes pitin & pitout laps.
   - Fixed an error that occurred after toggle auto-hide and reload preset.
   - Improved auto-hide function.
@@ -4307,7 +4310,7 @@ Thanks to @DanRZ for suggestions and testing feedback.
   - Moved all fuel usage calculation into the new separated "Fuel Module"
     which runs in a separated thread at a much higher 1000hz refresh rate.
   - Fuel Widget as well as other Widgets now have access to fuel usage info from this module.
-  - Ignores pit-in & pit-out lap for more accurate fuel usage report for endurance race. 
+  - Ignores pit-in & pit-out lap for more accurate fuel usage report for endurance race.
 
 * Gear Widget
   - [New]Display low fuel warning beside speed gauge. Default is set to show only for race.
@@ -4423,7 +4426,7 @@ Thanks to @DanRZ for suggestions and testing feedback.
   - Add new "minimum_speed" setting in config file, default value is 16.5 (m/s),
     which is the minimum speed threshold before APP can record wheel radius samples.
   - Add new "minimum_samples" setting in config file, default value is 400,
-    which is the minimum number of radius samples that required for calculating average wheel radius. 
+    which is the minimum number of radius samples that required for calculating average wheel radius.
   - Both settings significantly increase accuracy of wheel radius reading.
 
 * Gear Widget
@@ -4535,7 +4538,7 @@ Thanks to @DanRZ for suggestions and testing feedback.
 ----------------------------
 * Core
   - Added additional best laptime validation condition for deltabest module
-    that fixed invalid deltabest laptime being saved in some rare cases. 
+    that fixed invalid deltabest laptime being saved in some rare cases.
 
 1.3.2 (2022-05-24)
 ----------------------------
@@ -4666,7 +4669,7 @@ Thanks to @DanRZ for suggestions and testing feedback.
 
 * Wear Widget
   - Show new Tyre wear usage from last lap.
-  - No longer shows Tyre pressure. 
+  - No longer shows Tyre pressure.
 
 * Core
   - [New]Add additional unit types (by thoraxe) for Fuel, Temperature, Weather widgets.

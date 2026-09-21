@@ -1168,31 +1168,21 @@ For brand logo image preparation, see [Brand Logo](#brand-logo) section.
 
 `Brand name` is custom brand name.
 
-Note, brands data are automatically imported for `LMU` while driving, there is no need to manually import them. However it is required to manually import for `RF2`.
+Note, brands data are automatically imported for `LMU` while driving. However it is required to manually import for `RF2`.
 
-To import vehicle brand data from `Rest API`, click `Import from` menu, and select either `RF2 Rest API` or `LMU Rest API`. Note, game updates may introduce new vehicles, it is recommended to re-import after each game update to keep brand info updated.
+To import RF2 vehicle brand data, click `Import from` menu, and select `RF2 Rest API`. Note, updating game or installing mods may introduce new vehicles, which may require to re-import.
 
-Note, there are currently two sources for importing from `LMU Rest API`:
-- Primary: allows to import brands from both original and custom vehicle skins.
-- Alternative: may allow to import some brands that are missing from Primary source. This is normally not required.
-
-**Important notes**
+**Additional notes**
 
 Game must be running in order to import from `Rest API`. Newly imported data will be appended on top of existing data, existing data will not be changed.
 
-If importing fails while game is running, check if `URL Port` option in `RestAPI` module that matches `WebUI port` value that sets in `LMU` (UserData\player\Settings.JSON) or `RF2` (UserData\player\player.JSON) setting file. See [Telemetry API](#telemetry-api) section for details.
+If importing fails while game is running, check if `URL Port` option in `RestAPI` module that matches `WebUI port` value that sets in `RF2` (UserData\player\player.JSON) setting file. See [Telemetry API](#telemetry-api) section for details.
 
 Alternatively, to import vehicle brand data from vehicle `JSON` file, click `Import from` menu, and select `JSON file`.
 
     How to manually export vehicle brand data from RF2 Rest API:
     1. Start RF2, then open following link in web browser:
     localhost:5397/rest/race/car
-    2. Click "Save" button which saves vehicle data to JSON file.
-
-    How to manually export vehicle brand data from LMU Rest API:
-    1. Start LMU, then open following link in web browser:
-    localhost:6397/rest/race/car
-    localhost:6397/rest/sessions/getAllVehicles
     2. Click "Save" button which saves vehicle data to JSON file.
 
     Note: importing feature is experimental. Maximum acceptable JSON file size is limited to "5MB".
