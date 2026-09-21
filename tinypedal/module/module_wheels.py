@@ -247,6 +247,9 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
             pos_last = 0.0  # last checked vehicle position
 
         tread_curr_set = api.read.tyre.wear()
+        if max(tread_curr_set) < 0:
+            continue
+
         lap_number = api.read.lap.completed()
         laptime_curr = api.read.timing.current_laptime()
         pos_curr = api.read.lap.distance()
@@ -387,7 +390,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             pos_last = 0.0  # last checked vehicle position
 
         brake_curr_set = api.read.brake.wear()
-        if -1.0 in brake_curr_set:
+        if max(brake_curr_set) < 0:
             continue
 
         lap_number = api.read.lap.completed()
