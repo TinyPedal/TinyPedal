@@ -106,17 +106,8 @@ Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `Cu
 
 ### Download source code
 
-#### Method 1
-
-Download TinyPedal source code from [Releases](https://github.com/TinyPedal/TinyPedal/releases) page; or click `Code` button at the top of repository and select `Download ZIP`.
-
-Download submodule source code from following links:
-- pyLMUSharedMemory: https://github.com/TinyPedal/pyLMUSharedMemory
-- pyRfactor2SharedMemory: https://github.com/TinyPedal/pyRfactor2SharedMemory
-
-Extract TinyPedal source code ZIP file. Then extract submodule ZIP files and put them in corresponding folder inside `TinyPedal/thirdparty` folder.
-
-#### Method 2
+> [!NOTE]
+> It is not recommended to download source code via `Code` button at the top of repository, as it doesn't contain required submodule files, and not convenient to update or sync source code.
 
 Use [Git](https://git-scm.com/) tool and run following command to clone TinyPedal source code alongside required submodules:
 ```
@@ -144,7 +135,9 @@ It is recommended to setup an isolated development environment for running and t
 
 To start, make sure required Python version was installed. Currently the primary supported Python version is `3.8`, which is used in this example.
 
-First, we need to create a [Python virtual environment](https://docs.python.org/3/library/venv.html). On windows, run following command in `Powershell` (replace the last part to your preferred path, either relative or absolute path):
+First, we need to create a [Python virtual environment](https://docs.python.org/3/library/venv.html). Note, there are other ways or tools for managing virtual environment. This example utilizes Python's built-in module `venv`.
+
+On windows, run following command in `Powershell` (replace the last part to your preferred path, either relative or absolute path):
 
 ```
 py -3.8 -m venv '.virtualenvs\tinypedal_py38'

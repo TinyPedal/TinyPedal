@@ -34,20 +34,17 @@ if __name__ == "__main__":  # local import check
 
 if TYPE_CHECKING:  # for type checker only
     from thirdparty.pyRfactor2SharedMemory import rf2_data
-    from thirdparty.pyRfactor2SharedMemory.rf2_mmap import (
-        INVALID_INDEX,
-        MMapControl,
-        rFactor2Constants,
-    )
+    from thirdparty.pyRfactor2SharedMemory.rf2_data import rFactor2Constants
+    from thirdparty.pyRfactor2SharedMemory.rf2_mmap import MMapControl
 else:  # run time only
     from pyRfactor2SharedMemory import rf2_data
-    from pyRfactor2SharedMemory.rf2_mmap import (
-        INVALID_INDEX,
-        MMapControl,
-        rFactor2Constants,
-    )
+    from pyRfactor2SharedMemory.rf2_data import rFactor2Constants
+    from pyRfactor2SharedMemory.rf2_mmap import MMapControl
 
 logger = logging.getLogger(__name__)
+
+# Constant & Enum
+INVALID_INDEX = rFactor2Constants.INVALID_CAR_INDEX
 
 
 def copy_struct(struct_data):

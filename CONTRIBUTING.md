@@ -52,16 +52,12 @@ Avoid introducing new third-party libraries unless absolutely necessary.
 
 ### Game API support
 
-Implementing game API support should not be taken lightly, there are a few conditions to note below:
+Different games may have very different API accessing methods and data structures. There are a few things to note for implementing new game API support:
 
-- Implementation should be following the code structure/style of this project. Contributor should have a good understanding of this project's code base and how game API works. Code should be clearly written and readable.
+- Proper integration of new game API into the project without compromising existing game API. Code should be clearly written and maintainable.
 
-- Implementation to game API accessing must be restricted to READ-ONLY. **Modifying game API data or controlling game behavior will not be accepted.**
+- Game API accessing must be restricted to READ-ONLY. **Modifying game API data or controlling game behavior will not be accepted.**
 
-- Implementation should be solely related to game API, and should not touch any "Module" or overlay "Widget" code.
+- Implementation must be thoroughly tested and proved to be working via **Pull Requests**, before the code will be accepted into this project. This may take as long as the time required.
 
-- Implementation must be thoroughly tested and proved to be working, as during Pull Requests stage, before the code will be accepted into this project. **No half-baked implementation will be accepted.**
-
-- Contributor should be able to maintain the implementation for at least a short period, and willing to communicate for any issues, otherwise such implementation will likely become outdated and broken overtime (in worst case removed later).
-
-If any of above conditions is not acceptable for you, please do not waste your time on your implementation.
+Please do not waste time on implementation if above notice is not acceptable.

@@ -35,22 +35,17 @@ if __name__ == "__main__":  # local import check
 
 if TYPE_CHECKING:  # for type checker only
     from thirdparty.pyLMUSharedMemory import lmu_data, lmu_enum
-    from thirdparty.pyLMUSharedMemory.lmu_mmap import (
-        INVALID_INDEX,
-        LMUConstants,
-        MMapControl,
-    )
+    from thirdparty.pyLMUSharedMemory.lmu_data import LMUConstants
+    from thirdparty.pyLMUSharedMemory.lmu_mmap import MMapControl
 else:  # run time only
     from pyLMUSharedMemory import lmu_data, lmu_enum
-    from pyLMUSharedMemory.lmu_mmap import (
-        INVALID_INDEX,
-        LMUConstants,
-        MMapControl,
-    )
+    from pyLMUSharedMemory.lmu_data import LMUConstants
+    from pyLMUSharedMemory.lmu_mmap import MMapControl
 
 logger = logging.getLogger(__name__)
 
-# Enum map
+# Constant & Enum
+INVALID_INDEX = LMUConstants.INVALID_CAR_INDEX
 LMU_COMPOUND_TYPE = lmu_enum.enum_map(lmu_enum.LMUCompoundType)
 
 
