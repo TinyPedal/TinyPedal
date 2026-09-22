@@ -1,17 +1,18 @@
 # ignore list
 
-/dist/
-__pycache__/
-.mypy_cache/
+# Temp folder
+**/__pycache__/
+**/.mypy_cache/
+dist/
 
 # User data folder
-/brandlogo/
-/deltabest/
-/settings/
-/trackmap/
-/pacenotes/
-/tracknotes/
-/carsetups/
+brandlogo/
+deltabest/
+settings/
+trackmap/
+pacenotes/
+tracknotes/
+carsetups/
 
 # pipenv stuff
 Pipfile
@@ -26,7 +27,6 @@ pylintrc
 *.fuel
 
 # random file
-test*.py
 *.7z
 *.zip
 *.log
