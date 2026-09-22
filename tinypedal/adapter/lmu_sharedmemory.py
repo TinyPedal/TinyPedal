@@ -25,13 +25,9 @@ from __future__ import annotations
 import ctypes
 import logging
 import threading
-from time import monotonic, sleep
+from time import monotonic
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Sequence
-
-if __name__ == "__main__":  # local import check
-    import sys
-    sys.path.append("thirdparty")
 
 if TYPE_CHECKING:  # for type checker only
     from thirdparty.pyLMUSharedMemory import lmu_data, lmu_enum
@@ -570,45 +566,3 @@ class LMUInfo:
     def vehicleResets(self) -> int:
         """Number of player vehicle resets"""
         return self._sync.resets
-
-
-def test_api():
-    """API test run"""
-    # Add logger
-    test_handler = logging.StreamHandler()
-    logger.setLevel(logging.INFO)
-    logger.addHandler(test_handler)
-
-    # Test run
-    SEPARATOR = "=" * 50
-    print("Test API - Start")
-    info = LMUInfo()
-    info.setMode(1)  # set direct access
-    info.setPlayerOverride(True)  # enable player override
-    info.setPlayerIndex(0)  # set player index to 0
-    info.start()
-    sleep(0.2)
-
-    print(SEPARATOR)
-    print("Test API - Restart")
-    info.stop()
-    info.setMode()  # set copy access
-    info.setPlayerOverride()  # disable player override
-    info.start()
-
-    print(SEPARATOR)
-    print("Test API - Read")
-    version = info.lmuGeneric.gameVersion
-    driver = info.lmuScorVeh(0).mDriverName.decode()
-    track = info.lmuScorInfo.mTrackName.decode()
-    print(f"version: {version if version else 'not running'}")
-    print(f"driver name   : {driver if version else 'not running'}")
-    print(f"track name    : {track if version else 'not running'}")
-
-    print(SEPARATOR)
-    print("Test API - Close")
-    info.stop()
-
-
-if __name__ == "__main__":
-    test_api()

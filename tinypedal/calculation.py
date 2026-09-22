@@ -496,7 +496,6 @@ def search_column_key(key: Sequence, column: int | None = None):
 
 def linear_search_higher(data: Sequence, target: float, column: int | None = None) -> int:
     """linear search nearest value higher index from unordered list"""
-    #key = lambda x:x[column] if column >= 0 else x
     end = len(data) - 1
     nearest = DATA.FLOAT_INF
     for index, data_row in enumerate(data):
