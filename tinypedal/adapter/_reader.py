@@ -540,20 +540,8 @@ class Timing(ABC):
         """Estimated time into lap (seconds)"""
 
     @abstractmethod
-    def current_sector1(self, index: int | None = None) -> float:
-        """Current lap sector 1 time (seconds)"""
-
-    @abstractmethod
-    def current_sector2(self, index: int | None = None) -> float:
-        """Current lap sector 1+2 time (seconds)"""
-
-    @abstractmethod
-    def last_sector1(self, index: int | None = None) -> float:
-        """Last lap sector 1 time (seconds)"""
-
-    @abstractmethod
-    def last_sector2(self, index: int | None = None) -> float:
-        """Last lap sector 1+2 time (seconds)"""
+    def last_sector(self, index: int | None = None) -> float:
+        """Last sector time (seconds)"""
 
     @abstractmethod
     def behind_leader(self, index: int | None = None) -> float:

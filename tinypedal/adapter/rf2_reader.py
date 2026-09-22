@@ -673,21 +673,30 @@ class Timing(_reader.Timing, DataAdapter):
         """Estimated time into lap (seconds)"""
         return rmnan(self.shmm.rf2ScorVeh(index).mTimeIntoLap)
 
-    def current_sector1(self, index: int | None = None) -> float:
-        """Current lap sector 1 time (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mCurSector1)
-
-    def current_sector2(self, index: int | None = None) -> float:
-        """Current lap sector 1+2 time (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mCurSector2)
-
-    def last_sector1(self, index: int | None = None) -> float:
-        """Last lap sector 1 time (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mLastSector1)
-
-    def last_sector2(self, index: int | None = None) -> float:
-        """Last lap sector 1+2 time (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mLastSector2)
+    def last_sector(self, index: int | None = None) -> float:
+        """Last sector time (seconds)"""
+        data = self.shmm.rf2ScorVeh(index)
+        # rF2 sector index 0 = S3, index 1 = S1, index 2 = S2
+        sector_idx = data.mSector
+        last_sector_time = 0.0
+        # In S1, update S3 data
+        if sector_idx == 1:  # S1
+            last_laptime = data.mLastLapTime
+            last_sector2 = data.mLastSector2
+            if last_laptime > 0 < last_sector2:
+                last_sector_time = last_laptime - last_sector2
+        # In S2, update S1 data
+        elif sector_idx == 2:  # S2
+            curr_sector1 = data.mCurSector1
+            if curr_sector1 > 0:
+                last_sector_time = curr_sector1
+        # In S3, update S2 data
+        elif sector_idx == 0:  # S3
+            curr_sector1 = data.mCurSector1
+            curr_sector2 = data.mCurSector2
+            if curr_sector2 > 0 < curr_sector1:
+                last_sector_time = curr_sector2 - curr_sector1
+        return rmnan(last_sector_time)
 
     def behind_leader(self, index: int | None = None) -> float:
         """Time behind leader (seconds)"""

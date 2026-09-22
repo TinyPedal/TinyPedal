@@ -481,9 +481,17 @@ def ema_filter(samples: int, min_samples: int = 1) -> Callable[[float, float], f
     return partial(exp_mov_avg, ema_factor(samples, min_samples))
 
 
-def accumulated_sum(data: list, end_index: int) -> float:
-    """Calculate accumulated sum"""
-    return sum(data[:end_index + 1])
+def sector_sum(data: list, end_index: int, max_value: float = DATA.MAX_SECONDS) -> float:
+    """Calculate accumulated sector sum"""
+    time_sum = 0.0
+    for i, v in enumerate(data):
+        if i > end_index:
+            break
+        if 0 < v < max_value:
+            time_sum += v
+        else:  # stop if any invalid value
+            break
+    return time_sum
 
 
 # Search
