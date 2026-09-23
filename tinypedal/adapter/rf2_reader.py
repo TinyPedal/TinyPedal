@@ -35,7 +35,6 @@ from ..calculation import (
 )
 from ..constant import DATA
 from ..formatter import strip_invalid_char
-from ..process.weather import WeatherNode
 from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
 from . import _reader
@@ -483,14 +482,23 @@ class Session(_reader.Session, DataAdapter):
         scor = self.shmm.rf2ScorInfo
         return rmnan(scor.mAvgPathWetness + (scor.mMinPathWetness + scor.mMaxPathWetness) * 0.001)
 
-    def weather_forecast(self) -> tuple[WeatherNode, ...]:
-        """Weather forecast nodes"""
+    def weather_forecast(self) -> tuple[tuple[float, int, float, float]]:
+        """Weather forecast nodes, 0=forecast minutes, 1=sky type index, 2=air temperature, 3=rain chance"""
         session_type = self.session_type()
-        if session_type <= 1:  # practice session
-            return self.rest.forecastPractice
-        if session_type == 2:  # qualify session
-            return self.rest.forecastQualify
-        return self.rest.forecastRace  # race session
+        if session_type > 2:  # race/warmup session
+            data = self.rest.forecastRace
+        elif session_type > 1:  # qualify session
+            data = self.rest.forecastQualify
+        else:  # test/practice session
+            data = self.rest.forecastPractice
+        elapsed_time = self.shmm.rf2ScorInfo.mCurrentET
+        session_length = self.shmm.rf2ScorInfo.mEndET
+        forecast_data = tuple(
+            (minutes, forecast.sky_type, forecast.temperature, forecast.rain_chance)
+            for forecast in data
+            if (minutes := ((forecast.start * session_length - elapsed_time) // 60)) > 0
+        )
+        return forecast_data
 
     def cloud_coverage(self) -> int:
         """Cloud coverage (type index), range 0 to 10

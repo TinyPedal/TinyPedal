@@ -22,6 +22,7 @@ Vehicle
 
 from __future__ import annotations
 
+from ..calculation import oriyaw
 from ..regex_pattern import rex_number_extract
 
 
@@ -130,3 +131,23 @@ class LastImpact:
             self.timestamp = elapsed_time
             self.position = impact_x, impact_y
         return self
+
+
+class VehicleOrientation:
+    """Vehicle orientation"""
+
+    __slots__ = (
+        "last",
+        "yaw",
+    )
+
+    def __init__(self):
+        self.last = (0.0, 0.0)
+        self.yaw = 0.0
+
+    def update(self, *pos: float) -> float:
+        """Calculate high precision yaw based on coordinates displacement, inaccurate at very low speed"""
+        if self.last != pos:
+            self.yaw = oriyaw(pos[0] - self.last[0], pos[1] - self.last[1])
+            self.last = pos
+        return self.yaw

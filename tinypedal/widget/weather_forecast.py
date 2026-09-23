@@ -28,7 +28,6 @@ from PySide2.QtGui import QPixmap
 from .. import units
 from ..api_control import api
 from ..constant import DATA, FILE
-from ..process.weather import WeatherNode
 from ..userfile.custom_image import split_pixmap_image
 from ._base import Overlay
 from ._painter import ProgressBar
@@ -143,9 +142,6 @@ class Realtime(Overlay):
             right_to_left=layout_reversed,
         )
 
-        # Last data
-        self.estimated_time = [DATA.MAX_FORECAST_MINUTES] * DATA.MAX_FORECASTS
-
     def timerEvent(self, event):
         """Update when vehicle on track"""
         # Read weather data
@@ -153,33 +149,24 @@ class Realtime(Overlay):
         forecast_info = api.read.session.weather_forecast()
         forecast_count = min(len(forecast_info), DATA.MAX_FORECASTS)
 
-        if forecast_count < 1:
-            return
-
-        if finish_as_lap:
-            index_offset = 0
-        else:  # time type race, add index offset to ignore negative estimated time
-            index_offset = self.set_forecast_time(forecast_info)
-
         # Forecast
         for index in range(self.total_slot):
-            index_bias = index + index_offset
-
+            index_bias = index - 1
             # Update slot 0 with live(now) weather condition
             if index == 0:
-                rain_chance = api.read.session.raininess()
                 icon_index = api.read.session.cloud_coverage()
                 estimated_temp = api.read.session.ambient_temperature()
+                rain_chance = api.read.session.raininess()
                 estimated_time = 0
             # Update slot with available forecast
             elif index_bias < forecast_count:
-                rain_chance = forecast_info[index_bias].rain_chance
-                icon_index = forecast_info[index_bias].sky_type
-                estimated_temp = forecast_info[index_bias].temperature
                 if finish_as_lap:
                     estimated_time = DATA.MAX_FORECAST_MINUTES
                 else:
-                    estimated_time = self.estimated_time[index_bias]
+                    estimated_time = forecast_info[index_bias][0]
+                icon_index = forecast_info[index_bias][1]
+                estimated_temp = forecast_info[index_bias][2]
+                rain_chance = forecast_info[index_bias][3]
             # Update slot with unavailable forecast
             else:
                 rain_chance = 0
@@ -249,23 +236,6 @@ class Realtime(Overlay):
                     self.bars_temp[slot_index].setHidden(unavailable)
                 if self.wcfg["show_rain_chance_bar"]:
                     self.bars_rain[slot_index].setHidden(unavailable)
-
-    # Additional methods
-    def set_forecast_time(self, forecast_info: tuple[WeatherNode, ...]) -> int:
-        """Set forecast estimated time"""
-        index_offset = 0
-        session_length = api.read.session.end()
-        elapsed_time = api.read.session.elapsed()
-        for index, forecast in enumerate(forecast_info):
-            if index == 0:
-                continue
-            # Seconds away = next node start percent * session length - elapsed time
-            _time = self.estimated_time[index] = round(
-                (forecast.start * session_length - elapsed_time) / 60)
-            if _time <= 0:
-                index_offset += 1
-        return index_offset
-
 
 def create_weather_icon_set(icon_size: int):
     """Create weather icon set"""
