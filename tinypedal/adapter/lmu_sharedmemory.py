@@ -26,7 +26,6 @@ import ctypes
 import logging
 import threading
 from time import monotonic
-from types import MappingProxyType
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:  # for type checker only
@@ -37,6 +36,9 @@ else:  # run time only
     from pyLMUSharedMemory import lmu_data, lmu_enum
     from pyLMUSharedMemory.lmu_data import LMUConstants
     from pyLMUSharedMemory.lmu_mmap import MMapControl
+
+from ..process.session import LMUResults
+from ..process.timing import LastLapTime, TimeScale
 
 logger = logging.getLogger(__name__)
 
@@ -77,91 +79,6 @@ def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[lmu_data.LMUVehic
         if veh_info.mID == slot_id:
             return scor_idx
     return INVALID_INDEX
-
-
-class LapTimeData:
-    """Unverified lap time data"""
-
-    __slots__ = (
-        "last",
-        "timestamp",
-    )
-
-    def __init__(self):
-        self.last = 0.0
-        self.timestamp = 0.0
-
-    def update(self, timestamp: float) -> float:
-        """Update unverified lap time based on lap start time"""
-        if self.timestamp != timestamp:
-            if 0 < self.timestamp < timestamp:
-                self.last = timestamp - self.timestamp
-            else:
-                self.last = 0.0
-            self.timestamp = timestamp
-        return self.last
-
-
-class LMUResults:
-    """LMU results data (extracted from results stream)"""
-
-    DEFAULT = MappingProxyType({
-        "contact_vehicle": 0,
-        "contact_immovable": 0,
-        "track_cut": 0,
-    })
-    __slots__ = (
-        "data",
-        "timestamp",
-        "_last_stream",
-    )
-
-    def __init__(self):
-        self.data = {}
-        self.timestamp = 0
-        self._last_stream = b""
-
-    def check_missing(self, driver: bytes):
-        """Check & add missing driver"""
-        if driver not in self.data:
-            self.data[driver] = self.DEFAULT.copy()
-
-    def update(self, stream: bytes):
-        """Update results data"""
-        # Check stream
-        if self._last_stream == stream:
-            return
-        self._last_stream = stream
-        if not stream:
-            return
-        # Parse stream
-        results_data = self.data
-        for line in stream.split(b"\n"):
-            if not line:
-                continue
-            # Log incidents
-            if line.startswith(b"<Incident"):
-                pos_beg = line.find(b">")
-                if pos_beg > 8:
-                    pos_beg += 1
-                    pos_end = line.find(b"(", pos_beg)
-                    driver = line[pos_beg:pos_end]
-                    self.check_missing(driver)
-                    if b"with another vehicle" in line:
-                        results_data[driver]["contact_vehicle"] += 1
-                    else:
-                        results_data[driver]["contact_immovable"] += 1
-                continue
-            # Log track cuts
-            if line.startswith(b"<TrackLimits"):
-                if b"No Further Action" not in line:
-                    pos_beg = line.find(b"Driver=")
-                    if pos_beg > 11:
-                        pos_beg += 8
-                        pos_end = line.find(b'"', pos_beg)
-                        driver = line[pos_beg:pos_end]
-                        self.check_missing(driver)
-                        results_data[driver]["track_cut"] += 1
 
 
 class MMapDataSet:
@@ -441,6 +358,7 @@ class LMUInfo:
         "_state_override",
         "_active_state",
         "_laptime_last",
+        "_time_scale",
         "_shmm",
     )
 
@@ -449,7 +367,8 @@ class LMUInfo:
         self._access_mode = 0
         self._state_override = False
         self._active_state = False
-        self._laptime_last = tuple(LapTimeData() for _ in range(LMUConstants.MAX_MAPPED_VEHICLES))
+        self._laptime_last = tuple(LastLapTime() for _ in range(LMUConstants.MAX_MAPPED_VEHICLES))
+        self._time_scale = TimeScale()
         # Assign mmap instance
         self._shmm = self._sync.dataset.shmm
 
@@ -492,6 +411,12 @@ class LMUInfo:
     def lmuScorInfo(self) -> lmu_data.LMUScoringInfo:
         """LMU scoring info data"""
         return self._shmm.data.scoring.scoringInfo
+
+    @property
+    def lmuTimeScale(self) -> TimeScale:
+        """LMU time scale"""
+        data = self._shmm.data.scoring.scoringInfo
+        return self._time_scale.update(data.mCurrentET, data.mTimeOfDay)
 
     def lmuLastLapTime(self, index: int | None = None) -> float:
         """LMU unverified last lap time data

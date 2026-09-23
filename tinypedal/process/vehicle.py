@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Vehicle function
+Vehicle
 """
 
 from __future__ import annotations
@@ -72,3 +72,61 @@ def absolute_refilling(dataset: list[dict], default: float) -> float:
     except (AttributeError, TypeError, IndexError, ValueError):
         abs_refill = default
     return abs_refill
+
+
+class LastImpact:
+    """Calculate last impact time & position based on damage
+
+    Attributes:
+        position: last impact position (x, y coordinates).
+        timestamp: last impact timestamp.
+    """
+
+    __slots__ = (
+        "_damage",
+        "_impact_refer_x",
+        "_impact_refer_y",
+        "position",
+        "timestamp",
+    )
+
+    def __init__(self):
+        self._impact_refer_x = (0, 0, -1, 1, -1, 1, -1, 1)  # impact position reference
+        self._impact_refer_y = (-1, 1, 0, 0, -1, -1, 1, 1)
+        self._damage = [0.0] * 8
+        self.position = (0.0, 0.0)
+        self.timestamp = 0.0
+
+    def update(self, elapsed_time: float, *damages: float) -> LastImpact:
+        """Update last impact time & position
+
+        Damage arguments order:
+            0=front, 1=rear, 2=left, 3=right, 4=front left, 5=front right, 6=rear left, 7=rear right.
+
+        Position order:
+            front=Y-1, rear=Y+1, left=X-1, right=X+1.
+        """
+        impacted = False
+        impact_x = impact_y = 0
+        # Reset on session changed
+        if self.timestamp > elapsed_time:
+            self.timestamp = 0.0
+            for idx in range(8):
+                self._damage[idx] = 0.0
+        # Record impact coordinates
+        for idx, damage in enumerate(damages):
+            if self._damage[idx] != damage:
+                if self._damage[idx] > damage:
+                    self._damage[idx] = 0.0
+                else:
+                    self._damage[idx] = damage
+                    impacted = True
+                    if 0 != idx != 1:  # ignore front, rear
+                        impact_x = self._impact_refer_x[idx]
+                    if 2 != idx != 3:  # ignore left, right
+                        impact_y = self._impact_refer_y[idx]
+        # Update impact time
+        if impacted:
+            self.timestamp = elapsed_time
+            self.position = impact_x, impact_y
+        return self

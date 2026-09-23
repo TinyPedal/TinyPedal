@@ -545,7 +545,7 @@ class Session(_reader.Session, DataAdapter):
 
     def time_scale(self) -> int:
         """Time scale"""
-        return max(self.rest.timeScale, 0)
+        return self.shmm.lmuTimeScale.scale
 
     def limits_points(self) -> float:
         """Track limits points per penalty"""

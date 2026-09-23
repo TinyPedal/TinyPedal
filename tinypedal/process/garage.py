@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Garage setting function
+Garage (car setup)
 """
 
 from __future__ import annotations

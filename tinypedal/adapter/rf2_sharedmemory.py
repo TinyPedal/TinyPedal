@@ -37,6 +37,8 @@ else:  # run time only
     from pyRfactor2SharedMemory.rf2_data import rFactor2Constants
     from pyRfactor2SharedMemory.rf2_mmap import MMapControl
 
+from ..process.timing import LastLapTime
+
 logger = logging.getLogger(__name__)
 
 # Constant & Enum
@@ -75,29 +77,6 @@ def local_scoring_index_by_id(slot_id: int, scor_veh: Sequence[rf2_data.rF2Vehic
         if veh_info.mID == slot_id:
             return scor_idx
     return INVALID_INDEX
-
-
-class LapTimeData:
-    """Unverified lap time data"""
-
-    __slots__ = (
-        "last",
-        "timestamp",
-    )
-
-    def __init__(self):
-        self.last = 0.0
-        self.timestamp = 0.0
-
-    def update(self, timestamp: float) -> float:
-        """Update unverified lap time based on lap start time"""
-        if self.timestamp != timestamp:
-            if 0 < self.timestamp < timestamp:
-                self.last = timestamp - self.timestamp
-            else:
-                self.last = 0.0
-            self.timestamp = timestamp
-        return self.last
 
 
 class MMapDataSet:
@@ -402,7 +381,7 @@ class RF2Info:
         self._rf2_pid = ""
         self._state_override = False
         self._active_state = False
-        self._laptime_last = tuple(LapTimeData() for _ in range(rFactor2Constants.MAX_MAPPED_VEHICLES))
+        self._laptime_last = tuple(LastLapTime() for _ in range(rFactor2Constants.MAX_MAPPED_VEHICLES))
         # Assign mmap instance
         self._scor = self._sync.dataset.scor
         self._tele = self._sync.dataset.tele

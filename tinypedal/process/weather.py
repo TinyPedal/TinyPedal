@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Weather forecast function
+Weather forecast
 """
 
 from __future__ import annotations
