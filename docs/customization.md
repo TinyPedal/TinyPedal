@@ -4990,7 +4990,7 @@ Set number of samples for reducing data fluctuation. Lower value may result more
 ## Wind direction
 **This widget displays wind direction and speed info.**
 
-Note, wind arrow and direction marks are displayed relative to player's vehicle heading. Currently `RF2` and `LMU` do not have wind simulation, so readings are always zero in both games.
+Note, wind arrow and direction marks are displayed relative to player's vehicle heading. Currently `RF2` and `LMU` do not have wind simulation, wind arrow and speed readings are not displayed.
 
     display_size
 Set widget display size in pixels.

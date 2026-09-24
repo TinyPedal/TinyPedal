@@ -26,6 +26,7 @@ from PySide2.QtGui import QBrush, QPainter, QPen
 from .. import calculation as calc
 from .. import units
 from ..api_control import api
+from ..constant import DATA
 from ._base import Overlay
 
 
@@ -149,21 +150,23 @@ class Realtime(Overlay):
             painter_drawLine(0, -mark_start, 0, -mark_end),  # north
 
         # Draw wind arrow
-        wind_speed = api.read.session.wind_speed()
-        painter.setPen(Qt.NoPen)
-        painter.rotate(api.read.session.wind_direction())
-        painter.setBrush(self.wind_strength_color(wind_speed))
-        painter.drawPolygon(self.arrow_shape)
+        wind_direction = api.read.session.wind_direction()
+        if wind_direction != DATA.FLOAT_INF:  # draw if valid
+            wind_speed = api.read.session.wind_speed()
+            painter.setPen(Qt.NoPen)
+            painter.rotate(wind_direction)
+            painter.setBrush(self.wind_strength_color(wind_speed))
+            painter.drawPolygon(self.arrow_shape)
 
-        # Draw text
-        if self.wcfg["show_wind_speed"]:
-            painter.resetTransform()
-            if self.wcfg["show_wind_speed_unit"]:
-                text_angle = f"{self.unit_speed(wind_speed):.{self.decimals}f}{self.symbol_speed}"
-            else:
-                text_angle = f"{self.unit_speed(wind_speed):.{self.decimals}f}"
-            painter.setPen(self.pen_text)
-            painter.drawText(self.rect_text, Qt.AlignCenter, text_angle)
+            # Draw text
+            if self.wcfg["show_wind_speed"]:
+                painter.resetTransform()
+                if self.wcfg["show_wind_speed_unit"]:
+                    text_angle = f"{self.unit_speed(wind_speed):.{self.decimals}f}{self.symbol_speed}"
+                else:
+                    text_angle = f"{self.unit_speed(wind_speed):.{self.decimals}f}"
+                painter.setPen(self.pen_text)
+                painter.drawText(self.rect_text, Qt.AlignCenter, text_angle)
 
     def wind_strength_color(self, wind_speed: float):
         """Wind strength color"""

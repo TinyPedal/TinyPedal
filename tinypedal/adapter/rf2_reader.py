@@ -81,7 +81,7 @@ class State(_reader.State, DataAdapter):
     def version(self) -> str:
         """Identify API version"""
         version = tostr(self.shmm.rf2Ext.mVersion)
-        return version if version else "unknown"
+        return version if version else DATA.TEXT_NA
 
 
 class Brake(_reader.Brake, DataAdapter):
@@ -545,7 +545,7 @@ class Session(_reader.Session, DataAdapter):
 
     def wind_direction(self) -> float:
         """Wind direction (degrees)"""
-        return 0.0
+        return DATA.FLOAT_INF
 
     def wind_speed(self) -> float:
         """Wind speed (m/s)"""

@@ -82,7 +82,7 @@ class State(_reader.State, DataAdapter):
         """Identify API version"""
         version = str(self.shmm.lmuGeneric.gameVersion)
         if len(version) < 2:
-            return "unknown"
+            return DATA.TEXT_NA
         return f"{version[0]}.{version[1:]}"
 
 
@@ -572,7 +572,7 @@ class Session(_reader.Session, DataAdapter):
 
     def wind_direction(self) -> float:
         """Wind direction (degrees)"""
-        return 0.0
+        return DATA.FLOAT_INF
 
     def wind_speed(self) -> float:
         """Wind speed (m/s)"""

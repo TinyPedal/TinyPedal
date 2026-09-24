@@ -175,6 +175,9 @@ def set_style_window(base_font_pt: int) -> str:
             border: none;
             padding: 0.1em 0.2em;
         }}
+        #statusBarButtonAPI {{
+            font-weight: bold;
+        }}
         AppWindow QStatusBar > QPushButton::hover {{
             color: {color_active_highlighted_text};
             background: {color_active_highlight};

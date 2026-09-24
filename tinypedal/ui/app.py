@@ -133,6 +133,7 @@ class StatusButtonBar(QStatusBar):
     def __init__(self, parent):
         super().__init__(parent)
         self.button_api = QPushButton("")
+        self.button_api.setObjectName("statusBarButtonAPI")
         self.button_api.clicked.connect(self.refresh)
         self.button_api.setToolTip("Config Telemetry API")
 
