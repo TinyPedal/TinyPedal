@@ -4,3 +4,6 @@
 [submodule "pyLMUSharedMemory"]
 	path = thirdparty/pyLMUSharedMemory
 	url = https://github.com/TinyPedal/pyLMUSharedMemory.git
+[submodule "pyACCSharedMemory"]
+	path = thirdparty/pyACCSharedMemory
+	url = https://github.com/TinyPedal/pyACCSharedMemory.git
