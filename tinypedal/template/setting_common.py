@@ -44,6 +44,7 @@ COMMON_DEFAULT = {
         "turbo_pressure_unit": "bar",
         "tyre_pressure_unit": "kPa",
         "weight_unit": "Kilogram",
+        "wind_speed_unit": "m/s",
     },
     "pace_notes_playback": {
         "enable": False,

@@ -864,6 +864,9 @@ Available units: `kPa`, `psi`, `bar`.
     weight_unit
 Available units: `Kilogram`, `Pound`.
 
+    wind_speed_unit
+Available units: `KPH`, `MPH`, `m/s`.
+
 [**`Back to Top`**](#)
 
 
@@ -1759,7 +1762,7 @@ Note, timing precision is limited by `game API` and `update_interval`, which may
 Set column horizontal display order. Set `0` to show from left to right. Set `1` to show from right to left instead.
 
     speed_range_*_start, speed_range_*_end
-Set the start and end target speed values for measuring acceleration time. Speed value is defined in meter per second, and displayed according [Speed Units](#units) setting. To hide specific slot, set both target speed values to `0`.
+Set the start and end target speed values for measuring acceleration time. Speed value is defined in meters per second, and displayed according [Speed Units](#units) setting. To hide specific slot, set both target speed values to `0`.
 
 Note, to properly count acceleration from `0` start speed, set slightly higher value such as `0.6` instead of '0', because vehicle in game will not be sitting perfectly still at 0 speed while stopped.
 
@@ -4982,3 +4985,48 @@ Show total toe angle between left and right wheel on the same axle, useful for q
 Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
 
 [**`Back to Top`**](#)
+
+
+## Wind direction
+**This widget displays wind direction and speed info.**
+
+Note, wind arrow and direction marks are displayed relative to player's vehicle heading. Currently `RF2` and `LMU` do not have wind simulation, so readings are always zero in both games.
+
+    display_size
+Set widget display size in pixels.
+
+    display_margin
+Set widget display margin in pixels.
+
+    wind_arrow_scale_*
+Set wind arrow size scale.
+
+    show_wind_strength_color
+Show wind strength color indication on wind arrow (overrides `wind_arrow_color` option).
+
+    wind_strength_threshold
+Set wind speed (m/s) threshold for detecting wind strength. Default threshold values are roughly based on `Beaufort Wind Scale`.
+
+    show_background
+Show background color that covers entire widget.
+
+    show_circle_background
+Show circle background color.
+
+    show_wind_speed
+Show wind speed reading. Default unit is meters per second (m/s). Units can be changed in [Units](#units) dialog.
+
+    show_wind_speed_unit
+Show wind speed unit text.
+
+    show_direction_mark
+Show direction marks according to cardinal directions.
+
+    direction_mark_north_*
+Set direction mark style for North direction.
+
+    direction_mark_major_*
+Set direction mark style for other major directions (South, West, East).
+
+    direction_mark_minor_*
+Set direction mark style for minor directions in between major directions (30 degrees apart).

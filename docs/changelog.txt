@@ -11,6 +11,15 @@ WIP
 * Onboard setting Widget
   - Added "show_wiper_state" option.
 
+* [New]Wind direction Widget
+  - Show wind arrow and direction marks relative to player's vehicle heading.
+  - Show wind strength color indication on wind arrow, with customizable wind strength threshold setting.
+  - Show wind speed reading, default unit is "m/s", which can be changed in "Units" dialog.
+  - Note, currently "RF2" and "LMU" do not have wind simulation, so readings are always zero in both games.
+
+* Units
+  - Added "wind speed unit" option in "Units" config dialog.
+
 * Vehicle Brand Editor
   - Removed "import from LMU Rest API" option, which no longer required.
 

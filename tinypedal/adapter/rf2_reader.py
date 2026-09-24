@@ -543,6 +543,14 @@ class Session(_reader.Session, DataAdapter):
         """Current track limits cut points per penalty"""
         return 0.0
 
+    def wind_direction(self) -> float:
+        """Wind direction (degrees)"""
+        return 0.0
+
+    def wind_speed(self) -> float:
+        """Wind speed (m/s)"""
+        return 0.0
+
 
 class Switch(_reader.Switch, DataAdapter):
     """Switch"""

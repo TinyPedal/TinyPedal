@@ -429,6 +429,14 @@ class Session(ABC):
     def cut_points(self, index: int | None = None) -> float:
         """Current track limits cut points per penalty"""
 
+    @abstractmethod
+    def wind_direction(self) -> float:
+        """Wind direction (degrees)"""
+
+    @abstractmethod
+    def wind_speed(self) -> float:
+        """Wind speed (m/s)"""
+
 
 class Switch(ABC):
     """Switch"""

@@ -249,7 +249,7 @@ def set_symbol_speed(unit_name: str = "m/s") -> str:
         unit_name: "KPH", "MPH", "m/s".
     """
     if unit_name == "KPH":
-        return "km/h"
+        return "kph"
     if unit_name == "MPH":
         return "mph"
     return "m/s"
