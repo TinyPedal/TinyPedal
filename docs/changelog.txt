@@ -13,9 +13,8 @@ WIP
 
 * [New]Wind direction Widget
   - Show wind arrow and direction marks relative to player's vehicle heading.
-  - Show wind strength color indication on wind arrow, with customizable wind strength threshold setting.
-  - Show wind speed reading, default unit is "m/s", which can be changed in "Units" dialog.
-  - Note, currently "RF2" and "LMU" do not have wind simulation, wind arrow and speed readings are not displayed.
+  - Show wind strength color indication on wind arrow, with customizable wind strength threshold setting. Note, wind arrow will be replaced by a solid circle if wind speed is below "calm" threshold.
+  - Show wind speed reading, default unit is "m/s", which can be changed in "Units" dialog. Note, currently "RF2" and "LMU" do not have wind simulation, wind speed is always zero.
 
 * Mapping Module
   - Added "minimum_node_distance" option, which sets minimum recording distance (in meters) between each map node sample.

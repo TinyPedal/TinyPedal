@@ -3991,6 +3991,7 @@ WIDGET_DEFAULT = {
         "wind_arrow_scale_center": 0.1,
         "wind_arrow_color": "#FFFFFF",
         "show_wind_strength_color": True,
+        "wind_strength_threshold_calm": 0.1,
         "wind_strength_threshold_light": 2.0,
         "wind_strength_threshold_moderate": 6.0,
         "wind_strength_threshold_strong": 11.0,

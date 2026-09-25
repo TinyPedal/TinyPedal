@@ -67,6 +67,8 @@ class Realtime(Overlay):
         )
 
         # Arrow shape
+        size_nowind = area_center / 3
+        self.arrow_nowind = QRect(-size_nowind / 2, -size_nowind / 2, size_nowind, size_nowind)
         self.arrow_shape = (
             QPointF(0, -area_center * self.wcfg["wind_arrow_scale_top"]),
             QPointF(area_center * self.wcfg["wind_arrow_scale_side"], area_center * self.wcfg["wind_arrow_scale_bottom"]),
@@ -151,22 +153,29 @@ class Realtime(Overlay):
 
         # Draw wind arrow
         wind_direction = api.read.session.wind_direction()
-        if wind_direction != DATA.FLOAT_INF:  # draw if valid
-            wind_speed = api.read.session.wind_speed()
+        wind_speed = api.read.session.wind_speed()
+        if (
+            wind_speed < self.wcfg["wind_strength_threshold_calm"]
+            or wind_direction == DATA.FLOAT_INF
+        ):
+            painter.setPen(Qt.NoPen)
+            painter.setBrush(self.brush_arrow[0])
+            painter.drawEllipse(self.arrow_nowind)
+        else:
             painter.setPen(Qt.NoPen)
             painter.rotate(wind_direction)
             painter.setBrush(self.wind_strength_color(wind_speed))
             painter.drawPolygon(self.arrow_shape)
 
-            # Draw text
-            if self.wcfg["show_wind_speed"]:
-                painter.resetTransform()
-                if self.wcfg["show_wind_speed_unit"]:
-                    text_angle = f"{self.unit_speed(wind_speed):.{self.decimals}f}{self.symbol_speed}"
-                else:
-                    text_angle = f"{self.unit_speed(wind_speed):.{self.decimals}f}"
-                painter.setPen(self.pen_text)
-                painter.drawText(self.rect_text, Qt.AlignCenter, text_angle)
+        # Draw text
+        if self.wcfg["show_wind_speed"]:
+            painter.resetTransform()
+            if self.wcfg["show_wind_speed_unit"]:
+                text_angle = f"{self.unit_speed(wind_speed):.{self.decimals}f}{self.symbol_speed}"
+            else:
+                text_angle = f"{self.unit_speed(wind_speed):.{self.decimals}f}"
+            painter.setPen(self.pen_text)
+            painter.drawText(self.rect_text, Qt.AlignCenter, text_angle)
 
     def wind_strength_color(self, wind_speed: float):
         """Wind strength color"""

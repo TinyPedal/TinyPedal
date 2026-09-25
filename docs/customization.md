@@ -4993,7 +4993,7 @@ Set number of samples for reducing data fluctuation. Lower value may result more
 ## Wind direction
 **This widget displays wind direction and speed info.**
 
-Note, wind arrow and direction marks are displayed relative to player's vehicle heading. Currently `RF2` and `LMU` do not have wind simulation, wind arrow and speed readings are not displayed.
+Note, wind arrow and direction marks are displayed relative to player's vehicle heading. Currently `RF2` and `LMU` do not have wind simulation, wind speed is always zero.
 
     display_size
 Set widget display size in pixels.
@@ -5009,6 +5009,8 @@ Show wind strength color indication on wind arrow (overrides `wind_arrow_color` 
 
     wind_strength_threshold
 Set wind speed (m/s) threshold for detecting wind strength. Default threshold values are roughly based on `Beaufort Wind Scale`.
+
+Note, wind arrow will be replaced by a solid circle if wind speed is below `calm` threshold.
 
     show_background
 Show background color that covers entire widget.
