@@ -54,9 +54,11 @@ class Realtime(Overlay):
                 len(self.wcfg["prefix_water_temperature"]),
             )
             width_water = width_oil
+            width_exhaust = width_oil
         else:
             width_oil = len(self.wcfg["prefix_oil_temperature"])
             width_water = len(self.wcfg["prefix_water_temperature"])
+            width_exhaust = len(self.wcfg["prefix_exhaust_temperature"])
 
         # Config units
         self.unit_temp = units.set_unit_temperature(self.cfg.units["temperature_unit"])
@@ -176,11 +178,66 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_water_temperature"],
             )
 
+        # Exhaust temperature
+        if self.wcfg["show_exhaust_temperature"]:
+            layout_exhaust = self.set_grid_layout()
+            self.bar_style_exhaust_temp = (
+                self.wcfg["background_color_exhaust_temperature"],
+                self.wcfg["warning_color_overheat"],
+            )
+            self.bar_exhaust_temp = self.set_rawtext(
+                text="0.000°",
+                width=font_m.width * 6 + bar_padx,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_exhaust_temperature"],
+                bg_color=self.bar_style_exhaust_temp[0],
+                last=0,
+            )
+            layout_exhaust.addWidget(self.bar_exhaust_temp, 0, 1)
+            if self.wcfg["show_temperature_prefix"]:
+                bar_exhaust_prefix = self.set_rawtext(
+                    text=self.wcfg["prefix_exhaust_temperature"],
+                    width=font_m.width * width_exhaust + bar_padx,
+                    fixed_height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.wcfg["font_color_prefix"],
+                    bg_color=self.wcfg["background_color_prefix"],
+                )
+                layout_exhaust.addWidget(bar_exhaust_prefix, 0, 0)
+            if self.wcfg["show_rate_of_change"]:
+                self.bar_exhaust_rate = self.set_rawtext(
+                    text="0.0",
+                    width=font_m.width * 3 + bar_padx,
+                    fixed_height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.bar_style_rate[2],
+                    bg_color=self.wcfg["background_color_rate_of_change"],
+                    last=0,
+                )
+                layout_exhaust.addWidget(self.bar_exhaust_rate, 0, 2)
+            if self.wcfg["show_net_change_per_lap"]:
+                self.bar_exhaust_net = self.set_rawtext(
+                    text="0.0",
+                    width=font_m.width * 3 + bar_padx,
+                    fixed_height=font_m.height,
+                    offset_y=font_m.voffset,
+                    fg_color=self.bar_style_rate[2],
+                    bg_color=self.wcfg["background_color_rate_of_change"],
+                    last=0,
+                )
+                layout_exhaust.addWidget(self.bar_exhaust_net, 0, 3)
+            self.set_primary_orient(
+                target=layout_exhaust,
+                column=self.wcfg["display_order_exhaust_temperature"],
+            )
+
         # Last data
         self.last_elapsed_time = 0.0
         self.last_lap_number = -1
         self.last_temp_oil = 0.0
         self.last_temp_water = 0.0
+        self.last_temp_exhaust = 0.0
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -229,6 +286,22 @@ class Realtime(Overlay):
             if self.wcfg["show_net_change_per_lap"] and new_lap:
                 self.update_net(self.bar_water_net, temp_water, self.bar_water_net.last)
 
+        # Exhaust temperature
+        if self.wcfg["show_exhaust_temperature"]:
+            temp_exhaust = api.read.engine.exhaust_temperature()
+            self.update_exhaust(self.bar_exhaust_temp, temp_exhaust)
+
+            if self.wcfg["show_rate_of_change"] and interval:
+                rate_exhaust = self.calc_ema_rdiff(
+                    self.bar_exhaust_rate.last,
+                    (temp_exhaust - self.last_temp_exhaust) * interval
+                )
+                self.last_temp_exhaust = temp_exhaust
+                self.update_rate(self.bar_exhaust_rate, rate_exhaust)
+
+            if self.wcfg["show_net_change_per_lap"] and new_lap:
+                self.update_net(self.bar_exhaust_net, temp_exhaust, self.bar_exhaust_net.last)
+
     # GUI update methods
     def update_oil(self, target, data):
         """Oil temperature"""
@@ -246,6 +319,15 @@ class Realtime(Overlay):
             text_temp = f"{self.unit_temp(data):.3f}"
             target.text = f"{text_temp:.5}°"
             target.bg = self.bar_style_water_temp[data >= self.wcfg["overheat_threshold_water"]]
+            target.update()
+
+    def update_exhaust(self, target, data):
+        """Exhaust temperature"""
+        if target.last != data:
+            target.last = data
+            text_temp = f"{self.unit_temp(data):.3f}"
+            target.text = f"{text_temp:.5}°"
+            target.bg = self.bar_style_exhaust_temp[data >= self.wcfg["overheat_threshold_exhaust"]]
             target.update()
 
     def update_rate(self, target, data):

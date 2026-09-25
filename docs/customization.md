@@ -2302,8 +2302,11 @@ Show oil temperature.
     show_water_temperature
 Show water temperature.
 
-    overheat_threshold_oil, overheat_threshold_water
-Set temperature threshold for oil and water overheat color indicator, unit in Celsius.
+    show_exhaust_temperature
+Show exhaust temperature.
+
+    overheat_threshold_*
+Set temperature threshold for overheat color indicator, unit in Celsius.
 
     show_rate_of_change
 Show temperature rate of change for a specific time interval.

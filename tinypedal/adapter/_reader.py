@@ -182,6 +182,10 @@ class Engine(ABC):
         """Water temperature (Celsius)"""
 
     @abstractmethod
+    def exhaust_temperature(self, index: int | None = None) -> float:
+        """Exhaust temperature (Celsius)"""
+
+    @abstractmethod
     def lift_and_coast_progress(self, index: int | None = None) -> float:
         """Lift and coast progress (fraction), range 0.0 to 1.0"""
 

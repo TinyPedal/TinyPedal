@@ -5,6 +5,9 @@ WIP
   - Removed unused "electric_braking_allocation" option from Brake bias Widget.
   - Moved all submodules to "thirdparty" folder. If you are running the APP from source, make sure to run "git submodule update --init" command to sync submodule.
 
+* Engine temperature Widget
+  - Added "show_exhaust_temperature" option.
+
 * Relative, Rivals, Standings Widget
   - Added "show_track_limits_points" option (requested by user "paulndale79-png"), which shows driver's current track limits points (LMU only). This option is disabled by default.
 

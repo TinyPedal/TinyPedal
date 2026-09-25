@@ -206,6 +206,10 @@ class Engine(_reader.Engine, DataAdapter):
         """Water temperature (Celsius)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mEngineWaterTemp)
 
+    def exhaust_temperature(self, index: int | None = None) -> float:
+        """Exhaust temperature (Celsius)"""
+        return 0.0
+
     def lift_and_coast_progress(self, index: int | None = None) -> float:
         """Lift and coast progress (fraction), range 0.0 to 1.0"""
         return 0.0
