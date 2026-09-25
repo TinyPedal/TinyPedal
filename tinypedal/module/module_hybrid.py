@@ -110,16 +110,17 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
         elapsed_time = api.read.timing.elapsed()
         battery_charge = api.read.emotor.battery_charge() * 100
         motor_state = api.read.emotor.state()
+        laptime_curr = api.read.timing.current_laptime()
 
         # Lap start & finish detection
-        if last_lap_number < lap_number:
+        if last_lap_number != lap_number and laptime_curr < 1:
             battery_drain_last = battery_drain
             battery_regen_last = battery_regen
             battery_drain = 0
             battery_regen = 0
             motor_active_timer = 0
             delta_reset = True
-        last_lap_number = lap_number  # reset
+            last_lap_number = lap_number
 
         # Battery charge consumption
         if last_battery_charge:
@@ -163,7 +164,6 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
 
         # Battery charge delta calculation
         if motor_state != 0:
-            laptime_curr = api.read.timing.current_laptime()
             pos_curr = api.read.lap.distance()
             is_pit_lap |= api.read.vehicle.in_pits()
 
@@ -173,13 +173,13 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
                     delta_array_last = tuple(delta_array_raw)
                 delta_array_raw[:] = DATA.DELTA_DEFAULT
                 pos_last = pos_curr
-                delta_recording = laptime_curr < 1
+                delta_recording = True
                 net_change_last = battery_regen_last - battery_drain_last
                 is_valid_delta = len(delta_array_last) > 1
                 is_pit_lap = 0
 
             # Distance desync check at start of new lap, reset if higher than normal distance
-            if 0 < laptime_curr < 1 and pos_curr > 300:
+            if 1 > laptime_curr > 0 and pos_curr > 300:
                 pos_last = pos_curr = 0
             elif pos_last > pos_curr:
                 pos_last = pos_curr

@@ -61,6 +61,7 @@ MODULE_DEFAULT = {
         "enable": True,
         "update_interval": 10,
         "idle_update_interval": 400,
+        "minimum_node_distance": 5,
     },
     "module_notes": {
         "enable": True,

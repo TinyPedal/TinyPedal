@@ -179,7 +179,7 @@ def record_stint_history(
 
     # Stint consistency
     pitting = True
-    last_lap_number = DATA.FLOAT_INF
+    last_lap_number = DATA.MAX_LAPS
     consistency_laps = 0
     consistency_start = 0.0
     consistency_time = 0.0
@@ -240,7 +240,7 @@ def record_stint_history(
             start_wear = wear_avg
             # Reset consistency
             pitting = True
-            last_lap_number = DATA.FLOAT_INF
+            last_lap_number = DATA.MAX_LAPS
             consistency_laps = 0
             consistency_start = 0.0
             consistency_time = 0.0

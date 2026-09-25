@@ -17,6 +17,9 @@ WIP
   - Show wind speed reading, default unit is "m/s", which can be changed in "Units" dialog.
   - Note, currently "RF2" and "LMU" do not have wind simulation, wind arrow and speed readings are not displayed.
 
+* Mapping Module
+  - Added "minimum_node_distance" option, which sets minimum recording distance (in meters) between each map node sample.
+
 * Units
   - Added "wind speed unit" option in "Units" config dialog.
 

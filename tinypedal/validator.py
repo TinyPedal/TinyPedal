@@ -132,7 +132,7 @@ def valid_delta_set(data: tuple) -> tuple:
 def valid_delta_raw(dataset: list[tuple[float, float]], final: float, column: int) -> bool:
     """Validate raw delta data set"""
     try:
-        if len(dataset) <= 1:
+        if len(dataset) < 10:  # minimum 10 data samples
             return False
         # Remove rows if source value higher than final value
         while dataset[-1][column] > final:

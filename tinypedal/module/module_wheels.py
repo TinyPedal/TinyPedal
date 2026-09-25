@@ -275,7 +275,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
             is_pit_lap = 0
 
         # Distance desync check at start of new lap, reset if higher than normal distance
-        if 0 < laptime_curr < 1 and pos_curr > 300:
+        if 1 > laptime_curr > 0 and pos_curr > 300:
             pos_last = pos_curr = 0
         elif pos_last > pos_curr:
             pos_last = pos_curr
@@ -421,7 +421,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             is_pit_lap = 0
 
         # Distance desync check at start of new lap, reset if higher than normal distance
-        if 0 < laptime_curr < 1 and pos_curr > 300:
+        if 1 > laptime_curr > 0 and pos_curr > 300:
             pos_last = pos_curr = 0
         elif pos_last > pos_curr:
             pos_last = pos_curr

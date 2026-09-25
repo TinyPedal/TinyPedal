@@ -246,24 +246,30 @@ def calc_consumption(
                 output.rateOfConsumption = amount_diff / time_diff
 
         # Lap start & finish detection
-        if last_lap_number < lap_number:
-            if not is_pit_lap and valid_delta_raw(delta_array_raw, used_curr, 1):
-                delta_array_raw.append((  # set end value
-                    round6(pos_last + 10),
-                    round6(used_curr),
-                ))
+        if last_lap_number != lap_number and laptime_curr < 1:
+            if (
+                last_lap_number < lap_number
+                and not is_pit_lap
+                and valid_delta_raw(delta_array_raw, used_curr, 1)
+            ):
+                delta_array_raw.append(
+                    (  # set end value
+                        round6(pos_last + 10),
+                        round6(used_curr),
+                    )
+                )
                 delta_array_temp = tuple(delta_array_raw)
                 validating = elapsed_time
             delta_array_raw[:] = DATA.DELTA_DEFAULT
             pos_last = pos_recorded = pos_curr
             used_last_raw = used_curr
             used_curr = 0
-            recording = laptime_curr < 1
+            recording = True
             is_pit_lap = 0
-        last_lap_number = lap_number  # reset
+            last_lap_number = lap_number
 
         # Distance desync check at start of new lap, reset if higher than normal distance
-        if 0 < laptime_curr < 1 and pos_curr > 300:
+        if 1 > laptime_curr > 0 and pos_curr > 300:
             pos_last = pos_recorded = pos_curr = 0
 
         # Update if position value is different & positive

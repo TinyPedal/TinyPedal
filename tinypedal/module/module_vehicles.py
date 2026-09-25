@@ -247,7 +247,7 @@ def update_vehicle_data(
             last_laptime = api.read.timing.last_laptime(index)
             data.isValidLap = last_laptime > 0
             data.lastLapTime = abs(last_laptime)
-            if 1 < api.read.timing.current_laptime(index) > 8:
+            if 1 < api.read.timing.current_laptime(index) < 8:
                 data.lapTimeHistory.update(last_laptime, laps_completed, data.bestLapTime)
 
             fuel_remaining = api.read.engine.fuel_fraction(index)

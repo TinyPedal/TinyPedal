@@ -1599,6 +1599,9 @@ Set minimum recording distance (in meters) between each battery charge usage sam
     module_mapping
 Enable mapping module.
 
+    minimum_node_distance
+Set minimum recording distance (in meters) between each map node sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
+
 [**`Back to Top`**](#)
 
 

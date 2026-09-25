@@ -50,6 +50,7 @@ class Realtime(DataModule):
         gen_record_track_map = record_track_map(
             output=minfo.mapping,
             filepath=self.cfg.path.track_map,
+            min_node_distance=self.mcfg["minimum_node_distance"],
         )
         gen_record_track_info = record_track_info(
             output=minfo.mapping,
@@ -174,7 +175,7 @@ def record_track_info(output: MappingInfo):
 
 
 @generator_init
-def record_track_map(output: MappingInfo, filepath: str):
+def record_track_map(output: MappingInfo, filepath: str, min_node_distance: float):
     """Record map data"""
     last_reset = None  # reset check
 
@@ -231,6 +232,7 @@ def record_track_map(output: MappingInfo, filepath: str):
             validating = 0
             last_sector_idx = -1
             last_lap_number = DATA.MAX_LAPS
+            pos_recorded = 0.0  # last recorded vehicle position
             pos_last = 0.0  # last checked player vehicle position
 
         # Recording map data
@@ -239,19 +241,18 @@ def record_track_map(output: MappingInfo, filepath: str):
 
         # Lap start & finish detection
         lap_number = api.read.lap.completed()
-        if last_lap_number < lap_number:
-            # End recording
-            if recorder_data.is_valid():
+        laptime_curr = api.read.timing.current_laptime()
+        if last_lap_number != lap_number and laptime_curr < 1:
+            if last_lap_number < lap_number and recorder_data.is_valid():
                 temp_data.coords = tuple(recorder_data.coords)
                 temp_data.dists = tuple(recorder_data.dists)
                 temp_data.sectors = tuple(recorder_data.sectors)
                 validating = api.read.timing.elapsed()
-            # Reset
             recorder_data.new()
-            pos_last = 0
+            pos_last = pos_recorded = 0
             recording = True
+            last_lap_number = lap_number
             #logger.info("map recording")
-        last_lap_number = lap_number
 
         # Validate map data after crossing finish line
         if validating:
@@ -290,13 +291,20 @@ def record_track_map(output: MappingInfo, filepath: str):
                 last_sector_idx = sector_idx
 
             # Record driving path
-            # Update if position value is different & positive
             pos_curr = api.read.lap.distance()
+
+            # 1 sec position distance check after new lap begins
+            # Reset to 0 if higher than normal distance
+            if 1 > laptime_curr > 0 and pos_curr > 300:
+                pos_last = pos_recorded = pos_curr = 0
+
+            # Update if position value is different & positive
             if 0 <= pos_curr != pos_last:
-                if pos_curr > pos_last:  # position further
+                if pos_curr - pos_recorded >= min_node_distance:
                     pos_x = api.read.vehicle.position_longitudinal()
                     pos_y = api.read.vehicle.position_lateral()
                     pos_z = api.read.vehicle.position_vertical()
                     recorder_data.coords.append((pos_x, pos_y))
                     recorder_data.dists.append((pos_curr, pos_z))
+                    pos_recorded = pos_curr
                 pos_last = pos_curr  # reset last position
