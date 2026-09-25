@@ -22,7 +22,7 @@ Vehicle
 
 from __future__ import annotations
 
-from ..calculation import oriyaw
+from ..calculation import distance, oriyaw
 from ..regex_pattern import rex_number_extract
 
 
@@ -92,8 +92,8 @@ class LastImpact:
     )
 
     def __init__(self):
-        self._impact_refer_x = (0, 0, -1, 1, -1, 1, -1, 1)  # impact position reference
-        self._impact_refer_y = (-1, 1, 0, 0, -1, -1, 1, 1)
+        self._impact_refer_x = (0, 0, -1, 1)  # impact position reference
+        self._impact_refer_y = (-1, 1, 0, 0)
         self._damage = [0.0] * 8
         self.position = (0.0, 0.0)
         self.timestamp = 0.0
@@ -102,7 +102,7 @@ class LastImpact:
         """Update last impact time & position
 
         Damage arguments order:
-            0=front, 1=rear, 2=left, 3=right, 4=front left, 5=front right, 6=rear left, 7=rear right.
+            0=front, 1=rear, 2=left, 3=right.
 
         Position order:
             front=Y-1, rear=Y+1, left=X-1, right=X+1.
@@ -116,15 +116,17 @@ class LastImpact:
                 self._damage[idx] = 0.0
         # Record impact coordinates
         for idx, damage in enumerate(damages):
+            if idx > 3:
+                break
             if self._damage[idx] != damage:
                 if self._damage[idx] > damage:
                     self._damage[idx] = 0.0
                 else:
                     self._damage[idx] = damage
                     impacted = True
-                    if 0 != idx != 1:  # ignore front, rear
+                    if 1 < idx:  # ignore front, rear
                         impact_x = self._impact_refer_x[idx]
-                    if 2 != idx != 3:  # ignore left, right
+                    if 2 > idx:  # ignore left, right
                         impact_y = self._impact_refer_y[idx]
         # Update impact time
         if impacted:
@@ -151,3 +153,31 @@ class VehicleOrientation:
             self.yaw = oriyaw(pos[0] - self.last[0], pos[1] - self.last[1])
             self.last = pos
         return self.yaw
+
+
+class VehicleSpeed:
+    """Vehicle speed estimate based on GPS coordinates"""
+
+    __slots__ = (
+        "elapsed",
+        "pos",
+        "speed",
+    )
+
+    def __init__(self):
+        self.elapsed = 0.0
+        self.pos = (0.0, 0.0)
+        self.speed = 0.0
+
+    def update(self, elapsed: float, *pos: float) -> float:
+        """Calculate speed estimate based on GPS coordinates"""
+        delta_time = elapsed - self.elapsed
+        if delta_time < 0:
+            self.elapsed = elapsed
+            self.pos = pos
+        elif delta_time > 0.05:
+            delta_distance = distance(pos, self.pos)
+            self.speed += 0.2 * (delta_distance / delta_time - self.speed)
+            self.elapsed = elapsed
+            self.pos = pos
+        return self.speed
