@@ -611,6 +611,7 @@ class MappingInfo:
     lastModified: float = 0.0
     # Track info
     speedTrapPosition: float = 0.0
+    orientation: float = 0.0
     pitEntryPosition: float = 0.0
     pitExitPosition: float = 0.0
     pitLaneLength: float = 0.0

@@ -184,7 +184,7 @@ class Realtime(Overlay):
         map_sector_paths = []
         if raw_coords and raw_sectors:
             dist = calc.distance(raw_coords[0], raw_coords[-1])
-            angle = max(int(self.wcfg["display_orientation"]), 0)
+            angle = max(int(self.wcfg["display_orientation"] + minfo.mapping.orientation), 0)
             angle = angle - angle // 360 * 360
             self.map_orient = calc.radians(angle)
             (self.map_scaled, self.map_range, self.map_scale, self.map_offset

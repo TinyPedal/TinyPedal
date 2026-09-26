@@ -25,6 +25,9 @@ WIP
 * Units
   - Added "wind speed unit" option in "Units" config dialog.
 
+* Track Info Editor
+  - Added "Orient (°)" column (requested by user "tomydinino"), which sets display orientation angle (in degrees) for "Track Map" widget. This option allows custom map orientation for individual map without having to switch and config different presets. This option is additive to "display_orientation" option in "Track Map" widget.
+
 * Vehicle Brand Editor
   - Removed "import from LMU Rest API" option, which no longer required.
 

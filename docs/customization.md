@@ -1262,6 +1262,8 @@ Track info editor is used for editing [Tracks Preset](#tracks-preset). Note, any
 
 `Speed trap (m)` column is speed trap position (in meters) relative to track length. To manually set speed trap position at your current on-track position, `Right-Click` on corresponding track's speed trap column and select `Set from Telemetry`.
 
+`Orient (°)` column sets display orientation angle (in degrees) for [Track Map](#track-map-1) widget, which allows custom map orientation for individual map without having to switch and config different presets. This option is additive to `display_orientation` option in Track Map widget.
+
 `Sunrise` column is sunrise hour in `Hour:Minute` format. This value has to be manually defined.
 
 `Sunset` column is sunset hour in `Hour:Minute` format. This value has to be manually defined.

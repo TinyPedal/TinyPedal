@@ -47,6 +47,7 @@ HEADER_TRACKS = (
     "Pit exit (m)",
     "Pit speed (m/s)",
     "Speed trap (m)",
+    "Orient (°)",
     "Sunrise",
     "Sunset",
 )
@@ -60,7 +61,7 @@ class TrackInfoEditor(BaseEditor):
     def __init__(self, parent):
         super().__init__(parent)
         self.set_utility_title("Track Info Editor")
-        self.setMinimumSize(UIScaler.size(64), UIScaler.size(35))
+        self.setMinimumSize(UIScaler.size(68), UIScaler.size(35))
 
         self.tracks_temp = copy_setting(cfg.user.tracks)
 

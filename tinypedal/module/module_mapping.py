@@ -126,6 +126,7 @@ def record_track_info(output: MappingInfo):
             pit_exit = load_track_info(track_name, "pit_exit")
             pit_speed = load_track_info(track_name, "pit_speed")
             output.speedTrapPosition = load_track_info(track_name, "speed_trap")
+            output.orientation = load_track_info(track_name, "orientation")
             output.sunlightPhases = set_sunlight_phase(
                 load_track_info(track_name, "sunrise"),
                 load_track_info(track_name, "sunset"),

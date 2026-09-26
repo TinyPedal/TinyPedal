@@ -27,6 +27,7 @@ TRACKINFO_DEFAULT = MappingProxyType({
     "pit_exit": 0.0,
     "pit_speed": 0.0,
     "speed_trap": 0.0,
+    "orientation": 0.0,
     "sunrise": "06:00",
     "sunset": "20:00",
 })
