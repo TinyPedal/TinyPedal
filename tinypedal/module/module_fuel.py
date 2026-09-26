@@ -246,7 +246,7 @@ def calc_consumption(
                 output.rateOfConsumption = amount_diff / time_diff
 
         # Lap start & finish detection
-        if last_lap_number != lap_number and laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < laptime_curr < 1:
             if (
                 last_lap_number < lap_number
                 and not is_pit_lap

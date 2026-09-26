@@ -222,7 +222,7 @@ def calc_delta_time(
             laptime_stint_best = DATA.MAX_SECONDS
 
         # Lap start & finish detection
-        if last_lap_number != lap_number and laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < laptime_curr < 1:
             if last_lap_number < lap_number and len(delta_array_raw) >= 10:
                 delta_array_last = delta_array_raw.copy()
                 validating = api.read.timing.elapsed()

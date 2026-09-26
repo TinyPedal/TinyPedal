@@ -113,7 +113,7 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
         laptime_curr = api.read.timing.current_laptime()
 
         # Lap start & finish detection
-        if last_lap_number != lap_number and laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < laptime_curr < 1:
             battery_drain_last = battery_drain
             battery_regen_last = battery_regen
             battery_drain = 0

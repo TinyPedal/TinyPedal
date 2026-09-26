@@ -243,7 +243,7 @@ def record_track_map(output: MappingInfo, filepath: str, min_node_distance: floa
         # Lap start & finish detection
         lap_number = api.read.lap.completed()
         laptime_curr = api.read.timing.current_laptime()
-        if last_lap_number != lap_number and laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < laptime_curr < 1:
             if last_lap_number < lap_number and recorder_data.is_valid():
                 temp_data.coords = tuple(recorder_data.coords)
                 temp_data.dists = tuple(recorder_data.dists)

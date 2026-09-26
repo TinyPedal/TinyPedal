@@ -258,7 +258,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
         slip_ratio = output.slipRatio
         is_pit_lap |= in_pits
 
-        if last_lap_number != lap_number:
+        if last_lap_number != lap_number and 0 < laptime_curr < 1:
             last_lap_number = lap_number
             output.lastLapTreadWear[:] = tread_wear_curr
             # Update delta array for non-pit lap
@@ -269,7 +269,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
                 tread_wear_valid[:] = tread_wear_curr
             tread_wear_curr[:] = DATA.WHEELS_ZERO
             delta_array_raw[:] = (DATA.WHEELS_DELTA_DEFAULT,)
-            delta_recording = laptime_curr < 1
+            delta_recording = True
             is_valid_delta = len(delta_array_last) > 1
             pos_last = pos_curr
             is_pit_lap = 0
@@ -404,7 +404,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
         in_pits = api.read.vehicle.in_pits()
         is_pit_lap |= in_pits
 
-        if last_lap_number != lap_number:
+        if last_lap_number != lap_number and 0 < laptime_curr < 1:
             last_lap_number = lap_number
             output.lastLapBrakeWear[:] = brake_wear_curr
             # Update delta array for non-pit lap
@@ -415,7 +415,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
                 brake_wear_valid[:] = brake_wear_curr
             brake_wear_curr[:] = DATA.WHEELS_ZERO
             delta_array_raw[:] = (DATA.WHEELS_DELTA_DEFAULT,)
-            delta_recording = laptime_curr < 1
+            delta_recording = True
             is_valid_delta = len(delta_array_last) > 1
             pos_last = pos_curr
             is_pit_lap = 0

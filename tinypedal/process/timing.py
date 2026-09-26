@@ -55,6 +55,41 @@ class TimeScale:
         return self
 
 
+class ValidLapStatus:
+    """Valid lap status
+
+    Attributes:
+        current: is current lap valid.
+        last: is last lap valid.
+        timestamp: last recorded lap elapsed time.
+    """
+
+    __slots__ = (
+        "_resets",
+        "current",
+        "last",
+        "timestamp",
+    )
+
+    def __init__(self):
+        self._resets = 0
+        self.current = True
+        self.last = True
+        self.timestamp = 0.0
+
+    def update(self, timestamp: float, is_current_valid: bool, resets: int) -> ValidLapStatus:
+        """Update current and last lap validation status"""
+        if self._resets != resets:
+            self._resets = resets
+            self.last = self.current = True
+        if 10 < timestamp:  # record during current lap
+            self.current = is_current_valid
+        if self.timestamp > timestamp:  # new lap, store last
+            self.last = self.current
+        self.timestamp = timestamp
+        return self
+
+
 class LastLapTime:
     """Last lap time (unverified)
 
