@@ -20,6 +20,7 @@
 Slip angle Widget
 """
 
+from ..constant import DATA
 from ..module_info import minfo
 from ._base import Overlay
 from ._painter import WheelGaugeBar
@@ -52,6 +53,11 @@ class Realtime(Overlay):
         bar_width = max(self.wcfg["bar_width"], 20)
         bar_height = int(font_m.capital + pady * 2)
         max_range = max(int(self.wcfg["slip_angle_maximum_range"]), 1)
+        slip_max_color = (
+            self.wcfg["peak_slip_angle_range_color"]
+            if self.wcfg["show_peak_slip_angle_under_maximum_lateral_g"]
+            else ""
+        )
 
         # Caption
         if self.wcfg["show_caption"]:
@@ -94,6 +100,8 @@ class Realtime(Overlay):
                 input_color=self.wcfg["neutral_slip_angle_color"],
                 fg_color=self.wcfg["font_color"],
                 bg_color=self.wcfg["background_color"],
+                maxrange_height=max(self.wcfg["peak_slip_angle_range_size"], 0),
+                maxrange_color=slip_max_color,
                 right_side=idx % 2,
                 top_side=idx < 2,
             ) for idx in range(4)
@@ -111,6 +119,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         slip_angle_set = minfo.wheels.slipAngle
         diff_slip_angle = minfo.wheels.slipAngleDifference
+        peak_angle = DATA.WHEELS_NA
 
         if diff_slip_angle > self.wcfg["minimum_understeer_slip_angle_difference"]:
             color_index = 2
@@ -119,13 +128,18 @@ class Realtime(Overlay):
         else:
             color_index = 0
 
+        if self.wcfg["show_peak_slip_angle_under_maximum_lateral_g"]:
+            peak_angle = minfo.wheels.peakFrontSlipAngle, minfo.wheels.peakRearSlipAngle
+
         for idx, bar_slip_angle in enumerate(self.bars_slip_angle):
-            self.update_slip_angle(bar_slip_angle, abs(slip_angle_set[idx]), color_index)
+            self.update_slip_angle(bar_slip_angle, abs(slip_angle_set[idx]), peak_angle[idx > 1], color_index)
 
     # GUI update methods
-    def update_slip_angle(self, target, data, color_index):
+    def update_slip_angle(self, target, data, peak_angle, color_index):
         """Slip angle"""
         if target.last != data:
             target.last = data
             target.input_color = self.slip_angle_color[color_index]
+            if peak_angle > 0:
+                target.update_maxrange(peak_angle)
             target.update_input(abs(data))

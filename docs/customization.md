@@ -3854,6 +3854,9 @@ Set minimum slip angle difference threshold (in degrees) for neutral steer, over
 
 Note, value should be set as negative angle for oversteer, and positive angle for understeer.
 
+    show_peak_slip_angle_under_maximum_lateral_g
+Visualize peak slip angle range under recent maximum lateral acceleration. Note, peak slip angle range auto-recalibrates itself over time.
+
 [**`Back to Top`**](#)
 
 

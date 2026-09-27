@@ -11,6 +11,9 @@ WIP
 * Relative, Rivals, Standings Widget
   - Added "show_track_limits_points" option (requested by user "paulndale79-png"), which shows driver's current track limits points (LMU only). This option is disabled by default.
 
+* Slip angle Widget
+  - Added "show_peak_slip_angle_under_maximum_lateral_g" option, which visualizes peak slip angle range under recent maximum lateral acceleration. Note, peak slip angle range auto-recalibrates itself over time.
+
 * Onboard setting Widget
   - Added "show_wiper_state" option.
 

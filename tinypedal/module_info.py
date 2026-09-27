@@ -765,6 +765,8 @@ class WheelsInfo:
     slipAngle: list[float] = df_list(0.0, 4)
     averageFrontSlipAngle: float = 0.0
     averageRearSlipAngle: float = 0.0
+    peakFrontSlipAngle: float = 0.0
+    peakRearSlipAngle: float = 0.0
     slipAngleDifference: float = 0.0
     # Toe angle
     toeAngle: list[float] = df_list(0.0, 4)
