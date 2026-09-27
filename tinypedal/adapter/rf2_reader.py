@@ -399,7 +399,7 @@ class Session(_reader.Session, DataAdapter):
         return seconds
 
     def session_type(self) -> int:
-        """Session type, 0 = TESTDAY, 1 = PRACTICE, 2 = QUALIFY, 3 = WARMUP, 4 = RACE"""
+        """Session type, 0 = TESTDAY, 1 = PRACTICE, 2 = QUALIFY, 3 = WARMUP, 4 = RACE, 5 = HOTLAP"""
         session = self.shmm.rf2ScorInfo.mSession
         if session >= 10:  # race
             return 4

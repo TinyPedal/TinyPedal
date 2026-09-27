@@ -2410,6 +2410,7 @@ WIDGET_DEFAULT = {
         "session_text_qualify": "QUAL",
         "session_text_warmup": "WARM",
         "session_text_race": "RACE",
+        "session_text_hotlap": "HOT",
         "show_system_clock": True,
         "system_clock_format": "%H:%M%p",
         "font_color_system_clock": "#FFFFFF",

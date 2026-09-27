@@ -341,7 +341,7 @@ class Session(ABC):
 
     @abstractmethod
     def session_type(self) -> int:
-        """Session type, 0 = TESTDAY, 1 = PRACTICE, 2 = QUALIFY, 3 = WARMUP, 4 = RACE"""
+        """Session type, 0 = TESTDAY, 1 = PRACTICE, 2 = QUALIFY, 3 = WARMUP, 4 = RACE, 5 = HOTLAP"""
 
     @abstractmethod
     def finish_type(self, as_lap: bool | None = None) -> int:

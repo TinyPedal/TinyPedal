@@ -54,6 +54,7 @@ class Realtime(Overlay):
             self.wcfg["session_text_qualify"],
             self.wcfg["session_text_warmup"],
             self.wcfg["session_text_race"],
+            self.wcfg["session_text_hotlap"],
         )
 
         # Session name
