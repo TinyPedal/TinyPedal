@@ -251,14 +251,13 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
             continue
 
         lap_number = api.read.lap.completed()
-        laptime_curr = api.read.timing.current_laptime()
         pos_curr = api.read.lap.distance()
         in_pits = api.read.vehicle.in_pits()
         is_braking = api.read.inputs.brake_raw() > 0.02
         slip_ratio = output.slipRatio
         is_pit_lap |= in_pits
 
-        if last_lap_number != lap_number and 0 < laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < pos_curr < 200:
             last_lap_number = lap_number
             output.lastLapTreadWear[:] = tread_wear_curr
             # Update delta array for non-pit lap
@@ -274,19 +273,13 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
             pos_last = pos_curr
             is_pit_lap = 0
 
-        # Distance desync check at start of new lap, reset if higher than normal distance
-        if 1 > laptime_curr > 0 and pos_curr > 300:
-            pos_last = pos_curr = 0
-        elif pos_last > pos_curr:
-            pos_last = pos_curr
-
         # Update if position value is different & positive
         if delta_recording and pos_curr - pos_last >= min_delta_distance:
             delta_array_raw.append((pos_curr, *tread_wear_curr))
             pos_last = pos_curr
 
         # Find delta data index
-        if is_valid_delta and laptime_curr > 0.3:
+        if is_valid_delta and api.read.timing.current_laptime() > 0.3:
             index_higher = calc.binary_search_higher_column(
                 delta_array_last, pos_curr, 0, len(delta_array_last) - 1)
         else:
@@ -399,12 +392,11 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             continue
 
         lap_number = api.read.lap.completed()
-        laptime_curr = api.read.timing.current_laptime()
         pos_curr = api.read.lap.distance()
         in_pits = api.read.vehicle.in_pits()
         is_pit_lap |= in_pits
 
-        if last_lap_number != lap_number and 0 < laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < pos_curr < 200:
             last_lap_number = lap_number
             output.lastLapBrakeWear[:] = brake_wear_curr
             # Update delta array for non-pit lap
@@ -420,19 +412,13 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             pos_last = pos_curr
             is_pit_lap = 0
 
-        # Distance desync check at start of new lap, reset if higher than normal distance
-        if 1 > laptime_curr > 0 and pos_curr > 300:
-            pos_last = pos_curr = 0
-        elif pos_last > pos_curr:
-            pos_last = pos_curr
-
         # Update if position value is different & positive
         if delta_recording and pos_curr - pos_last >= min_delta_distance:
             delta_array_raw.append((pos_curr, *brake_wear_curr))
             pos_last = pos_curr
 
         # Find delta data index
-        if is_valid_delta and laptime_curr > 0.3:
+        if is_valid_delta and api.read.timing.current_laptime() > 0.3:
             index_higher = calc.binary_search_higher_column(
                 delta_array_last, pos_curr, 0, len(delta_array_last) - 1)
         else:

@@ -242,8 +242,7 @@ def record_track_map(output: MappingInfo, filepath: str, min_node_distance: floa
 
         # Lap start & finish detection
         lap_number = api.read.lap.completed()
-        laptime_curr = api.read.timing.current_laptime()
-        if last_lap_number != lap_number and 0 < laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < api.read.lap.distance() < 200:
             if last_lap_number < lap_number and recorder_data.is_valid():
                 temp_data.coords = tuple(recorder_data.coords)
                 temp_data.dists = tuple(recorder_data.dists)
@@ -293,11 +292,6 @@ def record_track_map(output: MappingInfo, filepath: str, min_node_distance: floa
 
             # Record driving path
             pos_curr = api.read.lap.distance()
-
-            # 1 sec position distance check after new lap begins
-            # Reset to 0 if higher than normal distance
-            if 1 > laptime_curr > 0 and pos_curr > 300:
-                pos_last = pos_recorded = pos_curr = 0
 
             # Update if position value is different & positive
             if 0 <= pos_curr != pos_last:

@@ -246,7 +246,7 @@ def calc_consumption(
                 output.rateOfConsumption = amount_diff / time_diff
 
         # Lap start & finish detection
-        if last_lap_number != lap_number and 0 < laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < pos_curr < 200:
             if (
                 last_lap_number < lap_number
                 and not is_pit_lap
@@ -267,10 +267,6 @@ def calc_consumption(
             recording = True
             is_pit_lap = 0
             last_lap_number = lap_number
-
-        # Distance desync check at start of new lap, reset if higher than normal distance
-        if 1 > laptime_curr > 0 and pos_curr > 300:
-            pos_last = pos_recorded = pos_curr = 0
 
         # Update if position value is different & positive
         if 0 <= pos_curr != pos_last:

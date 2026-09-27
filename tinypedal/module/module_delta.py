@@ -222,7 +222,7 @@ def calc_delta_time(
             laptime_stint_best = DATA.MAX_SECONDS
 
         # Lap start & finish detection
-        if last_lap_number != lap_number and 0 < laptime_curr < 1:
+        if last_lap_number != lap_number and 0 < pos_curr < 200:
             if last_lap_number < lap_number and len(delta_array_raw) >= 10:
                 delta_array_last = delta_array_raw.copy()
                 validating = api.read.timing.elapsed()
@@ -231,11 +231,6 @@ def calc_delta_time(
             recording = True
             is_pit_lap = 0
             last_lap_number = lap_number
-
-        # 1 sec position distance check after new lap begins
-        # Reset to 0 if higher than normal distance
-        if 1 > laptime_curr > 0 and pos_curr > 300:
-            pos_last = pos_recorded = pos_curr = 0
 
         # Update if position value is different & positive
         if 0 <= pos_curr != pos_last:
