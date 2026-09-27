@@ -91,6 +91,7 @@ CFG_USER_IMAGE = "_image_file"
 CFG_STRING = (
     # Exact match
     "^bind$|"
+    "^connection_password$|"
     "^preset$|"
     "^process_id$|"
     "^version$|"
@@ -199,6 +200,7 @@ ABBR_PATTERN = "|".join(
         "rpm",
         "rf2",
         "url",
+        "udp",
     )
 )
 

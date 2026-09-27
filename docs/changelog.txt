@@ -1,5 +1,9 @@
 WIP
 -----------------------------
+* [New]API support for Assetto Corsa Competizione
+  - TinyPedal now supports reading and displaying telemetry info from ACC.
+  - New telemetry API options for ACC can be accessed from "API" menu.
+
 * General
   - Fixed pace notes playback kept active even when disabled.
   - Removed unused "electric_braking_allocation" option from Brake bias Widget.

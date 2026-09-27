@@ -24,6 +24,7 @@ import logging
 
 from . import realtime_state
 from .adapter import (
+    acc_connector,
     lmu_connector,
     rf2_connector,
 )
@@ -36,6 +37,7 @@ logger = logging.getLogger(__name__)
 def _set_available_api(enable_legacy: bool):
     """Set available API"""
     available_api = (
+        acc_connector.SimACC,
         lmu_connector.SimLMU,
         rf2_connector.SimLMULegacy,
         rf2_connector.SimRF2,
@@ -91,7 +93,7 @@ class APIControl:
                 return
 
         logger.warning("CONNECTING: Invalid API name, fall back to default")
-        self._api = self._available_api[0]()
+        self._api = lmu_connector.SimLMU
         cfg.api_name = self._api.NAME
 
     def start(self):

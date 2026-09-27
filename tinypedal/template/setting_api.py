@@ -23,6 +23,22 @@ Default API setting template
 from ..constant import API
 
 API_DEFAULT = {
+    API.CONFIG_ACC: {
+        "access_mode": 0,
+        "character_encoding": "UTF-8",
+        "enable_active_state_override": False,
+        "active_state": True,
+        "enable_player_index_override": False,
+        "player_index": -1,
+        "enable_upd_api_access": True,
+        "upd_api_update_interval": 200,
+        "url_host": "127.0.0.1",
+        "url_port": 9000,
+        "connection_password": "",
+        "connection_timeout": 60,
+        "connection_retry": 3,
+        "connection_retry_delay": 3,
+    },
     API.CONFIG_LMU: {
         "access_mode": 0,
         "character_encoding": "UTF-8",
