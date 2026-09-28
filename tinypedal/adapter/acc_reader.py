@@ -1127,7 +1127,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def integrity(self, index: int | None = None) -> float:
         """Vehicle integrity"""
         if index is None:  # or index == self.shmm.playerIndex:
-            return rmnan(1 - sum(self.shmm.accPhysicsInfo.carDamage) / 4 * 0.005)
+            return rmnan(1 - self.shmm.accPhysicsInfo.carDamage[4] / 400)
         return 1.0
 
     def is_detached(self, index: int | None = None) -> bool:
@@ -1196,8 +1196,8 @@ class Wheel(_reader.Wheel, DataAdapter):
     def third_spring_deflection(self, index: int | None = None) -> tuple[float, ...]:
         """Third spring deflection front & rear (convert meters to millimeters)"""
         data = self.shmm.accPhysicsInfo.suspensionTravel
-        front = rmnan(mean(data[:2]) * 1000)
-        rear = rmnan(mean(data[2:]) * 1000)
+        front = rmnan((data[0] + data[1]) * 500)
+        rear = rmnan((data[2] + data[3]) * 500)
         return front, front, rear, rear
 
     def suspension_deflection(self, index: int | None = None) -> tuple[float, ...]:

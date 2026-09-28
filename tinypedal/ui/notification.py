@@ -31,7 +31,8 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from ..constant import APP
+from ..api_control import api
+from ..constant import API, APP, PLATFORM
 from ..setting import cfg
 from ..update import update_checker
 
@@ -83,6 +84,7 @@ class NotifyBar(QWidget):
                 f"color: {cfg.notification['font_color_locked_preset']};"
                 f"background: {cfg.notification['background_color_locked_preset']};"
             )
+
         # Spectate mode
         self.spectate.setVisible(
             cfg.notification["notify_spectate_mode"]
@@ -93,6 +95,7 @@ class NotifyBar(QWidget):
                 f"color: {cfg.notification['font_color_spectate_mode']};"
                 f"background: {cfg.notification['background_color_spectate_mode']};"
             )
+
         # Pace notes playback
         self.pacenotes.setVisible(
             cfg.notification["notify_pace_notes_playback"]
@@ -103,26 +106,38 @@ class NotifyBar(QWidget):
                 f"color: {cfg.notification['font_color_pace_notes_playback']};"
                 f"background: {cfg.notification['background_color_pace_notes_playback']};"
             )
+
         # Global hotkey
         self.hotkey.setVisible(
             cfg.notification["notify_global_hotkey"]
             and cfg.application["enable_global_hotkey"]
         )
         if self.hotkey.isVisible():
-            self.hotkey.setStyleSheet(
-                f"color: {cfg.notification['font_color_global_hotkey']};"
-                f"background: {cfg.notification['background_color_global_hotkey']};"
-            )
+            if PLATFORM.WINDOWS:
+                self.hotkey.setText("Global Hotkey Enabled")
+                self.hotkey.setStyleSheet(
+                    f"color: {cfg.notification['font_color_global_hotkey']};"
+                    f"background: {cfg.notification['background_color_global_hotkey']};"
+                )
+            else:
+                self.hotkey.setText("Global Hotkey Unavailable")
+                self.hotkey.setStyleSheet("color: #FFF;background: #555;")
+
         # Auto backup car setup
         self.carsetup.setVisible(
             cfg.notification["notify_auto_backup_car_setup"]
             and cfg.telemetry["enable_auto_backup_car_setup"]
         )
         if self.carsetup.isVisible():
-            self.carsetup.setStyleSheet(
-                f"color: {cfg.notification['font_color_auto_backup_car_setup']};"
-                f"background: {cfg.notification['background_color_auto_backup_car_setup']};"
-            )
+            if api.name == API.NAME_ACC:
+                self.carsetup.setText("Auto Backup Car Setup Unavailable")
+                self.carsetup.setStyleSheet("color: #FFF;background: #555;")
+            else:
+                self.carsetup.setText("Auto Backup Car Setup Enabled")
+                self.carsetup.setStyleSheet(
+                    f"color: {cfg.notification['font_color_auto_backup_car_setup']};"
+                    f"background: {cfg.notification['background_color_auto_backup_car_setup']};"
+                )
 
 
 class UpdatesNotifyButton(QPushButton):
