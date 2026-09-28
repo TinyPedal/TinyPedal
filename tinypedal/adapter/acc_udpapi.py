@@ -175,7 +175,7 @@ class UDPAPIConnector:
         # Start update loop
         last_timestamp = 0.0
         last_car_entry_count = 0
-        buffer_size = 2048
+        buffer_size = acc_udp.BroadcastingNetworkProtocol.BUFFER_SIZE
 
         while not _event_is_set() and not realtime_state.paused:
             # Get data

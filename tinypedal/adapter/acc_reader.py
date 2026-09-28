@@ -22,7 +22,7 @@ ACC API data reader
 
 from __future__ import annotations
 
-from math import asin
+from math import atan2, pi
 
 from ..calculation import mean, min_nonzero
 from ..constant import DATA
@@ -1159,30 +1159,24 @@ class Wheel(_reader.Wheel, DataAdapter):
     def toe(self, index: int | None = None) -> tuple[float, ...]:
         """Wheel toe (radians)"""
         data = self.shmm.accPhysicsInfo.tyreContactHeading
-        pi = 3.141592653
-        ph = 1.570796326
         yaw = self.shmm.accPhysicsInfo.heading
-        if yaw >= ph:
-            invert = True
-            offset = pi - yaw
-        elif yaw >= -ph:
-            invert = False
-            offset = yaw
-        else:
-            invert = True
-            offset = -yaw - pi
-        if invert:
+        ph = pi * 0.5
+        if ph > yaw > -ph:
             return (
-                rmnan(offset - asin(data[0].x)),
-                rmnan(offset - asin(data[1].x)),
-                rmnan(offset - asin(data[2].x)),
-                rmnan(offset - asin(data[3].x)),
+                rmnan(-yaw - atan2(-data[0].x, -data[0].z)),
+                rmnan(-yaw - atan2(-data[1].x, -data[1].z)),
+                rmnan(-yaw - atan2(-data[2].x, -data[2].z)),
+                rmnan(-yaw - atan2(-data[3].x, -data[3].z)),
             )
+        if yaw < 0:
+            yaw = -pi - yaw
+        elif yaw > 0:
+            yaw = pi - yaw
         return (
-            rmnan(asin(data[0].x) - offset),
-            rmnan(asin(data[1].x) - offset),
-            rmnan(asin(data[2].x) - offset),
-            rmnan(asin(data[3].x) - offset),
+            rmnan(yaw - atan2(data[0].x, data[0].z)),
+            rmnan(yaw - atan2(data[1].x, data[1].z)),
+            rmnan(yaw - atan2(data[2].x, data[2].z)),
+            rmnan(yaw - atan2(data[3].x, data[3].z)),
         )
 
     def rotation(self, index: int | None = None) -> tuple[float, ...]:
