@@ -41,6 +41,12 @@ from . import _reader
 from .lmu_restapi import RestAPIData
 from .lmu_sharedmemory import LMU_COMPOUND_TYPE, LMUInfo
 
+LMU_CAR_MODEL_CORRECTION = {
+    "Aston Martin Vantage AMR LMGT": "Aston Martin Vantage AMR LMGT3",
+    "Chevrolet Corvette Z06 LMGT3.": "Chevrolet Corvette Z06 LMGT3.R",
+    "Lamborghini Huracan LMGT3 Evo": "Lamborghini Huracan LMGT3 Evo2",
+}.get
+
 
 class DataAdapter:
     """Read & sort data into groups"""
@@ -967,7 +973,8 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def vehicle_model(self, index: int | None = None) -> str:
         """Vehicle model name (brand name + model ID)"""
-        return tostr(self.shmm.lmuTeleVeh(index).mVehicleModel)
+        model = tostr(self.shmm.lmuTeleVeh(index).mVehicleModel)
+        return LMU_CAR_MODEL_CORRECTION(model, model)
 
     def class_name(self, index: int | None = None) -> str:
         """Vehicle class name"""
