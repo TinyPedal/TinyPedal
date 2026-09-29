@@ -22,9 +22,9 @@ ACC API data reader
 
 from __future__ import annotations
 
-from math import atan2, pi
+from math import pi
 
-from ..calculation import min_nonzero
+from ..calculation import atan2, ceil, min_nonzero
 from ..constant import DATA
 from ..formatter import strip_invalid_char
 from ..validator import bytes_to_str as tostr
@@ -966,7 +966,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Is in pits"""
         if index is None:  # or index == self.shmm.playerIndex:
             return self.shmm.accGraphicsInfo.isInPitLane > 0
-        return self.udp_carinfo(index).carLocation >= 2
+        return self.udp_carinfo(index).carLocation == 2
 
     def in_garage(self, index: int | None = None) -> bool:
         """Is in garage"""
@@ -975,19 +975,18 @@ class Vehicle(_reader.Vehicle, DataAdapter):
                 self.shmm.accGraphicsInfo.isInPitLane > 0
                 and self.shmm.accVehicleSpeed(index) <= 0
             )
-        data = self.udp_carinfo(index)
-        return data.carLocation >= 2 and data.speedKmh <= 0
+        return (
+            self.udp_carinfo(index).carLocation == 2
+            and self.shmm.accVehicleSpeed(index) <= 0
+        )
 
     def in_paddock(self, index: int | None = None) -> int:
         """Is in paddock (either pit lane or garage), 0 = on track, 1 = pit lane, 2 = garage"""
         if index is None:  # or index == self.shmm.playerIndex:
             in_pit = self.shmm.accGraphicsInfo.isInPitLane > 0
-            stopped = self.shmm.accVehicleSpeed(index) <= 0
         else:
-            data = self.udp_carinfo(index)
-            in_pit = data.carLocation >= 2
-            stopped = data.speedKmh <= 0
-        return 2 if in_pit and stopped else in_pit
+            in_pit = self.udp_carinfo(index).carLocation == 2
+        return 2 if in_pit and self.shmm.accVehicleSpeed(index) <= 0 else in_pit
 
     def number_pitstops(self, index: int | None = None, penalty: int = 0) -> int:
         """Number of pit stops"""
@@ -1008,7 +1007,10 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def pit_stop_time(self) -> float:
         """Estimated pit stop time (seconds)"""
-        return 0.0
+        capacity = self.shmm.accStaticInfo.maxFuel
+        empty_capacity = capacity - self.shmm.accPhysicsInfo.fuel
+        valid_refill = ceil(min(empty_capacity, self.shmm.accGraphicsInfo.mfdFuelToAdd))
+        return 3.0 + valid_refill * 0.2  # base time = 3.0s, refill rate = 0.2L/s
 
     def repair_time(self) -> float:
         """Scheduled repair time (seconds)"""

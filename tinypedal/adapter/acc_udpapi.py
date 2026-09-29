@@ -95,7 +95,7 @@ class UDPAPIConnector:
 
         udp_host = self._cfg["url_host"]
         udp_port = self._cfg["url_port"]
-        udp_update_interval = max(self._cfg["udp_api_update_interval"], 200)
+        udp_update_interval = max(self._cfg["udp_api_update_interval"], 100)
         connection_timeout = max(self._cfg["connection_timeout"], 1)
         total_retry = max(int(self._cfg["connection_retry"]), 0)
         connection_retry_delay = min(max(self._cfg["connection_retry_delay"], 0.5), 60)

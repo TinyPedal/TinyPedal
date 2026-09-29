@@ -392,7 +392,8 @@ class PitTimer:
         laps: Total laps done since last pit stop.
     """
 
-    _last_pit_lap: int = 99999
+    _last_pit_pass_lap: int = 99999
+    _last_pit_stop_lap: int = 99999
     _last_state: int = 0
     _pitin_time: float = 0.0
     _pitstop_time: float = 0.0
@@ -407,8 +408,10 @@ class PitTimer:
         Pit state: 0 = not in pit, 1 = in pit, 2 = in garage.
         """
         # Reset if session changed
-        if self._last_pit_lap > laps_done:
-            self._last_pit_lap = laps_done
+        if self._last_pit_pass_lap > laps_done:
+            self._last_pit_pass_lap = laps_done
+        if self._last_pit_stop_lap > laps_done:
+            self._last_pit_stop_lap = laps_done
         # Pit status check
         if self._last_state != in_pit:
             self._last_state = in_pit
@@ -422,7 +425,8 @@ class PitTimer:
             if in_pit == 2:
                 self.elapsed = 0.0
                 self.stopped = 0.0
-                self._last_pit_lap = laps_done
+                self._last_pit_pass_lap = laps_done
+                self._last_pit_stop_lap = laps_done
             # Calculating time while in pit
             else:
                 # Total elapsed time in pit
@@ -435,11 +439,13 @@ class PitTimer:
             self._pitstop_time = elapsed_time
             # Save last in pit lap number
             # Pit state can desync, wait minimum 2 seconds before update
-            if self.elapsed > 2 and self.stopped > 1:  # stop for more than 1 seconds
-                self._last_pit_lap = laps_done
+            if self.elapsed > 2:
+                self._last_pit_pass_lap = laps_done
+                if self.stopped > 1:  # stop for more than 1 seconds
+                    self._last_pit_stop_lap = laps_done
         # Check whether is pitting lap
-        self.pitting = (in_pit > 0 or laps_done == self._last_pit_lap)
-        self.laps = laps_done - self._last_pit_lap
+        self.pitting = (in_pit > 0 or laps_done == self._last_pit_pass_lap)
+        self.laps = laps_done - self._last_pit_stop_lap
 
 
 @slotclass
