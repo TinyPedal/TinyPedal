@@ -191,6 +191,7 @@ ABBR_PATTERN = "|".join(
         "led",
         "tc",
         "abs",
+        "acc",
         "arb",
         "api",
         "dpi",
@@ -199,8 +200,8 @@ ABBR_PATTERN = "|".join(
         "lmu",
         "rpm",
         "rf2",
-        "url",
         "udp",
+        "url",
     )
 )
 

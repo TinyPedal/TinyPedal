@@ -70,7 +70,7 @@ class UDPAPIConnector:
 
     def start(self):
         """Start update thread"""
-        if not self._updating and self._cfg["enable_upd_api_access"]:
+        if not self._updating and self._cfg["enable_udp_api_access"]:
             self._updating = True
             self._event.clear()
             self._update_thread = threading.Thread(target=self.__update, daemon=True)
@@ -95,7 +95,7 @@ class UDPAPIConnector:
 
         udp_host = self._cfg["url_host"]
         udp_port = self._cfg["url_port"]
-        upd_update_interval = max(self._cfg["upd_api_update_interval"], 200)
+        udp_update_interval = max(self._cfg["udp_api_update_interval"], 200)
         connection_timeout = max(self._cfg["connection_timeout"], 1)
         total_retry = max(int(self._cfg["connection_retry"]), 0)
         connection_retry_delay = min(max(self._cfg["connection_retry_delay"], 0.5), 60)
@@ -105,7 +105,7 @@ class UDPAPIConnector:
             display_name=APP.TINYPEDAL,
             connection_password=self._cfg["connection_password"],
             command_password=secrets.token_hex(10),  # use random password for read-only access
-            realtime_update_interval=upd_update_interval,
+            realtime_update_interval=udp_update_interval,
         )
 
         while not _event_wait(update_interval):
@@ -141,7 +141,7 @@ class UDPAPIConnector:
 
                             available_retry = total_retry
                             connection_success = True
-                            self.fetch_data(client, upd_update_interval / 1000, udp_output)
+                            self.fetch_data(client, udp_update_interval / 1000, udp_output)
 
                     except (AttributeError, TypeError, IndexError, KeyError, ValueError, OSError, TimeoutError):
                         if connection_success:

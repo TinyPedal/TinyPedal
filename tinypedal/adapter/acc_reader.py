@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from math import atan2, pi
 
-from ..calculation import mean, min_nonzero
+from ..calculation import min_nonzero
 from ..constant import DATA
 from ..formatter import strip_invalid_char
 from ..validator import bytes_to_str as tostr
