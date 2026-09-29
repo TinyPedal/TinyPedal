@@ -71,8 +71,6 @@ class DataAdapter:
     def udp_carinfo(self, index: int) -> acc_udp.UDPCarInfo:
         """Get car info from UDP API"""
         car_id = self.shmm.accGraphicsInfo.carIDs[index]
-        if car_id >= 60:
-            car_id = -1
         return self.udp.entryList.entryListCars[car_id]
 
 
@@ -1018,13 +1016,15 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def finish_state(self, index: int | None = None) -> int:
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""
-        state = self.shmm.accGraphicsInfo.flag
-        if state == 0:
+        if index is None:  # or index == self.shmm.playerIndex:
+            state = self.shmm.accGraphicsInfo.flag
+            if state == 0:
+                return 0
+            if state == 5:
+                return 1
+            if state == 3:
+                return 3
             return 0
-        if state == 5:
-            return 1
-        if state == 3:
-            return 3
         return 0
 
     def orientation_yaw(self, index: int | None = None) -> float:

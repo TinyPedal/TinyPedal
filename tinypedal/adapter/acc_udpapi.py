@@ -61,6 +61,7 @@ class UDPAPIConnector:
     def reset_output(self):
         """Reset data output"""
         self._data_buffer[:] = bytes(acc_udp.UDPBroadcastOutput.size())
+        self.output.entryList.entryListCars.clear()
         logger.info("UDP: RESET: UDPBroadcastOutput")
 
     def setConnection(self, config: dict):
@@ -154,6 +155,7 @@ class UDPAPIConnector:
                 if reset:
                     reset = False
                     update_interval = 0.5
+                    self.reset_output()
 
     def fetch_data(self, client: socket.SocketType, update_interval: float, udp_output: acc_udp.UDPBroadcastOutput):
         """Fetch data"""
