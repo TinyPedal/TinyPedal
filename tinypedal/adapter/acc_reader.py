@@ -68,8 +68,10 @@ class DataAdapter:
         self.shmm = shmm
         self.udp = udp
 
-    def udp_carinfo(self, index: int) -> acc_udp.UDPCarInfo:
+    def udp_carinfo(self, index: int | None) -> acc_udp.UDPCarInfo:
         """Get car info from UDP API"""
+        if index is None:
+            index = self.shmm.playerIndex
         car_id = self.shmm.accGraphicsInfo.carIDs[index]
         return self.udp.entryList.entryListCars[car_id]
 
@@ -730,9 +732,6 @@ class Timing(_reader.Timing, DataAdapter):
         if length <= 0:
             length = self.udp.trackData.trackMeters
         estimated_laptime = length / 40
-        if index is None:
-            index = self.shmm.playerIndex
-            #return rmnan(estimated_laptime * self.shmm.accGraphicsInfo.normalizedCarPosition)
         return rmnan(estimated_laptime * self.udp_carinfo(index).splinePosition)
 
     def last_sector(self, index: int | None = None) -> float:
@@ -877,7 +876,8 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def incidents(self, index: int | None = None) -> int:
         """Number of incidents"""
-        return 0.0
+        data = self.udp_carinfo(index)
+        return data.accidents + data.trackCuts
 
     def is_player(self, index: int = 0) -> bool:
         """Is local player"""
@@ -907,8 +907,6 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def team_name(self, index: int | None = None) -> str:
         """Team name"""
-        if index is None:
-            index = self.shmm.playerIndex
         return tostr(self.udp_carinfo(index).teamName)
 
     def vehicle_model(self, index: int | None = None) -> str:
@@ -956,7 +954,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Is in pits"""
         if index is None:  # or index == self.shmm.playerIndex:
             return self.shmm.accGraphicsInfo.isInPitLane > 0
-        return self.udp_carinfo(index).carLocation == 2
+        return self.udp_carinfo(index).inPitLane
 
     def in_garage(self, index: int | None = None) -> bool:
         """Is in garage"""
@@ -965,42 +963,36 @@ class Vehicle(_reader.Vehicle, DataAdapter):
                 self.shmm.accGraphicsInfo.isInPitLane > 0
                 and self.shmm.accVehicleSpeed(index) <= 0
             )
-        return (
-            self.udp_carinfo(index).carLocation == 2
-            and self.shmm.accVehicleSpeed(index) <= 0
-        )
+        return self.udp_carinfo(index).inGarage
 
     def in_paddock(self, index: int | None = None) -> int:
         """Is in paddock (either pit lane or garage), 0 = on track, 1 = pit lane, 2 = garage"""
-        if index is None:  # or index == self.shmm.playerIndex:
-            in_pit = self.shmm.accGraphicsInfo.isInPitLane > 0
-        else:
-            in_pit = self.udp_carinfo(index).carLocation == 2
-        return 2 if in_pit and self.shmm.accVehicleSpeed(index) <= 0 else in_pit
+        data = self.udp_carinfo(index)
+        in_pit = data.inPitLane
+        return 2 if in_pit and data.inGarage else in_pit
 
     def number_pitstops(self, index: int | None = None, penalty: int = 0) -> int:
         """Number of pit stops"""
-        if index is None:  # or index == self.shmm.playerIndex:
-            data = self.shmm.accGraphicsInfo
-            return -penalty if penalty else data.mandatoryPitDone
-        return 0
+        return -penalty if penalty else self.udp_carinfo(index).pitStops
 
     def number_penalties(self, index: int | None = None) -> int:
         """Number of penalties"""
-        if index is None:  # or index == self.shmm.playerIndex:
-            return self.shmm.accGraphicsInfo.penalty > 0
+        if self.udp_carinfo(index).eventType == 3:
+            return 1
         return 0
 
     def pit_request(self, index: int | None = None) -> bool:
         """Is requested pit, 0 = none, 1 = request, 2 = entering, 3 = stopped, 4 = exiting"""
-        return 0
+        return self.udp_carinfo(index).carLocation == 3
 
     def pit_stop_time(self) -> float:
         """Estimated pit stop time (seconds)"""
         capacity = self.shmm.accStaticInfo.maxFuel
         empty_capacity = capacity - self.shmm.accPhysicsInfo.fuel
         valid_refill = ceil(min(empty_capacity, self.shmm.accGraphicsInfo.mfdFuelToAdd))
-        return 3.0 + valid_refill * 0.2  # base time = 3.0s, refill rate = 0.2L/s
+        if valid_refill:  # base time = 3.0s, refill rate = 0.2L/s
+            return 3.0 + valid_refill * 0.2
+        return 0.0
 
     def repair_time(self) -> float:
         """Scheduled repair time (seconds)"""
@@ -1017,6 +1009,8 @@ class Vehicle(_reader.Vehicle, DataAdapter):
             if state == 3:
                 return 3
             return 0
+        if self.udp_carinfo(index).finished:
+            return 1
         return 0
 
     def orientation_yaw(self, index: int | None = None) -> float:

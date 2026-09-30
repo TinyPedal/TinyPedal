@@ -175,6 +175,7 @@ class UDPAPIConnector:
         sync_entry_message = acc_udp.set_message(10, connection_id)
 
         # Start update loop
+        last_session_time = 0.0
         last_timestamp = 0.0
         last_car_entry_count = 0
         buffer_size = acc_udp.BroadcastingNetworkProtocol.BUFFER_SIZE
@@ -196,6 +197,10 @@ class UDPAPIConnector:
 
             # Wait interval after 2=InboundMessageTypes.REALTIME_UPDATE
             if message_type == 2:
+                # Reset on session change
+                if last_session_time > udp_output.sessionInfo.sessionTime:
+                    self.reset_output()
+                last_session_time = udp_output.sessionInfo.sessionTime
                 # Sync entry list
                 if udp_output.entryList.syncEntryList:
                     current_timestamp = monotonic()
