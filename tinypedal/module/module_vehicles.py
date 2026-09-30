@@ -63,12 +63,17 @@ class Realtime(DataModule):
                     last_veh_total = -1
                     last_session_elapsed = -1
                     last_in_race = -1
+                    temp_index = -1
 
                 veh_total = output.totalVehicles = api.read.vehicle.total_vehicles()
                 if veh_total > 0:
                     update_low_priority = next(gen_low_priority_timer)
                     session_elapsed = api.read.timing.elapsed()
                     in_race = api.read.session.in_race()
+                    if temp_index > 0:  # use temp index to loop data
+                        temp_index -= 1
+                    else:
+                        temp_index = veh_total - 1
 
                     update_vehicle_data(
                         output,
@@ -77,6 +82,7 @@ class Realtime(DataModule):
                         update_low_priority,
                         session_elapsed,
                         in_race,
+                        temp_index,
                     )
 
                     if update_low_priority:
@@ -116,6 +122,7 @@ def update_vehicle_data(
     update_low_priority: bool,
     elapsed_time: float,
     in_race: bool,
+    temp_index: int,
 ) -> None:
     """Update vehicle data"""
     nearest_line = DATA.MAX_METERS
@@ -138,12 +145,12 @@ def update_vehicle_data(
 
     # Local player data
     plr_lap_distance = api.read.lap.distance()
-    plr_lap_progress_total = api.read.lap.completed() + calc.lap_progress_distance(plr_lap_distance, track_length)
     plr_laptime_est = api.read.timing.estimated_laptime()
     plr_timeinto_est = api.read.timing.estimated_time_into()
     plr_pos_x = api.read.vehicle.position_longitudinal()
     plr_pos_y = api.read.vehicle.position_lateral()
     plr_ori_yaw = api.read.vehicle.orientation_yaw()
+    temp_position_overall = api.read.vehicle.place(temp_index)
 
     # Update dataset from all vehicles in current session
     for index, data in zip(range(output.totalVehicles), output.dataSet):
@@ -164,6 +171,11 @@ def update_vehicle_data(
         else:
             data.licoTimer.update(elapsed_time, api.read.inputs.throttle_raw(index), api.read.inputs.brake_raw(index))
             data.speedTrap.update(speed, lap_distance, speedtrap_distance, track_length)
+
+        if data.positionOverall == 1:
+            data.overallAheadIndex = -1
+        elif data.positionOverall - temp_position_overall == 1:
+            data.overallAheadIndex = temp_index
 
         if data.isPlayer:
             data.elapsedTime = elapsed_time
@@ -214,11 +226,34 @@ def update_vehicle_data(
         # Update low priority info
         if update_low_priority:
             data.currentLapProgress = calc.lap_progress_distance(lap_distance, track_length)
-            data.totalLapProgress = laps_completed + data.currentLapProgress
-            data.isLapped = calc.lap_difference(
-                data.totalLapProgress, plr_lap_progress_total,
-                max_lap_diff_ahead, max_lap_diff_behind
-            ) if in_race else 0
+
+            if data.totalLapCompleted != laps_completed:
+                data.totalLapCompleted = laps_completed
+            elif 0 < data.currentLapProgress < 1:  # helps avoid desync
+                data.totalLapProgress = data.totalLapCompleted + data.currentLapProgress
+                data.isLapped = calc.lap_difference(
+                    data.totalLapProgress, output.dataSet[output.playerIndex].totalLapProgress,
+                    max_lap_diff_ahead, max_lap_diff_behind
+                ) if in_race else 0
+
+                # Time gap
+                class_index_ahead = data.classAheadIndex
+                data.gapBehindNextInClass = calc_time_gap_behind(class_index_ahead, index, output.dataSet)
+
+                class_index_leader = data.classLeaderIndex
+                data.gapBehindLeaderInClass = calc_time_gap_behind(class_index_leader, index, output.dataSet)
+
+                overall_index_ahead = data.overallAheadIndex
+                if overall_index_ahead == class_index_ahead:
+                    data.gapBehindNext = data.gapBehindNextInClass
+                else:
+                    data.gapBehindNext = calc_time_gap_behind(overall_index_ahead, index, output.dataSet)
+
+                overall_index_leader = output.leaderIndex
+                if overall_index_leader == class_index_leader:
+                    data.gapBehindLeader = data.gapBehindLeaderInClass
+                else:
+                    data.gapBehindLeader = calc_time_gap_behind(overall_index_leader, index, output.dataSet)
 
             data.positionOverall = api.read.vehicle.place(index)
             data.bestLapTime = api.read.timing.best_laptime(index)
@@ -233,16 +268,6 @@ def update_vehicle_data(
             data.isFinished = api.read.vehicle.finish_state(index) == 1
             data.incidents = api.read.vehicle.incidents(index)
             data.trackLimitsPoints = api.read.session.cut_points(index)
-
-            data.gapBehindNext = calc_gap_behind_next(index)
-            data.gapBehindLeader = calc_gap_behind_leader(index)
-
-            opt_index_ahead = data.classAheadIndex
-            opt_index_leader = data.classLeaderIndex
-            data.gapBehindNextInClass = calc_time_gap_behind(
-                opt_index_ahead, index, output.dataSet[opt_index_ahead].totalLapProgress - data.totalLapProgress)
-            data.gapBehindLeaderInClass = calc_time_gap_behind(
-                opt_index_leader, index, output.dataSet[opt_index_leader].totalLapProgress - data.totalLapProgress)
 
             last_laptime = api.read.timing.last_laptime(index)
             data.isValidLap = last_laptime > 0
@@ -424,36 +449,22 @@ def update_qualify_position(output: VehiclesInfo) -> None:
 def calc_time_gap_behind(
     ahead_index: int,
     behind_index: int,
-    lap_diff: float,
+    dataset: tuple[VehicleDataSet, ...],
 ) -> float:
     """Calculate interval behind next in class"""
     if ahead_index < 0:
         return 0.0
-    if lap_diff >= 1 or lap_diff <= -1:  # laps
-        return int(abs(lap_diff))
+    lap_diff = dataset[ahead_index].totalLapProgress - dataset[behind_index].totalLapProgress
+    if lap_diff < 0:  # desync check during double-file formation lap
+        return 0.0
+    if lap_diff > 1:  # laps
+        return int(lap_diff)
     # Time gap between driver ahead and behind
     time_gap = api.read.timing.estimated_time_into(ahead_index) - api.read.timing.estimated_time_into(behind_index)
-    # Check lap diff (positive) for position correction
-    # in case the ahead driver is momentarily behind (such as during double-file formation lap)
-    if time_gap < 0 < lap_diff:
-        time_gap += api.read.timing.estimated_laptime(behind_index)
-    return abs(time_gap)
-
-
-def calc_gap_behind_next(index: int) -> float:
-    """Calculate interval behind next"""
-    laps_behind_next = api.read.lap.behind_next(index)
-    if laps_behind_next > 0:
-        return laps_behind_next
-    return api.read.timing.behind_next(index)
-
-
-def calc_gap_behind_leader(index: int) -> float:
-    """Calculate interval behind leader"""
-    laps_behind_leader = api.read.lap.behind_leader(index)
-    if laps_behind_leader > 0:
-        return laps_behind_leader
-    return api.read.timing.behind_leader(index)
+    if time_gap >= 0:
+        return time_gap
+    # Relatively behind, offset by a full lap time
+    return time_gap + api.read.timing.estimated_laptime(behind_index)
 
 
 def update_stint_usage(

@@ -463,6 +463,7 @@ class VehicleDataSet:
     brandName: str = ""
     vehicleName: str = ""
     vehicleClass: str = ""
+    overallAheadIndex: int = -1
     classAheadIndex: int = -1
     classBehindIndex: int = -1
     classLeaderIndex: int = -1
@@ -471,6 +472,7 @@ class VehicleDataSet:
     lastLapTime: float = DATA.MAX_SECONDS
     currentLapProgress: float = 0.0
     totalLapProgress: float = 0.0
+    totalLapCompleted: int = 0
     gapBehindNext: float = 0.0
     gapBehindNextInClass: float = 0.0
     gapBehindLeader: float = 0.0

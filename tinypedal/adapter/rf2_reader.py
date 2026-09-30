@@ -337,14 +337,6 @@ class Lap(_reader.Lap, DataAdapter):
             return 0
         return 1
 
-    def behind_leader(self, index: int | None = None) -> int:
-        """Laps behind leader"""
-        return self.shmm.rf2ScorVeh(index).mLapsBehindLeader
-
-    def behind_next(self, index: int | None = None) -> int:
-        """Laps behind next place"""
-        return self.shmm.rf2ScorVeh(index).mLapsBehindNext
-
     def safety_car_distance(self) -> float:
         """Safety car's distance into lap (meters)"""
         return rmnan(self.shmm.rf2Rule.mTrackRules.mSafetyCarLapDist)
@@ -717,14 +709,6 @@ class Timing(_reader.Timing, DataAdapter):
             if curr_sector2 > 0 < curr_sector1:
                 last_sector_time = curr_sector2 - curr_sector1
         return rmnan(last_sector_time)
-
-    def behind_leader(self, index: int | None = None) -> float:
-        """Time behind leader (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mTimeBehindLeader)
-
-    def behind_next(self, index: int | None = None) -> float:
-        """Time behind next place (seconds)"""
-        return rmnan(self.shmm.rf2ScorVeh(index).mTimeBehindNext)
 
 
 class Tyre(_reader.Tyre, DataAdapter):

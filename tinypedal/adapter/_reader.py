@@ -290,14 +290,6 @@ class Lap(ABC):
         """Sector index, 0 = S1, 1 = S2, 2 = S3"""
 
     @abstractmethod
-    def behind_leader(self, index: int | None = None) -> int:
-        """Laps behind leader"""
-
-    @abstractmethod
-    def behind_next(self, index: int | None = None) -> int:
-        """Laps behind next place"""
-
-    @abstractmethod
     def safety_car_distance(self) -> float:
         """Safety car's distance into lap (meters)"""
 
@@ -552,14 +544,6 @@ class Timing(ABC):
     @abstractmethod
     def last_sector(self, index: int | None = None) -> float:
         """Last sector time (seconds)"""
-
-    @abstractmethod
-    def behind_leader(self, index: int | None = None) -> float:
-        """Time behind leader (seconds)"""
-
-    @abstractmethod
-    def behind_next(self, index: int | None = None) -> float:
-        """Time behind next place (seconds)"""
 
 
 class Tyre(ABC):

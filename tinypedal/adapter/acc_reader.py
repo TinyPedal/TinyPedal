@@ -365,14 +365,6 @@ class Lap(_reader.Lap, DataAdapter):
             return 1
         return 2
 
-    def behind_leader(self, index: int | None = None) -> int:
-        """Laps behind leader"""
-        return 0.0
-
-    def behind_next(self, index: int | None = None) -> int:
-        """Laps behind next place"""
-        return 0.0
-
     def safety_car_distance(self) -> float:
         """Safety car's distance into lap (meters)"""
         return 0.0
@@ -746,14 +738,6 @@ class Timing(_reader.Timing, DataAdapter):
     def last_sector(self, index: int | None = None) -> float:
         """Last sector time (seconds)"""
         return self.shmm.accLastSectorTime.last
-
-    def behind_leader(self, index: int | None = None) -> float:
-        """Time behind leader (seconds)"""
-        return 0.0
-
-    def behind_next(self, index: int | None = None) -> float:
-        """Time behind next place (seconds)"""
-        return 0.0
 
 
 class Tyre(_reader.Tyre, DataAdapter):
