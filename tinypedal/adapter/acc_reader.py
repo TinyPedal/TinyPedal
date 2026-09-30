@@ -748,14 +748,20 @@ class Tyre(_reader.Tyre, DataAdapter):
     def compound_name(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set"""
         if index is None:  # or index == self.shmm.playerIndex:
-            compound = self.shmm.accGraphicsInfo.tyreCompound.replace("_", " ").title()
+            compound = self.shmm.accGraphicsInfo.tyreCompound
+            if "compound" not in compound:
+                return "", "", "", ""
+            compound = compound.replace("_", " ").title()
             return compound, compound, compound, compound
         return "", "", "", ""
 
     def compound_class(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set with class name prefix"""
         if index is None:  # or index == self.shmm.playerIndex:
-            compound = self.shmm.accGraphicsInfo.tyreCompound.replace("_", " ").title()
+            compound = self.shmm.accGraphicsInfo.tyreCompound
+            if "compound" not in compound:
+                return "", "", "", ""
+            compound = compound.replace("_", " ").title()
             class_name = ACC_CAR_CLASS(self.shmm.accStaticInfo.carModel)
             tyre_name = f"{class_name} - {compound}"
             return tyre_name, tyre_name, tyre_name, tyre_name

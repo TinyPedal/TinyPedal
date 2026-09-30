@@ -234,9 +234,14 @@ def calc_delta_time(
 
         # Update if position value is different & positive
         if 0 <= pos_curr != pos_last:
-            if recording and pos_curr - pos_recorded >= min_delta_distance:
-                delta_array_raw.append((round6(pos_curr), round6(laptime_curr)))
-                pos_recorded = pos_curr
+            if recording:
+                delta_pos = pos_curr - pos_recorded
+                if delta_pos > 100:  # detect teleporting
+                    recording = False
+                    delta_array_raw[:] = DATA.DELTA_DEFAULT
+                elif delta_pos >= min_delta_distance:
+                    delta_array_raw.append((round6(pos_curr), round6(laptime_curr)))
+                    pos_recorded = pos_curr
             pos_last = pos_curr  # reset last position
 
         # Validating 1s after passing finish line

@@ -281,21 +281,25 @@ def record_track_map(output: MappingInfo, filepath: str, min_node_distance: floa
 
         # Record map coords
         if recording:
-            # Record sector index
-            sector_idx = api.read.lap.sector_index()
-            if last_sector_idx != sector_idx:
-                if sector_idx == 1:
-                    recorder_data.sectors[0] = len(recorder_data.coords) - 1
-                elif sector_idx == 2:
-                    recorder_data.sectors[1] = len(recorder_data.coords) - 1
-                last_sector_idx = sector_idx
-
-            # Record driving path
             pos_curr = api.read.lap.distance()
 
             # Update if position value is different & positive
             if 0 <= pos_curr != pos_last:
-                if pos_curr - pos_recorded >= min_node_distance:
+                # Record sector index
+                sector_idx = api.read.lap.sector_index()
+                if last_sector_idx != sector_idx:
+                    if sector_idx == 1:
+                        recorder_data.sectors[0] = len(recorder_data.coords) - 1
+                    elif sector_idx == 2:
+                        recorder_data.sectors[1] = len(recorder_data.coords) - 1
+                    last_sector_idx = sector_idx
+
+                # Record driving path
+                delta_pos = pos_curr - pos_recorded
+                if delta_pos > 100:  # detect teleporting
+                    recording = False
+                    recorder_data.clear()
+                elif delta_pos >= min_node_distance:
                     pos_x = api.read.vehicle.position_longitudinal()
                     pos_y = api.read.vehicle.position_lateral()
                     pos_z = api.read.vehicle.position_vertical()

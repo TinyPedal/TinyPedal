@@ -274,9 +274,14 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
             is_pit_lap = 0
 
         # Update if position value is different & positive
-        if delta_recording and pos_curr - pos_last >= min_delta_distance:
-            delta_array_raw.append((pos_curr, *tread_wear_curr))
-            pos_last = pos_curr
+        if delta_recording:
+            delta_pos = pos_curr - pos_last
+            if delta_pos > 100:  # detect teleporting
+                delta_recording = False
+                delta_array_raw[:] = (DATA.WHEELS_DELTA_DEFAULT,)
+            elif delta_pos >= min_delta_distance:
+                delta_array_raw.append((pos_curr, *tread_wear_curr))
+                pos_last = pos_curr
 
         # Find delta data index
         if is_valid_delta and api.read.timing.current_laptime() > 0.3:
@@ -413,9 +418,14 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
             is_pit_lap = 0
 
         # Update if position value is different & positive
-        if delta_recording and pos_curr - pos_last >= min_delta_distance:
-            delta_array_raw.append((pos_curr, *brake_wear_curr))
-            pos_last = pos_curr
+        if delta_recording:
+            delta_pos = pos_curr - pos_last
+            if delta_pos > 100:  # detect teleporting
+                delta_recording = False
+                delta_array_raw[:] = (DATA.WHEELS_DELTA_DEFAULT,)
+            elif delta_pos >= min_delta_distance:
+                delta_array_raw.append((pos_curr, *brake_wear_curr))
+                pos_last = pos_curr
 
         # Find delta data index
         if is_valid_delta and api.read.timing.current_laptime() > 0.3:

@@ -61,7 +61,12 @@ class MapCoords:
 
     def is_valid(self) -> bool:
         """Is valid data"""
-        return len(self.coords) >= 10 and len(self.dists) >= 10 and len(self.sectors) == 2
+        return (
+            len(self.coords) >= 10
+            and len(self.dists) >= 10
+            and len(self.sectors) == 2
+            and self.sectors[0] < self.sectors[1]
+        )
 
     def clear(self):
         """Clear coords data"""

@@ -180,9 +180,14 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
 
             # Update if position value is different & positive
             net_change_curr = battery_regen - battery_drain
-            if delta_recording and pos_curr - pos_last >= min_delta_distance:
-                delta_array_raw.append((pos_curr, net_change_curr))
-                pos_last = pos_curr
+            if delta_recording:
+                delta_pos = pos_curr - pos_last
+                if delta_pos > 100:  # detect teleporting
+                    delta_recording = False
+                    delta_array_raw[:] = DATA.DELTA_DEFAULT
+                elif delta_pos >= min_delta_distance:
+                    delta_array_raw.append((pos_curr, net_change_curr))
+                    pos_last = pos_curr
 
             # Net change delta
             if is_valid_delta:
