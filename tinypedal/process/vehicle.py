@@ -159,25 +159,35 @@ class VehicleSpeed:
     """Vehicle speed estimate based on GPS coordinates"""
 
     __slots__ = (
-        "elapsed",
-        "pos",
+        "_index",
+        "_pos",
+        "_time",
         "speed",
     )
 
     def __init__(self):
-        self.elapsed = 0.0
-        self.pos = (0.0, 0.0)
+        self._index = 0
+        self._pos = [(0.0, 0.0)] * 10
+        self._time = [0.0] * 10
         self.speed = 0.0
 
     def update(self, elapsed: float, *pos: float) -> float:
         """Calculate speed estimate based on GPS coordinates"""
-        delta_time = elapsed - self.elapsed
-        if delta_time < 0:
-            self.elapsed = elapsed
-            self.pos = pos
-        elif delta_time > 0.05:
-            delta_distance = distance(pos, self.pos)
-            self.speed += 0.2 * (delta_distance / delta_time - self.speed)
-            self.elapsed = elapsed
-            self.pos = pos
+        if self._time[self._index] == elapsed:
+            return self.speed
+
+        offset = self._index + 1 if self._index < 9 else 0
+        delta_time = elapsed - self._time[offset]
+        if delta_time > 0:
+            delta_distance = distance(pos, self._pos[offset])
+            self.speed = delta_distance / delta_time
+
+        if self._index < 9:
+            self._index += 1
+        else:
+            self._index = 0
+
+        self._time[self._index] = elapsed
+        self._pos[self._index] = pos
+
         return self.speed
