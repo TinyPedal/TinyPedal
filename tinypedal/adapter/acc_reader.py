@@ -706,7 +706,7 @@ class Timing(_reader.Timing, DataAdapter):
             return laptime
         init_time = min_nonzero((
             self.best_laptime(index),
-            self.last_laptime(index),
+            abs(self.last_laptime(index)),
             DATA.MAX_SECONDS,
         ))
         if 0 < init_time < DATA.MAX_SECONDS:
@@ -791,29 +791,11 @@ class Tyre(_reader.Tyre, DataAdapter):
 
     def inner_temperature_avg(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre inner temperature set (Celsius) average"""
-        surface = self.shmm.accPhysicsInfo.tyreTemp
-        core = self.shmm.accPhysicsInfo.tyreCoreTemp
-        return (
-            rmnan((surface[0] + core[0]) / 2),
-            rmnan((surface[1] + core[1]) / 2),
-            rmnan((surface[2] + core[2]) / 2),
-            rmnan((surface[3] + core[3]) / 2),
-        )
+        return DATA.TYRE_AVERAGE_NA
 
     def inner_temperature_ico(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre inner temperature set (Celsius) inner,center,outer"""
-        surface = self.shmm.accPhysicsInfo.tyreTemp
-        core = self.shmm.accPhysicsInfo.tyreCoreTemp
-        front_left = rmnan((surface[0] + core[0]) / 2)
-        front_right = rmnan((surface[1] + core[1]) / 2)
-        rear_left = rmnan((surface[2] + core[2]) / 2)
-        rear_right = rmnan((surface[3] + core[3]) / 2)
-        return (
-            front_left, front_left, front_left,
-            front_right, front_right, front_right,
-            rear_left, rear_left, rear_left,
-            rear_right, rear_right, rear_right,
-        )
+        return DATA.TYRE_ICO_NA
 
     def pressure(self, index: int | None = None) -> tuple[float, ...]:
         """Tyre pressure (kPa)"""

@@ -670,7 +670,7 @@ class Timing(_reader.Timing, DataAdapter):
             return laptime
         init_time = min_nonzero((
             self.best_laptime(index),
-            self.last_laptime(index),
+            abs(self.last_laptime(index)),
             DATA.MAX_SECONDS,
         ))
         if 0 < init_time < DATA.MAX_SECONDS:

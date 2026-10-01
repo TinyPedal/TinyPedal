@@ -160,14 +160,16 @@ class DATA:
 
     # Data set
     EMPTY_DICT: MappingProxyType = MappingProxyType({})
-    DELTA_ZERO = (0.0, 0.0)  # pos, target
+    DELTA_ZERO = (0.0,) * 2  # pos, target
     DELTA_DEFAULT = (DELTA_ZERO,)
-    WHEELS_ZERO = (0.0, 0.0, 0.0, 0.0)  # FL, FR, RL, RR
-    WHEELS_NA = (-1.0, -1.0, -1.0, -1.0)  # FL, FR, RL, RR
+    WHEELS_ZERO = (0.0,) * 4  # FL, FR, RL, RR
+    WHEELS_NA = (-1.0,) * 4  # FL, FR, RL, RR
+    TYRE_AVERAGE_NA = (ABS_ZERO_CELSIUS,) * 4  # FL, FR, RL, RR
+    TYRE_ICO_NA = (ABS_ZERO_CELSIUS,) * 12  # FL*3, FR*3, RL*3, RR*3
     WHEELS_DELTA_DEFAULT = (0.0, *WHEELS_ZERO)  # pos, target set
     RELATIVE_NA = (0.0, -1)  # relative time gap, player index
-    VERSION_NA = (0, 0, 0)  # major, minor, patch
-    DATE_NA = (0, 0, 0)  # year, month, day
+    VERSION_NA = (0,) * 3  # major, minor, patch
+    DATE_NA = (0,) * 3  # year, month, day
 
     # ID selector
     TREND_SIGN = (
