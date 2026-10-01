@@ -298,11 +298,11 @@ class Inputs(_reader.Inputs, DataAdapter):
 
     def clutch(self, index: int | None = None) -> float:
         """Clutch filtered (fraction)"""
-        return rmnan(self.shmm.accPhysicsInfo.clutch)
+        return rmnan(1 - self.shmm.accPhysicsInfo.clutch)
 
     def clutch_raw(self, index: int | None = None) -> float:
         """Clutch raw (fraction)"""
-        return rmnan(self.shmm.accPhysicsInfo.clutch)
+        return rmnan(1 - self.shmm.accPhysicsInfo.clutch)
 
     def steering(self, index: int | None = None) -> float:
         """Steering (fraction)"""
