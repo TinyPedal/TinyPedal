@@ -593,9 +593,14 @@ class Switch(_reader.Switch, DataAdapter):
         """Headlights"""
         return self.shmm.rf2TeleVeh(index).mHeadlights
 
-    def ignition_starter(self, index: int | None = None) -> int:
-        """Ignition"""
-        return self.shmm.rf2TeleVeh(index).mIgnitionStarter
+    def ignition(self, index: int | None = None, stall_rpm: float = 100) -> int:
+        """Ignition, 0=engine off, 1=ignition on, 2=engine on"""
+        data = self.shmm.rf2TeleVeh(index)
+        if data.mIgnitionStarter:
+            if data.mEngineRPM > stall_rpm:
+                return 2
+            return 1
+        return 0
 
     def speed_limiter(self, index: int | None = None) -> int:
         """Speed limiter"""

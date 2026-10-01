@@ -480,8 +480,8 @@ class Switch(ABC):
         """Headlights"""
 
     @abstractmethod
-    def ignition_starter(self, index: int | None = None) -> int:
-        """Ignition"""
+    def ignition(self, index: int | None = None, stall_rpm: float = 100) -> int:
+        """Ignition, 0=engine off, 1=ignition on, 2=engine on"""
 
     @abstractmethod
     def speed_limiter(self, index: int | None = None) -> int:

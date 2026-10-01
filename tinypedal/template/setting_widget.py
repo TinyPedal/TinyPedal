@@ -1234,6 +1234,7 @@ WIDGET_DEFAULT = {
         "background_color_headlights": "#222222",
         "show_ignition": True,
         "background_color_ignition": "#222222",
+        "warning_color_engine_off": "#CC0000",
         "warning_color_stalling": "#00CC00",
         "stalling_rpm_threshold": 100,
         "show_clutch": True,

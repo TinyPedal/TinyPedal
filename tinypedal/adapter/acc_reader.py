@@ -631,11 +631,10 @@ class Switch(_reader.Switch, DataAdapter):
             return self.shmm.elapsed % 1 * 4 // 1 % 2  # pulse every 0.25s
         return data.lightsStage
 
-    def ignition_starter(self, index: int | None = None) -> int:
-        """Ignition"""
-        data = self.shmm.accPhysicsInfo
-        if data.ignitionOn:
-            if data.starterEngineOn:
+    def ignition(self, index: int | None = None, stall_rpm: float = 100) -> int:
+        """Ignition, 0=engine off, 1=ignition on, 2=engine on"""
+        if self.shmm.accPhysicsInfo.ignitionOn:
+            if self.shmm.accPhysicsInfo.rpm > stall_rpm:
                 return 2
             return 1
         return 0
