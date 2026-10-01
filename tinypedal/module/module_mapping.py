@@ -235,15 +235,17 @@ def record_track_map(output: MappingInfo, filepath: str, min_node_distance: floa
             last_lap_number = DATA.MAX_LAPS
             pos_recorded = 0.0  # last recorded vehicle position
             pos_last = 0.0  # last checked player vehicle position
+            is_pit_lap = 0  # whether pit in or pit out lap
 
         # Recording map data
         if map_exist:
             continue
 
         # Lap start & finish detection
+        is_pit_lap |= api.read.vehicle.in_pits()
         lap_number = api.read.lap.completed()
         if last_lap_number != lap_number and 0 < api.read.lap.distance() < 200:
-            if last_lap_number < lap_number and recorder_data.is_valid():
+            if not is_pit_lap and last_lap_number < lap_number and recorder_data.is_valid():
                 temp_data.coords = tuple(recorder_data.coords)
                 temp_data.dists = tuple(recorder_data.dists)
                 temp_data.sectors = tuple(recorder_data.sectors)
@@ -251,6 +253,7 @@ def record_track_map(output: MappingInfo, filepath: str, min_node_distance: floa
             recorder_data.new()
             pos_last = pos_recorded = 0
             recording = True
+            is_pit_lap = 0
             last_lap_number = lap_number
             #logger.info("map recording")
 

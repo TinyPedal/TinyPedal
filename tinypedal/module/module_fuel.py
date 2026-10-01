@@ -248,16 +248,14 @@ def calc_consumption(
         # Lap start & finish detection
         if last_lap_number != lap_number and 0 < pos_curr < 200:
             if (
-                last_lap_number < lap_number
-                and not is_pit_lap
+                not is_pit_lap
+                and last_lap_number < lap_number
                 and valid_delta_raw(delta_array_raw, used_curr, 1)
             ):
-                delta_array_raw.append(
-                    (  # set end value
-                        round6(delta_array_raw[-1][0] + 10),
-                        round6(used_curr),
-                    )
-                )
+                delta_array_raw.append((  # set end value
+                    round6(delta_array_raw[-1][0] + 10),
+                    round6(used_curr),
+                ))
                 delta_array_temp = tuple(delta_array_raw)
                 validating = elapsed_time
             delta_array_raw[:] = DATA.DELTA_DEFAULT

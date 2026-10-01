@@ -175,8 +175,9 @@ class UDPAPIConnector:
         sync_entry_message = acc_udp.set_message(10, connection_id)
 
         # Start update loop
-        last_session_time = 0.0
-        last_timestamp = 0.0
+        last_session_time = 0.0  # -1 if unavailable
+        last_session_phase = 0
+        last_entry_list_sync_time = 0.0
         last_car_entry_count = 0
         buffer_size = acc_udp.BroadcastingNetworkProtocol.BUFFER_SIZE
 
@@ -198,14 +199,17 @@ class UDPAPIConnector:
             # Wait interval after 2=InboundMessageTypes.REALTIME_UPDATE
             if message_type == 2:
                 # Reset on session change
-                if last_session_time > udp_output.sessionInfo.sessionTime:
+                session_time = udp_output.sessionInfo.sessionTime  # not always available
+                session_phase = udp_output.sessionInfo.sessionPhase  # so check phase too
+                if last_session_time > session_time > -1 or last_session_phase > session_phase:
                     self.reset_output()
-                last_session_time = udp_output.sessionInfo.sessionTime
+                last_session_phase = session_phase
+                last_session_time = session_time
                 # Sync entry list
                 if udp_output.entryList.syncEntryList:
-                    current_timestamp = monotonic()
-                    if current_timestamp - last_timestamp > 5:
-                        last_timestamp = current_timestamp
+                    current_time = monotonic()
+                    if current_time - last_entry_list_sync_time > 5:
+                        last_entry_list_sync_time = current_time
                         client.send(sync_entry_message)
                         udp_output.entryList.syncEntryList = False
                         logger.info("UDP: REQUESTED: REQUEST_ENTRY_LIST")

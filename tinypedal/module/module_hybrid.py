@@ -169,7 +169,7 @@ def calc_motor(output: HybridInfo, min_delta_distance: float):
 
             if delta_reset:
                 delta_reset = False
-                if len(delta_array_raw) > 1 and not is_pit_lap:
+                if not is_pit_lap and len(delta_array_raw) > 1:
                     delta_array_last = tuple(delta_array_raw)
                 delta_array_raw[:] = DATA.DELTA_DEFAULT
                 pos_last = pos_curr

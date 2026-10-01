@@ -223,7 +223,7 @@ def calc_delta_time(
 
         # Lap start & finish detection
         if last_lap_number != lap_number and 0 < pos_curr < 200:
-            if last_lap_number < lap_number and len(delta_array_raw) >= 10:
+            if not is_pit_lap and last_lap_number < lap_number and len(delta_array_raw) >= 10:
                 delta_array_last = delta_array_raw.copy()
                 validating = api.read.timing.elapsed()
             delta_array_raw[:] = DATA.DELTA_DEFAULT

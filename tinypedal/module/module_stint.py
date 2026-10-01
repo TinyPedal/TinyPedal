@@ -179,7 +179,7 @@ def record_stint_history(
     last_time_stop = 0.0
 
     # Stint consistency
-    pitting = True
+    is_pit_lap = 1  # whether pit in or pit out lap
     last_lap_number = DATA.MAX_LAPS
     consistency_laps = 0
     consistency_start = 0.0
@@ -240,7 +240,7 @@ def record_stint_history(
             start_energy = energy_curr
             start_wear = wear_avg
             # Reset consistency
-            pitting = True
+            is_pit_lap = 1
             last_lap_number = DATA.MAX_LAPS
             consistency_laps = 0
             consistency_start = 0.0
@@ -260,12 +260,12 @@ def record_stint_history(
             start_energy = energy_curr
 
         # Stint delta & consistency
-        pitting |= in_pits
+        is_pit_lap |= in_pits
 
         if last_lap_number != lap_number and api.read.timing.current_laptime() > 2:
             last_lap_number = lap_number
             laptime_temp = elapsed_time - consistency_start
-            if not pitting and laptime_temp > 0 and max(api.read.tyre.carcass_temperature()) > minimum_tyre_temperature:
+            if not is_pit_lap and laptime_temp > 0 and max(api.read.tyre.carcass_temperature()) > minimum_tyre_temperature:
                 consistency_laps += 1
                 consistency_time += laptime_temp
                 laptime_last = api.read.timing.last_laptime()
@@ -277,7 +277,7 @@ def record_stint_history(
                         consistency = stint_fastest / stint_average
                         delta = stint_average - stint_fastest
             consistency_start = elapsed_time
-            pitting = in_pits
+            is_pit_lap = in_pits
 
         # Current stint data
         stint_data.totalLaps = lap_number - start_laps
