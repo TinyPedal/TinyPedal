@@ -1118,6 +1118,18 @@ class Wheel(_reader.Wheel, DataAdapter):
 
     __slots__ = ()
 
+    def track_front(self, index: int | None = None) -> float:
+        """Wheel track front (millimeters)"""
+        return 0
+
+    def track_rear(self, index: int | None = None) -> float:
+        """Wheel track rear (millimeters)"""
+        return 0
+
+    def wheelbase(self, index: int | None = None) -> float:
+        """Wheelbase (millimeters)"""
+        return 0
+
     def camber(self, index: int | None = None) -> tuple[float, ...]:
         """Wheel camber (radians)"""
         wheel_data = self.shmm.lmuTeleVeh(index).mWheels

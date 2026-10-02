@@ -780,6 +780,18 @@ class Wheel(ABC):
     __slots__ = ()
 
     @abstractmethod
+    def track_front(self, index: int | None = None) -> float:
+        """Wheel track front (millimeters)"""
+
+    @abstractmethod
+    def track_rear(self, index: int | None = None) -> float:
+        """Wheel track rear (millimeters)"""
+
+    @abstractmethod
+    def wheelbase(self, index: int | None = None) -> float:
+        """Wheelbase (millimeters)"""
+
+    @abstractmethod
     def camber(self, index: int | None = None) -> tuple[float, ...]:
         """Wheel camber (radians)"""
 

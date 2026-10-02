@@ -159,15 +159,19 @@ class PaceNotesPlayer(QMediaPlayer):
 
     def __update_queue(self, pace_note: str | None):
         """Update playback queue"""
-        if (pace_note is not None
-            and len(self._play_queue) < self.mcfg["pace_notes_sound_maximum_queue"]):
+        if (
+            pace_note
+            and len(self._play_queue) < self.mcfg["pace_notes_sound_maximum_queue"]
+        ):
             self._play_queue.append(pace_note)
 
     def __play_next_in_queue(self):
         """Play next sound in playback queue"""
         # Wait if is playing & not exceeded max duration
-        if (self.is_playing() and
-            self.position() < self.mcfg["pace_notes_sound_maximum_duration"] * 1000):
+        if (
+            self.is_playing()
+            and self.position() < self.mcfg["pace_notes_sound_maximum_duration"] * 1000
+        ):
             return
         # Play next sound in queue
         self.set_source()

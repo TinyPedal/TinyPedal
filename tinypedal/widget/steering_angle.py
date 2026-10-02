@@ -49,8 +49,6 @@ class Realtime(Overlay):
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = font_m.width * 6 + bar_padx
-        self.wheeltrack_front = max(self.wcfg["wheel_track_front"], 1)
-        self.wheelbase = max(self.wcfg["wheelbase"], 1)
 
         # Config units
         self.unit_dist = units.set_unit_distance(self.cfg.units["distance_unit"])
@@ -203,6 +201,14 @@ class Realtime(Overlay):
         wheel_angle_front_average = minfo.wheels.averageFrontToeAngle
         diff_slip_angle = minfo.wheels.slipAngleDifference
 
+        wheeltrack_front = api.read.wheel.track_front()
+        if wheeltrack_front <= 0:
+            wheeltrack_front = self.wcfg["wheel_track_front"]
+
+        wheelbase = api.read.wheel.wheelbase()
+        if wheelbase <= 0:
+            wheelbase = self.wcfg["wheelbase"]
+
         # Steering angle
         if self.wcfg["show_steering_angle"]:
             self.update_steering_angle(self.bar_steer_angle, steer_angle)
@@ -221,8 +227,8 @@ class Realtime(Overlay):
             ackermann_percent = calc.ackermann_percentage(
                 minfo.wheels.toeAngle[0],
                 minfo.wheels.toeAngle[1],
-                self.wheeltrack_front,
-                self.wheelbase,
+                wheeltrack_front,
+                wheelbase,
             )
             self.update_ackermann_percentage(self.bar_ackermann_percentage, ackermann_percent)
 
@@ -239,7 +245,7 @@ class Realtime(Overlay):
         if self.wcfg["show_turning_radius"]:
             turning_radius = calc.turning_radius(
                 wheel_angle_front_average,
-                self.wheelbase,
+                wheelbase,
             )
             self.update_turning_radius(self.bar_turning_radius, turning_radius)
 
@@ -247,7 +253,7 @@ class Realtime(Overlay):
         if self.wcfg["show_turning_radius_under_slip_angle"]:
             slip_radius = calc.turning_radius(
                 wheel_angle_front_average + (minfo.wheels.averageFrontSlipAngle - minfo.wheels.averageRearSlipAngle),
-                self.wheelbase,
+                wheelbase,
             )
             self.update_turning_radius(self.bar_slip_radius, slip_radius)
 

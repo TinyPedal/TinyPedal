@@ -84,7 +84,10 @@ class Realtime(Overlay):
 
     def format_rake(self, rake):
         """Format rake"""
-        rake_angle = f"{calc.slope_angle(rake, self.wcfg['wheelbase']):+.{self.decimals}f}"
+        wheelbase = api.read.wheel.wheelbase()
+        if wheelbase <= 0:
+            wheelbase = self.wcfg["wheelbase"]
+        rake_angle = f"{calc.slope_angle(rake, wheelbase):+.{self.decimals}f}"
         if self.wcfg["show_ride_height_difference"]:
             ride_diff = f"({abs(rake):02.0f})"
         else:

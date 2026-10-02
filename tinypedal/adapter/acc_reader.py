@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from math import pi
 
-from ..calculation import atan2, ceil, min_nonzero
+from ..calculation import atan2, ceil, distance, min_nonzero
 from ..constant import DATA
 from ..formatter import strip_invalid_char
 from ..validator import bytes_to_str as tostr
@@ -1112,6 +1112,23 @@ class Wheel(_reader.Wheel, DataAdapter):
     """Wheel & suspension (front left, front right, rear left, rear right)"""
 
     __slots__ = ()
+
+    def track_front(self, index: int | None = None) -> float:
+        """Wheel track front (millimeters)"""
+        fl, fr, _, _ = self.shmm.accPhysicsInfo.tyreContactPoint
+        return rmnan(distance((fl.x, fl.y, fl.z), (fr.x, fr.y, fr.z)) * 1000)
+
+    def track_rear(self, index: int | None = None) -> float:
+        """Wheel track rear (millimeters)"""
+        _, _, rl, rr = self.shmm.accPhysicsInfo.tyreContactPoint
+        return rmnan(distance((rl.x, rl.y, rl.z), (rr.x, rr.y, rr.z)) * 1000)
+
+    def wheelbase(self, index: int | None = None) -> float:
+        """Wheelbase (millimeters)"""
+        fl, fr, rl, rr = self.shmm.accPhysicsInfo.tyreContactPoint
+        base_left = distance((fl.x, fl.y, fl.z), (rl.x, rl.y, rl.z))
+        base_right = distance((fr.x, fr.y, fr.z), (rr.x, rr.y, rr.z))
+        return rmnan((base_left + base_right) * 500)
 
     def camber(self, index: int | None = None) -> tuple[float, ...]:
         """Wheel camber (radians)"""

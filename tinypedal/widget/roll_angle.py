@@ -136,9 +136,17 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         height_fl, height_fr, height_rl, height_rr = api.read.wheel.ride_height()
 
+        wheeltrack_front = api.read.wheel.track_front()
+        if wheeltrack_front <= 0:
+            wheeltrack_front = self.wcfg["wheel_track_front"]
+
+        wheeltrack_rear = api.read.wheel.track_rear()
+        if wheeltrack_rear <= 0:
+            wheeltrack_rear = self.wcfg["wheel_track_rear"]
+
         # Roll angle
-        rollf_deg = calc.slope_angle(height_fr - height_fl, self.wcfg["wheel_track_front"])
-        rollr_deg = calc.slope_angle(height_rr - height_rl, self.wcfg["wheel_track_rear"])
+        rollf_deg = calc.slope_angle(height_fr - height_fl, wheeltrack_front)
+        rollr_deg = calc.slope_angle(height_rr - height_rl, wheeltrack_rear)
 
         ema_rollf_deg = self.calc_ema_roll(self.bar_rollf.last, rollf_deg)
         ema_rollr_deg = self.calc_ema_roll(self.bar_rollr.last, rollr_deg)
