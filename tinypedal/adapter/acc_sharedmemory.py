@@ -434,5 +434,5 @@ class ACCInfo:
 
     @property
     def elapsed(self) -> float:
-        """Number of player vehicle resets"""
+        """Current session elapsed time"""
         return self._sync.elapsed_time

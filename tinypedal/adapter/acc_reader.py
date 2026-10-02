@@ -106,9 +106,11 @@ class Brake(_reader.Brake, DataAdapter):
 
     def compound_name(self, index: int | None = None) -> tuple[str, str]:
         """Brake compound name, front, rear"""
-        front = f"Pad {self.shmm.accPhysicsInfo.frontBrakeCompound + 1}"
-        rear = f"Pad {self.shmm.accPhysicsInfo.rearBrakeCompound + 1}"
-        return front, rear
+        data = self.shmm.accPhysicsInfo
+        return (
+            f"Pad {data.frontBrakeCompound + 1}",
+            f"Pad {data.rearBrakeCompound + 1}",
+        )
 
     def bias_front(self, index: int | None = None) -> float:
         """Brake bias front (fraction)"""
@@ -241,7 +243,7 @@ class Engine(_reader.Engine, DataAdapter):
 
     def fuel(self, index: int | None = None) -> float:
         """Remaining fuel (liters)"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(self.shmm.accPhysicsInfo.fuel)
         return 0.0
 
@@ -251,7 +253,7 @@ class Engine(_reader.Engine, DataAdapter):
 
     def tank_capacity(self, index: int | None = None) -> float:
         """Fuel tank capacity (liters)"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(self.shmm.accStaticInfo.maxFuel)
         return 0.0
 
@@ -281,7 +283,7 @@ class Inputs(_reader.Inputs, DataAdapter):
 
     def throttle_raw(self, index: int | None = None) -> float:
         """Throttle raw (fraction)"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(self.shmm.accPhysicsInfo.throttle)
         return 0.0
 
@@ -292,7 +294,7 @@ class Inputs(_reader.Inputs, DataAdapter):
 
     def brake_raw(self, index: int | None = None) -> float:
         """Brake raw (fraction)"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(self.shmm.accPhysicsInfo.brake)
         return 0.0
 
@@ -324,7 +326,7 @@ class Lap(_reader.Lap, DataAdapter):
 
     def completed(self, index: int | None = None) -> int:
         """Total completed laps"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return self.shmm.accGraphicsInfo.completedLaps
         return self.udp_carinfo(index).completedLaps
 
@@ -340,13 +342,13 @@ class Lap(_reader.Lap, DataAdapter):
         length = ACC_TRACK_LENGTH(self.shmm.accStaticInfo.trackName)
         if length <= 0:
             length = self.udp.trackData.trackMeters
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(length * self.shmm.accGraphicsInfo.normalizedCarPosition)
         return rmnan(length * self.udp_carinfo(index).splinePosition)
 
     def progress(self, index: int | None = None) -> float:
         """Lap progress (fraction), distance into lap"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(self.shmm.accGraphicsInfo.normalizedCarPosition)
         return rmnan(self.udp_carinfo(index).splinePosition)
 
@@ -403,30 +405,23 @@ class Session(_reader.Session, DataAdapter):
 
     def identifier(self) -> tuple[int, int, int]:
         """Identify session"""
-        session_type = self.shmm.accGraphicsInfo.session
-        session_stamp = int(self.shmm.accGraphicsInfo.sessionIndex * 100 + session_type)
-        session_etime = int(rmnan(90000 - self.shmm.accGraphicsInfo.sessionTimeLeft * 0.001))
-        session_tlaps = self.shmm.accGraphicsInfo.numberOfLaps
+        data = self.shmm.accGraphicsInfo
+        session_type = data.session
+        session_stamp = int(data.sessionIndex * 100 + session_type)
+        session_etime = int(self.shmm.elapsed)
+        session_tlaps = data.completedLaps
         return session_stamp, session_etime, session_tlaps
 
     def elapsed(self) -> float:
         """Session elapsed time (seconds)"""
         return self.shmm.elapsed
 
-    def start(self) -> float:
-        """Session start time (seconds)"""
-        return 0.0
-
-    def end(self) -> float:
-        """Session end time (seconds)"""
-        return 0.0
-
     def remaining(self) -> float:
         """Session time remaining (seconds), minimum limit to 0"""
-        seconds = self.shmm.accGraphicsInfo.sessionTimeLeft * 0.001
+        seconds = self.shmm.accGraphicsInfo.sessionTimeLeft
         if seconds < 0:
             seconds = 0.0
-        return seconds
+        return rmnan(seconds * 0.001)
 
     def session_type(self) -> int:
         """Session type, 0 = TESTDAY, 1 = PRACTICE, 2 = QUALIFY, 3 = WARMUP, 4 = RACE, 5 = HOTLAP"""
@@ -476,12 +471,7 @@ class Session(_reader.Session, DataAdapter):
         return self.shmm.accGraphicsInfo.GlobalYellow
 
     def start_lights(self) -> int:
-        """Start lights countdown sequence, 0=green flag"""
-        data = self.shmm.accGraphicsInfo
-        # Green flag check
-        if data.completedLaps > 0 or data.GlobalGreen > 0:
-            return 0
-        # Start lights sequence
+        """Start lights countdown sequence, 0=green flag, -1=no start lights"""
         return -1
 
     def track_temperature(self) -> float:
@@ -515,18 +505,21 @@ class Session(_reader.Session, DataAdapter):
         """Road wetness set (fraction), range 0.0 - 1.0
 
         Wetness in percent:
-            0=none, 5=greasy, 10=damp, 15=wet, 60=flooded
+            0=none, 5=greasy, 10=damp, 15=wet, 60=flooded, 100=total flooded
         """
-        wetness = self.shmm.accGraphicsInfo.trackGripStatus
+        data = self.shmm.accGraphicsInfo
+        wetness = data.trackGripStatus
+        if wetness < 3:
+            return 0.0
         if wetness == 3:
             return 0.05
         if wetness == 4:
             return 0.1
         if wetness == 5:
             return 0.15
-        if wetness == 6:
+        if wetness == 6 and data.rainIntensity < 4:
             return 0.60
-        return 0.0
+        return 1.0
 
     def weather_forecast(self) -> tuple[tuple[float, int, float, float]]:
         """Weather forecast nodes, 0=forecast minutes, 1=sky type index, 2=air temperature, 3=rain chance"""
@@ -555,9 +548,9 @@ class Session(_reader.Session, DataAdapter):
             return 1.0
         return 0.0
 
-    def track_time(self) -> float:
+    def track_time(self, scale: int = 1) -> float:
         """Track time"""
-        return self.shmm.accGraphicsInfo.timeOfDay
+        return rmnan(self.shmm.accGraphicsInfo.timeOfDay)
 
     def time_scale(self) -> int:
         """Time scale"""
@@ -573,10 +566,10 @@ class Session(_reader.Session, DataAdapter):
 
     def wind_direction(self) -> float:
         """Wind direction (degrees)"""
-        dir = rmnan(self.shmm.accGraphicsInfo.windDirection + 90)
-        if dir == 0:
+        wind_dir = rmnan(self.shmm.accGraphicsInfo.windDirection + 90)
+        if wind_dir == 0:
             return 0
-        return dir - dir // 360 * 360
+        return wind_dir - wind_dir // 360 * 360
 
     def wind_speed(self) -> float:
         """Wind speed (m/s)"""
@@ -633,8 +626,9 @@ class Switch(_reader.Switch, DataAdapter):
 
     def ignition(self, index: int | None = None, stall_rpm: float = 100) -> int:
         """Ignition, 0=engine off, 1=ignition on, 2=engine on"""
-        if self.shmm.accPhysicsInfo.ignitionOn:
-            if self.shmm.accPhysicsInfo.rpm > stall_rpm:
+        data = self.shmm.accPhysicsInfo
+        if data.ignitionOn:
+            if data.rpm > stall_rpm:
                 return 2
             return 1
         return 0
@@ -671,19 +665,19 @@ class Timing(_reader.Timing, DataAdapter):
 
     def is_last_valid(self, index: int | None = None) -> bool:
         """Is last lap time valid"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return self.shmm.accValidLap.last
         return not self.udp_carinfo(index).lastLap.isInvalid
 
     def current_laptime(self, index: int | None = None) -> float:
         """Current lap time (seconds)"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(self.shmm.accGraphicsInfo.iCurrentTime * 0.001)
         return self.udp_carinfo(index).currentLap.laptimeMS * 0.001
 
     def last_laptime(self, index: int | None = None) -> float:
         """Last lap time (seconds), positive=valid, negative=invalid"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             last = rmnan(self.shmm.accGraphicsInfo.iLastTime * 0.001)
             if self.shmm.accValidLap.last:
                 return last
@@ -696,7 +690,7 @@ class Timing(_reader.Timing, DataAdapter):
 
     def best_laptime(self, index: int | None = None) -> float:
         """Best lap time (seconds)"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(self.shmm.accGraphicsInfo.iBestTime * 0.001)
         return self.udp_carinfo(index).bestSessionLap.laptimeMS * 0.001
 
@@ -745,7 +739,7 @@ class Tyre(_reader.Tyre, DataAdapter):
 
     def compound_name(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             compound = self.shmm.accGraphicsInfo.tyreCompound
             if len(compound) < 6:
                 return "", "", "", ""
@@ -755,7 +749,7 @@ class Tyre(_reader.Tyre, DataAdapter):
 
     def compound_class(self, index: int | None = None) -> tuple[str, ...]:
         """Tyre compound name set with class name prefix"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             compound = self.shmm.accGraphicsInfo.tyreCompound
             if len(compound) < 6:
                 return "", "", "", ""
@@ -880,7 +874,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def driver_name(self, index: int | None = None) -> str:
         """Driver name"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             stat_info = self.shmm.accStaticInfo
             return f"{stat_info.playerName} {stat_info.playerSurname}"
         data = self.udp_carinfo(index).currentDriverInfo
@@ -892,7 +886,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def vehicle_model(self, index: int | None = None) -> str:
         """Vehicle model name (brand name + model ID)"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             model = self.shmm.accStaticInfo.carModel
             model_name = ACC_CAR_MODEL(model)
             if model_name:
@@ -906,7 +900,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def class_name(self, index: int | None = None) -> str:
         """Vehicle class name"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return ACC_CAR_CLASS(self.shmm.accStaticInfo.carModel)
         model = ACC_CAR_MODEL_ID(self.udp_carinfo(index).carModelType)
         return ACC_CAR_CLASS(model)
@@ -923,7 +917,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def place(self, index: int | None = None) -> int:
         """Vehicle overall place"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return self.shmm.accGraphicsInfo.position
         return self.udp_carinfo(index).position
 
@@ -933,13 +927,13 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def in_pits(self, index: int | None = None) -> bool:
         """Is in pits"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return self.shmm.accGraphicsInfo.isInPitLane > 0
         return self.udp_carinfo(index).inPitLane
 
     def in_garage(self, index: int | None = None) -> bool:
         """Is in garage"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return (
                 self.shmm.accGraphicsInfo.isInPitLane > 0
                 and self.shmm.accPhysicsInfo.speedKmh <= 0
@@ -981,7 +975,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def finish_state(self, index: int | None = None) -> int:
         """Finish state, 0 = none, 1 = finished, 2 = DNF, 3 = DQ"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             state = self.shmm.accGraphicsInfo.flag
             if state == 0:
                 return 0
@@ -1056,7 +1050,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def speed(self, index: int | None = None) -> float:
         """Speed (m/s)"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(self.shmm.accPhysicsInfo.speedKmh / 3.6)
         return self.shmm.accVehicleSpeed(index)
 
@@ -1093,7 +1087,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def integrity(self, index: int | None = None) -> float:
         """Vehicle integrity"""
-        if index is None:  # or index == self.shmm.playerIndex:
+        if index is None:
             return rmnan(1 - self.shmm.accPhysicsInfo.carDamage[4] / 400)
         return 1.0
 

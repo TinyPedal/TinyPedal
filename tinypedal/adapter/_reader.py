@@ -320,14 +320,6 @@ class Session(ABC):
         """Session elapsed time (seconds)"""
 
     @abstractmethod
-    def start(self) -> float:
-        """Session start time (seconds)"""
-
-    @abstractmethod
-    def end(self) -> float:
-        """Session end time (seconds)"""
-
-    @abstractmethod
     def remaining(self) -> float:
         """Session time remaining (seconds), minimum limit to 0"""
 
@@ -369,7 +361,7 @@ class Session(ABC):
 
     @abstractmethod
     def start_lights(self) -> int:
-        """Start lights countdown sequence, 0=green flag"""
+        """Start lights countdown sequence, 0=green flag, -1=no start lights"""
 
     @abstractmethod
     def track_temperature(self) -> float:
@@ -410,7 +402,7 @@ class Session(ABC):
         """Track base grip level, convert to fraction 0.0 to 1.0"""
 
     @abstractmethod
-    def track_time(self) -> float:
+    def track_time(self, scale: int = 1) -> float:
         """Track time"""
 
     @abstractmethod

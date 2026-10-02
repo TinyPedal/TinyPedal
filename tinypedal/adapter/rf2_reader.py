@@ -26,6 +26,7 @@ Notes:
 from __future__ import annotations
 
 from ..calculation import (
+    clock_time,
     hypotenuse,
     lap_progress_distance,
     mean,
@@ -374,14 +375,6 @@ class Session(_reader.Session, DataAdapter):
         """Session elapsed time (seconds)"""
         return rmnan(self.shmm.rf2ScorInfo.mCurrentET)
 
-    def start(self) -> float:
-        """Session start time (seconds)"""
-        return rmnan(self.shmm.rf2ScorInfo.mStartET)
-
-    def end(self) -> float:
-        """Session end time (seconds)"""
-        return rmnan(self.shmm.rf2ScorInfo.mEndET)
-
     def remaining(self) -> float:
         """Session time remaining (seconds), minimum limit to 0"""
         scor = self.shmm.rf2ScorInfo
@@ -445,7 +438,7 @@ class Session(_reader.Session, DataAdapter):
         return any(data == 1 for data in sec_flag)
 
     def start_lights(self) -> int:
-        """Start lights countdown sequence, 0=green flag"""
+        """Start lights countdown sequence, 0=green flag, -1=no start lights"""
         scor = self.shmm.rf2ScorInfo
         # Green flag check
         if scor.mGamePhase >= 5:  # inaccurate (5fps refresh rate from API)
@@ -523,9 +516,10 @@ class Session(_reader.Session, DataAdapter):
         """Track base grip level, convert to fraction 0.0 to 1.0"""
         return -1.0
 
-    def track_time(self) -> float:
+    def track_time(self, scale: int = 1) -> float:
         """Track time"""
-        return -1.0
+        data = self.shmm.rf2ScorInfo
+        return rmnan(clock_time(data.mCurrentET, data.mStartET, scale))
 
     def time_scale(self) -> int:
         """Time scale"""

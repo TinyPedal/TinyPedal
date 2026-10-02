@@ -123,10 +123,7 @@ class Realtime(Overlay):
         else:
             time_scale = self.time_scale_override
 
-        track_time = api.read.session.track_time()
-        if track_time < 0:
-            track_time = calc.clock_time(api.read.session.elapsed(), api.read.session.start(), time_scale)
-        track_time = calc.zero_max(track_time, 86400)
+        track_time = api.read.session.track_time(time_scale)
 
         # Track clock
         if self.wcfg["show_track_clock"]:

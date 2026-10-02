@@ -381,7 +381,12 @@ def turning_direction(yaw_rad: float, x1: float, y1: float, x2: float, y2: float
 def clock_time(seconds: float, start: float = 0, scale: float = 1) -> float:
     """Clock time (seconds) looped in full 24 hours, 0 to 86400"""
     time_curr = start + seconds * scale
-    return time_curr - time_curr // 86400 * 86400
+    clock_time = time_curr - time_curr // 86400 * 86400
+    if clock_time < 0:
+        return 0
+    if clock_time > 86400:
+        return 86400
+    return clock_time
 
 
 def clock_time_to_seconds(clock_time: str) -> float:

@@ -386,14 +386,6 @@ class Session(_reader.Session, DataAdapter):
         """Session elapsed time (seconds)"""
         return rmnan(self.shmm.lmuScorInfo.mCurrentET)
 
-    def start(self) -> float:
-        """Session start time (seconds)"""
-        return rmnan(self.shmm.lmuScorInfo.mStartET)
-
-    def end(self) -> float:
-        """Session end time (seconds)"""
-        return rmnan(self.shmm.lmuScorInfo.mEndET)
-
     def remaining(self) -> float:
         """Session time remaining (seconds), minimum limit to 0"""
         scor = self.shmm.lmuScorInfo
@@ -457,17 +449,8 @@ class Session(_reader.Session, DataAdapter):
         return any(data == 1 for data in sec_flag)
 
     def start_lights(self) -> int:
-        """Start lights countdown sequence, 0=green flag"""
-        scor = self.shmm.lmuScorInfo
-        # Green flag check
-        if scor.mGamePhase >= 5:  # inaccurate (5fps refresh rate from API)
-            return 0
-        # Workaround for accurate green flag moment (standing-start type only)
-        tele_data = self.shmm.lmuTeleVeh()
-        if tele_data.mElapsedTime - tele_data.mLapStartET >= 0:
-            return 0
-        # Start lights sequence
-        return scor.mNumRedLights - scor.mStartLight + 1
+        """Start lights countdown sequence, 0=green flag, -1=no start lights"""
+        return -1
 
     def track_temperature(self) -> float:
         """Track temperature (Celsius)"""
@@ -549,9 +532,9 @@ class Session(_reader.Session, DataAdapter):
             return 1.0
         return 0.0
 
-    def track_time(self) -> float:
+    def track_time(self, scale: int = 1) -> float:
         """Track time"""
-        return self.shmm.lmuScorInfo.mTimeOfDay
+        return rmnan(self.shmm.lmuScorInfo.mTimeOfDay)
 
     def time_scale(self) -> int:
         """Time scale"""
