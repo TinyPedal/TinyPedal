@@ -91,7 +91,7 @@ class MMapDataSet:
         """
         self.phys.create(access_mode)
         self.ghfx.create(access_mode)
-        self.stat.create(1)
+        self.stat.create(access_mode)
 
     def close_mmap(self) -> None:
         """Close mmap instance"""
@@ -103,6 +103,7 @@ class MMapDataSet:
         """Update mmap data"""
         self.phys.update()
         self.ghfx.update()
+        self.stat.update()
 
 
 class SyncData:

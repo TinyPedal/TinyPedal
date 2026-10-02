@@ -277,7 +277,7 @@ class Inputs(_reader.Inputs, DataAdapter):
     def throttle(self, index: int | None = None) -> float:
         """Throttle filtered (fraction)"""
         data = self.shmm.accPhysicsInfo
-        return rmnan(data.throttle * (1 - data.tc))
+        return rmnan(data.throttle * (1 - data.tcActive))
 
     def throttle_raw(self, index: int | None = None) -> float:
         """Throttle raw (fraction)"""
@@ -288,7 +288,7 @@ class Inputs(_reader.Inputs, DataAdapter):
     def brake(self, index: int | None = None) -> float:
         """Brake filtered (fraction)"""
         data = self.shmm.accPhysicsInfo
-        return rmnan(data.brake * (1 - data.abs))
+        return rmnan(data.brake * (1 - data.absActive))
 
     def brake_raw(self, index: int | None = None) -> float:
         """Brake raw (fraction)"""
@@ -590,11 +590,11 @@ class Switch(_reader.Switch, DataAdapter):
 
     def tc_level(self, index: int | None = None) -> int:
         """TC level"""
-        return self.shmm.accGraphicsInfo.TC
+        return self.shmm.accGraphicsInfo.tcLevel
 
     def tc_cut_level(self, index: int | None = None) -> int:
         """TC cut level"""
-        return self.shmm.accGraphicsInfo.TCCUT
+        return self.shmm.accGraphicsInfo.tcCutLevel
 
     def tc_slip_level(self, index: int | None = None) -> int:
         """TC slip level"""
@@ -602,7 +602,7 @@ class Switch(_reader.Switch, DataAdapter):
 
     def abs_level(self, index: int | None = None) -> int:
         """ABS level"""
-        return self.shmm.accGraphicsInfo.ABS
+        return self.shmm.accGraphicsInfo.absLevel
 
     def motor_map_level(self, index: int | None = None) -> int:
         """Motor or engine map level"""
@@ -645,11 +645,11 @@ class Switch(_reader.Switch, DataAdapter):
 
     def tc_active(self, index: int | None = None) -> bool:
         """TC activation state"""
-        return self.shmm.accPhysicsInfo.tc > 0
+        return self.shmm.accPhysicsInfo.tcActive > 0
 
     def abs_active(self, index: int | None = None) -> bool:
         """ABS activation state"""
-        return self.shmm.accPhysicsInfo.abs > 0
+        return self.shmm.accPhysicsInfo.absActive > 0
 
     def drs_status(self, index: int | None = None) -> int:
         """DRS status, 0 not_available, 1 available, 2 allowed(not activated), 3 activated"""
@@ -747,7 +747,7 @@ class Tyre(_reader.Tyre, DataAdapter):
         """Tyre compound name set"""
         if index is None:  # or index == self.shmm.playerIndex:
             compound = self.shmm.accGraphicsInfo.tyreCompound
-            if "compound" not in compound:
+            if len(compound) < 6:
                 return "", "", "", ""
             compound = compound.replace("_", " ").title()
             return compound, compound, compound, compound
@@ -757,7 +757,7 @@ class Tyre(_reader.Tyre, DataAdapter):
         """Tyre compound name set with class name prefix"""
         if index is None:  # or index == self.shmm.playerIndex:
             compound = self.shmm.accGraphicsInfo.tyreCompound
-            if "compound" not in compound:
+            if len(compound) < 6:
                 return "", "", "", ""
             compound = compound.replace("_", " ").title()
             class_name = ACC_CAR_CLASS(self.shmm.accStaticInfo.carModel)
@@ -942,7 +942,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         if index is None:  # or index == self.shmm.playerIndex:
             return (
                 self.shmm.accGraphicsInfo.isInPitLane > 0
-                and self.shmm.accVehicleSpeed(index) <= 0
+                and self.shmm.accPhysicsInfo.speedKmh <= 0
             )
         return self.udp_carinfo(index).inGarage
 

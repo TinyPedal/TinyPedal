@@ -127,6 +127,7 @@ class Realtime(Overlay):
         # Last data
         self.last_in_pits = -1
         self.last_vehicle_name = None
+        self.last_compound_name = None
         self.last_elapsed_time = 0
         self.off_brake_timer = 0
 
@@ -140,8 +141,10 @@ class Realtime(Overlay):
             # Heatmap style
             if self.wcfg["enable_heatmap_auto_matching"]:
                 vehicle_name = api.read.vehicle.vehicle_model()
-                if self.last_vehicle_name != vehicle_name:
+                compound_name = api.read.brake.compound_name()
+                if self.last_vehicle_name != vehicle_name or self.last_compound_name != compound_name:
                     self.last_vehicle_name = vehicle_name
+                    self.last_compound_name = compound_name
                     class_name = api.read.vehicle.class_name()
                     compound_front, compound_rear = api.read.brake.compound_name()
                     self.update_heatmap(class_name, vehicle_name, compound_front, compound_rear)
