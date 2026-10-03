@@ -1,16 +1,25 @@
-WIP
+2.51.0 (2026-10-03)
 -----------------------------
-* [New]API support for Assetto Corsa Competizione
-  - TinyPedal now supports reading and displaying telemetry info from ACC.
-  - New telemetry API options for ACC can be accessed from "API" menu.
+* [New]Support for Assetto Corsa Competizione
+  - TinyPedal now supports reading and displaying telemetry info from "ACC". New telemetry API options for "ACC" can be accessed from "API" menu.
+    Note, "ACC" game API has less available telemetry data compare to "LMU" or "RF2", which means some data will be missing or shown as zero.
+    Make sure to read "Setup for Assetto Corsa Competizione" page for configuring API properly.
+    See Frequently Asked Questions for common issues.
 
-* General
-  - Fixed pace notes playback kept active even when disabled.
-  - Removed unused "electric_braking_allocation" option from Brake bias Widget.
-  - Moved all submodules to "thirdparty" folder. If you are running the APP from source, make sure to run "git submodule update --init" command to sync submodule.
+* Engine Widget
+  - Added "show_drive_ratio" option, which shows drive ratio between engine and drive wheel rotational speed.
+  - Added "drive_wheel_allocation" option. "0" for rear-wheel drive (default). "1" for front-wheel drive. "2" for all-wheel drive.
+  - Removed "show_oil_temperature" and "show_water_temperature" options (available in Engine temperature Widget).
 
 * Engine temperature Widget
-  - Added "show_exhaust_temperature" option.
+  - Added "show_exhaust_temperature" option. This option only works for "ACC".
+
+* Instrument Widget
+  - Now shows engine off color (red) warning when both ignition & engine are off.
+
+* Rake angle, Ride height, Roll angle Widget
+  - Added "static_height_front" & "static_height_rear" options in Ride height Widget, which sets static front and rear ride height (in millimeters) for calculating ride height, rake angle, roll angle estimates. These options are only used for "ACC", and shared with Rake angle and Roll angle Widget.
+    Note, both options have to be manually set according to the ride height values from car setup "Aero" page to get correct estimates in "ACC".
 
 * Relative, Rivals, Standings Widget
   - Added "show_track_limits_points" option (requested by user "paulndale79-png"), which shows driver's current track limits points (LMU only). This option is disabled by default.
@@ -24,13 +33,29 @@ WIP
 * Onboard setting Widget
   - Added "show_wiper_state" option.
 
+* [New]Wheel dimension Widget
+  - Show average front and rear tyre radius (in millimeters) measured in real time.
+  - Show front and rear wheel track (in millimeters) measured in real time ("ACC" only).
+  - Show wheelbase (in millimeters) measured in real time ("ACC" only).
+
 * [New]Wind direction Widget
   - Show wind arrow and direction marks relative to player's vehicle heading.
   - Show wind strength color indication on wind arrow, with customizable wind strength threshold setting. Note, wind arrow will be replaced by a solid circle if wind speed is below "calm" threshold.
-  - Show wind speed reading, default unit is "m/s", which can be changed in "Units" dialog. Note, currently "RF2" and "LMU" do not have wind simulation, wind speed is always zero.
+  - Show wind speed reading, default unit is "m/s", which can be changed in "Units" dialog.
+  - Note, currently this widget only works for "ACC". "RF2" and "LMU" do not have wind simulation, wind speed is always zero.
 
 * Mapping Module
   - Added "minimum_node_distance" option, which sets minimum recording distance (in meters) between each map node sample.
+
+* Wheels Module
+  - Added "enable_wheel_dimension_measurement" option, which enables real time wheel dimension measurement and calculation for tyre radius, wheel track, wheelbase. Note, wheel track and wheelbase measurement is only available for "ACC".
+  - Widgets that depend on "wheel track" & "wheelbase" data nows read data from measured wheel dimensions (if available).
+
+* Heatmap
+  - Changed default tyre heatmap to "tyre_optimal_80" when adding new tyre compounds.
+  - Changed default brake heatmap to "brake_optimal_400" when adding new brake compounds.
+  - Added "thermal_infrared" heatmap that based on old "tyre_default" heatmap.
+  - Existing presets will not be changed.
 
 * Units
   - Added "wind speed unit" option in "Units" config dialog.
@@ -39,7 +64,13 @@ WIP
   - Added "Orient (°)" column (requested by user "tomydinino"), which sets display orientation angle (in degrees) for "Track Map" widget. This option allows custom map orientation for individual map without having to switch and config different presets. This option is additive to "display_orientation" option in "Track Map" widget.
 
 * Vehicle Brand Editor
-  - Removed "import from LMU Rest API" option, which no longer required.
+  - Brand name matching is now based on "vehicle model" name for "LMU" & "ACC".
+  - Removed "import from LMU Rest API" option, which no longer used for LMU.
+
+* Misc
+  - Fixed pace notes playback kept active even when disabled.
+  - Removed unused "electric_braking_allocation" option from Brake bias Widget.
+  - Added "pyACCSharedMemory" library for accessing "ACC" API.
 
 2.50.0 (2026-08-31)
 -----------------------------

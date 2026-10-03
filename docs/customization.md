@@ -440,6 +440,60 @@ Additional notes:
 [**`Back to Top`**](#)
 
 
+## Assetto Corsa Competizione API
+**Assetto Corsa Competizione API options can be accessed from `Options` while this API is enabled in `API` menu in main window.**
+
+    access_mode
+Set access mode for API. Mode value `0` uses copy access and additional data check to avoid data desynchronized or interruption issues. Mode value `1` uses direct access, which may result data desynchronized or interruption issues. Default mode is copy access.
+
+    enable_active_state_override
+Set `true` to enable `active state` manual override. While enabled, `overriding` notification will be shown on API status bar from main window.
+
+    active_state
+This option overrides local player on-track status check, and updates or stops overlay and data processing accordingly. Set `true` to activate state. Set `false` to deactivate state. This option works only when `enable_active_state_override` enabled.
+
+    enable_player_index_override
+Set `true` to enable `player index` manual override.
+
+    player_index
+Set `player index` override for displaying data from specific player. Set value to `-1` for unspecified player.
+
+Note, this option works only when `enable_player_index_override` enabled. This option is automatically set while [Spectate Mode](#spectate-mode) enabled, and should not be set manually.
+
+    character_encoding
+Set character encoding for displaying text in correct encoding. Available encoding: `UTF-8`, `ISO-8859-1`. Default encoding is `UTF-8`.
+
+    enable_udp_api_access
+Enable UDP API accessing, which connects to game's UDP API (known as `Broadcasting Network Protocol`) for accessing additional data that is not available through sharedmemory API.
+
+    udp_api_update_interval
+Set update interval (in milliseconds) for requesting data from UDP API. Default is `200` milliseconds.
+
+Note, minimum update interval is hard-limited to `100` milliseconds.
+
+    url_host
+Set UDP API host address. Default is `127.0.0.1`, and should not be changed.
+
+    url_port
+Set port for UDP API host address. Port value must match `updListenerPort` value that sets in `ACC` (Documents\Assetto Corsa Competizione\Config\broadcasting.json) setting file in order to successfully connect to UDP API and receive data. The default port value for `ACC` is `9000`.
+
+Note, if `updListenerPort` value from game's `broadcasting.json` file is `0`, it requires to manually edit `broadcasting.json` file and set `updListenerPort` value to a valid port value that matches `url_port` option, such as `9000`. After edited `broadcasting.json` file, make sure to restart game to take effect.
+
+    connection_password
+Set connection password for accessing UDP API. Password must match `connectionPassword` value that sets in `ACC` (Documents\Assetto Corsa Competizione\Config\broadcasting.json) setting file in order to successfully connect to UDP API and receive data. Default value is no password (leave it blank).
+
+    connection_timeout
+Set connection timeout duration in seconds for UDP API. Minimum timeout is limited to `1.0` seconds. Default is `60` second. Note, connection may fail if timeout value is set too low.
+
+    connection_retry
+Set number of attempts to retry connection for UDP API. Default is `3` retries.
+
+    connection_retry_delay
+Set time delay in seconds to retry connection for UDP API. Value range in `0.5` to `60`. Default is `3` second.
+
+[**`Back to Top`**](#)
+
+
 ## Le Mans Ultimate API
 **Le Mans Ultimate API options can be accessed from `Options` while this API is enabled in `API` menu in main window.**
 
@@ -1711,6 +1765,11 @@ Unlike `Time` based race, finish criteria in `Laps & Time` based race is determi
 ## Wheels module
 **This module provides wheel radius, slip ratio, tyre wear, brake wear, suspension travel, vehicle weight data.**
 
+    enable_wheel_dimension_measurement
+Enable real time wheel dimension measurement and calculation for tyre radius, wheel track, wheelbase.
+
+Note, wheel track and wheelbase measurement is only available for `ACC`.
+
     minimum_axle_rotation
 Set minimum axle rotation (radians per second) for calculating wheel radius and differential locking percent. Default value is `4`.
 
@@ -2265,15 +2324,6 @@ Show player's current position line mark.
     layout
 2 layouts are available: `0` = vertical layout, `1` = horizontal layout.
 
-    show_oil_temperature
-Show oil temperature.
-
-    show_water_temperature
-Show water temperature.
-
-    overheat_threshold_oil, overheat_threshold_water
-Set temperature threshold for oil and water overheat color indicator, unit in Celsius.
-
     show_turbo_pressure
 Show turbo pressure.
 
@@ -2292,6 +2342,12 @@ Show engine power.
     show_power_to_weight_ratio
 Show estimated (maximum recorded) power to (current) weight ratio. Final reading is affected by power and weight units setting, and resets after returning to garage. The accuracy depends on game API data, and may not be available on certain vehicles.
 
+    show_drive_ratio
+Show drive ratio between engine and drive wheel rotational speed.
+
+    drive_wheel_allocation
+Set drive wheel allocation. `0` for rear-wheel drive (default). `1` for front-wheel drive. `2` for all-wheel drive (calculated as simple average of all 4 wheels rotational speed).
+
 [**`Back to Top`**](#)
 
 
@@ -2305,7 +2361,7 @@ Show oil temperature.
 Show water temperature.
 
     show_exhaust_temperature
-Show exhaust temperature.
+Show exhaust temperature. This option only works for `ACC`.
 
     overheat_threshold_*
 Set temperature threshold for overheat color indicator, unit in Celsius.
@@ -2873,7 +2929,7 @@ Set size of instrument icon in pixel. Minimum value is limited to `16`.
 Show headlights state.
 
     show_ignition
-Show engine ignition, starter, stalling state.
+Show engine off, ignition, stalling state.
 
     stalling_rpm_threshold
 Set RPM threshold for triggering engine stalling warning. Default is `100` RPM.
@@ -3397,8 +3453,10 @@ The three values define an invisible rectangle area(unit meter) that hides any v
 ## Rake angle
 **This widget displays vehicle rake angle info.**
 
+Note, for `ACC`, it is required to configure `static_height_front`, `static_height_rear` options in [Ride Height](#ride-height) Widget to correctly calculate rake estimates.
+
     wheelbase
-Set wheelbase in millimeters. Default is `2800` millimeters. This option affects `rake angle` calculation accuracy.
+Set wheelbase in millimeters, which will only be used if wheelbase data is not available from game API. Default is `2800` millimeters. This option affects `rake angle` calculation accuracy.
 
     rake_angle_smoothing_samples
 Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
@@ -3705,6 +3763,11 @@ Set prediction pit time for leader or local player.
     ride_height_maximum_range
 Set visualized maximum ride height display range (millimeter).
 
+    static_height_front, static_height_rear
+Set static front and rear ride height (in millimeters) for calculating Ride Height, [Rake Angle](#rake-angle), and [Roll Angle](#roll-angle) estimates. These options are only used for `ACC`, and shared with Rake angle and Roll angle Widget.
+
+Note, both options have to be manually set according to the ride height values from car setup `Aero` page to get correct ride height and rake estimates in `ACC`.
+
     bottoming_height_*
 Set bottoming ride height (in millimeters). This option is used for vehicle that hits ground before ride height reading reaches zero.
 
@@ -3728,11 +3791,13 @@ Set custom time interval color of opponent ahead and behind.
 ## Roll angle
 **This widget displays vehicle front and rear roll angles info.**
 
+Note, for `ACC`, it is required to configure `static_height_front`, `static_height_rear` options in [Ride Height](#ride-height) Widget to correctly calculate rake estimates.
+
     show_degree_and_percentage_sign
 Set `true` to show degree and percentage sign.
 
     wheel_track_front, wheel_track_rear
-Set front and rear wheel track in millimeters. Default is `1800` millimeters. This option affects `roll angle` calculation accuracy.
+Set front and rear wheel track in millimeters, which will only be used if wheel track data is not available from game API. Default is `1800` millimeters. This option affects `roll angle` calculation accuracy.
 
     roll_angle_smoothing_samples, roll_angle_ratio_smoothing_samples
 Set number of samples for reducing data fluctuation. Lower value may result more fluctuated reading. Set `1` to disable smoothing.
@@ -4036,10 +4101,10 @@ Set minimum time threshold (in seconds) for highlighting lift and coast time. De
 **This widget displays steering and wheel angle info.**
 
     wheel_track_front
-Set front wheel track in millimeters. Default is `1800` millimeters. This option affects `Ackermann percentage` calculation accuracy.
+Set front wheel track in millimeters, which will only be used if wheel track data is not available from game API. Default is `1800` millimeters. This option affects `Ackermann percentage` calculation accuracy.
 
     wheelbase
-Set wheelbase in millimeters. Default is `2800` millimeters. This option affects `Ackermann percentage` and `turning radius` calculation accuracy.
+Set wheelbase in millimeters, which will only be used if wheelbase data is not available from game API. Default is `2800` millimeters. This option affects `Ackermann percentage` and `turning radius` calculation accuracy.
 
     show_steering_angle
 Show steering angle in degrees.
@@ -4981,6 +5046,23 @@ Set number of samples for reducing data fluctuation. Lower value may result more
 [**`Back to Top`**](#)
 
 
+## Wheel dimension
+**This widget displays wheel dimension info.**
+
+Note, `enable_wheel_dimension_measurement` must be enabled in [Wheels Module](#wheels-module) to calculate wheel dimension.
+
+    show_front_tyre_radius, show_rear_tyre_radius
+Show average front and rear tyre radius (in millimeters) measured in real time.
+
+    show_front_wheel_track, show_rear_wheel_track
+Show front and rear wheel track (in millimeters) measured in real time. Note, currently only `ACC` provides wheel track data.
+
+    show_wheelbase
+Show wheelbase (in millimeters) measured in real time. Note, currently only `ACC` provides wheelbase data.
+
+[**`Back to Top`**](#)
+
+
 ## Wheel toe
 **This widget displays wheel toe angle info.**
 
@@ -5001,7 +5083,9 @@ Set number of samples for reducing data fluctuation. Lower value may result more
 ## Wind direction
 **This widget displays wind direction and speed info.**
 
-Note, wind arrow and direction marks are displayed relative to player's vehicle heading. Currently `RF2` and `LMU` do not have wind simulation, wind speed is always zero.
+Note, wind arrow and direction marks are displayed relative to player's vehicle heading.
+
+Currently this widget only works for `ACC`. `RF2` and `LMU` do not have wind simulation, wind speed is always zero.
 
     display_size
 Set widget display size in pixels.

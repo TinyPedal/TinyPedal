@@ -130,6 +130,7 @@ def build_exe(dist_path: str) -> None:
         "unittest",
         "xmlrpc",
         "multiprocessing",
+        "thirdparty",
         # "_ssl",
         # "ssl",
         # "email",
