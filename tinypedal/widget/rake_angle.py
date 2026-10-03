@@ -50,8 +50,8 @@ class Realtime(Overlay):
         self.prefix_text = self.wcfg["prefix_rake_angle"]
         self.sign_text = "°" if self.wcfg["show_degree_sign"] else ""
         self.decimals = max(int(self.wcfg["decimal_places"]), 1)
-        self.static_f = self.wcfg["static_height_front"]
-        self.static_r = self.wcfg["static_height_rear"]
+        self.static_f = self.cfg.user.setting["ride_height"]["static_height_front"]
+        self.static_r = self.cfg.user.setting["ride_height"]["static_height_rear"]
 
         # Rake angle
         self.bar_style_rake = (

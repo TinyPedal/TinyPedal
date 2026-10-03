@@ -1814,8 +1814,6 @@ WIDGET_DEFAULT = {
         "font_offset_vertical": 0,
         "opacity": 0.9,
         "bar_padding": 0.2,
-        "static_height_front": 0,
-        "static_height_rear": 0,
         "show_degree_sign": True,
         "show_ride_height_difference": True,
         "wheelbase": 2800,

@@ -22,6 +22,8 @@ Roll angle Widget
 
 from .. import calculation as calc
 from ..api_control import api
+from ..constant import DATA
+from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -48,6 +50,8 @@ class Realtime(Overlay):
         self.degree_sign_text = "°" if self.wcfg["show_degree_and_percentage_sign"] else ""
         self.percent_sign_text = "%" if self.wcfg["show_degree_and_percentage_sign"] else ""
         self.decimals = max(int(self.wcfg["decimal_places"]), 1)
+        self.static_f = self.cfg.user.setting["ride_height"]["static_height_front"]
+        self.static_r = self.cfg.user.setting["ride_height"]["static_height_rear"]
 
         if self.wcfg["layout"] == 0:
             prefix_just = max(
@@ -134,7 +138,16 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        height_fl, height_fr, height_rl, height_rr = api.read.wheel.ride_height()
+        rideh_set = api.read.wheel.ride_height()
+        if rideh_set == DATA.WHEELS_ZERO and self.static_f > 0 < self.static_r:
+            susp_current = minfo.wheels.currentSuspensionPosition
+            susp_static = minfo.wheels.staticSuspensionPosition
+            rideh_set = (
+                self.static_f - susp_current[0] + susp_static[0],
+                self.static_f - susp_current[1] + susp_static[1],
+                self.static_r - susp_current[2] + susp_static[2],
+                self.static_r - susp_current[3] + susp_static[3],
+            )
 
         wheeltrack_front = api.read.wheel.track_front()
         if wheeltrack_front <= 0:
@@ -145,8 +158,8 @@ class Realtime(Overlay):
             wheeltrack_rear = self.wcfg["wheel_track_rear"]
 
         # Roll angle
-        rollf_deg = calc.slope_angle(height_fr - height_fl, wheeltrack_front)
-        rollr_deg = calc.slope_angle(height_rr - height_rl, wheeltrack_rear)
+        rollf_deg = calc.slope_angle(rideh_set[1] - rideh_set[0], wheeltrack_front)
+        rollr_deg = calc.slope_angle(rideh_set[3] - rideh_set[2], wheeltrack_rear)
 
         ema_rollf_deg = self.calc_ema_roll(self.bar_rollf.last, rollf_deg)
         ema_rollr_deg = self.calc_ema_roll(self.bar_rollr.last, rollr_deg)
