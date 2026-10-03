@@ -97,7 +97,7 @@ class Realtime(Overlay):
 
     def format_rake(self, rake):
         """Format rake"""
-        wheelbase = api.read.wheel.wheelbase()
+        wheelbase = minfo.wheels.wheelbase
         if wheelbase <= 0:
             wheelbase = self.wcfg["wheelbase"]
         rake_angle = f"{calc.slope_angle(rake, wheelbase):+.{self.decimals}f}"

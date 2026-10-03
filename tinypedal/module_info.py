@@ -739,6 +739,12 @@ class VehiclesInfo:
 class WheelsInfo:
     """Wheels output data"""
 
+    # Wheel dimension (millimeters)
+    wheelRadiusFront: float = 0.0
+    wheelRadiusRear: float = 0.0
+    wheelTrackFront: float = 0.0
+    wheelTrackRear: float = 0.0
+    wheelbase: float = 0.0
     # Rotation
     lockingPercentFront: float = 0.0
     lockingPercentRear: float = 0.0

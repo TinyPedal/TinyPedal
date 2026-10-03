@@ -149,11 +149,11 @@ class Realtime(Overlay):
                 self.static_r - susp_current[3] + susp_static[3],
             )
 
-        wheeltrack_front = api.read.wheel.track_front()
+        wheeltrack_front = minfo.wheels.wheelTrackFront
         if wheeltrack_front <= 0:
             wheeltrack_front = self.wcfg["wheel_track_front"]
 
-        wheeltrack_rear = api.read.wheel.track_rear()
+        wheeltrack_rear = minfo.wheels.wheelTrackRear
         if wheeltrack_rear <= 0:
             wheeltrack_rear = self.wcfg["wheel_track_rear"]
 

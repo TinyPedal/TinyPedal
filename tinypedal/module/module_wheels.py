@@ -55,6 +55,7 @@ class Realtime(DataModule):
 
         gen_wheel_rotation = calc_wheel_rotation(
             output=minfo.wheels,
+            wheel_measurement=self.mcfg["enable_wheel_dimension_measurement"],
             max_rot_bias_f=max(self.mcfg["maximum_rotation_difference_front"], 0.00001),
             max_rot_bias_r=max(self.mcfg["maximum_rotation_difference_rear"], 0.00001),
             min_rot_axle=max(self.mcfg["minimum_axle_rotation"], 0.0),
@@ -111,6 +112,7 @@ class Realtime(DataModule):
 @generator_init
 def calc_wheel_rotation(
     output: WheelsInfo,
+    wheel_measurement: bool,
     max_rot_bias_f: float,
     max_rot_bias_r: float,
     min_rot_axle: float,
@@ -135,7 +137,6 @@ def calc_wheel_rotation(
                 continue
             last_reset = reset
 
-            last_accel_max = 0.0
             locking_f = 1.0
             locking_r = 1.0
             last_elapsed_time = 0.0
@@ -144,6 +145,19 @@ def calc_wheel_rotation(
                 vehicle_name = api.read.vehicle.vehicle_model()
                 radius_front_ema = 0.0
                 radius_rear_ema = 0.0
+            if not wheel_measurement:
+                output.wheelRadiusFront = 0.0
+                output.wheelRadiusRear = 0.0
+                output.wheelTrackFront = 0.0
+                output.wheelTrackRear = 0.0
+                output.wheelbase = 0.0
+
+        elapsed_time = api.read.timing.elapsed()
+        delta_time = elapsed_time - last_elapsed_time
+        last_elapsed_time = elapsed_time
+
+        if delta_time <= 0:
+            continue
 
         wheel_rot = api.read.wheel.rotation()
         speed = api.read.vehicle.speed()
@@ -165,16 +179,20 @@ def calc_wheel_rotation(
             locking_r = calc.differential_locking_percent(rot_axle_r, wheel_rot[2])
 
         # Record wheel radius value within max rotation difference
-        accel_max = max(abs(accel_lateral), abs(accel_longitudinal))
-        if last_accel_max != accel_max:  # check if game paused
-            last_accel_max = accel_max
-            d_factor = 2 / max(40 * accel_max, 20)  # scale ema factor with max accel
+        if speed < 1:
+            radius_front_raw = 0.0
+            radius_rear_raw = 0.0
+        else:
+            radius_front_raw = calc.rotation_radius(speed, rot_axle_f)
+            radius_rear_raw = calc.rotation_radius(speed, rot_axle_r)
+            # Scale ema factor with max accel
+            d_factor = 2 / max(abs(40 * accel_lateral), abs(40 * accel_longitudinal), 20)
             # Front average wheel radius
             if rot_axle_f < -min_rot_axle and 0 <= rot_bias_f < max_rot_bias_f:
-                radius_front_ema = calc.exp_mov_avg(d_factor, radius_front_ema, calc.rotation_radius(speed, rot_axle_f))
+                radius_front_ema = calc.exp_mov_avg(d_factor, radius_front_ema, radius_front_raw)
             # Rear average wheel radius
             if rot_axle_r < -min_rot_axle and 0 <= rot_bias_r < max_rot_bias_r:
-                radius_rear_ema = calc.exp_mov_avg(d_factor, radius_rear_ema, calc.rotation_radius(speed, rot_axle_r))
+                radius_rear_ema = calc.exp_mov_avg(d_factor, radius_rear_ema, radius_rear_raw)
 
         # Calculate slip ratio
         slip_ratio[0] = calc.slip_ratio(wheel_rot[0], radius_front_ema, speed)
@@ -183,16 +201,12 @@ def calc_wheel_rotation(
         slip_ratio[3] = calc.slip_ratio(wheel_rot[3], radius_rear_ema, speed)
 
         # Calculate wheel lock duration
-        elapsed_time = api.read.timing.elapsed()
-        delta_time = elapsed_time - last_elapsed_time
-        last_elapsed_time = elapsed_time
-
         if api.read.inputs.brake_raw() > 0.02:
             lap_number = api.read.lap.completed()
             if last_lap_number != lap_number:
                 last_lap_number = lap_number
                 locking_time[:] = DATA.WHEELS_ZERO  # reset on new lap
-            if 0.2 > delta_time > 0:
+            if 0.2 > delta_time:
                 if slip_ratio[0] < lock_threshold:
                     locking_time[0] += delta_time
                 if slip_ratio[1] < lock_threshold:
@@ -208,6 +222,12 @@ def calc_wheel_rotation(
         output.lockingPercentRear = locking_r
         output.slipRatio[:] = slip_ratio
         output.lockingTime[:] = locking_time
+        if wheel_measurement:
+            output.wheelRadiusFront = radius_front_raw * 1000
+            output.wheelRadiusRear = radius_rear_raw * 1000
+            output.wheelTrackFront = api.read.wheel.track_front()
+            output.wheelTrackRear = api.read.wheel.track_rear()
+            output.wheelbase = api.read.wheel.wheelbase()
 
 
 @generator_init

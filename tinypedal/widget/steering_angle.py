@@ -201,11 +201,11 @@ class Realtime(Overlay):
         wheel_angle_front_average = minfo.wheels.averageFrontToeAngle
         diff_slip_angle = minfo.wheels.slipAngleDifference
 
-        wheeltrack_front = api.read.wheel.track_front()
+        wheeltrack_front = minfo.wheels.wheelTrackFront
         if wheeltrack_front <= 0:
             wheeltrack_front = self.wcfg["wheel_track_front"]
 
-        wheelbase = api.read.wheel.wheelbase()
+        wheelbase = minfo.wheels.wheelbase
         if wheelbase <= 0:
             wheelbase = self.wcfg["wheelbase"]
 
