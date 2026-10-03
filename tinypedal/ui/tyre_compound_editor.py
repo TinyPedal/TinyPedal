@@ -150,8 +150,11 @@ class TyreCompoundEditor(BaseEditor):
 
     def __add_option_combolist(self, key):
         """Combo droplist string"""
+        available_heatmap = cfg.user.heatmap.keys()
         combo_edit = QComboBox()
-        combo_edit.addItems(cfg.user.heatmap.keys())
+        combo_edit.addItems(available_heatmap)
+        if key not in available_heatmap:
+            key = HEATMAP_DEFAULT_TYRE
         combo_edit.setCurrentText(key)
         combo_edit.currentTextChanged.connect(self.set_modified)
         return combo_edit
@@ -170,7 +173,7 @@ class TyreCompoundEditor(BaseEditor):
         for index in range(veh_total):
             compounds = set(api.read.tyre.compound_class(index))
             for compound in compounds:
-                if not self.is_value_in_table(compound, self.table_compounds):
+                if compound and not self.is_value_in_table(compound, self.table_compounds):
                     self.add_compound_entry(
                         row_index,
                         compound,

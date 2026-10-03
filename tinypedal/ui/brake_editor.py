@@ -136,8 +136,11 @@ class BrakeEditor(BaseEditor):
 
     def __add_option_combolist(self, key):
         """Combo droplist string"""
+        available_heatmap = cfg.user.heatmap.keys()
         combo_edit = QComboBox()
-        combo_edit.addItems(cfg.user.heatmap.keys())
+        combo_edit.addItems(available_heatmap)
+        if key not in available_heatmap:
+            key = HEATMAP_DEFAULT_BRAKE
         combo_edit.setCurrentText(key)
         combo_edit.currentTextChanged.connect(self.set_modified)
         return combo_edit
@@ -162,7 +165,7 @@ class BrakeEditor(BaseEditor):
                 set_predefined_brake_name(class_name, vehicle_name, compound_rear, False),
             )
             for brake in brake_names:
-                if not self.is_value_in_table(brake, self.table_brakes):
+                if brake and not self.is_value_in_table(brake, self.table_brakes):
                     self.add_brake_entry(row_index, brake, 0)
                     self.table_brakes.setCurrentCell(row_index, 0)
                     row_index += 1

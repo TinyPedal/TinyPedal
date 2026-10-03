@@ -20,13 +20,13 @@
 Default heatmap template
 """
 
-HEATMAP_DEFAULT_TYRE = "tyre_default"
-HEATMAP_DEFAULT_BRAKE = "brake_default"
+HEATMAP_DEFAULT_TYRE = "tyre_optimal_80"
+HEATMAP_DEFAULT_BRAKE = "brake_optimal_400"
 
 # key = temperature in Celsius
 # value = HEX color code
 HEATMAP_DEFAULT = {
-    HEATMAP_DEFAULT_TYRE: {
+    "thermal_infrared": {
         "-273": "#44F",
         "40": "#84F",
         "60": "#F4F",
@@ -35,7 +35,18 @@ HEATMAP_DEFAULT = {
         "120": "#F84",
         "140": "#FF4",
     },
-    HEATMAP_DEFAULT_BRAKE: {
+    "brake_optimal_300": {
+        "-273": "#44F",
+        "75": "#48F",
+        "150": "#4FF",
+        "225": "#4F8",
+        "300": "#4F4",
+        "375": "#8F4",
+        "450": "#FF4",
+        "525": "#F84",
+        "600": "#F44",
+    },
+    "brake_optimal_400": {
         "-273": "#44F",
         "100": "#48F",
         "200": "#4FF",
@@ -111,16 +122,5 @@ HEATMAP_DEFAULT = {
         "120": "#FF4",
         "130": "#F84",
         "140": "#F44",
-    },
-    "brake_optimal_300": {
-        "-273": "#44F",
-        "75": "#48F",
-        "150": "#4FF",
-        "225": "#4F8",
-        "300": "#4F4",
-        "375": "#8F4",
-        "450": "#FF4",
-        "525": "#F84",
-        "600": "#F44",
     },
 }
