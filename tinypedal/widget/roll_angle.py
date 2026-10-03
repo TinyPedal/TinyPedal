@@ -50,8 +50,6 @@ class Realtime(Overlay):
         self.degree_sign_text = "°" if self.wcfg["show_degree_and_percentage_sign"] else ""
         self.percent_sign_text = "%" if self.wcfg["show_degree_and_percentage_sign"] else ""
         self.decimals = max(int(self.wcfg["decimal_places"]), 1)
-        self.static_f = self.cfg.user.setting["ride_height"]["static_height_front"]
-        self.static_r = self.cfg.user.setting["ride_height"]["static_height_rear"]
 
         if self.wcfg["layout"] == 0:
             prefix_just = max(
@@ -139,15 +137,18 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         rideh_set = api.read.wheel.ride_height()
-        if rideh_set == DATA.WHEELS_ZERO and self.static_f > 0 < self.static_r:
-            susp_current = minfo.wheels.currentSuspensionPosition
-            susp_static = minfo.wheels.staticSuspensionPosition
-            rideh_set = (
-                self.static_f - susp_current[0] + susp_static[0],
-                self.static_f - susp_current[1] + susp_static[1],
-                self.static_r - susp_current[2] + susp_static[2],
-                self.static_r - susp_current[3] + susp_static[3],
-            )
+        if rideh_set == DATA.WHEELS_ZERO:
+            static_f = self.cfg.user.setting["ride_height"]["static_height_front"]
+            static_r = self.cfg.user.setting["ride_height"]["static_height_rear"]
+            if static_f > 0 < static_r:
+                susp_current = minfo.wheels.currentSuspensionPosition
+                susp_static = minfo.wheels.staticSuspensionPosition
+                rideh_set = (
+                    static_f - susp_current[0] + susp_static[0],
+                    static_f - susp_current[1] + susp_static[1],
+                    static_r - susp_current[2] + susp_static[2],
+                    static_r - susp_current[3] + susp_static[3],
+                )
 
         wheeltrack_front = minfo.wheels.wheelTrackFront
         if wheeltrack_front <= 0:

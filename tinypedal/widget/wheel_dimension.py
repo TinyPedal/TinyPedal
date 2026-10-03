@@ -127,31 +127,31 @@ class Realtime(Overlay):
         # Front tyre radius
         if self.wcfg["show_front_tyre_radius"]:
             radius_front = minfo.wheels.wheelRadiusFront
-            self.update_wheel_radius(self.bar_radius_front, radius_front)
+            self.update_wheel(self.bar_radius_front, radius_front)
 
         # Rear tyre radius
         if self.wcfg["show_rear_tyre_radius"]:
             radius_rear = minfo.wheels.wheelRadiusRear
-            self.update_wheel_radius(self.bar_radius_rear, radius_rear)
+            self.update_wheel(self.bar_radius_rear, radius_rear)
 
         # Front wheel track
         if self.wcfg["show_front_wheel_track"]:
             track_front = minfo.wheels.wheelTrackFront
-            self.update_wheel_radius(self.bar_track_front, track_front)
+            self.update_wheel(self.bar_track_front, track_front)
 
         # Rear wheel track
         if self.wcfg["show_rear_wheel_track"]:
             track_rear = minfo.wheels.wheelTrackRear
-            self.update_wheel_radius(self.bar_track_rear, track_rear)
+            self.update_wheel(self.bar_track_rear, track_rear)
 
         # Wheelbase
         if self.wcfg["show_wheelbase"]:
             wheelbase = minfo.wheels.wheelbase
-            self.update_wheel_radius(self.bar_wheelbase, wheelbase)
+            self.update_wheel(self.bar_wheelbase, wheelbase)
 
     # GUI update methods
-    def update_wheel_radius(self, target, data):
-        """Wheel radius"""
+    def update_wheel(self, target, data):
+        """Wheel dimension"""
         if target.last != data:
             target.last = data
             if data <= 0:
