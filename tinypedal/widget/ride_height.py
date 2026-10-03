@@ -21,6 +21,8 @@ Ride height Widget
 """
 
 from ..api_control import api
+from ..constant import DATA
+from ..module_info import minfo
 from ._base import Overlay
 from ._painter import WheelGaugeBar
 
@@ -58,6 +60,8 @@ class Realtime(Overlay):
             self.wcfg["bottoming_height_rear_right"],
         )
         max_range = max(int(self.wcfg["ride_height_maximum_range"]), 10)
+        self.static_f = self.wcfg["static_height_front"]
+        self.static_r = self.wcfg["static_height_rear"]
 
         # Caption
         if self.wcfg["show_caption"]:
@@ -116,6 +120,15 @@ class Realtime(Overlay):
     def timerEvent(self, event):
         """Update when vehicle on track"""
         rideh_set = api.read.wheel.ride_height()
+        if rideh_set == DATA.WHEELS_ZERO and self.static_f > 0 < self.static_r:
+            susp_current = minfo.wheels.currentSuspensionPosition
+            susp_static = minfo.wheels.staticSuspensionPosition
+            rideh_set = (
+                self.static_f - susp_current[0] + susp_static[0],
+                self.static_f - susp_current[1] + susp_static[1],
+                self.static_r - susp_current[2] + susp_static[2],
+                self.static_r - susp_current[3] + susp_static[3],
+            )
         for rideh, bar_rideh in zip(rideh_set, self.bars_rideh):
             self.update_rideh(bar_rideh, rideh)
 

@@ -147,9 +147,9 @@ class SyncData:
         self.player_car_id = INVALID_INDEX
         self.player_car_index = INVALID_INDEX
         self.dataset = MMapDataSet()
-        self.player_phys = None
-        self.player_ghfx = None
-        self.player_stat = None
+        self.player_phys: acc_data.ACCPhysics = None
+        self.player_ghfx: acc_data.ACCGraphics = None
+        self.player_stat: acc_data.ACCStatic = None
         self.elapsed_time = 0.0
 
     def __del__(self):
@@ -375,14 +375,14 @@ class ACCInfo:
             data.currentSectorIndex,
             data.lastSectorTime * 0.001,
             data.iLastTime * 0.001,
-            data.isValidLap,
+            data.isValidLap > 0,
         )
 
     @property
     def accValidLap(self) -> ValidLapStatus:
         """ACC valid lap status"""
         data = self._sync.player_ghfx
-        return self._valid_lap_status.update(data.iCurrentTime, data.isValidLap, self._sync.resets)
+        return self._valid_lap_status.update(data.iCurrentTime, data.isValidLap > 0, self._sync.resets)
 
     @property
     def accLastImpact(self) -> LastImpact:

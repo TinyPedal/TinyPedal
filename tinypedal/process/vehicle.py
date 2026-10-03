@@ -136,7 +136,12 @@ class LastImpact:
 
 
 class VehicleOrientation:
-    """Vehicle orientation"""
+    """Vehicle orientation
+
+    Attributes:
+        last: last x, y coordinates.
+        yaw: orientation yaw in radians.
+    """
 
     __slots__ = (
         "last",
@@ -156,7 +161,11 @@ class VehicleOrientation:
 
 
 class VehicleSpeed:
-    """Vehicle speed estimate based on GPS coordinates"""
+    """Vehicle speed estimate based on GPS coordinates
+
+    Attributes:
+        speed: estimated GPS speed.
+    """
 
     __slots__ = (
         "_index",
@@ -175,19 +184,18 @@ class VehicleSpeed:
         """Calculate speed estimate based on GPS coordinates"""
         if self._time[self._index] == elapsed:
             return self.speed
-
+        # Calculate speed
         offset = self._index + 1 if self._index < 9 else 0
         delta_time = elapsed - self._time[offset]
         if delta_time > 0:
             delta_distance = distance(pos, self._pos[offset])
             self.speed = delta_distance / delta_time
-
+        # Set next index
         if self._index < 9:
             self._index += 1
         else:
             self._index = 0
-
+        # Store data
         self._time[self._index] = elapsed
         self._pos[self._index] = pos
-
         return self.speed
