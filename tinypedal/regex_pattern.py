@@ -111,6 +111,7 @@ CFG_INTEGER = (
     # Exact match
     "^access_mode$|"
     "^display_orientation$|"
+    "^drive_wheel_allocation$|"
     "^grid_move_size$|"
     "^lap_time_history_count$|"
     "^leading_zero$|"
