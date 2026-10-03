@@ -471,7 +471,7 @@ class Session(_reader.Session, DataAdapter):
         scor = self.shmm.rf2ScorInfo
         return rmnan(scor.mAvgPathWetness + (scor.mMinPathWetness + scor.mMaxPathWetness) * 0.001)
 
-    def weather_forecast(self) -> tuple[tuple[float, int, float, float]]:
+    def weather_forecast(self) -> tuple[tuple[float, int, float, float], ...]:
         """Weather forecast nodes, 0=forecast minutes, 1=sky type index, 2=air temperature, 3=rain chance"""
         session_type = self.session_type()
         if session_type > 2:  # race/warmup session

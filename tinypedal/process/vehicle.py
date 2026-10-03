@@ -149,7 +149,7 @@ class VehicleOrientation:
 
     def update(self, *pos: float) -> float:
         """Calculate high precision yaw based on coordinates displacement, inaccurate at very low speed"""
-        if self.last != pos:
+        if distance(pos, self.last) > 0.02:
             self.yaw = oriyaw(pos[0] - self.last[0], pos[1] - self.last[1])
             self.last = pos
         return self.yaw

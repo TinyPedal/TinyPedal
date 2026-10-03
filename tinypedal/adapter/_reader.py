@@ -384,7 +384,7 @@ class Session(ABC):
         """Road wetness set (fraction), range 0.0 - 1.0"""
 
     @abstractmethod
-    def weather_forecast(self) -> tuple[tuple[float, int, float, float]]:
+    def weather_forecast(self) -> tuple[tuple[float, int, float, float], ...]:
         """Weather forecast nodes, 0=forecast minutes, 1=sky type index, 2=air temperature, 3=rain chance"""
 
     @abstractmethod

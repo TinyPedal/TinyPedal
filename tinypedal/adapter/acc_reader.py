@@ -40,14 +40,21 @@ ACC_TRACK_LENGTH = acc_enum.ACC_TRACK_LENGTH
 ACC_CAR_CLASS = acc_enum.ACC_CAR_CLASS
 ACC_BRAKEBIAS_OFFSET = acc_enum.ACC_BRAKEBIAS_OFFSET
 ACC_MAX_STEERING_RANGE = acc_enum.ACC_MAX_STEERING_RANGE
-ACC_TO_RF2_SKY_TYPE = acc_enum.dict_map({
-    0: 1,
-    1: 5,
-    2: 7,
-    3: 8,
-    4: 9,
-    5: 10,
-}, default=0)
+
+
+def acc_sky_type(raininess: int) -> int:
+    """ACC sky type to RF2 sky type"""
+    if raininess == 0:
+        return 1  # 1 Light Clouds
+    if raininess == 1:
+        return 5  # 5 Cloudy & Drizzle
+    if raininess == 2:
+        return 7  # 7 Overcast & Light Rain
+    if raininess == 3:
+        return 8  # 8 Overcast & Rain
+    if raininess == 4:
+        return 9  # 9 Overcast & Heavy Rain
+    return 10  # 10 Overcast & Storm
 
 
 class DataAdapter:
@@ -521,12 +528,12 @@ class Session(_reader.Session, DataAdapter):
             return 0.60
         return 1.0
 
-    def weather_forecast(self) -> tuple[tuple[float, int, float, float]]:
+    def weather_forecast(self) -> tuple[tuple[float, int, float, float], ...]:
         """Weather forecast nodes, 0=forecast minutes, 1=sky type index, 2=air temperature, 3=rain chance"""
         data = self.shmm.accGraphicsInfo
         return (
-            (10, ACC_TO_RF2_SKY_TYPE(data.rainIntensityIn10min), DATA.ABS_ZERO_CELSIUS, 0.0),
-            (30, ACC_TO_RF2_SKY_TYPE(data.rainIntensityIn30min), DATA.ABS_ZERO_CELSIUS, 0.0),
+            (10.0, acc_sky_type(data.rainIntensityIn10min), DATA.ABS_ZERO_CELSIUS, 0.0),
+            (30.0, acc_sky_type(data.rainIntensityIn30min), DATA.ABS_ZERO_CELSIUS, 0.0),
         )
 
     def cloud_coverage(self) -> int:
@@ -537,7 +544,7 @@ class Session(_reader.Session, DataAdapter):
             5 Cloudy & Drizzle, 6 Cloudy & Light Rain, 7 Overcast & Light Rain,
             8 Overcast & Rain, 9 Overcast & Heavy Rain, 10 Overcast & Storm
         """
-        return ACC_TO_RF2_SKY_TYPE(self.shmm.accGraphicsInfo.rainIntensity)
+        return acc_sky_type(self.shmm.accGraphicsInfo.rainIntensity)
 
     def grip_level(self) -> float:
         """Track base grip level, convert to fraction 0.0 to 1.0"""
