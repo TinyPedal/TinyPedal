@@ -746,7 +746,7 @@ class Vehicle(ABC):
         """Downforce rear (Newtons)"""
 
     @abstractmethod
-    def damage_severity(self, index: int | None = None) -> tuple[int, int, int, int, int, int, int, int]:
+    def damage_severity(self, index: int | None = None) -> tuple[float, ...]:
         """Damage severity, sort row by row from left to right, top to bottom"""
 
     @abstractmethod

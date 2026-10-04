@@ -87,7 +87,7 @@ def hotkey_restart_api():
 def hotkey_select_next_api():
     """Command - select next api"""
     api_name = api.name
-    api_list = tuple(_api.NAME for _api in api.available)
+    api_list = api.available
     next_index = 0
     if api_name in api_list:
         next_index = api_list.index(api_name) + 1
@@ -106,7 +106,7 @@ def hotkey_select_next_api():
 def hotkey_select_previous_api():
     """Command - select previous api"""
     api_name = api.name
-    api_list = tuple(_api.NAME for _api in api.available)
+    api_list = api.available
     next_index = 0
     if api_name in api_list:
         next_index = api_list.index(api_name) - 1

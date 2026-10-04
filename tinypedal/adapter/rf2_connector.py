@@ -20,23 +20,17 @@
 RF2 API connector
 """
 
-from functools import partial
-
 from ..constant import API
-from ..validator import bytes_to_str
-from . import (
-    _restapi,
-    lmu_restapi,
-    rf2_reader,
-    rf2_restapi,
-    rf2_sharedmemory,
-)
+from ..validator import string_converter
+from . import _restapi, lmu_restapi, rf2_reader, rf2_restapi, rf2_sharedmemory
 from ._connector import APIDataReader, Connector
 
 
 class SimRF2(Connector):
     """rFactor 2 - RF2 Sharedmemory Map Plugin API"""
 
+    NAME = API.NAME_RF2
+    LEGACY = False
     __slots__ = (
         # Primary API
         "_shmmapi",
@@ -44,8 +38,6 @@ class SimRF2(Connector):
         "_restapi",
         "_restapi_dataset",
     )
-    NAME = API.NAME_RF2
-    LEGACY = False
 
     def __init__(self):
         self._shmmapi = rf2_sharedmemory.RF2Info()
@@ -87,12 +79,14 @@ class SimRF2(Connector):
         self._shmmapi.setPlayerOverride(config["enable_player_index_override"])
         self._shmmapi.setPlayerIndex(config["player_index"])
         self._restapi.setConnection(config.copy())
-        rf2_reader.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
+        rf2_reader.tostr = string_converter(config["character_encoding"])
 
 
 class SimLMULegacy(SimRF2):
     """Le Mans Ultimate (legacy) - RF2 Sharedmemory Map Plugin API"""
 
+    NAME = API.NAME_LMULEGACY
+    LEGACY = True
     __slots__ = (
         # Primary API
         "_shmmapi",
@@ -100,8 +94,6 @@ class SimLMULegacy(SimRF2):
         "_restapi",
         "_restapi_dataset",
     )
-    NAME = API.NAME_LMULEGACY
-    LEGACY = True
 
     def __init__(self):
         self._shmmapi = rf2_sharedmemory.RF2Info()

@@ -35,11 +35,13 @@ from ..calculation import (
 )
 from ..constant import DATA
 from ..formatter import strip_invalid_char
-from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
+from ..validator import string_converter
 from . import _reader
 from .lmu_restapi import RestAPIData
 from .lmu_sharedmemory import LMU_COMPOUND_TYPE, LMUInfo
+
+tostr = string_converter()
 
 LMU_CAR_MODEL_CORRECTION = {
     "Aston Martin Vantage AMR LMGT": "Aston Martin Vantage AMR LMGT3",
@@ -1073,7 +1075,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Downforce rear (Newtons)"""
         return rmnan(self.shmm.lmuTeleVeh(index).mRearDownforce)
 
-    def damage_severity(self, index: int | None = None) -> tuple[int, int, int, int, int, int, int, int]:
+    def damage_severity(self, index: int | None = None) -> tuple[float, ...]:
         """Damage severity, sort row by row from left to right, top to bottom"""
         data = self.shmm.lmuTeleVeh(index)
         dmg = data.mDentSeverity

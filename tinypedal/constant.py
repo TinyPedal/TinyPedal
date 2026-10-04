@@ -168,8 +168,8 @@ class DATA:
     TYRE_ICO_NA = (ABS_ZERO_CELSIUS,) * 12  # FL*3, FR*3, RL*3, RR*3
     WHEELS_DELTA_DEFAULT = (0.0, *WHEELS_ZERO)  # pos, target set
     RELATIVE_NA = (0.0, -1)  # relative time gap, player index
-    VERSION_NA = (0,) * 3  # major, minor, patch
-    DATE_NA = (0,) * 3  # year, month, day
+    VERSION_NA = (0, 0, 0)  # major, minor, patch
+    DATE_NA = (0, 0, 0)  # year, month, day
 
     # ID selector
     TREND_SIGN = (

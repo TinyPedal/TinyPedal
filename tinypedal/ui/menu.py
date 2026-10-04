@@ -509,8 +509,7 @@ class APIMenu(QMenu):
 
         actions_api = QActionGroup(self)
 
-        for _api in api.available:
-            api_name = _api.NAME
+        for api_name in api.available:
             option = self.addAction(api_name)
             option.setCheckable(True)
             option.triggered.connect(lambda checked=True, name=api_name: self.__toggle_option(checked, name))

@@ -26,9 +26,10 @@ import logging
 import os
 import re
 import time
+from functools import partial
 from math import isfinite
 from time import monotonic
-from typing import Any
+from typing import Any, Callable
 
 from .constant import DATA, FILE
 from .decorator import generator_init
@@ -50,6 +51,15 @@ def bytes_to_str(bytestring: bytes | Any, char_encoding: str = "utf-8") -> str:
     if isinstance(bytestring, bytes):
         return bytestring.decode(encoding=char_encoding, errors="replace").rstrip()
     return ""
+
+
+def string_converter(encoding: str = "utf-8") -> Callable[[bytes], str]:
+    """Set bytes to string converter"""
+    if encoding:
+        encoding = encoding.lower()
+    else:
+        encoding = "utf-8"
+    return partial(bytes_to_str, char_encoding=encoding)
 
 
 def is_allowed_filename(filename: str) -> bool:

@@ -28,6 +28,8 @@ from ._reader import APIDataReader
 class Connector(ABC):
     """API Connector"""
 
+    NAME: str
+    LEGACY: bool
     __slots__ = ()
 
     @abstractmethod

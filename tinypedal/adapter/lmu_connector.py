@@ -20,22 +20,17 @@
 LMU API connector
 """
 
-from functools import partial
-
 from ..constant import API
-from ..validator import bytes_to_str
-from . import (
-    _restapi,
-    lmu_reader,
-    lmu_restapi,
-    lmu_sharedmemory,
-)
+from ..validator import string_converter
+from . import _restapi, lmu_reader, lmu_restapi, lmu_sharedmemory
 from ._connector import APIDataReader, Connector
 
 
 class SimLMU(Connector):
     """Le Mans Ultimate - LMU Native Sharedmemory API"""
 
+    NAME = API.NAME_LMU
+    LEGACY = False
     __slots__ = (
         # Primary API
         "_shmmapi",
@@ -43,8 +38,6 @@ class SimLMU(Connector):
         "_restapi",
         "_restapi_dataset",
     )
-    NAME = API.NAME_LMU
-    LEGACY = False
 
     def __init__(self):
         self._shmmapi = lmu_sharedmemory.LMUInfo()
@@ -84,4 +77,4 @@ class SimLMU(Connector):
         self._shmmapi.setPlayerOverride(config["enable_player_index_override"])
         self._shmmapi.setPlayerIndex(config["player_index"])
         self._restapi.setConnection(config.copy())
-        lmu_reader.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
+        lmu_reader.tostr = string_converter(config["character_encoding"])

@@ -27,10 +27,12 @@ from math import pi
 from ..calculation import atan2, ceil, distance, min_nonzero
 from ..constant import DATA
 from ..formatter import strip_invalid_char
-from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
+from ..validator import string_converter
 from . import _reader
 from .acc_sharedmemory import ACCInfo, acc_enum, acc_udp
+
+tostr = string_converter()
 
 ACC_CAR_MODEL = acc_enum.ACC_CAR_MODEL
 ACC_CAR_MODEL_ID = acc_enum.ACC_CAR_MODEL_ID
@@ -1069,7 +1071,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Downforce rear (Newtons)"""
         return 0.0
 
-    def damage_severity(self, index: int | None = None) -> tuple[int, int, int, int, int, int, int, int]:
+    def damage_severity(self, index: int | None = None) -> tuple[float, ...]:
         """Damage severity, sort row by row from left to right, top to bottom"""
         # ACC order: front 0, rear 1, left 2, right 3, center 4
         # 0-50=light damage, 50+=heavy damage
@@ -1078,15 +1080,11 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         rear = rmnan(data[1] * 0.02)
         left = rmnan(data[2] * 0.02)
         right = rmnan(data[3] * 0.02)
-        front_left = front * left / 4
-        front_right = front * right / 4
-        rear_left = rear * left / 4
-        rear_right = rear * right / 4
-        return (
-            front_left, front, front_right,
-            left,                    right,
-            rear_left,  rear,   rear_right,
-        )
+        f_left = front * left / 4
+        f_right = front * right / 4
+        r_left = rear * left / 4
+        r_right = rear * right / 4
+        return f_left, front, f_right, left, right, r_left, rear, r_right
 
     def aero_damage(self, index: int | None = None) -> float:
         """Aerodynamic damage (fraction), -1.0 unavailable, 0.0 no damage, 1.0 totaled"""

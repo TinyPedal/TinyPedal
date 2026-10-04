@@ -36,11 +36,13 @@ from ..calculation import (
 )
 from ..constant import DATA
 from ..formatter import strip_invalid_char
-from ..validator import bytes_to_str as tostr
 from ..validator import infnan_to_zero as rmnan
+from ..validator import string_converter
 from . import _reader
 from .rf2_restapi import RestAPIData
 from .rf2_sharedmemory import RF2Info
+
+tostr = string_converter()
 
 
 class DataAdapter:
@@ -1019,7 +1021,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Downforce rear (Newtons)"""
         return rmnan(self.shmm.rf2TeleVeh(index).mRearDownforce)
 
-    def damage_severity(self, index: int | None = None) -> tuple[int, int, int, int, int, int, int, int]:
+    def damage_severity(self, index: int | None = None) -> tuple[float, ...]:
         """Damage severity, sort row by row from left to right, top to bottom"""
         dmg = self.shmm.rf2TeleVeh(index).mDentSeverity
         return dmg[1], dmg[0], dmg[7], dmg[2], dmg[6], dmg[3], dmg[4], dmg[5]  # RF2 order

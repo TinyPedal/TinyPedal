@@ -20,6 +20,8 @@
 API control
 """
 
+from __future__ import annotations
+
 import logging
 
 from . import realtime_state
@@ -34,22 +36,22 @@ from .setting import cfg
 logger = logging.getLogger(__name__)
 
 
-def _set_available_api(enable_legacy: bool):
-    """Set available API"""
+def _get_available_api(enable_legacy: bool):
+    """get available API"""
     available_api = (
         acc_connector.SimACC,
         lmu_connector.SimLMU,
         rf2_connector.SimLMULegacy,
         rf2_connector.SimRF2,
     )
-    # Sort API by name
-    api_gen = (_api for _api in available_api if not _api.LEGACY or enable_legacy)
-    return tuple(sorted(api_gen, key=lambda _api: _api.NAME))
+    return {_api.NAME: _api for _api in available_api if not _api.LEGACY or enable_legacy}
 
 
 class APIControl:
     """API Control"""
 
+    _api: lmu_connector.Connector
+    read: lmu_connector.APIDataReader
     __slots__ = (
         "_api",
         "_available_api",
@@ -59,11 +61,11 @@ class APIControl:
     )
 
     def __init__(self):
-        self._api = None
-        self._available_api = ()
+        self._api = None  # type: ignore
+        self._available_api = {}
         self._enable_legacy = False
         self._same_api_loaded = False
-        self.read = None
+        self.read = None  # type: ignore
 
     def connect(self, name: str = ""):
         """Connect to API
@@ -77,7 +79,7 @@ class APIControl:
         enable_legacy = cfg.telemetry["enable_legacy_api_selection"]
         if not self._available_api or self._enable_legacy != enable_legacy:
             self._enable_legacy = enable_legacy
-            self._available_api = _set_available_api(enable_legacy)
+            self._available_api = _get_available_api(enable_legacy)
             self._same_api_loaded = False
         else:
             # Do not create new instance if same API already loaded
@@ -87,13 +89,13 @@ class APIControl:
             logger.info("CONNECTING: same API detected, fast restarting")
             return
 
-        for _api in self._available_api:
-            if _api.NAME == name:
-                self._api = _api()
-                return
+        _api = self._available_api.get(name)
+        if _api is not None:
+            self._api = _api()
+            return
 
         logger.warning("CONNECTING: Invalid API name, fall back to default")
-        self._api = lmu_connector.SimLMU
+        self._api = self._available_api[API.NAME_LMU]
         cfg.api_name = self._api.NAME
 
     def start(self):
@@ -138,9 +140,9 @@ class APIControl:
         self._api.setup(setting_api)
 
     @property
-    def available(self):
-        """Available API"""
-        return self._available_api
+    def available(self) -> tuple[str, ...]:
+        """Available API name list"""
+        return tuple(self._available_api)
 
     @property
     def name(self) -> str:

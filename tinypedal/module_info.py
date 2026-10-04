@@ -515,7 +515,7 @@ class VehicleDataSet:
 class DeltaInfo:
     """Delta output data"""
 
-    deltaBestData: tuple[tuple[float, float], ...] = DATA.DELTA_DEFAULT
+    deltaBestData: tuple[tuple[float, ...], ...] = DATA.DELTA_DEFAULT
     deltaBest: float = 0.0
     deltaLast: float = 0.0
     deltaSession: float = 0.0

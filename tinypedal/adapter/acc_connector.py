@@ -20,29 +20,23 @@
 ACC API connector
 """
 
-from functools import partial
-
 from ..constant import API
-from ..validator import bytes_to_str
-from . import (
-    acc_reader,
-    acc_sharedmemory,
-    acc_udpapi,
-)
+from ..validator import string_converter
+from . import acc_reader, acc_sharedmemory, acc_udpapi
 from ._connector import APIDataReader, Connector
 
 
 class SimACC(Connector):
     """Assetto Corsa Competizione - ACC Native Sharedmemory API"""
 
+    NAME = API.NAME_ACC
+    LEGACY = False
     __slots__ = (
         # Primary API
         "_shmmapi",
         # Secondary API
         "_udpapi",
     )
-    NAME = API.NAME_ACC
-    LEGACY = False
 
     def __init__(self):
         self._shmmapi = acc_sharedmemory.ACCInfo()
@@ -81,4 +75,4 @@ class SimACC(Connector):
         self._shmmapi.setPlayerOverride(config["enable_player_index_override"])
         self._shmmapi.setPlayerIndex(config["player_index"])
         self._udpapi.setConnection(config.copy())
-        acc_reader.tostr = partial(bytes_to_str, char_encoding=config["character_encoding"].lower())
+        acc_reader.tostr = string_converter(config["character_encoding"])

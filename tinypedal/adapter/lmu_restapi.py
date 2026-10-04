@@ -53,8 +53,8 @@ class RestAPIData:
     pitStopTime: float = 0.0
     absoluteRefill: float = 0.0
     maxVirtualEnergy: float = 0.0
-    brakeWear: tuple[float, float, float, float] = DATA.WHEELS_NA
-    suspensionDamage: tuple[float, float, float, float] = DATA.WHEELS_NA
+    brakeWear: tuple[float, ...] = DATA.WHEELS_NA
+    suspensionDamage: tuple[float, ...] = DATA.WHEELS_NA
 
     def __del__(self):
         logger.info("RestAPI: GC: RestAPIData")
