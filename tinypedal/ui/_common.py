@@ -23,7 +23,7 @@ Common
 from __future__ import annotations
 
 import re
-from typing import Callable
+from typing import Callable, ClassVar
 
 from PySide2.QtCore import QRegularExpression, Qt
 from PySide2.QtGui import (
@@ -52,7 +52,7 @@ from PySide2.QtWidgets import (
 
 from ..constant import APP
 from ..validator import is_string_number
-from . import UIScaler
+from ._style import UIScaler
 
 # Validator
 QVAL_INTEGER = QIntValidator(-999999, 999999)
@@ -93,7 +93,7 @@ def singleton_dialog(dialog_type: str, show_error: bool = True):
 class DialogSingleton:
     """Singleton dialog"""
 
-    _instance_type: set[str] = set()
+    _instance_type: ClassVar[set[str]] = set()
 
     def __init__(self):
         raise TypeError("not for instantiate")
@@ -419,10 +419,10 @@ class TableBatchReplace(BaseDialog):
         """Update selector list"""
         column_index = self.table_selector[self.column_selector.currentText()]
         self.search_selector.clear()
-        selector_list = set(
+        selector_list = {
             self.table_data.item(row_index, column_index).text()
             for row_index in range(self.table_data.rowCount())
-        )
+        }
         self.search_selector.addItems(sorted(selector_list))
         self.search_selector.setCurrentText(last_search)
 

@@ -20,39 +20,36 @@
 Launcher
 """
 
+import argparse
 import io
 import logging
 import os
-import sys
 
 import psutil
-from PySide2.QtCore import QCoreApplication, QLocale, Qt
-from PySide2.QtGui import QFont, QGuiApplication, QIcon, QPixmapCache
-from PySide2.QtWidgets import QApplication, QMessageBox
 
 from . import realtime_state, version_check
-from .constant import APP, CONFIG, FILE, PLATFORM
+from .constant import APP, FILE
 from .log_handler import set_logging_level
-from .setting import cfg
+from .userpath import set_global_config_path
 
 logger = logging.getLogger(__package__)
 log_stream = io.StringIO()
 
 
-def save_pid_file():
+def save_pid_file(filepath: str, filename: str):
     """Save PID info to file"""
-    with open(f"{cfg.path.config}{FILE.LOG_PID}", "w", encoding="utf-8") as f:
+    with open(f"{filepath}{filename}", "w", encoding="utf-8") as f:
         current_pid = os.getpid()
         pid_create_time = psutil.Process(current_pid).create_time()
         pid_str = f"{current_pid},{pid_create_time}"
         f.write(pid_str)
 
 
-def is_pid_exist() -> bool:
+def is_pid_exist(filepath: str, filename: str) -> bool:
     """Check and verify PID existence"""
     try:
         # Load last recorded PID and creation time from pid log file
-        with open(f"{cfg.path.config}{FILE.LOG_PID}", "r", encoding="utf-8") as f:
+        with open(f"{filepath}{filename}", "r", encoding="utf-8") as f:
             pid_read = f.readline()
         pid = pid_read.split(",")
         pid_last = int(pid[0])
@@ -65,38 +62,33 @@ def is_pid_exist() -> bool:
     return False  # no running
 
 
-def single_instance_check(is_single_instance: bool):
-    """Single instance check"""
-    realtime_state.singleton = is_single_instance
-    # Check if single instance mode enabled
-    if not is_single_instance:
-        logger.info("Single instance mode: OFF")
+def check_single_instance(single_mode: bool, filepath: str, filename: str):
+    """Check single instance, True=passed check, False=failed check"""
+    # Multi-instance mode enabled
+    if not single_mode:
         return
-    logger.info("Single instance mode: ON")
     # Skip if restarted
     if os.getenv("TINYPEDAL_RESTART"):
         os.environ.pop("TINYPEDAL_RESTART", None)
-        save_pid_file()
+        save_pid_file(filepath, filename)
         return
-    # Check existing PID file first, then exe PID
-    if not is_pid_exist():  # (is_pid_exist() or is_exe_running())
-        save_pid_file()
+    # Check existing PID file
+    if not is_pid_exist(filepath, filename):
+        save_pid_file(filepath, filename)
         return
-    # Show warning to console and popup dialog
-    warning_text = (
+    # Cancel & quit
+    from . import ui
+
+    message = (
         "TinyPedal is already running.\n\n"
         "Only one TinyPedal may be run at a time.\n"
         "Check system tray for hidden icon."
     )
-    logger.warning(warning_text)
-    root = QApplication(sys.argv)
-    set_app_icon(root)
-    QMessageBox.warning(None, f"{APP.TINYPEDAL} v{APP.VERSION}", warning_text)
-    sys.exit()
+    ui.cancel(message)
 
 
-def get_version():
-    """Get app & library version info"""
+def check_version_info():
+    """Check app & library version info"""
     logger.info("TinyPedal: %s", APP.VERSION)
     logger.info("Python: %s", version_check.python())
     logger.info("Qt: %s", version_check.qt())
@@ -104,103 +96,23 @@ def get_version():
     logger.info("psutil: %s", version_check.psutil())
 
 
-def init_gui() -> QApplication:
-    """Initialize Qt Gui"""
-    # Set global locale
-    loc = QLocale(QLocale.C)
-    loc.setNumberOptions(QLocale.RejectGroupSeparator)
-    QLocale.setDefault(loc)
-    # Set DPI scale
-    if cfg.application["enable_high_dpi_scaling"]:
-        QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-        QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
-    # Set GUI
-    QApplication.setStyle("Fusion")
-    root = QApplication(sys.argv)
-    root.setQuitOnLastWindowClosed(False)
-    root.setApplicationName(APP.TINYPEDAL)
-    set_app_icon(root)
-    set_app_font(root)
-    # Disable global pixmap cache
-    QPixmapCache.setCacheLimit(0)
-    logger.info("Screen pixel ratio: %s", root.devicePixelRatio())
-    logger.info("Platform plugin: %s", root.platformName())
-    return root
-
-
-def set_app_icon(root: QApplication):
-    """Set APP icon"""
-    root.setWindowIcon(QIcon(FILE.IMAGE_TINYPEDAL))
-    # Set window icon for X11/Wayland (workaround)
-    if not PLATFORM.WINDOWS:
-        root.setDesktopFileName("TinyPedal-overlay")
-
-
-def set_app_font(root: QApplication):
-    """Set APP default font"""
-    font = root.font()
-    if os.getenv("PYSIDE_OVERRIDE") != "6":  # don't set family for pyside6
-        font.setFamily("sans-serif")
-    font.setPointSize(10)
-    font.setStyleHint(QFont.SansSerif)
-    root.setFont(font)
-
-
-def unset_environment():
-    """Clear any previous environment variable (required after auto-restarted APP)"""
-    os.environ.pop("QT_QPA_PLATFORM", None)
-    os.environ.pop("QT_ENABLE_HIGHDPI_SCALING", None)
-    os.environ.pop("QT_MEDIA_BACKEND", None)
-    os.environ.pop("QT_MULTIMEDIA_PREFERRED_PLUGINS", None)
-
-
-def set_environment():
-    """Set environment before starting GUI"""
-    # Windows only
-    if PLATFORM.WINDOWS:
-        if os.getenv("PYSIDE_OVERRIDE") == "6":
-            # Use "freetype" to avoid high memory usage in pyside6
-            # Match system dark-mode on windows
-            os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2:fontengine=freetype"
-            os.environ["QT_MEDIA_BACKEND"] = "windows"
-        else:
-            if cfg.compatibility["multimedia_plugin_on_windows"] == "WMF":
-                multimedia_plugin = "windowsmediafoundation"
-            else:
-                multimedia_plugin = "directshow"
-            os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = multimedia_plugin
-
-    # Linux only
-    else:
-        if cfg.compatibility["enable_x11_platform_plugin_override"]:
-            os.environ["QT_QPA_PLATFORM"] = "xcb"
-
-    # Common
-    if cfg.application["enable_high_dpi_scaling"]:
-        logger.info("High DPI scaling: ON")
-    else:
-        os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"  # force disable (qt6 only)
-        logger.info("High DPI scaling: OFF")
-
-
-def start_app(cli_args):
+def start_app(cli_args: argparse.Namespace):
     """Init main window"""
-    unset_environment()
+    # Set global path
+    path_global = set_global_config_path()
+
     # Initialize logger
-    set_logging_level(logger, cfg.path.config, FILE.LOG_APP, log_stream, cli_args.log_level)
+    set_logging_level(logger, path_global, FILE.LOG_APP, log_stream, cli_args.log_level)
+
     # Check single instance
-    single_instance_check(bool(cli_args.single_instance))
-    # Version info
-    get_version()
-    # Load global config
-    cfg.load_global()
-    cfg.save(config_type=CONFIG.TYPE_CONFIG)
-    cfg.save(config_type=CONFIG.TYPE_SHORTCUTS)
-    set_environment()
-    # Main GUI
-    root = init_gui()
-    # Load core modules
+    realtime_state.singleton = bool(cli_args.single_instance)
+    logger.info("Single instance mode: %s", "ON" if realtime_state.singleton else "OFF")
+    check_single_instance(realtime_state.singleton, path_global, FILE.LOG_PID)
+
+    # Check versions
+    check_version_info()
+
+    # Start app
     from . import loader
-    loader.start()
-    # Start mainloop
-    sys.exit(root.exec_())
+
+    loader.start(path_global)

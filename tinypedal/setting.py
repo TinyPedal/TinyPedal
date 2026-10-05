@@ -32,12 +32,12 @@ from typing import Any
 
 from .constant import API, CONFIG, DATA, FILE
 from .setting_validator import PresetValidator, StyleValidator
-from .userfile import set_global_config_path, set_user_data_path
 from .userfile.json_setting import (
     load_setting_json_file,
     load_style_json_file,
     save_and_verify_json_file,
 )
+from .userpath import set_user_data_path
 from .validator import is_allowed_filename
 
 logger = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ class FilePath:
 
     def __init__(self):
         # Global path, should not be modified
-        self.config = set_global_config_path()
+        self.config = ""
         # User setting path
         self.settings = ""
         # User data path

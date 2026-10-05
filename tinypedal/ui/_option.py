@@ -39,7 +39,7 @@ from PySide2.QtWidgets import (
 )
 
 from ..constant import FILE
-from ..userfile import set_relative_path, set_user_data_path
+from ..userpath import set_relative_path, set_user_data_path
 from ..validator import image_exists, is_clock_format, is_hex_color, is_string_number
 
 

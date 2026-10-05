@@ -21,7 +21,7 @@ Default global (config) setting template
 """
 
 from ..constant import API, PLATFORM
-from ..userfile import set_default_config_path, set_default_data_path
+from ..userpath import set_default_config_path, set_default_data_path
 from ..version import __version__
 
 GLOBAL_DEFAULT = {

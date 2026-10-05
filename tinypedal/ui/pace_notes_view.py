@@ -49,8 +49,8 @@ from ..constant import FILE
 from ..module_control import mctrl
 from ..module_info import minfo
 from ..setting import cfg
-from ..userfile import set_relative_path
 from ..userfile.track_notes import COLUMN_PACENOTE
+from ..userpath import set_relative_path
 from ._common import CompactButton, UIScaler
 
 logger = logging.getLogger(__name__)

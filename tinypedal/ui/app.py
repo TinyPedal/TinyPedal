@@ -41,8 +41,8 @@ from ..api_control import api
 from ..constant import APP, CONFIG
 from ..module_control import mctrl, wctrl
 from ..setting import cfg
-from . import set_style_palette, set_style_window
 from ._common import DialogSingleton, UIScaler
+from ._style import set_style_palette, set_style_window
 from .hotkey_view import HotkeyList
 from .menu import APIMenu, ConfigMenu, HelpMenu, OverlayMenu, ToolsMenu, WindowMenu
 from .module_view import ModuleList
