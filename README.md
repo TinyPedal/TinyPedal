@@ -42,7 +42,7 @@ Game display mode must be set to `Borderless` or `Windowed` to show overlay. `Fu
 
 #### Linux
 
-* LMU's built-in `Sharedmemory API` API can be selected on Linux, but may require third-party plugin to access, see [discussion #9](https://github.com/TinyPedal/TinyPedal/issues/9) for info.
+* ACC's built-in `Sharedmemory API` API can be selected on Linux, but may require third-party plugin to access, see [discussion #9](https://github.com/TinyPedal/TinyPedal/issues/9) for info.
 * See below for enabling UDP API (same as Windows).
 
 #### Enable UDP API
