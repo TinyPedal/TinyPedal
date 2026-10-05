@@ -22,10 +22,15 @@ Init logger, state, signal
 
 import logging
 
-from PySide2.QtCore import QObject, Signal
+from PySide2.QtCore import QObject, Signal, SignalInstance
 
-# Create logger
+# Create root logger
 logger = logging.getLogger(__package__)
+
+
+def qt_signal(t: object) -> SignalInstance:
+    """Add & correct qt signal instance type hint"""
+    return Signal(t)  # type: ignore
 
 
 class RealtimeState:
@@ -74,10 +79,10 @@ class OverlaySignal(QObject):
         iconify: signal for toggling taskbar icon visibility state (for VR compatibility).
     """
 
-    hidden = Signal(bool)
-    locked = Signal(bool)
-    paused = Signal(bool)
-    iconify = Signal(bool)
+    hidden: SignalInstance = qt_signal(bool)
+    locked: SignalInstance = qt_signal(bool)
+    paused: SignalInstance = qt_signal(bool)
+    iconify: SignalInstance = qt_signal(bool)
     __slots__ = ()
 
 
@@ -92,11 +97,11 @@ class ApplicationSignal(QObject):
         hotkey: signal for run hotkey command from main thread.
     """
 
-    reload = Signal(bool)
-    updates = Signal(bool)
-    refresh = Signal(bool)
-    quitapp = Signal(bool)
-    hotkey = Signal(object)
+    reload: SignalInstance = qt_signal(bool)
+    updates: SignalInstance = qt_signal(bool)
+    refresh: SignalInstance = qt_signal(bool)
+    quitapp: SignalInstance = qt_signal(bool)
+    hotkey: SignalInstance = qt_signal(object)
     __slots__ = ()
 
 

@@ -22,7 +22,7 @@ Track map viewer
 
 import os
 
-from PySide2.QtCore import QPoint, QPointF, QRect, Qt, Signal
+from PySide2.QtCore import QPoint, QPointF, QRect, Qt
 from PySide2.QtGui import QPainter, QPainterPath, QPen
 from PySide2.QtWidgets import (
     QAbstractSpinBox,
@@ -41,6 +41,7 @@ from PySide2.QtWidgets import (
 )
 
 from .. import calculation as calc
+from .. import qt_signal
 from ..constant import CONFIG, FILE
 from ..setting import cfg
 from ..userfile.track_map import load_track_map_file
@@ -95,7 +96,7 @@ class TrackMapViewer(BaseDialog):
 class MapView(QWidget):
     """Map view"""
 
-    reloaded = Signal(bool)
+    reloaded = qt_signal(bool)
 
     def __init__(self, parent):
         super().__init__(parent)

@@ -65,11 +65,11 @@ class OverlayControl:
     """Overlay control"""
 
     __slots__ = (
-        "toggle",
-        "_stopped",
         "_event",
         "_last_active_state",
         "_last_hide_state",
+        "_stopped",
+        "toggle",
     )
 
     def __init__(self):

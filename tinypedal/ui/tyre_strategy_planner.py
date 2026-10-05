@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import os
 
-from PySide2.QtCore import QPoint, QStandardPaths, Qt, Signal, Slot
+from PySide2.QtCore import QPoint, QStandardPaths, Qt, Slot
 from PySide2.QtGui import QBrush, QFont, QKeySequence, QPainter, QPen
 from PySide2.QtWidgets import (
     QAbstractItemView,
@@ -50,6 +50,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import qt_signal
 from ..constant import CONFIG, FILE
 from ..formatter import format_option_name
 from ..setting import cfg
@@ -116,7 +117,7 @@ class TyreNameListItem(QListWidgetItem):
 class TyrePlanTable(QTableWidget):
     """Tyre plan table"""
 
-    refresh = Signal(bool)
+    refresh = qt_signal(bool)
 
     def __init__(self, parent):
         super().__init__(parent)

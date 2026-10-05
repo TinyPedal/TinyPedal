@@ -31,7 +31,6 @@ from time import localtime, monotonic, sleep, strftime, time
 from typing import Callable
 
 from ..constant import FILE
-from ..setting_validator import PresetValidator
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +57,7 @@ def copy_setting(dict_user: dict) -> dict:
 
 def load_setting_json_file(
     filename: str, filepath: str, dict_def: dict, file_info: str = "user preset",
-    validator: Callable[[dict, dict], dict] = PresetValidator.user_preset, max_attempts: int = 5,
+    validator: Callable[[dict, dict], dict] | None = None, max_attempts: int = 5,
 ) -> dict:
     """Load setting json file & verify"""
     filename_source = f"{filepath}{filename}"
@@ -69,7 +68,8 @@ def load_setting_json_file(
             with open(filename_source, "r", encoding="utf-8") as jsonfile:
                 setting_user = json.load(jsonfile)
             # Verify & assign setting
-            setting_user = validator(setting_user, dict_def)
+            if callable(validator):
+                setting_user = validator(setting_user, dict_def)
             break
         except FileNotFoundError:
             logger.info("USERDATA: %s not found, fall back to default", filename)
@@ -102,10 +102,9 @@ def load_style_json_file(
             with open(filename_source, "r", encoding="utf-8") as jsonfile:
                 style_user = json.load(jsonfile)
             # Whether to validate style
-            if validator is not None:
-                if validator(style_user):
-                    create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
-                    msg_text = "updated"
+            if callable(validator) and validator(style_user):
+                create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
+                msg_text = "updated"
             break
         except FileNotFoundError:
             logger.info("USERDATA: %s not found, fall back to default", filename)

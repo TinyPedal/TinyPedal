@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 
 class FileName:
-    """File name"""
+    """File name (with extension)"""
 
     __slots__ = (
         "config",
@@ -308,6 +308,7 @@ class Setting:
             filename=filename_setting_temp,
             filepath=self.path.settings,
             dict_def=self.default.setting,
+            validator=PresetValidator.user_preset,
             max_attempts=loading_attempts,
         )
         self.filename.setting = filename_setting_temp

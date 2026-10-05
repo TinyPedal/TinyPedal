@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 
 def _get_available_api(enable_legacy: bool):
-    """get available API"""
+    """Get available API"""
     available_api = (
         acc_connector.SimACC,
         lmu_connector.SimLMU,

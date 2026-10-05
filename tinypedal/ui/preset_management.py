@@ -49,6 +49,7 @@ from .. import regex_pattern as rxp
 from ..constant import CONFIG, FILE
 from ..formatter import format_option_name, strip_filename_extension
 from ..setting import cfg, load_setting_json_file, save_and_verify_json_file
+from ..setting_validator import PresetValidator
 from ..template.setting_shortcuts import SHORTCUTS_PRESET
 from ..userfile.json_setting import verify_json_file
 from ..validator import is_allowed_filename
@@ -407,6 +408,7 @@ class PresetTransfer(BaseEditor):
             filename=dest_preset_name,
             filepath=cfg.path.settings,
             dict_def=cfg.default.setting,
+            validator=PresetValidator.user_preset,
         )
         # Copy setting
         self.copy_setting(dest_dict, setting_selection, options_selection)

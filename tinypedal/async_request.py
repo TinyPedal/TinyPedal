@@ -151,7 +151,7 @@ async def localhost_resolve(hostnames: set[str], port: int, timeout: float = 3) 
     """Resolve localhost name, returns fastest address (or empty if none)"""
     # Set task
     task_group = [
-        create_task(latency_test("/", hostname, port, timeout))
+        create_task(latency_test(set_header_get("/", hostname), hostname, port, timeout))
         for hostname in hostnames
     ]
     # Cancel all task on first response
@@ -164,7 +164,7 @@ async def localhost_resolve(hostnames: set[str], port: int, timeout: float = 3) 
         try:
             await task
         except (asyncio.CancelledError, BaseException):
-            pass
+            logger.info("RestAPI: cancelled localhost resolving")
     # Get fastest host name
     if result:
         host, latency = result[0]
