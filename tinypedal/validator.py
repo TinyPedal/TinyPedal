@@ -32,7 +32,6 @@ from time import monotonic
 from typing import Any, Callable
 
 from .constant import DATA, FILE
-from .decorator import generator_init
 from .regex_pattern import CFG_INVALID_FILENAME, rex_hex_color
 
 logger = logging.getLogger(__name__)
@@ -213,59 +212,3 @@ def state_timer(interval: float, last: float = 0):
             yield True
         else:
             yield False
-
-
-# Desync check
-@generator_init
-def vehicle_position_sync(max_diff: float = 200, max_desync: int = 20):
-    """Vehicle position synchronization
-
-    Args:
-        max_diff: max delta position (meters). Exceeding max delta counts as new lap.
-        max_desync: max desync counts.
-
-    Sends:
-        pos_curr: current position (meters).
-
-    Yields:
-        Synchronized position (meters).
-    """
-    pos_synced = 0
-    desync_count = 0
-
-    while True:
-        pos_curr = yield pos_synced
-        if pos_curr is None:  # reset
-            pos_curr = 0
-            pos_synced = 0
-            desync_count = 0
-            continue
-        if pos_synced > pos_curr:
-            if desync_count > max_desync or pos_synced - pos_curr > max_diff:
-                desync_count = 0  # reset
-                pos_synced = pos_curr
-            else:
-                desync_count += 1
-        elif pos_synced < pos_curr:
-            pos_synced = pos_curr
-            if desync_count:
-                desync_count = 0
-
-
-@generator_init
-def vehicle_position_interp():
-    """Interpolate vehicle traveled distance based on time delta"""
-    time_last = 0.0
-    dist_last = 0.0
-    dist_est = 0.0
-
-    while True:
-        time_curr, dist_curr = yield dist_est
-
-        if dist_last != dist_curr:
-            dist_delta = dist_curr - dist_last
-            time_delta = time_curr - time_last
-            dist_last = dist_curr
-            time_last = time_curr
-        elif time_delta > 0 < dist_delta:
-            dist_est = dist_last + dist_delta * (time_curr - time_last) / time_delta

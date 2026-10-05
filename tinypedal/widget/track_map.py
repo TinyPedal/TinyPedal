@@ -27,7 +27,7 @@ from .. import calculation as calc
 from ..api_control import api
 from ..formatter import random_color_class
 from ..module_info import minfo
-from ..validator import vehicle_position_interp
+from ..process.vehicle import vehicle_position_interp
 from ._base import Overlay
 
 
