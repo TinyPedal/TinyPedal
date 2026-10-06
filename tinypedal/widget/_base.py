@@ -561,16 +561,13 @@ class Overlay(Base):
             option: layout option name in Widget JSON.
             default: default layout orientation, 0 = vertical, 1 = horizontal.
         """
-        layout = self.layout()
-        assert isinstance(layout, QGridLayout)
+        layout: QGridLayout = self.layout()
         if self.wcfg.get(option, 0) == default:
-            order = column, row  # Vertical layout
-        else:
-            order = row, column  # Horizontal layout
+            column, row = row, column  # Vertical layout
         if isinstance(target, QWidget):
-            layout.addWidget(target, *order)
+            layout.addWidget(target, row, column)
         else:
-            layout.addLayout(target, *order)
+            layout.addLayout(target, row, column)
 
 
 def validate_option(config: dict) -> dict:

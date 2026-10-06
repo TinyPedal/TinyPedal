@@ -46,9 +46,6 @@ class Realtime(DataModule):
 
     __slots__ = ()
 
-    def __init__(self, config, module_name):
-        super().__init__(config, module_name)
-
     def update_data(self):
         """Update module data"""
         _event_wait = self._event.wait

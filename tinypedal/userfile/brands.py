@@ -41,9 +41,9 @@ def extract_brand_name(value: str, default: str) -> str:
         return default
     try:
         match_obj = rex_lmu_brand_extract.search(value)
-        assert match_obj is not None
-        return match_obj.group().strip()
-    except (AssertionError, AttributeError, TypeError, ValueError):
+        if match_obj is not None:
+            return match_obj.group().strip()
+    except (AttributeError, TypeError, ValueError):
         return default
 
 

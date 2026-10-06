@@ -82,10 +82,13 @@ class ValidLapStatus:
         if self._resets != resets:
             self._resets = resets
             self.last = self.current = True
-        if 10 < timestamp:  # record during current lap
-            self.current = is_current_valid
-        if self.timestamp > timestamp:  # new lap, store last
+        # New lap, store last
+        if self.timestamp > timestamp:
             self.last = self.current
+            self.current = True
+        # Record during current lap
+        elif self.current and 1 < timestamp:
+            self.current = is_current_valid
         self.timestamp = timestamp
         return self
 

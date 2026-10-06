@@ -39,9 +39,9 @@ def expected_usage(value: str, default: float) -> float:
     """Extract expected fuel or energy usage from car setup"""
     try:
         match_obj = rex_number_extract.findall(value)
-        assert match_obj is not None
-        return float(match_obj[0]) / float(match_obj[1])
-    except (AssertionError, ZeroDivisionError, AttributeError, IndexError, TypeError, ValueError):
+        if match_obj is not None:
+            return float(match_obj[0]) / float(match_obj[1])
+    except (ZeroDivisionError, AttributeError, IndexError, TypeError, ValueError):
         return default
 
 
@@ -49,9 +49,9 @@ def steerlock_to_number(value: str, default: float) -> float:
     """Convert steerlock (degree) string to float value from car setup"""
     try:
         match_obj = rex_number_extract.search(value)
-        assert match_obj is not None
-        return float(match_obj.group())
-    except (AssertionError, AttributeError, TypeError, ValueError):
+        if match_obj is not None:
+            return float(match_obj.group())
+    except (AttributeError, TypeError, ValueError):
         return default
 
 
@@ -67,7 +67,10 @@ def absolute_refilling(dataset: list[dict], default: float) -> float:
             # Get absolute refilling fuel (liter) from raw string
             if data.get("name") == "FUEL:":
                 raw_value = data["settings"][data["currentSetting"]]["text"]
-                abs_refill = float(rex_number_extract.search(raw_value).group())
+                result = rex_number_extract.search(raw_value)
+                if result is None:
+                    break
+                abs_refill = float(result.group())
                 if "gal" in raw_value.lower():  # convert to liter
                     abs_refill *= 3.7854118
                 break
