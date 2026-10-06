@@ -21,7 +21,7 @@ RF2 API connector
 """
 
 from ..constant import API
-from ..validator import string_converter
+from ..validator import bytes_decoder
 from . import _restapi, lmu_restapi, rf2_reader, rf2_restapi, rf2_sharedmemory
 from ._connector import APIDataReader, Connector
 
@@ -79,7 +79,7 @@ class SimRF2(Connector):
         self._shmmapi.setPlayerOverride(config["enable_player_index_override"])
         self._shmmapi.setPlayerIndex(config["player_index"])
         self._restapi.setConnection(config.copy())
-        rf2_reader.tostr = string_converter(config["character_encoding"])
+        rf2_reader.tostr = bytes_decoder(config["character_encoding"])
 
 
 class SimLMULegacy(SimRF2):

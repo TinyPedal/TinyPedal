@@ -36,13 +36,13 @@ from ..calculation import (
 )
 from ..constant import DATA
 from ..formatter import strip_invalid_char
+from ..validator import bytes_decoder
 from ..validator import infnan_to_zero as rmnan
-from ..validator import string_converter
 from . import _reader
 from .rf2_restapi import RestAPIData
 from .rf2_sharedmemory import RF2Info
 
-tostr = string_converter()
+tostr = bytes_decoder()
 
 
 class DataAdapter:

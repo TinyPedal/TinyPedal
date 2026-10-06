@@ -35,13 +35,13 @@ from ..calculation import (
 )
 from ..constant import DATA
 from ..formatter import strip_invalid_char
+from ..validator import bytes_decoder
 from ..validator import infnan_to_zero as rmnan
-from ..validator import string_converter
 from . import _reader
 from .lmu_restapi import RestAPIData
 from .lmu_sharedmemory import LMU_COMPOUND_TYPE, LMUInfo
 
-tostr = string_converter()
+tostr = bytes_decoder()
 
 LMU_CAR_MODEL_CORRECTION = {
     "Aston Martin Vantage AMR LMGT": "Aston Martin Vantage AMR LMGT3",
@@ -919,7 +919,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def incidents(self, index: int | None = None) -> int:
         """Number of incidents"""
         data = self.shmm.lmuResults(index)
-        return data["contact_vehicle"] + data["track_cut"]
+        return int(data["contact_vehicle"] + data["track_cut"])
 
     def is_player(self, index: int = 0) -> bool:
         """Is local player"""

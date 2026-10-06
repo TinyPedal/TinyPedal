@@ -27,12 +27,12 @@ from math import pi
 from ..calculation import atan2, ceil, distance, min_nonzero
 from ..constant import DATA
 from ..formatter import strip_invalid_char
+from ..validator import bytes_decoder
 from ..validator import infnan_to_zero as rmnan
-from ..validator import string_converter
 from . import _reader
 from .acc_sharedmemory import ACCInfo, acc_enum, acc_udp
 
-tostr = string_converter()
+tostr = bytes_decoder()
 
 ACC_CAR_MODEL = acc_enum.ACC_CAR_MODEL
 ACC_CAR_MODEL_ID = acc_enum.ACC_CAR_MODEL_ID
@@ -464,12 +464,12 @@ class Session(_reader.Session, DataAdapter):
     def pre_race(self) -> bool:
         """Before race starts (green flag)"""
         data = self.shmm.accGraphicsInfo
-        return data.session == 2 and data.GlobalGreen <= 0
+        return data.session == 2 and data.globalGreen <= 0
 
     def green_flag(self) -> bool:
         """Green flag (race starts)"""
         data = self.shmm.accGraphicsInfo
-        return data.session == 2 and data.GlobalGreen > 0
+        return data.session == 2 and data.globalGreen > 0
 
     def blue_flag(self, index: int | None = None) -> bool:
         """Is under blue flag"""
@@ -477,7 +477,7 @@ class Session(_reader.Session, DataAdapter):
 
     def yellow_flag(self) -> bool:
         """Is there yellow flag in any sectors"""
-        return self.shmm.accGraphicsInfo.GlobalYellow
+        return self.shmm.accGraphicsInfo.globalYellow > 0
 
     def start_lights(self) -> int:
         """Start lights countdown sequence, 0=green flag, -1=no start lights"""
@@ -630,7 +630,7 @@ class Switch(_reader.Switch, DataAdapter):
         """Headlights"""
         data = self.shmm.accGraphicsInfo
         if data.flashingLights:
-            return self.shmm.elapsed % 1 * 4 // 1 % 2  # pulse every 0.25s
+            return int(self.shmm.elapsed % 1 * 4 // 1 % 2)  # pulse every 0.25s
         return data.lightsStage
 
     def ignition(self, index: int | None = None, stall_rpm: float = 100) -> int:
@@ -1213,7 +1213,7 @@ class Wheel(_reader.Wheel, DataAdapter):
 
     def is_detached(self, index: int | None = None) -> tuple[bool, ...]:
         """Whether wheel is detached"""
-        return DATA.WHEELS_ZERO
+        return DATA.WHEELS_FALSE
 
     def offroad(self, index: int | None = None) -> int:
         """Number of wheels currently off the road"""

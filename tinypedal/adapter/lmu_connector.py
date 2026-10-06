@@ -21,7 +21,7 @@ LMU API connector
 """
 
 from ..constant import API
-from ..validator import string_converter
+from ..validator import bytes_decoder
 from . import _restapi, lmu_reader, lmu_restapi, lmu_sharedmemory
 from ._connector import APIDataReader, Connector
 
@@ -77,4 +77,4 @@ class SimLMU(Connector):
         self._shmmapi.setPlayerOverride(config["enable_player_index_override"])
         self._shmmapi.setPlayerIndex(config["player_index"])
         self._restapi.setConnection(config.copy())
-        lmu_reader.tostr = string_converter(config["character_encoding"])
+        lmu_reader.tostr = bytes_decoder(config["character_encoding"])

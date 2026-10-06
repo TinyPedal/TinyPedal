@@ -162,6 +162,7 @@ class DATA:
     EMPTY_DICT: MappingProxyType = MappingProxyType({})
     DELTA_ZERO = (0.0,) * 2  # pos, target
     DELTA_DEFAULT = (DELTA_ZERO,)
+    WHEELS_FALSE = (False,) * 4  # FL, FR, RL, RR
     WHEELS_ZERO = (0.0,) * 4  # FL, FR, RL, RR
     WHEELS_NA = (-1.0,) * 4  # FL, FR, RL, RR
     TYRE_AVERAGE_NA = (ABS_ZERO_CELSIUS,) * 4  # FL, FR, RL, RR

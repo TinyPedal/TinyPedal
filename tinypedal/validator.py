@@ -52,8 +52,8 @@ def bytes_to_str(bytestring: bytes | Any, char_encoding: str = "utf-8") -> str:
     return ""
 
 
-def string_converter(encoding: str = "utf-8") -> Callable[[bytes], str]:
-    """Set bytes to string converter"""
+def bytes_decoder(encoding: str = "utf-8") -> Callable[[bytes], str]:
+    """Set bytes to string decode function"""
     if encoding:
         encoding = encoding.lower()
     else:

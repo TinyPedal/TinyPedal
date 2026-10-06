@@ -21,7 +21,7 @@ ACC API connector
 """
 
 from ..constant import API
-from ..validator import string_converter
+from ..validator import bytes_decoder
 from . import acc_reader, acc_sharedmemory, acc_udpapi
 from ._connector import APIDataReader, Connector
 
@@ -75,4 +75,4 @@ class SimACC(Connector):
         self._shmmapi.setPlayerOverride(config["enable_player_index_override"])
         self._shmmapi.setPlayerIndex(config["player_index"])
         self._udpapi.setConnection(config.copy())
-        acc_reader.tostr = string_converter(config["character_encoding"])
+        acc_reader.tostr = bytes_decoder(config["character_encoding"])
