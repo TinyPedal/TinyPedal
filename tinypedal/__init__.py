@@ -50,13 +50,13 @@ app_signal = state.ApplicationSignal()
 # Global singleton (init later)
 log_stream: io.StringIO = None  # type: ignore
 cfg: Setting = None  # type: ignore
-api: APIControl
-minfo: ModuleInfo
-mctrl: ModuleControl
-wctrl: ModuleControl
-kctrl: HotkeyControl
-octrl: OverlayControl
-updater: UpdateChecker
+api: APIControl = None  # type: ignore
+minfo: ModuleInfo = None  # type: ignore
+mctrl: ModuleControl = None  # type: ignore
+wctrl: ModuleControl = None  # type: ignore
+kctrl: HotkeyControl = None  # type: ignore
+octrl: OverlayControl = None  # type: ignore
+updater: UpdateChecker = None  # type: ignore
 
 
 def start(single_instance: bool, log_level: int):

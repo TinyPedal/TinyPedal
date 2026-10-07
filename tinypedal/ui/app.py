@@ -395,8 +395,9 @@ class AppWindow(QMainWindow):
     @Slot(bool)  # type: ignore[operator]
     def reload_preset(self, reload_preset: bool):
         """Reload current preset"""
-        for _widget in QApplication.topLevelWidgets():
-            if isinstance(_widget, BaseDialog) and _widget.TYPE == CONFIG.TYPE_CONFIG:
+        # Close any config dialog first
+        for _widget in self.findChildren(BaseDialog):
+            if _widget.TYPE == CONFIG.TYPE_CONFIG:
                 _widget.close()
         loader.reload(reload_preset)
         app_signal.refresh.emit(True)
