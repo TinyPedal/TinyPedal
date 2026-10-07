@@ -20,13 +20,12 @@
 Default heatmap template
 """
 
-HEATMAP_DEFAULT_TYRE = "tyre_optimal_80"
-HEATMAP_DEFAULT_BRAKE = "brake_optimal_400"
+from ..constant import HEATMAP
 
 # key = temperature in Celsius
 # value = HEX color code
 HEATMAP_DEFAULT = {
-    "thermal_infrared": {
+    HEATMAP.THERMAL_INFRARED: {
         "-273": "#44F",
         "40": "#84F",
         "60": "#F4F",
@@ -35,7 +34,7 @@ HEATMAP_DEFAULT = {
         "120": "#F84",
         "140": "#FF4",
     },
-    "brake_optimal_300": {
+    HEATMAP.BRAKE_300: {
         "-273": "#44F",
         "75": "#48F",
         "150": "#4FF",
@@ -46,7 +45,7 @@ HEATMAP_DEFAULT = {
         "525": "#F84",
         "600": "#F44",
     },
-    "brake_optimal_400": {
+    HEATMAP.BRAKE_400: {
         "-273": "#44F",
         "100": "#48F",
         "200": "#4FF",
@@ -57,7 +56,7 @@ HEATMAP_DEFAULT = {
         "700": "#F84",
         "800": "#F44",
     },
-    "tyre_optimal_50": {
+    HEATMAP.TYRE_50: {
         "-273": "#44F",
         "20": "#48F",
         "30": "#4FF",
@@ -68,7 +67,7 @@ HEATMAP_DEFAULT = {
         "80": "#F84",
         "90": "#F44",
     },
-    "tyre_optimal_60": {
+    HEATMAP.TYRE_60: {
         "-273": "#44F",
         "30": "#48F",
         "40": "#4FF",
@@ -79,7 +78,7 @@ HEATMAP_DEFAULT = {
         "90": "#F84",
         "100": "#F44",
     },
-    "tyre_optimal_70": {
+    HEATMAP.TYRE_70: {
         "-273": "#44F",
         "40": "#48F",
         "50": "#4FF",
@@ -90,7 +89,7 @@ HEATMAP_DEFAULT = {
         "100": "#F84",
         "110": "#F44",
     },
-    "tyre_optimal_80": {
+    HEATMAP.TYRE_80: {
         "-273": "#44F",
         "50": "#48F",
         "60": "#4FF",
@@ -101,7 +100,7 @@ HEATMAP_DEFAULT = {
         "110": "#F84",
         "120": "#F44",
     },
-    "tyre_optimal_90": {
+    HEATMAP.TYRE_90: {
         "-273": "#44F",
         "60": "#48F",
         "70": "#4FF",
@@ -112,7 +111,7 @@ HEATMAP_DEFAULT = {
         "120": "#F84",
         "130": "#F44",
     },
-    "tyre_optimal_100": {
+    HEATMAP.TYRE_100: {
         "-273": "#44F",
         "70": "#48F",
         "80": "#4FF",

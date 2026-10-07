@@ -22,9 +22,8 @@ Tyre inner layer temperature Widget
 
 from .. import api, units
 from .. import calculation as calc
-from ..constant import DATA
+from ..constant import DATA, HEATMAP
 from ..userfile.heatmap import (
-    HEATMAP_DEFAULT_TYRE,
     load_heatmap_color,
     select_compound_color,
     select_compound_symbol,
@@ -70,7 +69,7 @@ class Realtime(Overlay):
         self.heatmap_styles = 4 * [
             load_heatmap_color(
                 heatmap_name=self.wcfg["heatmap_name"],
-                default_name=HEATMAP_DEFAULT_TYRE,
+                default_name=HEATMAP.TYRE_DEFAULT,
                 swap_style=self.wcfg["swap_style"],
                 fg_color=self.wcfg["font_color_inner_layer"],
                 bg_color=self.wcfg["background_color_inner_layer"],
@@ -177,7 +176,7 @@ class Realtime(Overlay):
         """Heatmap style"""
         self.heatmap_styles[index] = load_heatmap_color(
             heatmap_name=select_tyre_heatmap_name(compound),
-            default_name=HEATMAP_DEFAULT_TYRE,
+            default_name=HEATMAP.TYRE_DEFAULT,
             swap_style=self.wcfg["swap_style"],
             fg_color=self.wcfg["font_color_inner_layer"],
             bg_color=self.wcfg["background_color_inner_layer"],

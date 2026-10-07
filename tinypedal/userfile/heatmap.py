@@ -25,11 +25,9 @@ from __future__ import annotations
 import re
 
 from .. import cfg
-from ..constant import CONFIG
-from ..regex_pattern import COMMON_TYRE_COMPOUNDS
+from ..constant import CONFIG, HEATMAP
 from ..template.setting_brakes import BRAKEINFO_DEFAULT
 from ..template.setting_compounds import COMPOUNDINFO_DEFAULT
-from ..template.setting_heatmap import HEATMAP_DEFAULT_BRAKE, HEATMAP_DEFAULT_TYRE
 from ..validator import invalid_save_name, is_hex_color
 from .brands import select_brand_name
 
@@ -82,9 +80,9 @@ def select_brake_heatmap_name(brake_name: str) -> str:
     brake = cfg.user.brakes.get(brake_name)
     if brake is None:
         if invalid_save_name(brake_name):
-            return HEATMAP_DEFAULT_BRAKE
+            return HEATMAP.BRAKE_DEFAULT
         brake = add_missing_brake(brake_name)
-    return brake.get("heatmap", HEATMAP_DEFAULT_BRAKE)
+    return brake.get("heatmap", HEATMAP.BRAKE_DEFAULT)
 
 
 def brake_failure_thickness(brake_name_front: str, brake_name_rear: str) -> tuple[float, float, float, float]:
@@ -111,7 +109,7 @@ def add_missing_compound(compound_name: str) -> dict:
 
 def set_predefined_compound_symbol(compound_name: str) -> str:
     """Set common tyre compound name to predefined symbol"""
-    for compound in COMMON_TYRE_COMPOUNDS:
+    for compound in HEATMAP.TYRE_PATTERNS:
         if re.search(compound[0], compound_name, flags=re.IGNORECASE):
             return compound[1]
     if compound_name:  # use first letter if available
@@ -144,9 +142,9 @@ def select_tyre_heatmap_name(compound_name: str) -> str:
     compound = cfg.user.compounds.get(compound_name)
     if compound is None:
         if invalid_save_name(compound_name):
-            return HEATMAP_DEFAULT_TYRE
+            return HEATMAP.TYRE_DEFAULT
         compound = add_missing_compound(compound_name)
-    return compound.get("heatmap", HEATMAP_DEFAULT_TYRE)
+    return compound.get("heatmap", HEATMAP.TYRE_DEFAULT)
 
 
 # Heatmap function

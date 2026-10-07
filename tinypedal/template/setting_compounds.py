@@ -22,133 +22,133 @@ Default compounds template
 
 from types import MappingProxyType
 
-from .setting_heatmap import HEATMAP_DEFAULT_TYRE
+from ..constant import HEATMAP
 
 COMPOUNDINFO_DEFAULT = MappingProxyType({
     "symbol": "?",
     "color": "#AAAAAA",
-    "heatmap": HEATMAP_DEFAULT_TYRE,
+    "heatmap": HEATMAP.TYRE_DEFAULT,
 })
 
 COMPOUNDS_DEFAULT = {
     "Hyper - Soft": {
         "symbol": "S",
         "color": "#AAAAAA",
-        "heatmap": "tyre_optimal_80",
+        "heatmap": HEATMAP.TYRE_80,
     },
     "Hyper - Medium": {
         "symbol": "M",
         "color": "#FFCC00",
-        "heatmap": "tyre_optimal_90",
+        "heatmap": HEATMAP.TYRE_90,
     },
     "Hyper - Hard": {
         "symbol": "H",
         "color": "#EE2200",
-        "heatmap": "tyre_optimal_100",
+        "heatmap": HEATMAP.TYRE_100,
     },
     "Hyper - Wet": {
         "symbol": "W",
         "color": "#00AAFF",
-        "heatmap": "tyre_optimal_50",
+        "heatmap": HEATMAP.TYRE_50,
     },
     "LMP2 - Soft": {
         "symbol": "S",
         "color": "#AAAAAA",
-        "heatmap": "tyre_optimal_80",
+        "heatmap": HEATMAP.TYRE_80,
     },
     "LMP2 - Medium": {
         "symbol": "M",
         "color": "#FFCC00",
-        "heatmap": "tyre_optimal_90",
+        "heatmap": HEATMAP.TYRE_90,
     },
     "LMP2 - Hard": {
         "symbol": "H",
         "color": "#EE2200",
-        "heatmap": "tyre_optimal_100",
+        "heatmap": HEATMAP.TYRE_100,
     },
     "LMP2 - Wet": {
         "symbol": "W",
         "color": "#00AAFF",
-        "heatmap": "tyre_optimal_50",
+        "heatmap": HEATMAP.TYRE_50,
     },
     "LMP2_ELMS - Soft": {
         "symbol": "S",
         "color": "#AAAAAA",
-        "heatmap": "tyre_optimal_80",
+        "heatmap": HEATMAP.TYRE_80,
     },
     "LMP2_ELMS - Medium": {
         "symbol": "M",
         "color": "#FFCC00",
-        "heatmap": "tyre_optimal_90",
+        "heatmap": HEATMAP.TYRE_90,
     },
     "LMP2_ELMS - Hard": {
         "symbol": "H",
         "color": "#EE2200",
-        "heatmap": "tyre_optimal_100",
+        "heatmap": HEATMAP.TYRE_100,
     },
     "LMP2_ELMS - Wet": {
         "symbol": "W",
         "color": "#00AAFF",
-        "heatmap": "tyre_optimal_50",
+        "heatmap": HEATMAP.TYRE_50,
     },
     "LMP3 - Soft": {
         "symbol": "S",
         "color": "#AAAAAA",
-        "heatmap": "tyre_optimal_80",
+        "heatmap": HEATMAP.TYRE_80,
     },
     "LMP3 - Medium": {
         "symbol": "M",
         "color": "#FFCC00",
-        "heatmap": "tyre_optimal_90",
+        "heatmap": HEATMAP.TYRE_90,
     },
     "LMP3 - Hard": {
         "symbol": "H",
         "color": "#EE2200",
-        "heatmap": "tyre_optimal_100",
+        "heatmap": HEATMAP.TYRE_100,
     },
     "LMP3 - Wet": {
         "symbol": "W",
         "color": "#00AAFF",
-        "heatmap": "tyre_optimal_50",
+        "heatmap": HEATMAP.TYRE_50,
     },
     "GTE - Soft": {
         "symbol": "S",
         "color": "#AAAAAA",
-        "heatmap": "tyre_optimal_80",
+        "heatmap": HEATMAP.TYRE_80,
     },
     "GTE - Medium": {
         "symbol": "M",
         "color": "#FFCC00",
-        "heatmap": "tyre_optimal_90",
+        "heatmap": HEATMAP.TYRE_90,
     },
     "GTE - Hard": {
         "symbol": "H",
         "color": "#EE2200",
-        "heatmap": "tyre_optimal_100",
+        "heatmap": HEATMAP.TYRE_100,
     },
     "GTE - Wet": {
         "symbol": "W",
         "color": "#00AAFF",
-        "heatmap": "tyre_optimal_50",
+        "heatmap": HEATMAP.TYRE_50,
     },
     "GT3 - Soft": {
         "symbol": "S",
         "color": "#AAAAAA",
-        "heatmap": "tyre_optimal_80",
+        "heatmap": HEATMAP.TYRE_80,
     },
     "GT3 - Medium": {
         "symbol": "M",
         "color": "#FFCC00",
-        "heatmap": "tyre_optimal_90",
+        "heatmap": HEATMAP.TYRE_90,
     },
     "GT3 - Hard": {
         "symbol": "H",
         "color": "#EE2200",
-        "heatmap": "tyre_optimal_100",
+        "heatmap": HEATMAP.TYRE_100,
     },
     "GT3 - Wet": {
         "symbol": "W",
         "color": "#00AAFF",
-        "heatmap": "tyre_optimal_50",
+        "heatmap": HEATMAP.TYRE_50,
     },
 }

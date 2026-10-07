@@ -22,9 +22,8 @@ Brake temperature Widget
 
 from .. import api, units
 from .. import calculation as calc
-from ..constant import DATA
+from ..constant import DATA, HEATMAP
 from ..userfile.heatmap import (
-    HEATMAP_DEFAULT_BRAKE,
     load_heatmap_color,
     select_brake_heatmap_name,
     set_predefined_brake_name,
@@ -64,7 +63,7 @@ class Realtime(Overlay):
         self.heatmap_styles = 4 * [
             load_heatmap_color(
                 heatmap_name=self.wcfg["heatmap_name"],
-                default_name=HEATMAP_DEFAULT_BRAKE,
+                default_name=HEATMAP.BRAKE_DEFAULT,
                 swap_style=not self.wcfg["swap_style"],
                 fg_color=self.wcfg["font_color_temperature"],
                 bg_color=self.wcfg["background_color_temperature"],
@@ -202,14 +201,14 @@ class Realtime(Overlay):
         heatmap_r = select_brake_heatmap_name(brake_name_rear)
         heatmap_style_f = load_heatmap_color(
             heatmap_name=heatmap_f,
-            default_name=HEATMAP_DEFAULT_BRAKE,
+            default_name=HEATMAP.BRAKE_DEFAULT,
             swap_style=not self.wcfg["swap_style"],
             fg_color=self.wcfg["font_color_temperature"],
             bg_color=self.wcfg["background_color_temperature"],
         )
         heatmap_style_r = load_heatmap_color(
             heatmap_name=heatmap_r,
-            default_name=HEATMAP_DEFAULT_BRAKE,
+            default_name=HEATMAP.BRAKE_DEFAULT,
             swap_style=not self.wcfg["swap_style"],
             fg_color=self.wcfg["font_color_temperature"],
             bg_color=self.wcfg["background_color_temperature"],

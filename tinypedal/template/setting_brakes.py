@@ -22,44 +22,44 @@ Default brakes template
 
 from types import MappingProxyType
 
-from .setting_heatmap import HEATMAP_DEFAULT_BRAKE
+from ..constant import HEATMAP
 
 BRAKEINFO_DEFAULT = MappingProxyType({
     "failure_thickness": 0.0,
-    "heatmap": HEATMAP_DEFAULT_BRAKE,
+    "heatmap": HEATMAP.BRAKE_DEFAULT,
 })
 
 BRAKES_DEFAULT = {
     "Hyper - Front Brake": {
         "failure_thickness": 25.0,
-        "heatmap": HEATMAP_DEFAULT_BRAKE,
+        "heatmap": HEATMAP.BRAKE_DEFAULT,
     },
     "Hyper - Rear Brake": {
         "failure_thickness": 25.0,
-        "heatmap": HEATMAP_DEFAULT_BRAKE,
+        "heatmap": HEATMAP.BRAKE_DEFAULT,
     },
     "LMP2 - Front Brake": {
         "failure_thickness": 25.0,
-        "heatmap": HEATMAP_DEFAULT_BRAKE,
+        "heatmap": HEATMAP.BRAKE_DEFAULT,
     },
     "LMP2 - Rear Brake": {
         "failure_thickness": 25.0,
-        "heatmap": HEATMAP_DEFAULT_BRAKE,
+        "heatmap": HEATMAP.BRAKE_DEFAULT,
     },
     "GTE - Front Brake": {
         "failure_thickness": 30.0,
-        "heatmap": HEATMAP_DEFAULT_BRAKE,
+        "heatmap": HEATMAP.BRAKE_DEFAULT,
     },
     "GTE - Rear Brake": {
         "failure_thickness": 30.0,
-        "heatmap": HEATMAP_DEFAULT_BRAKE,
+        "heatmap": HEATMAP.BRAKE_DEFAULT,
     },
     "GT3 - Front Brake": {
         "failure_thickness": 30.0,
-        "heatmap": HEATMAP_DEFAULT_BRAKE,
+        "heatmap": HEATMAP.BRAKE_DEFAULT,
     },
     "GT3 - Rear Brake": {
         "failure_thickness": 30.0,
-        "heatmap": HEATMAP_DEFAULT_BRAKE,
+        "heatmap": HEATMAP.BRAKE_DEFAULT,
     },
 }

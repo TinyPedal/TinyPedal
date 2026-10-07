@@ -206,7 +206,6 @@ ABBR_PATTERN = "|".join(
     )
 )
 
-
 # Font weight
 FONT_WEIGHT_MAP = MappingProxyType({
     "Thin": QFont.Thin,
@@ -244,17 +243,3 @@ CHOICE_UNITS = MappingProxyType({
     "weight_unit": ("Kilogram", "Pound"),
     "wind_speed_unit": ("KPH", "MPH", "m/s"),
 })
-
-# Misc
-COMMON_TYRE_COMPOUNDS = (
-    ("super", "Q"),  # super soft
-    ("inter", "I"),  # intermediate
-    ("soft", "S"),
-    ("med", "M"),  # medium
-    ("hard", "H"),
-    ("rain|wet", "W"),
-    ("slick|dry", "S"),
-    ("oval", "O"),
-    ("road|radial|tread", "R"),
-    ("bias", "B"),  # bias ply
-)

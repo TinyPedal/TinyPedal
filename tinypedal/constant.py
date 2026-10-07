@@ -137,6 +137,40 @@ class CONFIG:
 
 
 @constantclass
+class HEATMAP:
+    """Heatmap constants"""
+
+    # Thermal
+    THERMAL_INFRARED = "thermal_infrared"
+    # Brake
+    BRAKE_300 = "brake_optimal_300"
+    BRAKE_400 = "brake_optimal_400"
+    # Tyre
+    TYRE_50 = "tyre_optimal_50"
+    TYRE_60 = "tyre_optimal_60"
+    TYRE_70 = "tyre_optimal_70"
+    TYRE_80 = "tyre_optimal_80"
+    TYRE_90 = "tyre_optimal_90"
+    TYRE_100 = "tyre_optimal_100"
+    # Default
+    TYRE_DEFAULT = TYRE_80
+    BRAKE_DEFAULT = BRAKE_400
+    # Pattern
+    TYRE_PATTERNS = (
+        ("super", "Q"),  # super soft
+        ("inter", "I"),  # intermediate
+        ("soft", "S"),
+        ("med", "M"),  # medium
+        ("hard", "H"),
+        ("rain|wet", "W"),
+        ("slick|dry", "S"),
+        ("oval", "O"),
+        ("road|radial|tread", "R"),
+        ("bias", "B"),  # bias ply
+    )
+
+
+@constantclass
 class DATA:
     """Data constants"""
 

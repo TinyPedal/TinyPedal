@@ -22,7 +22,7 @@ Default widget setting template
 Widget key name must match corresponding file name in 'widget' folder
 """
 
-from .setting_heatmap import HEATMAP_DEFAULT_BRAKE, HEATMAP_DEFAULT_TYRE
+from ..constant import HEATMAP
 
 WIDGET_DEFAULT = {
     "acceleration": {
@@ -250,7 +250,7 @@ WIDGET_DEFAULT = {
         "font_color_temperature": "#000000",
         "background_color_temperature": "#222222",
         "enable_heatmap_auto_matching": True,
-        "heatmap_name": HEATMAP_DEFAULT_BRAKE,
+        "heatmap_name": HEATMAP.BRAKE_DEFAULT,
         "show_average": True,
         "average_sampling_duration": 10,
         "off_brake_duration": 1,
@@ -3492,7 +3492,7 @@ WIDGET_DEFAULT = {
         "font_color_carcass": "#000000",
         "background_color_carcass": "#222222",
         "enable_heatmap_auto_matching": True,
-        "heatmap_name": HEATMAP_DEFAULT_TYRE,
+        "heatmap_name": HEATMAP.TYRE_DEFAULT,
         "show_rate_of_change": True,
         "rate_of_change_interval": 5,
         "rate_of_change_smoothing_samples": 20,
@@ -3557,7 +3557,7 @@ WIDGET_DEFAULT = {
         "font_color_inner_layer": "#000000",
         "background_color_inner_layer": "#222222",
         "enable_heatmap_auto_matching": True,
-        "heatmap_name": HEATMAP_DEFAULT_TYRE,
+        "heatmap_name": HEATMAP.TYRE_DEFAULT,
         "show_tyre_compound": True,
         "show_compound_color_by_type": True,
         "font_color_tyre_compound": "#666666",
@@ -3644,7 +3644,7 @@ WIDGET_DEFAULT = {
         "font_color_surface": "#000000",
         "background_color_surface": "#222222",
         "enable_heatmap_auto_matching": True,
-        "heatmap_name": HEATMAP_DEFAULT_TYRE,
+        "heatmap_name": HEATMAP.TYRE_DEFAULT,
         "show_tyre_compound": True,
         "show_compound_color_by_type": True,
         "font_color_tyre_compound": "#666666",
