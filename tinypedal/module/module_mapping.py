@@ -20,12 +20,11 @@
 Mapping module
 """
 
+from .. import api, minfo, realtime_state
 from .. import calculation as calc
-from .. import realtime_state
-from ..api_control import api
 from ..constant import DATA, FILE
 from ..decorator import generator_init
-from ..module_info import MapCoords, MappingInfo, minfo
+from ..module_info import MapCoords, MappingInfo
 from ..userfile.track_info import load_track_info, save_track_info
 from ..userfile.track_map import load_track_map_file, save_track_map_file
 from ..validator import file_last_modified

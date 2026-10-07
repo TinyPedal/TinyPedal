@@ -20,12 +20,11 @@
 Delta module
 """
 
+from .. import api, minfo, realtime_state
 from .. import calculation as calc
-from .. import realtime_state
-from ..api_control import api
 from ..constant import DATA
 from ..decorator import generator_init
-from ..module_info import DeltaInfo, minfo
+from ..module_info import DeltaInfo
 from ..process.vehicle import vehicle_position_sync
 from ..userfile.delta_best import load_delta_best_file, save_delta_best_file
 from ..validator import is_same_session, valid_delta_raw

@@ -26,11 +26,11 @@ Notes:
 from __future__ import annotations
 
 from ..calculation import (
-    hypotenuse,
+    atan2,
+    fmean,
+    hypot,
     lap_progress_distance,
-    mean,
     min_nonzero,
-    oriyaw,
     slip_angle,
 )
 from ..constant import DATA
@@ -788,10 +788,10 @@ class Tyre(_reader.Tyre, DataAdapter):
         """Tyre surface temperature set (Celsius) average"""
         wheel_data = self.shmm.lmuTeleVeh(index).mWheels
         return (
-            rmnan(mean(wheel_data[0].mTemperature)) - 273.15,
-            rmnan(mean(wheel_data[1].mTemperature)) - 273.15,
-            rmnan(mean(wheel_data[2].mTemperature)) - 273.15,
-            rmnan(mean(wheel_data[3].mTemperature)) - 273.15,
+            rmnan(fmean(wheel_data[0].mTemperature)) - 273.15,
+            rmnan(fmean(wheel_data[1].mTemperature)) - 273.15,
+            rmnan(fmean(wheel_data[2].mTemperature)) - 273.15,
+            rmnan(fmean(wheel_data[3].mTemperature)) - 273.15,
         )
 
     def surface_temperature_ico(self, index: int | None = None) -> tuple[float, ...]:
@@ -816,10 +816,10 @@ class Tyre(_reader.Tyre, DataAdapter):
         """Tyre inner temperature set (Celsius) average"""
         wheel_data = self.shmm.lmuTeleVeh(index).mWheels
         return (
-            rmnan(mean(wheel_data[0].mTireInnerLayerTemperature)) - 273.15,
-            rmnan(mean(wheel_data[1].mTireInnerLayerTemperature)) - 273.15,
-            rmnan(mean(wheel_data[2].mTireInnerLayerTemperature)) - 273.15,
-            rmnan(mean(wheel_data[3].mTireInnerLayerTemperature)) - 273.15,
+            rmnan(fmean(wheel_data[0].mTireInnerLayerTemperature)) - 273.15,
+            rmnan(fmean(wheel_data[1].mTireInnerLayerTemperature)) - 273.15,
+            rmnan(fmean(wheel_data[2].mTireInnerLayerTemperature)) - 273.15,
+            rmnan(fmean(wheel_data[3].mTireInnerLayerTemperature)) - 273.15,
         )
 
     def inner_temperature_ico(self, index: int | None = None) -> tuple[float, ...]:
@@ -1019,7 +1019,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def orientation_yaw(self, index: int | None = None) -> float:
         """Orientation yaw (radians)"""
         ori = self.shmm.lmuTeleVeh(index).mOri[2]
-        return rmnan(oriyaw(ori.x, ori.z))
+        return rmnan(atan2(ori.x, ori.z))
 
     def position_xyz(self, index: int | None = None) -> tuple[float, float, float]:
         """Raw x,y,z position (meters)"""
@@ -1065,7 +1065,7 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def speed(self, index: int | None = None) -> float:
         """Speed (m/s)"""
         vel = self.shmm.lmuTeleVeh(index).mLocalVel
-        return rmnan(hypotenuse(vel.x, vel.y, vel.z))
+        return rmnan(hypot(vel.x, vel.y, vel.z))
 
     def downforce_front(self, index: int | None = None) -> float:
         """Downforce front (Newtons)"""
@@ -1112,6 +1112,10 @@ class Vehicle(_reader.Vehicle, DataAdapter):
 
     def setup(self) -> tuple[str, ...]:
         """Car setup data"""
+        data = self.rest.lastCarSetup
+        if data and data[0] == "":
+            header = (f'VehicleClassSetting="{self.class_name()}"', "UpgradeSetting=(0,0,0,0)")
+            self.rest.lastCarSetup = header + data
         return self.rest.lastCarSetup
 
 

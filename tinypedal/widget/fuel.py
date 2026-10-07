@@ -21,8 +21,7 @@ Fuel Widget
 """
 
 from .. import calculation as calc
-from .. import units
-from ..module_info import minfo
+from .. import minfo, units
 from ._base import Overlay
 from ._common import warning_flash
 from ._painter import FuelLevelBar

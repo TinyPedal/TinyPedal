@@ -23,7 +23,7 @@ DRS Widget
 from PySide2.QtCore import QRectF, Qt
 from PySide2.QtGui import QPainter, QPen
 
-from ..api_control import api
+from .. import api
 from ._base import Overlay
 
 

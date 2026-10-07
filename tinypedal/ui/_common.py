@@ -161,6 +161,7 @@ class CompactButton(QPushButton):
 class BaseDialog(QDialog):
     """Base dialog class"""
     MARGIN = UIScaler.pixel(6)
+    TYPE = None
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -267,7 +268,7 @@ class BaseEditor(BaseDialog):
     def reloading(reload_module: bool = True, reload_widget: bool = True) -> None:
         """Reloading module & widget only"""
         # Delay import
-        from ..module_control import mctrl, wctrl
+        from .. import mctrl, wctrl
 
         if reload_module:
             mctrl.reload()

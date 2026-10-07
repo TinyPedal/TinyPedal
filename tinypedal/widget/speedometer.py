@@ -20,8 +20,7 @@
 Speedometer Widget
 """
 
-from .. import units
-from ..api_control import api
+from .. import api, units
 from ._base import Overlay
 
 

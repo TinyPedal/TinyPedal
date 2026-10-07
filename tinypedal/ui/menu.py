@@ -25,14 +25,9 @@ import os
 from PySide2.QtGui import QDesktopServices
 from PySide2.QtWidgets import QMenu, QMessageBox
 
-from .. import app_signal, loader
-from ..api_control import api
+from .. import api, app_signal, cfg, mctrl, octrl, updater
 from ..constant import APP, CONFIG, PLATFORM
 from ..formatter import format_option_name
-from ..module_control import mctrl
-from ..overlay_control import octrl
-from ..setting import cfg
-from ..update import update_checker
 from .about import About
 from .brake_editor import BrakeEditor
 from .config import FontConfig, UserConfig
@@ -52,14 +47,12 @@ from .vehicle_class_editor import VehicleClassEditor
 # Define menu command
 def menu_reload_preset():
     """Command - full reload"""
-    loader.reload(reload_preset=True)
-    app_signal.refresh.emit(True)
+    app_signal.reload.emit(True)
 
 
 def menu_reload_only():
     """Command - fast reload"""
-    loader.reload(reload_preset=False)
-    app_signal.refresh.emit(True)
+    app_signal.reload.emit(False)
 
 
 def menu_refresh_only():
@@ -649,7 +642,7 @@ class WindowMenu(QMenu):
         self.addSeparator()
 
         restart_app = self.addAction("Restart TinyPedal")
-        restart_app.triggered.connect(loader.restart)
+        restart_app.triggered.connect(parent.restart_app)
 
         self.aboutToShow.connect(self.refresh_menu)
 
@@ -719,7 +712,7 @@ class HelpMenu(QMenu):
 
     def show_update(self):
         """Show update"""
-        update_checker.check(True)
+        updater.check(True)
 
     def open_user_guide(self):
         """Open user guide link"""

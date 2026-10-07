@@ -584,14 +584,14 @@ def validate_option(config: dict) -> dict:
 
 def disable_widget(widget_name: str):
     """Disable widget"""
-    from ..module_control import wctrl
+    from .. import wctrl
     wctrl.toggle(widget_name)
     app_signal.refresh.emit(True)
 
 
 def reload_widget(widget_name: str):
     """Reload widget"""
-    from ..module_control import wctrl
+    from .. import wctrl
     wctrl.reload(widget_name)
     app_signal.refresh.emit(True)
 
@@ -600,8 +600,7 @@ def config_widget(widget_name: str):
     """Open widget config dialog"""
     from PySide2.QtWidgets import QApplication, QMainWindow
 
-    from ..module_control import wctrl
-    from ..setting import cfg
+    from .. import cfg, wctrl
     from ..ui.config import UserConfig
 
     # Find main window instance

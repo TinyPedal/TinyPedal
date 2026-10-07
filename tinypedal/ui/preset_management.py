@@ -44,14 +44,17 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from .. import app_signal
+from .. import app_signal, cfg
 from .. import regex_pattern as rxp
 from ..constant import CONFIG, FILE
 from ..formatter import format_option_name, strip_filename_extension
-from ..setting import cfg, load_setting_json_file, save_and_verify_json_file
 from ..setting_validator import PresetValidator
 from ..template.setting_shortcuts import SHORTCUTS_PRESET
-from ..userfile.json_setting import verify_json_file
+from ..userfile.json_setting import (
+    load_setting_json_file,
+    save_and_verify_json_file,
+    verify_json_file,
+)
 from ..validator import is_allowed_filename
 from ._common import QVAL_FILENAME, BaseDialog, BaseEditor, CompactButton, UIScaler
 

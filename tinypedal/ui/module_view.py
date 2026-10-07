@@ -32,10 +32,9 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal
+from .. import app_signal, cfg
 from ..formatter import format_module_name
 from ..module_control import ModuleControl
-from ..setting import cfg
 from ._common import UIScaler
 from .config import UserConfig
 

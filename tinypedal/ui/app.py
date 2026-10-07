@@ -36,12 +36,9 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal, loader
-from ..api_control import api
+from .. import api, app_signal, cfg, loader, mctrl, wctrl
 from ..constant import APP, CONFIG
-from ..module_control import mctrl, wctrl
-from ..setting import cfg
-from ._common import DialogSingleton, UIScaler
+from ._common import BaseDialog, UIScaler
 from ._style import set_style_palette, set_style_window
 from .hotkey_view import HotkeyList
 from .menu import APIMenu, ConfigMenu, HelpMenu, OverlayMenu, ToolsMenu, WindowMenu
@@ -195,7 +192,7 @@ class StatusButtonBar(QStatusBar):
 
         cfg.application["enable_high_dpi_scaling"] = not cfg.application["enable_high_dpi_scaling"]
         cfg.save(config_type=CONFIG.TYPE_CONFIG)
-        loader.restart()
+        app_signal.restart.emit(True)
 
     def toggle_color_theme(self):
         """Toggle color theme"""
@@ -370,6 +367,12 @@ class AppWindow(QMainWindow):
         app_signal.refresh.emit(True)
 
     @Slot(bool)  # type: ignore[operator]
+    def restart_app(self):
+        """Restart app"""
+        self.save_window_state()
+        loader.restart()
+
+    @Slot(bool)  # type: ignore[operator]
     def quit_app(self):
         """Quit manager"""
         if self.closing:  # one-time quit only
@@ -390,15 +393,12 @@ class AppWindow(QMainWindow):
             self.quit_app()
 
     @Slot(bool)  # type: ignore[operator]
-    def reload_preset(self, check_singleton: bool):
+    def reload_preset(self, reload_preset: bool):
         """Reload current preset"""
-        # Cancel loading while any config dialog opened
-        if check_singleton and DialogSingleton.is_opened(CONFIG.TYPE_CONFIG):
-            msg_text = "Cannot load preset while Config dialog is opened."
-            QMessageBox.warning(self, "Error", msg_text)
-            cfg.set_next_to_load("")
-            return
-        loader.reload(reload_preset=True)
+        for _widget in QApplication.topLevelWidgets():
+            if isinstance(_widget, BaseDialog) and _widget.TYPE == CONFIG.TYPE_CONFIG:
+                _widget.close()
+        loader.reload(reload_preset)
         app_signal.refresh.emit(True)
 
     @Slot(object)  # type: ignore[operator]
@@ -410,6 +410,7 @@ class AppWindow(QMainWindow):
         """Connect signal"""
         app_signal.hotkey.connect(self.hotkey_command)
         app_signal.refresh.connect(self.refresh)
+        app_signal.restart.connect(self.restart_app)
         app_signal.quitapp.connect(self.quit_app)
         app_signal.reload.connect(self.reload_preset)
         logger.info("GUI: connect signals")
@@ -419,6 +420,7 @@ class AppWindow(QMainWindow):
         app_signal.hotkey.disconnect()
         app_signal.updates.disconnect()
         app_signal.refresh.disconnect()
+        app_signal.restart.disconnect()
         app_signal.quitapp.disconnect()
         app_signal.reload.disconnect()
         logger.info("GUI: disconnect signals")

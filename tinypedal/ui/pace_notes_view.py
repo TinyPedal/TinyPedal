@@ -43,14 +43,9 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal, overlay_signal, realtime_state
-from ..api_control import api
+from .. import api, app_signal, cfg, mctrl, minfo, overlay_signal, paths, realtime_state
 from ..constant import FILE
-from ..module_control import mctrl
-from ..module_info import minfo
-from ..setting import cfg
 from ..userfile.track_notes import COLUMN_PACENOTE
-from ..userpath import set_relative_path
 from ._common import CompactButton, UIScaler
 
 logger = logging.getLogger(__name__)
@@ -62,7 +57,6 @@ class PaceNotesPlayer(QMediaPlayer):
     def __init__(self, parent, config: dict):
         super().__init__(parent)
         self.mcfg = config
-        self.is_pyside6 = os.getenv("PYSIDE_OVERRIDE") == "6"
         self.audio_device = self.set_audio_device()
 
         # Set update timer
@@ -125,7 +119,7 @@ class PaceNotesPlayer(QMediaPlayer):
 
     def set_audio_device(self):
         """Set audio device"""
-        if self.is_pyside6:
+        if os.getenv("PYSIDE_OVERRIDE") == "6":
             from PySide6.QtMultimedia import QAudioOutput
 
             audio_device = QAudioOutput()
@@ -141,19 +135,19 @@ class PaceNotesPlayer(QMediaPlayer):
         sound_format = self.mcfg["pace_notes_sound_format"].strip(".")
         source_url = QUrl(f"{sound_path}{pace_note}.{sound_format}")
 
-        if self.is_pyside6:
+        if self.audio_device:
             return self.setSource(source_url)  # qt6
         return self.setMedia(source_url)  # qt5
 
     def set_volume(self, value: int) -> None:
         """Set volume (compatibility)"""
-        if self.is_pyside6 and self.audio_device:
+        if self.audio_device:
             return self.audio_device.setVolume(value / 100)  # qt6 (0.0 - 1.0)
         return self.setVolume(value)  # qt5 (0 - 100)
 
     def is_playing(self) -> bool:
         """Is playing state (compatibility)"""
-        if self.is_pyside6:
+        if self.audio_device:
             return self.playbackState() == QMediaPlayer.PlayingState  # qt6
         return self.state() == QMediaPlayer.State.PlayingState  # qt5
 
@@ -355,7 +349,7 @@ class PaceNotesControl(QWidget):
         filename_full = QFileDialog.getExistingDirectory(self, dir=filepath)
         if not filename_full:
             return
-        filename_full = set_relative_path(filename_full)
+        filename_full = paths.relative_path(filename_full)
         self.path_selector.setText(filename_full)
         self.update_config("pace_notes_sound_path", filename_full)
 

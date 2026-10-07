@@ -20,9 +20,8 @@
 Tyre pressure Widget
 """
 
+from .. import api, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import DATA
 from ..userfile.heatmap import select_compound_color, select_compound_symbol
 from ._base import Overlay

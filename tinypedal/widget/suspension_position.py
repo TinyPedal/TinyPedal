@@ -20,9 +20,8 @@
 Suspension position Widget
 """
 
-from ..api_control import api
+from .. import api, minfo
 from ..constant import DATA
-from ..module_info import minfo
 from ._base import Overlay
 from ._painter import WheelGaugeBar
 

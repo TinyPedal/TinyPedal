@@ -112,6 +112,9 @@ if __name__ == "__main__":
     override_pyside_version(pyside_override)
 
     # Start
-    from tinypedal.main import start_app
+    import tinypedal
 
-    start_app(cli_args)
+    tinypedal.start(
+        single_instance=(cli_args.single_instance != 0),
+        log_level=cli_args.log_level,
+    )

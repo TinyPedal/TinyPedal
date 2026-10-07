@@ -31,8 +31,8 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
+from .. import log_stream
 from ..constant import FILE
-from ..main import log_stream
 from ._common import BaseDialog, CompactButton, UIScaler, singleton_dialog
 
 

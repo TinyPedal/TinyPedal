@@ -23,8 +23,8 @@ Steering meter Widget
 from PySide2.QtCore import QRectF, Qt
 from PySide2.QtGui import QPainter, QPen, QPixmap
 
+from .. import api
 from .. import calculation as calc
-from ..api_control import api
 from ._base import Overlay
 
 

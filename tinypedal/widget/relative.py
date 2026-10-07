@@ -20,12 +20,10 @@
 Relative Widget
 """
 
+from .. import api, minfo, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
-from ..module_info import minfo
 from ..userfile.custom_image import load_brand_logo_image
 from ..userfile.heatmap import select_compound_color, select_compound_symbol
 from ._base import Overlay

@@ -45,10 +45,10 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import cfg
 from .. import regex_pattern as rxp
 from ..constant import CONFIG
 from ..formatter import format_option_name
-from ..setting import cfg
 from ._common import (
     QVAL_COLOR,
     QVAL_FLOAT,
@@ -86,6 +86,8 @@ def get_font_list() -> list[str]:
 @singleton_dialog(CONFIG.TYPE_CONFIG)
 class FontConfig(BaseDialog):
     """Config global font setting"""
+
+    TYPE = CONFIG.TYPE_CONFIG
 
     def __init__(self, parent, user_setting: dict, reload_func: Callable):
         super().__init__(parent)
@@ -208,6 +210,8 @@ class FontConfig(BaseDialog):
 @singleton_dialog(CONFIG.TYPE_CONFIG)
 class UserConfig(BaseDialog):
     """User configuration"""
+
+    TYPE = CONFIG.TYPE_CONFIG
 
     def __init__(
         self,

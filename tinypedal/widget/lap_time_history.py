@@ -20,11 +20,10 @@
 Lap time history Widget
 """
 
+from .. import api, minfo, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import DATA
-from ..module_info import ConsumptionData, minfo
+from ..module_info import ConsumptionData
 from ._base import Overlay
 
 
@@ -326,7 +325,7 @@ class Realtime(Overlay):
         if self.wcfg["show_fuel_ratio"]:
             self.update_ratio(self.bars_ratio[0], minfo.hybrid.fuelEnergyRatio)
         if self.wcfg["show_wear"]:
-            self.update_wear(self.bars_wear[0], calc.mean(minfo.wheels.estimatedTreadWear))
+            self.update_wear(self.bars_wear[0], calc.fmean(minfo.wheels.estimatedTreadWear))
 
         # History laps data
         if (

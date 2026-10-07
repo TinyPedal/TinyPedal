@@ -33,9 +33,8 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..api_control import api
+from .. import api, cfg
 from ..constant import CONFIG
-from ..setting import cfg
 from ..userfile.heatmap import HEATMAP_DEFAULT_BRAKE, set_predefined_brake_name
 from ..userfile.json_setting import copy_setting
 from ._common import BaseEditor, CompactButton, FloatTableItem, UIScaler

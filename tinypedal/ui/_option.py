@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import os
 from collections import deque
-from typing import Any
+from typing import Any, ClassVar
 
 from PySide2.QtCore import QPoint, Qt
 from PySide2.QtGui import QColor, qGray
@@ -38,8 +38,8 @@ from PySide2.QtWidgets import (
     QMenu,
 )
 
+from .. import paths
 from ..constant import FILE
-from ..userpath import set_relative_path, set_user_data_path
 from ..validator import image_exists, is_clock_format, is_hex_color, is_string_number
 
 
@@ -212,9 +212,9 @@ class DropDownListEdit(BaseComboBox):
 class ColorEdit(BaseLineEdit):
     """Color option edit with double click dialog trigger"""
 
-    HISTORY = deque(
+    HISTORY: ClassVar[deque] = deque(
         ["#FFF"] * QColorDialog.customCount(),
-        maxlen=QColorDialog.customCount()
+        maxlen=QColorDialog.customCount(),
     )
 
     def __init__(self, parent, init: str):
@@ -287,8 +287,8 @@ class FilePathEdit(BaseLineEdit):
     def validate(self):
         """Validate & export value, returns None if invalid"""
         # Try convert to relative path again, in case user manually sets path
-        value = set_relative_path(self.text())
-        if not set_user_data_path(value):
+        value = paths.relative_path(self.text())
+        if not paths.user_data_path(value):
             return None
         self.setText(value)  # update reformatted path
         return value
@@ -298,7 +298,7 @@ class FilePathEdit(BaseLineEdit):
         path_selected = QFileDialog.getExistingDirectory(self, dir=self.init_value)
         if os.path.exists(path_selected):
             # Convert to relative path if in APP root folder
-            path_valid = set_relative_path(path_selected)
+            path_valid = paths.relative_path(path_selected)
             # Update edit box and init value
             self.setText(path_valid)
             self.init_value = path_valid

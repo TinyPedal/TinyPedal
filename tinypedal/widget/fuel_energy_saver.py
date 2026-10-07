@@ -20,13 +20,9 @@
 Fuel energy saver Widget
 """
 
-from math import floor
-
+from .. import api, minfo, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import DATA
-from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -200,7 +196,7 @@ class Realtime(Overlay):
         total_fuel_remaining = max(fuel_curr + fuel_used_curr - self.min_reserve + pit_bias * fuel_est, 0)
         # Estimate laps current fuel can last, minus center slot offset
         # Round to 1 decimal to reduce sensitivity
-        est_runlaps = floor(round(calc.end_stint_laps(
+        est_runlaps = int(round(calc.end_stint_laps(
             total_fuel_remaining, fuel_est), 1)) - self.center_slot
 
         if self.consumption_rate:

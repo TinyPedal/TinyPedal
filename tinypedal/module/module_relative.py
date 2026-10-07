@@ -26,11 +26,9 @@ from functools import lru_cache
 from itertools import chain
 from operator import itemgetter
 
-from .. import realtime_state
-from ..api_control import api
+from .. import api, minfo, realtime_state
 from ..calculation import asym_max
 from ..constant import DATA
-from ..module_info import minfo
 from ..validator import state_timer
 from ._base import DataModule
 

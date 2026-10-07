@@ -31,10 +31,8 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from ..api_control import api
+from .. import api, cfg, updater
 from ..constant import API, APP, PLATFORM
-from ..setting import cfg
-from ..update import update_checker
 
 
 class NotifyBar(QWidget):
@@ -166,8 +164,8 @@ class UpdatesNotifyButton(QPushButton):
         if checking:
             # Show checking message only with manual checking
             self.setText("Checking For Updates...")
-            self.setVisible(update_checker.is_manual())
+            self.setVisible(updater.is_manual())
         else:
             # Hide message if no unpdates and not manual checking
-            self.setText(update_checker.message())
-            self.setVisible(update_checker.is_manual() or update_checker.is_updates())
+            self.setText(updater.message())
+            self.setVisible(updater.is_manual() or updater.is_updates())

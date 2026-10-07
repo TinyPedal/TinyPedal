@@ -20,13 +20,9 @@
 Relative finish order Widget
 """
 
-from math import ceil
-
+from .. import api, minfo, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import DATA
-from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -265,7 +261,7 @@ class Realtime(Overlay):
                     lap_into_offset, player_laptime_pace, time_left)
                 lap_final = lap_remaining % 1
                 player_hi_range = self.set_highlight_range(player_laptime_pace, lap_final)
-                full_laps_left = calc.time_type_laps_remain(ceil(lap_remaining), player_lap_into)
+                full_laps_left = calc.time_type_laps_remain(calc.ceil(lap_remaining), player_lap_into)
             self.update_lap_player(self.bars_lap_player[index], lap_final, player_hi_range)
 
             if index == 1:  # store relative lap offset
@@ -302,7 +298,7 @@ class Realtime(Overlay):
                 # Lap-type final lap progress + lap difference from leader
                 # Round up laps difference for relative final lap progress against player
                 leader_lap_final = calc.lap_progress_offset(
-                    leader_laptime_pace, ceil(laps_diff), self.leader_pit_time_set[index])
+                    leader_laptime_pace, calc.ceil(laps_diff), self.leader_pit_time_set[index])
                 leader_hi_range = self.set_highlight_range(
                     leader_laptime_pace, leader_lap_final % 1)
             else:  # time-type race

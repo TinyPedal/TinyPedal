@@ -20,11 +20,9 @@
 Traffic Widget
 """
 
-from .. import units
-from ..api_control import api
+from .. import api, minfo, units
 from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
-from ..module_info import minfo
 from ._base import Overlay
 
 

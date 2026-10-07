@@ -20,10 +20,8 @@
 Weather Widget
 """
 
-from .. import units
-from ..api_control import api
+from .. import api, minfo, units
 from ..constant import DATA
-from ..module_info import minfo
 from ._base import Overlay
 
 

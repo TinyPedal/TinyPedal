@@ -22,8 +22,8 @@ Track info preset function
 
 from __future__ import annotations
 
+from .. import cfg
 from ..constant import CONFIG
-from ..setting import cfg
 from ..template.setting_tracks import TRACKINFO_DEFAULT
 from ..validator import invalid_save_name
 

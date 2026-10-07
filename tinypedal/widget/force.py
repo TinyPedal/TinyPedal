@@ -20,9 +20,8 @@
 Force Widget
 """
 
-from .. import units
+from .. import minfo, units
 from ..constant import DATA
-from ..module_info import minfo
 from ._base import Overlay
 
 

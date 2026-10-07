@@ -23,10 +23,8 @@ Elevation Widget
 from PySide2.QtCore import QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPainterPath, QPen, QPixmap
 
+from .. import api, minfo, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
-from ..module_info import minfo
 from ._base import Overlay
 
 

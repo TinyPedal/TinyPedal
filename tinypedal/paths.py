@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-User path function
+Data path function
 """
 
 import logging
@@ -28,7 +28,7 @@ from .constant import APP, PLATFORM
 logger = logging.getLogger(__name__)
 
 
-def set_user_data_path(filepath: str) -> str:
+def user_data_path(filepath: str) -> str:
     """Set user data path, create if not exist"""
     if not os.path.exists(filepath):
         logger.info("%s folder does not exist, attemp to create", filepath)
@@ -40,7 +40,7 @@ def set_user_data_path(filepath: str) -> str:
     return filepath
 
 
-def set_relative_path(filepath: str) -> str:
+def relative_path(filepath: str) -> str:
     """Convert absolute path to relative if path is inside APP root folder"""
     try:
         rel_path = os.path.relpath(filepath)
@@ -58,21 +58,21 @@ def set_relative_path(filepath: str) -> str:
     return output_path
 
 
-def set_global_config_path(filepath: str = APP.TINYPEDAL) -> str:
+def global_config_path(filepath: str = APP.TINYPEDAL) -> str:
     """Set path for global configurable user files, create if not exist
 
     Default to APPDATA folder (AppData/Roaming) on Windows.
     Default to XDG_CONFIG_HOME ($HOME/.config) on Linux.
     """
     if PLATFORM.WINDOWS:
-        return set_user_data_path(f"{os.getenv('APPDATA', '.')}\\{filepath}\\")
+        return user_data_path(f"{os.getenv('APPDATA', '.')}\\{filepath}\\")
     # Linux
-    from xdg import BaseDirectory as BD
+    from xdg import BaseDirectory as BD  # type: ignore
 
     return BD.save_config_path(filepath) + "/"
 
 
-def set_default_config_path(filepath: str) -> str:
+def default_config_path(filepath: str) -> str:
     """Set path for default configurable user files
 
     Default to TinyPedal local folder (./) on Windows.
@@ -81,12 +81,12 @@ def set_default_config_path(filepath: str) -> str:
     if PLATFORM.WINDOWS:
         return filepath
     # Linux
-    from xdg import BaseDirectory as BD
+    from xdg import BaseDirectory as BD  # type: ignore
 
     return BD.save_config_path(APP.TINYPEDAL, filepath)
 
 
-def set_default_data_path(filepath: str) -> str:
+def default_data_path(filepath: str) -> str:
     """Set path for default non-configurable data files
 
     Default to TinyPedal local folder (./) on Windows.
@@ -95,6 +95,6 @@ def set_default_data_path(filepath: str) -> str:
     if PLATFORM.WINDOWS:
         return filepath
     # Linux
-    from xdg import BaseDirectory as BD
+    from xdg import BaseDirectory as BD  # type: ignore
 
     return BD.save_data_path(APP.TINYPEDAL, filepath)

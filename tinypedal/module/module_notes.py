@@ -24,12 +24,11 @@ from __future__ import annotations
 
 from typing import Callable, Mapping
 
+from .. import api, minfo, realtime_state
 from .. import calculation as calc
-from .. import realtime_state
-from ..api_control import api
 from ..constant import FILE
 from ..decorator import generator_init
-from ..module_info import NotesData, minfo
+from ..module_info import NotesData
 from ..userfile.track_notes import (
     COLUMN_DISTANCE,
     COLUMN_TAGS,

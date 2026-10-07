@@ -56,22 +56,26 @@ def is_new_version(
 
 
 def python() -> str:
+    """Python version"""
     return ".".join(map(str, sys.version_info))
 
 
 def qt() -> str:
+    """Qt version"""
     from PySide2.QtCore import qVersion
 
     return qVersion()
 
 
 def pyside() -> str:
+    """PySide version"""
     import PySide2
 
     return PySide2.__version__
 
 
 def psutil() -> str:
+    """psutil version"""
     import psutil
 
     return psutil.__version__

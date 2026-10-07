@@ -20,7 +20,7 @@
 Onboard setting Widget
 """
 
-from ..api_control import api
+from .. import api
 from ..constant import DATA
 from ._base import Overlay
 

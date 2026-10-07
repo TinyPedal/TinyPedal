@@ -29,11 +29,6 @@ from typing import Any, Callable, Sequence
 
 from .constant import DATA
 
-distance = dist  # distance between 2 coordinates
-hypotenuse = hypot  # distance from origin point (0) to a point
-mean = fmean
-oriyaw = atan2  # orientation yaw to radians
-
 
 # Common
 def sym_max(value: float, rng: float) -> float:
@@ -102,12 +97,12 @@ def mean_iter(average: float, value: float, num_samples: int) -> float:
 
 def min_vs_avg(data: Sequence) -> float:
     """Min vs average"""
-    return abs(min(data) - mean(data))
+    return abs(min(data) - fmean(data))
 
 
 def max_vs_avg(data: Sequence) -> float:
     """Max vs average"""
-    return abs(max(data) - mean(data))
+    return abs(max(data) - fmean(data))
 
 
 def max_vs_min(data: Sequence) -> float:
@@ -353,11 +348,11 @@ def tri_coords_angle(a_len: float, b_len: float, c_len: float) -> float:
 def quad_coords_angle(
     coords_center: tuple[float, float], coords_start: tuple[float, float], coords_mid: tuple[float, float], coords_end: tuple[float, float]) -> float:
     """Quad-coordinates angle (degree)"""
-    center1_edge = distance(coords_start, coords_mid)
-    center2_edge = distance(coords_mid, coords_end)
-    start_edge = distance(coords_center, coords_start)
-    mid_edge = distance(coords_center, coords_mid)
-    end_edge = distance(coords_center, coords_end)
+    center1_edge = dist(coords_start, coords_mid)
+    center2_edge = dist(coords_mid, coords_end)
+    start_edge = dist(coords_center, coords_start)
+    mid_edge = dist(coords_center, coords_mid)
+    end_edge = dist(coords_center, coords_end)
     rad1 = tri_coords_angle(center1_edge, start_edge, mid_edge)
     rad2 = tri_coords_angle(center2_edge, mid_edge, end_edge)
     return degrees(rad1 + rad2)
@@ -672,7 +667,7 @@ def line_intersect_coords(
     rad: amount rotation (radians) to apply
     length: length between coordinates
     """
-    yaw_rad = oriyaw(
+    yaw_rad = atan2(
         coord_b[1] - coord_a[1],
         coord_b[0] - coord_a[0]
     )

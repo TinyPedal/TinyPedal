@@ -22,11 +22,10 @@ Sectors module
 
 from __future__ import annotations
 
-from .. import realtime_state
-from ..api_control import api
+from .. import api, minfo, realtime_state
 from ..constant import DATA
 from ..decorator import generator_init
-from ..module_info import SectorData, minfo
+from ..module_info import SectorData
 from ..userfile.sector_best import load_sector_best_file, save_sector_best_file
 from ..validator import valid_sectors
 from ._base import DataModule

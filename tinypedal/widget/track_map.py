@@ -23,10 +23,9 @@ Track map Widget
 from PySide2.QtCore import QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPainterPath, QPen, QPixmap
 
+from .. import api, minfo
 from .. import calculation as calc
-from ..api_control import api
 from ..formatter import random_color_class
-from ..module_info import minfo
 from ..process.vehicle import vehicle_position_interp
 from ._base import Overlay
 
@@ -183,7 +182,7 @@ class Realtime(Overlay):
         """Create map path"""
         map_sector_paths = []
         if raw_coords and raw_sectors:
-            dist = calc.distance(raw_coords[0], raw_coords[-1])
+            pos_dist = calc.dist(raw_coords[0], raw_coords[-1])
             angle = max(int(self.wcfg["display_orientation"] + minfo.mapping.orientation), 0)
             angle = angle - angle // 360 * 360
             self.map_orient = calc.radians(angle)
@@ -231,7 +230,7 @@ class Realtime(Overlay):
                 last_skip += 1
 
             # Close map loop if start & end distance less than 500 meters
-            if dist < 500:
+            if pos_dist < 500:
                 map_sector_path.lineTo(*self.map_scaled[0])
                 map_full_path.closeSubpath()
                 self.circular_map = True

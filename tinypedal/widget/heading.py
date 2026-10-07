@@ -23,10 +23,9 @@ Heading Widget
 from PySide2.QtCore import QPointF, QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen, QPixmap
 
+from .. import api, minfo
 from .. import calculation as calc
-from ..api_control import api
 from ..constant import FILE
-from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -127,7 +126,7 @@ class Realtime(Overlay):
 
         # Direction of travel yaw angle
         if self.last_pos != pos_curr and speed > 1:
-            self.yaw_angle = temp_veh_ori_yaw - calc.degrees(calc.oriyaw(
+            self.yaw_angle = temp_veh_ori_yaw - calc.degrees(calc.atan2(
                 pos_curr[0] - self.last_pos[0], pos_curr[1] - self.last_pos[1])) + 180
             self.last_pos = pos_curr
         elif speed <= 1:

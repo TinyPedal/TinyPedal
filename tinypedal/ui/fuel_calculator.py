@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import os
 from collections import deque
-from math import ceil, floor
 
 from PySide2.QtCore import QPoint, Qt
 from PySide2.QtGui import QColor, QPainter
@@ -48,13 +47,11 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from .. import api, cfg, minfo, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import CONFIG, FILE
 from ..formatter import laptime_string_to_seconds
-from ..module_info import ConsumptionData, minfo
-from ..setting import cfg
+from ..module_info import ConsumptionData
 from ..userfile.consumption_history import load_consumption_history_file
 from ._common import BaseDialog, UIScaler
 
@@ -251,9 +248,9 @@ class PitStopPreview(QWidget):
 
     def sync(self, total_laps: float, stint_runlaps: float, start_runlaps: float):
         """Sync data"""
-        self.floor_total_laps = floor(total_laps)
-        self.floor_stint_runlaps = floor(stint_runlaps)
-        self.floor_start_runlaps = floor(start_runlaps) if start_runlaps > 0 else self.floor_stint_runlaps
+        self.floor_total_laps = int(total_laps)
+        self.floor_stint_runlaps = int(stint_runlaps)
+        self.floor_start_runlaps = int(start_runlaps) if start_runlaps > 0 else self.floor_stint_runlaps
         self.label_laps.setText(str(self.floor_total_laps) if self.floor_total_laps else "-")
         self.update()
 
@@ -565,7 +562,7 @@ class CalculatorPanel(QWidget):
         # Total pit seconds depends on estimated pit counts
         # Recalculate and find nearest minimum pit counts on previous loop
         while loop_counts:
-            minimum_pit_counts = ceil(estimate_pit_counts)
+            minimum_pit_counts = calc.ceil(estimate_pit_counts)
             if total_race_seconds:  # time-type race
                 total_pit_seconds = minimum_pit_counts * average_pit_seconds
                 total_race_laps = total_formation_laps + calc.time_type_full_laps_remain(
@@ -577,9 +574,9 @@ class CalculatorPanel(QWidget):
 
             # Keep 1 decimal place for Gallon
             if self.is_gallon and output_type == "fuel":
-                total_need_full = ceil(total_need_frac * 10) / 10
+                total_need_full = calc.ceil(total_need_frac * 10) / 10
             else:
-                total_need_full = ceil(total_need_frac)
+                total_need_full = calc.ceil(total_need_frac)
 
             # amount_refuel = total_need_full - tank_capacity
             amount_refuel = total_need_full - fuel_start
@@ -595,10 +592,10 @@ class CalculatorPanel(QWidget):
             # Set one last loop to revert back to last minimum pit counts
             # If new rounded up minimum pit counts is not enough to finish race
             if (minimum_pit_counts < estimate_pit_counts and
-                minimum_pit_counts == floor(estimate_pit_counts)):
+                minimum_pit_counts == int(estimate_pit_counts)):
                 loop_counts = 1
 
-            if minimum_pit_counts == ceil(estimate_pit_counts):
+            if minimum_pit_counts == calc.ceil(estimate_pit_counts):
                 break
 
         total_runlaps = calc.end_stint_laps(total_need_full, consumption)
@@ -637,7 +634,7 @@ class CalculatorPanel(QWidget):
         output_usage.end_stint.setText(
             f"{end_stint_fuel:.3f}")
         output_usage.pit_stops.setText(
-            f"{max(estimate_pit_counts, 0):.3f} ≈ {max(ceil(minimum_pit_counts), 0)}")
+            f"{max(estimate_pit_counts, 0):.3f} ≈ {max(calc.ceil(minimum_pit_counts), 0)}")
         output_usage.one_less_stint.setText(
             f"{max(used_one_less, 0):.3f}")
         output_usage.total_laps.setText(

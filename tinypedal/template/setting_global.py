@@ -20,8 +20,8 @@
 Default global (config) setting template
 """
 
+from .. import paths
 from ..constant import API, PLATFORM
-from ..userpath import set_default_config_path, set_default_data_path
 from ..version import __version__
 
 GLOBAL_DEFAULT = {
@@ -66,16 +66,16 @@ GLOBAL_DEFAULT = {
         "enable_legacy_api_selection": False,
     },
     "user_path": {
-        "settings_path": set_default_config_path("settings/"),
-        "brand_logo_path": set_default_config_path("brandlogo/"),
-        "delta_best_path": set_default_data_path("deltabest/"),
-        "sector_best_path": set_default_data_path("deltabest/"),
-        "energy_delta_path": set_default_data_path("deltabest/"),
-        "fuel_delta_path": set_default_data_path("deltabest/"),
-        "track_map_path": set_default_data_path("trackmap/"),
-        "pace_notes_path": set_default_config_path("pacenotes/"),
-        "track_notes_path": set_default_config_path("tracknotes/"),
-        "car_setups_path": set_default_data_path("carsetups/"),
+        "settings_path": paths.default_config_path("settings/"),
+        "brand_logo_path": paths.default_config_path("brandlogo/"),
+        "delta_best_path": paths.default_data_path("deltabest/"),
+        "sector_best_path": paths.default_data_path("deltabest/"),
+        "energy_delta_path": paths.default_data_path("deltabest/"),
+        "fuel_delta_path": paths.default_data_path("deltabest/"),
+        "track_map_path": paths.default_data_path("trackmap/"),
+        "pace_notes_path": paths.default_config_path("pacenotes/"),
+        "track_notes_path": paths.default_config_path("tracknotes/"),
+        "car_setups_path": paths.default_data_path("carsetups/"),
     },
     "notification": {
         "notify_locked_preset": True,

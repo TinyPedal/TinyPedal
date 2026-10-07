@@ -34,9 +34,8 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..api_control import api
+from .. import api, cfg
 from ..constant import CONFIG
-from ..setting import cfg
 from ..template.setting_tracks import TRACKINFO_DEFAULT
 from ..userfile.json_setting import copy_setting
 from ._common import BaseEditor, ClockTableItem, CompactButton, FloatTableItem, UIScaler

@@ -20,7 +20,7 @@
 Battery Widget
 """
 
-from ..module_info import minfo
+from .. import minfo
 from ._base import Overlay
 from ._common import warning_flash
 

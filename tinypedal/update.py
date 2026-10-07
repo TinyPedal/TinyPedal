@@ -86,18 +86,18 @@ class UpdateChecker:
 
     __slots__ = (
         "_is_checking",
-        "_update_available",
-        "_manual_checking",
-        "_last_checked_version",
         "_last_checked_date",
+        "_last_checked_version",
+        "_manual_checking",
+        "_update_available",
     )
 
     def __init__(self):
         self._is_checking = False
-        self._update_available = False
-        self._manual_checking = False
-        self._last_checked_version = DATA.VERSION_NA
         self._last_checked_date = DATA.DATE_NA
+        self._last_checked_version = DATA.VERSION_NA
+        self._manual_checking = False
+        self._update_available = False
 
     def is_manual(self) -> bool:
         """Is manual checking"""
@@ -141,6 +141,3 @@ class UpdateChecker:
             *self._last_checked_version,
             *self._last_checked_date,
         )
-
-
-update_checker = UpdateChecker()

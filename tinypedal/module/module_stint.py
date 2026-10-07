@@ -22,12 +22,11 @@ Stint module
 
 from __future__ import annotations
 
+from .. import api, minfo, realtime_state
 from .. import calculation as calc
-from .. import realtime_state
-from ..api_control import api
 from ..constant import DATA
 from ..decorator import generator_init
-from ..module_info import ConsumptionData, HistoryInfo, minfo
+from ..module_info import ConsumptionData, HistoryInfo
 from ..userfile.consumption_history import (
     load_consumption_history_file,
     save_consumption_history_file,
@@ -138,7 +137,7 @@ def record_consumption_history(output: HistoryInfo, filepath: str):
                     lastLapUsedEnergy=minfo.energy.lastLapConsumption,
                     batteryDrainLast=minfo.hybrid.batteryDrainLast,
                     batteryRegenLast=minfo.hybrid.batteryRegenLast,
-                    tyreAvgWearLast=calc.mean(minfo.wheels.lastLapTreadWear),
+                    tyreAvgWearLast=calc.fmean(minfo.wheels.lastLapTreadWear),
                     capacityFuel=minfo.fuel.capacity,
                 )
             )

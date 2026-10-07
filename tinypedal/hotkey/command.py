@@ -26,13 +26,10 @@ import logging
 import os
 from functools import partial
 
-from .. import app_signal, loader, overlay_signal, realtime_state
-from ..api_control import api
+from .. import api, app_signal, cfg, mctrl, overlay_signal, realtime_state, wctrl
 from ..constant import CONFIG, FILE
 from ..decorator import constantclass
-from ..module_control import mctrl, wctrl
 from ..regex_pattern import CFG_DELTABEST_SOURCE, CHOICE_COMMON
-from ..setting import cfg
 from ..template.setting_module import MODULE_FILENAME
 from ..template.setting_shortcuts import SHORTCUTS_PRESET
 from ..template.setting_widget import WIDGET_FILENAME
@@ -218,7 +215,7 @@ def hotkey_pace_notes_playback():
 
 def hotkey_restart_application():
     """Command - restart application"""
-    loader.restart()
+    app_signal.restart.emit(True)
 
 
 def hotkey_quit_application():

@@ -20,8 +20,7 @@
 Acceleration Widget
 """
 
-from .. import units
-from ..api_control import api
+from .. import api, units
 from ..constant import DATA
 from ._base import Overlay
 

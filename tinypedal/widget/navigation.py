@@ -23,9 +23,8 @@ Navigation Widget
 from PySide2.QtCore import QPointF, QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPainterPath, QPen, QPixmap, QRadialGradient
 
+from .. import api, minfo
 from .. import calculation as calc
-from ..api_control import api
-from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -189,7 +188,7 @@ class Realtime(Overlay):
         """Create map path"""
         if raw_coords and raw_sectors:
             map_path = QPainterPath()
-            dist = calc.distance(raw_coords[0], raw_coords[-1])
+            pos_dist = calc.dist(raw_coords[0], raw_coords[-1])
             (self.map_scaled, self.map_size, self.map_offset
              ) = calc.zoom_map(raw_coords, self.global_scale)
             for index, coords in enumerate(self.map_scaled):
@@ -198,7 +197,7 @@ class Realtime(Overlay):
                 else:
                     map_path.lineTo(*coords)
             # Close map loop if start & end distance less than 500 meters
-            if dist < 500:
+            if pos_dist < 500:
                 map_path.closeSubpath()
             # Create start/finish path
             sfinish_path = QPainterPath()

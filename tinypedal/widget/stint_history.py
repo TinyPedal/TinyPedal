@@ -25,8 +25,8 @@ from __future__ import annotations
 from collections import deque
 
 from .. import calculation as calc
-from .. import units
-from ..module_info import StintData, minfo
+from .. import minfo, units
+from ..module_info import StintData
 from ._base import Overlay
 
 

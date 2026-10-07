@@ -24,8 +24,7 @@ from PySide2.QtCore import QRect, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen
 from PySide2.QtWidgets import QWidget
 
-from ..api_control import api
-from ..module_info import minfo
+from .. import api, minfo
 from ._base import Overlay
 
 

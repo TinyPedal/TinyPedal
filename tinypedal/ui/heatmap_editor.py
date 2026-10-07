@@ -33,8 +33,8 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
+from .. import cfg
 from ..constant import CONFIG
-from ..setting import cfg
 from ..userfile.json_setting import copy_setting
 from ._common import (
     QVAL_COLOR,

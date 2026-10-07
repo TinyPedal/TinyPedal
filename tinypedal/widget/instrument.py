@@ -23,9 +23,8 @@ Instrument Widget
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap
 
-from ..api_control import api
+from .. import api, minfo
 from ..constant import FILE
-from ..module_info import minfo
 from ..userfile.custom_image import split_pixmap_image
 from ._base import Overlay
 

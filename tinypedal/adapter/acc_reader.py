@@ -22,9 +22,7 @@ ACC API data reader
 
 from __future__ import annotations
 
-from math import pi
-
-from ..calculation import atan2, ceil, distance, min_nonzero
+from ..calculation import atan2, ceil, dist, min_nonzero
 from ..constant import DATA
 from ..formatter import strip_invalid_char
 from ..validator import bytes_decoder
@@ -1121,18 +1119,18 @@ class Wheel(_reader.Wheel, DataAdapter):
     def track_front(self, index: int | None = None) -> float:
         """Wheel track front (millimeters)"""
         fl, fr, _, _ = self.shmm.accPhysicsInfo.tyreContactPoint
-        return rmnan(distance((fl.x, fl.y, fl.z), (fr.x, fr.y, fr.z)) * 1000)
+        return rmnan(dist((fl.x, fl.y, fl.z), (fr.x, fr.y, fr.z)) * 1000)
 
     def track_rear(self, index: int | None = None) -> float:
         """Wheel track rear (millimeters)"""
         _, _, rl, rr = self.shmm.accPhysicsInfo.tyreContactPoint
-        return rmnan(distance((rl.x, rl.y, rl.z), (rr.x, rr.y, rr.z)) * 1000)
+        return rmnan(dist((rl.x, rl.y, rl.z), (rr.x, rr.y, rr.z)) * 1000)
 
     def wheelbase(self, index: int | None = None) -> float:
         """Wheelbase (millimeters)"""
         fl, fr, rl, rr = self.shmm.accPhysicsInfo.tyreContactPoint
-        base_left = distance((fl.x, fl.y, fl.z), (rl.x, rl.y, rl.z))
-        base_right = distance((fr.x, fr.y, fr.z), (rr.x, rr.y, rr.z))
+        base_left = dist((fl.x, fl.y, fl.z), (rl.x, rl.y, rl.z))
+        base_right = dist((fr.x, fr.y, fr.z), (rr.x, rr.y, rr.z))
         return rmnan((base_left + base_right) * 500)
 
     def camber(self, index: int | None = None) -> tuple[float, ...]:
@@ -1143,8 +1141,7 @@ class Wheel(_reader.Wheel, DataAdapter):
         """Wheel toe (radians)"""
         data = self.shmm.accPhysicsInfo.tyreContactHeading
         yaw = self.shmm.accPhysicsInfo.heading
-        ph = pi * 0.5
-        if ph > yaw > -ph:
+        if 1.57079632679 > yaw > -1.57079632679:
             return (
                 rmnan(-yaw - atan2(-data[0].x, -data[0].z)),
                 rmnan(-yaw - atan2(-data[1].x, -data[1].z)),
@@ -1152,9 +1149,9 @@ class Wheel(_reader.Wheel, DataAdapter):
                 rmnan(-yaw - atan2(-data[3].x, -data[3].z)),
             )
         if yaw < 0:
-            yaw = -pi - yaw
+            yaw = -3.141592653589 - yaw
         elif yaw > 0:
-            yaw = pi - yaw
+            yaw = 3.141592653589 - yaw
         return (
             rmnan(yaw - atan2(data[0].x, data[0].z)),
             rmnan(yaw - atan2(data[1].x, data[1].z)),

@@ -43,9 +43,8 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..api_control import api
+from .. import api, cfg
 from ..constant import DATA
-from ..setting import cfg
 from ..userfile.track_notes import (
     COLUMN_DISTANCE,
     COLUMN_TAGS,

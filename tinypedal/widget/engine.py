@@ -20,10 +20,8 @@
 Engine Widget
 """
 
+from .. import api, minfo, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
-from ..module_info import minfo
 from ._base import Overlay
 
 
@@ -223,7 +221,7 @@ class Realtime(Overlay):
                 wheel_speed = abs(wheel_speed[0] + wheel_speed[1]) / 2
                 drive_alloc = "F"
             else:
-                wheel_speed = abs(calc.mean(wheel_speed))
+                wheel_speed = abs(calc.fmean(wheel_speed))
                 drive_alloc = "A"
             if wheel_speed > 1:
                 engine_speed = rpm * 0.104719755  # rad/s

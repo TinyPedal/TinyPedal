@@ -20,7 +20,7 @@
 Tyre deflection Widget
 """
 
-from ..api_control import api
+from .. import api
 from ._base import Overlay
 from ._painter import WheelGaugeBar
 

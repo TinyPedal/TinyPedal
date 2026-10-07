@@ -20,9 +20,8 @@
 Electric motor Widget
 """
 
+from .. import api, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ._base import Overlay
 
 

@@ -28,13 +28,8 @@ import signal
 import sys
 import time
 
-from .api_control import api
+from . import api, cfg, kctrl, mctrl, octrl, updater, wctrl
 from .constant import CONFIG, FILE, PLATFORM
-from .hotkey_control import kctrl
-from .module_control import mctrl, wctrl
-from .overlay_control import octrl
-from .setting import cfg
-from .update import update_checker
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +117,7 @@ def start(path_global: str):
     kctrl.enable()
     # 3 Check for updates
     if cfg.application["check_for_updates_on_startup"]:
-        update_checker.check(False)
+        updater.check(False)
 
     # Start main loop
     sys.exit(root.exec_())

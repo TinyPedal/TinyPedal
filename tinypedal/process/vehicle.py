@@ -22,7 +22,7 @@ Vehicle
 
 from __future__ import annotations
 
-from ..calculation import distance, oriyaw
+from ..calculation import atan2, dist
 from ..decorator import generator_init
 from ..regex_pattern import rex_number_extract
 
@@ -32,7 +32,8 @@ def export_wheels(data: list, default: tuple[float, float, float, float]) -> tup
     try:
         return data[0], data[1], data[2], data[3]
     except (IndexError, TypeError, ValueError):
-        return default
+        pass
+    return default
 
 
 def expected_usage(value: str, default: float) -> float:
@@ -42,7 +43,8 @@ def expected_usage(value: str, default: float) -> float:
         if match_obj is not None:
             return float(match_obj[0]) / float(match_obj[1])
     except (ZeroDivisionError, AttributeError, IndexError, TypeError, ValueError):
-        return default
+        pass
+    return default
 
 
 def steerlock_to_number(value: str, default: float) -> float:
@@ -52,7 +54,8 @@ def steerlock_to_number(value: str, default: float) -> float:
         if match_obj is not None:
             return float(match_obj.group())
     except (AttributeError, TypeError, ValueError):
-        return default
+        pass
+    return default
 
 
 def absolute_refilling(dataset: list[dict], default: float) -> float:
@@ -213,8 +216,8 @@ class VehicleOrientation:
 
     def update(self, *pos: float) -> float:
         """Calculate high precision yaw based on coordinates displacement, inaccurate at very low speed"""
-        if distance(pos, self.last) > 0.02:
-            self.yaw = oriyaw(pos[0] - self.last[0], pos[1] - self.last[1])
+        if dist(pos, self.last) > 0.02:
+            self.yaw = atan2(pos[0] - self.last[0], pos[1] - self.last[1])
             self.last = pos
         return self.yaw
 
@@ -247,7 +250,7 @@ class VehicleSpeed:
         offset = self._index + 1 if self._index < 9 else 0
         delta_time = elapsed - self._time[offset]
         if delta_time > 0:
-            delta_distance = distance(pos, self._pos[offset])
+            delta_distance = dist(pos, self._pos[offset])
             self.speed = delta_distance / delta_time
         # Set next index
         if self._index < 9:

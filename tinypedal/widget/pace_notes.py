@@ -20,9 +20,8 @@
 Pace notes Widget
 """
 
-from ..api_control import api
+from .. import api, minfo
 from ..constant import DATA
-from ..module_info import minfo
 from ..userfile.track_notes import COLUMN_COMMENT, COLUMN_DISTANCE, COLUMN_PACENOTE
 from ._base import Overlay
 

@@ -21,8 +21,8 @@ Brake Wear Widget
 """
 
 from .. import calculation as calc
+from .. import minfo
 from ..constant import DATA
-from ..module_info import minfo
 from ._base import Overlay
 
 

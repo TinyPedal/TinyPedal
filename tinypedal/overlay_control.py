@@ -24,9 +24,7 @@ import logging
 import threading
 from time import sleep
 
-from . import app_signal, overlay_signal, realtime_state
-from .api_control import api
-from .setting import cfg
+from . import api, app_signal, cfg, overlay_signal, realtime_state
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +148,4 @@ class OverlayControl:
             return
         # Update preset name & signal reload
         cfg.set_next_to_load(preset_name)
-        app_signal.reload.emit(False)
-
-
-octrl = OverlayControl()
+        app_signal.reload.emit(True)

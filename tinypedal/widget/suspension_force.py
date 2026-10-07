@@ -20,8 +20,8 @@
 Suspension force Widget
 """
 
+from .. import api
 from .. import calculation as calc
-from ..api_control import api
 from ._base import Overlay
 from ._painter import WheelGaugeBar
 

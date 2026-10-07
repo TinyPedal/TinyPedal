@@ -23,7 +23,7 @@ RPM LED Widget
 from PySide2.QtCore import QRect, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen
 
-from ..api_control import api
+from .. import api
 from ..constant import DATA
 from ._base import Overlay
 from ._common import warning_flash

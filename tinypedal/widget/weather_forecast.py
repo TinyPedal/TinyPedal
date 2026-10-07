@@ -25,8 +25,7 @@ from __future__ import annotations
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap
 
-from .. import units
-from ..api_control import api
+from .. import api, units
 from ..constant import DATA, FILE
 from ..userfile.custom_image import split_pixmap_image
 from ._base import Overlay

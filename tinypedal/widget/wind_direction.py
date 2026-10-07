@@ -23,9 +23,8 @@ Wind direction Widget
 from PySide2.QtCore import QPointF, QRect, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen
 
+from .. import api, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import DATA
 from ._base import Overlay
 

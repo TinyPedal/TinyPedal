@@ -26,7 +26,7 @@ from PySide2.QtCore import QPointF, QRectF, Qt
 from PySide2.QtGui import QBrush, QColor, QPainter, QPen, QPixmap, QRadialGradient
 
 from .. import calculation as calc
-from ..module_info import minfo
+from .. import minfo
 from ._base import Overlay
 
 

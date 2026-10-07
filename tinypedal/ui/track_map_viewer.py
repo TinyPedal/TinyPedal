@@ -41,9 +41,8 @@ from PySide2.QtWidgets import (
 )
 
 from .. import calculation as calc
-from .. import qt_signal
+from .. import cfg, state
 from ..constant import CONFIG, FILE
-from ..setting import cfg
 from ..userfile.track_map import load_track_map_file
 from ._common import BaseDialog, CompactButton, UIScaler
 from .config import UserConfig
@@ -96,7 +95,7 @@ class TrackMapViewer(BaseDialog):
 class MapView(QWidget):
     """Map view"""
 
-    reloaded = qt_signal(bool)
+    reloaded = state.qt_signal(bool)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -271,9 +270,9 @@ class MapView(QWidget):
         """Update highlighted coordinates"""
         if not self.raw_coords:
             return
-        dist = self.spinbox_pos_dist.value()
+        pos_dist = self.spinbox_pos_dist.value()
         index = calc.binary_search_higher_column(
-            self.raw_dists, dist, 0, self.map_nodes - 1)
+            self.raw_dists, pos_dist, 0, self.map_nodes - 1)
         self.highlighted_coords = self.raw_coords[index]
         self.update()
 
@@ -285,10 +284,10 @@ class MapView(QWidget):
             return
         end_node = self.map_nodes - 1
         self.marked_coords.clear()
-        for dist in temp_dists:
-            if 0 <= dist <= self.map_length:
+        for pos_dist in temp_dists:
+            if 0 <= pos_dist <= self.map_length:
                 index = calc.binary_search_higher_column(
-                    self.raw_dists, dist, 0, end_node)
+                    self.raw_dists, pos_dist, 0, end_node)
                 self.marked_coords.append(QPointF(*self.raw_coords[index]))
         self.marked_dists = temp_dists
         self.update()
@@ -398,7 +397,7 @@ class MapView(QWidget):
             else:
                 map_path.lineTo(*coords)
         # Close map loop if start & end distance less than 500 meters
-        if calc.distance(raw_coords[0], raw_coords[-1]) < 500:
+        if calc.dist(raw_coords[0], raw_coords[-1]) < 500:
             map_path.closeSubpath()
         # Create start/finish path
         sfinish_path = self.create_sector_path(
@@ -482,10 +481,10 @@ class MapView(QWidget):
         point_mid = curve_section[mid_index].x(), curve_section[mid_index].y()
         point_end = curve_section[-1].x(), curve_section[-1].y()
         arc_center_pos = calc.tri_coords_circle_center(*point_one, *point_mid, *point_end)
-        arc_radius = calc.distance(point_one, arc_center_pos)
+        arc_radius = calc.dist(point_one, arc_center_pos)
         arc_angle = calc.quad_coords_angle(
             arc_center_pos, point_one, point_mid, point_end)
-        yaw_radians = calc.oriyaw(
+        yaw_radians = calc.atan2(
             point_sec[1] - point_one[1], point_sec[0] - point_one[0])
         turn_direct = calc.turning_direction(
             yaw_radians, *point_one, *point_end)

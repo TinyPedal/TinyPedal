@@ -23,8 +23,8 @@ Damage Widget
 from PySide2.QtCore import QRect, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen
 
+from .. import api
 from .. import calculation as calc
-from ..api_control import api
 from ..constant import DATA
 from ._base import Overlay
 from ._common import warning_flash
@@ -217,7 +217,7 @@ class Realtime(Overlay):
         painter.setRenderHint(QPainter.Antialiasing, True)
         painter.setPen(Qt.NoPen)
         painter.setBrush(self.brush_cone)
-        raw_angle = calc.degrees(calc.oriyaw(*api.read.vehicle.impact_position()))
+        raw_angle = calc.degrees(calc.atan2(*api.read.vehicle.impact_position()))
         start_angle = 16 * (raw_angle - 90 - self.impact_cone_angle * 0.5)
         length_angle = 16 * self.impact_cone_angle
         painter.drawPie(self.rect_impact_cone, start_angle, length_angle)

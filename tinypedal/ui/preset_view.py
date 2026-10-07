@@ -36,9 +36,8 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal
+from .. import app_signal, cfg
 from ..constant import APP, CONFIG, FILE
-from ..setting import cfg
 from ..userfile.json_setting import create_backup_file, set_backup_timestamp
 from ._common import UIScaler
 from .preset_management import CreatePreset, PresetTransfer, RestoreBackup

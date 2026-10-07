@@ -38,7 +38,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal
+from .. import app_signal, cfg, kctrl
 from ..constant import CONFIG, FILE, PLATFORM
 from ..formatter import format_option_name
 from ..hotkey.common import (
@@ -47,8 +47,6 @@ from ..hotkey.common import (
     refresh_keystate,
     set_hotkey_win,
 )
-from ..hotkey_control import kctrl
-from ..setting import cfg
 from ..template.setting_shortcuts import (
     SHORTCUTS_GENERAL,
     SHORTCUTS_MODULE,

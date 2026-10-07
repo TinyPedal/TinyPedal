@@ -30,6 +30,7 @@ from time import sleep
 from types import MappingProxyType
 from typing import Any
 
+from . import paths
 from .constant import API, CONFIG, DATA, FILE
 from .setting_validator import PresetValidator, StyleValidator
 from .userfile.json_setting import (
@@ -37,7 +38,6 @@ from .userfile.json_setting import (
     load_style_json_file,
     save_and_verify_json_file,
 )
-from .userpath import set_user_data_path
 from .validator import is_allowed_filename
 
 logger = logging.getLogger(__name__)
@@ -112,9 +112,9 @@ class FilePath:
         """Update path variables from global user path dictionary"""
         for key in user_path:
             # Reset path if invalid
-            if not set_user_data_path(user_path[key]):
+            if not paths.user_data_path(user_path[key]):
                 user_path[key] = default_path[key]
-                set_user_data_path(user_path[key])
+                paths.user_data_path(user_path[key])
             # Assign path
             setattr(self, key.replace("_path", ""), user_path[key])
 
@@ -525,7 +525,3 @@ class Setting:
     def max_loading_attempts(self) -> int:
         """Get max loading attempts"""
         return max(self.application["maximum_loading_attempts"], 1)
-
-
-# Assign config setting
-cfg = Setting()

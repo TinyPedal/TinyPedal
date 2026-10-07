@@ -22,10 +22,9 @@ Brands preset function
 
 from __future__ import annotations
 
-from ..api_control import api
+from .. import api, cfg
 from ..constant import API, CONFIG
 from ..regex_pattern import rex_lmu_brand_extract
-from ..setting import cfg
 
 
 def extract_brand_name(value: str, default: str) -> str:
@@ -44,7 +43,8 @@ def extract_brand_name(value: str, default: str) -> str:
         if match_obj is not None:
             return match_obj.group().strip()
     except (AttributeError, TypeError, ValueError):
-        return default
+        pass
+    return default
 
 
 def select_brand_name(vehicle_name: str) -> str:

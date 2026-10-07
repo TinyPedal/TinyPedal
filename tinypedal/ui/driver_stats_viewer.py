@@ -35,13 +35,11 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
+from .. import api, cfg, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import DATA
 from ..formatter import strip_invalid_char
 from ..module_info import DriverStats
-from ..setting import cfg
 from ..userfile.driver_stats import (
     load_stats_json_file,
     save_stats_json_file,

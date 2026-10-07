@@ -39,10 +39,9 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..api_control import api
+from .. import api, cfg
 from ..async_request import get_response, resolve_hostname, set_header_get
 from ..constant import API, CONFIG, FILE
-from ..setting import cfg
 from ..userfile.brands import extract_brand_name
 from ..userfile.json_setting import copy_setting
 from ._common import BaseEditor, CompactButton, TableBatchReplace, UIScaler

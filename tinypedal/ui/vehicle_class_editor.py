@@ -32,10 +32,9 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..api_control import api
+from .. import api, cfg
 from ..constant import CONFIG, DATA
 from ..formatter import random_color_class
-from ..setting import cfg
 from ..userfile.json_setting import copy_setting
 from ._common import QVAL_COLOR, BaseEditor, CompactButton, UIScaler
 from ._option import ColorEdit

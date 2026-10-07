@@ -34,10 +34,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import app_signal, realtime_state
-from ..api_control import api
-from ..module_control import mctrl
-from ..setting import cfg
+from .. import api, app_signal, cfg, mctrl, realtime_state
 from ._common import UIScaler
 
 logger = logging.getLogger(__name__)

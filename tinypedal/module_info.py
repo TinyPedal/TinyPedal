@@ -817,6 +817,3 @@ class ModuleInfo:
     tracknotes: NotesInfo = df_wrap(NotesInfo)
     vehicles: VehiclesInfo = df_wrap(VehiclesInfo)
     wheels: WheelsInfo = df_wrap(WheelsInfo)
-
-
-minfo = ModuleInfo()

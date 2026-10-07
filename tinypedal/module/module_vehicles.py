@@ -22,11 +22,10 @@ Vehicles module
 
 from __future__ import annotations
 
+from .. import api, minfo, realtime_state
 from .. import calculation as calc
-from .. import realtime_state
-from ..api_control import api
 from ..constant import DATA
-from ..module_info import VehicleDataSet, VehiclesInfo, minfo
+from ..module_info import VehicleDataSet, VehiclesInfo
 from ..userfile.brands import select_brand_name
 from ..validator import state_timer
 from ._base import DataModule
@@ -211,7 +210,7 @@ def update_vehicle_data(
                     est_pos_y - plr_pos_y,  # y position related to player
                 )
                 # Relative distance & time gap
-                data.relativeStraightDistance = calc.distance(
+                data.relativeStraightDistance = calc.dist(
                     (plr_pos_x, plr_pos_y),
                     (est_pos_x, est_pos_y)
                 )

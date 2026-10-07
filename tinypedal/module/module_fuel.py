@@ -22,15 +22,13 @@ Fuel module
 
 from __future__ import annotations
 
-from math import ceil
 from typing import Callable
 
+from .. import api, minfo, realtime_state
 from .. import calculation as calc
-from .. import realtime_state
-from ..api_control import api
 from ..constant import API, DATA, FILE
 from ..decorator import generator_init
-from ..module_info import FuelInfo, minfo
+from ..module_info import FuelInfo
 from ..userfile.fuel_delta import load_fuel_delta_file, save_fuel_delta_file
 from ..validator import valid_delta_raw
 from ._base import DataModule, round6
@@ -312,7 +310,7 @@ def calc_consumption(
             time_left -= minfo.vehicles.finishTimeOffset
             end_timer_laps_left = calc.end_timer_laps_remain(
                 lap_into, laptime_pace, time_left)
-            full_laps_left = ceil(end_timer_laps_left)
+            full_laps_left = calc.ceil(end_timer_laps_left)
             laps_left = calc.time_type_laps_remain(
                 full_laps_left, lap_into)
 

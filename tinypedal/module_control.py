@@ -27,9 +27,7 @@ from time import sleep
 from types import MappingProxyType
 from typing import Any, KeysView
 
-from . import module, widget
-from .constant import CONFIG
-from .setting import cfg
+from . import cfg
 
 logger = logging.getLogger(__name__)
 
@@ -58,17 +56,17 @@ class ModuleControl:
     """
 
     __slots__ = (
-        "_imported_modules",
         "_active_modules",
-        "type_id",
+        "_imported_modules",
         "active_modules",
+        "type_id",
     )
 
     def __init__(self, target: Any, type_id: str):
-        self._imported_modules = MappingProxyType(create_module_pack(target))
         self._active_modules: dict = {}
-        self.type_id = type_id
+        self._imported_modules = MappingProxyType(create_module_pack(target))
         self.active_modules: MappingProxyType = MappingProxyType(self._active_modules)
+        self.type_id = type_id
 
     def start(self, name: str = ""):
         """Start module, specify name for selected module"""
@@ -156,7 +154,3 @@ class ModuleControl:
     def names(self) -> KeysView[str]:
         """List of module names"""
         return self._imported_modules.keys()
-
-
-mctrl = ModuleControl(target=module, type_id=CONFIG.TYPE_MODULE)
-wctrl = ModuleControl(target=widget, type_id=CONFIG.TYPE_WIDGET)

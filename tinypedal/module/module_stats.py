@@ -24,12 +24,11 @@ from __future__ import annotations
 
 from time import localtime, strftime
 
+from .. import api, minfo, realtime_state
 from .. import calculation as calc
-from .. import realtime_state
-from ..api_control import api
 from ..constant import DATA
 from ..decorator import generator_init
-from ..module_info import DriverStats, StatsInfo, minfo
+from ..module_info import DriverStats, StatsInfo
 from ..userfile.brands import select_brand_name
 from ..userfile.car_setup import (
     rename_car_setup_file,
@@ -202,7 +201,7 @@ def record_driver_stats(
         # Driven distance
         gps_curr = api.read.vehicle.position_xyz()
         if gps_last != gps_curr:
-            moved_distance = calc.distance(gps_last, gps_curr)
+            moved_distance = calc.dist(gps_last, gps_curr)
             if moved_distance < max_moved_distance:
                 driver_stats.meters += moved_distance
             gps_last = gps_curr
@@ -317,7 +316,7 @@ def auto_backup_car_setup(filepath: str):
                             strftime("%Y-%m-%d %H-%M-%S", localtime()),
                             api.read.session.track_name(),
                             api.read.vehicle.class_name(),
-                            select_brand_name(api.read.vehicle.vehicle_model()),
+                            api.read.vehicle.vehicle_model(),
                         )
                         save_car_setup_file(
                             filepath=filepath,

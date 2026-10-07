@@ -20,12 +20,11 @@
 Hybrid module
 """
 
+from .. import api, minfo, realtime_state
 from .. import calculation as calc
-from .. import realtime_state
-from ..api_control import api
 from ..constant import DATA
 from ..decorator import generator_init
-from ..module_info import HybridInfo, minfo
+from ..module_info import HybridInfo
 from ._base import DataModule
 
 

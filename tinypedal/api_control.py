@@ -24,34 +24,29 @@ from __future__ import annotations
 
 import logging
 
-from . import realtime_state
-from .adapter import (
-    acc_connector,
-    lmu_connector,
-    rf2_connector,
-)
+from . import adapter, cfg, realtime_state
 from .constant import API
-from .setting import cfg
 
 logger = logging.getLogger(__name__)
 
 
 def _get_available_api(enable_legacy: bool):
     """Get available API"""
-    available_api = (
-        acc_connector.SimACC,
-        lmu_connector.SimLMU,
-        rf2_connector.SimLMULegacy,
-        rf2_connector.SimRF2,
-    )
-    return {_api.NAME: _api for _api in available_api if not _api.LEGACY or enable_legacy}
+    return {
+        _api.NAME: _api
+        for _api in (
+            adapter.SimACC,
+            adapter.SimLMU,
+            adapter.SimLMULegacy,
+            adapter.SimRF2,
+        )
+        if not _api.LEGACY or enable_legacy
+    }
 
 
 class APIControl:
     """API Control"""
 
-    _api: lmu_connector.Connector
-    read: lmu_connector.APIDataReader
     __slots__ = (
         "_api",
         "_available_api",
@@ -61,11 +56,11 @@ class APIControl:
     )
 
     def __init__(self):
-        self._api = None  # type: ignore
+        self._api: adapter.Connector = None  # type: ignore
         self._available_api = {}
         self._enable_legacy = False
         self._same_api_loaded = False
-        self.read = None  # type: ignore
+        self.read: adapter.APIDataReader = None  # type: ignore
 
     def connect(self, name: str = ""):
         """Connect to API
@@ -153,6 +148,3 @@ class APIControl:
     def alias(self) -> str:
         """API alias name"""
         return API.MAP_ALIAS[self._api.NAME]
-
-
-api = APIControl()

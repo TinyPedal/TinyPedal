@@ -20,10 +20,9 @@
 Sectors Widget
 """
 
+from .. import api, minfo
 from .. import calculation as calc
-from ..api_control import api
 from ..constant import DATA
-from ..module_info import minfo
 from ..validator import valid_sectors
 from ._base import Overlay
 

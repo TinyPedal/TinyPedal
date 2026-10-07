@@ -22,10 +22,9 @@ Track clock Widget
 
 from time import gmtime, strftime
 
+from .. import api, minfo
 from .. import calculation as calc
-from ..api_control import api
 from ..constant import DATA
-from ..module_info import minfo
 from ._base import Overlay
 
 

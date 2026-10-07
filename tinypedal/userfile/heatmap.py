@@ -24,9 +24,9 @@ from __future__ import annotations
 
 import re
 
+from .. import cfg
 from ..constant import CONFIG
 from ..regex_pattern import COMMON_TYRE_COMPOUNDS
-from ..setting import cfg
 from ..template.setting_brakes import BRAKEINFO_DEFAULT
 from ..template.setting_compounds import COMPOUNDINFO_DEFAULT
 from ..template.setting_heatmap import HEATMAP_DEFAULT_BRAKE, HEATMAP_DEFAULT_TYRE

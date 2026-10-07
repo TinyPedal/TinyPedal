@@ -236,18 +236,10 @@ RF2_CARSETUP_REFERENCE_KEY = (
 
 def lmu_car_setup_json_to_svm(source: dict, reference: Mapping):
     """Parse car setup JSON to SVM (LMU format)"""
-    from ..api_control import api
-
     if not isinstance(source, dict):
         return ""
 
-    class_name = api.read.vehicle.class_name()
-    if not class_name:
-        return ""
-
-    yield f'VehicleClassSetting="{class_name}"'
-    yield "UpgradeSetting=(0,0,0,0)"
-    yield ""
+    yield ""  # first line reserved for headers
 
     for name, setting in reference.items():
         # Setting category

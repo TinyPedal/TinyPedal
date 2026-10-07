@@ -20,9 +20,8 @@
 Tyre temperature Widget
 """
 
+from .. import api, units
 from .. import calculation as calc
-from .. import units
-from ..api_control import api
 from ..constant import DATA
 from ..userfile.heatmap import (
     HEATMAP_DEFAULT_TYRE,

@@ -50,10 +50,9 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import qt_signal
+from .. import cfg, state
 from ..constant import CONFIG, FILE
 from ..formatter import format_option_name
-from ..setting import cfg
 from ..userfile.tyre_strategy import (
     DEFAULT_TYRE_SET,
     DEFAULT_TYRE_SETTING,
@@ -117,7 +116,7 @@ class TyreNameListItem(QListWidgetItem):
 class TyrePlanTable(QTableWidget):
     """Tyre plan table"""
 
-    refresh = qt_signal(bool)
+    refresh = state.qt_signal(bool)
 
     def __init__(self, parent):
         super().__init__(parent)

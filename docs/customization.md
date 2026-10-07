@@ -434,8 +434,7 @@ Additional notes:
 - Backup file is only generated after leaving pit lane. Stint best lap time (if available) will be auto-appended to backup file name after back to garage.
 - Only one backup file of the most recent setup will be generated if no changes were made.
 - Backup file name format:\
-    `[game name]` - `[date & time]` - `[track name]` - `[class name]` - `[brand name]` - `[stint best lap time]`\
-    **If brand name is not available, vehicle name will be used instead.*
+    `[game name]` - `[date & time]` - `[track name]` - `[class name]` - `[vehicle name]` - `[stint best lap time]`
 
 [**`Back to Top`**](#)
 
