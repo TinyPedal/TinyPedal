@@ -169,7 +169,8 @@ def hotkey_load_previous_preset():
 
 def hotkey_spectate_mode():
     """Command - spectate mode"""
-    cfg.api["enable_player_index_override"] = not cfg.api["enable_player_index_override"]
+    override = cfg.api["enable_player_index_override"]
+    cfg.api["enable_player_index_override"] = not override
     cfg.save()
     app_signal.refresh.emit(True)
 
@@ -208,7 +209,8 @@ def hotkey_spectate_previous_driver():
 
 def hotkey_pace_notes_playback():
     """Command - pace notes playback"""
-    cfg.user.setting["pace_notes_playback"]["enable"] = not cfg.user.setting["pace_notes_playback"]["enable"]
+    enable = cfg.user.setting["pace_notes_playback"]["enable"]
+    cfg.user.setting["pace_notes_playback"]["enable"] = not enable
     cfg.save()
     app_signal.refresh.emit(True)
 

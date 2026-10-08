@@ -230,9 +230,6 @@ class AppWindow(QMainWindow):
         self.set_window_state()
         self.__connect_signal()
 
-        # Refresh GUI
-        app_signal.refresh.emit(True)
-
     @Slot(bool)  # type: ignore[operator]
     def refresh(self):
         """Refresh GUI"""

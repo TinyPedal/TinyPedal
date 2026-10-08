@@ -29,7 +29,7 @@ from time import sleep
 from typing import Any
 
 from .constant import API, CONFIG, FILE
-from .setting import FileName, FilePath, Setting
+from .setting import FileName, FilePath, FileSetting
 from .setting.validator import PresetValidator, StyleValidator
 from .userfile.json_setting import (
     load_setting_json_file,
@@ -71,10 +71,10 @@ class Configuration:
         self._save_queue = {}
         self._setting_to_load = ""
         # Settings
-        self.default = Setting()
+        self.default = FileSetting()
         self.filename = FileName()
         self.path = FilePath()
-        self.user = Setting()
+        self.user = FileSetting()
         self.version = 0
 
     @property
@@ -158,7 +158,9 @@ class Configuration:
         return ""
 
     def load_global(self):
-        """Load global setting, should only done once per launch"""
+        """Load global setting (once per launch)"""
+        if self.user.config:
+            raise RuntimeError("global setting already loaded")
         # Delayed init
         self.default.set_default()
         # Load setting

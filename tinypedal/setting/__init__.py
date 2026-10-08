@@ -81,8 +81,8 @@ class FilePath:
 
 
 @slotclass
-class Setting:
-    """Preset setting"""
+class FileSetting:
+    """File setting"""
 
     # Global preset
     config: dict = DATA.EMPTY_DICT
@@ -101,7 +101,7 @@ class Setting:
     def set_default(self):
         """Set default setting (one time only)"""
         if self.config != DATA.EMPTY_DICT:
-            return
+            raise RuntimeError("default setting already set")
         from .default_api import API_DEFAULT
         from .default_brakes import BRAKES_DEFAULT
         from .default_classes import CLASSES_DEFAULT

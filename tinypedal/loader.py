@@ -27,7 +27,7 @@ import os
 import sys
 import time
 
-from . import api, cfg, kctrl, mctrl, octrl, updater, wctrl
+from . import api, app_signal, cfg, kctrl, mctrl, octrl, updater, wctrl
 from .constant import FILE
 
 logger = logging.getLogger(__name__)
@@ -35,38 +35,32 @@ logger = logging.getLogger(__name__)
 
 def init():
     """Initialize gui, api, modules (once per launch)"""
-    # Load core GUI
+    logger.info("STARTING............")
+    # 1 init core GUI
     from . import ui
     if ui.QApplication.instance():
-        return
+        raise RuntimeError("core GUI already initialized")
     root = ui.init(cfg.application["enable_high_dpi_scaling"])
-
-    # Start api, modules, widgets, main window in order
-    logger.info("STARTING............")
-    # 1 load user preset
+    # 2 load user preset
     cfg.set_next_to_load(f"{cfg.preset_files()[0]}{FILE.EXT_JSON}")
     cfg.load_user()
     cfg.save()
-    # 2 start api
+    # 3 start api
     api.connect()
     api.start()
-    # 3 start modules
-    mctrl.start()
-    # 4 start widgets
-    wctrl.start()
-    # 5 start main window
+    # 4 start main window
     from .ui import app
     app.AppWindow()
 
     # Finalize loading after main GUI fully loaded
     logger.info("FINALIZING............")
-    # 1 Enable overlay control
-    octrl.enable()
-    # 2 Enable hotkey control
-    kctrl.enable()
-    # 3 Check for updates
+    # 1 start modules
+    load_modules()
+    # 2 Check for updates
     if cfg.application["check_for_updates_on_startup"]:
         updater.check(False)
+    # 3 Refresh GUI
+    app_signal.refresh.emit(True)
 
     # Start main loop
     sys.exit(root.exec_())
@@ -80,7 +74,6 @@ def close():
     # 2 stop & close api
     api.stop()
     api.close()
-    logger.info("API: closed")
 
 
 def restart():
@@ -133,16 +126,16 @@ def reload(reload_preset: bool = False):
 
 
 def load_modules():
-    """Load modules"""
-    octrl.enable()  # 1 overlay control
-    mctrl.start()  # 2 module
-    wctrl.start()  # 3 widget
-    kctrl.enable()  # 4 hotkey
+    """Load modules (in order)"""
+    mctrl.start()
+    wctrl.start()
+    kctrl.enable()
+    octrl.enable()
 
 
 def unload_modules():
-    """Unload modules"""
-    kctrl.disable()  # 1 hotkey
-    wctrl.close()  # 2 widget
-    mctrl.close()  # 3 module
-    octrl.disable()  # 4 overlay control
+    """Unload modules (in order)"""
+    octrl.disable()
+    kctrl.disable()
+    wctrl.close()
+    mctrl.close()

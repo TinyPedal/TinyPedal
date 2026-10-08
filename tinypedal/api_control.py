@@ -120,6 +120,7 @@ class APIControl:
             self._api.close()
         for var in self.__slots__:
             setattr(self, var, None)
+        logger.info("API: closed")
 
     def restart(self):
         """Restart API"""

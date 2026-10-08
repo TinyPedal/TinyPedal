@@ -64,7 +64,7 @@ def start(single_instance: bool, log_level: int):
     # Set log stream
     global log_stream
     if log_stream:  # one time init only
-        return
+        raise RuntimeError("launch check already done")
     log_stream = io.StringIO()
 
     # Set global path
@@ -103,7 +103,7 @@ def _init_globals(path_global: str):
     # 1 config
     global cfg
     if cfg:  # one time init only
-        return
+        raise RuntimeError("global singleton already initialized")
     from .configuration import Configuration
     cfg = Configuration()
     cfg.path.config = path_global
