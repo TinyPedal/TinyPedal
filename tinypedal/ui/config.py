@@ -385,7 +385,8 @@ class UserConfig(BaseDialog):
         if self.config_type:
             # Save global settings
             if self.config_type == CONFIG.TYPE_CONFIG:
-                cfg.update_path()
+                if self.key_name == "user_path":
+                    cfg.update_path()
                 cfg.save(0, config_type=CONFIG.TYPE_CONFIG)
             # Save user preset settings
             else:

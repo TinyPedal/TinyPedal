@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Setting
+Configuration
 """
 
 from __future__ import annotations
@@ -25,14 +25,12 @@ from __future__ import annotations
 import logging
 import os
 import threading
-from collections import ChainMap
 from time import sleep
-from types import MappingProxyType
 from typing import Any
 
-from . import paths
-from .constant import API, CONFIG, DATA, FILE
-from .setting_validator import PresetValidator, StyleValidator
+from .constant import API, CONFIG, FILE
+from .setting import FileName, FilePath, Setting
+from .setting.validator import PresetValidator, StyleValidator
 from .userfile.json_setting import (
     load_setting_json_file,
     load_style_json_file,
@@ -43,167 +41,46 @@ from .validator import is_allowed_filename
 logger = logging.getLogger(__name__)
 
 
-class FileName:
-    """File name (with extension)"""
+class Configuration:
+    """Configure file, path, preset
+
+    Attributes:
+        default: Default setting.
+        user: Current user setting.
+        filename: User setting file name.
+        path: User setting file path.
+        version: Last updated (increment) version number.
+    """
 
     __slots__ = (
-        "config",
-        "filelock",
-        "shortcuts",
-        "setting",
-        "brakes",
-        "brands",
-        "classes",
-        "compounds",
-        "heatmap",
-        "tracks",
-    )
-
-    def __init__(self):
-        # Global preset
-        self.config = f"config{FILE.EXT_JSON}"
-        self.filelock = f"config{FILE.EXT_LOCK}"
-        self.shortcuts = f"shortcuts{FILE.EXT_JSON}"
-        # User preset
-        self.setting = f"default{FILE.EXT_JSON}"
-        # Style preset
-        self.brakes = f"brakes{FILE.EXT_JSON}"
-        self.brands = f"brands{FILE.EXT_JSON}"
-        self.classes = f"classes{FILE.EXT_JSON}"
-        self.compounds = f"compounds{FILE.EXT_JSON}"
-        self.heatmap = f"heatmap{FILE.EXT_JSON}"
-        self.tracks = f"tracks{FILE.EXT_JSON}"
-
-
-class FilePath:
-    """File path"""
-
-    __slots__ = (
-        "config",
-        "settings",
-        "brand_logo",
-        "delta_best",
-        "energy_delta",
-        "fuel_delta",
-        "pace_notes",
-        "sector_best",
-        "track_map",
-        "track_notes",
-        "car_setups",
-    )
-
-    def __init__(self):
-        # Global path, should not be modified
-        self.config = ""
-        # User setting path
-        self.settings = ""
-        # User data path
-        self.brand_logo = ""
-        self.delta_best = ""
-        self.energy_delta = ""
-        self.fuel_delta = ""
-        self.pace_notes = ""
-        self.sector_best = ""
-        self.track_map = ""
-        self.track_notes = ""
-        self.car_setups = ""
-
-    def update(self, user_path: dict, default_path: dict):
-        """Update path variables from global user path dictionary"""
-        for key in user_path:
-            # Reset path if invalid
-            if not paths.user_data_path(user_path[key]):
-                user_path[key] = default_path[key]
-                paths.user_data_path(user_path[key])
-            # Assign path
-            setattr(self, key.replace("_path", ""), user_path[key])
-
-
-class Preset:
-    """Preset setting"""
-
-    __slots__ = (
-        "config",
-        "filelock",
-        "shortcuts",
-        "setting",
-        "brakes",
-        "brands",
-        "classes",
-        "compounds",
-        "heatmap",
-        "tracks",
-    )
-
-    def set_default(self):
-        """Set default setting (one time only)"""
-        if hasattr(self, "config"):
-            return
-        from .template.setting_api import API_DEFAULT
-        from .template.setting_brakes import BRAKES_DEFAULT
-        from .template.setting_classes import CLASSES_DEFAULT
-        from .template.setting_common import COMMON_DEFAULT
-        from .template.setting_compounds import COMPOUNDS_DEFAULT
-        from .template.setting_filelock import FILELOCK_DEFAULT
-        from .template.setting_global import GLOBAL_DEFAULT
-        from .template.setting_heatmap import HEATMAP_DEFAULT
-        from .template.setting_module import MODULE_DEFAULT
-        from .template.setting_shortcuts import (
-            SHORTCUTS_GENERAL,
-            SHORTCUTS_MODULE,
-            SHORTCUTS_PRESET,
-            SHORTCUTS_WIDGET,
-        )
-        from .template.setting_tracks import TRACKS_DEFAULT
-        from .template.setting_widget import WIDGET_DEFAULT
-
-        # Global preset
-        self.config = MappingProxyType(GLOBAL_DEFAULT)
-        self.filelock = MappingProxyType(FILELOCK_DEFAULT)
-        self.shortcuts = MappingProxyType(ChainMap(SHORTCUTS_MODULE, SHORTCUTS_WIDGET, SHORTCUTS_PRESET, SHORTCUTS_GENERAL))
-        # User preset
-        self.setting = MappingProxyType(ChainMap(WIDGET_DEFAULT, MODULE_DEFAULT, API_DEFAULT, COMMON_DEFAULT))
-        # Style preset
-        self.brakes = MappingProxyType(BRAKES_DEFAULT)
-        self.brands = DATA.EMPTY_DICT
-        self.classes = MappingProxyType(CLASSES_DEFAULT)
-        self.compounds = MappingProxyType(COMPOUNDS_DEFAULT)
-        self.heatmap = MappingProxyType(HEATMAP_DEFAULT)
-        self.tracks = MappingProxyType(TRACKS_DEFAULT)
-
-
-class Setting:
-    """APP setting"""
-
-    __slots__ = (
+        "_is_saving",
         "_save_delay",
         "_save_queue",
         "_setting_to_load",
-        "is_saving",
-        "version_update",
-        "filename",
         "default",
-        "user",
+        "filename",
         "path",
+        "user",
+        "version",
     )
 
     def __init__(self):
         # States
+        self._is_saving = False
         self._save_delay = 0
         self._save_queue = {}
         self._setting_to_load = ""
-        self.is_saving = False
-        self.version_update = 0
         # Settings
+        self.default = Setting()
         self.filename = FileName()
-        self.default = Preset()
-        self.user = Preset()
         self.path = FilePath()
+        self.user = Setting()
+        self.version = 0
 
     @property
     def api(self) -> dict[str, Any]:
         """API setting (quick reference)"""
-        return self.user.setting[self.api_key]
+        return self.user.setting[API.MAP_CONFIG[self.selected_api]]
 
     @property
     def application(self) -> dict[str, Any]:
@@ -234,6 +111,35 @@ class Setting:
     def units(self) -> dict[str, Any]:
         """Units setting (quick reference)"""
         return self.user.setting["units"]
+
+    @property
+    def selected_api(self) -> str:
+        """Get selected api name"""
+        if self.telemetry["enable_api_selection_from_preset"]:
+            return self.user.setting["preset"]["api_name"]
+        return self.telemetry["api_name"]
+
+    @selected_api.setter
+    def selected_api(self, name: str) -> None:
+        """Set selected api name"""
+        if self.telemetry["enable_api_selection_from_preset"]:
+            self.user.setting["preset"]["api_name"] = name
+        else:
+            self.telemetry["api_name"] = name
+
+    @property
+    def max_saving_attempts(self) -> int:
+        """Get max saving attempts"""
+        return max(self.application["maximum_saving_attempts"], 3)
+
+    @property
+    def max_loading_attempts(self) -> int:
+        """Get max loading attempts"""
+        return max(self.application["maximum_loading_attempts"], 1)
+
+    @property
+    def is_saving(self) -> bool:
+        return self._is_saving
 
     def is_loaded(self, filename: str) -> bool:
         """Check if selected setting file is already loaded"""
@@ -355,26 +261,6 @@ class Setting:
             max_attempts=loading_attempts,
         )
 
-    @property
-    def api_name(self) -> str:
-        """Get selected api name"""
-        if self.telemetry["enable_api_selection_from_preset"]:
-            return self.user.setting["preset"]["api_name"]
-        return self.telemetry["api_name"]
-
-    @api_name.setter
-    def api_name(self, name: str) -> None:
-        """Set selected api name"""
-        if self.telemetry["enable_api_selection_from_preset"]:
-            self.user.setting["preset"]["api_name"] = name
-        else:
-            self.telemetry["api_name"] = name
-
-    @property
-    def api_key(self) -> str:
-        """Get selected api config key name"""
-        return API.MAP_CONFIG[self.api_name]
-
     def preset_files(self, by_date: bool = True, reverse: bool = True) -> list[str]:
         """Get user preset JSON filename list
 
@@ -488,8 +374,8 @@ class Setting:
         if not self._save_queue:
             return
 
-        if not self.is_saving:
-            self.is_saving = True
+        if not self._is_saving:
+            self._is_saving = True
             threading.Thread(target=self.__saving).start()
 
     def __saving(self):
@@ -513,15 +399,5 @@ class Setting:
             )
             self._save_queue.pop(filename, None)
 
-        self.is_saving = False
-        self.version_update += 1
-
-    @property
-    def max_saving_attempts(self) -> int:
-        """Get max saving attempts"""
-        return max(self.application["maximum_saving_attempts"], 3)
-
-    @property
-    def max_loading_attempts(self) -> int:
-        """Get max loading attempts"""
-        return max(self.application["maximum_loading_attempts"], 1)
+        self._is_saving = False
+        self.version += 1

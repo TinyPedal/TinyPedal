@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Setting pre update function
+Setting pre-update
 """
 
 from __future__ import annotations

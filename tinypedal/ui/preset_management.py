@@ -48,8 +48,8 @@ from .. import app_signal, cfg
 from .. import regex_pattern as rxp
 from ..constant import CONFIG, FILE
 from ..formatter import format_option_name, strip_filename_extension
-from ..setting_validator import PresetValidator
-from ..template.setting_shortcuts import SHORTCUTS_PRESET
+from ..setting.default_shortcuts import SHORTCUTS_PRESET
+from ..setting.validator import PresetValidator
 from ..userfile.json_setting import (
     load_setting_json_file,
     save_and_verify_json_file,

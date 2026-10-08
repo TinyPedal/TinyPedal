@@ -20,7 +20,7 @@
 Data modules
 """
 
-from ..template.setting_module import MODULE_FILENAME
+from ..setting.default_module import MODULE_FILENAME
 
 __all__ = MODULE_FILENAME
 

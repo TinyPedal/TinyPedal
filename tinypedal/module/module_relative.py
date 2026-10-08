@@ -65,8 +65,8 @@ class Realtime(DataModule):
                     update_interval = self.active_interval
 
                 # Check setting
-                if last_version_update != self.cfg.version_update:
-                    last_version_update = self.cfg.version_update
+                if last_version_update != self.cfg.version:
+                    last_version_update = self.cfg.version
                     show_in_garage = setting_relative["show_vehicle_in_garage"]
                     is_exclusive_mode = setting_standings["enable_single_class_exclusive_mode"]
                     is_split_mode = setting_standings["enable_multi_class_split_mode"]

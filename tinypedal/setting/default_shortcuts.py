@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Default keyboard shortcuts template
+Default keyboard shortcuts setting
 """
 
 from __future__ import annotations
@@ -25,8 +25,8 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Iterable, Mapping
 
-from ..template.setting_module import MODULE_FILENAME
-from ..template.setting_widget import WIDGET_FILENAME
+from .default_module import MODULE_FILENAME
+from .default_widget import WIDGET_FILENAME
 
 BINDING_GENERAL = MappingProxyType({
     "bind": "",

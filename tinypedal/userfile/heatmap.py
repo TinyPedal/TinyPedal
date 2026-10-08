@@ -26,8 +26,8 @@ import re
 
 from .. import cfg
 from ..constant import CONFIG, HEATMAP
-from ..template.setting_brakes import BRAKEINFO_DEFAULT
-from ..template.setting_compounds import COMPOUNDINFO_DEFAULT
+from ..setting.default_brakes import BRAKEINFO_DEFAULT
+from ..setting.default_compounds import COMPOUNDINFO_DEFAULT
 from ..validator import invalid_save_name, is_hex_color
 from .brands import select_brand_name
 

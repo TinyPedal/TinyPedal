@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Default widget setting template
+Default widget setting
 
 Widget key name must match corresponding file name in 'widget' folder
 """

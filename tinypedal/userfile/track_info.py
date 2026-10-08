@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from .. import cfg
 from ..constant import CONFIG
-from ..template.setting_tracks import TRACKINFO_DEFAULT
+from ..setting.default_tracks import TRACKINFO_DEFAULT
 from ..validator import invalid_save_name
 
 

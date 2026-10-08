@@ -24,72 +24,21 @@ Important: DO NOT call those functions in non-main thread.
 
 import logging
 import os
-import signal
 import sys
 import time
 
 from . import api, cfg, kctrl, mctrl, octrl, updater, wctrl
-from .constant import CONFIG, FILE, PLATFORM
+from .constant import FILE
 
 logger = logging.getLogger(__name__)
 
 
-def int_signal_handler(sign, frame):
-    """Quit by keyboard interrupt"""
-    close()
-    sys.exit()
-
-
-def clear_environment():
-    """Clear any previous environment variable (required after auto-restarted APP)"""
-    os.environ.pop("QT_QPA_PLATFORM", None)
-    os.environ.pop("QT_ENABLE_HIGHDPI_SCALING", None)
-    os.environ.pop("QT_MEDIA_BACKEND", None)
-    os.environ.pop("QT_MULTIMEDIA_PREFERRED_PLUGINS", None)
-
-
-def update_environment():
-    """Update environment before starting GUI"""
-    # Windows only
-    if PLATFORM.WINDOWS:
-        if os.getenv("PYSIDE_OVERRIDE") == "6":
-            # Use "freetype" to avoid high memory usage in pyside6
-            # Match system dark-mode on windows
-            os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2:fontengine=freetype"
-            os.environ["QT_MEDIA_BACKEND"] = "windows"
-        else:
-            if cfg.compatibility["multimedia_plugin_on_windows"] == "WMF":
-                multimedia_plugin = "windowsmediafoundation"
-            else:
-                multimedia_plugin = "directshow"
-            os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = multimedia_plugin
-
-    # Linux only
-    else:
-        if cfg.compatibility["enable_x11_platform_plugin_override"]:
-            os.environ["QT_QPA_PLATFORM"] = "xcb"
-
-    # Common
-    if not cfg.application["enable_high_dpi_scaling"]:
-        os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"  # force disable (qt6 only)
-
-
-def start(path_global: str):
-    """Initializing (once per launch)"""
-    signal.signal(signal.SIGINT, int_signal_handler)
-
-    # Load global config
-    cfg.path.config = path_global
-    cfg.load_global()
-    cfg.save(config_type=CONFIG.TYPE_CONFIG)
-    cfg.save(config_type=CONFIG.TYPE_SHORTCUTS)
-
-    # Config environment
-    clear_environment()
-    update_environment()
-
+def init():
+    """Initialize gui, api, modules (once per launch)"""
     # Load core GUI
     from . import ui
+    if ui.QApplication.instance():
+        return
     root = ui.init(cfg.application["enable_high_dpi_scaling"])
 
     # Start api, modules, widgets, main window in order
@@ -124,7 +73,7 @@ def start(path_global: str):
 
 
 def close():
-    """Close api, modules, widgets. Call before quit APP."""
+    """Close api, modules (call before quit APP)"""
     logger.info("CLOSING............")
     # 1 unload modules
     unload_modules()
@@ -155,7 +104,7 @@ def restart():
 
 
 def reload(reload_preset: bool = False):
-    """Reload preset, api, modules, widgets
+    """Reload preset, api, modules
 
     Args:
         reload_preset:
@@ -184,7 +133,7 @@ def reload(reload_preset: bool = False):
 
 
 def load_modules():
-    """Load modules, widgets"""
+    """Load modules"""
     octrl.enable()  # 1 overlay control
     mctrl.start()  # 2 module
     wctrl.start()  # 3 widget
@@ -192,7 +141,7 @@ def load_modules():
 
 
 def unload_modules():
-    """Unload modules, widgets"""
+    """Unload modules"""
     kctrl.disable()  # 1 hotkey
     wctrl.close()  # 2 widget
     mctrl.close()  # 3 module

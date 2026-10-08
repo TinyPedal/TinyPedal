@@ -47,7 +47,7 @@ from ..hotkey.common import (
     refresh_keystate,
     set_hotkey_win,
 )
-from ..template.setting_shortcuts import (
+from ..setting.default_shortcuts import (
     SHORTCUTS_GENERAL,
     SHORTCUTS_MODULE,
     SHORTCUTS_PRESET,

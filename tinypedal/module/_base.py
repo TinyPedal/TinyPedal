@@ -24,7 +24,7 @@ import logging
 import threading
 from functools import partial
 
-from ..setting import Setting
+from ..configuration import Configuration
 
 logger = logging.getLogger(__name__)
 # Function
@@ -44,7 +44,7 @@ class DataModule:
         "module_name",
     )
 
-    def __init__(self, config: Setting, module_name: str):
+    def __init__(self, config: Configuration, module_name: str):
         self.module_name = module_name
         self.closed = True
 

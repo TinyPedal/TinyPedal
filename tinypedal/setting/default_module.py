@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Default module setting template
+Default module setting
 
 Module key name must match corresponding file name in 'module' folder
 """

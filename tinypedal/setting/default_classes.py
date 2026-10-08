@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Default classes template
+Default classes setting
 """
 
 from types import MappingProxyType

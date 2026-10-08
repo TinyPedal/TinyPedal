@@ -31,11 +31,11 @@ from . import state
 
 if TYPE_CHECKING:
     from .api_control import APIControl
+    from .configuration import Configuration
     from .hotkey_control import HotkeyControl
     from .module_control import ModuleControl
     from .module_info import ModuleInfo
     from .overlay_control import OverlayControl
-    from .setting import Setting
     from .update import UpdateChecker
 
 
@@ -49,7 +49,7 @@ app_signal = state.ApplicationSignal()
 
 # Global singleton (init later)
 log_stream: io.StringIO = None  # type: ignore
-cfg: Setting = None  # type: ignore
+cfg: Configuration = None  # type: ignore
 api: APIControl = None  # type: ignore
 minfo: ModuleInfo = None  # type: ignore
 mctrl: ModuleControl = None  # type: ignore
@@ -63,7 +63,7 @@ def start(single_instance: bool, log_level: int):
     """Launch check & start app"""
     # Set log stream
     global log_stream
-    if log_stream is not None:  # one time init only
+    if log_stream:  # one time init only
         return
     log_stream = io.StringIO()
 
@@ -91,21 +91,30 @@ def start(single_instance: bool, log_level: int):
     logger.info("psutil: %s", version_check.psutil())
 
     # Init global variable
-    _init_globals()
+    _init_globals(path_global)
 
     # Start app
     from . import loader
-    loader.start(path_global)
+    loader.init()
 
 
-def _init_globals():
+def _init_globals(path_global: str):
     """Initialize global singleton (in order), once only after launch check done"""
     # 1 config
     global cfg
-    if cfg is not None:  # one time init only
+    if cfg:  # one time init only
         return
-    from .setting import Setting
-    cfg = Setting()
+    from .configuration import Configuration
+    cfg = Configuration()
+    cfg.path.config = path_global
+
+    # Load global config & set environment
+    from .constant import CONFIG
+    cfg.load_global()
+    cfg.save(config_type=CONFIG.TYPE_CONFIG)
+    cfg.save(config_type=CONFIG.TYPE_SHORTCUTS)
+    _clear_environment()
+    _update_environment()
 
     # 2 api
     global api
@@ -192,3 +201,38 @@ def _check_single_instance(single_mode: bool, filepath: str, filename: str):
         "Check system tray for hidden icon."
     )
     ui.cancel(message)
+
+
+def _clear_environment():
+    """Clear any previous environment variable (required after auto-restarted APP)"""
+    os.environ.pop("QT_QPA_PLATFORM", None)
+    os.environ.pop("QT_ENABLE_HIGHDPI_SCALING", None)
+    os.environ.pop("QT_MEDIA_BACKEND", None)
+    os.environ.pop("QT_MULTIMEDIA_PREFERRED_PLUGINS", None)
+
+
+def _update_environment():
+    """Update environment before starting GUI"""
+    from .constant import PLATFORM
+    # Windows only
+    if PLATFORM.WINDOWS:
+        if os.getenv("PYSIDE_OVERRIDE") == "6":
+            # Use "freetype" to avoid high memory usage in pyside6
+            # Match system dark-mode on windows
+            os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2:fontengine=freetype"
+            os.environ["QT_MEDIA_BACKEND"] = "windows"
+        else:
+            if cfg.compatibility["multimedia_plugin_on_windows"] == "WMF":
+                multimedia_plugin = "windowsmediafoundation"
+            else:
+                multimedia_plugin = "directshow"
+            os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = multimedia_plugin
+
+    # Linux only
+    else:
+        if cfg.compatibility["enable_x11_platform_plugin_override"]:
+            os.environ["QT_QPA_PLATFORM"] = "xcb"
+
+    # Common
+    if not cfg.application["enable_high_dpi_scaling"]:
+        os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"  # force disable (qt6 only)

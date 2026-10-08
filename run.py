@@ -24,6 +24,7 @@ Run program
 
 import argparse
 import os
+import signal
 import sys
 
 
@@ -92,8 +93,14 @@ def override_module(original: str, override: str):
     sys.modules[original] = __import__(override, fromlist=[override])
 
 
+def int_signal_handler(sign, frame):
+    """Quit by keyboard interrupt"""
+    sys.exit()
+
+
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+    signal.signal(signal.SIGINT, int_signal_handler)
 
     # Check whether running from source
     if "tinypedal.exe" not in sys.executable:

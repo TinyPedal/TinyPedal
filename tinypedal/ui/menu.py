@@ -26,7 +26,7 @@ from PySide2.QtGui import QDesktopServices
 from PySide2.QtWidgets import QMenu, QMessageBox
 
 from .. import api, app_signal, cfg, mctrl, octrl, updater
-from ..constant import APP, CONFIG, PLATFORM
+from ..constant import API, APP, CONFIG, PLATFORM
 from ..formatter import format_option_name
 from .about import About
 from .brake_editor import BrakeEditor
@@ -449,7 +449,7 @@ class APIMenu(QMenu):
 
     def refresh_menu(self):
         """Refresh menu"""
-        selected_api_name = cfg.api_name
+        selected_api_name = cfg.selected_api
         for action in self.actions_api.actions():
             if selected_api_name == action.text():
                 action.setChecked(True)
@@ -484,7 +484,7 @@ class APIMenu(QMenu):
         """Config API"""
         _dialog = UserConfig(
             parent=self._parent,
-            key_name=cfg.api_key,
+            key_name=API.MAP_CONFIG[api.name],
             preset_name=cfg.filename.setting,
             config_type=CONFIG.TYPE_SETTING,
             user_setting=cfg.user.setting,
@@ -511,15 +511,14 @@ class APIMenu(QMenu):
 
     def __toggle_option(self, checked: bool, api_name: str):
         """Toggle option"""
-        if cfg.api_name == api_name:
-            return
-        cfg.api_name = api_name
-        if cfg.telemetry["enable_api_selection_from_preset"]:
-            save_type = CONFIG.TYPE_SETTING
-        else:
-            save_type = CONFIG.TYPE_CONFIG
-        cfg.save(config_type=save_type)
-        menu_reload_only()
+        if cfg.selected_api != api_name:
+            cfg.selected_api = api_name
+            if cfg.telemetry["enable_api_selection_from_preset"]:
+                save_type = CONFIG.TYPE_SETTING
+            else:
+                save_type = CONFIG.TYPE_CONFIG
+            cfg.save(config_type=save_type)
+            menu_reload_only()
 
 
 class ToolsMenu(QMenu):

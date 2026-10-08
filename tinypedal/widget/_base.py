@@ -30,10 +30,10 @@ from PySide2.QtGui import QFont, QFontMetrics, QPalette, QPixmap
 from PySide2.QtWidgets import QGridLayout, QLayout, QMenu, QWidget
 
 from .. import app_signal, overlay_signal, realtime_state
+from ..configuration import Configuration
 from ..constant import APP
 from ..formatter import format_module_name
 from ..regex_pattern import FONT_WEIGHT_MAP
-from ..setting import Setting
 from ._common import FontMetrics, MousePosition
 from ._painter import RawImage, RawText
 
@@ -44,7 +44,7 @@ mousepos = MousePosition()  # single instance shared by all widgets
 class Base(QWidget):
     """Base window"""
 
-    def __init__(self, config: Setting, widget_name: str):
+    def __init__(self, config: Configuration, widget_name: str):
         super().__init__()
         self.widget_name = widget_name
 

@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Default global (config) setting template
+Default global (config) setting
 """
 
 from .. import paths

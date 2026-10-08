@@ -30,9 +30,9 @@ from .. import api, app_signal, cfg, mctrl, overlay_signal, realtime_state, wctr
 from ..constant import CONFIG, FILE
 from ..decorator import constantclass
 from ..regex_pattern import CFG_DELTABEST_SOURCE, CHOICE_COMMON
-from ..template.setting_module import MODULE_FILENAME
-from ..template.setting_shortcuts import SHORTCUTS_PRESET
-from ..template.setting_widget import WIDGET_FILENAME
+from ..setting.default_module import MODULE_FILENAME
+from ..setting.default_shortcuts import SHORTCUTS_PRESET
+from ..setting.default_widget import WIDGET_FILENAME
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,7 @@ def hotkey_select_next_api():
         next_index = api_list.index(api_name) + 1
         if next_index >= len(api_list):
             next_index = 0
-    cfg.api_name = api_list[next_index]
+    cfg.selected_api = api_list[next_index]
     if cfg.telemetry["enable_api_selection_from_preset"]:
         save_type = CONFIG.TYPE_SETTING
     else:
@@ -109,7 +109,7 @@ def hotkey_select_previous_api():
         next_index = api_list.index(api_name) - 1
         if next_index < 0:
             next_index = max(len(api_list) - 1, 0)
-    cfg.api_name = api_list[next_index]
+    cfg.selected_api = api_list[next_index]
     if cfg.telemetry["enable_api_selection_from_preset"]:
         save_type = CONFIG.TYPE_SETTING
     else:

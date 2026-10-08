@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Setting validator function
+Setting validator
 """
 
 from __future__ import annotations
@@ -25,13 +25,13 @@ from __future__ import annotations
 import re
 from typing import Any, Mapping
 
-from . import regex_pattern as rxp
-from . import version
-from .constant import DATA
-from .hotkey.common import validate_hotkey
-from .setting_preupdate import preupdate_global_setting, preupdate_user_setting
-from .validator import is_clock_format, is_hex_color
-from .version_check import parse_version_string
+from .. import regex_pattern as rxp
+from .. import version
+from ..constant import DATA
+from ..hotkey.common import validate_hotkey
+from ..validator import is_clock_format, is_hex_color
+from ..version_check import parse_version_string
+from .preupdate import preupdate_global_setting, preupdate_user_setting
 
 
 def _get_preset_version(dict_user: dict, version_current: str) -> tuple[int, int, int]:
@@ -76,28 +76,28 @@ class StyleValidator:
     @staticmethod
     def classes(dict_user: dict[str, dict]) -> bool:
         """Classes style validator"""
-        from .template.setting_classes import CLASSES_DEFAULT, CLASSINFO_DEFAULT
+        from .default_classes import CLASSES_DEFAULT, CLASSINFO_DEFAULT
 
         return _validate_style(dict_user, CLASSES_DEFAULT, CLASSINFO_DEFAULT)
 
     @staticmethod
     def brakes(dict_user: dict[str, dict]) -> bool:
         """Brakes style validator"""
-        from .template.setting_brakes import BRAKEINFO_DEFAULT, BRAKES_DEFAULT
+        from .default_brakes import BRAKEINFO_DEFAULT, BRAKES_DEFAULT
 
         return _validate_style(dict_user, BRAKES_DEFAULT, BRAKEINFO_DEFAULT)
 
     @staticmethod
     def compounds(dict_user: dict[str, dict]) -> bool:
         """Compounds style validator"""
-        from .template.setting_compounds import COMPOUNDINFO_DEFAULT, COMPOUNDS_DEFAULT
+        from .default_compounds import COMPOUNDINFO_DEFAULT, COMPOUNDS_DEFAULT
 
         return _validate_style(dict_user, COMPOUNDS_DEFAULT, COMPOUNDINFO_DEFAULT)
 
     @staticmethod
     def heatmap(dict_user: dict[str, dict]) -> bool:
         """Heatmap style validator"""
-        from .template.setting_heatmap import HEATMAP_DEFAULT
+        from .default_heatmap import HEATMAP_DEFAULT
 
         save_change = PresetValidator.add_missing_key(dict_user, HEATMAP_DEFAULT)
         # Sort styles
@@ -115,14 +115,14 @@ class StyleValidator:
     @staticmethod
     def tracks(dict_user: dict[str, dict]) -> bool:
         """Tracks style validator"""
-        from .template.setting_tracks import TRACKINFO_DEFAULT, TRACKS_DEFAULT
+        from .default_tracks import TRACKINFO_DEFAULT, TRACKS_DEFAULT
 
         return _validate_style(dict_user, TRACKS_DEFAULT, TRACKINFO_DEFAULT)
 
     @staticmethod
     def filelock(dict_user: dict[str, dict]) -> bool:
         """File lock validator"""
-        from .template.setting_filelock import FILELOCK_DEFAULT, FILELOCKINFO_DEFAULT
+        from .default_filelock import FILELOCK_DEFAULT, FILELOCKINFO_DEFAULT
 
         return _validate_style(dict_user, FILELOCK_DEFAULT, FILELOCKINFO_DEFAULT)
 
@@ -218,7 +218,7 @@ class PresetValidator:
     # Set validator methods in order
     _value_validators = tuple(
         getattr(ValueValidator, key)
-        for key, value in ValueValidator.__dict__.items()
+        for key, value in vars(ValueValidator).items()
         if isinstance(value, staticmethod)
     )
 

@@ -36,7 +36,7 @@ from PySide2.QtWidgets import (
 
 from .. import api, cfg
 from ..constant import CONFIG
-from ..template.setting_tracks import TRACKINFO_DEFAULT
+from ..setting.default_tracks import TRACKINFO_DEFAULT
 from ..userfile.json_setting import copy_setting
 from ._common import BaseEditor, ClockTableItem, CompactButton, FloatTableItem, UIScaler
 

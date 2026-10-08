@@ -69,7 +69,7 @@ class APIControl:
             name: API full name
         """
         if not name:
-            name = cfg.api_name
+            name = cfg.selected_api
 
         enable_legacy = cfg.telemetry["enable_legacy_api_selection"]
         if not self._available_api or self._enable_legacy != enable_legacy:
@@ -91,7 +91,7 @@ class APIControl:
 
         logger.warning("CONNECTING: Invalid API name, fall back to default")
         self._api = self._available_api[API.NAME_LMU]
-        cfg.api_name = self._api.NAME
+        cfg.selected_api = self._api.NAME
 
     def start(self):
         """Start API"""

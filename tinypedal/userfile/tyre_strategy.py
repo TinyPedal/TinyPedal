@@ -26,7 +26,7 @@ import csv
 import json
 import logging
 
-from ..setting_validator import PresetValidator
+from ..setting.validator import PresetValidator
 from ..userfile.json_setting import copy_setting
 
 logger = logging.getLogger(__name__)
