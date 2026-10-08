@@ -449,7 +449,7 @@ class TrackNotesEditor(BaseEditor):
 
     def delete_notes(self):
         """Delete notes entry"""
-        selected_rows = set(data.row() for data in self.table_notes.selectedIndexes())
+        selected_rows = {data.row() for data in self.table_notes.selectedIndexes()}
         if not selected_rows:
             QMessageBox.warning(self, "Error", "No data selected.")
             return
@@ -599,7 +599,7 @@ class TrackNotesEditor(BaseEditor):
     def add_tag(self, tag_name: str):
         """Add tag"""
         column_index = 3
-        row_indexes = set(data.row() for data in self.table_notes.selectedIndexes())
+        row_indexes = {data.row() for data in self.table_notes.selectedIndexes()}
         for row_index in row_indexes:
             item = self.table_notes.item(row_index, column_index)
             text = item.text()
@@ -610,7 +610,7 @@ class TrackNotesEditor(BaseEditor):
         """Remove all tags"""
         if self.confirm_operation("Clear Tag", "Clear all tags from selected notes?"):
             column_index = 3
-            row_indexes = set(data.row() for data in self.table_notes.selectedIndexes())
+            row_indexes = {data.row() for data in self.table_notes.selectedIndexes()}
             for row_index in row_indexes:
                 item = self.table_notes.item(row_index, column_index)
                 item.setText("")
@@ -624,10 +624,10 @@ class TrackNotesEditor(BaseEditor):
 
     def mark_positions_on_map(self):
         """Mark all positions on map"""
-        temp_coords = set(
+        temp_coords = {
             self.table_notes.item(row_index, 0).value()
             for row_index in range(self.table_notes.rowCount())
-        )
+        }
         self.trackmap.update_marked_coords(temp_coords)
 
     def get_track_name(self) -> str:

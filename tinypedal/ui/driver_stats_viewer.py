@@ -188,10 +188,8 @@ class DriverStatsViewer(BaseEditor):
         self.table_stats.setSortingEnabled(False)  # must disable before refresh
         self.table_stats.setRowCount(0)
 
-        row_index = 0
-        for veh_name, veh_data in self.selected_stats_dict.items():
+        for row_index, (veh_name, veh_data) in enumerate(self.selected_stats_dict.items()):
             self.add_stats_vehicle(row_index, veh_name, veh_data)
-            row_index += 1
 
         self.table_stats.setSortingEnabled(True)
         self.table_stats.sortByColumn(1, Qt.AscendingOrder)  # sort by laptime

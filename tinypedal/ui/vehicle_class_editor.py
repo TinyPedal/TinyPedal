@@ -114,11 +114,9 @@ class VehicleClassEditor(BaseEditor):
     def refresh_table(self):
         """Refresh class list"""
         self.table_classes.setRowCount(0)
-        row_index = 0
-        for class_name, class_data in self.classes_temp.items():
+        for row_index, (class_name, class_data) in enumerate(self.classes_temp.items()):
             self.add_vehicle_entry(
                 row_index, class_name, class_data["alias"], class_data["color"])
-            row_index += 1
 
     def __add_option_color(self, key):
         """Color string"""
@@ -162,7 +160,7 @@ class VehicleClassEditor(BaseEditor):
 
     def delete_class(self):
         """Delete class entry"""
-        selected_rows = set(data.row() for data in self.table_classes.selectedIndexes())
+        selected_rows = {data.row() for data in self.table_classes.selectedIndexes()}
         if not selected_rows:
             QMessageBox.warning(self, "Error", "No data selected.")
             return

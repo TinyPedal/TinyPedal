@@ -138,10 +138,8 @@ class VehicleBrandEditor(BaseEditor):
     def refresh_table(self):
         """Refresh brands list"""
         self.table_brands.setRowCount(0)
-        row_index = 0
-        for veh_name, brand_name in self.brands_temp.items():
+        for row_index, (veh_name, brand_name) in enumerate(self.brands_temp.items()):
             self.add_vehicle_entry(row_index, veh_name, brand_name)
-            row_index += 1
 
     def import_from_rf2(self):
         """Import brand from RF2"""
@@ -244,7 +242,7 @@ class VehicleBrandEditor(BaseEditor):
 
     def delete_brand(self):
         """Delete brand entry"""
-        selected_rows = set(data.row() for data in self.table_brands.selectedIndexes())
+        selected_rows = {data.row() for data in self.table_brands.selectedIndexes()}
         if not selected_rows:
             QMessageBox.warning(self, "Error", "No data selected.")
             return

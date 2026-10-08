@@ -64,6 +64,11 @@ CLASSES_DEFAULT = {
         "color": "#00CC44",
         "preset": "",
     },
+    "GT2": {
+        "alias": "GT2",
+        "color": "#BB0000",
+        "preset": "",
+    },
     "GT3": {
         "alias": "GT3",
         "color": "#229900",

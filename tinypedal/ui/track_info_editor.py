@@ -129,10 +129,8 @@ class TrackInfoEditor(BaseEditor):
     def refresh_table(self):
         """Refresh tracks list"""
         self.table_tracks.setRowCount(0)
-        row_index = 0
-        for track_name, track_data in self.tracks_temp.items():
+        for row_index, (track_name, track_data) in enumerate(self.tracks_temp.items()):
             self.add_track_entry(row_index, track_name, track_data)
-            row_index += 1
 
     def add_track(self):
         """Add new track"""
@@ -169,7 +167,7 @@ class TrackInfoEditor(BaseEditor):
 
     def delete_track(self):
         """Delete track entry"""
-        selected_rows = set(data.row() for data in self.table_tracks.selectedIndexes())
+        selected_rows = {data.row() for data in self.table_tracks.selectedIndexes()}
         if not selected_rows:
             QMessageBox.warning(self, "Error", "No data selected.")
             return

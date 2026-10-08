@@ -136,10 +136,8 @@ class DisplayOrderList(QListWidget):
     def refresh(self, target_orders: dict):
         """Refresh list"""
         self.clear()
-        row = 0
         for key in sorted(target_orders, key=lambda k: target_orders[k]):
             self._add_item(key)
-            row += 1
         self.setCurrentRow(0)
 
     def set_min_height(self, rows: int, min_rows: int = 5):

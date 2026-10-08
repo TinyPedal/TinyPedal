@@ -148,12 +148,9 @@ class HeatmapEditor(BaseEditor):
     def refresh_table(self):
         """Refresh temperature table"""
         self.table_heatmap.setRowCount(0)
-        row_index = 0
-
         self._verify_enabled = False
-        for temperature, color in self.selected_heatmap_dict.items():
+        for row_index, (temperature, color) in enumerate(self.selected_heatmap_dict.items()):
             self.add_temperature_entry(row_index, float(temperature), color)
-            row_index += 1
         self._verify_enabled = True
 
     def __add_option_color(self, key):
@@ -240,9 +237,9 @@ class HeatmapEditor(BaseEditor):
         self.add_temperature_entry(row_index, temperature, color)
         self.table_heatmap.setCurrentCell(row_index, 0)
 
-    def delete_temperature(self, row_index: int):
+    def delete_temperature(self):
         """Delete temperature entry"""
-        selected_rows = set(data.row() for data in self.table_heatmap.selectedIndexes())
+        selected_rows = {data.row() for data in self.table_heatmap.selectedIndexes()}
         if not selected_rows:
             QMessageBox.warning(self, "Error", "No data selected.")
             return
