@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from asyncio import StreamReader, create_task, open_connection, wait_for
+from asyncio import create_task, open_connection, wait_for
 from contextlib import asynccontextmanager
 from functools import partial
 from time import perf_counter
@@ -54,7 +54,7 @@ def set_header_get(uri: str = "/", host: str = "localhost", *headers: str) -> by
     return f"GET {uri} HTTP/1.1\r\nHost: {host}{extra_headers}\r\n\r\n".encode()
 
 
-async def parse_response(reader: StreamReader) -> bytes:
+async def parse_response(reader: asyncio.StreamReader) -> bytes:
     """Parse response"""
     # Get headers
     header_bytes = await reader.readuntil(b"\r\n\r\n")

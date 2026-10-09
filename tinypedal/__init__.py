@@ -17,7 +17,9 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Global variable
+Global variable, function
+
+Important: DO NOT call those functions in non-main thread.
 """
 
 from __future__ import annotations
@@ -25,9 +27,9 @@ from __future__ import annotations
 import io
 import logging
 import os
+import sys
+import time
 from typing import TYPE_CHECKING
-
-from . import state
 
 if TYPE_CHECKING:
     from .api_control import APIControl
@@ -36,6 +38,7 @@ if TYPE_CHECKING:
     from .module_control import ModuleControl
     from .module_info import ModuleInfo
     from .overlay_control import OverlayControl
+    from .state import ApplicationSignal, OverlaySignal, RealtimeState
     from .update import UpdateChecker
 
 
@@ -43,9 +46,9 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__package__)
 
 # Global state & signal
-realtime_state = state.RealtimeState()
-overlay_signal = state.OverlaySignal()
-app_signal = state.ApplicationSignal()
+realtime_state: RealtimeState = None  # type: ignore
+overlay_signal: OverlaySignal = None  # type: ignore
+app_signal: ApplicationSignal = None  # type: ignore
 
 # Global singleton (init later)
 log_stream: io.StringIO = None  # type: ignore
@@ -59,6 +62,7 @@ octrl: OverlayControl = None  # type: ignore
 updater: UpdateChecker = None  # type: ignore
 
 
+# Public function
 def start(single_instance: bool, log_level: int):
     """Launch check & start app"""
     # Set log stream
@@ -77,8 +81,6 @@ def start(single_instance: bool, log_level: int):
     set_logging_level(logger, path_global, FILE.LOG_APP, log_stream, log_level)
 
     # Check single instance
-    from . import realtime_state
-    realtime_state.singleton = single_instance
     logger.info("Single instance mode: %s", "ON" if single_instance else "OFF")
     _check_single_instance(single_instance, path_global, FILE.LOG_PID)
 
@@ -91,42 +93,109 @@ def start(single_instance: bool, log_level: int):
     logger.info("psutil: %s", version_check.psutil())
 
     # Init global variable
-    _init_globals(path_global)
+    _init_globals(single_instance, path_global)
 
-    # Start app
-    from . import loader
-    loader.init()
+    # Init app
+    _init_app()
 
 
-def _init_globals(path_global: str):
+def close():
+    """Close api, modules (call before quit APP)"""
+    logger.info("CLOSING............")
+    # Unload modules
+    _unload_modules()
+    # Stop & close api
+    api.stop()
+    api.close()
+
+
+def restart():
+    """Restart APP"""
+    logger.info("RESTARTING............")
+    # Wait unfinished saving
+    if cfg.is_saving:
+        # Trigger immediate saving from queue
+        cfg.save(next_task=True)
+        while cfg.is_saving:
+            time.sleep(0.01)
+    # Close modules
+    close()
+    # Set restart env for skipping single instance check
+    os.environ["TINYPEDAL_RESTART"] = "TRUE"
+    # Restart
+    if os.getenv("RUN_FROM_SOURCE"):  # run as script
+        os.execl(sys.executable, sys.executable, *sys.argv)
+    else:  # run as exe
+        os.execl(sys.executable, *sys.argv)
+
+
+def reload(reload_preset: bool = False):
+    """Reload preset, api, modules
+
+    Args:
+        reload_preset:
+            Whether to reload preset file.
+            Should only done if changed global setting,
+            or reloading from preset tab,
+            or auto-loading preset.
+    """
+    logger.info("RELOADING............")
+    # Wait unfinished saving
+    if cfg.is_saving:
+        # Trigger immediate saving from queue
+        cfg.save(next_task=True)
+        while cfg.is_saving:
+            time.sleep(0.01)
+    # Unload modules
+    _unload_modules()
+    # Reload user preset from file
+    if reload_preset:
+        cfg.load_user()
+        cfg.save(0)  # save new changes in case preset file modified externally
+    # Restart api
+    api.restart()
+    # Load modules
+    _load_modules()
+
+
+# Private function
+def _init_globals(single_instance: bool, path_global: str):
     """Initialize global singleton (in order), once only after launch check done"""
-    # 1 config
+    # Config
     global cfg
     if cfg:  # one time init only
         raise RuntimeError("global singleton already initialized")
     from .configuration import Configuration
     cfg = Configuration()
-    cfg.path.config = path_global
 
     # Load global config & set environment
     from .constant import CONFIG
+    cfg.path.config = path_global
     cfg.load_global()
     cfg.save(config_type=CONFIG.TYPE_CONFIG)
     cfg.save(config_type=CONFIG.TYPE_SHORTCUTS)
     _clear_environment()
     _update_environment()
 
-    # 2 api
+    # State & signal
+    global realtime_state, overlay_signal, app_signal
+    from .state import ApplicationSignal, OverlaySignal, RealtimeState
+    realtime_state = RealtimeState()
+    overlay_signal = OverlaySignal()
+    app_signal = ApplicationSignal()
+    realtime_state.singleton = single_instance
+
+    # API
     global api
     from .api_control import APIControl
     api = APIControl()
 
-    # 3 module data
+    # Module data
     global minfo
     from .module_info import ModuleInfo
     minfo = ModuleInfo()
 
-    # 4 module, widget control
+    # Module, widget control
     global mctrl, wctrl
     from . import module, widget
     from .constant import CONFIG
@@ -134,20 +203,75 @@ def _init_globals(path_global: str):
     mctrl = ModuleControl(target=module, type_id=CONFIG.TYPE_MODULE)
     wctrl = ModuleControl(target=widget, type_id=CONFIG.TYPE_WIDGET)
 
-    # 5 hotkey control
+    # Hotkey control
     global kctrl
     from .hotkey_control import HotkeyControl
     kctrl = HotkeyControl()
 
-    # 6 overlay control
+    # Overlay control
     global octrl
     from .overlay_control import OverlayControl
     octrl = OverlayControl()
 
-    # 7 update checker
+    # Update checker
     global updater
     from .update import UpdateChecker
     updater = UpdateChecker()
+
+
+def _init_app():
+    """Initialize gui, api, modules (once per launch)"""
+    logger.info("STARTING............")
+    # Init core GUI
+    from . import ui
+    if ui.QApplication.instance():
+        raise RuntimeError("core GUI already initialized")
+    root = ui.init(cfg.application["enable_high_dpi_scaling"])
+
+    # Load user preset
+    cfg.set_next_to_load()
+    cfg.load_user()
+    cfg.save()
+
+    # Start api
+    api.connect()
+    api.start()
+
+    # Start main window
+    from .ui import app
+    app.AppWindow()
+
+    # Finalize loading after main GUI fully loaded
+    logger.info("FINALIZING............")
+
+    # Start modules
+    _load_modules()
+
+    # Check for updates
+    if cfg.application["check_for_updates_on_startup"]:
+        updater.check(False)
+
+    # Refresh main GUI
+    app_signal.refresh.emit(True)
+
+    # Start main loop
+    sys.exit(root.exec_())
+
+
+def _load_modules():
+    """Load modules (in order)"""
+    mctrl.start()
+    wctrl.start()
+    kctrl.enable()
+    octrl.enable()
+
+
+def _unload_modules():
+    """Unload modules (in order)"""
+    octrl.disable()
+    kctrl.disable()
+    wctrl.close()
+    mctrl.close()
 
 
 def _save_pid_file(filepath: str, filename: str):

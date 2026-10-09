@@ -36,7 +36,9 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from .. import api, app_signal, cfg, loader, mctrl, wctrl
+import tinypedal
+
+from .. import api, app_signal, cfg, mctrl, wctrl
 from ..constant import APP, CONFIG
 from ._common import BaseDialog, UIScaler
 from ._style import set_style_palette, set_style_window
@@ -367,7 +369,7 @@ class AppWindow(QMainWindow):
     def restart_app(self):
         """Restart app"""
         self.save_window_state()
-        loader.restart()
+        tinypedal.restart()
 
     @Slot(bool)  # type: ignore[operator]
     def quit_app(self):
@@ -375,10 +377,10 @@ class AppWindow(QMainWindow):
         if self.closing:  # one-time quit only
             return
         self.closing = True
-        loader.close()  # must close this first
         self.save_window_state()
         self.__break_signal()
         self.findChild(QSystemTrayIcon).hide()  # workaround tray icon not removed after exited
+        tinypedal.close()
         QApplication.quit()
 
     def closeEvent(self, event):
@@ -396,7 +398,7 @@ class AppWindow(QMainWindow):
         for _widget in self.findChildren(BaseDialog):
             if _widget.TYPE == CONFIG.TYPE_CONFIG:
                 _widget.close()
-        loader.reload(reload_preset)
+        tinypedal.reload(reload_preset)
         app_signal.refresh.emit(True)
 
     @Slot(object)  # type: ignore[operator]

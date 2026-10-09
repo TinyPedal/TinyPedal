@@ -145,8 +145,10 @@ class Configuration:
         """Check if selected setting file is already loaded"""
         return self.filename.setting == filename
 
-    def set_next_to_load(self, filename: str):
+    def set_next_to_load(self, filename: str = ""):
         """Set next setting filename to load"""
+        if not filename:
+            filename = f"{self.preset_files()[0]}{FILE.EXT_JSON}"
         self._setting_to_load = filename
 
     def get_primary_preset_name(self, preset_name: str) -> str:
