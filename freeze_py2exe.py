@@ -133,10 +133,27 @@ def build_exe(dist_path: str) -> None:
         "thirdparty",
         # "_ssl",
         # "ssl",
-        # "email",
-        # "http",
-        # "urllib",
+        "email",
+        "http",
+        "_pydecimal",
+        "lzma",
+        "bz2",
+        "calender",
+        "getopt",
+        "argparse",
+        "optparse",
+        "tarfile",
+        "doctest",
+        "configparser",
+        "plistlib",
+        "pickle",
     ]
+    if sys.version_info < (3, 10):
+        EXCLUDE_MODULES += [
+            # Required by pyside2 on python 3.10+
+            "urllib",
+            "pathlib",
+        ]
     BUILD_OPTIONS = {
         "dist_dir": f"{dist_path}/{APP.TINYPEDAL}",
         "excludes": EXCLUDE_MODULES,

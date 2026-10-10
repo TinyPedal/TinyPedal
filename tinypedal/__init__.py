@@ -63,7 +63,7 @@ updater: UpdateChecker = None  # type: ignore
 
 
 # Public function
-def start(single_instance: bool, log_level: int):
+def start(log_level: int, single_instance: bool):
     """Launch check & start app"""
     # Set log stream
     global log_stream
@@ -81,7 +81,6 @@ def start(single_instance: bool, log_level: int):
     set_logging_level(logger, path_global, FILE.LOG_APP, log_stream, log_level)
 
     # Check single instance
-    logger.info("Single instance mode: %s", "ON" if single_instance else "OFF")
     _check_single_instance(single_instance, path_global, FILE.LOG_PID)
 
     # Check app & library version
@@ -224,9 +223,7 @@ def _init_app():
     logger.info("STARTING............")
     # Init core GUI
     from . import ui
-    if ui.QApplication.instance():
-        raise RuntimeError("core GUI already initialized")
-    root = ui.init(cfg.application["enable_high_dpi_scaling"])
+    ui.init(cfg.application["enable_high_dpi_scaling"])
 
     # Load user preset
     cfg.set_next_to_load()
@@ -253,9 +250,6 @@ def _init_app():
 
     # Refresh main GUI
     app_signal.refresh.emit(True)
-
-    # Start main loop
-    sys.exit(root.exec_())
 
 
 def _load_modules():
@@ -304,6 +298,7 @@ def _is_pid_exist(filepath: str, filename: str) -> bool:
 
 def _check_single_instance(single_mode: bool, filepath: str, filename: str):
     """Check single instance, True=passed check, False=failed check"""
+    logger.info("Single instance mode: %s", "ON" if single_mode else "OFF")
     # Multi-instance mode enabled
     if not single_mode:
         return

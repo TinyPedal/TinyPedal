@@ -70,6 +70,8 @@ def set_app_font(root: QApplication):
 
 def init(high_dpi: bool) -> QApplication:
     """Initialize APP core GUI"""
+    if QApplication.instance():
+        raise RuntimeError("core GUI already initialized")
     # Set global locale
     set_app_locale()
     # Set DPI scale
