@@ -267,27 +267,36 @@ def export_lmu_car_setup(source: dict, default: tuple) -> tuple[str, ...]:
     return tuple(lmu_car_setup_json_to_svm(source, LMU_CARSETUP_MAP))
 
 
-def export_rf2_car_setup(source: dict, default: tuple, _shared_data: dict = {}) -> tuple[str, ...]:
-    """Export rf2 car setup"""
-    if not isinstance(source, dict) or not source:
-        _shared_data.clear()
-        return default
+class ExportCarSetupRF2:
+    """Export RF2 car setup
 
-    # RF2 setup data splits amount different API access points
-    # Store temp data in '_shared_data' and share amount calls
-    # Check & reset data in case of incomplete data due to inaccessible point
-    for key in RF2_CARSETUP_REFERENCE_KEY:
-        if key in source and key in _shared_data:
-            _shared_data.clear()
+    RF2 setup data splits amount different API access points.
+    Store temp data in '_shared_data' and share amount calls.
+    """
 
-    # Update temp data
-    _shared_data.update(source)
+    def __init__(self):
+        self._shared_data = {}
 
-    # Export only if all unique reference keys exist
-    for key in RF2_CARSETUP_REFERENCE_KEY:
-        if key not in _shared_data:
+    def __call__(self, source: dict, default: tuple) -> tuple[str, ...]:
+        """Export rf2 car setup"""
+        temp_data = self._shared_data
+        if not isinstance(source, dict) or not source:
+            temp_data.clear()
             return default
 
-    export_data = tuple(lmu_car_setup_json_to_svm(_shared_data, LMU_CARSETUP_MAP))
-    _shared_data.clear()
-    return export_data
+        # Check & reset data in case of incomplete data due to inaccessible point
+        for key in RF2_CARSETUP_REFERENCE_KEY:
+            if key in source and key in temp_data:
+                temp_data.clear()
+
+        # Update temp data
+        temp_data.update(source)
+
+        # Export only if all unique reference keys exist
+        for key in RF2_CARSETUP_REFERENCE_KEY:
+            if key not in temp_data:
+                return default
+
+        export_data = tuple(lmu_car_setup_json_to_svm(temp_data, LMU_CARSETUP_MAP))
+        temp_data.clear()
+        return export_data

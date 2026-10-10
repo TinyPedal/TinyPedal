@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import logging
 
-from ..process.garage import export_rf2_car_setup
+from ..process.garage import ExportCarSetupRF2
 from ..process.weather import FORECAST_DEFAULT, forecast_rf2
 from ..validator import valid_value_type
 from ._restapi import ResOutput, RestAPITask
@@ -48,7 +48,7 @@ def rf2_restapi_tasks() -> tuple[RestAPITask, ...]:
         ResOutput("privateQualifying", 0, valid_value_type, ("currentValue",)),
     )
     res_garagesetup = (
-        ResOutput("lastCarSetup", (), export_rf2_car_setup),
+        ResOutput("lastCarSetup", (), ExportCarSetupRF2()),
     )
     # Define task set
     return (
