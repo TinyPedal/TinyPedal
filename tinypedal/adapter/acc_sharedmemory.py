@@ -89,9 +89,16 @@ class MMapDataSet:
         Args:
             access_mode: 0 = copy access, 1 = direct access.
         """
-        self.phys.create(access_mode)
-        self.ghfx.create(access_mode)
-        self.stat.create(access_mode)
+        created = []
+        try:
+            for mmap_control in (self.phys, self.ghfx, self.stat):
+                mmap_control.create(access_mode)
+                created.append(mmap_control)
+        except (FileNotFoundError, ValueError):
+            # Not all files available yet, roll back to avoid half-open state
+            for mmap_control in created:
+                mmap_control.close()
+            raise
 
     def close_mmap(self) -> None:
         """Close mmap instance"""
@@ -120,6 +127,7 @@ class SyncData:
 
     __slots__ = (
         "_updating",
+        "_mapped",
         "_update_thread",
         "_event",
         "paused",
@@ -137,6 +145,7 @@ class SyncData:
 
     def __init__(self) -> None:
         self._updating = False
+        self._mapped = False
         self._update_thread = None
         self._event = threading.Event()
 
@@ -165,14 +174,19 @@ class SyncData:
             logger.warning("sharedmemory: UPDATING: already started")
         else:
             self._updating = True
-            # Initialize mmap data
-            self.dataset.create_mmap(access_mode)
-            self.player_phys = self.dataset.phys.data
-            self.player_ghfx = self.dataset.ghfx.data
-            self.player_stat = self.dataset.stat.data
+            # Use blank data until mmap is available
+            self.player_phys = acc_data.ACCPhysics()
+            self.player_ghfx = acc_data.ACCGraphics()
+            self.player_stat = acc_data.ACCStatic()
+            # Initialize mmap data, if game is not running yet, keep waiting in thread
+            self._mapped = False
+            if not self.__map_dataset(access_mode):
+                logger.info("sharedmemory: WAITING: shared memory not available yet")
             # Setup updating thread
             self._event.clear()
-            self._update_thread = threading.Thread(target=self.__update, daemon=True)
+            self._update_thread = threading.Thread(
+                target=self.__update, args=(access_mode,), daemon=True
+            )
             self._update_thread.start()
             logger.info("sharedmemory: UPDATING: thread started")
             logger.info("sharedmemory: player index override: %s", self.override_player_index)
@@ -187,17 +201,44 @@ class SyncData:
             self.player_phys = copy_struct(self.player_phys)
             self.player_ghfx = copy_struct(self.player_ghfx)
             self.player_stat = copy_struct(self.player_stat)
-            self.dataset.close_mmap()
+            if self._mapped:
+                self.dataset.close_mmap()
+                self._mapped = False
         else:
             logger.warning("sharedmemory: UPDATING: already stopped")
 
-    def __update(self) -> None:
+    def __map_dataset(self, access_mode: int) -> bool:
+        """Try creating mmap data set, without creating any shared memory file
+
+        Returns:
+            True if mmap is ready, False if game has not provided shared memory yet.
+        """
+        try:
+            self.dataset.create_mmap(access_mode)
+        except (FileNotFoundError, ValueError):
+            return False
+        self.player_phys = self.dataset.phys.data
+        self.player_ghfx = self.dataset.ghfx.data
+        self.player_stat = self.dataset.stat.data
+        self._mapped = True
+        return True
+
+    def __update(self, access_mode: int) -> None:
         """Update synced player data"""
         self.paused = True
         self.synced = False
         self.resets = 0
 
         _event_wait = self._event.wait
+
+        # Wait for game (or its bridge) to provide shared memory
+        while not self._mapped:
+            if _event_wait(1.0):  # stop requested
+                logger.info("sharedmemory: UPDATING: thread stopped")
+                return
+            if self.__map_dataset(access_mode):
+                logger.info("sharedmemory: UPDATING: shared memory found")
+
         freezed_timestamp = 0  # store freezed timestamp
         last_session_timestamp = 0  # store last timestamp
         last_update_time = 0.0
