@@ -210,13 +210,14 @@ def load_notes_file(
 def write_csv_notes(
     notes_file: Any, table_header: tuple, dataset: list, metadata: dict, _: str):
     """Write TinyPedal notes format to file"""
+    writer = notes_file.write
     # Write TinyPedal file version
-    notes_file.write(f"TINYPEDAL {table_header[1].upper()}S FILE VERSION,2")
-    notes_file.write(DATA.CRLF * 2)
+    writer(f"TINYPEDAL {table_header[1].upper()}S FILE VERSION,2")
+    writer(DATA.CRLF * 2)
     # Write metadata
     meta_output = DATA.CRLF.join(f"{key},\"{value}\"" for key, value in metadata.items())
-    notes_file.write(meta_output)
-    notes_file.write(DATA.CRLF * 2)
+    writer(meta_output)
+    writer(DATA.CRLF * 2)
     # Write notes
     notes_writer = csv.DictWriter(
         notes_file, fieldnames=table_header, extrasaction="ignore", quoting=csv.QUOTE_MINIMAL
@@ -234,35 +235,36 @@ def write_gpl_notes(
     # Write metadata
     meta_output = DATA.CRLF.join(f";{key}: {value}" for key, value in metadata.items())
     line_separator = f";{'*' * 27}{DATA.CRLF}"
-    notes_file.write(line_separator)
-    notes_file.write(f";GPL PACE NOTES .INI FILE  Version 3{DATA.CRLF}")
-    notes_file.write(f";{filename[:-4]}{DATA.CRLF}")
-    notes_file.write(line_separator)
-    notes_file.write(DATA.CRLF)
-    notes_file.write(meta_output)
-    notes_file.write(DATA.CRLF * 2)
-    notes_file.write(line_separator)
-    notes_file.write(DATA.CRLF)
-    notes_file.write(f";Any line beginning with a ; is a comment and is ignored{DATA.CRLF}")
-    notes_file.write(f";Any information to the right of a ; is a comment and is ignored{DATA.CRLF}")
-    notes_file.write(f";Any line beginning with a space is ignored{DATA.CRLF}")
-    notes_file.write(DATA.CRLF)
-    notes_file.write(line_separator)
-    notes_file.write(DATA.CRLF)
-    notes_file.write(f";This section contains the sound entries with:{DATA.CRLF}")
-    notes_file.write(f";1) Sound filename including the .mp3 suffix{DATA.CRLF}")
-    notes_file.write(f";2) Distance in meters from the track start point to play the sound{DATA.CRLF}")
-    notes_file.write(DATA.CRLF)
-    notes_file.write(line_separator)
-    notes_file.write(DATA.CRLF)
+    writer = notes_file.write
+    writer(line_separator)
+    writer(f";GPL PACE NOTES .INI FILE  Version 3{DATA.CRLF}")
+    writer(f";{filename[:-4]}{DATA.CRLF}")
+    writer(line_separator)
+    writer(DATA.CRLF)
+    writer(meta_output)
+    writer(DATA.CRLF * 2)
+    writer(line_separator)
+    writer(DATA.CRLF)
+    writer(f";Any line beginning with a ; is a comment and is ignored{DATA.CRLF}")
+    writer(f";Any information to the right of a ; is a comment and is ignored{DATA.CRLF}")
+    writer(f";Any line beginning with a space is ignored{DATA.CRLF}")
+    writer(DATA.CRLF)
+    writer(line_separator)
+    writer(DATA.CRLF)
+    writer(f";This section contains the sound entries with:{DATA.CRLF}")
+    writer(f";1) Sound filename including the .mp3 suffix{DATA.CRLF}")
+    writer(f";2) Distance in meters from the track start point to play the sound{DATA.CRLF}")
+    writer(DATA.CRLF)
+    writer(line_separator)
+    writer(DATA.CRLF)
     # Write notes
     for note_line in dataset:
-        notes_file.write(
+        writer(
             f"{note_line[table_header[1]]}.mp3, "  # sound file name
             f"{note_line[table_header[0]]:.0f}; "  # distance integer
             f"{note_line[table_header[2]]}{DATA.CRLF}"  # comment
         )
-    notes_file.write(DATA.CRLF)
+    writer(DATA.CRLF)
 
 
 def save_notes_file(

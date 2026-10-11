@@ -23,11 +23,9 @@ Track map file function
 from __future__ import annotations
 
 import logging
-import xml.dom.minidom
-import xml.parsers.expat
 
-from ..constant import FILE
-from ..validator import invalid_save_name
+from ..constant import DATA, FILE
+from ..validator import image_exists, invalid_save_name
 
 logger = logging.getLogger(__name__)
 
@@ -80,30 +78,46 @@ def load_track_map_file(
     filepath: str, filename: str, extension: str = FILE.EXT_SVG
 ) -> tuple[tuple, ...]:
     """Load svg track map file (*.svg)"""
+    full_filename = f"{filepath}{filename}{extension}"
     try:
-        dom = xml.dom.minidom.parse(f"{filepath}{filename}{extension}")
-        desc_col = dom.documentElement.getElementsByTagName("desc")
-        path_col = dom.documentElement.getElementsByTagName("polyline")
-        svg_coords = svg_dists = None
-        for tags in path_col:
-            if tags.getAttribute("id") == "map":
-                svg_coords = tags.getAttribute("points")
-                continue
-            if tags.getAttribute("id") == "dist":
-                svg_dists = tags.getAttribute("points")
-                continue
+        track_title = None
+        track_sector = None
+        track_map = None
+        track_dist = None
+        # Check existing file and size < 5MB
+        if not image_exists(full_filename, extension, 5_120_000):
+            raise ValueError
+        # Parse track map data
+        with open(full_filename, "r", encoding="utf-8") as svg_data:
+            for line in svg_data:
+                if not track_title:
+                    temp_data = _read_data(line, "<title>", "</title>")
+                    if temp_data:
+                        track_title = temp_data
+                    continue
+                if not track_sector:
+                    temp_data = _read_data(line, "<desc>", "</desc>")
+                    if temp_data:
+                        track_sector = temp_data
+                    continue
+                if not track_map:
+                    temp_data = _read_data(line, '<polyline id="map"', '"/>', 'points="')
+                    if temp_data:
+                        track_map = temp_data
+                    continue
+                if not track_dist:
+                    temp_data = _read_data(line, '<polyline id="dist"', '"/>', 'points="')
+                    if temp_data:
+                        track_dist = temp_data
+                    continue
         # Convert to coordinates list
-        if not isinstance(svg_coords, str):
-            raise TypeError
-        if not isinstance(svg_dists, str):
-            raise TypeError
-        raw_coords = points_to_coords(svg_coords)
-        raw_dists = points_to_coords(svg_dists)
-        sector_index = string_pair_to_int(desc_col[0].childNodes[0].nodeValue)
+        raw_coords = points_to_coords(track_map)
+        raw_dists = points_to_coords(track_dist)
+        sector_index = string_pair_to_int(track_sector)
         return raw_coords, raw_dists, sector_index
     except FileNotFoundError:
         logger.info("MISSING: track map (%s) data", extension)
-    except (AttributeError, IndexError, ValueError, xml.parsers.expat.ExpatError):
+    except (AttributeError, IndexError, ValueError, TypeError):
         logger.info("MISSING: invalid track map (%s) data", extension)
     return (), (), ()
 
@@ -122,52 +136,42 @@ def save_track_map_file(
     if invalid_save_name(filename):
         return
     # Convert to svg coordinates
-    svg_coords = coords_to_points(raw_coords, decimals)
-    svg_dists = coords_to_points(raw_dists, decimals)
-    # Create new svg file
-    new_svg = xml.dom.minidom.Document()
-    # Create comments
-    root_comment = new_svg.createComment(" Track map generated with TinyPedal ")
-    new_svg.appendChild(root_comment)
-    # Create svg
-    root_node = new_svg.createElement("svg")
-    root_node.setAttribute("viewBox", view_box)
-    root_node.setAttribute("version", "1.1")
-    root_node.setAttribute("xmlns", "http://www.w3.org/2000/svg")
-    new_svg.appendChild(root_node)
-    # Create title
-    title_node = new_svg.createElement("title")
-    title_text = new_svg.createTextNode(filename)
-    title_node.appendChild(title_text)
-    root_node.appendChild(title_node)
-    # Create desc
-    desc_comment = new_svg.createComment(" Sector coordinates index ")
-    root_node.appendChild(desc_comment)
-    desc_node = new_svg.createElement("desc")
-    desc_text = new_svg.createTextNode(f"{sector_index[0]},{sector_index[1]}")
-    desc_node.appendChild(desc_text)
-    root_node.appendChild(desc_node)
-    # Create map
-    map_comment = new_svg.createComment(" Raw global coordinates ")
-    root_node.appendChild(map_comment)
-    map_node = new_svg.createElement("polyline")
-    map_node.setAttribute("id", "map")
-    map_node.setAttribute("fill", "none")
-    map_node.setAttribute("stroke", "black")
-    map_node.setAttribute("stroke-width", "10")
-    map_node.setAttribute("points", svg_coords)
-    root_node.appendChild(map_node)
-    # Create distance
-    dist_comment = new_svg.createComment(" Raw distance reference points ")
-    root_node.appendChild(dist_comment)
-    dist_node = new_svg.createElement("polyline")
-    dist_node.setAttribute("id", "dist")
-    dist_node.setAttribute("fill", "none")
-    dist_node.setAttribute("stroke", "none")
-    dist_node.setAttribute("stroke-width", "0")
-    dist_node.setAttribute("points", svg_dists)
-    root_node.appendChild(dist_node)
+    map_coords = coords_to_points(raw_coords, decimals)
+    map_dists = coords_to_points(raw_dists, decimals)
     # Save svg
-    with open(f"{filepath}{filename}{extension}", "w", encoding="utf-8") as svgfile:
-        new_svg.writexml(svgfile, indent="", addindent="\t", newl="\n", encoding="utf-8")
+    full_filename = f"{filepath}{filename}{extension}"
+    with open(full_filename, "w", encoding="utf-8", newline=DATA.CRLF) as svgfile:
+        writer = svgfile.write
+        # XML declaration
+        writer('<?xml version="1.0" encoding="utf-8"?>\n')
+        writer("<!-- Track map generated with TinyPedal -->\n")
+        # SVG start tag
+        writer(f'<svg viewBox="{view_box}" version="1.1" xmlns="http://www.w3.org/2000/svg">\n')
+        # SVG title
+        writer(f"\t<title>{filename}</title>\n")
+        # SVG description (sector)
+        writer("\t<!-- Sector coordinates index -->\n")
+        writer(f"\t<desc>{sector_index[0]},{sector_index[1]}</desc>\n")
+        # SVG map coordinates
+        writer("\t<!-- Raw global coordinates -->\n")
+        writer(f'\t<polyline id="map" fill="none" stroke="black" stroke-width="10" points="{map_coords}"/>\n')
+        # SVG distance elevation coordinates
+        writer("\t<!-- Raw distance reference points -->\n")
+        writer(f'\t<polyline id="dist" fill="none" stroke="none" stroke-width="0" points="{map_dists}"/>\n')
+        # SVG end tag
+        writer("</svg>\n")
         logger.info("USERDATA: %s%s saved", filename, extension)
+
+
+def _read_data(data: str, start: str, end: str, mid: str = "") -> str | None:
+    """Read svg data"""
+    pos_beg = data.find(start)
+    if pos_beg < 0:
+        return None
+    if mid:
+        start = mid
+        pos_beg = data.find(start)
+        if pos_beg < 0:
+            return None
+    pos_end = data.find(end)
+    return data[pos_beg+len(start):pos_end]
