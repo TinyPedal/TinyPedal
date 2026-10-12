@@ -3603,6 +3603,15 @@ Show vehicles parked in garage stall. Default is `false`. Note, local player is 
     additional_players_front, additional_players_behind
 Set additional players shown on relative list. Each value is limited to a maximum of 60 additional players (for a total of 120 additional players). Default is `0`.
 
+    show_caption
+Show caption row on top of table columns. Caption may expand column width to fit caption text. Caption alignment follows corresponding column text alignment option.
+
+    caption_text_*
+Set caption text for each column. Set to `""` to show caption background only, which is default for self-explanatory columns such as position, driver name, brand logo.
+
+    caption_text_title
+Set title text that displayed across leading columns with empty caption text, such as position, brand logo, driver name columns. Default is widget name. Set to `""` to disable.
+
 [**`Back to Top`**](#)
 
 

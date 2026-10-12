@@ -511,6 +511,90 @@ class Overlay(Base):
             if hide_start <= row:
                 target.hide()
 
+    def set_grid_layout_table_caption(
+        self,
+        layout: QGridLayout,
+        padding: int = 0,
+        row: int = 0,
+        row_start: int = 1,
+        alignments: dict[str, str] | None = None,
+    ):
+        """Set grid layout - table caption row
+
+        Set caption for each "display_order_*" column that contains widget at row_start,
+        with text from corresponding "caption_text_*" option. Caption expands column width
+        to fit text. Empty caption text fills column with caption background only.
+
+        If "caption_text_title" option is not empty, title text is displayed (left aligned)
+        across leading columns that have empty caption text, without expanding column width.
+
+        Args:
+            layout: table grid layout.
+            padding: horizontal padding in pixel.
+            row: caption row index.
+            row_start: table row start index, for checking column existence.
+            alignments: caption text alignment ("Left", "Center", "Right") by column name.
+                Default is "Center".
+        """
+        font_cap = self.config_font(
+            self.wcfg["font_name"],
+            self.wcfg["font_size"] * self.wcfg["font_scale_caption"],
+            self.wcfg["font_weight"],
+        )
+        font_cap_m = self.get_font_metrics(font_cap)
+        text_metrics = QFontMetrics(font_cap)
+        if alignments is None:
+            alignments = {}
+
+        # Caption text of existing columns, sorted by column index
+        captions = sorted(
+            (column, key[len("display_order_"):])
+            for key, column in self.wcfg.items()
+            if key.startswith("display_order_")
+            and layout.itemAtPosition(row_start, column) is not None
+        )
+        captions = [
+            (column, self.wcfg.get(f"caption_text_{name}", ""), alignments.get(name, "Center"))
+            for column, name in captions
+        ]
+
+        # Title across leading columns with empty caption text
+        title = self.wcfg.get("caption_text_title", "")
+        title_span = 0
+        if title:
+            for _, text, _ in captions:
+                if text:
+                    break
+                title_span += 1
+        if title_span:
+            cap_temp = self.set_rawtext(
+                font=font_cap,
+                text=title,
+                padding=padding,
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
+                fg_color=self.wcfg["font_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
+                alignment="Left",
+            )
+            column_first = captions[0][0]
+            column_last = captions[title_span - 1][0]
+            layout.addWidget(cap_temp, row, column_first, 1, column_last - column_first + 1)
+
+        for column, text, align in captions[title_span:]:
+            cap_temp = self.set_rawtext(
+                font=font_cap,
+                text=text,
+                padding=padding,
+                width=text_metrics.horizontalAdvance(text),
+                fixed_height=font_cap_m.height,
+                offset_y=font_cap_m.voffset,
+                fg_color=self.wcfg["font_color_caption"],
+                bg_color=self.wcfg["background_color_caption"],
+                alignment=align,
+            )
+            layout.addWidget(cap_temp, row, column)
+
     @staticmethod
     def set_grid_layout(
         gap: int = 0,
