@@ -58,7 +58,8 @@ class Realtime(Overlay):
         text_rake = self.format_rake(0)
         self.bar_rake = self.set_rawtext(
             text=text_rake,
-            width=font_m.width * len(text_rake) + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * len(text_rake),
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_rake_angle"],

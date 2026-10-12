@@ -1,3 +1,9 @@
+WIP
+-----------------------------
+* Relative, Rivals, Standings Widget
+  - Replaced "driver_name_align_center, vehicle_name_align_center, time_gap_align_center, time_interval_align_center" with new corresponding "text_alignment" options, which support "Left, Center, Right" alignment. Old setting will be automatically transferred over.
+  - New text alignment options now supports proper left or right alignment for regular (none monospaced) fonts (requested by user "ssalamon").
+
 2.51.0 (2026-10-03)
 -----------------------------
 * [New]Support for Assetto Corsa Competizione

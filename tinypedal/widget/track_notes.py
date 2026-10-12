@@ -64,12 +64,13 @@ class Realtime(Overlay):
         if self.wcfg["show_track_notes"]:
             self.bar_notes = self.set_rawtext(
                 text="TRACK NOTES",
-                width=font_m.width * notes_width + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * notes_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_track_notes"],
                 bg_color=bg_color_notes,
-                alignment=self.set_text_alignment(self.wcfg["track_notes_text_alignment"]),
+                alignment=self.wcfg["track_notes_text_alignment"],
             )
             self.set_primary_orient(
                 target=self.bar_notes,
@@ -81,12 +82,13 @@ class Realtime(Overlay):
             self.base_height = font_m.height
             self.bar_comments = self.set_rawtext(
                 text="COMMENTS",
-                width=font_m.width * comments_width + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * comments_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_comments"],
                 bg_color=bg_color_comments,
-                alignment=self.set_text_alignment(self.wcfg["comments_text_alignment"]),
+                alignment=self.wcfg["comments_text_alignment"],
             )
             self.set_primary_orient(
                 target=self.bar_comments,
@@ -97,12 +99,13 @@ class Realtime(Overlay):
         if self.wcfg["show_debugging"]:
             self.bar_debugging = self.set_rawtext(
                 text="DEBUGGING",
-                width=font_m.width * debugging_width + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * debugging_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_debugging"],
                 bg_color=bg_color_debugging,
-                alignment=self.set_text_alignment(self.wcfg["debugging_text_alignment"]),
+                alignment=self.wcfg["debugging_text_alignment"],
             )
             self.set_primary_orient(
                 target=self.bar_debugging,

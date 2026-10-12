@@ -53,13 +53,14 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 4 + bar_padx
+        bar_width = font_m.width * 4
 
         # Total travel
         if self.wcfg["show_total_travel"]:
             layout_total = self.set_grid_layout()
             self.bars_total = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -92,6 +93,7 @@ class Realtime(Overlay):
             layout_bump = self.set_grid_layout()
             self.bars_bump = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -124,6 +126,7 @@ class Realtime(Overlay):
             layout_rebound = self.set_grid_layout()
             self.bars_rebound = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -156,6 +159,7 @@ class Realtime(Overlay):
             layout_ratio = self.set_grid_layout()
             self.bars_ratio = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -188,6 +192,7 @@ class Realtime(Overlay):
             layout_motion = self.set_grid_layout()
             self.bars_motion = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -220,6 +225,7 @@ class Realtime(Overlay):
             layout_minpos = self.set_grid_layout()
             self.bars_minpos = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -252,6 +258,7 @@ class Realtime(Overlay):
             layout_maxpos = self.set_grid_layout()
             self.bars_maxpos = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -284,6 +291,7 @@ class Realtime(Overlay):
             layout_live = self.set_grid_layout()
             self.bars_live = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

@@ -95,7 +95,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_pos = self.set_rawtext(
-                width=2 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=2 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_pos[0][0],
@@ -129,7 +130,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_pgl = self.set_rawtext(
-                width=3 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=3 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_pgl[0][0],
@@ -155,11 +157,13 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_drv = self.set_rawtext(
-                width=self.drv_width * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=self.drv_width * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_drv[0][0],
                 bg_color=self.bar_style_drv[0][1],
+                alignment=self.wcfg["driver_name_text_alignment"],
                 count=self.veh_range,
             )
             self.set_grid_layout_table_column(
@@ -181,11 +185,13 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_veh = self.set_rawtext(
-                width=self.veh_width * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=self.veh_width * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_veh[0][0],
                 bg_color=self.bar_style_veh[0][1],
+                alignment=self.wcfg["vehicle_name_text_alignment"],
                 count=self.veh_range,
             )
             self.set_grid_layout_table_column(
@@ -225,7 +231,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_gap = self.set_rawtext(
-                width=self.gap_width * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=self.gap_width * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_gap[0][0],
@@ -251,7 +258,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_int = self.set_rawtext(
-                width=self.int_width * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=self.int_width * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_int[0][0],
@@ -285,7 +293,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_lpt = self.set_rawtext(
-                width=8 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=8 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_lpt[0][0],
@@ -311,7 +320,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_blp = self.set_rawtext(
-                width=8 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=8 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_blp[0][0],
@@ -337,7 +347,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_alp = self.set_rawtext(
-                width=8 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=8 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_alp[0][0],
@@ -392,7 +403,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_pic = self.set_rawtext(
-                width=2 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=2 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_pic[0][0],
@@ -408,7 +420,8 @@ class Realtime(Overlay):
         # Vehicle class
         if self.wcfg["show_class"]:
             self.bars_cls = self.set_rawtext(
-                width=self.cls_width * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=self.cls_width * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_class"],
@@ -450,7 +463,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_pit = self.set_rawtext(
-                width=max(map(len, self.pit_status_text)) * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=max(map(len, self.pit_status_text)) * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_pit[0][0],
@@ -517,7 +531,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_psc = self.set_rawtext(
-                width=2 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=2 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_psc[0][0],
@@ -555,7 +570,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_nrg = self.set_rawtext(
-                width=self.nrg_width * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=self.nrg_width * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_nrg[0][0],
@@ -589,7 +605,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_dmg = self.set_rawtext(
-                width=1 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=1 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_dmg[0][0],
@@ -623,7 +640,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_icd = self.set_rawtext(
-                width=3 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=3 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_icd[0][0],
@@ -649,7 +667,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_tlp = self.set_rawtext(
-                width=4 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=4 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_tlp[0][0],
@@ -675,7 +694,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_stl = self.set_rawtext(
-                width=5 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=5 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_stl[0][0],
@@ -702,7 +722,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_spd = self.set_rawtext(
-                width=5 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=5 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_spd[0][0],
@@ -732,7 +753,8 @@ class Realtime(Overlay):
                 ),
             )
             self.bars_lic = self.set_rawtext(
-                width=4 * font_m.width + bar_padx,
+                padding=bar_padx,
+                width=4 * font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_lic[0][0],
@@ -808,9 +830,9 @@ class Realtime(Overlay):
                         time_gap = self.gap_to_leader_race(veh_info.gapBehindLeader, veh_info.positionOverall)
                 else:
                     if self.show_class_timegap:
-                        time_gap = self.gap_to_leader_best(veh_info.bestLapTime, veh_info.classBestLapTime)
+                        time_gap = self.gap_to_leader_best(veh_info.positionInClass, veh_info.bestLapTime, veh_info.classBestLapTime)
                     else:
-                        time_gap = self.gap_to_leader_best(veh_info.bestLapTime, minfo.vehicles.leaderBestLapTime)
+                        time_gap = self.gap_to_leader_best(veh_info.positionOverall, veh_info.bestLapTime, minfo.vehicles.leaderBestLapTime)
                 self.update_gap(self.bars_gap[idx], time_gap, hi_player, state)
             # Time interval
             if self.wcfg["show_time_interval"]:
@@ -928,10 +950,7 @@ class Realtime(Overlay):
                 text = data[0]
             if self.wcfg["driver_name_uppercase"]:
                 text = text.upper()
-            if self.wcfg["driver_name_align_center"]:
-                text = f"{text:.{self.drv_width}}"
-            else:
-                text = f"{text:<{self.drv_width}.{self.drv_width}}"
+            text = f"{text:.{self.drv_width}}"
             target.text = text
             target.fg, target.bg = self.bar_style_drv[data[1]]
             self.toggle_visibility(target, data[-1])
@@ -943,10 +962,7 @@ class Realtime(Overlay):
             text = data[0]
             if self.wcfg["vehicle_name_uppercase"]:
                 text = text.upper()
-            if self.wcfg["vehicle_name_align_center"]:
-                text = f"{text:.{self.veh_width}}"
-            else:
-                text = f"{text:<{self.veh_width}.{self.veh_width}}"
+            text = f"{text:.{self.veh_width}}"
             target.text = text
             target.fg, target.bg = self.bar_style_veh[data[1]]
             self.toggle_visibility(target, data[-1])
@@ -1277,13 +1293,13 @@ class Realtime(Overlay):
             return f"{'PIT' if inpit else 'OUT'}{pit_time:>5.1f}"
         return DATA.TEXT_NOLAPTIME
 
-    def gap_to_leader_best(self, player_best, leader_best):
+    def gap_to_leader_best(self, position, player_best, leader_best):
         """Gap to leader's best laptime"""
-        time = player_best - leader_best  # leader best
-        if time == 0 and player_best > 0:
+        if position == 1:
             return self.wcfg["time_gap_leader_text"]
-        if time < 0 or player_best < 1:  # no time set
-            return "0.0"
+        time = player_best - leader_best  # leader best
+        if time < 0 or not 0 < player_best < DATA.MAX_SECONDS:  # no time set
+            time = DATA.MAX_SECONDS
         return f"{time:.{self.gap_decimals}f}"
 
     def gap_to_leader_race(self, gap_behind, position):

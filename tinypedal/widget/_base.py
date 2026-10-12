@@ -306,40 +306,40 @@ class Overlay(Base):
         return self.wcfg["font_offset_vertical"]
 
     @staticmethod
-    def set_padding(size: int, scale: float, side: int = 2) -> int:
+    def set_padding(size: int, scale: float) -> int:
         """Set padding
 
         Args:
             size: reference font size in pixel.
             scale: scale font size for relative padding.
-            side: number of sides to add padding.
 
         Returns:
             Padding size in pixel.
         """
-        return round(size * scale) * side
+        return round(size * scale)
 
     @staticmethod
-    def set_text_alignment(align: int | str = 0) -> Qt.Alignment:
+    def set_text_alignment(align: str = "Center") -> Qt.Alignment:
         """Set text alignment
 
         Args:
-            align: 0 or "Center", 1 or "Left", 2 or "Right".
+            align: "Center", "Left", "Right".
 
         Returns:
             Qt alignment.
         """
-        if align == 0 or align == "Center":
-            return Qt.AlignCenter
-        if align == 1 or align == "Left":
+        if align == "Left":
             return Qt.AlignLeft | Qt.AlignVCenter
-        return Qt.AlignRight | Qt.AlignVCenter
+        if align == "Right":
+            return Qt.AlignRight | Qt.AlignVCenter
+        return Qt.AlignCenter
 
     def set_rawtext(
         self,
         *,
         font: QFont | None = None,
         text: str = "",
+        padding: int = 0,
         width: int = 0,
         height: int = 0,
         fixed_width: int = 0,
@@ -347,7 +347,7 @@ class Overlay(Base):
         offset_y: int = 0,
         fg_color: str = "",
         bg_color: str = "",
-        alignment: Qt.Alignment = Qt.AlignCenter,
+        alignment: str = "Center",
         last: Any | None = None,
         count: int = 1,
     ) -> tuple[RawText, ...] | RawText:
@@ -356,6 +356,7 @@ class Overlay(Base):
         Args:
             font: QFont.
             text: bar text.
+            padding: bar padding.
             width: fixed width in pixel.
             height: fixed height in pixel.
             fixed_width: fixed width in pixel, takes priority over width.
@@ -363,7 +364,7 @@ class Overlay(Base):
             offset_y: font vertical offset in pixel.
             fg_color: foreground (font) color.
             bg_color: background color.
-            alignment: Qt.Alignment.
+            alignment: 'Center', 'Left', 'Right'.
             last: cache last data for comparison.
             count: number of RawText to set.
 
@@ -375,6 +376,7 @@ class Overlay(Base):
             RawText(
                 parent=self,
                 font=font,
+                padding=padding,
                 width=width,
                 height=height,
                 fixed_width=fixed_width,

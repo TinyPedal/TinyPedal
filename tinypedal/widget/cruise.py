@@ -65,7 +65,8 @@ class Realtime(Overlay):
             text_compass = f"{180:03.0f}°{calc.select_grade(DATA.COMPASS_BEARINGS, 180):>2}"
             self.bar_compass = self.set_rawtext(
                 text=text_compass,
-                width=font_m.width * len(text_compass) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_compass),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_compass"],
@@ -81,7 +82,8 @@ class Realtime(Overlay):
             text_elevation = f"↑{self.unit_dist(0):>5.0f}{self.symbol_dist}"
             self.bar_elevation = self.set_rawtext(
                 text=text_elevation,
-                width=font_m.width * len(text_elevation) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_elevation),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_elevation"],
@@ -97,7 +99,8 @@ class Realtime(Overlay):
             text_odometer = f"{min(self.unit_odm(0), self.odm_range):>{self.odm_digits}f}{self.symbol_odm}"
             self.bar_odometer = self.set_rawtext(
                 text=text_odometer,
-                width=font_m.width * len(text_odometer) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_odometer),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_odometer"],
@@ -113,7 +116,8 @@ class Realtime(Overlay):
             text_lap_distance = f"{self.unit_dist(0):>6.0f}{self.symbol_dist}"
             self.bar_lap_distance = self.set_rawtext(
                 text=text_lap_distance,
-                width=font_m.width * len(text_lap_distance) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_lap_distance),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_distance_into_lap"],

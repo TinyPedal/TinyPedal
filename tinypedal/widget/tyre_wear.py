@@ -54,7 +54,7 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 4 + bar_padx
+        bar_width = font_m.width * 4
 
         # Remaining tyre tread
         if self.wcfg["show_remaining"]:
@@ -65,6 +65,7 @@ class Realtime(Overlay):
             )
             self.bars_remain = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -102,6 +103,7 @@ class Realtime(Overlay):
             )
             self.bars_diff = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -138,6 +140,7 @@ class Realtime(Overlay):
             )
             self.bars_live = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -174,6 +177,7 @@ class Realtime(Overlay):
             )
             self.bars_lock = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -210,6 +214,7 @@ class Realtime(Overlay):
             )
             self.bars_laps = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -246,6 +251,7 @@ class Realtime(Overlay):
             )
             self.bars_mins = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -282,6 +288,7 @@ class Realtime(Overlay):
             )
             self.bars_end = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

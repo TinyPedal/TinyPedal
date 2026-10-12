@@ -47,7 +47,7 @@ class Realtime(Overlay):
         text_def = "-.--"
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.bar_width = max(self.wcfg["bar_width"], 3)
-        style_width = font_m.width * self.bar_width + bar_padx
+        style_width = font_m.width * self.bar_width
 
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
@@ -73,6 +73,7 @@ class Realtime(Overlay):
         # Estimated pit pass through time
         self.bar_pass = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -96,6 +97,7 @@ class Realtime(Overlay):
         # Pit timer
         self.bar_timer = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -123,6 +125,7 @@ class Realtime(Overlay):
         )
         self.bar_stop = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -146,6 +149,7 @@ class Realtime(Overlay):
         # Estimated min total pit time
         self.bar_minpit = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -171,6 +175,7 @@ class Realtime(Overlay):
             # Relative refilling
             self.bar_refill = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -194,6 +199,7 @@ class Realtime(Overlay):
             # Estimated total needed refill
             self.bar_needed = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -218,6 +224,7 @@ class Realtime(Overlay):
             # Estimated laps
             self.bar_elaps = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -241,6 +248,7 @@ class Realtime(Overlay):
             # Estimated minutes
             self.bar_emins = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -265,6 +273,7 @@ class Realtime(Overlay):
             # Pit occupancy
             self.bar_inpit = self.set_rawtext(
                 text="-/-",
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -287,6 +296,7 @@ class Realtime(Overlay):
             # Number of pit requests
             self.bar_request = self.set_rawtext(
                 text="-/-",
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

@@ -66,7 +66,8 @@ class Realtime(Overlay):
             text_distf = self.format_dist(0, self.prefix_distf)
             self.bar_distf = self.set_rawtext(
                 text=text_distf,
-                width=font_m.width * len(text_distf) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_distf),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_front_to_rear_distribution"],
@@ -83,7 +84,8 @@ class Realtime(Overlay):
             text_distl = self.format_dist(0, self.prefix_distl)
             self.bar_distl = self.set_rawtext(
                 text=text_distl,
-                width=font_m.width * len(text_distl) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_distl),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_left_to_right_distribution"],
@@ -100,7 +102,8 @@ class Realtime(Overlay):
             text_cross = self.format_dist(0, self.prefix_cross)
             self.bar_cross = self.set_rawtext(
                 text=text_cross,
-                width=font_m.width * len(text_cross) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_cross),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_cross_weight"],

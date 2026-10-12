@@ -75,7 +75,8 @@ class Realtime(Overlay):
             text_sbst = f"{self.prefix_sbst}{DATA.TEXT_NOLAPTIME}"
             self.bar_sbst = self.set_rawtext(
                 text=text_sbst,
-                width=font_m.width * len(text_sbst) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_sbst),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_session_best"],
@@ -91,7 +92,8 @@ class Realtime(Overlay):
             text_best = f"{self.prefix_best}{DATA.TEXT_NOLAPTIME}"
             self.bar_best = self.set_rawtext(
                 text=text_best,
-                width=font_m.width * len(text_best) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_best),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_best"],
@@ -111,7 +113,8 @@ class Realtime(Overlay):
             )
             self.bar_last = self.set_rawtext(
                 text=text_last,
-                width=font_m.width * len(text_last) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_last),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_last[1],
@@ -127,7 +130,8 @@ class Realtime(Overlay):
             text_curr = f"{self.prefix_curr}{DATA.TEXT_NOLAPTIME}"
             self.bar_curr = self.set_rawtext(
                 text=text_curr,
-                width=font_m.width * len(text_curr) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_curr),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_current"],
@@ -143,7 +147,8 @@ class Realtime(Overlay):
             text_esti = f"{self.prefix_esti}{DATA.TEXT_NOLAPTIME}"
             self.bar_esti = self.set_rawtext(
                 text=text_esti,
-                width=font_m.width * len(text_esti) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_esti),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_estimated"],
@@ -159,7 +164,8 @@ class Realtime(Overlay):
             text_spbt = f"{self.prefix_spbt}{DATA.TEXT_NOLAPTIME}"
             self.bar_spbt = self.set_rawtext(
                 text=text_spbt,
-                width=font_m.width * len(text_spbt) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_spbt),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_session_personal_best"],
@@ -175,7 +181,8 @@ class Realtime(Overlay):
             text_stbt = f"{self.prefix_stbt}{DATA.TEXT_NOLAPTIME}"
             self.bar_stbt = self.set_rawtext(
                 text=text_stbt,
-                width=font_m.width * len(text_stbt) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_stbt),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_stint_best"],
@@ -191,7 +198,8 @@ class Realtime(Overlay):
             text_avpc = f"{self.prefix_avpc}{DATA.TEXT_NOLAPTIME}"
             self.bar_avpc = self.set_rawtext(
                 text=text_avpc,
-                width=font_m.width * len(text_avpc) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_avpc),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_average_pace"],

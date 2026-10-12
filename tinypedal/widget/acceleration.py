@@ -54,7 +54,7 @@ class Realtime(Overlay):
         layout_reversed = self.wcfg["layout"] != 0
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.char_width = max(self.wcfg["bar_width"], 4)
-        bar_width = font_m.width * self.char_width + bar_padx
+        bar_width = font_m.width * self.char_width
 
         self.decimals_timer = max(self.wcfg["decimal_places_timer"], 0)
         self.decimals_delta = max(self.wcfg["decimal_places_delta"], 0)
@@ -69,6 +69,7 @@ class Realtime(Overlay):
         self.bars_speed_range = self.set_rawtext(
             font=font_cap,
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
@@ -97,6 +98,7 @@ class Realtime(Overlay):
         )
         self.bars_timer_last = self.set_rawtext(
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -115,6 +117,7 @@ class Realtime(Overlay):
         # Best timer
         self.bars_timer_best = self.set_rawtext(
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -138,6 +141,7 @@ class Realtime(Overlay):
         )
         self.bars_timer_delta = self.set_rawtext(
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,

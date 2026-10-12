@@ -45,7 +45,7 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 8 + bar_padx
+        bar_width = font_m.width * 8
         self.freeze_duration = min(max(self.wcfg["freeze_duration"], 0), 30)
 
         # Battery charge
@@ -57,6 +57,7 @@ class Realtime(Overlay):
             )
             self.bar_charge = self.set_rawtext(
                 text="BATTERY",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -72,6 +73,7 @@ class Realtime(Overlay):
         if self.wcfg["show_battery_drain"]:
             self.bar_drain = self.set_rawtext(
                 text="B DRAIN",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -87,6 +89,7 @@ class Realtime(Overlay):
         if self.wcfg["show_battery_regen"]:
             self.bar_regen = self.set_rawtext(
                 text="B REGEN",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -102,6 +105,7 @@ class Realtime(Overlay):
         if self.wcfg["show_estimated_net_change"]:
             self.bar_net = self.set_rawtext(
                 text="B   NET",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -117,6 +121,7 @@ class Realtime(Overlay):
         if self.wcfg["show_activation_timer"]:
             self.bar_timer = self.set_rawtext(
                 text="B TIMER",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

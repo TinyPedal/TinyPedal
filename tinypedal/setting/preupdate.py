@@ -45,6 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
+        ((2, 51, 3), _user_prior_2_51_3),  # 2026-10-12
         ((2, 49, 9), _user_prior_2_49_9),  # 2026-08-30
         ((2, 49, 2), _user_prior_2_49_2),  # 2026-08-09
         ((2, 48, 7), _user_prior_2_48_7),  # 2026-07-27
@@ -73,6 +74,34 @@ def _global_prior_2_43_0(dict_user: dict):
 
 
 # User setting update function
+def _user_prior_2_51_3(dict_user: dict):
+    # Update relative widget
+    relative = dict_user.get("relative")
+    if isinstance(relative, dict):
+        if relative["driver_name_align_center"]:
+            relative["driver_name_text_alignment"] = "Center"
+        if relative["vehicle_name_align_center"]:
+            relative["vehicle_name_text_alignment"] = "Center"
+        if relative["time_gap_align_center"]:
+            relative["time_gap_text_alignment"] = "Center"
+    # Update rivals widget
+    rivals = dict_user.get("rivals")
+    if isinstance(rivals, dict):
+        if rivals["driver_name_align_center"]:
+            rivals["driver_name_text_alignment"] = "Center"
+        if rivals["vehicle_name_align_center"]:
+            rivals["vehicle_name_text_alignment"] = "Center"
+        if rivals["time_interval_align_center"]:
+            rivals["time_interval_text_alignment"] = "Center"
+    # Update standings widget
+    standings = dict_user.get("standings")
+    if isinstance(standings, dict):
+        if standings["driver_name_align_center"]:
+            standings["driver_name_text_alignment"] = "Center"
+        if standings["vehicle_name_align_center"]:
+            standings["vehicle_name_text_alignment"] = "Center"
+
+
 def _user_prior_2_49_9(dict_user: dict):
     # Rename steering widget to steering_meter
     steering = dict_user.get("steering")

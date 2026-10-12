@@ -67,7 +67,8 @@ class Realtime(Overlay):
             )
             self.bar_charge = self.set_rawtext(
                 text="P2P",
-                width=font_m.width * 3 + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * 3,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_charge[1][0],
@@ -92,7 +93,8 @@ class Realtime(Overlay):
             )
             self.bar_timer = self.set_rawtext(
                 text="0.00",
-                width=font_m.width * 4 + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * 4,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_timer[0][0],

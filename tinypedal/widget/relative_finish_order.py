@@ -55,7 +55,7 @@ class Realtime(Overlay):
         layout_reversed = self.wcfg["layout"] != 0
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.char_width = max(self.wcfg["bar_width"], 3)
-        bar_width = font_m.width * self.char_width + bar_padx
+        bar_width = font_m.width * self.char_width
         self.range_start = max(self.wcfg["near_start_range"], 0)
         self.range_finish = max(self.wcfg["near_finish_range"], 0)
         self.total_slot = min(max(self.wcfg["number_of_prediction"], 0), 10) + 3
@@ -72,6 +72,7 @@ class Realtime(Overlay):
         # Leader pit time row
         self.bars_pit_leader = self.set_rawtext(
             font=font_cap,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
@@ -97,6 +98,7 @@ class Realtime(Overlay):
         )
         self.bars_lap_leader = self.set_rawtext(
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -120,6 +122,7 @@ class Realtime(Overlay):
         )
         self.bars_lap_player = self.set_rawtext(
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -137,6 +140,7 @@ class Realtime(Overlay):
         # Player pit time row
         self.bars_pit_player = self.set_rawtext(
             font=font_cap,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
@@ -157,6 +161,7 @@ class Realtime(Overlay):
         # Player refill row
         self.bars_refill = self.set_rawtext(
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -175,6 +180,7 @@ class Realtime(Overlay):
         if self.wcfg["show_extra_refilling"]:
             self.bars_refill_extra = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

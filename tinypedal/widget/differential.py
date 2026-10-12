@@ -67,7 +67,8 @@ class Realtime(Overlay):
             text_power_front = f"{self.prefix_power_f}{self.format_reading(1)}"
             self.bar_power_front = self.set_rawtext(
                 text=text_power_front,
-                width=font_m.width * len(text_power_front) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_power_front),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_power_locking_front"],
@@ -84,7 +85,8 @@ class Realtime(Overlay):
             text_coast_front = f"{self.prefix_coast_f}{self.format_reading(1)}"
             self.bar_coast_front = self.set_rawtext(
                 text=text_coast_front,
-                width=font_m.width * len(text_coast_front) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_coast_front),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_coast_locking_front"],
@@ -101,7 +103,8 @@ class Realtime(Overlay):
             text_power_rear = f"{self.prefix_power_r}{self.format_reading(1)}"
             self.bar_power_rear = self.set_rawtext(
                 text=text_power_rear,
-                width=font_m.width * len(text_power_rear) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_power_rear),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_power_locking_rear"],
@@ -118,7 +121,8 @@ class Realtime(Overlay):
             text_coast_rear = f"{self.prefix_coast_r}{self.format_reading(1)}"
             self.bar_coast_rear = self.set_rawtext(
                 text=text_coast_rear,
-                width=font_m.width * len(text_coast_rear) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_coast_rear),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_coast_locking_rear"],

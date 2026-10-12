@@ -83,7 +83,8 @@ class Realtime(Overlay):
             )
             self.bar_laps = self.set_rawtext(
                 text=text_laps,
-                width=font_m.width * len(text_laps) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_laps),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_laps"],
@@ -99,7 +100,8 @@ class Realtime(Overlay):
             text_pos_overall = f"{self.prefix_pos_overall}{'00/00':>{self.just_pos_overall}}"
             self.bar_pos_overall = self.set_rawtext(
                 text=text_pos_overall,
-                width=font_m.width * len(text_pos_overall) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_pos_overall),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_position_overall"],
@@ -115,7 +117,8 @@ class Realtime(Overlay):
             text_pos_inclass = f"{self.prefix_pos_inclass}{'00/00':>{self.just_pos_inclass}}"
             self.bar_pos_inclass = self.set_rawtext(
                 text=text_pos_inclass,
-                width=font_m.width * len(text_pos_inclass) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_pos_inclass),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_position_in_class"],
@@ -131,7 +134,8 @@ class Realtime(Overlay):
             text_cut_points = f"{self.prefix_cut_points}{'0.000/-':>{self.just_cut_points}}"
             self.bar_cut_points = self.set_rawtext(
                 text=text_cut_points,
-                width=font_m.width * len(text_cut_points) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_cut_points),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_track_limits_points"],
@@ -161,7 +165,8 @@ class Realtime(Overlay):
             )
             self.bar_pos_change = self.set_rawtext(
                 text=text_pos_change,
-                width=font_m.width * len(text_pos_change) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_pos_change),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_pos_change[0][0],

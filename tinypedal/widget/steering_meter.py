@@ -72,8 +72,8 @@ class Realtime(Overlay):
         self.pen_text = QPen()
         self.pen_text.setColor(self.wcfg["font_color_steering_angle"])
         self.align_text = (
-            self.set_text_alignment("Left"),
-            self.set_text_alignment("Right"),
+            Qt.AlignLeft | Qt.AlignVCenter,
+            Qt.AlignRight | Qt.AlignVCenter,
         )
 
         self.draw_scale_mark()

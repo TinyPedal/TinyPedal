@@ -71,7 +71,8 @@ class Realtime(Overlay):
             text_atbest = f"{self.prefix_atbest}{text_def}"
             self.bar_atbest = self.set_rawtext(
                 text=text_atbest,
-                width=font_m.width * len(text_atbest) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_atbest),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_all_time_deltabest"],
@@ -88,7 +89,8 @@ class Realtime(Overlay):
             text_ssbest = f"{self.prefix_ssbest}{text_def}"
             self.bar_ssbest = self.set_rawtext(
                 text=text_ssbest,
-                width=font_m.width * len(text_ssbest) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_ssbest),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_session_deltabest"],
@@ -105,7 +107,8 @@ class Realtime(Overlay):
             text_stbest = f"{self.prefix_stbest}{text_def}"
             self.bar_stbest = self.set_rawtext(
                 text=text_stbest,
-                width=font_m.width * len(text_stbest) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_stbest),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_stint_deltabest"],
@@ -122,7 +125,8 @@ class Realtime(Overlay):
             text_labest = f"{self.prefix_labest}{text_def}"
             self.bar_labest = self.set_rawtext(
                 text=text_labest,
-                width=font_m.width * len(text_labest) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_labest),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_deltalast"],

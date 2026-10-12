@@ -49,7 +49,7 @@ class Realtime(Overlay):
         text_def = "-.--"
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.bar_width = max(self.wcfg["bar_width"], 3)
-        style_width = font_m.width * self.bar_width + bar_padx
+        style_width = font_m.width * self.bar_width
         column_count = 0
 
         # Create layout
@@ -77,6 +77,7 @@ class Realtime(Overlay):
         )
         self.bar_curr = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -105,6 +106,7 @@ class Realtime(Overlay):
         )
         self.bar_need = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -133,6 +135,7 @@ class Realtime(Overlay):
         # Estimated laps can last
         self.bar_laps = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -156,6 +159,7 @@ class Realtime(Overlay):
         # Estimated minutes can last
         self.bar_mins = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -179,6 +183,7 @@ class Realtime(Overlay):
         # Estimated consumption
         self.bar_used = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -203,6 +208,7 @@ class Realtime(Overlay):
         # Estimated one less pit consumption
         self.bar_save = self.set_rawtext(
             text=text_def,
+            padding=bar_padx,
             fixed_width=style_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -227,6 +233,7 @@ class Realtime(Overlay):
             # Estimate pit stop counts when pitting at end of current stint
             self.bar_pits = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -251,6 +258,7 @@ class Realtime(Overlay):
             # Estimate pit stop counts when pitting at end of current lap
             self.bar_early = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -275,6 +283,7 @@ class Realtime(Overlay):
             # Delta consumption
             self.bar_delta = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -299,6 +308,7 @@ class Realtime(Overlay):
             # Estimated end remaining
             self.bar_end = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -323,6 +333,7 @@ class Realtime(Overlay):
             # Fuel ratio
             self.bar_ratio = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -347,6 +358,7 @@ class Realtime(Overlay):
             # Fuel bias
             self.bar_bias = self.set_rawtext(
                 text=text_def,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -371,7 +383,7 @@ class Realtime(Overlay):
         if self.wcfg["show_energy_level_bar"]:
             self.bar_level = FuelLevelBar(
                 self,
-                width=(font_m.width * self.bar_width + bar_padx) * column_count,
+                width=(font_m.width * self.bar_width + bar_padx * 2) * column_count,
                 height=max(self.wcfg["energy_level_bar_height"], 1),
                 start_mark_width=max(self.wcfg["starting_energy_level_mark_width"], 1),
                 refill_mark_width=max(self.wcfg["refilling_level_mark_width"], 1),

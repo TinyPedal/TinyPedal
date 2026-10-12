@@ -46,7 +46,7 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 7 + bar_padx
+        bar_width = font_m.width * 7
 
         # Config units
         self.unit_fuel = units.set_unit_fuel(self.cfg.units["fuel_unit"])
@@ -72,6 +72,7 @@ class Realtime(Overlay):
             )
             self.bar_pit_timer = self.set_rawtext(
                 text="PITST0P",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -87,6 +88,7 @@ class Realtime(Overlay):
         if self.wcfg["show_low_fuel"]:
             self.bar_lowfuel = self.set_rawtext(
                 text="LOWFUEL",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -103,6 +105,7 @@ class Realtime(Overlay):
             self.decimals_speed = max(self.wcfg["decimal_places_speed"], 0)
             self.bar_limiter = self.set_rawtext(
                 text=self.wcfg["speed_limiter_text"],
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -118,6 +121,7 @@ class Realtime(Overlay):
         if self.wcfg["show_yellow_flag"]:
             self.bar_yellowflag = self.set_rawtext(
                 text="YELLOW",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -133,6 +137,7 @@ class Realtime(Overlay):
         if self.wcfg["show_blue_flag"]:
             self.bar_blueflag = self.set_rawtext(
                 text="BLUE",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -152,6 +157,7 @@ class Realtime(Overlay):
             )
             self.bar_startlights = self.set_rawtext(
                 text="SLIGHTS",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -167,6 +173,7 @@ class Realtime(Overlay):
         if self.wcfg["show_traffic"]:
             self.bar_traffic = self.set_rawtext(
                 text="TRAFFIC",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -182,6 +189,7 @@ class Realtime(Overlay):
         if self.wcfg["show_pit_request"]:
             self.bar_pit_request = self.set_rawtext(
                 text="PIT REQ",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -207,6 +215,7 @@ class Realtime(Overlay):
             )
             self.bar_finish_state = self.set_rawtext(
                 text=self.wcfg["finish_text"],
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -222,6 +231,7 @@ class Realtime(Overlay):
         if self.wcfg["show_scheduled_repairs"]:
             self.bar_repairs = self.set_rawtext(
                 text="REPAIRS",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

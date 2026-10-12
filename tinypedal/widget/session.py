@@ -61,7 +61,8 @@ class Realtime(Overlay):
             text_session_name = self.session_name_list[0]
             self.bar_session_name = self.set_rawtext(
                 text=text_session_name,
-                width=font_m.width * max(map(len, self.session_name_list)) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * max(map(len, self.session_name_list)),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_session_name"],
@@ -77,7 +78,8 @@ class Realtime(Overlay):
             text_system_clock = strftime(self.wcfg["system_clock_format"])
             self.bar_system_clock = self.set_rawtext(
                 text=text_system_clock,
-                width=font_m.width * len(text_system_clock) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_system_clock),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_system_clock"],
@@ -93,7 +95,8 @@ class Realtime(Overlay):
             text_session_time = calc.sec2sessiontime(0)
             self.bar_session_time = self.set_rawtext(
                 text=text_session_time,
-                width=font_m.width * len(text_session_time) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_session_time),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_session_time"],
@@ -113,7 +116,8 @@ class Realtime(Overlay):
                 text_estimated_laps = f"{self.prefix_estimated_laps}-.---"
             self.bar_estimated_laps = self.set_rawtext(
                 text=text_estimated_laps,
-                width=font_m.width * len(text_estimated_laps) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_estimated_laps),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_estimated_laps"],

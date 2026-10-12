@@ -45,7 +45,7 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 8 + bar_padx
+        bar_width = font_m.width * 8
         self.drive_wheel_allocation = self.wcfg["drive_wheel_allocation"]
 
         # Config units
@@ -59,6 +59,7 @@ class Realtime(Overlay):
         if self.wcfg["show_turbo_pressure"]:
             self.bar_turbo = self.set_rawtext(
                 text="Turbo",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -74,6 +75,7 @@ class Realtime(Overlay):
         if self.wcfg["show_rpm"]:
             self.bar_rpm = self.set_rawtext(
                 text="RPM",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -89,6 +91,7 @@ class Realtime(Overlay):
         if self.wcfg["show_rpm_maximum"]:
             self.bar_rpm_max = self.set_rawtext(
                 text="MAX RPM",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -104,6 +107,7 @@ class Realtime(Overlay):
         if self.wcfg["show_torque"]:
             self.bar_torque = self.set_rawtext(
                 text="TORQUE",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -119,6 +123,7 @@ class Realtime(Overlay):
         if self.wcfg["show_power"]:
             self.bar_power = self.set_rawtext(
                 text="POWER",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -134,6 +139,7 @@ class Realtime(Overlay):
         if self.wcfg["show_power_to_weight_ratio"]:
             self.bar_pwratio = self.set_rawtext(
                 text="PW RATIO",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -149,6 +155,7 @@ class Realtime(Overlay):
         if self.wcfg["show_drive_ratio"]:
             self.bar_dwratio = self.set_rawtext(
                 text="DW RATIO",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

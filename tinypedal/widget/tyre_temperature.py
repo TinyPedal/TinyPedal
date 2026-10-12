@@ -85,7 +85,8 @@ class Realtime(Overlay):
 
         self.bars_stemp = self.set_rawtext(
             text=DATA.TEXT_NA,
-            width=font_m.width * text_width + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * text_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_surface"],
@@ -106,7 +107,8 @@ class Realtime(Overlay):
         if self.wcfg["show_tyre_compound"]:
             self.bars_tcmpd = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
-                width=font_m.width + bar_padx,
+                padding=bar_padx,
+                width=font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tyre_compound"],

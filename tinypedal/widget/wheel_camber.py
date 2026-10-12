@@ -80,7 +80,8 @@ class Realtime(Overlay):
         )
         self.bars_camber = self.set_rawtext(
             text=DATA.TEXT_NA,
-            width=font_m.width * (3 + self.decimals_camber) + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * (3 + self.decimals_camber),
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_camber"],
@@ -103,7 +104,8 @@ class Realtime(Overlay):
             self.decimals_cdiff = max(self.wcfg["decimal_places_camber_difference"], 1)
             self.bars_cdiff = self.set_rawtext(
                 text=DATA.TEXT_NA,
-                width=font_m.width * (3 + self.decimals_cdiff) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * (3 + self.decimals_cdiff),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_camber_difference"],

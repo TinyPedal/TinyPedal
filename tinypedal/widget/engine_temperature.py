@@ -78,7 +78,8 @@ class Realtime(Overlay):
             )
             self.bar_oil_temp = self.set_rawtext(
                 text="0.000°",
-                width=font_m.width * 6 + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * 6,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_oil_temperature"],
@@ -89,7 +90,8 @@ class Realtime(Overlay):
             if self.wcfg["show_temperature_prefix"]:
                 bar_oil_prefix = self.set_rawtext(
                     text=self.wcfg["prefix_oil_temperature"],
-                    width=font_m.width * width_oil + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * width_oil,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.wcfg["font_color_prefix"],
@@ -99,7 +101,8 @@ class Realtime(Overlay):
             if self.wcfg["show_rate_of_change"]:
                 self.bar_oil_rate = self.set_rawtext(
                     text="0.0",
-                    width=font_m.width * 3 + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * 3,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_rate[2],
@@ -110,7 +113,8 @@ class Realtime(Overlay):
             if self.wcfg["show_net_change_per_lap"]:
                 self.bar_oil_net = self.set_rawtext(
                     text="0.0",
-                    width=font_m.width * 3 + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * 3,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_rate[2],
@@ -132,7 +136,8 @@ class Realtime(Overlay):
             )
             self.bar_water_temp = self.set_rawtext(
                 text="0.000°",
-                width=font_m.width * 6 + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * 6,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_water_temperature"],
@@ -143,7 +148,8 @@ class Realtime(Overlay):
             if self.wcfg["show_temperature_prefix"]:
                 bar_water_prefix = self.set_rawtext(
                     text=self.wcfg["prefix_water_temperature"],
-                    width=font_m.width * width_water + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * width_water,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.wcfg["font_color_prefix"],
@@ -153,7 +159,8 @@ class Realtime(Overlay):
             if self.wcfg["show_rate_of_change"]:
                 self.bar_water_rate = self.set_rawtext(
                     text="0.0",
-                    width=font_m.width * 3 + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * 3,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_rate[2],
@@ -164,7 +171,8 @@ class Realtime(Overlay):
             if self.wcfg["show_net_change_per_lap"]:
                 self.bar_water_net = self.set_rawtext(
                     text="0.0",
-                    width=font_m.width * 3 + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * 3,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_rate[2],
@@ -186,7 +194,8 @@ class Realtime(Overlay):
             )
             self.bar_exhaust_temp = self.set_rawtext(
                 text="0.000°",
-                width=font_m.width * 6 + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * 6,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_exhaust_temperature"],
@@ -197,7 +206,8 @@ class Realtime(Overlay):
             if self.wcfg["show_temperature_prefix"]:
                 bar_exhaust_prefix = self.set_rawtext(
                     text=self.wcfg["prefix_exhaust_temperature"],
-                    width=font_m.width * width_exhaust + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * width_exhaust,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.wcfg["font_color_prefix"],
@@ -207,7 +217,8 @@ class Realtime(Overlay):
             if self.wcfg["show_rate_of_change"]:
                 self.bar_exhaust_rate = self.set_rawtext(
                     text="0.0",
-                    width=font_m.width * 3 + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * 3,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_rate[2],
@@ -218,7 +229,8 @@ class Realtime(Overlay):
             if self.wcfg["show_net_change_per_lap"]:
                 self.bar_exhaust_net = self.set_rawtext(
                     text="0.0",
-                    width=font_m.width * 3 + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width * 3,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_rate[2],

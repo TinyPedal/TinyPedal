@@ -76,7 +76,8 @@ class Realtime(Overlay):
         self.decimals_toe = max(self.wcfg["decimal_places_toe_angle"], 1)
         self.bars_toe = self.set_rawtext(
             text=DATA.TEXT_NA,
-            width=font_m.width * (3 + self.decimals_toe) + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * (3 + self.decimals_toe),
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_toe_angle"],
@@ -103,7 +104,8 @@ class Realtime(Overlay):
             self.decimals_total = max(self.wcfg["decimal_places_total_toe_angle"], 1)
             self.bars_total = self.set_rawtext(
                 text=DATA.TEXT_NA,
-                width=font_m.width * (2 + self.decimals_total) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * (2 + self.decimals_total),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_total[0],

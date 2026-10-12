@@ -65,7 +65,8 @@ class Realtime(Overlay):
             text_system = f"{self.prefix_sys}0.00% 0.00GB"
             self.bar_system = self.set_rawtext(
                 text=text_system,
-                width=font_m.width * len(text_system) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_system),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_system"],
@@ -82,7 +83,8 @@ class Realtime(Overlay):
             text_app = f"{self.prefix_app}0.00% 0.00MB"
             self.bar_app = self.set_rawtext(
                 text=text_app,
-                width=font_m.width * len(text_app) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_app),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tinypedal"],

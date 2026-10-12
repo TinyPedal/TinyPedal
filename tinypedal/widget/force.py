@@ -45,7 +45,7 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 6 + bar_padx
+        bar_width = font_m.width * 6
 
         # Config units
         self.unit_weight = units.set_unit_weight(self.cfg.units["weight_unit"])
@@ -55,6 +55,7 @@ class Realtime(Overlay):
         if self.wcfg["show_longitudinal_g_force"]:
             self.bar_gforce_lgt = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -70,6 +71,7 @@ class Realtime(Overlay):
         if self.wcfg["show_lateral_g_force"]:
             self.bar_gforce_lat = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -85,6 +87,7 @@ class Realtime(Overlay):
         if self.wcfg["show_downforce_ratio"]:
             self.bar_df_ratio = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -104,6 +107,7 @@ class Realtime(Overlay):
             )
             self.bar_df_front = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -123,6 +127,7 @@ class Realtime(Overlay):
             )
             self.bar_df_rear = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -138,6 +143,7 @@ class Realtime(Overlay):
         if self.wcfg["show_estimated_static_weight"]:
             self.bar_static = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -153,6 +159,7 @@ class Realtime(Overlay):
         if self.wcfg["show_estimated_dynamic_weight"]:
             self.bar_dynamic = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -168,6 +175,7 @@ class Realtime(Overlay):
         if self.wcfg["show_acceleration_reduction"]:
             self.bar_accloss = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

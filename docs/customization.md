@@ -3502,9 +3502,6 @@ Set driver name to uppercase.
     driver_name_width
 Set drive name display width, value in chars, such as 10 = 10 chars.
 
-    driver_name_align_center
-Align driver name in the center when enabled. Default is left alignment when disabled.
-
     show_vehicle_name
 Show vehicle model name.
 
@@ -3518,9 +3515,6 @@ Set vehicle name to uppercase.
 
     vehicle_name_width
 Set vehicle name display width, value in chars, such as 10 = 10 chars.
-
-    vehicle_name_align_center
-Align vehicle name in the center when enabled. Default is left alignment when disabled.
 
     show_brand_logo
 Show user-defined brand logo if available.
@@ -3536,9 +3530,6 @@ Show plus or minus sign for time gap. `-` sign indicates opponent's relative pos
 
     time_gap_width
 Set time gap display width, value is in chars, 5 = 5 chars wide.
-
-    time_gap_align_center
-Align time gap in the center when enabled. Default is right alignment when disabled.
 
     show_highlighted_nearest_time_gap
 Show highlighted color on opponents within nearest time gap threshold.
@@ -3777,9 +3768,6 @@ Set bottoming ride height (in millimeters). This option is used for vehicle that
 **This widget displays standings info from opponent ahead and behind local player from same vehicle class.**
 
 Note, most options are inherited from [Relative](#relative) and [Standings](#standings) widgets, with some additions noted below.
-
-    time_interval_align_center
-Align time interval in the center when enabled. Default is right alignment when disabled.
 
     *_color_time_interval_ahead, *_color_time_interval_behind
 Set custom time interval color of opponent ahead and behind.

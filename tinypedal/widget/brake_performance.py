@@ -44,12 +44,13 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 5 + bar_padx
+        bar_width = font_m.width * 5
 
         # Transient max braking rate
         if self.wcfg["show_transient_maximum_braking_rate"]:
             self.bar_trans_rate = self.set_rawtext(
                 text="0.00g",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -66,6 +67,7 @@ class Realtime(Overlay):
         if self.wcfg["show_maximum_braking_rate"]:
             self.bar_max_rate = self.set_rawtext(
                 text="0.00g",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -87,6 +89,7 @@ class Realtime(Overlay):
             )
             self.bar_delta_rate = self.set_rawtext(
                 text="+0.00",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -103,6 +106,7 @@ class Realtime(Overlay):
         if self.wcfg["show_front_wheel_lock_duration"]:
             self.bar_lock_f = self.set_rawtext(
                 text="F 0.0",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -119,6 +123,7 @@ class Realtime(Overlay):
         if self.wcfg["show_rear_wheel_lock_duration"]:
             self.bar_lock_r = self.set_rawtext(
                 text="R 0.0",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

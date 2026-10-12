@@ -116,7 +116,7 @@ class Realtime(Overlay):
                 fg_color=self.wcfg["font_color_rpm"],
                 bg_color=self.wcfg["background_color_rpm_bar"],
                 show_reading=self.wcfg["show_rpm_reading"],
-                align=self.set_text_alignment(self.wcfg["rpm_reading_text_alignment"]),
+                alignment=self.wcfg["rpm_reading_text_alignment"],
                 right_side=self.wcfg["show_inverted_rpm"],
             )
             self.set_primary_orient(
@@ -146,7 +146,7 @@ class Realtime(Overlay):
                 fg_color=self.wcfg["font_color_battery"],
                 bg_color=self.wcfg["background_color_battery_bar"],
                 show_reading=self.wcfg["show_battery_reading"],
-                align=self.set_text_alignment(self.wcfg["battery_reading_text_alignment"]),
+                alignment=self.wcfg["battery_reading_text_alignment"],
                 right_side=self.wcfg["show_inverted_battery"],
             )
             self.bar_battbar.state = None
@@ -176,7 +176,7 @@ class Realtime(Overlay):
                 fg_color=self.wcfg["font_color_consumption"],
                 bg_color=self.wcfg["background_color_consumption_bar"],
                 show_reading=self.wcfg["show_consumption_reading"],
-                align=self.set_text_alignment(self.wcfg["consumption_reading_text_alignment"]),
+                alignment=self.wcfg["consumption_reading_text_alignment"],
                 right_side=self.wcfg["show_inverted_consumption"],
             )
             self.set_primary_orient(

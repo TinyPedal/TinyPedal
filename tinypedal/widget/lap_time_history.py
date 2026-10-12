@@ -66,7 +66,8 @@ class Realtime(Overlay):
         if self.wcfg["show_laps"]:
             self.bars_laps = self.set_rawtext(
                 text="---",
-                width=font_m.width * 3 + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * 3,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_laps"],
@@ -112,7 +113,8 @@ class Realtime(Overlay):
             )
             self.bars_time = self.set_rawtext(
                 text=DATA.TEXT_NOLAPTIME,
-                width=font_m.width * 8 + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * 8,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_time[1][0],
@@ -156,7 +158,8 @@ class Realtime(Overlay):
             self.width_delta = 3 + decimals_delta
             self.bars_delta = self.set_rawtext(
                 text=f"--.{'-' * decimals_delta}",
-                width=font_m.width * self.width_delta + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * self.width_delta,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_delta[1][0],
@@ -195,7 +198,8 @@ class Realtime(Overlay):
             self.width_fuel = 2 + decimals_fuel
             self.bars_fuel = self.set_rawtext(
                 text=f"-.{'-' * decimals_fuel}{self.sign_fuel}",
-                width=font_m.width * (self.width_fuel + len(self.sign_fuel)) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * (self.width_fuel + len(self.sign_fuel)),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_fuel"],
@@ -229,7 +233,8 @@ class Realtime(Overlay):
             self.width_ratio = 2 + decimals_ratio
             self.bars_ratio = self.set_rawtext(
                 text=f"-.{'-' * decimals_ratio}",
-                width=font_m.width * self.width_ratio + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * self.width_ratio,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_fuel_ratio"],
@@ -267,7 +272,8 @@ class Realtime(Overlay):
             self.width_wear = 2 + decimals_wear
             self.bars_wear = self.set_rawtext(
                 text=f"-.{'-' * decimals_wear}{self.sign_wear}",
-                width=font_m.width * (self.width_wear + len(self.sign_wear)) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * (self.width_wear + len(self.sign_wear)),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_wear"],

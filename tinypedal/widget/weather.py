@@ -88,7 +88,8 @@ class Realtime(Overlay):
             text_temp = f"{track_temp}({air_temp}){self.symbol_temp}"
             self.bar_temp = self.set_rawtext(
                 text=text_temp,
-                width=font_m.width * len(text_temp) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_temp),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_temperature"],
@@ -106,7 +107,8 @@ class Realtime(Overlay):
             if self.wcfg["show_trend"]:
                 self.bar_temp_trend = self.set_rawtext(
                     text=DATA.TREND_SIGN[0],
-                    width=font_m.width + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_trend[0],
@@ -121,7 +123,8 @@ class Realtime(Overlay):
             text_rain = f"{self.prefix_rain}  0%"
             self.bar_rain = self.set_rawtext(
                 text=text_rain,
-                width=font_m.width * len(text_rain) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_rain),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_rain"],
@@ -139,7 +142,8 @@ class Realtime(Overlay):
             if self.wcfg["show_trend"]:
                 self.bar_raininess_trend = self.set_rawtext(
                     text=DATA.TREND_SIGN[0],
-                    width=font_m.width + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_trend[0],
@@ -154,7 +158,8 @@ class Realtime(Overlay):
             text_wetness = f"{self.prefix_dry}  0%"
             self.bar_wetness = self.set_rawtext(
                 text=text_wetness,
-                width=font_m.width * len(text_wetness) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_wetness),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_wetness"],
@@ -172,7 +177,8 @@ class Realtime(Overlay):
             if self.wcfg["show_trend"]:
                 self.bar_wetness_trend = self.set_rawtext(
                     text=DATA.TREND_SIGN[0],
-                    width=font_m.width + bar_padx,
+                    padding=bar_padx,
+                    width=font_m.width,
                     fixed_height=font_m.height,
                     offset_y=font_m.voffset,
                     fg_color=self.bar_style_trend[0],

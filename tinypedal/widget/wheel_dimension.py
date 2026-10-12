@@ -45,12 +45,13 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 6 + bar_padx
+        bar_width = font_m.width * 6
 
         # Front tyre radius
         if self.wcfg["show_front_tyre_radius"]:
             self.bar_radius_front = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -66,6 +67,7 @@ class Realtime(Overlay):
         if self.wcfg["show_rear_tyre_radius"]:
             self.bar_radius_rear = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -81,6 +83,7 @@ class Realtime(Overlay):
         if self.wcfg["show_front_wheel_track"]:
             self.bar_track_front = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -96,6 +99,7 @@ class Realtime(Overlay):
         if self.wcfg["show_rear_wheel_track"]:
             self.bar_track_rear = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -111,6 +115,7 @@ class Realtime(Overlay):
         if self.wcfg["show_wheelbase"]:
             self.bar_wheelbase = self.set_rawtext(
                 text=DATA.TEXT_NA,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

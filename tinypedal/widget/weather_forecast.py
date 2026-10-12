@@ -55,7 +55,7 @@ class Realtime(Overlay):
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         icon_size = max(self.wcfg["icon_size"], 16) // 2 * 2
         self.total_slot = min(max(self.wcfg["number_of_forecasts"], 1), DATA.MAX_FORECASTS - 1) + 1
-        self.bar_width = max(font_m.width * 4 + bar_padx, icon_size)
+        bar_width = max(font_m.width * 4 + bar_padx * 2, icon_size)
         self.bar_rain_height = max(self.wcfg["rain_chance_bar_height"], 1)
 
         # Config units
@@ -63,13 +63,13 @@ class Realtime(Overlay):
 
         # Config canvas
         self.pixmap_weather = create_weather_icon_set(icon_size)
-        self.pixmap_rainchance = QPixmap(self.bar_width, self.bar_rain_height)
+        self.pixmap_rainchance = QPixmap(bar_width, self.bar_rain_height)
 
         # Estimated time
         if self.wcfg["show_estimated_time"]:
             self.bars_time = self.set_rawtext(
                 text=DATA.TEXT_NA,
-                fixed_width=self.bar_width,
+                fixed_width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_estimated_time"],
@@ -88,7 +88,7 @@ class Realtime(Overlay):
         if self.wcfg["show_ambient_temperature"]:
             self.bars_temp = self.set_rawtext(
                 text=DATA.TEXT_NA,
-                fixed_width=self.bar_width,
+                fixed_width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_ambient_temperature"],
@@ -109,7 +109,7 @@ class Realtime(Overlay):
                     self,
                     font=font,
                     text=DATA.TEXT_NA,
-                    width=self.bar_width,
+                    width=bar_width,
                     height=self.bar_rain_height,
                     offset_x=0.5,
                     offset_y=font_m.voffset,
@@ -129,7 +129,7 @@ class Realtime(Overlay):
         # Forecast icon
         self.bars_icon = self.set_rawimage(
             image=self.pixmap_weather[-1],
-            fixed_width=self.bar_width,
+            fixed_width=bar_width,
             fixed_height=icon_size,
             bg_color=self.wcfg["background_color"],
             count=self.total_slot,

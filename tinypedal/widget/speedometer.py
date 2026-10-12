@@ -46,7 +46,7 @@ class Realtime(Overlay):
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         decimals = max(int(self.wcfg["decimal_places"]), 0)
         zero_offset = (decimals > 0)
-        bar_width = font_m.width * (3 + decimals + zero_offset) + bar_padx
+        bar_width = font_m.width * (3 + decimals + zero_offset)
         self.leading_zero = min(max(self.wcfg["leading_zero"], 1), 3) + zero_offset + decimals + decimals / 10
 
         # Config units
@@ -56,6 +56,7 @@ class Realtime(Overlay):
         if self.wcfg["show_speed"]:
             self.bar_speed_curr = self.set_rawtext(
                 text="SPD",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -70,6 +71,7 @@ class Realtime(Overlay):
         if self.wcfg["show_speed_minimum"]:
             self.bar_speed_min = self.set_rawtext(
                 text="MIN",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -84,6 +86,7 @@ class Realtime(Overlay):
         if self.wcfg["show_speed_maximum"]:
             self.bar_speed_max = self.set_rawtext(
                 text="MAX",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -98,6 +101,7 @@ class Realtime(Overlay):
         if self.wcfg["show_speed_fastest"]:
             self.bar_speed_fast = self.set_rawtext(
                 text="TOP",
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

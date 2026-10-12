@@ -82,7 +82,8 @@ class Realtime(Overlay):
         )
         self.bars_tpres = self.set_rawtext(
             text=DATA.TEXT_NA,
-            width=font_m.width * self.text_width + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * self.text_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.bar_style_tpres[0][0],
@@ -98,7 +99,8 @@ class Realtime(Overlay):
         if self.wcfg["show_tyre_compound"]:
             self.bars_tcmpd = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
-                width=font_m.width + bar_padx,
+                padding=bar_padx,
+                width=font_m.width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_tyre_compound"],
@@ -113,7 +115,8 @@ class Realtime(Overlay):
         if self.wcfg["show_pressure_deviation"]:
             self.bars_pdiff = self.set_rawtext(
                 text=DATA.TEXT_NA,
-                width=font_m.width * self.text_width + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * self.text_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_pressure_deviation"],

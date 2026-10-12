@@ -53,7 +53,7 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        bar_width = font_m.width * 1 + bar_padx
+        bar_width = font_m.width * 1
         row_caption = 2 * self.wcfg["swap_upper_caption"]
 
         # ABS
@@ -65,6 +65,7 @@ class Realtime(Overlay):
             )
             self.bars_abs = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -97,6 +98,7 @@ class Realtime(Overlay):
             )
             self.bars_tc = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -125,6 +127,7 @@ class Realtime(Overlay):
             layout_tc_cut = self.set_grid_layout()
             self.bars_tc_cut = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -153,6 +156,7 @@ class Realtime(Overlay):
             layout_tc_slip = self.set_grid_layout()
             self.bars_tc_slip = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -181,6 +185,7 @@ class Realtime(Overlay):
             layout_farb = self.set_grid_layout()
             self.bars_farb = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -209,6 +214,7 @@ class Realtime(Overlay):
             layout_rarb = self.set_grid_layout()
             self.bars_rarb = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -237,6 +243,7 @@ class Realtime(Overlay):
             layout_bmig = self.set_grid_layout()
             self.bars_bmig = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -265,6 +272,7 @@ class Realtime(Overlay):
             layout_mmap = self.set_grid_layout()
             self.bars_mmap = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -293,6 +301,7 @@ class Realtime(Overlay):
             layout_wiper = self.set_grid_layout()
             self.bars_wiper = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 width=bar_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

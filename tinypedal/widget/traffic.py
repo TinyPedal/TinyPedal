@@ -55,7 +55,7 @@ class Realtime(Overlay):
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         bar_width = max(self.wcfg["bar_width"], 3)
-        style_width = font_m.width * bar_width + bar_padx
+        style_width = font_m.width * bar_width
         self.lap_width = bar_width - 1
         self.cls_width = bar_width
         self.show_slower_ahead = self.wcfg["show_slower_ahead"]
@@ -87,6 +87,7 @@ class Realtime(Overlay):
         if self.wcfg["show_class"]:
             self.bar_classes = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -111,6 +112,7 @@ class Realtime(Overlay):
             )
             self.bar_laps = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
@@ -125,6 +127,7 @@ class Realtime(Overlay):
             self.decimals_time = max(self.wcfg["decimal_places_time_interval"], 0)
             self.bar_time = self.set_rawtext(
                 text=DATA.TEXT_PLACEHOLDER,
+                padding=bar_padx,
                 fixed_width=style_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,

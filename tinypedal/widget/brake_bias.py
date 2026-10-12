@@ -58,7 +58,8 @@ class Realtime(Overlay):
             text_bbias = self.format_brake_bias(0.5)
             self.bar_bbias = self.set_rawtext(
                 text=text_bbias,
-                width=font_m.width * len(text_bbias) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_bbias),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_brake_bias"],
@@ -75,7 +76,8 @@ class Realtime(Overlay):
             self.width_delta = len(text_delta)
             self.bar_delta = self.set_rawtext(
                 text=text_delta,
-                width=font_m.width * self.width_delta + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * self.width_delta,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_baseline_bias_delta"],
@@ -91,7 +93,8 @@ class Realtime(Overlay):
             text_bmigt = self.format_brake_migt(0)
             self.bar_bmigt = self.set_rawtext(
                 text=text_bmigt,
-                width=font_m.width * len(text_bmigt) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_bmigt),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_brake_migration"],

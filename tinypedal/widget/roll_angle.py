@@ -69,7 +69,8 @@ class Realtime(Overlay):
         text_rollf = self.format_roll(0, self.prefix_rollf)
         self.bar_rollf = self.set_rawtext(
             text=text_rollf,
-            width=font_m.width * len(text_rollf) + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * len(text_rollf),
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_roll_angle_front"],
@@ -85,7 +86,8 @@ class Realtime(Overlay):
         text_rollr = self.format_roll(0, self.prefix_rollr)
         self.bar_rollr = self.set_rawtext(
             text=text_rollr,
-            width=font_m.width * len(text_rollr) + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * len(text_rollr),
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_roll_angle_rear"],
@@ -104,7 +106,8 @@ class Realtime(Overlay):
             text_rolld = self.format_roll(0, self.prefix_rolld)
             self.bar_rolld = self.set_rawtext(
                 text=text_rolld,
-                width=font_m.width * len(text_rolld) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_rolld),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_roll_angle_difference"],
@@ -120,7 +123,8 @@ class Realtime(Overlay):
             text_ratio = self.format_ratio(0, self.prefix_ratio)
             self.bar_ratio = self.set_rawtext(
                 text=text_ratio,
-                width=font_m.width * len(text_ratio) + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * len(text_ratio),
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_roll_angle_ratio"],

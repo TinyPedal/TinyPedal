@@ -55,7 +55,7 @@ class Realtime(Overlay):
         layout_reversed = self.wcfg["layout"] != 0
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.char_width = max(self.wcfg["bar_width"], 4)
-        bar_width = font_m.width * self.char_width + bar_padx
+        bar_width = font_m.width * self.char_width
 
         self.pitin_bias = self.wcfg["enable_pit_entry_bias"]
         self.consumption_rate = self.wcfg["show_rate_of_consumption"]
@@ -77,6 +77,7 @@ class Realtime(Overlay):
         self.bars_target_lap = self.set_rawtext(
             font=font_cap,
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_cap_m.height,
             offset_y=font_cap_m.voffset,
@@ -102,6 +103,7 @@ class Realtime(Overlay):
         # Target consumption row
         self.bars_target_use = self.set_rawtext(
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
@@ -125,6 +127,7 @@ class Realtime(Overlay):
         )
         self.bars_delta = self.set_rawtext(
             text=DATA.TEXT_PLACEHOLDER,
+            padding=bar_padx,
             width=bar_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,

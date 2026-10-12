@@ -77,7 +77,8 @@ class Realtime(Overlay):
         )
         self.bars_btemp = self.set_rawtext(
             text=DATA.TEXT_NA,
-            width=font_m.width * text_width + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * text_width,
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_temperature"],
@@ -102,7 +103,8 @@ class Realtime(Overlay):
             )
             self.bars_btavg = self.set_rawtext(
                 text=DATA.TEXT_NA,
-                width=font_m.width * text_width + bar_padx,
+                padding=bar_padx,
+                width=font_m.width * text_width,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_average"],

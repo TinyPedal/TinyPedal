@@ -53,77 +53,77 @@ class WheelGaugeBar(QWidget):
     ):
         super().__init__(parent)
         self.last = -1
-        self.display_range = display_range
-        self.decimals = max(decimals, 0)
-        self.width_scale = bar_width / self.display_range
         self.input_color = input_color
         self.bg_color = bg_color
         self.mark_color = mark_color
         self.maxrange_color = maxrange_color
-        self.rect_bg = QRectF(0, 0, bar_width, bar_height)
-        self.rect_input = self.rect_bg.adjusted(0, 0, 0, 0)
-        self.rect_text = self.rect_bg.adjusted(padding_x, offset_y, -padding_x, 0)
-        self.right_side = right_side
-
-        if self.mark_color:
-            self.rect_mark = QRectF(0, 0, mark_width, bar_height)
-        else:
-            self.rect_mark = self.rect_bg
-
-        if self.maxrange_color:
-            if top_side:
-                self.rect_max = QRectF(0, 0, bar_width, maxrange_height)
-            else:
-                self.rect_max = QRectF(0, bar_height - maxrange_height, bar_width, maxrange_height)
-            if right_side:
-                self.rect_max.setWidth(0)
-            else:
-                self.rect_max.setX(bar_width)
-        else:
-            self.rect_max = self.rect_bg
-
-        if right_side:
-            self.align = Qt.AlignRight | Qt.AlignVCenter
-        else:
-            self.align = Qt.AlignLeft | Qt.AlignVCenter
-
         self.pen = QPen()
         self.pen.setColor(fg_color)
+        self._display_range = display_range
+        self._decimals = max(decimals, 0)
+        self._width_scale = bar_width / self._display_range
+        self._rect_bg = QRectF(0, 0, bar_width, bar_height)
+        self._rect_input = self._rect_bg.adjusted(0, 0, 0, 0)
+        self._rect_text = self._rect_bg.adjusted(padding_x, offset_y, -padding_x, 0)
+        self._right_side = right_side
+
+        if mark_color:
+            self._rect_mark = QRectF(0, 0, mark_width, bar_height)
+        else:
+            self._rect_mark = self._rect_bg
+
+        if maxrange_color:
+            if top_side:
+                self._rect_max = QRectF(0, 0, bar_width, maxrange_height)
+            else:
+                self._rect_max = QRectF(0, bar_height - maxrange_height, bar_width, maxrange_height)
+            if right_side:
+                self._rect_max.setWidth(0)
+            else:
+                self._rect_max.setX(bar_width)
+        else:
+            self._rect_max = self._rect_bg
+
+        if right_side:
+            self._alignment = Qt.AlignRight | Qt.AlignVCenter
+        else:
+            self._alignment = Qt.AlignLeft | Qt.AlignVCenter
+
         self.setFixedSize(bar_width, bar_height)
 
     def update_input(self, input_value: float):
         """Update input value"""
-        if self.right_side:
-            self.rect_input.setWidth(input_value * self.width_scale)
+        if self._right_side:
+            self._rect_input.setWidth(input_value * self._width_scale)
         else:
-            self.rect_input.setX((self.display_range - input_value) * self.width_scale)
+            self._rect_input.setX((self._display_range - input_value) * self._width_scale)
         self.update()
 
     def update_mark(self, mark_value: float):
         """Update mark"""
-        if self.right_side:
-            self.rect_mark.moveRight(mark_value * self.width_scale)
+        if self._right_side:
+            self._rect_mark.moveRight(mark_value * self._width_scale)
         else:
-            self.rect_mark.moveLeft((self.display_range - mark_value) * self.width_scale)
+            self._rect_mark.moveLeft((self._display_range - mark_value) * self._width_scale)
 
     def update_maxrange(self, input_value: float):
         """Update max range"""
-        if self.right_side:
-            self.rect_max.setWidth(input_value * self.width_scale)
+        if self._right_side:
+            self._rect_max.setWidth(input_value * self._width_scale)
         else:
-            self.rect_max.setX((self.display_range - input_value) * self.width_scale)
+            self._rect_max.setX((self._display_range - input_value) * self._width_scale)
 
     def paintEvent(self, event):
         """Draw normal without warning or negative highlighting"""
         painter = QPainter(self)
-        painter.fillRect(self.rect_bg, self.bg_color)
-        painter.fillRect(self.rect_input, self.input_color)
+        painter.fillRect(self._rect_bg, self.bg_color)
+        painter.fillRect(self._rect_input, self.input_color)
         if self.mark_color:
-            painter.fillRect(self.rect_mark, self.mark_color)
+            painter.fillRect(self._rect_mark, self.mark_color)
         if self.maxrange_color:
-            painter.fillRect(self.rect_max, self.maxrange_color)
+            painter.fillRect(self._rect_max, self.maxrange_color)
         painter.setPen(self.pen)
-        painter.drawText(self.rect_text, self.align, f"{self.last:.{self.decimals}f}")
+        painter.drawText(self._rect_text, self._alignment, f"{self.last:.{self._decimals}f}")
 
 
 class PedalInputBar(QWidget):
@@ -148,66 +148,66 @@ class PedalInputBar(QWidget):
     ):
         super().__init__(parent)
         self.last = None
-        self.is_maxed = False
-        self.show_reading = show_reading
-        self.input_reading = 0.0
-        self.pedal_length = pedal_length
-        self.pedal_extend = pedal_extend
         self.input_color = input_color
         self.bg_color = bg_color
-        self.rect_pedal = QRectF(*pedal_size)
-        self.rect_raw = QRectF(*raw_size)
-        self.rect_filtered = QRectF(*filtered_size)
-        self.rect_text = QRectF(*reading_size)
-        self.horizontal_style = horizontal_style
+        self.pen = QPen()
+        self.pen.setColor(fg_color)
+        self._is_maxed = False
+        self._show_reading = show_reading
+        self._input_reading = 0.0
+        self._pedal_length = pedal_length
+        self._pedal_extend = pedal_extend
+        self._rect_pedal = QRectF(*pedal_size)
+        self._rect_raw = QRectF(*raw_size)
+        self._rect_filtered = QRectF(*filtered_size)
+        self._rect_text = QRectF(*reading_size)
+        self._horizontal_style = horizontal_style
 
         if ffb_color:
-            self.rect_max = self.rect_pedal
+            self.rect_max = self._rect_pedal
             self.max_color = ffb_color
         else:
             self.rect_max = QRectF(*max_size)
             self.max_color = input_color
 
-        self.pen = QPen()
-        self.pen.setColor(fg_color)
         self.setFixedSize(pedal_size[2], pedal_size[3])
 
     def update_input(self, input_raw: float, input_filtered: float):
         """Update input value - horizontal style"""
-        self.input_reading = max(input_raw, input_filtered) * 100
-        if self.horizontal_style:
+        self._input_reading = max(input_raw, input_filtered) * 100
+        if self._horizontal_style:
             scaled_raw = self.__scale_horizontal(input_raw)
             scaled_filtered = self.__scale_horizontal(input_filtered)
-            self.rect_raw.setRight(scaled_raw)
-            self.rect_filtered.setRight(scaled_filtered)
-            self.is_maxed = scaled_raw >= self.pedal_length
+            self._rect_raw.setRight(scaled_raw)
+            self._rect_filtered.setRight(scaled_filtered)
+            self._is_maxed = scaled_raw >= self._pedal_length
         else:
             scaled_raw = self.__scale_vertical(input_raw)
             scaled_filtered = self.__scale_vertical(input_filtered)
-            self.rect_raw.setTop(scaled_raw)
-            self.rect_filtered.setTop(scaled_filtered)
-            self.is_maxed = scaled_raw <= self.pedal_extend
+            self._rect_raw.setTop(scaled_raw)
+            self._rect_filtered.setTop(scaled_filtered)
+            self._is_maxed = scaled_raw <= self._pedal_extend
         self.update()
 
     def __scale_horizontal(self, input_value: float) -> float:
         """Scale input - horizontal style"""
-        return input_value * self.pedal_length
+        return input_value * self._pedal_length
 
     def __scale_vertical(self, input_value: float) -> float:
         """Scale input - vertical style"""
-        return (1 - input_value) * self.pedal_length + self.pedal_extend
+        return (1 - input_value) * self._pedal_length + self._pedal_extend
 
     def paintEvent(self, event):
         """Draw"""
         painter = QPainter(self)
-        painter.fillRect(self.rect_pedal, self.bg_color)
-        painter.fillRect(self.rect_raw, self.input_color)
-        painter.fillRect(self.rect_filtered, self.input_color)
-        if self.is_maxed:
+        painter.fillRect(self._rect_pedal, self.bg_color)
+        painter.fillRect(self._rect_raw, self.input_color)
+        painter.fillRect(self._rect_filtered, self.input_color)
+        if self._is_maxed:
             painter.fillRect(self.rect_max, self.max_color)
-        if self.show_reading:
+        if self._show_reading:
             painter.setPen(self.pen)
-            painter.drawText(self.rect_text, Qt.AlignCenter, f"{self.input_reading:.0f}")
+            painter.drawText(self._rect_text, Qt.AlignCenter, f"{self._input_reading:.0f}")
 
 
 class ProgressBar(QWidget):
@@ -226,44 +226,52 @@ class ProgressBar(QWidget):
         fg_color: str = "",
         bg_color: str = "",
         show_reading: bool = False,
-        align: Qt.Alignment = Qt.AlignCenter,
+        alignment: str = "Center",
         right_side: bool = False,
     ):
         super().__init__(parent)
-        self.last = -1
-        self.text = text
         if show_reading and font is not None:
             height = max(font.pixelSize(), height)
             self.setFont(font)
-        self.bar_width = width
-        self.rect_bar = QRectF(0, 0, width, height)
-        self.rect_input = QRectF(0, 0, width, height)
-        self.rect_text = QRectF(width * (offset_x - 0.5), offset_y, width, height)
+
+        if alignment == "Left":
+            align = Qt.AlignLeft | Qt.AlignVCenter
+        elif alignment == "Right":
+            align = Qt.AlignRight | Qt.AlignVCenter
+        else:
+            align = Qt.AlignCenter
+
+        self.last = -1
+        self.text = text
         self.input_color = input_color
         self.bg_color = bg_color
-        self.show_reading = show_reading
-        self.align = align
-        self.right_side = right_side
         self.pen = QPen()
         self.pen.setColor(fg_color)
+        self.show_reading = show_reading
+        self._bar_width = width
+        self._rect_bar = QRectF(0, 0, width, height)
+        self._rect_input = QRectF(0, 0, width, height)
+        self._rect_text = QRectF(width * (offset_x - 0.5), offset_y, width, height)
+        self._alignment = align
+        self._right_side = right_side
         self.setFixedSize(width, height)
 
     def update_input(self, input_value: float):
         """Update input"""
-        if self.right_side:
-            self.rect_input.setLeft((1 - input_value) * self.bar_width)
+        if self._right_side:
+            self._rect_input.setLeft((1 - input_value) * self._bar_width)
         else:
-            self.rect_input.setRight(input_value * self.bar_width)
+            self._rect_input.setRight(input_value * self._bar_width)
         self.update()
 
     def paintEvent(self, event):
         """Draw"""
         painter = QPainter(self)
-        painter.fillRect(self.rect_bar, self.bg_color)
-        painter.fillRect(self.rect_input, self.input_color)
+        painter.fillRect(self._rect_bar, self.bg_color)
+        painter.fillRect(self._rect_input, self.input_color)
         if self.show_reading:
             painter.setPen(self.pen)
-            painter.drawText(self.rect_text, self.align, self.text)
+            painter.drawText(self._rect_text, self._alignment, self.text)
 
 
 class FuelLevelBar(QWidget):
@@ -285,35 +293,36 @@ class FuelLevelBar(QWidget):
     ):
         super().__init__(parent)
         self.last = None
-        self.bar_width = width
-        self.rect_bar = QRectF(0, 0, width, height)
-        self.rect_input = QRectF(0, 0, width, height)
-        self.rect_start = QRectF(0, 0, start_mark_width, height)
-        self.rect_refuel = QRectF(0, 0, refill_mark_width, height)
         self.input_color = input_color
         self.bg_color = bg_color
         self.start_mark_color = start_mark_color
         self.refill_mark_color = refill_mark_color
-        self.show_start_mark = show_start_mark
-        self.show_refill_mark = show_refill_mark
+        self._bar_width = width
+        self._rect_bar = QRectF(0, 0, width, height)
+        self._rect_input = QRectF(0, 0, width, height)
+        self._rect_start = QRectF(0, 0, start_mark_width, height)
+        self._rect_refuel = QRectF(0, 0, refill_mark_width, height)
+        self._show_start_mark = show_start_mark
+        self._show_refill_mark = show_refill_mark
+
         self.setFixedSize(width, height)
 
     def update_input(self, input_value: float, start_value: float, refill_value: float):
         """Update input"""
-        self.rect_input.setRight(input_value * self.bar_width)
-        self.rect_start.moveLeft(start_value * self.bar_width)
-        self.rect_refuel.moveLeft(refill_value * self.bar_width)
+        self._rect_input.setRight(input_value * self._bar_width)
+        self._rect_start.moveLeft(start_value * self._bar_width)
+        self._rect_refuel.moveLeft(refill_value * self._bar_width)
         self.update()
 
     def paintEvent(self, event):
         """Draw"""
         painter = QPainter(self)
-        painter.fillRect(self.rect_bar, self.bg_color)
-        painter.fillRect(self.rect_input, self.input_color)
-        if self.show_start_mark:
-            painter.fillRect(self.rect_start, self.start_mark_color)
-        if self.show_refill_mark:
-            painter.fillRect(self.rect_refuel, self.refill_mark_color)
+        painter.fillRect(self._rect_bar, self.bg_color)
+        painter.fillRect(self._rect_input, self.input_color)
+        if self._show_start_mark:
+            painter.fillRect(self._rect_start, self.start_mark_color)
+        if self._show_refill_mark:
+            painter.fillRect(self._rect_refuel, self.refill_mark_color)
 
 
 class GearGaugeBar(QWidget):
@@ -333,39 +342,39 @@ class GearGaugeBar(QWidget):
     ):
         super().__init__(parent)
         self.last = -1
-        self.gear = "N"
-        self.speed = 0
-        self.color_index = 0
-        self.show_speed = show_speed
-        self.font_speed = font_speed
-        self.bg_color = bg_color
-        self.rect_gear = QRectF(*gear_size)
-        self.rect_speed = QRectF(*speed_size)
-        self.rect_bar = QRectF(0, 0, width, height)
-
         self.pen = QPen()
         self.pen.setColor(fg_color)
+        self._gear = "N"
+        self._speed = 0
+        self._color_index = 0
+        self._show_speed = show_speed
+        self._font_speed = font_speed
+        self._bg_color = bg_color
+        self._rect_gear = QRectF(*gear_size)
+        self._rect_speed = QRectF(*speed_size)
+        self._rect_bar = QRectF(0, 0, width, height)
+
         self.setFixedSize(width, height)
 
     def update_input(self, gear: str, speed: int, color_index: int, bg_color: str):
         """Update input"""
-        self.gear = gear
-        self.speed = speed
-        self.color_index = color_index
-        self.bg_color = bg_color
+        self._gear = gear
+        self._speed = speed
+        self._color_index = color_index
+        self._bg_color = bg_color
         self.update()
 
     def paintEvent(self, event):
         """Draw"""
         painter = QPainter(self)
-        painter.fillRect(self.rect_bar, self.bg_color)
-        if self.color_index == -4:  # flicker trigger
+        painter.fillRect(self._rect_bar, self._bg_color)
+        if self._color_index == -4:  # flicker trigger
             return
         painter.setPen(self.pen)
-        painter.drawText(self.rect_gear, Qt.AlignCenter, self.gear)
-        if self.show_speed:
-            painter.setFont(self.font_speed)
-            painter.drawText(self.rect_speed, Qt.AlignCenter, f"{self.speed:03.0f}")
+        painter.drawText(self._rect_gear, Qt.AlignCenter, self._gear)
+        if self._show_speed:
+            painter.setFont(self._font_speed)
+            painter.drawText(self._rect_speed, Qt.AlignCenter, f"{self._speed:03.0f}")
 
 
 class RawText(QWidget):
@@ -376,6 +385,7 @@ class RawText(QWidget):
         parent,
         font: QFont | None = None,
         text: str = "",
+        padding: int = 0,
         width: int = 0,
         height: int = 0,
         fixed_width: int = 0,
@@ -383,17 +393,27 @@ class RawText(QWidget):
         offset_y: int = 0,
         fg_color: str = "",
         bg_color: str = "",
-        alignment: Qt.Alignment = Qt.AlignCenter,
+        alignment: str = "Center",
         last: Any | None = None,
     ):
         super().__init__(parent)
         if font is not None:
             self.setFont(font)
 
+        if alignment == "Left":
+            align = Qt.AlignLeft | Qt.AlignVCenter
+            padding_offset = padding
+        elif alignment == "Right":
+            align = Qt.AlignRight | Qt.AlignVCenter
+            padding_offset = -padding
+        else:
+            align = Qt.AlignCenter
+            padding_offset = 0
+
         if fixed_width > 0:
-            self.setFixedWidth(fixed_width)
+            self.setFixedWidth(fixed_width + padding * 2)
         elif width > 0:
-            self.setMinimumWidth(width)
+            self.setMinimumWidth(width + padding * 2)
 
         if fixed_height > 0:
             self.setFixedHeight(fixed_height)
@@ -405,7 +425,8 @@ class RawText(QWidget):
         self.text = text
         self.fg = fg_color if fg_color else Qt.transparent
         self.bg = bg_color if bg_color else Qt.transparent
-        self._alignment = alignment
+        self._alignment = align
+        self._offset_x = padding_offset
         self._offset_y = offset_y
         self._pen_text = QPen()
         self._width = self.width()
@@ -428,7 +449,7 @@ class RawText(QWidget):
         self._pen_text.setColor(self.fg)
         painter.setPen(self._pen_text)
         painter.fillRect(0, 0, self._width, self._height, self.bg)
-        painter.drawText(0, self._offset_y, self._width, self._height, self._alignment, self.text)
+        painter.drawText(self._offset_x, self._offset_y, self._width, self._height, self._alignment, self.text)
 
 
 class RawImage(QWidget):
@@ -545,30 +566,28 @@ class MultiCompounds(QWidget):
         offset_y: int = 0,
         fg_color: str = "",
         bg_color: str = "",
-        alignment: Qt.Alignment = Qt.AlignCenter,
         last: Any | None = None,
     ):
         super().__init__(parent)
         if font is not None:
             self.setFont(font)
 
-        self.setFixedWidth(count * (width + spacing) + padding)
+        self.setFixedWidth(count * (width + spacing) + padding * 2)
         self.setFixedHeight(height)
 
         self.state = None
         self.last = last
         fg = fg_color if fg_color else Qt.transparent
         self.bg = bg_color if bg_color else Qt.transparent
+        self.compounds = ()
+        self.colors = (fg,) * count
         self._count = count
-        self._alignment = alignment
         self._offset_y = offset_y
-        self._padding = padding // 2
+        self._padding = padding
         self._word_width = width + spacing
         self._pen_text = QPen()
         self._width = self.width()
         self._height = self.height()
-        self.compounds = ()
-        self.colors = (fg,) * count
 
     def clear(self):
         """Clear display"""
@@ -595,7 +614,7 @@ class MultiCompounds(QWidget):
                 self._offset_y,
                 self._word_width,
                 self._height,
-                self._alignment,
+                Qt.AlignCenter,
                 compound,
             )
 
@@ -619,14 +638,13 @@ class DeltaLapTime(QWidget):
         fg_color_loss: str = "",
         fg_color_player: str = "",
         inverted: bool = False,
-        alignment: Qt.Alignment = Qt.AlignCenter,
         last: Any | None = None,
     ):
         super().__init__(parent)
         if font is not None:
             self.setFont(font)
 
-        self.setFixedWidth(count * (width + spacing) + padding)
+        self.setFixedWidth(count * (width + spacing) + padding * 2)
         self.setFixedHeight(height)
 
         self.state = None
@@ -636,17 +654,16 @@ class DeltaLapTime(QWidget):
         self.fg_gain = fg_color_gain
         self.fg_loss = fg_color_loss
         self.fg_player = fg_color_player
+        self.delta = ()
+        self.is_player = False
         self._count = count
-        self._alignment = alignment
         self._offset_y = offset_y
-        self._padding = padding // 2
+        self._padding = padding
         self._word_width = width + spacing
         self._pen_text = QPen()
         self._width = self.width()
         self._height = self.height()
         self._inverted = inverted
-        self.delta = ()
-        self.is_player = False
 
     def clear(self):
         """Clear display"""
@@ -698,6 +715,6 @@ class DeltaLapTime(QWidget):
                 self._offset_y,
                 self._word_width,
                 self._height,
-                self._alignment,
+                Qt.AlignCenter,
                 text,
             )

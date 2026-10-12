@@ -63,7 +63,8 @@ class Realtime(Overlay):
         )
         self.bar_time_target = self.set_rawtext(
             text=f"{self.prefix_best}{DATA.TEXT_NOLAPTIME:>{9 + self.extra_width}}",
-            width=font_m.width * (11 + self.extra_width) + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * (11 + self.extra_width),
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.bar_style_time_target[2],
@@ -74,7 +75,8 @@ class Realtime(Overlay):
         # Current time
         self.bar_time_curr = self.set_rawtext(
             text=f"{DATA.TEXT_NOLAPTIME:>{11 + self.extra_width}}",
-            width=font_m.width * (11 + self.extra_width) + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * (11 + self.extra_width),
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.wcfg["font_color_current_time"],
@@ -99,7 +101,8 @@ class Realtime(Overlay):
             ),
         )
         self.bars_time_gap = self.set_rawtext(
-            width=font_m.width * (7 + self.extra_width) + bar_padx,
+            padding=bar_padx,
+            width=font_m.width * (7 + self.extra_width),
             fixed_height=font_m.height,
             offset_y=font_m.voffset,
             fg_color=self.bar_style_gap[2][0],
