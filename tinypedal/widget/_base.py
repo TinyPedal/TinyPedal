@@ -518,7 +518,8 @@ class Overlay(Base):
         row: int = 0,
         row_start: int = 1,
         alignments: dict[str, str] | None = None,
-    ) -> dict[str, RawText]:
+        transparent_columns: tuple[str, ...] = (),
+    ):
         """Set grid layout - table caption row
 
         Set caption for each "display_order_*" column that contains widget at row_start,
@@ -527,6 +528,7 @@ class Overlay(Base):
 
         If "caption_text_title" option is not empty, title text is displayed (left aligned)
         across leading columns that have empty caption text, without expanding column width.
+        Leading transparent columns are excluded from title.
 
         Args:
             layout: table grid layout.
@@ -535,9 +537,8 @@ class Overlay(Base):
             row_start: table row start index, for checking column existence.
             alignments: caption text alignment ("Left", "Center", "Right") by column name.
                 Default is "Center".
-
-        Returns:
-            Caption RawText by column name, excluding columns within title span.
+            transparent_columns: column names that use transparent caption background,
+                except when within title.
         """
         font_cap = self.config_font(
             self.wcfg["font_name"],
@@ -559,22 +560,27 @@ class Overlay(Base):
         captions = [
             (
                 column,
-                name,
                 self.wcfg.get(f"caption_text_{name}", ""),
                 alignments.get(name, "Center"),
+                name in transparent_columns,
             )
             for column, name in captions
         ]
-        caption_bars = {}
 
-        # Title across leading columns with empty caption text
+        # Title across leading columns with empty caption text, after transparent columns
         title = self.wcfg.get("caption_text_title", "")
+        title_start = 0
         title_span = 0
         if title:
-            for _, _, text, _ in captions:
+            for _, _, _, transparent in captions:
+                if not transparent:
+                    break
+                title_start += 1
+            for _, text, _, _ in captions[title_start:]:
                 if text:
                     break
                 title_span += 1
+        title_end = title_start + title_span
         if title_span:
             cap_temp = self.set_rawtext(
                 font=font_cap,
@@ -586,11 +592,11 @@ class Overlay(Base):
                 bg_color=self.wcfg["background_color_caption"],
                 alignment="Left",
             )
-            column_first = captions[0][0]
-            column_last = captions[title_span - 1][0]
+            column_first = captions[title_start][0]
+            column_last = captions[title_end - 1][0]
             layout.addWidget(cap_temp, row, column_first, 1, column_last - column_first + 1)
 
-        for column, name, text, align in captions[title_span:]:
+        for column, text, align, transparent in captions[:title_start] + captions[title_end:]:
             cap_temp = self.set_rawtext(
                 font=font_cap,
                 text=text,
@@ -599,12 +605,10 @@ class Overlay(Base):
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],
-                bg_color=self.wcfg["background_color_caption"],
+                bg_color="#00000000" if transparent else self.wcfg["background_color_caption"],
                 alignment=align,
             )
             layout.addWidget(cap_temp, row, column)
-            caption_bars[name] = cap_temp
-        return caption_bars
 
     @staticmethod
     def set_grid_layout(

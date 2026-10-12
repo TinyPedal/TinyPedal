@@ -234,8 +234,11 @@ class Realtime(Overlay):
 
         # Caption
         if self.wcfg["show_caption"]:
-            captions = self.set_grid_layout_table_caption(layout=layout, row=row_caption)
-            self.cap_fuel = captions.get("fuel")
+            self.set_grid_layout_table_caption(layout=layout, row=row_caption)
+            if self.wcfg["show_fuel"]:
+                self.cap_fuel = layout.itemAtPosition(
+                    row_caption, self.wcfg["display_order_fuel"]
+                ).widget()
 
         # Last data
         self.last_data_version = -1

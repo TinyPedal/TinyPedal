@@ -609,6 +609,12 @@ class Realtime(Overlay):
 
         # Caption
         if self.wcfg["show_caption"]:
+            # Hide pit status caption if none status background is transparent
+            none_status_bg = self.wcfg["background_color_none_status"]
+            if len(none_status_bg) == 9 and none_status_bg.startswith("#00"):
+                transparent_columns = ("pit_status",)
+            else:
+                transparent_columns = ()
             self.set_grid_layout_table_caption(
                 layout=layout,
                 padding=bar_padx,
@@ -617,6 +623,7 @@ class Realtime(Overlay):
                     "vehicle": self.wcfg["vehicle_name_text_alignment"],
                     "time_interval": self.wcfg["time_interval_text_alignment"],
                 },
+                transparent_columns=transparent_columns,
             )
 
     def timerEvent(self, event):
