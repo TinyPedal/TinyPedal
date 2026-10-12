@@ -310,14 +310,17 @@ class Realtime(Overlay):
         # Vehicle in pit
         if self.wcfg["show_pit_status"]:
             self.pit_status_text = (
-                "",
+                self.wcfg["none_status_text"],
                 self.wcfg["pit_status_text"],
                 self.wcfg["garage_status_text"],
                 self.wcfg["yellow_flag_status_text"],
                 self.wcfg["finish_status_text"],
             )
             self.bar_style_pit = (
-                ("#00000000", "#00000000"),
+                (
+                    self.wcfg["font_color_none_status"],
+                    self.wcfg["background_color_none_status"],
+                ),
                 (
                     self.wcfg["font_color_pit"],
                     self.wcfg["background_color_pit"],
