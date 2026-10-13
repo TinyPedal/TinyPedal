@@ -465,12 +465,33 @@ class Session(_reader.Session, DataAdapter):
 
         Rain in percent:
             1-10 drizzle, 11-20 light rain, 21-40 rain, 41-60 heavy rain, 61-100 storm
+
+        Notes:
+            - Game API only reports those data with limited accuracy,
+              where raininess reading only updates when certain threshold reaches:
+              0%, 5%, 15%, 30%, etc.
         """
         return rmnan(self.shmm.rf2ScorInfo.mRaining)
 
     def wetness(self) -> float:
-        """Road wetness set (fraction), range 0.0 - 1.0"""
+        """Road wetness set (fraction), range 0.0 - 1.0
+
+        RF2/LMU API provides 3 wetness readings from:
+            - Minimum path wetness (this can always show '0' if some part of road is covered by building/bridge roof).
+            - Maximum path wetness (this can grow faster than minimum & average readings).
+            - Average path wetness (this is the average road wetness for most driving path).
+
+        Notes:
+            - 'path' means anywhere that is part of 'racesurface' that can become wet due to 'rain'.
+            - Game API only reports those data with limited accuracy,
+              where wetness reading only updates when following threshold reaches:
+              0%, 5%, 12%, 40%, 60%, 100%.
+            - It's not good idea to calculate average of all 3 readings, because min path can always be '0' as reason mentioned above.
+        """
         scor = self.shmm.rf2ScorInfo
+        # Add up min/max path wetness, then divide by 1000 and add to average wetness
+        # so it allows to indicate any changes to min/max path wetness
+        # but not affecting average wetness reading (necessary for calculating 'trend' later)
         return rmnan(scor.mAvgPathWetness + (scor.mMinPathWetness + scor.mMaxPathWetness) * 0.001)
 
     def weather_forecast(self) -> tuple[tuple[float, int, float, float], ...]:
