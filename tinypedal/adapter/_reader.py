@@ -630,6 +630,10 @@ class Vehicle(ABC):
         """Team name"""
 
     @abstractmethod
+    def race_number(self, index: int | None = None) -> str:
+        """Race number"""
+
+    @abstractmethod
     def vehicle_model(self, index: int | None = None) -> str:
         """Vehicle model name (brand name + model ID)"""
 

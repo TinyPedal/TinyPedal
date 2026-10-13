@@ -54,6 +54,8 @@ class Realtime(Overlay):
         row_start = 1 if self.wcfg["show_caption"] else 0
         self.drv_width = max(int(self.wcfg["driver_name_width"]), 1)
         self.veh_width = max(int(self.wcfg["vehicle_name_width"]), 1)
+        self.rcn_width = max(int(self.wcfg["race_number_width"]), 1)
+        self.rcn_prefix = self.wcfg["prefix_race_number"]
         self.brd_width = max(int(self.wcfg["brand_logo_width"]), 1)
         self.brd_height = max(self.wcfg["font_size"], 1)
         self.cls_width = max(int(self.wcfg["class_width"]), 0)
@@ -156,6 +158,24 @@ class Realtime(Overlay):
                 targets=self.bars_veh,
                 row_start=row_start,
                 column=self.wcfg["display_order_vehicle"],
+                hide_start=row_start + 1,
+            )
+        # Race number
+        if self.wcfg["show_race_number"]:
+            self.bars_rcn = self.set_rawtext(
+                padding=bar_padx,
+                width=(len(self.rcn_prefix) + self.rcn_width) * font_m.width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_race_number"],
+                bg_color=self.wcfg["background_color_race_number"],
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_rcn,
+                row_start=row_start,
+                column=self.wcfg["display_order_race_number"],
                 hide_start=row_start + 1,
             )
         # Brand logo
@@ -667,6 +687,9 @@ class Realtime(Overlay):
                 else:
                     vehicle_name = veh_info.vehicleName
                 self.update_veh(self.bars_veh[idx], vehicle_name, state)
+            # Race number
+            if self.wcfg["show_race_number"]:
+                self.update_rcn(self.bars_rcn[idx], veh_info.raceNumber, state)
             # Brand logo
             if self.wcfg["show_brand_logo"]:
                 self.update_brd(self.bars_brd[idx], veh_info.brandName, state)
@@ -793,6 +816,13 @@ class Realtime(Overlay):
                 text = text.upper()
             text = f"{text:.{self.veh_width}}"
             target.text = text
+            self.toggle_visibility(target, data[-1])
+
+    def update_rcn(self, target, *data):
+        """Race number"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{self.rcn_prefix}{data[0][:self.rcn_width]}" if data[0] else ""
             self.toggle_visibility(target, data[-1])
 
     def update_brd(self, target, *data):

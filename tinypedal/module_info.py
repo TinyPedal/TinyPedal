@@ -468,6 +468,7 @@ class VehicleDataSet:
     brandName: str = ""
     vehicleName: str = ""
     vehicleClass: str = ""
+    raceNumber: str = ""
     overallAheadIndex: int = -1
     classAheadIndex: int = -1
     classBehindIndex: int = -1

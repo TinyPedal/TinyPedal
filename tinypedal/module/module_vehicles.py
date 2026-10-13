@@ -259,6 +259,7 @@ def update_vehicle_data(
             data.vehicleName = api.read.vehicle.vehicle_model(index)
             data.brandName = select_brand_name(data.vehicleName)
             data.vehicleClass = api.read.vehicle.class_name(index)
+            data.raceNumber = api.read.vehicle.race_number(index)
             data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.tireCompoundName = api.read.tyre.compound_class(index)
             data.isFinished = api.read.vehicle.finish_state(index) == 1

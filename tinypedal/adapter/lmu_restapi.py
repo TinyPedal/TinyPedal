@@ -27,7 +27,12 @@ import logging
 from ..constant import DATA
 from ..decorator import slotclass
 from ..process.garage import export_lmu_car_setup
-from ..process.vehicle import absolute_refilling, export_wheels, steerlock_to_number
+from ..process.vehicle import (
+    absolute_refilling,
+    export_race_numbers,
+    export_wheels,
+    steerlock_to_number,
+)
 from ..process.weather import FORECAST_DEFAULT, WeatherNode, forecast_rf2
 from ..validator import valid_value_type
 from ._restapi import ResOutput, RestAPITask
@@ -55,6 +60,7 @@ class RestAPIData:
     maxVirtualEnergy: float = 0.0
     brakeWear: tuple[float, ...] = DATA.WHEELS_NA
     suspensionDamage: tuple[float, ...] = DATA.WHEELS_NA
+    raceNumbers: dict[int, str] = {}
 
     def __del__(self):
         logger.info("RestAPI: GC: RestAPIData")
@@ -87,6 +93,9 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
         ResOutput("pitStopTime", 0.0, valid_value_type, ("total",)),
         ResOutput("repairTime", 0.0, valid_value_type, ("damage",)),
     )
+    res_racenumbers = (
+        ResOutput("raceNumbers", {}, export_race_numbers),
+    )
     # Define task set
     return (
         RestAPITask("/rest/sessions/weather", res_weatherforecast, "enable_weather_info", False, 0.1),
@@ -94,4 +103,5 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
         RestAPITask("/rest/garage/getPlayerGarageData", res_garagesetup, "enable_garage_setup_info", False, 0.1),
         RestAPITask("/rest/garage/UIScreen/RepairAndRefuel", res_currentstint, "enable_vehicle_info", True, 0.2),
         RestAPITask("/rest/strategy/pitstop-estimate", res_pitstoptime, "enable_vehicle_info", True, 1.0),
+        RestAPITask("/rest/watch/standings", res_racenumbers, "enable_race_number_info", False, 0.1),
     )

@@ -553,6 +553,9 @@ Enable access to `vehicle` data from Rest API. This is essential for accessing `
     enable_weather_info
 Enable access to `weather` data from Rest API. This is required for showing weather forecast. This data is requested `only once` when player exited garage each time.
 
+    enable_race_number_info
+Enable access to `race number` data from Rest API. This is required for showing server assigned race number (car number) in online sessions, which may differ from the number in vehicle name. Falls back to the number in vehicle name if not available. This data is requested `only once` when player exited garage each time.
+
 [**`Back to Top`**](#)
 
 

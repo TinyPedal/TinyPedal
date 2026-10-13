@@ -34,7 +34,7 @@ from ..calculation import (
     slip_angle,
 )
 from ..constant import DATA
-from ..formatter import strip_invalid_char
+from ..formatter import strip_invalid_char, vehicle_race_number
 from ..validator import bytes_decoder
 from ..validator import infnan_to_zero as rmnan
 from . import _reader
@@ -965,6 +965,15 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def team_name(self, index: int | None = None) -> str:
         """Team name"""
         return tostr(self.shmm.lmuScorVeh(index).mVehicleName)
+
+    def race_number(self, index: int | None = None) -> str:
+        """Race number"""
+        veh_scor = self.shmm.lmuScorVeh(index)
+        # Server assigned race number from Rest API, fall back to vehicle name
+        race_number = self.rest.raceNumbers.get(veh_scor.mID)
+        if race_number:
+            return race_number
+        return vehicle_race_number(tostr(veh_scor.mVehicleName))
 
     def vehicle_model(self, index: int | None = None) -> str:
         """Vehicle model name (brand name + model ID)"""

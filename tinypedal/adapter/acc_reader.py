@@ -891,6 +891,10 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         """Team name"""
         return tostr(self.udp_carinfo(index).teamName)
 
+    def race_number(self, index: int | None = None) -> str:
+        """Race number"""
+        return f"{self.udp_carinfo(index).raceNumber}"
+
     def vehicle_model(self, index: int | None = None) -> str:
         """Vehicle model name (brand name + model ID)"""
         if index is None:

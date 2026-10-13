@@ -36,6 +36,19 @@ def export_wheels(data: list, default: tuple[float, float, float, float]) -> tup
     return default
 
 
+def export_race_numbers(dataset: list[dict], default: dict[int, str]) -> dict[int, str]:
+    """Export race number (car number) by slot ID from standings"""
+    try:
+        return {
+            data["slotID"]: data["carNumber"]
+            for data in dataset
+            if isinstance(data.get("carNumber"), str)
+        }
+    except (AttributeError, KeyError, TypeError):
+        pass
+    return default
+
+
 def expected_usage(value: str, default: float) -> float:
     """Extract expected fuel or energy usage from car setup"""
     try:

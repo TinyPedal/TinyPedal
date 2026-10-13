@@ -111,6 +111,18 @@ def shorten_driver_name(name: str) -> str:
     return name_split[-1]
 
 
+@lru_cache(maxsize=128)
+def vehicle_race_number(name: str) -> str:
+    """Get race number from vehicle name, ex. "Ferrari AF Corse 2024 #50:LM" -> "50" """
+    _, sep, number = name.rpartition("#")
+    if not sep:
+        return ""
+    matched = re.match(r"\w+", number)
+    if matched is None:
+        return ""
+    return matched.group()
+
+
 def strip_invalid_char(name: str) -> str:
     """Strip invalid characters"""
     return rex_invalid_char.sub("", name)
