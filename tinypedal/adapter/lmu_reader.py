@@ -508,9 +508,9 @@ class Session(_reader.Session, DataAdapter):
         elapsed_time = self.shmm.lmuScorInfo.mCurrentET
         session_length = self.shmm.lmuScorInfo.mEndET
         forecast_data = tuple(
-            (minutes, forecast.sky_type, forecast.temperature, forecast.rain_chance)
-            for forecast in data
-            if (minutes := ((forecast.start * session_length - elapsed_time) // 60)) > 0
+            (minutes, sky_type, temperature, rain_chance)
+            for start_frac, sky_type, temperature, rain_chance in data
+            if (minutes := ((start_frac * session_length - elapsed_time) // 60)) > 0
         )
         return forecast_data
 

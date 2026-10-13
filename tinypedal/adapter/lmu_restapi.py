@@ -28,7 +28,7 @@ from ..constant import DATA
 from ..decorator import slotclass
 from ..process.garage import export_lmu_car_setup
 from ..process.vehicle import absolute_refilling, export_wheels, steerlock_to_number
-from ..process.weather import FORECAST_DEFAULT, WeatherNode, forecast_rf2
+from ..process.weather import FORECAST_RF2_DEFAULT, forecast_rf2
 from ..validator import valid_value_type
 from ._restapi import ResOutput, RestAPITask
 
@@ -42,9 +42,9 @@ class RestAPIData:
     # LMU, RF2
     timeScale: int = 1
     privateQualifying: int = 0
-    forecastPractice: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-    forecastQualify: tuple[WeatherNode, ...] = FORECAST_DEFAULT
-    forecastRace: tuple[WeatherNode, ...] = FORECAST_DEFAULT
+    forecastPractice: tuple[float, int, float, float] = FORECAST_RF2_DEFAULT
+    forecastQualify: tuple[float, int, float, float] = FORECAST_RF2_DEFAULT
+    forecastRace: tuple[float, int, float, float] = FORECAST_RF2_DEFAULT
     lastCarSetup: tuple[str, ...] = ()
     # LMU only
     steeringWheelRange: float = 0.0
@@ -64,9 +64,9 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
     """Define RestAPI task set - LMU"""
     # Define resources output set
     res_weatherforecast = (
-        ResOutput("forecastPractice", FORECAST_DEFAULT, forecast_rf2, ("PRACTICE",)),
-        ResOutput("forecastQualify", FORECAST_DEFAULT, forecast_rf2, ("QUALIFY",)),
-        ResOutput("forecastRace", FORECAST_DEFAULT, forecast_rf2, ("RACE",)),
+        ResOutput("forecastPractice", FORECAST_RF2_DEFAULT, forecast_rf2, ("PRACTICE",)),
+        ResOutput("forecastQualify", FORECAST_RF2_DEFAULT, forecast_rf2, ("QUALIFY",)),
+        ResOutput("forecastRace", FORECAST_RF2_DEFAULT, forecast_rf2, ("RACE",)),
     )
     res_currentstint = (
         ResOutput("aeroDamage", -1.0, valid_value_type, ("wearables", "body", "aero")),

@@ -25,7 +25,7 @@ from __future__ import annotations
 import logging
 
 from ..process.garage import ExportCarSetupRF2
-from ..process.weather import FORECAST_DEFAULT, forecast_rf2
+from ..process.weather import FORECAST_RF2_DEFAULT, forecast_rf2
 from ..validator import valid_value_type
 from ._restapi import ResOutput, RestAPITask
 from .lmu_restapi import RestAPIData as RestAPIData
@@ -37,9 +37,9 @@ def rf2_restapi_tasks() -> tuple[RestAPITask, ...]:
     """Define RestAPI task set - RF2"""
     # Define resources output set
     res_weatherforecast = (
-        ResOutput("forecastPractice", FORECAST_DEFAULT, forecast_rf2, ("PRACTICE",)),
-        ResOutput("forecastQualify", FORECAST_DEFAULT, forecast_rf2, ("QUALIFY",)),
-        ResOutput("forecastRace", FORECAST_DEFAULT, forecast_rf2, ("RACE",)),
+        ResOutput("forecastPractice", FORECAST_RF2_DEFAULT, forecast_rf2, ("PRACTICE",)),
+        ResOutput("forecastQualify", FORECAST_RF2_DEFAULT, forecast_rf2, ("QUALIFY",)),
+        ResOutput("forecastRace", FORECAST_RF2_DEFAULT, forecast_rf2, ("RACE",)),
     )
     res_timescale = (
         ResOutput("timeScale", 1, valid_value_type, ("currentValue",)),

@@ -22,42 +22,36 @@ Weather forecast
 
 from __future__ import annotations
 
-from typing import NamedTuple
-
 from ..constant import DATA
 
-
-class WeatherNode(NamedTuple):
-    """Weather forecast node info
-
-    Attributes:
-        start: fraction of forecast start time relative to session length, range 0.0 - 1.0.
-        sky_type: sky type index, range 0 - 10.
-        temperature: degrees in Celsius.
-        rain_chance: fraction of rain chance, range 0.0 - 1.0.
-    """
-
-    start: float = 1.0
-    sky_type: int = -1
-    temperature: float = DATA.ABS_ZERO_CELSIUS
-    rain_chance: float = 0.0
+FORECAST_RF2_DEFAULT = (
+    1.0,  # fraction of forecast start time relative to session length, range 0.0 - 1.0
+    -1,  # sky type index, range 0 - 10
+    DATA.ABS_ZERO_CELSIUS,  # degrees in Celsius
+    0.0  # fraction of rain chance, range 0.0 - 1.0
+)
 
 
-FORECAST_DEFAULT = (WeatherNode(),)
-
-
-def forecast_rf2(data: dict, default: tuple[WeatherNode, ...]) -> tuple[WeatherNode, ...]:
+def forecast_rf2(
+    data: dict, default: tuple[tuple[float, int, float, float], ...]
+) -> tuple[tuple[float, int, float, float], ...]:
     """Get value from weather forecast dictionary, output 5 api data"""
     try:
-        forecast_nodes = ("START", "NODE_25", "NODE_50", "NODE_75", "FINISH")
+        forecast_nodes = (
+            (0.0, "START"),
+            (0.2, "NODE_25"),
+            (0.4, "NODE_50"),
+            (0.6, "NODE_75"),
+            (0.8, "FINISH"),
+        )
         output = tuple(
-            WeatherNode(
-                start=round(index * 0.2, 1),
-                sky_type=int(data[node]["WNV_SKY"]["currentValue"]),
-                temperature=float(data[node]["WNV_TEMPERATURE"]["currentValue"]),
-                rain_chance=min(max(float(data[node]["WNV_RAIN_CHANCE"]["currentValue"]) * 0.01, 0.0), 1.0),
+            (
+                start_fraction,
+                int(data[node]["WNV_SKY"]["currentValue"]),
+                float(data[node]["WNV_TEMPERATURE"]["currentValue"]),
+                min(max(float(data[node]["WNV_RAIN_CHANCE"]["currentValue"]) * 0.01, 0.0), 1.0),
             )
-            for index, node in enumerate(forecast_nodes)
+            for start_fraction, node in forecast_nodes
         )
     except (KeyError, TypeError, ValueError):
         output = default
