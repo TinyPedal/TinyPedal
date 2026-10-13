@@ -45,7 +45,7 @@ def preupdate_user_setting(preset_version: tuple[int, int, int], dict_user: dict
     # Create target version and update function list
     # Very old version may be removed later
     target_versions = (
-        ((2, 51, 3), _user_prior_2_51_3),  # 2026-10-12
+        ((2, 51, 5), _user_prior_2_51_5),  # 2026-10-13
         ((2, 49, 9), _user_prior_2_49_9),  # 2026-08-30
         ((2, 49, 2), _user_prior_2_49_2),  # 2026-08-09
         ((2, 48, 7), _user_prior_2_48_7),  # 2026-07-27
@@ -74,32 +74,44 @@ def _global_prior_2_43_0(dict_user: dict):
 
 
 # User setting update function
-def _user_prior_2_51_3(dict_user: dict):
+def _user_prior_2_51_5(dict_user: dict):
     # Update relative widget
     relative = dict_user.get("relative")
     if isinstance(relative, dict):
-        if relative["driver_name_align_center"]:
+        if relative.get("driver_name_align_center"):
             relative["driver_name_text_alignment"] = "Center"
-        if relative["vehicle_name_align_center"]:
+        if relative.get("vehicle_name_align_center"):
             relative["vehicle_name_text_alignment"] = "Center"
-        if relative["time_gap_align_center"]:
+        if relative.get("time_gap_align_center"):
             relative["time_gap_text_alignment"] = "Center"
+        _rename_key_exact(relative, "caption_text_driver", "caption_text_driver_name")
+        _rename_key_exact(relative, "caption_text_vehicle", "caption_text_vehicle_name")
+        _rename_key_exact(relative, "display_order_driver", "display_order_driver_name")
+        _rename_key_exact(relative, "display_order_vehicle", "display_order_vehicle_name")
     # Update rivals widget
     rivals = dict_user.get("rivals")
     if isinstance(rivals, dict):
-        if rivals["driver_name_align_center"]:
+        if rivals.get("driver_name_align_center"):
             rivals["driver_name_text_alignment"] = "Center"
-        if rivals["vehicle_name_align_center"]:
+        if rivals.get("vehicle_name_align_center"):
             rivals["vehicle_name_text_alignment"] = "Center"
-        if rivals["time_interval_align_center"]:
+        if rivals.get("time_interval_align_center"):
             rivals["time_interval_text_alignment"] = "Center"
+        _rename_key_exact(rivals, "caption_text_driver", "caption_text_driver_name")
+        _rename_key_exact(rivals, "caption_text_vehicle", "caption_text_vehicle_name")
+        _rename_key_exact(rivals, "display_order_driver", "display_order_driver_name")
+        _rename_key_exact(rivals, "display_order_vehicle", "display_order_vehicle_name")
     # Update standings widget
     standings = dict_user.get("standings")
     if isinstance(standings, dict):
-        if standings["driver_name_align_center"]:
+        if standings.get("driver_name_align_center"):
             standings["driver_name_text_alignment"] = "Center"
-        if standings["vehicle_name_align_center"]:
+        if standings.get("vehicle_name_align_center"):
             standings["vehicle_name_text_alignment"] = "Center"
+        _rename_key_exact(standings, "caption_text_driver", "caption_text_driver_name")
+        _rename_key_exact(standings, "caption_text_vehicle", "caption_text_vehicle_name")
+        _rename_key_exact(standings, "display_order_driver", "display_order_driver_name")
+        _rename_key_exact(standings, "display_order_vehicle", "display_order_vehicle_name")
 
 
 def _user_prior_2_49_9(dict_user: dict):
@@ -446,10 +458,16 @@ def _user_prior_2_36_0(dict_user: dict):
 
 # Misc function
 def _rename_key(data: dict, old: str, new: str):
-    """Rename key name"""
+    """Rename all old key names in data, partial match"""
     for key in tuple(data):
         if old in key:
             data[key.replace(old, new)] = data[key]
+
+
+def _rename_key_exact(data: dict, old: str, new: str):
+    """Rename single old key in data, exact match"""
+    if old in data:
+        data[new] = data[old]
 
 
 def _swap_suffix_with_prefix(data: dict, suffix: str, prefix: str):

@@ -152,7 +152,7 @@ class Realtime(Overlay):
                 layout=layout,
                 targets=self.bars_drv,
                 row_start=row_start,
-                column=self.wcfg["display_order_driver"],
+                column=self.wcfg["display_order_driver_name"],
             )
         # Vehicle name
         if self.wcfg["show_vehicle_name"]:
@@ -176,7 +176,7 @@ class Realtime(Overlay):
                 layout=layout,
                 targets=self.bars_veh,
                 row_start=row_start,
-                column=self.wcfg["display_order_vehicle"],
+                column=self.wcfg["display_order_vehicle_name"],
             )
         # Brand logo
         if self.wcfg["show_brand_logo"]:
@@ -712,11 +712,6 @@ class Realtime(Overlay):
             self.set_grid_layout_table_caption(
                 layout=layout,
                 padding=bar_padx,
-                alignments={
-                    "driver": self.wcfg["driver_name_text_alignment"],
-                    "vehicle": self.wcfg["vehicle_name_text_alignment"],
-                    "time_gap": self.wcfg["time_gap_text_alignment"],
-                },
                 transparent_columns=transparent_columns,
             )
 

@@ -518,7 +518,6 @@ class Overlay(Base):
         padding: int = 0,
         row: int = 0,
         row_start: int = 1,
-        alignments: dict[str, str] | None = None,
         transparent_columns: tuple[str, ...] = (),
     ):
         """Set grid layout - table caption row
@@ -536,8 +535,6 @@ class Overlay(Base):
             padding: horizontal padding in pixel.
             row: caption row index.
             row_start: table row start index, for checking column existence.
-            alignments: caption text alignment ("Left", "Center", "Right") by column name.
-                Default is "Center".
             transparent_columns: column names that use transparent caption background,
                 except when within title.
         """
@@ -547,25 +544,20 @@ class Overlay(Base):
             self.wcfg["font_weight"],
         )
         font_cap_m = self.get_font_metrics(font_cap)
-        if alignments is None:
-            alignments = {}
 
         # Caption text of existing columns, sorted by column index
         captions = sorted(
-            (column, key[len("display_order_"):])
+            (
+                column,
+                self.wcfg[f"caption_text_{name}"],  # raise error if caption text option missing
+                self.wcfg.get(f"{name}_text_alignment", "Center"),
+                name in transparent_columns,
+            )
             for key, column in self.wcfg.items()
             if key.startswith("display_order_")
             and layout.itemAtPosition(row_start, column) is not None
+            and (name := key[len("display_order_") :])  # get column type name
         )
-        captions = [
-            (
-                column,
-                self.wcfg.get(f"caption_text_{name}", ""),
-                alignments.get(name, "Center"),
-                name in transparent_columns,
-            )
-            for column, name in captions
-        ]
 
         # Title across leading columns with empty caption text, after transparent columns
         title = self.wcfg.get("caption_text_title", "")
