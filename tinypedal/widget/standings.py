@@ -26,6 +26,7 @@ from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
 from ..userfile.custom_image import load_brand_logo_image
 from ..userfile.heatmap import select_compound_color, select_compound_symbol
+from ..validator import is_transparent_color
 from ._base import Overlay
 from ._painter import DeltaLapTime, MultiCompounds
 
@@ -798,8 +799,7 @@ class Realtime(Overlay):
         # Caption
         if self.wcfg["show_caption"]:
             # Hide pit status caption if none status background is transparent
-            none_status_bg = self.wcfg["background_color_none_status"]
-            if len(none_status_bg) == 9 and none_status_bg.startswith("#00"):
+            if is_transparent_color(self.wcfg["background_color_none_status"]):
                 transparent_columns = ("pit_status",)
             else:
                 transparent_columns = ()

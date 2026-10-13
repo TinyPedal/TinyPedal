@@ -4,8 +4,8 @@
 * Xiang (S.Victor) - Project founder, core development, TinyPedal icons
 
 ## Cross-platform
-* Bernat (berarma) - Cross-platform (Linux) implementation & maintainer
-* Lawrence Stalder (Bykow) - Cross-platform (Linux) features
+* Bernat (berarma) - Cross-platform (Linux) implementation
+* Lawrence Stalder (Bykow) - Cross-platform (Linux) features, widget enhancements
 * SynthetikzZ - Cross-platform (Linux) assistance, features
 * Sergio Rafael Lemke (srlemke) - Cross-platform (Linux) assistance, features, bug fixes
 

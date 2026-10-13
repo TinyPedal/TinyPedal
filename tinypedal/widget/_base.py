@@ -275,6 +275,7 @@ class Overlay(Base):
         font.setHintingPreference(QFont.PreferNoHinting)
         font_metrics = QFontMetrics(font)
         return FontMetrics(
+            metrics=font_metrics,
             width=font_metrics.averageCharWidth(),
             height=font_metrics.height(),
             leading=font_metrics.leading(),
@@ -546,7 +547,6 @@ class Overlay(Base):
             self.wcfg["font_weight"],
         )
         font_cap_m = self.get_font_metrics(font_cap)
-        text_metrics = QFontMetrics(font_cap)
         if alignments is None:
             alignments = {}
 
@@ -601,7 +601,7 @@ class Overlay(Base):
                 font=font_cap,
                 text=text,
                 padding=padding,
-                width=text_metrics.horizontalAdvance(text),
+                width=font_cap_m.metrics.horizontalAdvance(text),
                 fixed_height=font_cap_m.height,
                 offset_y=font_cap_m.voffset,
                 fg_color=self.wcfg["font_color_caption"],

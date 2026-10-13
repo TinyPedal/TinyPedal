@@ -1,8 +1,13 @@
 WIP
 -----------------------------
 * Relative, Rivals, Standings Widget
+  - Added "show_caption_*" options (by @Bykow), which shows caption row on top of table columns. Caption may expand column width to fit caption text. Caption alignment follows corresponding column text alignment option.
+    Note, "caption_text_title" option allows to set title text that displayed across leading columns with empty caption text, such as position, brand logo, driver name columns. Default is widget name. Set to "" (blank) to disable.
   - Replaced "driver_name_align_center, vehicle_name_align_center, time_gap_align_center, time_interval_align_center" with new corresponding "text_alignment" options, which support "Left, Center, Right" alignment. Old setting will be automatically transferred over.
   - New text alignment options now supports proper left or right alignment for regular (none monospaced) fonts (requested by user "ssalamon").
+
+* Misc
+  - Improved column caption drawing methods for "Lap time history" & "Stint history" widgets (by @Bykow).
 
 2.51.0 (2026-10-03)
 -----------------------------

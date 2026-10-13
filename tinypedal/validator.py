@@ -185,6 +185,14 @@ def is_hex_color(color_str: str | Any) -> bool:
     return False
 
 
+def is_transparent_color(color_str: str | Any) -> bool:
+    """Check if HEX color string is fully transparent"""
+    if isinstance(color_str, str):
+        # Qt HEX color format (first two number is alpha color)
+        return len(color_str) == 9 and color_str.startswith("#00")
+    return False
+
+
 # Time format validate
 def is_clock_format(_format: str) -> bool:
     """Validate clock time format"""

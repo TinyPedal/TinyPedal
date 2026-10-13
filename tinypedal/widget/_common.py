@@ -26,6 +26,7 @@ from time import monotonic
 from typing import NamedTuple
 
 from PySide2.QtCore import QPoint
+from PySide2.QtGui import QFontMetrics
 from PySide2.QtWidgets import QApplication, QWidget
 
 from ..decorator import generator_init
@@ -34,6 +35,7 @@ from ..decorator import generator_init
 class FontMetrics(NamedTuple):
     """Font metrics info"""
 
+    metrics: QFontMetrics
     width: int = 0
     height: int = 0
     leading: int = 0
