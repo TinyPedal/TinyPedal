@@ -50,6 +50,7 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
+        row_start = 1 if self.wcfg["show_caption"] else 0
         self.drv_width = max(int(self.wcfg["driver_name_width"]), 1)
         self.veh_width = max(int(self.wcfg["vehicle_name_width"]), 1)
         self.brd_width = max(int(self.wcfg["brand_logo_width"]), 1)
@@ -90,6 +91,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pos,
+                row_start=row_start,
                 column=self.wcfg["display_order_position"],
             )
         # Driver position change
@@ -124,6 +126,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pgl,
+                row_start=row_start,
                 column=self.wcfg["display_order_position_change"],
             )
         # Driver name
@@ -147,6 +150,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_drv,
+                row_start=row_start,
                 column=self.wcfg["display_order_driver"],
             )
         # Vehicle name
@@ -170,6 +174,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_veh,
+                row_start=row_start,
                 column=self.wcfg["display_order_vehicle"],
             )
         # Brand logo
@@ -187,6 +192,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_brd,
+                row_start=row_start,
                 column=self.wcfg["display_order_brand_logo"],
             )
         # Time gap
@@ -222,6 +228,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_gap,
+                row_start=row_start,
                 column=self.wcfg["display_order_time_gap"],
             )
         # Vehicle laptime
@@ -256,6 +263,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_lpt,
+                row_start=row_start,
                 column=self.wcfg["display_order_laptime"],
             )
         # Vehicle best laptime
@@ -282,6 +290,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_blp,
+                row_start=row_start,
                 column=self.wcfg["display_order_best_laptime"],
             )
         # Vehicle average laptime
@@ -308,6 +317,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_alp,
+                row_start=row_start,
                 column=self.wcfg["display_order_average_laptime"],
             )
         # Position in class
@@ -334,6 +344,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pic,
+                row_start=row_start,
                 column=self.wcfg["display_order_position_in_class"],
             )
         # Vehicle class
@@ -350,6 +361,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_cls,
+                row_start=row_start,
                 column=self.wcfg["display_order_class"],
             )
         # Vehicle in pit
@@ -395,6 +407,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_pit,
+                row_start=row_start,
                 column=self.wcfg["display_order_pit_status"],
             )
         # Tyre compound
@@ -427,6 +440,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_tcp,
+                row_start=row_start,
                 column=self.wcfg["display_order_tyre_compound"],
             )
         # Pitstop count
@@ -461,6 +475,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_psc,
+                row_start=row_start,
                 column=self.wcfg["display_order_pitstop_count"],
             )
         # Remaining energy
@@ -499,6 +514,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_nrg,
+                row_start=row_start,
                 column=self.wcfg["display_order_energy_remaining"],
             )
         # Vehicle integrity
@@ -533,6 +549,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_dmg,
+                row_start=row_start,
                 column=self.wcfg["display_order_vehicle_integrity"],
             )
         # Incidents
@@ -567,6 +584,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_icd,
+                row_start=row_start,
                 column=self.wcfg["display_order_incidents"],
             )
         # Track limits points
@@ -593,6 +611,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_tlp,
+                row_start=row_start,
                 column=self.wcfg["display_order_track_limits_points"],
             )
         # Stint laps
@@ -619,6 +638,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_stl,
+                row_start=row_start,
                 column=self.wcfg["display_order_stint_laps"],
             )
         # Speed trap
@@ -646,6 +666,7 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_spd,
+                row_start=row_start,
                 column=self.wcfg["display_order_speed_trap"],
             )
         # Lift and coast time
@@ -676,7 +697,27 @@ class Realtime(Overlay):
             self.set_grid_layout_table_column(
                 layout=layout,
                 targets=self.bars_lic,
+                row_start=row_start,
                 column=self.wcfg["display_order_lift_and_coast_time"],
+            )
+
+        # Caption
+        if self.wcfg["show_caption"]:
+            # Hide pit status caption if none status background is transparent
+            none_status_bg = self.wcfg["background_color_none_status"]
+            if len(none_status_bg) == 9 and none_status_bg.startswith("#00"):
+                transparent_columns = ("pit_status",)
+            else:
+                transparent_columns = ()
+            self.set_grid_layout_table_caption(
+                layout=layout,
+                padding=bar_padx,
+                alignments={
+                    "driver": self.wcfg["driver_name_text_alignment"],
+                    "vehicle": self.wcfg["vehicle_name_text_alignment"],
+                    "time_gap": self.wcfg["time_gap_text_alignment"],
+                },
+                transparent_columns=transparent_columns,
             )
 
     def timerEvent(self, event):
