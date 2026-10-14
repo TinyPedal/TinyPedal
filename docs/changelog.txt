@@ -6,8 +6,13 @@ WIP
   - Replaced "driver_name_align_center, vehicle_name_align_center, time_gap_align_center, time_interval_align_center" with new corresponding "text_alignment" options, which support "Left, Center, Right" alignment. Old setting will be automatically transferred over.
   - New text alignment options now supports proper left or right alignment for regular (none monospaced) fonts (requested by user "ssalamon").
 
+* ACC API
+  - Added "memory_map_prefix" option, which set memory map file name prefix for accessing API on Linux. This option is not used on Windows system. See User Guide for details.
+  - Fixed ACC shared memory API accessing issues on Linux (by @Potajito).
+
 * Misc
   - Improved column caption drawing methods for "Lap time history" & "Stint history" widgets (by @Bykow).
+  - Added new contributor "Potajito" to contributors.md in "Cross-platform" section.
 
 2.51.0 (2026-10-03)
 -----------------------------

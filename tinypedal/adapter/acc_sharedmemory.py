@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import ctypes
 import logging
+import sys
 import threading
 from time import monotonic
 from typing import TYPE_CHECKING, Sequence
@@ -83,15 +84,15 @@ class MMapDataSet:
     def __del__(self):
         logger.info("sharedmemory: GC: MMapDataSet")
 
-    def create_mmap(self, access_mode: int) -> None:
+    def create_mmap(self, access_mode: int, mmap_prefix: str) -> None:
         """Create mmap instance
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
         """
-        self.phys.create(access_mode)
-        self.ghfx.create(access_mode)
-        self.stat.create(access_mode)
+        self.phys.create(access_mode, mmap_prefix)
+        self.ghfx.create(access_mode, mmap_prefix)
+        self.stat.create(access_mode, mmap_prefix)
 
     def close_mmap(self) -> None:
         """Close mmap instance"""
@@ -155,7 +156,7 @@ class SyncData:
     def __del__(self):
         logger.info("sharedmemory: GC: SyncData")
 
-    def start(self, access_mode: int) -> None:
+    def start(self, access_mode: int, mmap_prefix: str) -> None:
         """Update & sync mmap data copy in separate thread
 
         Args:
@@ -166,7 +167,7 @@ class SyncData:
         else:
             self._updating = True
             # Initialize mmap data
-            self.dataset.create_mmap(access_mode)
+            self.dataset.create_mmap(access_mode, mmap_prefix)
             self.player_phys = self.dataset.phys.data
             self.player_ghfx = self.dataset.ghfx.data
             self.player_stat = self.dataset.stat.data
@@ -176,6 +177,7 @@ class SyncData:
             self._update_thread.start()
             logger.info("sharedmemory: UPDATING: thread started")
             logger.info("sharedmemory: player index override: %s", self.override_player_index)
+            logger.info("sharedmemory: memory map prefix: %s", f"'{mmap_prefix}'")
 
     def stop(self) -> None:
         """Join and stop updating thread, close mmap"""
@@ -290,6 +292,7 @@ class ACCInfo:
     __slots__ = (
         "_sync",
         "_access_mode",
+        "_mmap_prefix",
         "_state_override",
         "_active_state",
         "_last_impact",
@@ -303,6 +306,7 @@ class ACCInfo:
     def __init__(self) -> None:
         self._sync = SyncData()
         self._access_mode = 0
+        self._mmap_prefix = ""
         self._state_override = False
         self._active_state = False
         self._last_impact = LastImpact()
@@ -317,11 +321,18 @@ class ACCInfo:
 
     def start(self) -> None:
         """Start data updating thread"""
-        self._sync.start(self._access_mode)
+        self._sync.start(self._access_mode, self._mmap_prefix)
 
     def stop(self) -> None:
         """Stop data updating thread"""
         self._sync.stop()
+
+    def setPrefix(self, prefix: str = "") -> None:
+        """Set ACC mmap file name prefix, can only be customized on Linux"""
+        if sys.platform == "win32":
+            self._mmap_prefix = "Local\\"  # for displaying console logging only
+        else:
+            self._mmap_prefix = prefix
 
     def setMode(self, mode: int = 0) -> None:
         """Set mmap access mode

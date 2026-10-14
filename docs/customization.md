@@ -445,6 +445,13 @@ Additional notes:
     access_mode
 Set access mode for API. Mode value `0` uses copy access and additional data check to avoid data desynchronized or interruption issues. Mode value `1` uses direct access, which may result data desynchronized or interruption issues. Default mode is copy access.
 
+    memory_map_prefix
+Set memory map file name prefix for accessing API on Linux.
+
+This option is only provided for compatibility purpose on Linux system, which may be used in conjunction with third party shared memory mapping tools through `wine`.
+
+This option is not used on Windows system. On windows system, the prefix is internally set to `Local\`, changing this option has no effect.
+
     enable_active_state_override
 Set `true` to enable `active state` manual override. While enabled, `overriding` notification will be shown on API status bar from main window.
 

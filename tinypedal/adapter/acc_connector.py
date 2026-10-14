@@ -69,6 +69,7 @@ class SimACC(Connector):
         )
 
     def setup(self, config: dict):
+        self._shmmapi.setPrefix(config["memory_map_prefix"])
         self._shmmapi.setMode(config["access_mode"])
         self._shmmapi.setStateOverride(config["enable_active_state_override"])
         self._shmmapi.setActiveState(config["active_state"])

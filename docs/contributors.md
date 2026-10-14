@@ -4,8 +4,9 @@
 * Xiang (S.Victor) - Project founder, core development, TinyPedal icons
 
 ## Cross-platform
-* Bernat (berarma) - Cross-platform (Linux) implementation
+* Potajito - Cross-platform (Linux) implementation, bug fixes
 * Lawrence Stalder (Bykow) - Cross-platform (Linux) features, widget enhancements
+* Bernat (berarma) - Cross-platform (Linux) implementation, bug fixes
 * SynthetikzZ - Cross-platform (Linux) assistance, features
 * Sergio Rafael Lemke (srlemke) - Cross-platform (Linux) assistance, features, bug fixes
 
@@ -31,11 +32,11 @@
 * DumibirdF - Assistance on mathematics & testing
 
 ## Community support
-* rFactor 2 Community (forum.studio-397.com) - for everyone's kind support over the years
-* Andres (Corti) - Community support & help
 * sepi - Community support & help
+* Andres (Corti) - Community support & help
 
 ## Special Thanks
-* Vytautas Leonavičius (The Iron Wolf) - for rF2 Shared Memory Map Plugin
-* Tony Whitley (Seven Smiles) - for pyRfactor2SharedMemory library
+* rFactor 2 Community (forum.studio-397.com) - for everyone's kind support over the years
 * Alpha testers (Rnzi, chips, derricklu30, DKxiaoming, fatboy, fartman, felixfight, Sendoh, y1Thunder, zxd1997)
+* Tony Whitley (Seven Smiles) - for pyRfactor2SharedMemory library
+* Vytautas Leonavičius (The Iron Wolf) - for rF2 Shared Memory Map Plugin
