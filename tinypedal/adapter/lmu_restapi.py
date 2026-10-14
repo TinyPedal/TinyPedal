@@ -42,9 +42,9 @@ class RestAPIData:
     # LMU, RF2
     timeScale: int = 1
     privateQualifying: int = 0
-    forecastPractice: tuple[float, int, float, float] = FORECAST_RF2_DEFAULT
-    forecastQualify: tuple[float, int, float, float] = FORECAST_RF2_DEFAULT
-    forecastRace: tuple[float, int, float, float] = FORECAST_RF2_DEFAULT
+    forecastPractice: tuple[tuple[float, int, float, float], ...] = FORECAST_RF2_DEFAULT
+    forecastQualify: tuple[tuple[float, int, float, float], ...] = FORECAST_RF2_DEFAULT
+    forecastRace: tuple[tuple[float, int, float, float], ...] = FORECAST_RF2_DEFAULT
     lastCarSetup: tuple[str, ...] = ()
     # LMU only
     steeringWheelRange: float = 0.0

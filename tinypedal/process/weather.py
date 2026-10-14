@@ -24,12 +24,12 @@ from __future__ import annotations
 
 from ..constant import DATA
 
-FORECAST_RF2_DEFAULT = (
+FORECAST_RF2_DEFAULT = ((
     1.0,  # fraction of forecast start time relative to session length, range 0.0 - 1.0
     -1,  # sky type index, range 0 - 10
     DATA.ABS_ZERO_CELSIUS,  # degrees in Celsius
     0.0  # fraction of rain chance, range 0.0 - 1.0
-)
+),)
 
 
 def forecast_rf2(
