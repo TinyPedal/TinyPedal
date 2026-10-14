@@ -107,22 +107,11 @@ class MMapDataSet:
             access_mode: 0 = copy access, 1 = direct access.
             rf2_pid: rF2 Process ID for accessing server data.
         """
-        created = []
-        try:
-            for mmap_control, mode in (
-                (self.scor, access_mode),
-                (self.tele, access_mode),
-                (self.ext, 1),
-                (self.ffb, 1),
-                (self.rule, 1),
-            ):
-                mmap_control.create(mode, rf2_pid)
-                created.append(mmap_control)
-        except (FileNotFoundError, ValueError):
-            # Not all files available yet, roll back to avoid half-open state
-            for mmap_control in created:
-                mmap_control.close()
-            raise
+        self.scor.create(access_mode, rf2_pid)
+        self.tele.create(access_mode, rf2_pid)
+        self.ext.create(1, rf2_pid)
+        self.ffb.create(1, rf2_pid)
+        self.rule.create(1, rf2_pid)
 
     def close_mmap(self) -> None:
         """Close mmap instance"""
@@ -154,7 +143,6 @@ class SyncData:
 
     __slots__ = (
         "_updating",
-        "_mapped",
         "_update_thread",
         "_event",
         "_tele_indexes",
@@ -171,7 +159,6 @@ class SyncData:
 
     def __init__(self) -> None:
         self._updating = False
-        self._mapped = False
         self._update_thread = None
         self._event = threading.Event()
         self._tele_indexes = {_index: _index for _index in range(128)}
@@ -258,23 +245,19 @@ class SyncData:
             logger.warning("sharedmemory: UPDATING: already started")
         else:
             self._updating = True
-            # Use blank data until mmap is available
-            self._mapped = False
-            self.dataset.scor.data = rf2_data.rF2Scoring()
-            self.dataset.tele.data = rf2_data.rF2Telemetry()
-            self.dataset.ext.data = rf2_data.rF2Extended()
-            self.dataset.ffb.data = rf2_data.rF2ForceFeedback()
-            self.dataset.rule.data = rf2_data.rF2Rules()
-            self.player_scor = rf2_data.rF2VehicleScoring()
-            self.player_tele = rf2_data.rF2VehicleTelemetry()
-            # Initialize mmap data, if game is not running yet, keep waiting in thread
-            if not self.__map_dataset(access_mode, rf2_pid):
-                logger.info("sharedmemory: WAITING: shared memory not available yet")
+            # Initialize mmap data
+            self.dataset.create_mmap(access_mode, rf2_pid)
+            self.__update_tele_indexes(
+                self.dataset.tele.data.mNumVehicles,
+                self.dataset.tele.data,
+                self._tele_indexes,
+            )
+            if not self.__sync_player_data():
+                self.__sync_player_scor()
+                self.__sync_player_tele()
             # Setup updating thread
             self._event.clear()
-            self._update_thread = threading.Thread(
-                target=self.__update, args=(access_mode, rf2_pid), daemon=True
-            )
+            self._update_thread = threading.Thread(target=self.__update, daemon=True)
             self._update_thread.start()
             logger.info("sharedmemory: UPDATING: thread started")
             logger.info("sharedmemory: player index override: %s", self.override_player_index)
@@ -289,49 +272,17 @@ class SyncData:
             # Make final copy before close, otherwise mmap won't close if using direct access
             self.player_scor = copy_struct(self.player_scor)
             self.player_tele = copy_struct(self.player_tele)
-            if self._mapped:
-                self.dataset.close_mmap()
-                self._mapped = False
+            self.dataset.close_mmap()
         else:
             logger.warning("sharedmemory: UPDATING: already stopped")
 
-    def __map_dataset(self, access_mode: int, rf2_pid: str) -> bool:
-        """Try creating mmap data set, without creating any shared memory file
-
-        Returns:
-            True if mmap is ready, False if game has not provided shared memory yet.
-        """
-        try:
-            self.dataset.create_mmap(access_mode, rf2_pid)
-        except (FileNotFoundError, ValueError):
-            return False
-        self.__update_tele_indexes(
-            self.dataset.tele.data.mNumVehicles,
-            self.dataset.tele.data,
-            self._tele_indexes,
-        )
-        if not self.__sync_player_data():
-            self.__sync_player_scor()
-            self.__sync_player_tele()
-        self._mapped = True
-        return True
-
-    def __update(self, access_mode: int, rf2_pid: str) -> None:
+    def __update(self) -> None:
         """Update synced player data"""
         self.paused = True
         self.synced = False
         self.resets = 0
 
         _event_wait = self._event.wait
-
-        # Wait for game (or its bridge) to provide shared memory
-        while not self._mapped:
-            if _event_wait(1.0):  # stop requested
-                logger.info("sharedmemory: UPDATING: thread stopped")
-                return
-            if self.__map_dataset(access_mode, rf2_pid):
-                logger.info("sharedmemory: UPDATING: shared memory found")
-
         freezed_timestamp = 0  # store freezed timestamp
         last_session_timestamp = 0  # store last timestamp
         last_update_time = 0.0
