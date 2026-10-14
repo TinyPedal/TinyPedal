@@ -100,18 +100,18 @@ class MMapDataSet:
     def __del__(self):
         logger.info("sharedmemory: GC: MMapDataSet")
 
-    def create_mmap(self, access_mode: int, rf2_pid: str) -> None:
+    def create_mmap(self, access_mode: int, server_pid: str) -> None:
         """Create mmap instance
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
-            rf2_pid: rF2 Process ID for accessing server data.
+            server_pid: rF2 Process ID for accessing server data.
         """
-        self.scor.create(access_mode, rf2_pid)
-        self.tele.create(access_mode, rf2_pid)
-        self.ext.create(1, rf2_pid)
-        self.ffb.create(1, rf2_pid)
-        self.rule.create(1, rf2_pid)
+        self.scor.create(access_mode, server_pid)
+        self.tele.create(access_mode, server_pid)
+        self.ext.create(1, server_pid)
+        self.ffb.create(1, server_pid)
+        self.rule.create(1, server_pid)
 
     def close_mmap(self) -> None:
         """Close mmap instance"""
@@ -234,19 +234,19 @@ class SyncData:
         return self._tele_indexes.get(
             self.dataset.scor.data.mVehicles[scor_idx].mID, INVALID_INDEX)
 
-    def start(self, access_mode: int, rf2_pid: str) -> None:
+    def start(self, access_mode: int, server_pid: str) -> None:
         """Update & sync mmap data copy in separate thread
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
-            rf2_pid: rF2 Process ID for accessing server data.
+            server_pid: rF2 Process ID for accessing server data.
         """
         if self._updating:
             logger.warning("sharedmemory: UPDATING: already started")
         else:
             self._updating = True
             # Initialize mmap data
-            self.dataset.create_mmap(access_mode, rf2_pid)
+            self.dataset.create_mmap(access_mode, server_pid)
             self.__update_tele_indexes(
                 self.dataset.tele.data.mNumVehicles,
                 self.dataset.tele.data,
@@ -261,7 +261,7 @@ class SyncData:
             self._update_thread.start()
             logger.info("sharedmemory: UPDATING: thread started")
             logger.info("sharedmemory: player index override: %s", self.override_player_index)
-            logger.info("sharedmemory: server process ID: %s", rf2_pid if rf2_pid else "DISABLED")
+            logger.info("sharedmemory: server process ID: %s", server_pid if server_pid else "DISABLED")
 
     def stop(self) -> None:
         """Join and stop updating thread, close mmap"""
@@ -364,7 +364,7 @@ class RF2Info:
     __slots__ = (
         "_sync",
         "_access_mode",
-        "_rf2_pid",
+        "_server_pid",
         "_state_override",
         "_active_state",
         "_laptime_last",
@@ -378,7 +378,7 @@ class RF2Info:
     def __init__(self) -> None:
         self._sync = SyncData()
         self._access_mode = 0
-        self._rf2_pid = ""
+        self._server_pid = ""
         self._state_override = False
         self._active_state = False
         self._laptime_last = tuple(LastLapTime() for _ in range(rFactor2Constants.MAX_MAPPED_VEHICLES))
@@ -394,7 +394,7 @@ class RF2Info:
 
     def start(self) -> None:
         """Start data updating thread"""
-        self._sync.start(self._access_mode, self._rf2_pid)
+        self._sync.start(self._access_mode, self._server_pid)
 
     def stop(self) -> None:
         """Stop data updating thread"""
@@ -402,7 +402,7 @@ class RF2Info:
 
     def setPID(self, pid: str = "") -> None:
         """Set rF2 process ID for connecting to server data"""
-        self._rf2_pid = str(pid)
+        self._server_pid = str(pid)
 
     def setMode(self, mode: int = 0) -> None:
         """Set rF2 mmap access mode
