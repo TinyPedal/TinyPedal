@@ -72,8 +72,6 @@ from ._common import (
 )
 from .track_map_viewer import MapView
 
-DECIMALS = 2
-
 
 def set_file_path(notes_type: str, filename: str = "") -> str:
     """Set file path"""
@@ -91,6 +89,7 @@ class TrackNotesEditor(BaseEditor):
         super().__init__(parent)
         self.set_utility_title("Track Notes Editor")
 
+        self.decimals = 2
         self.notes_type = None
         self.notes_header = None
         self.notes_metadata = create_notes_metadata()
@@ -351,7 +350,7 @@ class TrackNotesEditor(BaseEditor):
         for column_index, fieldname in enumerate(self.notes_header):
             if fieldname == COLUMN_DISTANCE:
                 value = note_data.get(fieldname, 0)
-                item = FloatTableItem(round(value, DECIMALS))
+                item = FloatTableItem(round(value, self.decimals))
             elif fieldname == COLUMN_TAGS:
                 value = note_data.get(fieldname, "")
                 item = QTableWidgetItem(value)
@@ -397,7 +396,7 @@ class TrackNotesEditor(BaseEditor):
                 value *= offset
             else:
                 value += offset
-            item.setValue(round(value, DECIMALS))
+            item.setValue(round(value, self.decimals))
         self._verify_enabled = True
         self.set_modified()
         self.mark_positions_on_map()
@@ -422,7 +421,7 @@ class TrackNotesEditor(BaseEditor):
         if not self.confirm_operation(message=f"Set position at <b>{position}</b> {source}?"):
             return
 
-        pos_curr = round(position, DECIMALS)
+        pos_curr = round(position, self.decimals)
         row_index = self.table_notes.currentRow()
         self.table_notes.item(row_index, 0).setValue(pos_curr)
         self.mark_positions_on_map()
@@ -475,11 +474,10 @@ class TrackNotesEditor(BaseEditor):
         )
         return list(temp)
 
-    @staticmethod
-    def parse_notes(item, index: int):
+    def parse_notes(self, item, index: int):
         """Parse notes"""
         if index == 0:
-            return round(item.value(), DECIMALS)
+            return round(item.value(), self.decimals)
         return item.text()
 
     def saving(self):

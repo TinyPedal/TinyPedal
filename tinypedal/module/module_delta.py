@@ -28,7 +28,7 @@ from ..module_info import DeltaInfo
 from ..process.vehicle import vehicle_position_sync
 from ..userfile.delta_best import load_delta_best_file, save_delta_best_file
 from ..validator import is_same_session, valid_delta_raw
-from ._base import DataModule, round6
+from ._base import DataModule
 
 
 class Realtime(DataModule):
@@ -237,7 +237,7 @@ def calc_delta_time(
                     recording = False
                     delta_array_raw[:] = DATA.DELTA_DEFAULT
                 elif delta_pos >= min_delta_distance:
-                    delta_array_raw.append((round6(pos_curr), round6(laptime_curr)))
+                    delta_array_raw.append((pos_curr, laptime_curr))
                     pos_recorded = pos_curr
             pos_last = pos_curr  # reset last position
 
@@ -250,8 +250,8 @@ def calc_delta_time(
                 # Set end value
                 valid_delta_raw(delta_array_last, laptime_last, 1)
                 delta_array_last.append((
-                    round6(delta_array_last[-1][0] + 10),
-                    round6(laptime_last),
+                    delta_array_last[-1][0] + 10,
+                    laptime_last,
                 ))
                 delta_array_last = tuple(delta_array_last)
                 # Update laptime pace

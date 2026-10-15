@@ -31,7 +31,7 @@ from ..decorator import generator_init
 from ..module_info import FuelInfo
 from ..userfile.fuel_delta import load_fuel_delta_file, save_fuel_delta_file
 from ..validator import valid_delta_raw
-from ._base import DataModule, round6
+from ._base import DataModule
 
 
 class Realtime(DataModule):
@@ -248,8 +248,8 @@ def calc_consumption(
                 and valid_delta_raw(delta_array_raw, used_curr, 1)
             ):
                 delta_array_raw.append((  # set end value
-                    round6(delta_array_raw[-1][0] + 10),
-                    round6(used_curr),
+                    delta_array_raw[-1][0] + 10,
+                    used_curr,
                 ))
                 delta_array_temp = tuple(delta_array_raw)
                 validating = elapsed_time
@@ -269,7 +269,7 @@ def calc_consumption(
                     recording = False
                     delta_array_raw[:] = DATA.DELTA_DEFAULT
                 elif delta_pos >= min_delta_distance:
-                    delta_array_raw.append((round6(pos_curr), round6(used_curr)))
+                    delta_array_raw.append((pos_curr, used_curr))
                     pos_recorded = pos_curr
             pos_last = pos_curr  # reset last position
 

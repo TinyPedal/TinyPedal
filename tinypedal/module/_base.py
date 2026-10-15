@@ -22,13 +22,10 @@ Data module base
 
 import logging
 import threading
-from functools import partial
 
 from ..configuration import Configuration
 
 logger = logging.getLogger(__name__)
-# Function
-round6 = partial(round, ndigits=6)
 
 
 class DataModule:
