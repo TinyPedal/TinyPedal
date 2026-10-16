@@ -144,22 +144,22 @@ Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `Cu
 > It is not recommended to download source code via `Code` button at the top of repository, as it doesn't contain required submodule files, and not convenient to update or sync source code.
 
 Use [Git](https://git-scm.com/) tool and run following command to clone TinyPedal source code alongside required submodules:
-```
+```sh
 git clone --recursive https://github.com/TinyPedal/TinyPedal.git
 ```
 
 To update submodules, run command:
-```
+```sh
 git submodule update --init
 ```
 
 Since `master` branch is the development branch, it may not be stable for normal use. You may switch to specific released version instead, such as `v2.45.0`, run command:
-```
+```sh
 git checkout tags/v2.45.0
 ```
 
 And to switch back to development branch, run:
-```
+```sh
 git checkout master
 ```
 
@@ -173,13 +173,13 @@ First, we need to create a [Python virtual environment](https://docs.python.org/
 
 On windows, run following command in `Powershell` (replace the last part to your preferred path, either relative or absolute path):
 
-```
+```sh
 py -3.8 -m venv '.virtualenvs\tinypedal_py38'
 ```
 
 Then run following command to activate this virtual environment:
 
-```
+```sh
 .virtualenvs\tinypedal_py38\Scripts\activate.ps1
 ```
 
@@ -190,12 +190,12 @@ Finally, remember to activate this virtual environment (if haven't already) befo
 ### Install dependencies
 
 Install additional dependencies by using command:
-```
+```sh
 pip3 install PySide2 psutil
 ```
 
 To start TinyPedal, type command from project root folder:
-```
+```sh
 python run.py
 ```
 
@@ -204,19 +204,19 @@ python run.py
 Executable file can be built with [py2exe](http://www.py2exe.org).
 
 To install py2exe, run command:
-```
+```sh
 pip3 install py2exe
 ```
 
 To build executable file, run command:
-```
+```sh
 python freeze_py2exe.py
 ```
 
 After building completed, executable file can be found in `dist\TinyPedal` folder.
 
 > [!NOTE]
-> The build script only supports py2exe `v0.12.0.0` or higher. The build script does not support PySide6.
+> The build script only supports py2exe `v0.12.0.0` or higher. The build script does not support `PySide6`.
 
 ## Running on Linux
 
@@ -226,7 +226,7 @@ built. The differences are explained here.
 
 Configuration and data files will be stored in the defined user-specific
 directories, default to:
-```
+```sh
 $HOME/.config/TinyPedal/
 $HOME/.local/share/TinyPedal/
 ```
@@ -242,12 +242,12 @@ Some distros split `PySide2` in subpackages. If you don't find
 Alternatively, you can install them using `pip3` but this will bypass your
 system package manager and it isn't the recommended option. The command to
 install the dependencies with this method is:
-```
+```sh
 pip3 install PySide2 psutil pyxdg
 ```
 
-To start TinyPedal type the following command:
-```
+To start TinyPedal, type the following command:
+```sh
 ./run.py
 ```
 
@@ -268,7 +268,7 @@ You can run the script as (it doesn't support any arguments or options):
 sudo ./install.sh
 ```
 
-If you need persistent launch arguments (for example, to force PySide6), create
+If you need persistent launch arguments (for example, to force `PySide6`), create
 `~/.config/TinyPedal/launcher.conf` with:
 
 ```sh
@@ -279,7 +279,7 @@ The installed launcher and desktop entry will read this file automatically. This
 
 ### Known issues
 
-- Some features may not be available on Linux currently.
+- Some features may not be available or supported on Linux, such as `Global Hotkey`.
 - Widgets don't appear over the game window in KDE. Workaround: enable `Bypass Window Manager` option in `Compatibility` dialog from `Config` menu in main window.
 - Transparency of widgets doesn't work when desktop compositing is disabled. Workaround: enable `window manager compositing` in your Desktop Environment.
 
