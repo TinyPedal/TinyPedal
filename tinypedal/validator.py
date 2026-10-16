@@ -122,7 +122,7 @@ def is_json_data(data: Any) -> bool:
     return isinstance(data, (dict, list))
 
 
-# Delta list validate
+# Delta data validate
 def valid_delta_set(data: tuple) -> tuple:
     """Validate delta data set"""
     # Final row value(second column) must be higher than previous row
@@ -136,21 +136,6 @@ def valid_delta_set(data: tuple) -> tuple:
     if len(data) < 10:
         raise ValueError
     return data
-
-
-def valid_delta_raw(dataset: list[tuple[float, float]], final: float, column: int) -> bool:
-    """Validate raw delta data set"""
-    try:
-        if len(dataset) < 10:  # minimum 10 data samples
-            return False
-        # Remove rows if source value higher than final value
-        while dataset[-1][column] > final:
-            dataset.pop()
-            if not dataset:
-                return False
-        return True
-    except (AttributeError, TypeError, IndexError):
-        return False
 
 
 # Value type validate

@@ -20,7 +20,7 @@
 Constants
 """
 
-import platform
+import sys
 from types import MappingProxyType
 
 from .decorator import constantclass
@@ -50,8 +50,8 @@ class PLATFORM:
     """Platform constants"""
 
     # System info
-    SYSTEM = platform.system()
-    WINDOWS = bool(SYSTEM == "Windows")
+    SYSTEM = sys.platform
+    WINDOWS = bool(SYSTEM == "win32")
 
 
 @constantclass

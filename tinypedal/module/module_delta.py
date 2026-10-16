@@ -27,7 +27,7 @@ from ..decorator import generator_init
 from ..module_info import DeltaInfo
 from ..process.vehicle import vehicle_position_sync
 from ..userfile.delta_best import load_delta_best_file, save_delta_best_file
-from ..validator import is_same_session, valid_delta_raw
+from ..validator import is_same_session
 from ._base import DataModule
 
 
@@ -220,8 +220,12 @@ def calc_delta_time(
 
         # Lap start & finish detection
         if last_lap_number != lap_number and 0 < pos_curr < 200:
-            if not is_pit_lap and last_lap_number < lap_number and len(delta_array_raw) >= 10:
-                delta_array_last = delta_array_raw.copy()
+            if (
+                not is_pit_lap
+                and last_lap_number < lap_number
+                and len(delta_array_raw) >= 10
+            ):
+                delta_array_last = tuple(delta_array_raw)
                 validating = api.read.timing.elapsed()
             delta_array_raw[:] = DATA.DELTA_DEFAULT
             pos_last = pos_recorded = pos_curr
@@ -248,12 +252,7 @@ def calc_delta_time(
                 validating = 0
             elif timer > 1 and laptime_last > 0:  # is valid laptime
                 # Set end value
-                valid_delta_raw(delta_array_last, laptime_last, 1)
-                delta_array_last.append((
-                    delta_array_last[-1][0] + 10,
-                    laptime_last,
-                ))
-                delta_array_last = tuple(delta_array_last)
+                delta_array_last += ((delta_array_last[-1][0] + 10, laptime_last),)
                 # Update laptime pace
                 if not is_pit_lap:
                     # Set initial laptime if invalid, or align to faster laptime

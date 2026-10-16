@@ -30,7 +30,6 @@ from ..constant import API, DATA, FILE
 from ..decorator import generator_init
 from ..module_info import FuelInfo
 from ..userfile.fuel_delta import load_fuel_delta_file, save_fuel_delta_file
-from ..validator import valid_delta_raw
 from ._base import DataModule
 
 
@@ -245,7 +244,7 @@ def calc_consumption(
             if (
                 not is_pit_lap
                 and last_lap_number < lap_number
-                and valid_delta_raw(delta_array_raw, used_curr, 1)
+                and len(delta_array_raw) >= 10
             ):
                 delta_array_raw.append((  # set end value
                     delta_array_raw[-1][0] + 10,
