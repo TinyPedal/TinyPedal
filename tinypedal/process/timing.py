@@ -45,8 +45,8 @@ class TimeScale:
         """Update time scale estimate"""
         delta_elapsed_time = elapsed_time - self.last_elapsed_time
         delta_track_time = track_time - self.last_track_time
-        if delta_elapsed_time > 5 and delta_track_time >= 0:
-            self.scale = round(delta_track_time / delta_elapsed_time)
+        if delta_elapsed_time > 5:
+            self.scale = round(max(delta_track_time, 0) / delta_elapsed_time)
             self.last_elapsed_time = elapsed_time
             self.last_track_time = track_time
         elif delta_elapsed_time < 0:

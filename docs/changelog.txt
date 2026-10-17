@@ -11,6 +11,7 @@ WIP
   - Fixed ACC shared memory API accessing issues on Linux (by @Potajito).
 
 * Misc
+  - Fixed an issue where sometimes track clock time scale could not be synchronized.
   - Improved column caption drawing methods for "Lap time history" & "Stint history" widgets (by @Bykow).
   - Added new contributor "Potajito" to contributors.md in "Cross-platform" section.
 
