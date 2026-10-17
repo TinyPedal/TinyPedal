@@ -324,9 +324,10 @@ class Realtime(Overlay):
         else:
             est_runlaps = minfo.fuel.estimatedLaps
 
+        data = minfo.wheels
         for idx in range(4):
-            tread_curr = minfo.wheels.currentTreadDepth[idx]
-            est_valid_wear = minfo.wheels.estimatedValidTreadWear[idx]
+            tread_curr = data.currentTreadDepth[idx]
+            est_valid_wear = data.estimatedValidTreadWear[idx]
 
             # Remaining tyre tread
             if self.wcfg["show_remaining"]:
@@ -334,15 +335,15 @@ class Realtime(Overlay):
 
             # Wear differences
             if self.wcfg["show_wear_difference"]:
-                self.update_diff(self.bars_diff[idx], minfo.wheels.estimatedTreadWear[idx])
+                self.update_diff(self.bars_diff[idx], data.estimatedTreadWear[idx])
 
             # Live wear difference
             if self.wcfg["show_live_wear_difference"]:
-                self.update_live(self.bars_live[idx], minfo.wheels.currentLapTreadWear[idx])
+                self.update_live(self.bars_live[idx], data.currentLapTreadWear[idx])
 
             # Flat spot wear
             if self.wcfg["show_flat_spot"]:
-                self.update_lock(self.bars_lock[idx], minfo.wheels.lockingTreadWear[idx])
+                self.update_lock(self.bars_lock[idx], data.lockingTreadWear[idx])
 
             # Estimated lifespan in laps
             if self.wcfg["show_lifespan_laps"]:

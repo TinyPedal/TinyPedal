@@ -245,17 +245,18 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
+        data = minfo.wheels
         for idx in range(4):
-            brake_curr = minfo.wheels.currentBrakeThickness[idx]
+            brake_curr = data.currentBrakeThickness[idx]
             is_failed = brake_curr <= 0
 
             # Calculate effective thickness in millimeters
-            failure_thickness = minfo.wheels.failureBrakeThickness[idx]
-            max_thickness = minfo.wheels.maxBrakeThickness[idx] - failure_thickness
+            failure_thickness = data.failureBrakeThickness[idx]
+            max_thickness = data.maxBrakeThickness[idx] - failure_thickness
             brake_curr -= failure_thickness
-            live_wear = minfo.wheels.currentlapBrakeWear[idx]
-            est_wear = minfo.wheels.estimatedBrakeWear[idx]
-            est_valid_wear = minfo.wheels.estimatedValidBrakeWear[idx]
+            live_wear = data.currentlapBrakeWear[idx]
+            est_wear = data.estimatedBrakeWear[idx]
+            est_valid_wear = data.estimatedValidBrakeWear[idx]
 
             if max_thickness <= 0:  # bypass invalid value
                 max_thickness = 99999999
