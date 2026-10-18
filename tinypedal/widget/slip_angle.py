@@ -88,6 +88,10 @@ class Realtime(Overlay):
             self.wcfg["oversteer_slip_angle_color"],
             self.wcfg["understeer_slip_angle_color"],
         )
+        if self.wcfg["show_peak_slip_angle_reading"]:
+            maxreading_width = font_m.width * self.wcfg["peak_slip_angle_padding"]
+        else:
+            maxreading_width = 0
         self.bars_slip_angle = tuple(
             WheelGaugeBar(
                 self,
@@ -102,6 +106,8 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color"],
                 maxrange_height=max(self.wcfg["peak_slip_angle_range_size"], 0),
                 maxrange_color=slip_max_color,
+                maxreading_width=maxreading_width,
+                maxreading_color=self.wcfg["font_color_peak_slip_angle"],
                 right_side=idx % 2,
                 top_side=idx < 2,
             ) for idx in range(4)
@@ -119,7 +125,6 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         slip_angle_set = minfo.wheels.slipAngle
         diff_slip_angle = minfo.wheels.slipAngleDifference
-        peak_angle = DATA.WHEELS_NA
 
         if diff_slip_angle > self.wcfg["minimum_understeer_slip_angle_difference"]:
             color_index = 2
@@ -129,10 +134,12 @@ class Realtime(Overlay):
             color_index = 0
 
         if self.wcfg["show_peak_slip_angle_under_maximum_lateral_g"]:
-            peak_angle = minfo.wheels.peakFrontSlipAngle, minfo.wheels.peakRearSlipAngle
+            peak_angle = minfo.wheels.peakSlipAngle
+        else:
+            peak_angle = DATA.WHEELS_NA
 
         for idx, bar_slip_angle in enumerate(self.bars_slip_angle):
-            self.update_slip_angle(bar_slip_angle, abs(slip_angle_set[idx]), peak_angle[idx > 1], color_index)
+            self.update_slip_angle(bar_slip_angle, abs(slip_angle_set[idx]), peak_angle[idx], color_index)
 
     # GUI update methods
     def update_slip_angle(self, target, data, peak_angle, color_index):

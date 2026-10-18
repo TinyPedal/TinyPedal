@@ -3925,6 +3925,12 @@ Note, value should be set as negative angle for oversteer, and positive angle fo
     show_peak_slip_angle_under_maximum_lateral_g
 Visualize peak slip angle range under recent maximum lateral acceleration. Note, peak slip angle range auto-recalibrates itself over time.
 
+    show_peak_slip_angle_reading
+Show peak slip angle reading under recent maximum lateral acceleration.
+
+    peak_slip_angle_padding
+Set horizontal padding for displaying peak slip angle reading alongside slip angle padding.
+
 [**`Back to Top`**](#)
 
 

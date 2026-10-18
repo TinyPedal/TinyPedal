@@ -48,17 +48,18 @@ class WheelGaugeBar(QWidget):
         mark_color: str = "",
         maxrange_height: int = 0,
         maxrange_color: str = "",
+        maxreading_width: int = 0,
+        maxreading_color: str = "",
         right_side: bool = False,
         top_side: bool = True,
     ):
         super().__init__(parent)
         self.last = -1
+        self.max_value = 0
         self.input_color = input_color
         self.bg_color = bg_color
         self.mark_color = mark_color
         self.maxrange_color = maxrange_color
-        self.pen = QPen()
-        self.pen.setColor(fg_color)
         self._display_range = display_range
         self._decimals = max(decimals, 0)
         self._width_scale = bar_width / self._display_range
@@ -66,6 +67,19 @@ class WheelGaugeBar(QWidget):
         self._rect_input = self._rect_bg.adjusted(0, 0, 0, 0)
         self._rect_text = self._rect_bg.adjusted(padding_x, offset_y, -padding_x, 0)
         self._right_side = right_side
+        self._pen = QPen()
+        self._pen.setColor(fg_color)
+
+        if maxreading_width > 0:
+            self._pen_max = QPen()
+            self._pen_max.setColor(maxreading_color)
+            self._rect_max_text = self._rect_text.adjusted(0, 0, 0, 0)
+            if right_side:
+                self._rect_text.adjust(0, 0, -maxreading_width, 0)
+            else:
+                self._rect_text.adjust(maxreading_width, 0, 0, 0)
+        else:
+            self._rect_max_text = None
 
         if mark_color:
             self._rect_mark = QRectF(0, 0, mark_width, bar_height)
@@ -112,6 +126,7 @@ class WheelGaugeBar(QWidget):
             self._rect_max.setWidth(input_value * self._width_scale)
         else:
             self._rect_max.setX((self._display_range - input_value) * self._width_scale)
+        self.max_value = input_value
 
     def paintEvent(self, event):
         """Draw normal without warning or negative highlighting"""
@@ -122,8 +137,11 @@ class WheelGaugeBar(QWidget):
             painter.fillRect(self._rect_mark, self.mark_color)
         if self.maxrange_color:
             painter.fillRect(self._rect_max, self.maxrange_color)
-        painter.setPen(self.pen)
+        painter.setPen(self._pen)
         painter.drawText(self._rect_text, self._alignment, f"{self.last:.{self._decimals}f}")
+        if self._rect_max_text:
+            painter.setPen(self._pen_max)
+            painter.drawText(self._rect_max_text, self._alignment, f"{self.max_value:.{self._decimals}f}")
 
 
 class PedalInputBar(QWidget):
@@ -150,8 +168,6 @@ class PedalInputBar(QWidget):
         self.last = None
         self.input_color = input_color
         self.bg_color = bg_color
-        self.pen = QPen()
-        self.pen.setColor(fg_color)
         self._is_maxed = False
         self._show_reading = show_reading
         self._input_reading = 0.0
@@ -162,6 +178,8 @@ class PedalInputBar(QWidget):
         self._rect_filtered = QRectF(*filtered_size)
         self._rect_text = QRectF(*reading_size)
         self._horizontal_style = horizontal_style
+        self._pen = QPen()
+        self._pen.setColor(fg_color)
 
         if ffb_color:
             self.rect_max = self._rect_pedal
@@ -206,7 +224,7 @@ class PedalInputBar(QWidget):
         if self._is_maxed:
             painter.fillRect(self.rect_max, self.max_color)
         if self._show_reading:
-            painter.setPen(self.pen)
+            painter.setPen(self._pen)
             painter.drawText(self._rect_text, Qt.AlignCenter, f"{self._input_reading:.0f}")
 
 
@@ -245,8 +263,6 @@ class ProgressBar(QWidget):
         self.text = text
         self.input_color = input_color
         self.bg_color = bg_color
-        self.pen = QPen()
-        self.pen.setColor(fg_color)
         self.show_reading = show_reading
         self._bar_width = width
         self._rect_bar = QRectF(0, 0, width, height)
@@ -254,6 +270,9 @@ class ProgressBar(QWidget):
         self._rect_text = QRectF(width * (offset_x - 0.5), offset_y, width, height)
         self._alignment = align
         self._right_side = right_side
+        self._pen = QPen()
+        self._pen.setColor(fg_color)
+
         self.setFixedSize(width, height)
 
     def update_input(self, input_value: float):
@@ -270,7 +289,7 @@ class ProgressBar(QWidget):
         painter.fillRect(self._rect_bar, self.bg_color)
         painter.fillRect(self._rect_input, self.input_color)
         if self.show_reading:
-            painter.setPen(self.pen)
+            painter.setPen(self._pen)
             painter.drawText(self._rect_text, self._alignment, self.text)
 
 
@@ -342,8 +361,6 @@ class GearGaugeBar(QWidget):
     ):
         super().__init__(parent)
         self.last = -1
-        self.pen = QPen()
-        self.pen.setColor(fg_color)
         self._gear = "N"
         self._speed = 0
         self._color_index = 0
@@ -353,6 +370,8 @@ class GearGaugeBar(QWidget):
         self._rect_gear = QRectF(*gear_size)
         self._rect_speed = QRectF(*speed_size)
         self._rect_bar = QRectF(0, 0, width, height)
+        self._pen = QPen()
+        self._pen.setColor(fg_color)
 
         self.setFixedSize(width, height)
 
@@ -370,7 +389,7 @@ class GearGaugeBar(QWidget):
         painter.fillRect(self._rect_bar, self._bg_color)
         if self._color_index == -4:  # flicker trigger
             return
-        painter.setPen(self.pen)
+        painter.setPen(self._pen)
         painter.drawText(self._rect_gear, Qt.AlignCenter, self._gear)
         if self._show_speed:
             painter.setFont(self._font_speed)

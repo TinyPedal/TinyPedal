@@ -746,8 +746,7 @@ def calc_wheel_angle(output: WheelsInfo):
     # Peak slip angle under max lateral G
     max_accel_lateral = 0.0
     ema_accel_lateral = 0.0
-    ema_peak_slip_angle_front = 0.0
-    ema_peak_slip_angle_rear = 0.0
+    ema_peak_slip_angle = list(DATA.WHEELS_ZERO)
 
     while True:
         reset = yield None
@@ -761,8 +760,7 @@ def calc_wheel_angle(output: WheelsInfo):
 
             max_accel_lateral = 0.0
             ema_accel_lateral = 0.0
-            ema_peak_slip_angle_front = 0.0
-            ema_peak_slip_angle_rear = 0.0
+            ema_peak_slip_angle[:] = DATA.WHEELS_ZERO
 
         # Slip angle
         if 1 < api.read.vehicle.speed():
@@ -781,17 +779,15 @@ def calc_wheel_angle(output: WheelsInfo):
             api.read.vehicle.acceleration_lateral() - ema_accel_lateral
         )
 
-        if (
+        if (  # ignore impact
             max_accel_lateral < ema_accel_lateral
-            and api.read.timing.elapsed() - api.read.vehicle.impact_time() > 2  # ignore impact
+            and api.read.timing.elapsed() - api.read.vehicle.impact_time() > 2
         ):
             max_accel_lateral = ema_accel_lateral
-            ema_peak_slip_angle_front += 0.1 * (
-                max(abs(raw_slip_angle[0]), abs(raw_slip_angle[1])) - ema_peak_slip_angle_front
-            )
-            ema_peak_slip_angle_rear += 0.1 * (
-                max(abs(raw_slip_angle[2]), abs(raw_slip_angle[3])) - ema_peak_slip_angle_rear
-            )
+            for idx in range(4):
+                ema_peak_slip_angle[idx] += 0.1 * (
+                    abs(raw_slip_angle[idx]) - ema_peak_slip_angle[idx]
+                )
 
         # Toe angle
         raw_toe_angle[:] = map(calc.degrees, api.read.wheel.toe())
@@ -814,8 +810,7 @@ def calc_wheel_angle(output: WheelsInfo):
         output.camberAngle[:] = raw_camber_angle
         output.averageFrontSlipAngle = average_slip_angle_front
         output.averageRearSlipAngle = average_slip_angle_rear
-        output.peakFrontSlipAngle = ema_peak_slip_angle_front
-        output.peakRearSlipAngle = ema_peak_slip_angle_rear
+        output.peakSlipAngle[:] = ema_peak_slip_angle
         output.slipAngleDifference = slip_angle_difference
         output.averageFrontToeAngle = average_toe_angle_front
         output.averageRearToeAngle = average_toe_angle_rear
