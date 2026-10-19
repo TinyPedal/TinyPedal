@@ -299,4 +299,6 @@ Licenses and notices file for third-party software are located in `docs\licenses
 
 ## Credits
 
+TinyPedal is a non-profit project, developed and maintained by sim racing enthusiasts and volunteers.
+
 See [docs\contributors.md](./docs/contributors.md) file for full list of developers and contributors.

@@ -11,7 +11,7 @@ Before posting new feature requests or issues, make sure to:
 > [!IMPORTANT]
 > Please keep **one request or report per issue with a concise title that clearly describes the issue**. The developers won't be able to keep track of requests that scattered in random posts and issues.
 >
-> Issues with duplicated requests or issues, or questions already answered in [Frequently Asked Questions](https://github.com/TinyPedal/TinyPedal/wiki/Frequently-Asked-Questions), will be closed with or without notice.
+> Issues with duplicated requests or issues, or questions already answered in [Frequently Asked Questions](https://github.com/TinyPedal/TinyPedal/wiki/Frequently-Asked-Questions), will be closed.
 
 ## Requesting Features
 
