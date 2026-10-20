@@ -23,7 +23,6 @@ ACC UDP API connector
 from __future__ import annotations
 
 import logging
-import secrets
 import socket
 import threading
 from time import monotonic
@@ -104,7 +103,7 @@ class UDPAPIConnector:
         connection_message = acc_udp.set_register_message(
             display_name=APP.TINYPEDAL,
             connection_password=self._cfg["connection_password"],
-            command_password=secrets.token_hex(10),  # use random password for read-only access
+            command_password=str(monotonic())[:10],  # use random password for read-only access
             realtime_update_interval=udp_update_interval,
         )
 

@@ -22,7 +22,7 @@ Pedal Widget
 
 from .. import api
 from ._base import Overlay
-from ._painter import PedalInputBar
+from ._painter import HorizontalPedalInputBar, VerticalPedalInputBar
 
 
 class Realtime(Overlay):
@@ -45,6 +45,11 @@ class Realtime(Overlay):
 
         pedal_size = self.set_pedal_size(font_m)
 
+        if self.wcfg["enable_horizontal_style"]:
+            PedalInputBar = HorizontalPedalInputBar
+        else:
+            PedalInputBar = VerticalPedalInputBar
+
         # Throttle
         if self.wcfg["show_throttle"]:
             self.bar_throttle = PedalInputBar(
@@ -54,7 +59,6 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_throttle"],
                 input_color=self.wcfg["throttle_color"],
                 show_reading=self.wcfg["show_readings"],
-                horizontal_style=self.wcfg["enable_horizontal_style"],
             )
             self.set_primary_orient(
                 target=self.bar_throttle,
@@ -72,7 +76,6 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_brake"],
                 input_color=self.wcfg["brake_color"],
                 show_reading=self.wcfg["show_readings"],
-                horizontal_style=self.wcfg["enable_horizontal_style"],
             )
             self.set_primary_orient(
                 target=self.bar_brake,
@@ -90,7 +93,6 @@ class Realtime(Overlay):
                 bg_color=self.wcfg["background_color_clutch"],
                 input_color=self.wcfg["clutch_color"],
                 show_reading=self.wcfg["show_readings"],
-                horizontal_style=self.wcfg["enable_horizontal_style"],
             )
             self.set_primary_orient(
                 target=self.bar_clutch,
@@ -109,7 +111,6 @@ class Realtime(Overlay):
                 input_color=self.wcfg["ffb_color"],
                 ffb_color=self.wcfg["ffb_clipping_color"],
                 show_reading=self.wcfg["show_readings"],
-                horizontal_style=self.wcfg["enable_horizontal_style"],
             )
             self.set_primary_orient(
                 target=self.bar_ffb,

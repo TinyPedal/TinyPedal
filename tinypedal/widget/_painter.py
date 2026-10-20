@@ -144,7 +144,7 @@ class WheelGaugeBar(QWidget):
             painter.drawText(self._rect_max_text, self._alignment, f"{self.max_value:.{self._decimals}f}")
 
 
-class PedalInputBar(QWidget):
+class _PedalInputBar(QWidget):
     """Pedal input bar"""
 
     def __init__(
@@ -162,7 +162,6 @@ class PedalInputBar(QWidget):
         input_color: str = "",
         ffb_color: str = "",
         show_reading: bool = False,
-        horizontal_style: bool = False,
     ):
         super().__init__(parent)
         self.last = None
@@ -177,7 +176,6 @@ class PedalInputBar(QWidget):
         self._rect_raw = QRectF(*raw_size)
         self._rect_filtered = QRectF(*filtered_size)
         self._rect_text = QRectF(*reading_size)
-        self._horizontal_style = horizontal_style
         self._pen = QPen()
         self._pen.setColor(fg_color)
 
@@ -190,31 +188,6 @@ class PedalInputBar(QWidget):
 
         self.setFixedSize(pedal_size[2], pedal_size[3])
 
-    def update_input(self, input_raw: float, input_filtered: float):
-        """Update input value - horizontal style"""
-        self._input_reading = max(input_raw, input_filtered) * 100
-        if self._horizontal_style:
-            scaled_raw = self.__scale_horizontal(input_raw)
-            scaled_filtered = self.__scale_horizontal(input_filtered)
-            self._rect_raw.setRight(scaled_raw)
-            self._rect_filtered.setRight(scaled_filtered)
-            self._is_maxed = scaled_raw >= self._pedal_length
-        else:
-            scaled_raw = self.__scale_vertical(input_raw)
-            scaled_filtered = self.__scale_vertical(input_filtered)
-            self._rect_raw.setTop(scaled_raw)
-            self._rect_filtered.setTop(scaled_filtered)
-            self._is_maxed = scaled_raw <= self._pedal_extend
-        self.update()
-
-    def __scale_horizontal(self, input_value: float) -> float:
-        """Scale input - horizontal style"""
-        return input_value * self._pedal_length
-
-    def __scale_vertical(self, input_value: float) -> float:
-        """Scale input - vertical style"""
-        return (1 - input_value) * self._pedal_length + self._pedal_extend
-
     def paintEvent(self, event):
         """Draw"""
         painter = QPainter(self)
@@ -226,6 +199,34 @@ class PedalInputBar(QWidget):
         if self._show_reading:
             painter.setPen(self._pen)
             painter.drawText(self._rect_text, Qt.AlignCenter, f"{self._input_reading:.0f}")
+
+
+class VerticalPedalInputBar(_PedalInputBar):
+    """Vertical pedal input bar"""
+
+    def update_input(self, input_raw: float, input_filtered: float):
+        """Update input value"""
+        self._input_reading = max(input_raw, input_filtered) * 100
+        self._is_maxed = input_raw >= 1
+        scaled_raw = (1 - input_raw) * self._pedal_length + self._pedal_extend
+        scaled_filtered = (1 - input_filtered) * self._pedal_length + self._pedal_extend
+        self._rect_raw.setTop(scaled_raw)
+        self._rect_filtered.setTop(scaled_filtered)
+        self.update()
+
+
+class HorizontalPedalInputBar(_PedalInputBar):
+    """Horizontal pedal input bar"""
+
+    def update_input(self, input_raw: float, input_filtered: float):
+        """Update input value"""
+        self._input_reading = max(input_raw, input_filtered) * 100
+        self._is_maxed = input_raw >= 1
+        scaled_raw = input_raw * self._pedal_length
+        scaled_filtered = input_filtered * self._pedal_length
+        self._rect_raw.setRight(scaled_raw)
+        self._rect_filtered.setRight(scaled_filtered)
+        self.update()
 
 
 class ProgressBar(QWidget):
@@ -444,6 +445,7 @@ class RawText(QWidget):
         self.text = text
         self.fg = fg_color if fg_color else Qt.transparent
         self.bg = bg_color if bg_color else Qt.transparent
+        self._last_fg = ""
         self._alignment = align
         self._offset_x = padding_offset
         self._offset_y = offset_y
@@ -465,7 +467,9 @@ class RawText(QWidget):
     def paintEvent(self, event):
         """Draw"""
         painter = QPainter(self)
-        self._pen_text.setColor(self.fg)
+        if self._last_fg != self.fg:
+            self._last_fg = self.fg  # avoid calling re-set color if same
+            self._pen_text.setColor(self.fg)
         painter.setPen(self._pen_text)
         painter.fillRect(0, 0, self._width, self._height, self.bg)
         painter.drawText(self._offset_x, self._offset_y, self._width, self._height, self._alignment, self.text)
