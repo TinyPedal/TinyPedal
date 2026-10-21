@@ -273,12 +273,14 @@ class DeltaFuelHistory:
 
     Attributes:
         used: Last lap used fuel.
+        average: Average fuel usage from recent laps.
         laps: Last lap remaining laps.
     """
 
     _last_lap_number: int = -1
     _last_remaining: float = 0.0
     used: float = 0.0
+    average: float = 0.0
     laps: float = 0.0
 
     def update(self, lap_number: int, remaining: float):
@@ -287,11 +289,15 @@ class DeltaFuelHistory:
             if -1 < self._last_lap_number < lap_number:
                 if self._last_remaining > remaining:
                     self.used = self._last_remaining - remaining
+                    if self.average > 0:  # 5-lap average
+                        self.average += 0.3333333 * (self.used - self.average)
+                    else:  # initial sample
+                        self.average = self.used
                 self._last_remaining = remaining
                 if self.used > 0:
                     self.laps = remaining / self.used
             else:  # reset all laptime on session change
-                self.used = self.laps = self._last_remaining = 0.0
+                self.used = self.average = self.laps = self._last_remaining = 0.0
             self._last_lap_number = lap_number
 
 

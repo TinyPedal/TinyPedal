@@ -4064,11 +4064,14 @@ Show remaining virtual energy reading in percentage from each driver, with 4 dif
 Note, for vehicle without virtual energy, remaining fuel (only if available) will be displayed instead. If fuel data is not available from game API, then nothing will be displayed.
 
     energy_remaining_decimal_places
-Set additional decimals to be displayed.
+Set additional decimals to be displayed. Note, decimal place accuracy depends on game API data accuracy, which may have certain amount margin of error.
 
-**Important notes on decimal place accuracy:**
+    show_energy_usage, show_last_energy_usage, show_average_energy_usage
+Show last lap and average five laps energy usage.
 
-Currently due to known limitation from game API (as explained in User Guide), energy remaining readings from game API does not grant decimal place accuracy. The margin of error from this option can be as high as 1.0% per lap, which may not provide more accuracy than without decimals.
+Note, both `show_last_energy_usage` and `show_average_energy_usage` options are optional. However if both options are disabled, last lap energy usage will be displayed instead.
+
+For vehicle without virtual energy, fuel usage (only if available) will be displayed instead.
 
     show_vehicle_integrity
 Show opponent vehicle integrity reading.

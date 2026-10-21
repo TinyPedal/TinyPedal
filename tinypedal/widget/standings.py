@@ -69,6 +69,8 @@ class Realtime(Overlay):
         self.max_delta = calc.asym_max(int(self.wcfg["number_of_delta_laptime"]), 2, 5)
         self.nrg_decimals = max(int(self.wcfg["decimal_places_energy_remaining"]), 0)
         self.nrg_width = 3 + self.nrg_decimals + (self.nrg_decimals > 0)
+        self.use_decimals = max(int(self.wcfg["decimal_places_energy_usage"]), 1)
+        self.use_width = 1 + self.use_decimals + (self.use_decimals > 0)
 
         self.height_def = font_m.height
         self.height_gap = self.wcfg["split_gap"]
@@ -606,6 +608,38 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_energy_remaining"],
                 hide_start=row_start + 1,
             )
+        # Energy usage
+        if self.wcfg["show_energy_usage"]:
+            self.bar_style_use = (
+                (
+                    self.wcfg["font_color_energy_usage"],
+                    self.wcfg["background_color_energy_usage"],
+                ),
+                (
+                    self.wcfg["font_color_player_energy_usage"],
+                    self.wcfg["background_color_player_energy_usage"],
+                ),
+            )
+            min_use_width = self.use_width + (
+                self.wcfg["show_last_energy_usage"]
+                and self.wcfg["show_average_energy_usage"]
+            ) * (1 + self.use_width)
+            self.bars_use = self.set_rawtext(
+                padding=bar_padx,
+                width=min_use_width * font_m.width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_use[0][0],
+                bg_color=self.bar_style_use[0][1],
+                count=self.veh_range,
+            )
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_use,
+                row_start=row_start,
+                column=self.wcfg["display_order_energy_usage"],
+                hide_start=row_start + 1,
+            )
         # Vehicle integrity
         if self.wcfg["show_vehicle_integrity"]:
             self.bar_style_dmg = (
@@ -933,6 +967,14 @@ class Realtime(Overlay):
             # Remaining energy
             if self.wcfg["show_energy_remaining"]:
                 self.update_nrg(self.bars_nrg[idx], veh_info.energyRemaining, hi_player, state)
+            # Energy usage
+            if self.wcfg["show_energy_usage"]:
+                nrg_usage = veh_info.energyHistory.used
+                nrg_average = veh_info.energyHistory.average
+                if nrg_usage <= 0:
+                    nrg_usage = veh_info.fuelHistory.used
+                    nrg_average = veh_info.fuelHistory.average
+                self.update_use(self.bars_use[idx], nrg_usage, nrg_average, hi_player, state)
             # Vehicle integrity
             if self.wcfg["show_vehicle_integrity"]:
                 self.update_dmg(self.bars_dmg[idx], veh_info.vehicleIntegrity, hi_player, state)
@@ -1176,11 +1218,37 @@ class Realtime(Overlay):
             else:
                 color_index = 1
             if ve <= -1:
-                text = "-" * self.nrg_width
+                text = DATA.TEXT_PLACEHOLDER * self.nrg_width
             else:
                 text = f"{ve:0{self.nrg_width}.{self.nrg_decimals}%}"[:self.nrg_width]
             target.text = text
             target.fg, target.bg = self.bar_style_nrg[color_index]
+            self.toggle_visibility(target, data[-1])
+
+    def update_use(self, target, *data):
+        """Energy usage"""
+        if target.last != data:
+            target.last = data
+            text = ""
+            if self.wcfg["show_last_energy_usage"] or not self.wcfg["show_average_energy_usage"]:
+                used = data[0]
+                if used <= 0:
+                    text = DATA.TEXT_PLACEHOLDER * self.use_width
+                else:
+                    text = f"{used * 100:.{self.use_decimals}f}"[:self.use_width]
+            if self.wcfg["show_average_energy_usage"]:
+                average = data[1]
+                if average <= 0:
+                    text_avg = DATA.TEXT_PLACEHOLDER * self.use_width
+                else:
+                    text_avg = f"{average * 100:.{self.use_decimals}f}"[:self.use_width]
+                if text:
+                    text = f"{text}/{text_avg}"
+                else:
+                    text = text_avg
+            target.text = text
+            target.fg, target.bg = self.bar_style_use[data[2]]
+            target.update()
             self.toggle_visibility(target, data[-1])
 
     def update_dmg(self, target, *data):
@@ -1219,11 +1287,7 @@ class Realtime(Overlay):
                 color_index = 1
             else:
                 color_index = 0
-            if score <= 0:
-                text = "--"
-            else:
-                text = f"x{score:d}"
-            target.text = text
+            target.text = f"x{score:d}"
             target.fg, target.bg = self.bar_style_icd[color_index]
             self.toggle_visibility(target, data[-1])
 

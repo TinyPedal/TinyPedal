@@ -1,6 +1,9 @@
 WIP
 -----------------------------
 * Relative, Rivals, Standings Widget
+  - Added "show_energy_usage, show_last_energy_usage, show_average_energy_usage" options, which show last lap and average five laps energy usage.
+    Note, both "show_last_energy_usage" and "show_average_energy_usage" options are optional. However if both options are disabled, last lap energy usage will be displayed instead.
+    For vehicle without virtual energy, fuel usage (only if available) will be displayed instead.
   - Added "show_caption_*" options (by @Bykow), which shows caption row on top of table columns. Caption may expand column width to fit caption text. Caption alignment follows corresponding column text alignment option.
     Note, "caption_text_title" option allows to set title text that displayed across leading columns with empty caption text, such as position, brand logo, driver name columns. Default is widget name. Set to "" (blank) to disable.
   - Replaced "driver_name_align_center, vehicle_name_align_center, time_gap_align_center, time_interval_align_center" with new corresponding "text_alignment" options, which support "Left, Center, Right" alignment. Old setting will be automatically transferred over.
