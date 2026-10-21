@@ -529,51 +529,6 @@ class RawImage(QWidget):
             )
 
 
-class RawFrame(QWidget):
-    """Raw frame widget for optimized drawing"""
-
-    def __init__(
-        self,
-        parent,
-        width: int = 0,
-        height: int = 0,
-        fixed_width: int = 0,
-        fixed_height: int = 0,
-        bg_color: str = "",
-        last: Any | None = None,
-    ):
-        super().__init__(parent)
-        if fixed_width > 0:
-            self.setFixedWidth(fixed_width)
-        elif width > 0:
-            self.setMinimumWidth(width)
-
-        if fixed_height > 0:
-            self.setFixedHeight(fixed_height)
-        elif height > 0:
-            self.setMinimumHeight(height)
-
-        self.state = None
-        self.last = last
-        self.bg = bg_color if bg_color else Qt.transparent
-        self._width = self.width()
-        self._height = self.height()
-
-    def clear(self):
-        """Clear display"""
-        self.bg = Qt.transparent
-
-    def resizeEvent(self, event):
-        """Update size info"""
-        self._width = self.width()
-        self._height = self.height()
-
-    def paintEvent(self, event):
-        """Draw"""
-        painter = QPainter(self)
-        painter.fillRect(0, 0, self._width, self._height, self.bg)
-
-
 class MultiCompounds(QWidget):
     """Multi color compounds text"""
 
@@ -595,7 +550,7 @@ class MultiCompounds(QWidget):
         if font is not None:
             self.setFont(font)
 
-        self.setFixedWidth(count * (width + spacing) + padding * 2)
+        self.setMinimumWidth(count * (width + spacing) + padding * 2)
         self.setFixedHeight(height)
 
         self.state = None
@@ -606,7 +561,6 @@ class MultiCompounds(QWidget):
         self.colors = (fg,) * count
         self._count = count
         self._offset_y = offset_y
-        self._padding = padding
         self._word_width = width + spacing
         self._pen_text = QPen()
         self._width = self.width()
@@ -627,13 +581,17 @@ class MultiCompounds(QWidget):
         """Draw"""
         painter = QPainter(self)
         painter.fillRect(0, 0, self._width, self._height, self.bg)
+        if not self.compounds:
+            return
+        # Recalculate padding in case width increased
+        padding = (self._width - self._count * self._word_width) // 2
         for index, compound in enumerate(self.compounds):
             if compound == "":
                 continue
             self._pen_text.setColor(self.colors[index])
             painter.setPen(self._pen_text)
             painter.drawText(
-                self._padding + self._word_width * index,
+                padding + self._word_width * index,
                 self._offset_y,
                 self._word_width,
                 self._height,
@@ -667,7 +625,7 @@ class DeltaLapTime(QWidget):
         if font is not None:
             self.setFont(font)
 
-        self.setFixedWidth(count * (width + spacing) + padding * 2)
+        self.setMinimumWidth(count * (width + spacing) + padding * 2)
         self.setFixedHeight(height)
 
         self.state = None
@@ -703,6 +661,10 @@ class DeltaLapTime(QWidget):
         """Draw"""
         painter = QPainter(self)
         painter.fillRect(0, 0, self._width, self._height, self.bg)
+        if not self.delta:
+            return
+        # Recalculate padding in case width increased
+        padding = (self._width - self._count * self._word_width) // 2
         for index, delta in enumerate(
             reversed(self.delta) if self._inverted else self.delta
         ):
@@ -734,7 +696,7 @@ class DeltaLapTime(QWidget):
             self._pen_text.setColor(fg_color)
             painter.setPen(self._pen_text)
             painter.drawText(
-                self._padding + self._word_width * index,
+                padding + self._word_width * index,
                 self._offset_y,
                 self._word_width,
                 self._height,
