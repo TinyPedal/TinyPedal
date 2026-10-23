@@ -2023,6 +2023,35 @@ Set warning threshold for estimated brake lifespan in minutes. Default is `5` la
 [**`Back to Top`**](#)
 
 
+## Class fields
+**This widget displays number of active and total vehicles for each vehicle class in a session.**
+
+Each field shows class name, followed by number of active vehicles (on track or in pit lane) and total vehicles in class, for example `GT3 12/18`. Field background color follows class color from `Vehicle Class` editor. Fields are sorted by class leader's overall position. Vehicles that are in garage, DNF or DQ are not counted as active.
+
+    layout
+0 = vertical layout (one class per row), 1 = horizontal layout (all classes in one row).
+
+    maximum_classes
+Set maximum number of class fields to display. Valid range is `1` to `20`. Default is `5`.
+
+    refresh_interval
+Set interval (seconds) to recount class fields, in case vehicle state changes without leaving or entering garage (such as retired on track). Fields are always recounted instantly when total vehicles or vehicles in garage changes. Minimum value is `1`. Default is `5` seconds.
+
+    enable_finished_vehicles_as_active
+Enable counting vehicles that finished race but not yet in garage as active vehicles. Default is `true`.
+
+    class_width
+Set class name display width in characters. Longer class names are truncated, it is recommended to set short class alias in `Vehicle Class` editor. Default is `4`.
+
+    background_color_class_field
+Set fallback background color for vehicles without class name.
+
+    show_inactive_count
+Show number of inactive vehicles (in garage, DNF, DQ) in class. This option is disabled by default.
+
+[**`Back to Top`**](#)
+
+
 ## Cruise
 **This widget displays compass, elevation, odometer info.**
 
