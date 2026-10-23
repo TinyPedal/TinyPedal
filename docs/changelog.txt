@@ -1,4 +1,4 @@
-WIP
+2.52.0 (2026-10-23)
 -----------------------------
 * Relative, Rivals, Standings Widget
   - Added "show_energy_usage, show_last_energy_usage, show_average_energy_usage" options, which show last lap and average five laps energy usage.
@@ -8,18 +8,21 @@ WIP
     Note, "caption_text_title" option allows to set title text that displayed across leading columns with empty caption text, such as position, brand logo, driver name columns. Default is widget name. Set to "" (blank) to disable.
   - Replaced "driver_name_align_center, vehicle_name_align_center, time_gap_align_center, time_interval_align_center" with new corresponding "text_alignment" options, which support "Left, Center, Right" alignment. Old setting will be automatically transferred over.
   - New text alignment options now supports proper left or right alignment for regular (none monospaced) fonts (requested by user "ssalamon").
+  - Fixed a display issue where opponent's remaining fuel always stuck on 50% for vehicle without virtual energy (reported by user "kfran42").
+  - Fixed a display issue where empty delta lap time row sometimes did not hide.
 
 * Slip angle Widget
   - Added "show_peak_slip_angle_reading" option, which shows peak slip angle reading under recent maximum lateral acceleration. This option is disabled by default.
 
 * ACC API
   - Added "memory_map_prefix" option, which set memory map file name prefix for accessing API on Linux. This option is not used on Windows system. See User Guide for details.
-  - Fixed ACC shared memory API accessing issues on Linux (by @Potajito).
+  - Fixed ACC shared memory API accessing issues on Linux (by @Potajito), ACC API now fully functional on Linux.
 
 * Misc
   - Fixed an issue where sometimes track clock time scale could not be synchronized.
   - Improved column caption drawing methods for "Lap time history" & "Stint history" widgets (by @Bykow).
   - Added new contributor "Potajito" to contributors.md in "Cross-platform" section.
+  - Various optimization.
 
 2.51.0 (2026-10-03)
 -----------------------------
