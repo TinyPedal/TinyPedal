@@ -738,11 +738,8 @@ class Realtime(Overlay):
                 self.update_psc(self.bars_psc[idx], veh_info.numPitStops, veh_info.pitRequested, state)
             # Delta laptime
             if _option["show_delta_laptime"]:
-                self.update_dlt(
-                    self.bars_dlt[idx],
-                    veh_info.lapTimeHistory.data, plr_veh_info.lapTimeHistory.data,
-                    veh_info.lapTimeHistory.last, plr_veh_info.lapTimeHistory.last, state,
-                )
+                delta_lap = calc.delta_laptime(veh_info.lapTimeHistory.data, plr_veh_info.lapTimeHistory.data, self.max_delta)
+                self.update_dlt(self.bars_dlt[idx], delta_lap, state)
             # Remaining energy
             if _option["show_energy_remaining"]:
                 self.update_nrg(self.bars_nrg[idx], veh_info.energyRemaining, state)
@@ -861,11 +858,11 @@ class Realtime(Overlay):
             target.text = self.set_laptime(data[0])[:8]
             self.toggle_visibility(target, data[-1])
 
-    def update_dlt(self, target, opt_data, plr_data, *data):
+    def update_dlt(self, target, *data):
         """Vehicle delta laptime"""
         if target.last != data:
             target.last = data
-            target.delta = calc.delta_laptime(opt_data, plr_data, self.max_delta)
+            target.delta = data[0]
             self.toggle_visibility(target, data[-1])
 
     def update_pic(self, target, *data):
