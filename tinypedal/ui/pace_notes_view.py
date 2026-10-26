@@ -99,6 +99,9 @@ class PaceNotesPlayer(QMediaPlayer):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
+        if not self.mcfg["enable_playback_while_spectating"] and realtime_state.spectating:
+            return
+
         # Out pit notes
         notes_index = minfo.pacenotes.out.currentIndex
         if self._last_notes_index != notes_index:
@@ -238,6 +241,9 @@ class PaceNotesControl(QWidget):
         self.checkbox_playinpit = QCheckBox("Enable Playback While in Pit Lane")
         self.checkbox_playinpit.toggled.connect(self.toggle_playinpit_state)
 
+        self.checkbox_playwhilespectate = QCheckBox("Enable Playback While Spectating")
+        self.checkbox_playwhilespectate.toggled.connect(self.toggle_playwhilespectate_state)
+
         # Frame layout
         layout_file = QGridLayout()
         layout_file.setAlignment(Qt.AlignTop)
@@ -271,6 +277,7 @@ class PaceNotesControl(QWidget):
         layout_setting.addWidget(self.label_volume)
         layout_setting.addWidget(self.slider_volume)
         layout_setting.addWidget(self.checkbox_playinpit)
+        layout_setting.addWidget(self.checkbox_playwhilespectate)
 
         self.frame_control = QFrame(self)
         self.frame_control.setFrameShape(QFrame.StyledPanel)
@@ -305,6 +312,7 @@ class PaceNotesControl(QWidget):
         enabled = self.mcfg["enable"]
 
         self.toggle_playinpit_state(self.mcfg["enable_playback_while_in_pit"])
+        self.toggle_playwhilespectate_state(self.mcfg["enable_playback_while_spectating"])
         self.toggle_selector_state(self.mcfg["enable_manual_file_selector"])
         self.file_selector.setText(self.mcfg["pace_notes_file_name"])
         self.path_selector.setText(self.mcfg["pace_notes_sound_path"])
@@ -387,6 +395,11 @@ class PaceNotesControl(QWidget):
         """Toggle playback in pit state"""
         self.checkbox_playinpit.setChecked(checked)
         self.update_config("enable_playback_while_in_pit", checked)
+
+    def toggle_playwhilespectate_state(self, checked: bool):
+        """Toggle playback while spectating"""
+        self.checkbox_playwhilespectate.setChecked(checked)
+        self.update_config("enable_playback_while_spectating", checked)
 
     def toggle_button_state(self, checked: bool):
         """Toggle button state"""

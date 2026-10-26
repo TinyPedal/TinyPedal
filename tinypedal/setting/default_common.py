@@ -50,6 +50,7 @@ COMMON_DEFAULT = {
         "enable": False,
         "update_interval": 10,
         "enable_playback_while_in_pit": False,
+        "enable_playback_while_spectating": False,
         "enable_manual_file_selector": False,
         "pace_notes_file_name": "",
         "pace_notes_sound_path": "/",

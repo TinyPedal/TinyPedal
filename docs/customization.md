@@ -974,6 +974,8 @@ Click `Playback Enabled` or `Playback Disabled` button to quickly enable or disa
 
 Click `Enable Playback While in Pit Lane` check box to enable or disable pace notes (that tagged with `#pit`) playback while in pit lane. This option takes immediate effect when changed.
 
+Click `Enable Playback While Spectating` check box to enable or disable pace notes playback while [Spectate Mode](#spectate-mode) enabled. This option takes immediate effect when changed.
+
 Enable `Manually Select Pace Notes File` check box to disable auto-file-name matching, and manually select a pace notes file that can be played on any track. By default, pace notes file is automatically loaded from `pace_notes_path` if a file that matches current track name is found. This option takes immediate effect when changed.
 
 `Sound file path` sets path for loading pace notes sound files that matches name value (exclude file extension) from `pace note` column found in pace notes file. If no sound file found, sound won't be played. This option takes immediate effect when changed.

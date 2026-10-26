@@ -1,4 +1,4 @@
 # Core version (MAJOR.MINOR.PATCH)
-__version__ = "2.52.0"
+__version__ = "2.52.1"
 # Development version tag (set to "" for release-version)
-DEVELOPMENT = ""
+DEVELOPMENT = "dev"

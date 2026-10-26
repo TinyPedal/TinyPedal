@@ -1,3 +1,8 @@
+WIP
+-----------------------------
+* Pace notes playback
+  - Added "Enable Playback While Spectating" check box, which allows to enable or disable pace notes playback while "Spectate" mode enabled. This option is disabled by default.
+
 2.52.0 (2026-10-23)
 -----------------------------
 * Relative, Rivals, Standings Widget
