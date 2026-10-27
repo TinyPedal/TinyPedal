@@ -50,18 +50,23 @@ class Realtime(Overlay):
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
         self.class_range = min(max(int(self.wcfg["maximum_classes"]), 2), DATA.MAX_CLASSES)
         self.class_width = max(int(self.wcfg["class_width"]), 0)
+
         self.prefix_active = self.wcfg["prefix_active_count"]
         self.prefix_total = self.wcfg["prefix_total_count"]
         self.prefix_inactive = self.wcfg["prefix_inactive_count"]
 
+        self.suffix_active = self.wcfg["suffix_active_count"]
+        self.suffix_total = self.wcfg["suffix_total_count"]
+        self.suffix_inactive = self.wcfg["suffix_inactive_count"]
+
         # Class fields
         text_field = f"{'CLASS':<{self.class_width}.{self.class_width}}"
         if self.wcfg["show_active_count"]:
-            text_field += f"{self.prefix_active}00"
+            text_field += f"{self.prefix_active}00{self.suffix_active}"
         if self.wcfg["show_total_count"]:
-            text_field += f"{self.prefix_total}00"
+            text_field += f"{self.prefix_total}00{self.suffix_total}"
         if self.wcfg["show_inactive_count"]:
-            text_field += f"{self.prefix_inactive}00"
+            text_field += f"{self.prefix_inactive}00{self.suffix_inactive}"
         self.bars_field = self.set_rawtext(
             text=text_field,
             padding=bar_padx,
@@ -114,11 +119,11 @@ class Realtime(Overlay):
             text_class, target.bg = self.set_class_style(class_name)
             text_field = f"{text_class:<{self.class_width}.{self.class_width}}"
             if self.wcfg["show_active_count"]:
-                text_field += f"{self.prefix_active}{active:02d}"
+                text_field += f"{self.prefix_active}{active:02d}{self.suffix_active}"
             if self.wcfg["show_total_count"]:
-                text_field += f"{self.prefix_total}{total:02d}"
+                text_field += f"{self.prefix_total}{total:02d}{self.suffix_total}"
             if self.wcfg["show_inactive_count"]:
-                text_field += f"{self.prefix_inactive}{total - active:02d}"
+                text_field += f"{self.prefix_inactive}{total - active:02d}{self.suffix_inactive}"
             target.text = text_field
             target.update()
             target.setHidden(False)
