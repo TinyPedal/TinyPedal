@@ -77,6 +77,9 @@ class Realtime(Overlay):
                 target.hide()  # keep first field visible as placeholder
 
         # Last data
+        self.post_update()
+
+    def post_update(self):
         self.last_totals = None
         self.last_fields = ()
 
@@ -84,9 +87,10 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         veh_info = minfo.vehicles
         totals = (
+            # Force refresh when leader completes a lap
+            # in case any class overall position changed
+            veh_info.dataSet[veh_info.leaderIndex].totalLapCompleted,
             veh_info.totalVehicles,
-            veh_info.totalOutPits,
-            veh_info.totalInPits,
             veh_info.totalInGarage,
         )
         # Only recount if vehicle total changes

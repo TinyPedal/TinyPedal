@@ -281,10 +281,7 @@ def update_vehicle_data(
             # Update counter
             total_completed_laps += laps_completed
 
-            if data.inPit == 1:  # in pit (exclude garage)
-                total_in_pits += 1
-                total_stopped_pits += (speed < 0.1)
-            elif data.inPit == 0:  # out pit
+            if data.inPit == 0:  # out pit
                 total_out_pits += 1
                 total_pit_requests += data.pitRequested
                 # Nearest traffic time gap (opponents behind local players)
@@ -297,6 +294,9 @@ def update_vehicle_data(
                     nearest_time_behind = opt_time_behind
                     if under_blue and (not in_race or data.isLapped > 0):
                         nearest_blue_class = data.vehicleClass
+            elif data.inPit == 1:  # in pit (exclude garage)
+                total_in_pits += 1
+                total_stopped_pits += (speed < 0.1)
             else:  # in garage (or retired)
                 total_in_garage += 1
 
