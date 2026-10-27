@@ -23,6 +23,7 @@ Class fields Widget
 from itertools import islice
 
 from .. import minfo
+from ..constant import DATA
 from ..formatter import random_color_class
 from ._base import Overlay
 
@@ -47,7 +48,7 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        self.class_range = min(max(int(self.wcfg["maximum_classes"]), 2), 20)
+        self.class_range = min(max(int(self.wcfg["maximum_classes"]), 2), DATA.MAX_CLASSES)
         self.class_width = max(int(self.wcfg["class_width"]), 0)
         self.prefix_active = self.wcfg["prefix_active_count"]
         self.prefix_total = self.wcfg["prefix_total_count"]

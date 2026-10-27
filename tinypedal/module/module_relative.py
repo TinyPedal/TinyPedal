@@ -184,7 +184,7 @@ def get_vehicles_info(
 
         TEMP_CLASSES[index] = (
             class_name,  # 0 vehicle class name
-            place_overall,  # 1 overall position/place
+            place_overall,  # 1 overall position
             index,  # 2 player index
             laptime_personal_best,  # 3 best lap time
             laptime_personal_last,  # 4 last lap time (for fastest last lap check)
@@ -316,7 +316,7 @@ def calc_standings_index(
     return list(standings_index_from_place_reference(ref_place_list, class_index_list, veh_total))
 
 
-@lru_cache(maxsize=20)
+@lru_cache(maxsize=DATA.MAX_CLASSES)
 def create_reference_place(
     min_top_veh: int, veh_total: int, plr_place: int, veh_limit: int
 ) -> tuple[int, ...]:
@@ -390,5 +390,5 @@ def max_vehicles_in_class(max_cls_veh: int, min_top_veh: int, min_add_veh: int =
 
 
 def sort_class_collection(collection: list) -> float:
-    """Sort class collection by class best laptime"""
-    return collection[0][3]  # 3 class best laptime
+    """Sort class collection by overall position"""
+    return collection[0][1]  # 1 overall position

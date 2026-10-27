@@ -147,7 +147,7 @@ class SyncData:
         self._updating = False
         self._update_thread = None
         self._event = threading.Event()
-        self._tele_indexes = {_index: _index for _index in range(128)}
+        self._tele_indexes = {0: 0}
 
         self.paused = False
         self.synced = False

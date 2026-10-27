@@ -26,6 +26,7 @@ import random
 import re
 from functools import lru_cache
 
+from .constant import DATA
 from .regex_pattern import ABBR_PATTERN, rex_invalid_char
 
 
@@ -102,7 +103,7 @@ def random_color_class(name: str) -> str:
     return f"#{rgb[0]:02X}{rgb[1]:02X}{rgb[2]:02X}"
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=DATA.MAX_VEHICLES)
 def shorten_driver_name(name: str) -> str:
     """Shorten driver name"""
     name_split = name.strip(" ").split(" ")

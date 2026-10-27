@@ -176,13 +176,14 @@ class DATA:
 
     # Numeric
     FLOAT_INF = float("inf")
-    MAX_VEHICLES = 128  # set vehicle data size limit
-    MAX_SECONDS = 99999.0  # for lap or sector time limit
-    MAX_METERS = 999999.0  # for distance limit
-    MAX_LAPS = 2_147_483_647  # max laps
+    MAX_VEHICLES = 128  # max number of vehicles
+    MAX_CLASSES = 20  # max number of vehicle classes
+    MAX_SECONDS = 99999.0  # max lap time threshold
+    MAX_METERS = 999999.0  # max distance threshold
+    MAX_LAPS = 2_147_483_647  # max laps threshold
 
-    MAX_FORECASTS = 5  # for weather forecast
-    MAX_FORECAST_MINUTES = 9999.0  # for weather forecast
+    MAX_FORECASTS = 5  # max number of weather forecast slots
+    MAX_FORECAST_MINUTES = 9999.0  # max minutes of each weather forecast
     ABS_ZERO_CELSIUS = -273.15  # absolute zero celsius
 
     # Text
