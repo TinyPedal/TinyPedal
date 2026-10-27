@@ -752,15 +752,14 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         _option = self.wcfg  # reduce lookup in loop
 
-        player_idx = minfo.vehicles.playerIndex
         relative_list = relative_data(
             minfo.relative.relativeAhead,
             minfo.relative.relativeBehind,
-            player_idx,
+            minfo.vehicles.playerIndex,
             self.max_veh_front,
             self.max_veh_behind,
         )
-        plr_veh_info = minfo.vehicles.dataSet[player_idx]
+        plr_veh_info = minfo.vehicles.playerData
         in_race = api.read.session.in_race()
 
         # Relative update

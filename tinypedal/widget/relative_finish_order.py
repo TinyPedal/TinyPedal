@@ -209,7 +209,7 @@ class Realtime(Overlay):
         leader_lap_into = api.read.lap.progress(leader_index)
         player_lap_into = api.read.lap.progress()
 
-        leader_laptime_pace = minfo.vehicles.dataSet[leader_index].lapTimeHistory.average
+        leader_laptime_pace = minfo.vehicles.leaderData.lapTimeHistory.average
         player_laptime_pace = minfo.delta.lapTimePace
 
         leader_valid = 0 < leader_laptime_pace < DATA.MAX_SECONDS
@@ -228,10 +228,10 @@ class Realtime(Overlay):
             laps_diff = 0
 
         # Update last pit time slot
-        self.leader_pit_time_set[-1] = minfo.vehicles.dataSet[leader_index].pitTimer.elapsed
+        self.leader_pit_time_set[-1] = minfo.vehicles.leaderData.pitTimer.elapsed
         self.update_pit_time(self.bars_pit_leader[-1], self.leader_pit_time_set[-1])
 
-        self.player_pit_time_set[-1] = minfo.vehicles.dataSet[player_index].pitTimer.elapsed
+        self.player_pit_time_set[-1] = minfo.vehicles.playerData.pitTimer.elapsed
         self.update_pit_time(self.bars_pit_player[-1], self.player_pit_time_set[-1])
 
         # Get remaining fuel/energy & consumption

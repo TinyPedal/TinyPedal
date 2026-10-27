@@ -394,7 +394,7 @@ class Realtime(Overlay):
         abs_intercept_x = abs(intercept_x)
         if abs_intercept_x > self.coll_range_nearby:
             return
-        player_speed = minfo.vehicles.dataSet[minfo.vehicles.playerIndex].speed
+        player_speed = minfo.vehicles.playerData.speed
         relative_speed = veh_info.speed - player_speed
         min_speed = max(self.coll_min_speed, self.coll_add_speed * veh_info.relativeStraightDistance)
         if relative_speed > min_speed or veh_info.isYellow:

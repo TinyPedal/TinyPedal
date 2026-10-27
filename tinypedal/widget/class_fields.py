@@ -90,7 +90,7 @@ class Realtime(Overlay):
         totals = (
             # Force refresh when leader completes a lap
             # in case any class overall position changed
-            veh_info.dataSet[veh_info.leaderIndex].totalLapCompleted,
+            veh_info.leaderData.totalLapCompleted,
             veh_info.totalVehicles,
             veh_info.totalInGarage,
         )

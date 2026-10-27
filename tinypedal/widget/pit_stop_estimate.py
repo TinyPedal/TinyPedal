@@ -322,7 +322,7 @@ class Realtime(Overlay):
         min_pitstop_time = api.read.vehicle.pit_stop_time()
         abs_refill = api.read.engine.absolute_refill()
         pass_time = minfo.mapping.pitPassTime
-        pit_timer = minfo.vehicles.dataSet[minfo.vehicles.playerIndex].pitTimer.elapsed
+        pit_timer = minfo.vehicles.playerData.pitTimer.elapsed
         is_lengthy_stop = min_pitstop_time >= self.wcfg["lengthy_stop_duration_threshold"]
         padding = 0.00000001 * is_lengthy_stop
 

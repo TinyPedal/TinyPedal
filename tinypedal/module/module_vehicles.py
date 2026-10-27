@@ -175,10 +175,11 @@ def update_vehicle_data(
             data.overallAheadIndex = temp_index
 
         if data.isPlayer:
+            output.playerIndex = index
+            output.playerData = data
             data.elapsedTime = elapsed_time
             data.worldPositionX = plr_pos_x
             data.worldPositionY = plr_pos_y
-            output.playerIndex = index
             if data.isYellow:
                 nearest_yellow_ahead = 0.0
                 nearest_yellow_behind = 0.0
@@ -229,7 +230,7 @@ def update_vehicle_data(
             elif 0 < data.currentLapProgress < 1:  # helps avoid desync
                 data.totalLapProgress = data.totalLapCompleted + data.currentLapProgress
                 data.isLapped = calc.lap_difference(
-                    data.totalLapProgress, output.dataSet[output.playerIndex].totalLapProgress,
+                    data.totalLapProgress, output.playerData.totalLapProgress,
                     max_lap_diff_ahead, max_lap_diff_behind
                 ) if in_race else 0
 
@@ -312,7 +313,7 @@ def update_vehicle_data(
             # Save leader info
             if data.positionOverall == 1:
                 output.leaderIndex = index
-                output.leaderBestLapTime = data.bestLapTime
+                output.leaderData = data
 
     if update_low_priority:
         output.nearestTraffic = -nearest_time_behind
@@ -338,7 +339,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
     remaining_time = api.read.session.remaining()
     leader_index = output.leaderIndex
     player_index = output.playerIndex
-    leader_pace = output.dataSet[leader_index].lapTimeHistory.average
+    leader_pace = output.leaderData.lapTimeHistory.average
     player_pace = minfo.delta.lapTimePace
 
     # Time only
@@ -356,7 +357,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
             final_pit_time = 0.0
 
         # Leader time
-        if leader_index == player_index or output.dataSet[leader_index].isFinished:
+        if leader_index == player_index or output.leaderData.isFinished:
             leader_finish_offset = 0.0
             player_lap_offset = 0.0
         else:

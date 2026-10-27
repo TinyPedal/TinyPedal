@@ -722,8 +722,13 @@ class VehiclesInfo:
 
     dataSet: tuple[VehicleDataSet, ...] = df_tuple(VehicleDataSet, DATA.MAX_VEHICLES)
     dataSetVersion: int = -1
+    # Leader reference
     leaderIndex: int = 0
+    leaderData: VehicleDataSet = df_wrap(VehicleDataSet)
+    # Player reference
     playerIndex: int = -1
+    playerData: VehicleDataSet = df_wrap(VehicleDataSet)
+    # Counter
     totalOutPits: int = 0
     totalInPits: int = 0
     totalInGarage: int = 0
@@ -731,12 +736,13 @@ class VehiclesInfo:
     totalPitRequests: int = 0
     totalCompletedLaps: int = 0
     totalVehicles: int = 0
+    # Nearest
     nearestLine: float = DATA.MAX_METERS
     nearestTraffic: float = DATA.MAX_SECONDS
     nearestYellowAhead: float = DATA.MAX_METERS
     nearestYellowBehind: float = -DATA.MAX_METERS
     nearestBlueClass: str = ""
-    leaderBestLapTime: float = DATA.MAX_SECONDS
+    # Finish type
     finishTimeOffset: float = 0.0
     finishAsLap: bool = True
     finishLapOffset: float = 0.0

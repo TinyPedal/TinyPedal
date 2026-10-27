@@ -650,7 +650,7 @@ class Realtime(Overlay):
         _option = self.wcfg  # reduce lookup in loop
 
         in_race = api.read.session.in_race()
-        plr_veh_info = minfo.vehicles.dataSet[minfo.vehicles.playerIndex]
+        plr_veh_info = minfo.vehicles.playerData
         rivals_list = plr_veh_info.classAheadIndex, plr_veh_info.classBehindIndex
 
         # Standings update

@@ -224,7 +224,7 @@ class Realtime(Overlay):
 
         # Position change
         if self.wcfg["show_position_change"]:
-            veh_info = minfo.vehicles.dataSet[minfo.vehicles.playerIndex]
+            veh_info = minfo.vehicles.playerData
             if self.wcfg["show_position_change_in_class"]:
                 pos_diff = veh_info.qualifyInClass - veh_info.positionInClass
             else:

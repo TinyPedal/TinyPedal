@@ -849,8 +849,7 @@ class Realtime(Overlay):
 
         standings_list = minfo.relative.standings
         total_std_idx = len(standings_list) - 1  # skip final -1 index
-        player_idx = minfo.vehicles.playerIndex
-        plr_veh_info = minfo.vehicles.dataSet[player_idx]
+        plr_veh_info = minfo.vehicles.playerData
         in_race = api.read.session.in_race()
 
         # Standings update
@@ -909,7 +908,7 @@ class Realtime(Overlay):
                     if self.show_class_timegap:
                         time_gap = self.gap_to_leader_best(veh_info.positionInClass, veh_info.bestLapTime, veh_info.classBestLapTime)
                     else:
-                        time_gap = self.gap_to_leader_best(veh_info.positionOverall, veh_info.bestLapTime, minfo.vehicles.leaderBestLapTime)
+                        time_gap = self.gap_to_leader_best(veh_info.positionOverall, veh_info.bestLapTime, minfo.vehicles.leaderData.bestLapTime)
                 self.update_gap(self.bars_gap[idx], time_gap, hi_player, state)
             # Time interval
             if _option["show_time_interval"]:

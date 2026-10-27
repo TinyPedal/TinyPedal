@@ -175,7 +175,7 @@ class Realtime(Overlay):
             self.draw_pitout_prediction(
                 painter,
                 self.map_scaled,
-                minfo.vehicles.dataSet[minfo.vehicles.playerIndex],
+                minfo.vehicles.playerData,
             )
 
     def create_map_path(self, raw_coords, raw_sectors):
