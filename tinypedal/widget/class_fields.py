@@ -20,9 +20,10 @@
 Class fields Widget
 """
 
-from .. import api, minfo
+from itertools import islice
+
+from .. import minfo
 from ..formatter import random_color_class
-from ..validator import state_timer
 from ._base import Overlay
 
 
@@ -46,17 +47,20 @@ class Realtime(Overlay):
 
         # Config variable
         bar_padx = self.set_padding(self.wcfg["font_size"], self.wcfg["bar_padding"])
-        self.class_range = min(max(int(self.wcfg["maximum_classes"]), 1), 20)
-        self.class_width = max(int(self.wcfg["class_width"]), 1)
-        self.count_finished = self.wcfg["enable_finished_vehicles_as_active"]
-        self.show_inactive = self.wcfg["show_inactive_count"]
+        self.class_range = min(max(int(self.wcfg["maximum_classes"]), 2), 20)
+        self.class_width = max(int(self.wcfg["class_width"]), 0)
+        self.prefix_active = self.wcfg["prefix_active_count"]
+        self.prefix_total = self.wcfg["prefix_total_count"]
         self.prefix_inactive = self.wcfg["prefix_inactive_count"]
-        self.gen_refresh_timer = state_timer(max(self.wcfg["refresh_interval"], 1))
 
         # Class fields
-        text_field = f"{'':<{self.class_width}} 00/00"
-        if self.show_inactive:
-            text_field += f" {self.prefix_inactive}00"
+        text_field = f"{'CLASS':<{self.class_width}.{self.class_width}}"
+        if self.wcfg["show_active_count"]:
+            text_field += f"{self.prefix_active}00"
+        if self.wcfg["show_total_count"]:
+            text_field += f"{self.prefix_total}00"
+        if self.wcfg["show_inactive_count"]:
+            text_field += f"{self.prefix_inactive}00"
         self.bars_field = self.set_rawtext(
             text=text_field,
             padding=bar_padx,
@@ -69,19 +73,25 @@ class Realtime(Overlay):
         )
         for idx, target in enumerate(self.bars_field):
             self.set_primary_orient(target=target, column=idx)
-            target.setHidden(idx > 0)  # keep first field visible as placeholder
+            if idx > 0:
+                target.hide()  # keep first field visible as placeholder
 
         # Last data
-        self.last_trigger = None
+        self.last_totals = None
         self.last_fields = ()
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
         veh_info = minfo.vehicles
-        # Only recount if vehicle total or garage state changes, or on refresh timer
-        trigger = (veh_info.totalVehicles, veh_info.totalOutPits + veh_info.totalInPits)
-        if next(self.gen_refresh_timer) or self.last_trigger != trigger:
-            self.last_trigger = trigger
+        totals = (
+            veh_info.totalVehicles,
+            veh_info.totalOutPits,
+            veh_info.totalInPits,
+            veh_info.totalInGarage,
+        )
+        # Only recount if vehicle total changes
+        if self.last_totals != totals:
+            self.last_totals = totals
             fields = self.count_class_fields(veh_info)
             if self.last_fields != fields:
                 self.last_fields = fields
@@ -97,9 +107,13 @@ class Realtime(Overlay):
                 continue
             class_name, active, total = fields[idx]
             text_class, target.bg = self.set_class_style(class_name)
-            text_field = f"{text_class[:self.class_width]:<{self.class_width}} {active:02d}/{total:02d}"
-            if self.show_inactive:
-                text_field += f" {self.prefix_inactive}{total - active:<2}"
+            text_field = f"{text_class:<{self.class_width}.{self.class_width}}"
+            if self.wcfg["show_active_count"]:
+                text_field += f"{self.prefix_active}{active:02d}"
+            if self.wcfg["show_total_count"]:
+                text_field += f"{self.prefix_total}{total:02d}"
+            if self.wcfg["show_inactive_count"]:
+                text_field += f"{self.prefix_inactive}{total - active:02d}"
             target.text = text_field
             target.update()
             target.setHidden(False)
@@ -112,19 +126,16 @@ class Realtime(Overlay):
             Tuple of (class name, active vehicles, total vehicles).
         """
         class_data = {}  # class name: [best position, active, total]
-        for index, data in zip(range(veh_info.totalVehicles), veh_info.dataSet):
-            finish_state = api.read.vehicle.finish_state(index)
-            is_active = (
-                data.inPit != 2  # not in garage
-                and finish_state < 2  # not DNF or DQ
-                and (self.count_finished or finish_state != 1)
-            )
-            field = class_data.get(data.vehicleClass)
+        for data in islice(veh_info.dataSet, veh_info.totalVehicles):
+            class_name = data.vehicleClass
+            position_overall = data.positionOverall
+            is_active = data.inPit != 2  # not in garage (DNF or DQ will end up in garage)
+            field = class_data.get(class_name)
             if field is None:
-                class_data[data.vehicleClass] = [data.positionOverall, is_active, 1]
+                class_data[class_name] = [position_overall, is_active, 1]
             else:
-                if field[0] > data.positionOverall:
-                    field[0] = data.positionOverall
+                if field[0] > position_overall:
+                    field[0] = position_overall
                 field[1] += is_active
                 field[2] += 1
 

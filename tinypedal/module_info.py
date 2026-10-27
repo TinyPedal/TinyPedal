@@ -726,6 +726,7 @@ class VehiclesInfo:
     playerIndex: int = -1
     totalOutPits: int = 0
     totalInPits: int = 0
+    totalInGarage: int = 0
     totalStoppedPits: int = 0
     totalPitRequests: int = 0
     totalCompletedLaps: int = 0

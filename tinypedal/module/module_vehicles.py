@@ -131,6 +131,7 @@ def update_vehicle_data(
     total_completed_laps = 0
     total_out_pits = 0
     total_in_pits = 0
+    total_in_garage = 0
     total_stopped_pits = 0
     total_pit_requests = 0
 
@@ -296,6 +297,8 @@ def update_vehicle_data(
                     nearest_time_behind = opt_time_behind
                     if under_blue and (not in_race or data.isLapped > 0):
                         nearest_blue_class = data.vehicleClass
+            else:  # in garage (or retired)
+                total_in_garage += 1
 
             # Nearest yellow flag distance
             if data.isYellow:
@@ -319,6 +322,7 @@ def update_vehicle_data(
 
         output.totalOutPits = total_out_pits
         output.totalInPits = total_in_pits
+        output.totalInGarage = total_in_garage
         output.totalStoppedPits = total_stopped_pits
         output.totalPitRequests = total_pit_requests
         output.totalCompletedLaps = total_completed_laps
