@@ -501,7 +501,7 @@ class Overlay(Base):
         for column, target in enum_target:
             layout.addWidget(target, row, column)
             if hide_start <= column:
-                target.clear()
+                target.hide()
 
     @staticmethod
     def set_grid_layout_table_column(
@@ -520,7 +520,7 @@ class Overlay(Base):
         for row, target in enum_target:
             layout.addWidget(target, row, column)
             if hide_start <= row:
-                target.clear()
+                target.hide()
 
     def set_grid_layout_table_caption(
         self,
