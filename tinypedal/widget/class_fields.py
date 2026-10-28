@@ -80,7 +80,7 @@ class Realtime(Overlay):
         for idx, target in enumerate(self.bars_field):
             self.set_primary_orient(target=target, column=idx)
             if idx > 0:
-                target.hide()  # keep first field visible as placeholder
+                target.clear()  # keep first field visible as placeholder
 
         # Last data
         self.post_update()

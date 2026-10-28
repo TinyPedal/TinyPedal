@@ -574,7 +574,7 @@ Set memory map file name prefix for accessing RF2 API via alternative plugin ver
 
 This option is provided for compatibility purpose, which may be used with alternative RF2 SharedMemory Plugin, such as [RF2.3.8.SharedMemoryMapPlugin.dll](https://github.com/TonyWhitley/rF2SharedMemoryMapPlugin/releases) that used by CrewChief.
 
-Note, to use with `RF2.3.8.SharedMemoryMapPlugin.dll`, set prefix value to `$rF2.3.8.`. Remember to update prefix value (with matching version value) if a new version of the plugin DLL file installed in game.
+Note, to use with `RF2.3.8.SharedMemoryMapPlugin.dll`, set prefix value to `rF2.3.8.`. Remember to update prefix value (with matching version value) if a new version of the plugin DLL file installed in game.
 
     process_id
 Set process ID string for accessing API from server. This option is for server use only.
