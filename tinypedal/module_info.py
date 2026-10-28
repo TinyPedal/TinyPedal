@@ -35,6 +35,7 @@ class ConsumptionData(NamedTuple):
     """Consumption history data"""
 
     lapNumber: int = 0
+    stintLapNumber: int = 0
     isValidLap: int = 0
     lapTimeLast: float = 0.0
     lastLapUsedFuel: float = 0.0

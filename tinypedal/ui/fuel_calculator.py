@@ -49,7 +49,7 @@ from PySide2.QtWidgets import (
 
 from .. import api, cfg, minfo, units
 from .. import calculation as calc
-from ..constant import CONFIG, FILE
+from ..constant import CONFIG, DATA, FILE
 from ..formatter import laptime_string_to_seconds
 from ..module_info import ConsumptionData
 from ..userfile.consumption_history import load_consumption_history_file
@@ -236,7 +236,7 @@ class PitStopPreview(QWidget):
         frame = QFrame(self)
         frame.setFrameShape(QFrame.StyledPanel)
 
-        self.label_laps = QLabel("-")
+        self.label_laps = QLabel(DATA.TEXT_PLACEHOLDER)
         self.label_laps.setAlignment(Qt.AlignCenter)
 
         layout = QVBoxLayout()
@@ -251,7 +251,7 @@ class PitStopPreview(QWidget):
         self.floor_total_laps = int(total_laps)
         self.floor_stint_runlaps = int(stint_runlaps)
         self.floor_start_runlaps = int(start_runlaps) if start_runlaps > 0 else self.floor_stint_runlaps
-        self.label_laps.setText(str(self.floor_total_laps) if self.floor_total_laps else "-")
+        self.label_laps.setText(str(self.floor_total_laps) if self.floor_total_laps else DATA.TEXT_PLACEHOLDER)
         self.update()
 
     def paintEvent(self, event):
@@ -310,6 +310,7 @@ class HistoryPanel(QWidget):
 
         headers = (
             "Lap",
+            "Stint",
             "Time",
             f"Fuel({self.symbol_fuel})",
             "Energy(%)",
@@ -325,9 +326,14 @@ class HistoryPanel(QWidget):
         self.table_history.setColumnCount(len(headers))
         self.table_history.verticalHeader().setVisible(False)
         self.table_history.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Laps column
         self.table_history.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
         self.table_history.setColumnWidth(0, UIScaler.size(3))
-        self.table_history.setFixedWidth(UIScaler.size(3 + 5 * (len(headers) - 1)))
+        # Stint laps column
+        self.table_history.horizontalHeader().setSectionResizeMode(1, QHeaderView.Fixed)
+        self.table_history.setColumnWidth(1, UIScaler.size(3))
+        # Other columns
+        self.table_history.setFixedWidth(UIScaler.size(3 + 3 + 5 * (len(headers) - 1)))
         self.table_history.setHorizontalHeaderLabels(headers)
 
         self.table_history.horizontalHeader().setContextMenuPolicy(Qt.CustomContextMenu)
@@ -342,12 +348,13 @@ class HistoryPanel(QWidget):
     def toggle_column(self):
         """Toggle column visibility"""
         config = cfg.user.config["fuel_calculator"]
-        self.table_history.setColumnHidden(4, not config["show_column_fuel_ratio"])
-        self.table_history.setColumnHidden(5, not config["show_column_battery_drain"])
-        self.table_history.setColumnHidden(6, not config["show_column_battery_regen"])
-        self.table_history.setColumnHidden(7, not config["show_column_battery_net_change"])
-        self.table_history.setColumnHidden(8, not config["show_column_tyre_wear"])
-        self.table_history.setColumnHidden(9, not config["show_column_tank_capacity"])
+        self.table_history.setColumnHidden(1, not config["show_column_stint_laps"])
+        self.table_history.setColumnHidden(5, not config["show_column_fuel_ratio"])
+        self.table_history.setColumnHidden(6, not config["show_column_battery_drain"])
+        self.table_history.setColumnHidden(7, not config["show_column_battery_regen"])
+        self.table_history.setColumnHidden(8, not config["show_column_battery_net_change"])
+        self.table_history.setColumnHidden(9, not config["show_column_tyre_wear"])
+        self.table_history.setColumnHidden(10, not config["show_column_tank_capacity"])
 
         base_column_count = self.table_history.columnCount() - 1
         hidden_column_count = 0
@@ -368,7 +375,8 @@ class HistoryPanel(QWidget):
             self.table_history.insertRow(row_index)
             for column_index, item in enumerate(
                 (
-                    ("lap", f"{lap_data.lapNumber}", flag_unselectable),
+                    ("lap", f"{lap_data.lapNumber}" if lap_data.lapNumber > 0 else DATA.TEXT_PLACEHOLDER, flag_unselectable),
+                    ("stint", f"{lap_data.stintLapNumber}" if lap_data.stintLapNumber > 0 else DATA.TEXT_PLACEHOLDER, flag_unselectable),
                     ("time", calc.sec2laptime_full(lap_data.lapTimeLast), flag_selectable, highlight_color),
                     ("fuel", f"{self.unit_fuel(lap_data.lastLapUsedFuel):.3f}", flag_selectable, highlight_color),
                     ("energy", f"{lap_data.lastLapUsedEnergy:.3f}", flag_selectable, highlight_color),

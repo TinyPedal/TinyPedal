@@ -124,13 +124,14 @@ def record_consumption_history(output: HistoryInfo, filepath: str):
 
         # Update consumption history
         lap_number = api.read.lap.completed()
-        if (
+        if lap_number > 0 and (
             output.consumptionDataSet[0].lapTimeLast != minfo.delta.lapTimeLast
             or output.consumptionDataSet[0].lapNumber != lap_number
         ):
             output.consumptionDataSet.appendleft(
                 ConsumptionData(
                     lapNumber=lap_number,
+                    stintLapNumber=minfo.history.stintDataCurrent.totalLaps,
                     isValidLap=int(minfo.delta.isValidLap),
                     lapTimeLast=minfo.delta.lapTimeLast,
                     lastLapUsedFuel=minfo.fuel.lastLapConsumption,
@@ -276,7 +277,7 @@ def record_stint_history(
             is_pit_lap = in_pits
 
         # Current stint data
-        stint_data.totalLaps = lap_number - start_laps
+        stint_data.totalLaps = max(lap_number - start_laps, 0)
         stint_data.totalTime = elapsed_time - start_time
         stint_data.totalFuel = start_fuel - fuel_curr
         stint_data.totalEnergy = start_energy - energy_curr

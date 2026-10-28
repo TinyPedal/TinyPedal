@@ -56,10 +56,11 @@ class Realtime(Overlay):
 
         # Laps
         if self.wcfg["show_laps"]:
+            self.width_laps = min(max(int(self.wcfg["laps_width"]), 1), 4)
             self.bars_laps = self.set_rawtext(
-                text="---",
+                text=DATA.TEXT_PLACEHOLDER * self.width_laps,
                 padding=bar_padx,
-                width=font_m.width * 3,
+                width=font_m.width * self.width_laps,
                 fixed_height=font_m.height,
                 offset_y=font_m.voffset,
                 fg_color=self.wcfg["font_color_last_laps"],
@@ -73,6 +74,29 @@ class Realtime(Overlay):
                 targets=self.bars_laps,
                 row_start=1,
                 column=self.wcfg["display_order_laps"],
+                bottom_to_top=layout_reversed,
+            )
+
+        # Stint laps
+        if self.wcfg["show_stint_laps"]:
+            self.width_stint_laps = min(max(int(self.wcfg["stint_laps_width"]), 1), 4)
+            self.bars_stint_laps = self.set_rawtext(
+                text=DATA.TEXT_PLACEHOLDER * self.width_stint_laps,
+                padding=bar_padx,
+                width=font_m.width * self.width_stint_laps,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_stint_last_laps"],
+                bg_color=self.wcfg["background_color_stint_last_laps"],
+                count=self.history_slot + 1,
+            )
+            self.bars_stint_laps[0].fg = self.wcfg["font_color_stint_laps"]
+            self.bars_stint_laps[0].bg = self.wcfg["background_color_stint_laps"]
+            self.set_grid_layout_table_column(
+                layout=layout,
+                targets=self.bars_stint_laps,
+                row_start=1,
+                column=self.wcfg["display_order_stint_laps"],
                 bottom_to_top=layout_reversed,
             )
 
@@ -248,6 +272,8 @@ class Realtime(Overlay):
         # Current laps data
         if self.wcfg["show_laps"]:
             self.update_laps(self.bars_laps[0], api.read.lap.completed() + 1)
+        if self.wcfg["show_stint_laps"]:
+            self.update_stint_laps(self.bars_stint_laps[0], minfo.history.stintDataCurrent.totalLaps + 1)
         if self.wcfg["show_time"]:
             self.update_time(self.bars_time[0], minfo.delta.lapTimeEstimated)
         if self.wcfg["show_delta"]:
@@ -281,7 +307,14 @@ class Realtime(Overlay):
         """Laps data"""
         if target.last != data:
             target.last = data
-            target.text = f"{data:03.0f}"
+            target.text = f"{data:0{self.width_laps}.0f}"[-self.width_laps:]
+            target.update()
+
+    def update_stint_laps(self, target, data):
+        """Stint laps data"""
+        if target.last != data:
+            target.last = data
+            target.text = f"{data:0{self.width_stint_laps}.0f}"[-self.width_stint_laps:]
             target.update()
 
     def update_time(self, target, data):
@@ -347,6 +380,10 @@ class Realtime(Overlay):
             if self.wcfg["show_laps"]:
                 self.update_laps(self.bars_laps[index], data.lapNumber)
                 self.bars_laps[index].setHidden(hidden)
+
+            if self.wcfg["show_stint_laps"]:
+                self.update_stint_laps(self.bars_stint_laps[index], data.stintLapNumber)
+                self.bars_stint_laps[index].setHidden(hidden)
 
             if self.wcfg["show_time"]:
                 invalid = (2 - data.isValidLap) if (data.lapTimeLast > 0) else 1

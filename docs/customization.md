@@ -3040,6 +3040,17 @@ Show empty lap time history. Default is `false`, which hides empty rows.
     show_laps
 Show lap number.
 
+    laps_width
+Set maximum display width for lap number. Value range in `1` to `4`. Default is `3`.
+
+This option can be used to limit column display width by stripping off unnecessary leading zeros. For example, if you know a race would never exceed `99` total laps, then you could set width to `2`. But if a race could exceed `100` total laps, then you should set width to `3` to avoid stripping off number from hundred place.
+
+    show_stint_laps
+Show stint lap number.
+
+    stint_laps_width
+Set maximum display width for stint lap number. Value range in `1` to `4`. Default is `2`.
+
     show_time
 Show lap time.
 

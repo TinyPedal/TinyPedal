@@ -96,6 +96,7 @@ GLOBAL_DEFAULT = {
     },
     "fuel_calculator": {
         "show_consumption_history": True,
+        "show_column_stint_laps": True,
         "show_column_fuel_ratio": True,
         "show_column_battery_drain": True,
         "show_column_battery_regen": True,

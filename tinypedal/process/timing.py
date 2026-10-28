@@ -108,12 +108,12 @@ class LastLapTime:
 
     def __init__(self):
         self.last = 0.0
-        self.timestamp = 0.0
+        self.timestamp = -1.0
 
     def update(self, timestamp: float) -> float:
         """Update unverified lap time based on lap start time"""
         if self.timestamp != timestamp:
-            if 0 < self.timestamp < timestamp:
+            if 0 <= self.timestamp < timestamp:
                 self.last = timestamp - self.timestamp
             else:
                 self.last = 0.0
