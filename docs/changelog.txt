@@ -1,5 +1,14 @@
 WIP
 -----------------------------
+* Overlay
+  - Added "Combined Mode" option in "Overlay" menu, which sets overlay display mode. This option is disabled by default.
+    While "Combined Mode" disabled, each Widget will be displayed in separate window. This is the default setting.
+    While "Combined Mode" enabled, all Widgets will be combined and drawn in one single maximized window, which may improve performance and compatibility when using "OpenKneeboard" in "VR", and easier to project overlay window.
+  - Known issues when enabled "Combined Mode":
+    - Some widgets may show visual artifacts when moved and displayed on top of other widgets, such as Navigation and Radar Widget (try not to overlap widgets).
+    - With multi-screen, all widgets will only be displayed on one of the screens.
+    - Individual widget's "opacity" option doesn't work. To workaround this issue, a new "overlay_combined_mode_opacity" option is added to "Compatibility" config dialog, which allows to set overall overlay opacity.
+
 * Lap time history
   - Added "show_stint_laps" option (requested by user "lucamilan87"), which shows stint lap number.
   - Added "laps_width", "stint_laps_width" options, which set max display width for lap number.

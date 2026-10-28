@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from .hotkey_control import HotkeyControl
     from .module_control import ModuleControl
     from .module_info import ModuleInfo
+    from .overlay_container import OverlayContainer
     from .overlay_control import OverlayControl
     from .state import ApplicationSignal, OverlaySignal, RealtimeState
     from .update import UpdateChecker
@@ -60,6 +61,7 @@ wctrl: ModuleControl = None  # type: ignore
 kctrl: HotkeyControl = None  # type: ignore
 octrl: OverlayControl = None  # type: ignore
 updater: UpdateChecker = None  # type: ignore
+container: OverlayContainer = None  # type: ignore
 
 
 # Public function
@@ -229,6 +231,13 @@ def _init_app():
     cfg.set_next_to_load()
     cfg.load_user()
     cfg.save()
+
+    # Enable overlay combined mode
+    if cfg.overlay["combined_mode"]:
+        global container
+        from .overlay_container import OverlayContainer
+        container = OverlayContainer()
+    logger.info("Overlay combined mode: %s", "Enabled" if cfg.overlay["combined_mode"] else "Disabled")
 
     # Start api
     api.connect()

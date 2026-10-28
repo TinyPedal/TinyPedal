@@ -45,17 +45,22 @@ class Base(QWidget):
     """Base window"""
 
     def __init__(self, config: Configuration, widget_name: str):
-        super().__init__()
-        self.widget_name = widget_name
+        # Set parent if "combined_mode" option enabled (None if not)
+        from .. import container
+
+        super().__init__(container)
 
         # Base config
+        self.widget_name = widget_name
         self.cfg = config
+        self._combined_mode = self.cfg.overlay["combined_mode"]  # store state
 
         # Widget config
         self.wcfg = validate_option(self.cfg.user.setting[widget_name])
 
         # Base setting
-        self.setWindowTitle(f"{APP.TINYPEDAL} - {widget_name.capitalize()}")
+        if not self._combined_mode:
+            self.setWindowTitle(f"{APP.TINYPEDAL} - {widget_name.capitalize()}")
         self.move(self.wcfg["position_x"], self.wcfg["position_y"])
 
         # Set update timer
@@ -68,8 +73,11 @@ class Base(QWidget):
     def start(self):
         """Set initial widget state in orders, and start update"""
         self.__connect_signal()
-        self.__set_window_attributes()  # 1
-        self.__set_window_flags()  # 2
+        if self._combined_mode:
+            self.show()
+        else:
+            self.__set_window_attributes()  # 1
+            self.__set_window_flags()  # 2
         self.__toggle_timer(not realtime_state.active)
 
     def stop(self):
@@ -157,17 +165,19 @@ class Base(QWidget):
 
     def __connect_signal(self):
         """Connect overlay lock and hide signal"""
-        overlay_signal.locked.connect(self.__toggle_lock)
-        overlay_signal.hidden.connect(self.setHidden)
         overlay_signal.paused.connect(self.__toggle_timer)
-        overlay_signal.iconify.connect(self.__toggle_vr_compat)
+        if not self._combined_mode:
+            overlay_signal.locked.connect(self.__toggle_lock)
+            overlay_signal.hidden.connect(self.setHidden)
+            overlay_signal.iconify.connect(self.__toggle_vr_compat)
 
     def __break_signal(self):
         """Disconnect overlay lock and hide signal"""
-        overlay_signal.locked.disconnect(self.__toggle_lock)
-        overlay_signal.hidden.disconnect(self.setHidden)
         overlay_signal.paused.disconnect(self.__toggle_timer)
-        overlay_signal.iconify.disconnect(self.__toggle_vr_compat)
+        if not self._combined_mode:
+            overlay_signal.locked.disconnect(self.__toggle_lock)
+            overlay_signal.hidden.disconnect(self.setHidden)
+            overlay_signal.iconify.disconnect(self.__toggle_vr_compat)
 
     def mouseMoveEvent(self, event):
         """Update widget position"""

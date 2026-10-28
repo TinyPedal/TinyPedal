@@ -806,6 +806,9 @@ Set `true` to enable main application window position correction, which is used 
     enable_x11_platform_plugin_override
 Set Qt platform plugin type to `X11` via environment variable on Linux. This option may help work around some issues with overlay dragging and position on `Wayland`. This option requires restarting TinyPedal to take effect. This option is enabled by default on Linux.
 
+    overlay_combined_mode_opacity
+Set overall overlay opacity, only used when overlay `Combined Mode` is enabled.
+
     background_color_global
 Sets global background color for all widgets.
 
@@ -897,6 +900,19 @@ Enable grid-snap effect while moving widget for easy alignment and repositioning
 Enable widget visibility as windows on taskbar in order to be used in VR via APPs such as `OpenKneeboard`. Non-VR user should not enable this option.
 
 Note, you will still need a third party program (such as `OpenKneeboard`) to project overlay windows (widgets) into VR.
+
+    combined_mode
+Enable overlay combined mode for displaying widgets. This option is disabled by default.
+
+While `Combined Mode` disabled, each Widget will be displayed in separate window. This is the default setting.
+
+While `Combined Mode` enabled, all Widgets will be combined and drawn in one single maximized window. This may improve performance and compatibility when using `OpenKneeboard` in `VR`, and easier to project overlay window.
+
+**Known issues when enabled Combined Mode:**
+
+* Some widgets may show visual artifacts when moved and displayed on top of other widgets, such as Navigation and Radar Widget (try not to overlap widgets).
+* With multi-screen, all widgets will only be displayed on one of the screens.
+* Individual widget's "opacity" option doesn't work. To workaround this issue, a new "overlay_combined_mode_opacity" option is added to "Compatibility" config dialog, which allows to set overall overlay opacity.
 
 [**`Back to Top`**](#)
 

@@ -33,6 +33,7 @@ COMMON_DEFAULT = {
         "auto_hide": True,
         "enable_grid_move": False,
         "vr_compatibility": False,
+        "combined_mode": False,
     },
     "units": {
         "distance_unit": "Meter",

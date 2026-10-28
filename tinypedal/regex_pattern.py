@@ -50,6 +50,7 @@ CFG_BOOL = (
     "^active_state$|"
     "^auto_hide$|"
     "^check_for_updates_on_startup$|"
+    "^combined_mode$|"
     "^fixed_position$|"
     "^global$|"
     "^minimize_to_tray$|"
