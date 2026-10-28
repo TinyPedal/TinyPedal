@@ -17,6 +17,12 @@ WIP
 * Pace notes playback
   - Added "Enable Playback While Spectating" check box, which allows to enable or disable pace notes playback while "Spectate" mode enabled. This option is disabled by default.
 
+* RF2 API
+  - Added "memory_map_prefix" option, which sets memory map file name prefix for accessing RF2 API via alternative plugin version. Make sure to leave this option as blank if you are using the original "rFactor2SharedMemoryMapPlugin64.dll" Plugin.
+    This option is provided for compatibility purpose, which may be used with alternative RF2 SharedMemory Plugin, such as [RF2.3.8.SharedMemoryMapPlugin.dll](https://github.com/TonyWhitley/rF2SharedMemoryMapPlugin/releases) that used by CrewChief.
+    Note, to use with "RF2.3.8.SharedMemoryMapPlugin.dll", set prefix value to "$rF2.3.8.". Remember to update prefix value (with matching version value) if a new version of the plugin DLL file installed in game.
+  - Fixed an issue that caused RF2 API not working on Linux.
+
 2.52.0 (2026-10-23)
 -----------------------------
 * Relative, Rivals, Standings Widget

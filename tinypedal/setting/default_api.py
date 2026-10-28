@@ -61,6 +61,7 @@ API_DEFAULT = {
     },
     API.CONFIG_RF2: {
         "access_mode": 0,
+        "memory_map_prefix": "",
         "process_id": "",
         "character_encoding": "UTF-8",
         "enable_active_state_override": False,

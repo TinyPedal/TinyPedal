@@ -569,6 +569,13 @@ Enable access to `weather` data from Rest API. This is required for showing weat
     access_mode
 Set access mode for API. Mode value `0` uses copy access and additional data check to avoid data desynchronized or interruption issues. Mode value `1` uses direct access, which may result data desynchronized or interruption issues. Default mode is copy access.
 
+    memory_map_prefix
+Set memory map file name prefix for accessing RF2 API via alternative plugin version. Make sure to leave this option as blank if you are using the original `rFactor2SharedMemoryMapPlugin64.dll` Plugin.
+
+This option is provided for compatibility purpose, which may be used with alternative RF2 SharedMemory Plugin, such as [RF2.3.8.SharedMemoryMapPlugin.dll](https://github.com/TonyWhitley/rF2SharedMemoryMapPlugin/releases) that used by CrewChief.
+
+Note, to use with `RF2.3.8.SharedMemoryMapPlugin.dll`, set prefix value to `$rF2.3.8.`. Remember to update prefix value (with matching version value) if a new version of the plugin DLL file installed in game.
+
     process_id
 Set process ID string for accessing API from server. This option is for server use only.
 

@@ -89,6 +89,7 @@ class MMapDataSet:
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
+            mmap_prefix: mmap name prefix to be appended to base name; always point to 'Local\\' on windows.
         """
         self.phys.create(access_mode, mmap_prefix)
         self.ghfx.create(access_mode, mmap_prefix)
@@ -161,6 +162,7 @@ class SyncData:
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
+            mmap_prefix: mmap name prefix to be appended to base name; always point to 'Local\\' on windows.
         """
         if self._updating:
             logger.warning("sharedmemory: UPDATING: already started")
@@ -177,7 +179,6 @@ class SyncData:
             self._update_thread.start()
             logger.info("sharedmemory: UPDATING: thread started")
             logger.info("sharedmemory: player index override: %s", self.override_player_index)
-            logger.info("sharedmemory: memory map prefix: %s", f"'{mmap_prefix}'")
 
     def stop(self) -> None:
         """Join and stop updating thread, close mmap"""

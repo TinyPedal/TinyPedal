@@ -100,18 +100,19 @@ class MMapDataSet:
     def __del__(self):
         logger.info("sharedmemory: GC: MMapDataSet")
 
-    def create_mmap(self, access_mode: int, server_pid: str) -> None:
+    def create_mmap(self, access_mode: int, mmap_prefix: str, server_pid: str) -> None:
         """Create mmap instance
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
+            mmap_prefix: mmap name prefix to be appended to base name.
             server_pid: rF2 Process ID for accessing server data.
         """
-        self.scor.create(access_mode, server_pid)
-        self.tele.create(access_mode, server_pid)
-        self.ext.create(1, server_pid)
-        self.ffb.create(1, server_pid)
-        self.rule.create(1, server_pid)
+        self.scor.create(access_mode, mmap_prefix, server_pid)
+        self.tele.create(access_mode, mmap_prefix, server_pid)
+        self.ext.create(1, mmap_prefix, server_pid)
+        self.ffb.create(1, mmap_prefix, server_pid)
+        self.rule.create(1, mmap_prefix, server_pid)
 
     def close_mmap(self) -> None:
         """Close mmap instance"""
@@ -234,11 +235,12 @@ class SyncData:
         return self._tele_indexes.get(
             self.dataset.scor.data.mVehicles[scor_idx].mID, INVALID_INDEX)
 
-    def start(self, access_mode: int, server_pid: str) -> None:
+    def start(self, access_mode: int, mmap_prefix: str, server_pid: str) -> None:
         """Update & sync mmap data copy in separate thread
 
         Args:
             access_mode: 0 = copy access, 1 = direct access.
+            mmap_prefix: mmap name prefix to be appended to base name.
             server_pid: rF2 Process ID for accessing server data.
         """
         if self._updating:
@@ -246,7 +248,7 @@ class SyncData:
         else:
             self._updating = True
             # Initialize mmap data
-            self.dataset.create_mmap(access_mode, server_pid)
+            self.dataset.create_mmap(access_mode, mmap_prefix, server_pid)
             self.__update_tele_indexes(
                 self.dataset.tele.data.mNumVehicles,
                 self.dataset.tele.data,
@@ -364,6 +366,7 @@ class RF2Info:
     __slots__ = (
         "_sync",
         "_access_mode",
+        "_mmap_prefix",
         "_server_pid",
         "_state_override",
         "_active_state",
@@ -378,6 +381,7 @@ class RF2Info:
     def __init__(self) -> None:
         self._sync = SyncData()
         self._access_mode = 0
+        self._mmap_prefix = ""
         self._server_pid = ""
         self._state_override = False
         self._active_state = False
@@ -394,11 +398,15 @@ class RF2Info:
 
     def start(self) -> None:
         """Start data updating thread"""
-        self._sync.start(self._access_mode, self._server_pid)
+        self._sync.start(self._access_mode, self._mmap_prefix, self._server_pid)
 
     def stop(self) -> None:
         """Stop data updating thread"""
         self._sync.stop()
+
+    def setPrefix(self, prefix: str = "") -> None:
+        """Set RF2 mmap file name prefix, leave blank to use default 'rFactor2' prefix"""
+        self._mmap_prefix = prefix
 
     def setPID(self, pid: str = "") -> None:
         """Set rF2 process ID for connecting to server data"""
