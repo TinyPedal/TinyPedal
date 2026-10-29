@@ -400,6 +400,7 @@ class ConfigMenu(QMenu):
             default_setting=cfg.default.config,
             reload_func=menu_reload_preset,
             option_width=22,
+            fixed_column=False,
         )
         _dialog.open()
 
