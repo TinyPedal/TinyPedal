@@ -43,6 +43,14 @@ class OverlayContainer(QWidget):
         self.__set_window_attributes()  # 1
         self.__set_window_flags()  # 2
 
+        # "showMaximized" doesn't fill whole screen
+        # Use fixed size to set to screen size instead
+        self.setFixedSize(self.screen().size())
+        self.move(0, 0)  # may not work on Linux? normally should end up at 0,0
+
+        # Check hide state
+        self.setHidden(cfg.overlay["auto_hide"] and not realtime_state.active)
+
     def __set_window_attributes(self):
         """Set window attributes"""
         self.__set_opacity()
@@ -65,15 +73,6 @@ class OverlayContainer(QWidget):
         self.setWindowOpacity(cfg.compatibility["overlay_combined_mode_opacity"])
 
     @Slot(bool)  # type: ignore[operator]
-    def __toggle_hide(self, hidden: bool):
-        """Toggle widget hide state"""
-        if hidden:
-            self.setHidden(hidden)
-        else:
-            self.show()
-            self.showMaximized()
-
-    @Slot(bool)  # type: ignore[operator]
     def __toggle_lock(self, locked: bool):
         """Toggle widget lock state"""
         self.setWindowFlag(Qt.WindowTransparentForInput, locked)
@@ -90,6 +89,6 @@ class OverlayContainer(QWidget):
     def __connect_signal(self):
         """Connect overlay lock and hide signal"""
         overlay_signal.locked.connect(self.__toggle_lock)
-        overlay_signal.hidden.connect(self.__toggle_hide)
+        overlay_signal.hidden.connect(self.setHidden)
         overlay_signal.iconify.connect(self.__toggle_vr_compat)
         app_signal.reload.connect(self.__set_opacity)
