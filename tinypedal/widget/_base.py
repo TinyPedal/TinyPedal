@@ -631,6 +631,8 @@ class Overlay(Base):
             layout.setContentsMargins(margin, margin, margin, margin)
         if align is not None:
             layout.setAlignment(align)
+        # Avoid resize issue if layout item hide before widget show
+        layout.setSizeConstraint(QLayout.SetFixedSize)
         return layout
 
     def set_primary_layout(

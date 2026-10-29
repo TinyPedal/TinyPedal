@@ -72,7 +72,7 @@ class Realtime(Overlay):
 
         # Empty dataset
         self.pixmap_brandlogo = {}
-        self.row_visible = [False] * self.veh_range
+        self.row_visible = [True] * self.veh_range
 
         # Driver position
         if self.wcfg["show_position"]:

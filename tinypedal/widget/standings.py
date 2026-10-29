@@ -83,8 +83,10 @@ class Realtime(Overlay):
         else:
             max_display_vehicles = self.wcfg["maximum_vehicles_combined_mode"]
         self.veh_range = min(max(int(max_display_vehicles), 5), 126)
+
+        # Empty dataset
         self.pixmap_brandlogo = {}
-        self.row_visible = [False] * self.veh_range
+        self.row_visible = [True] * self.veh_range
 
         # Driver position
         if self.wcfg["show_position"]:
