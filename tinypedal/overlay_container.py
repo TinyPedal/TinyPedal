@@ -43,10 +43,12 @@ class OverlayContainer(QWidget):
         self.__set_window_attributes()  # 1
         self.__set_window_flags()  # 2
 
-        # "showMaximized" doesn't fill whole screen
-        # Use fixed size to set to screen size instead
+        # Set fixed size to set to screen size
         self.setFixedSize(self.screen().size())
         self.move(0, 0)  # may not work on Linux? normally should end up at 0,0
+        # Show as full screen
+        self.show()
+        self.showFullScreen()
 
         # Check hide state
         self.setHidden(cfg.overlay["auto_hide"] and not realtime_state.active)
