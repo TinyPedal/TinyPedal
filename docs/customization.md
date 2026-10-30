@@ -2112,6 +2112,9 @@ Show distance into current lap.
 
 Note, body aero integrity and suspension damage display is only available for `LMU`.
 
+    global_scale
+Set global scale of damage display. Default is `1.0`. Minimum scale is limited to `0.1`.
+
     display_margin
 Set display margin in pixels.
 
@@ -3397,7 +3400,7 @@ Show number of vehicles that requested for pit stop, and number of vehicles curr
 **This widget displays vehicle radar info.**
 
     global_scale
-Sets global scale of radar display. Default is `6`, which is 6 times of original size.
+Set global scale of radar display. Default is `6`, which is 6 times of original size.
 
     radar_radius
 Set the radar display area by radius(unit meter). Default is `30` meters. Minimum value is limited to `5`.

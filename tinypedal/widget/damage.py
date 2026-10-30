@@ -20,7 +20,7 @@
 Damage Widget
 """
 
-from PySide2.QtCore import QRect, Qt
+from PySide2.QtCore import QRectF, Qt
 from PySide2.QtGui import QBrush, QPainter, QPen
 
 from .. import api
@@ -37,26 +37,31 @@ class Realtime(Overlay):
         # Assign base setting
         super().__init__(config, widget_name)
 
+        global_scale = max(self.wcfg["global_scale"], 0.1)
+
         # Config font
         font = self.config_font(
             self.wcfg["font_name"],
-            self.wcfg["font_size"],
+            self.wcfg["font_size"] * global_scale,
             self.wcfg["font_weight"],
         )
         self.setFont(font)
         font_m = self.get_font_metrics(font)
 
         # Config variable
-        display_margin = max(int(self.wcfg["display_margin"]), 0)
-        inner_gap = max(int(self.wcfg["inner_gap"]), 0)
+        display_margin = max(int(self.wcfg["display_margin"] * global_scale), 0)
+        inner_gap = max(int(self.wcfg["inner_gap"] * global_scale), 0)
 
-        parts_max_width = max(int(self.wcfg["parts_maximum_width"]), 4)
-        parts_max_height = max(int(self.wcfg["parts_maximum_height"]), 4)
+        parts_max_width = max(int(self.wcfg["parts_maximum_width"] * global_scale), 4)
+        parts_max_height = max(int(self.wcfg["parts_maximum_height"] * global_scale), 4)
+
+        wheel_width = max(int(self.wcfg["wheel_width"] * global_scale), 1)
+        wheel_height = max(int(self.wcfg["wheel_height"] * global_scale), 1)
 
         parts_full_width = parts_max_width * 3 + inner_gap * 2
         parts_full_height = parts_max_height * 3 + inner_gap * 2
         parts_width = max(min(
-            int(self.wcfg["parts_width"]),
+            int(self.wcfg["parts_width"] * global_scale),
             parts_max_width * 0.5,
             parts_max_height * 0.5), 1)
 
@@ -66,21 +71,33 @@ class Realtime(Overlay):
         self.impact_cone_angle = max(min(self.wcfg["last_impact_cone_angle"], 90), 2)
 
         # Rect parts
-        self.rect_mask = QRect(
-            display_margin + parts_width, display_margin + parts_width,
-            parts_full_width - parts_width * 2, parts_full_height - parts_width * 2
+        self.rect_mask = QRectF(
+            display_margin + parts_width,
+            display_margin + parts_width,
+            parts_full_width - parts_width * 2,
+            parts_full_height - parts_width * 2,
         )
         self.rects_wheels = self.create_wheels_rect(
-            display_margin, parts_width, inner_gap, parts_full_width, parts_full_height
+            display_margin,
+            parts_width,
+            inner_gap,
+            parts_full_width,
+            parts_full_height,
+            wheel_width,
+            wheel_height,
         )
         self.rects_parts = self.create_parts_rect(
-            display_margin, inner_gap, parts_width, parts_max_width, parts_max_height
+            display_margin,
+            inner_gap,
+            parts_width,
+            parts_max_width,
+            parts_max_height,
         )
 
         # Rect
-        self.rect_background = QRect(0, 0, display_width, display_height)
+        self.rect_background = QRectF(0, 0, display_width, display_height)
         self.rect_integrity = self.rect_background.adjusted(0, font_m.voffset, 0, 0)
-        self.rect_impact_cone = QRect(
+        self.rect_impact_cone = QRectF(
             display_width * 0.5 - impact_cone_size,
             display_height * 0.5 - impact_cone_size,
             impact_cone_size * 2,
@@ -277,22 +294,20 @@ class Realtime(Overlay):
         return self.wcfg["suspension_color_damage_totaled"]
 
     def create_wheels_rect(
-        self, display_margin, parts_width, inner_gap, parts_full_width, parts_full_height):
+        self, display_margin, parts_width, inner_gap, parts_full_width, parts_full_height, wheel_width, wheel_height):
         """Wheel parts rect, row by row from left to right, top to bottom"""
-        wheel_width = max(int(self.wcfg["wheel_width"]), 1)
-        wheel_height = max(int(self.wcfg["wheel_height"]), 1)
         offset_w = parts_width + inner_gap
         offset_x = parts_full_width - wheel_width - offset_w
         offset_y = parts_full_height - wheel_height - offset_w
         wheels_rect = (
             # front left
-            QRect(display_margin + offset_w, display_margin + offset_w, wheel_width, wheel_height),
+            QRectF(display_margin + offset_w, display_margin + offset_w, wheel_width, wheel_height),
             # front right
-            QRect(display_margin + offset_x, display_margin + offset_w, wheel_width, wheel_height),
+            QRectF(display_margin + offset_x, display_margin + offset_w, wheel_width, wheel_height),
             # rear left
-            QRect(display_margin + offset_w, display_margin + offset_y, wheel_width, wheel_height),
+            QRectF(display_margin + offset_w, display_margin + offset_y, wheel_width, wheel_height),
             # rear right
-            QRect(display_margin + offset_x, display_margin + offset_y, wheel_width, wheel_height),
+            QRectF(display_margin + offset_x, display_margin + offset_y, wheel_width, wheel_height),
         )
         return wheels_rect
 
@@ -305,20 +320,20 @@ class Realtime(Overlay):
         part_center_width = parts_max_width * 3 - part_side_width * 2
         parts_rect = (
             # front left
-            QRect(display_margin, display_margin, part_side_width, parts_max_height),
+            QRectF(display_margin, display_margin, part_side_width, parts_max_height),
             # front center
-            QRect(display_margin + inner_gap + part_side_width, display_margin, part_center_width, parts_max_height),
+            QRectF(display_margin + inner_gap + part_side_width, display_margin, part_center_width, parts_max_height),
             # front right
-            QRect(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin, part_side_width, parts_max_height),
+            QRectF(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin, part_side_width, parts_max_height),
             # center left
-            QRect(display_margin, display_margin + offset_y, part_side_width, parts_max_height),
+            QRectF(display_margin, display_margin + offset_y, part_side_width, parts_max_height),
             # center right
-            QRect(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin + offset_y, part_side_width, parts_max_height),
+            QRectF(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin + offset_y, part_side_width, parts_max_height),
             # rear left
-            QRect(display_margin, display_margin + offset_y * 2, part_side_width, parts_max_height),
+            QRectF(display_margin, display_margin + offset_y * 2, part_side_width, parts_max_height),
             # rear center
-            QRect(display_margin + inner_gap + part_side_width, display_margin + offset_y * 2, part_center_width, parts_max_height),
+            QRectF(display_margin + inner_gap + part_side_width, display_margin + offset_y * 2, part_center_width, parts_max_height),
             # rear right
-            QRect(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin + offset_y * 2, part_side_width, parts_max_height),
+            QRectF(display_margin + inner_gap * 2 + part_side_width + part_center_width, display_margin + offset_y * 2, part_side_width, parts_max_height),
         )
         return parts_rect

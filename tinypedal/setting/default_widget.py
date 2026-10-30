@@ -380,6 +380,7 @@ WIDGET_DEFAULT = {
         "enable_auto_font_offset": True,
         "font_offset_vertical": 0,
         "opacity": 0.9,
+        "global_scale": 1,
         "display_margin": 4,
         "inner_gap": 3,
         "parts_width": 6,

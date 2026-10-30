@@ -9,14 +9,6 @@ WIP
     - With multi-screen, all widgets will only be displayed on one of the screens.
     - Individual widget's "opacity" option doesn't work. To workaround this issue, a new "overlay_combined_mode_opacity" option is added to "Compatibility" config dialog, which allows to set overall overlay opacity.
 
-* Lap time history
-  - Added "show_stint_laps" option (requested by user "lucamilan87"), which shows stint lap number.
-  - Added "laps_width", "stint_laps_width" options, which set max display width for lap number.
-
-* [New]Class fields Widget
-  - Show number of active, inactive, and total vehicles for each vehicle class in a session (implemented by @Bykow).
-    Note, each field shows class name, followed by number of active vehicles (on track or in pit lane) and total vehicles in class, for example "GT3 12/18". Field background color follows class color from "Vehicle Class Editor". Fields are sorted by class leader's overall position. Vehicles that are in garage, DNF or DQ are not counted as active.
-
 * Fuel Calculator
   - Added "Stint laps" column under "Stint" header, which shows stint lap number for each lap entry. Column can be toggled hidden via right-click menu on column header.
 
@@ -31,6 +23,17 @@ WIP
     This option is provided for compatibility purpose, which may be used with alternative RF2 SharedMemory Plugin, such as [RF2.3.8.SharedMemoryMapPlugin.dll](https://github.com/TonyWhitley/rF2SharedMemoryMapPlugin/releases) that used by CrewChief.
     Note, to use with "RF2.3.8.SharedMemoryMapPlugin.dll", set prefix value to "rF2.3.8.". Remember to update prefix value (with matching version value) if a new version of the plugin DLL file installed in game.
   - Fixed an issue that caused RF2 API not working on Linux.
+
+* Damage Widget
+  - Added "global_scale" option (requested by user "cnc3937-eng"), which allows to scale display size without adjusting size of individual parts. Default scale is "1.0". Minimum scale is limited to "0.1".
+
+* Lap time history Widget
+  - Added "show_stint_laps" option (requested by user "lucamilan87"), which shows stint lap number.
+  - Added "laps_width", "stint_laps_width" options, which set max display width for lap number.
+
+* [New]Class fields Widget
+  - Show number of active, inactive, and total vehicles for each vehicle class in a session (implemented by @Bykow).
+    Note, each field shows class name, followed by number of active vehicles (on track or in pit lane) and total vehicles in class, for example "GT3 12/18". Field background color follows class color from "Vehicle Class Editor". Fields are sorted by class leader's overall position. Vehicles that are in garage, DNF or DQ are not counted as active.
 
 2.52.0 (2026-10-23)
 -----------------------------
