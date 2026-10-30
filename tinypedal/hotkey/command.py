@@ -68,6 +68,13 @@ def hotkey_overlay_auto_hide():
     cfg.save()
 
 
+def hotkey_overlay_combined_mode():
+    """Command - overlay combined mode"""
+    cfg.overlay["combined_mode"] = not cfg.overlay["combined_mode"]
+    cfg.save()
+    app_signal.reload.emit(True)
+
+
 def hotkey_vr_compatibility():
     """Command - vr compatibility"""
     cfg.overlay["vr_compatibility"] = not cfg.overlay["vr_compatibility"]
@@ -252,6 +259,7 @@ class COMMANDS:
         ("overlay_visibility", hotkey_overlay_visibility),
         ("overlay_lock", hotkey_overlay_lock),
         ("overlay_auto_hide", hotkey_overlay_auto_hide),
+        ("overlay_combined_mode", hotkey_overlay_combined_mode),
         ("vr_compatibility", hotkey_vr_compatibility),
         ("restart_api", hotkey_restart_api),
         ("select_next_api", hotkey_select_next_api),

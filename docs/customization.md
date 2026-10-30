@@ -1042,6 +1042,9 @@ Lock or unlock overlay.
     overlay_auto_hide
 Enable or disable overlay auto hide function.
 
+    overlay combined mode
+Enable or disable overlay combined mode.
+
     vr_compatibility
 Enable or disable VR Compatibility.
 

@@ -186,7 +186,7 @@ class OverlayMenu(QMenu):
         if toggle_msg != QMessageBox.Yes:
             return
         cfg.overlay["combined_mode"] = not combined_mode
-        cfg.save(0)
+        cfg.save()
         app_signal.reload.emit(True)
 
 

@@ -9,6 +9,9 @@ WIP
     - With multi-screen, all widgets will only be displayed on one of the screens.
     - Individual widget's "opacity" option doesn't work. To workaround this issue, a new "overlay_combined_mode_opacity" option is added to "Compatibility" config dialog, which allows to set overall overlay opacity.
 
+* Hotkey Tab
+  - Added "Overlay Combined Mode" keybinding for toggling overlay combined mode.
+
 * Fuel Calculator
   - Added "Stint laps" column under "Stint" header, which shows stint lap number for each lap entry. Column can be toggled hidden via right-click menu on column header.
 
