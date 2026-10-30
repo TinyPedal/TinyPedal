@@ -48,7 +48,7 @@ class Base(QWidget):
         # Set parent if "combined_mode" option enabled (None if not)
         from .. import container
 
-        super().__init__(container)
+        super().__init__(container.overlay)
 
         # Base config
         self.widget_name = widget_name

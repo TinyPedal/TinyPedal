@@ -170,23 +170,24 @@ class OverlayMenu(QMenu):
 
     def combined_mode(self):
         """Check combined mode state"""
-        if cfg.overlay["combined_mode"]:
+        combined_mode = cfg.overlay["combined_mode"]
+        if combined_mode:
             state = "Disable"
             desc = "Each <b>Widget</b> will be displayed in separate window."
         else:
             state = "Enable"
             desc = "All <b>Widgets</b> will be combined and drawn in one single maximized window."
-        msg_text = f"{state} <b>Overlay Combined Mode</b> and restart <b>TinyPedal</b>?<br><br>{desc}"
-        restart_msg = QMessageBox.question(
+        msg_text = f"{state} <b>Overlay Combined Mode</b>?<br><br>{desc}"
+        toggle_msg = QMessageBox.question(
             self._parent, "Overlay Combined Mode", msg_text,
             buttons=QMessageBox.Yes | QMessageBox.No,
             defaultButton=QMessageBox.No,
         )
-        if restart_msg != QMessageBox.Yes:
+        if toggle_msg != QMessageBox.Yes:
             return
-        cfg.overlay["combined_mode"] = not cfg.overlay["combined_mode"]
+        cfg.overlay["combined_mode"] = not combined_mode
         cfg.save(0)
-        app_signal.restart.emit(True)
+        app_signal.reload.emit(True)
 
 
 class ResetDataMenu(QMenu):

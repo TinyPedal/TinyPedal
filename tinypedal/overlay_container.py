@@ -33,8 +33,39 @@ from .constant import APP
 logger = logging.getLogger(__name__)
 
 
-class OverlayContainer(QWidget):
-    """Overlay container (top-level window) for holding widgets"""
+class OverlayContainer:
+    """Overlay container"""
+
+    __slots__ = (
+        "_overlay",
+    )
+
+    def __init__(self):
+        self._overlay = None
+
+    @property
+    def overlay(self) -> OverlayCombined | None:
+        return self._overlay
+
+    def enable(self):
+        """Enable overlay combined mode"""
+        if cfg.overlay["combined_mode"]:
+            if self._overlay is None:
+                self._overlay = OverlayCombined()
+        else:
+            self.disable()
+
+        logger.info("Overlay combined mode: %s", "Enabled" if cfg.overlay["combined_mode"] else "Disabled")
+
+    def disable(self):
+        """Disable overlay combined mode"""
+        if self._overlay is not None:
+            self._overlay.stop()
+            self._overlay = None
+
+
+class OverlayCombined(QWidget):
+    """Overlay (top-level window) for display combined widgets"""
 
     def __init__(self):
         super().__init__()
@@ -52,6 +83,16 @@ class OverlayContainer(QWidget):
 
         # Check hide state
         self.setHidden(cfg.overlay["auto_hide"] and not realtime_state.active)
+
+    def stop(self):
+        """Stop and close widget"""
+        self.__unload_resource()
+        if not self.close():
+            logger.error("FAILED TO CLOSE: overlay container")
+
+    def __unload_resource(self):
+        """Unload widget resource"""
+        self.__dict__.clear()
 
     def __set_window_attributes(self):
         """Set window attributes"""
@@ -94,3 +135,8 @@ class OverlayContainer(QWidget):
         overlay_signal.hidden.connect(self.setHidden)
         overlay_signal.iconify.connect(self.__toggle_vr_compat)
         app_signal.reload.connect(self.__set_opacity)
+
+    def closeEvent(self, event):
+        """Ignore attempts to close via window Close button when VR compatibility enabled"""
+        if self.__dict__:
+            event.ignore()

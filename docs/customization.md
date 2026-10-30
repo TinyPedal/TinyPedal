@@ -906,7 +906,7 @@ Enable overlay combined mode for displaying widgets. This option is disabled by 
 
 While `Combined Mode` disabled, each Widget will be displayed in separate window. This is the default setting.
 
-While `Combined Mode` enabled, all Widgets will be combined and drawn in one single maximized window. This may improve performance and compatibility when using `OpenKneeboard` in `VR`, and easier to project overlay window.
+While `Combined Mode` enabled, all Widgets will be combined and drawn in one single maximized window. This may improve performance and compatibility when using `OpenKneeboard` (or similar tool) for displaying overlay in `VR`, and easier to project overlay window.
 
 **Known issues when enabled Combined Mode:**
 

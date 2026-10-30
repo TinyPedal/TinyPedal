@@ -1,9 +1,9 @@
 WIP
 -----------------------------
 * Overlay
-  - Added "Combined Mode" option in "Overlay" menu, which sets overlay display mode. This option is disabled by default.
+  - Added "Combined Mode" option in "Overlay" menu, which sets overlay combined mode for displaying widgets. This option is disabled by default.
     While "Combined Mode" disabled, each Widget will be displayed in separate window. This is the default setting.
-    While "Combined Mode" enabled, all Widgets will be combined and drawn in one single maximized window, which may improve performance and compatibility when using "OpenKneeboard" in "VR", and easier to project overlay window.
+    While "Combined Mode" enabled, all Widgets will be combined and drawn in one single maximized window, which may improve performance and compatibility when using "OpenKneeboard" (or similar tool) for displaying overlay in "VR", and easier to project overlay window.
   - Known issues when enabled "Combined Mode":
     - Some widgets may show visual artifacts when moved and displayed on top of other widgets, such as Navigation and Radar Widget (try not to overlap widgets).
     - With multi-screen, all widgets will only be displayed on one of the screens.

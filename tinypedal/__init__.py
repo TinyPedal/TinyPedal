@@ -219,6 +219,11 @@ def _init_globals(single_instance: bool, path_global: str):
     from .update import UpdateChecker
     updater = UpdateChecker()
 
+    # Overlay container
+    global container
+    from .overlay_container import OverlayContainer
+    container = OverlayContainer()
+
 
 def _init_app():
     """Initialize gui, api, modules (once per launch)"""
@@ -231,13 +236,6 @@ def _init_app():
     cfg.set_next_to_load()
     cfg.load_user()
     cfg.save()
-
-    # Enable overlay combined mode
-    if cfg.overlay["combined_mode"]:
-        global container
-        from .overlay_container import OverlayContainer
-        container = OverlayContainer()
-    logger.info("Overlay combined mode: %s", "Enabled" if cfg.overlay["combined_mode"] else "Disabled")
 
     # Start api
     api.connect()
@@ -263,6 +261,7 @@ def _init_app():
 
 def _load_modules():
     """Load modules (in order)"""
+    container.enable()
     mctrl.start()
     wctrl.start()
     kctrl.enable()
@@ -275,6 +274,7 @@ def _unload_modules():
     kctrl.disable()
     wctrl.close()
     mctrl.close()
+    container.disable()
 
 
 def _save_pid_file(filepath: str, filename: str):
