@@ -3087,7 +3087,7 @@ Show lap time.
 Show lap time delta between two consecutive laps.
 
     show_fuel
-Show fuel consumption per lap.
+Show fuel consumption.
 
     show_virtual_energy_if_available
 Show virtual energy consumption instead of fuel consumption if available. This option is enabled by default.
@@ -3099,7 +3099,10 @@ Show fuel (or virtual energy) unit sign. `L` for liter, `G` for Gallon, `E` for 
 Show fuel ratio between fuel and energy consumption.
 
     show_wear
-Show average tyre wear (percent) per lap.
+Show average tread wear (percent) of all tyres.
+
+    show_highest_wear
+Show highest tread wear of all tyres instead of average wear. This option is disabled by default.
 
     show_wear_sign
 Show tyre wear percentage sign.

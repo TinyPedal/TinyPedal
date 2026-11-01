@@ -291,7 +291,11 @@ class Realtime(Overlay):
         if self.wcfg["show_fuel_ratio"]:
             self.update_ratio(self.bars_ratio[0], minfo.hybrid.fuelEnergyRatio)
         if self.wcfg["show_wear"]:
-            self.update_wear(self.bars_wear[0], calc.fmean(minfo.wheels.estimatedTreadWear))
+            if self.wcfg["show_highest_wear"]:
+                wear = max(minfo.wheels.estimatedTreadWear)
+            else:
+                wear = calc.fmean(minfo.wheels.estimatedTreadWear)
+            self.update_wear(self.bars_wear[0], wear)
 
         # History laps data
         if (
@@ -413,5 +417,9 @@ class Realtime(Overlay):
                 self.bars_ratio[index].setHidden(hidden)
 
             if self.wcfg["show_wear"]:
-                self.update_wear(self.bars_wear[index], data.tyre_wear_average())
+                if self.wcfg["show_highest_wear"]:
+                    wear = data.tyre_wear_max()
+                else:
+                    wear = data.tyre_wear_average()
+                self.update_wear(self.bars_wear[index], wear)
                 self.bars_wear[index].setHidden(hidden)

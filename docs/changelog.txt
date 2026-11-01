@@ -34,6 +34,7 @@ WIP
 * Lap time history Widget
   - Added "show_stint_laps" option (requested by user "lucamilan87"), which shows stint lap number.
   - Added "laps_width", "stint_laps_width" options, which set max display width for lap number.
+  - Added "show_highest_wear" option (requested by user "lucamilan87"), which shows highest tread wear of all tyres instead of average wear. This option is disabled by default.
 
 * [New]Class fields Widget
   - Show number of active, inactive, and total vehicles for each vehicle class in a session (implemented by @Bykow).

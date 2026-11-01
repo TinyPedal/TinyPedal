@@ -1378,6 +1378,7 @@ WIDGET_DEFAULT = {
         "font_color_last_fuel_ratio": "#AAAAAA",
         "background_color_last_fuel_ratio": "#88444444",
         "show_wear": True,
+        "show_highest_wear": False,
         "show_wear_sign": True,
         "decimal_places_wear": 1,
         "font_color_wear": "#222222",
