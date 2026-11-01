@@ -33,6 +33,20 @@ from ..validator import dict_value_type, invalid_save_name
 logger = logging.getLogger(__name__)
 
 
+def parse_consumption(data_reader, default_data):
+    """Parse consumption data"""
+    for data in data_reader:
+        # Update deprecated tyre wear data
+        if not data.get("tyreWearFL"):
+            tyre_wear_avg = data.get("tyreAvgWearLast")
+            if tyre_wear_avg:
+                data["tyreWearFL"] = tyre_wear_avg
+                data["tyreWearFR"] = tyre_wear_avg
+                data["tyreWearRL"] = tyre_wear_avg
+                data["tyreWearRR"] = tyre_wear_avg
+        yield ConsumptionData(**dict_value_type(data, default_data))
+
+
 def load_consumption_history_file(
     filepath: str, filename: str, extension: str = FILE.EXT_CONSUMPTION
 ) -> tuple[ConsumptionData, ...]:
@@ -41,10 +55,7 @@ def load_consumption_history_file(
         with open(f"{filepath}{filename}{extension}", newline="", encoding="utf-8") as csvfile:
             data_reader = csv.DictReader(csvfile, restval="", restkey="unknown")
             default_data = ConsumptionData._field_defaults
-            dataset = tuple(
-                ConsumptionData(**dict_value_type(data, default_data))
-                for data in data_reader
-            )
+            dataset = tuple(parse_consumption(data_reader, default_data))
             if not dataset:
                 raise ValueError
         return dataset

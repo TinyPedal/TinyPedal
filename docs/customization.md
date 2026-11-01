@@ -1123,7 +1123,7 @@ Click `Load File` button to load data from specific consumption history file to 
 
 Loaded data source and track and class name will be displayed on status bar.
 
-Select one or more `Time`, `Fuel`, `Energy`, `Tyre`, `Tank` values from history table and click `Add selected data` button to send value to calculator.
+Select one or more `Time`, `Fuel`, `NRG`, `Tyre`, `Tank` values from history table and click `Add selected data` button to send value to calculator.
 
 Select multiple values from history table and click `Add selected data` button to calculate average reading of selected values and send to calculator.
 
@@ -1137,7 +1137,7 @@ Set vehicle fuel tank capacity. This value can be retrieved from `Tank` column.
 Set fuel consumption per lap. This value can be retrieved from `Fuel` column.
 
     Energy consumption
-Set virtual energy consumption per lap. This value can be retrieved from `Energy` column.
+Set virtual energy consumption per lap. This value can be retrieved from `NRG` column.
 
     Fuel ratio
 Show fuel ratio between fuel and virtual energy consumption.

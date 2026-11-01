@@ -26,7 +26,7 @@ import os
 from collections import deque
 
 from PySide2.QtCore import QPoint, Qt
-from PySide2.QtGui import QColor, QPainter
+from PySide2.QtGui import QBrush, QColor, QLinearGradient, QPainter
 from PySide2.QtWidgets import (
     QDoubleSpinBox,
     QFileDialog,
@@ -136,9 +136,9 @@ class FuelCalculator(BaseDialog):
         layout_panel.addLayout(layout_calculator)
         layout_panel.addLayout(layout_history)
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, 0)
+        layout_main.setSizeConstraint(QHBoxLayout.SetFixedSize)
         layout_main.addLayout(layout_panel, stretch=1)
         layout_main.addWidget(self.status_bar)
-        self.setFixedWidth(self.sizeHint().width())
 
         self.load_live_data()
 
@@ -183,15 +183,8 @@ class FuelCalculator(BaseDialog):
         self.button_adddata.setHidden(not checked)
         self.button_toggle.setText("Hide History" if checked else "Show History")
 
-        margin = self.layout().contentsMargins()
-        width = self.panel_calculator.sizeHint().width() + margin.left() + margin.right()
-
-        if checked:
-            width += self.panel_history.sizeHint().width() + self.layout().spacing()
-        self.setFixedWidth(width)
-
         config = cfg.user.config["fuel_calculator"]
-        if checked != config["show_consumption_history"]:
+        if config["show_consumption_history"] != checked:
             config["show_consumption_history"] = checked
             cfg.save(config_type=CONFIG.TYPE_CONFIG)
 
@@ -214,13 +207,11 @@ class FuelCalculator(BaseDialog):
             return
 
         selected_name = "show_column_" + selected_action.text().replace(" ", "_").lower()
-        for option_name in config:
-            if selected_name == option_name:
-                config[option_name] = not config[option_name]
-                self.panel_history.toggle_column()
-                self.toggle_history_panel(config["show_consumption_history"])
-                cfg.save(config_type=CONFIG.TYPE_CONFIG)
-                break
+        if selected_name in config:
+            config[selected_name] = not config[selected_name]
+            self.panel_history.toggle_column()
+            self.toggle_history_panel(config["show_consumption_history"])
+            cfg.save(config_type=CONFIG.TYPE_CONFIG)
 
 
 class PitStopPreview(QWidget):
@@ -308,36 +299,124 @@ class HistoryPanel(QWidget):
         self.unit_fuel = units.set_unit_fuel(cfg.units["fuel_unit"])
         self.symbol_fuel = units.set_symbol_fuel(cfg.units["fuel_unit"])
 
-        headers = (
-            "Lap",
-            "Stint",
-            "Time",
-            f"Fuel({self.symbol_fuel})",
-            "Energy(%)",
-            "F/Ratio",
-            "Drain(%)",
-            "Regen(%)",
-            "B/Net(%)",
-            "Tyre(%)",
-            f"Tank({self.symbol_fuel})",
+        flag_selectable = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        flag_unselectable = Qt.NoItemFlags
+        self.columns = (
+            {
+                "name": "lap",
+                "header": "Lap",
+                "width": 3,
+                "config": "",
+                "process": (lambda data: f"{data.lapNumber}" if data.lapNumber > 0 else DATA.TEXT_PLACEHOLDER),
+                "flags": flag_unselectable,
+                "highlight": False,
+            },
+            {
+                "name": "stint",
+                "header": "Stint",
+                "width": 3,
+                "config": "show_column_stint_laps",
+                "process": (lambda data: f"{data.stintLapNumber}" if data.stintLapNumber > 0 else DATA.TEXT_PLACEHOLDER),
+                "flags": flag_unselectable,
+                "highlight": False,
+            },
+            {
+                "name": "time",
+                "header": "Time",
+                "width": 6,
+                "config": "",
+                "process": (lambda data: calc.sec2laptime_full(data.lapTimeLast)),
+                "flags": flag_selectable,
+                "highlight": True,
+            },
+            {
+                "name": "fuel",
+                "header": f"Fuel({self.symbol_fuel})",
+                "width": 5,
+                "config": "",
+                "process": (lambda data: f"{self.unit_fuel(data.lastLapUsedFuel):.3f}"),
+                "flags": flag_selectable,
+                "highlight": True,
+            },
+            {
+                "name": "energy",
+                "header": "NRG(%)",
+                "width": 5,
+                "config": "",
+                "process": (lambda data: f"{data.lastLapUsedEnergy:.3f}"),
+                "flags": flag_selectable,
+                "highlight": True,
+            },
+            {
+                "name": "ratio",
+                "header": "F/Ratio",
+                "width": 5,
+                "config": "show_column_fuel_ratio",
+                "process": (lambda data: f"{calc.fuel_to_energy_ratio(data.lastLapUsedFuel, data.lastLapUsedEnergy):.3f}"),
+                "flags": flag_unselectable,
+                "highlight": False,
+            },
+            {
+                "name": "drain",
+                "header": "Drain(%)",
+                "width": 5,
+                "config": "show_column_battery_drain",
+                "process": (lambda data: f"{data.batteryDrainLast:.3f}"),
+                "flags": flag_unselectable,
+                "highlight": False,
+            },
+            {
+                "name": "regen",
+                "header": "Regen(%)",
+                "width": 5,
+                "config": "show_column_battery_regen",
+                "process": (lambda data: f"{data.batteryRegenLast:.3f}"),
+                "flags": flag_unselectable,
+                "highlight": False,
+            },
+            {
+                "name": "net",
+                "header": "B/Net(%)",
+                "width": 5,
+                "config": "show_column_battery_net_change",
+                "process": (lambda data: f"{data.batteryRegenLast - data.batteryDrainLast:+.3f}"),
+                "flags": flag_unselectable,
+                "highlight": False,
+            },
+            {
+                "name": "tyre",
+                "header": "Tyre(%)",
+                "width": 5,
+                "config": "show_column_tyre_wear",
+                "process": (lambda data: f"{data.tyre_wear_average():.3f}"),
+                "flags": flag_selectable,
+                "highlight": False,
+            },
+            {
+                "name": "tank",
+                "header": f"Tank({self.symbol_fuel})",
+                "width": 5,
+                "config": "show_column_tank_capacity",
+                "process": (lambda data: f"{self.unit_fuel(data.capacityFuel):.3f}"),
+                "flags": flag_selectable,
+                "highlight": False,
+            },
         )
 
         self.table_history = QTableWidget(self)
-        self.table_history.setColumnCount(len(headers))
+        self.table_history.setColumnCount(len(self.columns))
+        self.table_history.setHorizontalHeaderLabels([col["header"] for col in self.columns])
         self.table_history.verticalHeader().setVisible(False)
-        self.table_history.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        # Laps column
-        self.table_history.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
-        self.table_history.setColumnWidth(0, UIScaler.size(3))
-        # Stint laps column
-        self.table_history.horizontalHeader().setSectionResizeMode(1, QHeaderView.Fixed)
-        self.table_history.setColumnWidth(1, UIScaler.size(3))
-        # Other columns
-        self.table_history.setFixedWidth(UIScaler.size(3 + 3 + 5 * (len(headers) - 1)))
-        self.table_history.setHorizontalHeaderLabels(headers)
 
-        self.table_history.horizontalHeader().setContextMenuPolicy(Qt.CustomContextMenu)
-        self.table_history.horizontalHeader().customContextMenuRequested.connect(parent.table_header_menu)
+        table_hori_header = self.table_history.horizontalHeader()
+        table_hori_header.setSectionResizeMode(QHeaderView.Fixed)
+        table_hori_header.setStretchLastSection(True)
+
+        for idx, col in enumerate(self.columns):
+            self.table_history.setColumnWidth(idx, UIScaler.size(col["width"]))
+
+        table_hori_header.setContextMenuPolicy(Qt.CustomContextMenu)
+        table_hori_header.customContextMenuRequested.connect(parent.table_header_menu)
         self.toggle_column()
 
         layout_panel = QVBoxLayout()
@@ -348,57 +427,59 @@ class HistoryPanel(QWidget):
     def toggle_column(self):
         """Toggle column visibility"""
         config = cfg.user.config["fuel_calculator"]
-        self.table_history.setColumnHidden(1, not config["show_column_stint_laps"])
-        self.table_history.setColumnHidden(5, not config["show_column_fuel_ratio"])
-        self.table_history.setColumnHidden(6, not config["show_column_battery_drain"])
-        self.table_history.setColumnHidden(7, not config["show_column_battery_regen"])
-        self.table_history.setColumnHidden(8, not config["show_column_battery_net_change"])
-        self.table_history.setColumnHidden(9, not config["show_column_tyre_wear"])
-        self.table_history.setColumnHidden(10, not config["show_column_tank_capacity"])
+        table = self.table_history
 
-        base_column_count = self.table_history.columnCount() - 1
-        hidden_column_count = 0
-        for column_index in range(self.table_history.columnCount()):
-            hidden_column_count += self.table_history.isColumnHidden(column_index)
+        width = 20
+        for idx, col in enumerate(self.columns):
+            if col["config"]:
+                table.setColumnHidden(idx, not config[col["config"]])
+            if not table.isColumnHidden(idx):
+                width += UIScaler.size(col["width"])
 
-        self.table_history.setFixedWidth(UIScaler.size(3 + 5.1 * (base_column_count - hidden_column_count)))
+        table.setFixedWidth(width)
 
     def refresh(self, dataset: deque[ConsumptionData]):
         """Refresh history data table"""
-        self.table_history.setRowCount(0)
+        table = self.table_history
+        table.setRowCount(0)
         invalid_color = QColor("#F40")
-        flag_selectable = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-        flag_unselectable = Qt.NoItemFlags
+        separator_color = None
 
         for row_index, lap_data in enumerate(dataset):
             highlight_color = None if lap_data.isValidLap else invalid_color
-            self.table_history.insertRow(row_index)
-            for column_index, item in enumerate(
-                (
-                    ("lap", f"{lap_data.lapNumber}" if lap_data.lapNumber > 0 else DATA.TEXT_PLACEHOLDER, flag_unselectable),
-                    ("stint", f"{lap_data.stintLapNumber}" if lap_data.stintLapNumber > 0 else DATA.TEXT_PLACEHOLDER, flag_unselectable),
-                    ("time", calc.sec2laptime_full(lap_data.lapTimeLast), flag_selectable, highlight_color),
-                    ("fuel", f"{self.unit_fuel(lap_data.lastLapUsedFuel):.3f}", flag_selectable, highlight_color),
-                    ("energy", f"{lap_data.lastLapUsedEnergy:.3f}", flag_selectable, highlight_color),
-                    ("ratio", f"{calc.fuel_to_energy_ratio(lap_data.lastLapUsedFuel, lap_data.lastLapUsedEnergy):.3f}", flag_unselectable),
-                    ("drain", f"{lap_data.batteryDrainLast:.3f}", flag_unselectable),
-                    ("regen", f"{lap_data.batteryRegenLast:.3f}", flag_unselectable),
-                    ("net", f"{lap_data.batteryRegenLast - lap_data.batteryDrainLast:+.3f}", flag_unselectable),
-                    ("tyre", f"{lap_data.tyreAvgWearLast:.3f}", flag_selectable),
-                    ("tank", f"{self.unit_fuel(lap_data.capacityFuel):.3f}", flag_selectable),
+            table.insertRow(row_index)
+            for column_index, col in enumerate(self.columns):
+                item = self._add_table_item(
+                    header=col["name"],
+                    text=col["process"](lap_data),
+                    flags=col["flags"],
+                    highlight=highlight_color if col["highlight"] else None,
+                    background=separator_color,
                 )
-            ):
-                self.table_history.setItem(row_index, column_index, self._add_table_item(*item))
+                table.setItem(row_index, column_index, item)
+            # Set separator style
+            if row_index == 0:  # get row height after item added to first row
+                lin_grad = QLinearGradient(0, 0, 0, table.rowHeight(0))
+                lin_grad.setStops(((0.04, "#888"), (0.05, Qt.transparent)))
+                separator = QBrush(lin_grad)
+            # Draw line separator on next row
+            separator_color = (
+                separator
+                if lap_data.stintLapNumber == 1 or lap_data.lapNumber == 1
+                else None
+            )
 
-    def _add_table_item(self, header: str, text: str, flags: Qt.ItemFlags, highlight_color=None):
+    def _add_table_item(self, header: str, text: str, flags: Qt.ItemFlags, highlight=None, background=None):
         """Add table item"""
         item = QTableWidgetItem()
         item.header = header
         item.setText(text)
         item.setTextAlignment(Qt.AlignCenter)
         item.setFlags(flags)
-        if highlight_color:
-            item.setForeground(highlight_color)
+        if highlight:
+            item.setForeground(highlight)
+        if background:
+            item.setBackground(background)
         return item
 
 
@@ -468,7 +549,7 @@ class CalculatorPanel(QWidget):
             self.input_fuel.fuel_used.setValue(self.unit_fuel(fuel_used))
             energy_used = latest_history.lastLapUsedEnergy
             self.input_fuel.energy_used.setValue(energy_used)
-            tyre_wear = latest_history.tyreAvgWearLast
+            tyre_wear = latest_history.tyre_wear_average()
             self.input_tyre.wear_lap.setValue(tyre_wear)
 
     def add_table_data(self, selected_data: list[QTableWidgetItem]):

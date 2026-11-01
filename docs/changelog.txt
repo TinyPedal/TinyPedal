@@ -14,6 +14,7 @@ WIP
 
 * Fuel Calculator
   - Added "Stint laps" column under "Stint" header, which shows stint lap number for each lap entry. Column can be toggled hidden via right-click menu on column header.
+  - Show line separator between each stint or race lap data for improved readability.
 
 * Stint Module
   - Added stint lap number logging to consumption history data.

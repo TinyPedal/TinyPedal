@@ -413,5 +413,5 @@ class Realtime(Overlay):
                 self.bars_ratio[index].setHidden(hidden)
 
             if self.wcfg["show_wear"]:
-                self.update_wear(self.bars_wear[index], data.tyreAvgWearLast)
+                self.update_wear(self.bars_wear[index], data.tyre_wear_average())
                 self.bars_wear[index].setHidden(hidden)

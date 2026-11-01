@@ -42,8 +42,24 @@ class ConsumptionData(NamedTuple):
     lastLapUsedEnergy: float = 0.0
     batteryDrainLast: float = 0.0
     batteryRegenLast: float = 0.0
-    tyreAvgWearLast: float = 0.0
     capacityFuel: float = 0.0
+    tyreWearFL: float = 0.0
+    tyreWearFR: float = 0.0
+    tyreWearRL: float = 0.0
+    tyreWearRR: float = 0.0
+    #tyreAvgWearLast: float = 0.0  # deprecated, replaced with individual wear
+
+    def tyre_wear_average(self) -> float:
+        """Average tyre wear"""
+        return (self.tyreWearFL + self.tyreWearFR + self.tyreWearRL + self.tyreWearRR) / 4
+
+    def tyre_wear_max(self) -> float:
+        """Maximum tyre wear"""
+        return max(self.tyreWearFL, self.tyreWearFR, self.tyreWearRL, self.tyreWearRR)
+
+    def tyre_wear_min(self) -> float:
+        """Minimum tyre wear"""
+        return min(self.tyreWearFL, self.tyreWearFR, self.tyreWearRL, self.tyreWearRR)
 
 
 @slotclass
