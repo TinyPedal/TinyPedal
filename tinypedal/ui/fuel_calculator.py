@@ -444,9 +444,18 @@ class HistoryPanel(QWidget):
         table.setRowCount(0)
         invalid_color = QColor("#F40")
         separator_color = None
+        separator_stint = None
+        separator_session = None
+        lap_number = DATA.MAX_LAPS
 
         for row_index, lap_data in enumerate(dataset):
-            highlight_color = None if lap_data.isValidLap else invalid_color
+            if lap_data.lapNumber > lap_number:  # new session
+                separator_color = separator_session
+            if lap_data.isValidLap:
+                highlight_color = None
+            else:
+                highlight_color = invalid_color
+            # Add row
             table.insertRow(row_index)
             for column_index, col in enumerate(self.columns):
                 item = self._add_table_item(
@@ -461,13 +470,15 @@ class HistoryPanel(QWidget):
             if row_index == 0:  # get row height after item added to first row
                 lin_grad = QLinearGradient(0, 0, 0, table.rowHeight(0))
                 lin_grad.setStops(((0.04, "#888"), (0.05, Qt.transparent)))
-                separator = QBrush(lin_grad)
+                separator_stint = QBrush(lin_grad)
+                lin_grad.setStops(((0.06, "#F40"), (0.07, Qt.transparent)))
+                separator_session = QBrush(lin_grad)
             # Draw line separator on next row
-            separator_color = (
-                separator
-                if lap_data.stintLapNumber == 1 or lap_data.lapNumber == 1
-                else None
-            )
+            lap_number = lap_data.lapNumber
+            if lap_data.stintLapNumber == 1:  # new stint
+                separator_color = separator_stint
+            else:
+                separator_color = None
 
     def _add_table_item(self, header: str, text: str, flags: Qt.ItemFlags, highlight=None, background=None):
         """Add table item"""
