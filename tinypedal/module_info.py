@@ -606,7 +606,7 @@ class HistoryInfo:
     """History output data"""
 
     consumptionDataVersion: int = 0
-    consumptionDataSet: deque[ConsumptionData] = df_deque(ConsumptionData, 100)
+    consumptionDataSet: deque[ConsumptionData] = df_deque(ConsumptionData, 300)
     stintDataVersion: int = 0
     stintDataCurrent: StintData = df_wrap(StintData)
     stintDataSet: deque[StintData] = df_deque(StintData, 100)

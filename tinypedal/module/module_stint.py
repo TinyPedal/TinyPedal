@@ -23,7 +23,6 @@ Stint module
 from __future__ import annotations
 
 from .. import api, minfo, realtime_state
-from .. import calculation as calc
 from ..constant import DATA
 from ..decorator import generator_init
 from ..module_info import ConsumptionData, HistoryInfo

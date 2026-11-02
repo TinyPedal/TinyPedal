@@ -278,7 +278,7 @@ Data recording is handled by [Fuel Module](#fuel-module).
 ## Consumption history
 Consumption history data is stored as `CSV` format (.consumption extension) under `TinyPedal\deltabest` folder (default). Those files can be opened in spreadsheet or notepad programs.
 
-Consumption history data stores lap time, fuel consumption, battery charge, tyre wear usage data per `track and vehicle class`, which can be loaded in [Fuel Calculator](#fuel-calculator). Up to 100 most recent lap entries are saved per `track and vehicle class`. Data recording is handled by [Fuel Module](#fuel-module).
+Consumption history data stores lap time, fuel consumption, battery charge, tyre wear usage data per `track and vehicle class`, which can be loaded in [Fuel Calculator](#fuel-calculator). Up to `300` most recent lap entries are saved per `track and vehicle class`. Data recording is handled by [Stint Module](#fuel-module).
 
 [**`Back to Top`**](#)
 

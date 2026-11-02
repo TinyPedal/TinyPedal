@@ -17,7 +17,8 @@ WIP
   - Show line separator between each new stint (grey color) or session (red color) lap data for improved readability.
 
 * Stint Module
-  - Added stint lap number logging to consumption history data.
+  - Added stint lap number logging to Consumption History data.
+  - Increased maximum Consumption History data logging from "100" to "300" most recent laps per vehicle class.
 
 * Pace notes playback
   - Added "Enable Playback While Spectating" check box, which allows to enable or disable pace notes playback while "Spectate" mode enabled. This option is disabled by default.
