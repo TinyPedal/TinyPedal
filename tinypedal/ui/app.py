@@ -216,6 +216,9 @@ class AppWindow(QMainWindow):
         self.last_style = None
         self.closing = False
 
+        # Load style before UI
+        self.refresh()
+
         # Status bar
         self.setStatusBar(StatusButtonBar(self))
 
