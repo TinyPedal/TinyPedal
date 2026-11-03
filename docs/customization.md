@@ -1115,7 +1115,7 @@ This panel also includes a vertical `pit stop preview` bar on the left, which vi
 Note, when `Energy consumption` value is higher than zero, pit stops and stint laps from preview bar will be calculated based on energy usage. Stint lap mark may not be displayed if there is not enough space to draw.
 
     Consumption history table
-On the right side is consumption history table, which lists `lap number`, `lap time`, `fuel consumption`, `virtual energy consumption`, `fuel ratio`, `battery drain`, `battery regen`, `battery net change`, `average tyre tread wear`, `tank capacity` columns from [Consumption History](#consumption-history) data. Invalid lap time or consumption data is highlighted in red. Nonessential column can be hidden (or shown) by right-click on table header and select corresponding column name.
+On the right side is consumption history table, which lists `lap number`, `lap time`, `fuel consumption`, `virtual energy consumption`, `fuel ratio`, `battery drain`, `battery regen`, `battery net change`, `tyre tread wear`, `tank capacity` columns from [Consumption History](#consumption-history) data. Invalid lap time or consumption data is highlighted in red. Nonessential column can be hidden (or shown) by right-click on table header and select corresponding column name.
 
 Click `Load Live` button to load or update consumption history from live session to history table and automatically fill in latest data to calculator.
 
@@ -1139,7 +1139,7 @@ Set fuel consumption per lap. This value can be retrieved from `Fuel` column.
     Energy consumption
 Set virtual energy consumption per lap. This value can be retrieved from `NRG` column.
 
-    Fuel ratio
+    Fuel/Energy ratio
 Show fuel ratio between fuel and virtual energy consumption.
 
     Race minutes
@@ -1157,22 +1157,25 @@ Set average pit stop time in seconds.
     Total race fuel, Total race energy
 Show total required fuel or energy to finish race. First value is raw reading with decimal places, second value behind `≈` sign is rounded up integer reading.
 
-    End stint fuel, End stint energy
-Show remaining fuel or energy at the end of stint.
-
     Total pit stops
 Show total number of pit stops required to finish race. First value is raw reading with decimal places, second value behind `≈` sign is rounded up integer reading.
 
 Note, sometimes when `Average pit seconds` is set to longer duration, ceiling integer reading may be rounded up `2` units higher than raw reading, this is not an error. For example, it may show `5.978 ≈ 7` instead of `5.978 ≈ 6`, this is because when calculating from `6` pit stops, due to less amount time spent in pit stop compare to `7`, more fuel is required per pit stop which would exceed tank capacity, hence calculator adds 1 more pit stop.
 
-    One less pit stop
-Show theoretical fuel or energy consumption in order to make one less pit stop.
-
-    Total laps, Total minutes
-Show total laps and minutes can run based on `Total race fuel` or `Total race energy` value.
+    Total race laps, Total race minutes
+Show total race laps and minutes can be completed based on `Total race fuel` or `Total race energy` value.
 
     Maximum stint laps, Maximum stint minutes
 Show maximum laps and minutes can run per stint based on `Tank capacity` value (or 100% capacity for virtual energy).
+
+    Final stint laps
+Show number of laps to complete on the final stint.
+
+    End stint fuel, End stint energy
+Show remaining fuel or energy at the end of stint.
+
+    One less pit stop
+Show theoretical fuel or energy consumption in order to make one less pit stop.
 
     Starting fuel, Starting energy
 Set amount fuel or energy to carry at the starting of race (first stint). This value affects `Total race fuel (or energy)` and `Total pit stops` calculation, and is used for calculating `Average refueling` or `Average replenishing` per pit stop. Maximum value cannot exceed `Tank capacity` for fuel (or `100%` for energy). If value is set to `0` (default), `Tank capacity` value will be used as starting fuel (or `100%` for starting energy) for `Average refueling` calculation.
@@ -1181,13 +1184,13 @@ Set amount fuel or energy to carry at the starting of race (first stint). This v
 Show average refueling or replenishing per pit stop, and display warning color if value exceeds `Tank capacity` (fuel) or `100%` (energy).
 
     Starting tyre tread
-Set average starting tyre tread (percent). For example, 100% for new tyres, and less for worn tyres.
+Set starting tyre tread (percent). For example, 100% for new tyres, and less for worn tyres.
 
     Tread wear per lap
-Set average tyre tread wear (percent) per lap. This value can be retrieved from `Tyre` column.
+Set tyre tread wear (percent) per lap. This value can be retrieved from `Tyre` column.
 
     Tread wear per stint
-Show total average tyre tread wear (percent) per stint. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
+Show total tyre tread wear (percent) per stint. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
 
     Lifespan laps, Lifespan minutes
 Show total tyre lifespan in laps and minutes based on `tread wear per lap` and `lap time`.

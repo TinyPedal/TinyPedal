@@ -804,27 +804,27 @@ def fuel_to_energy_ratio(fuel: float, energy: float) -> float:
 
 
 # Wear
-def wear_lifespan_in_laps(remaining: float, wear_last_lap: float) -> float:
+def wear_lifespan_in_laps(remaining: float, wear_last_lap: float, max_laps: float = 999) -> float:
     """Wear lifespan in laps = remaining / last lap wear"""
     if wear_last_lap > 0:
         est_laps = remaining / wear_last_lap
     else:
-        est_laps = 999
-    if est_laps > 999:
-        est_laps = 999
+        est_laps = max_laps
+    if est_laps > max_laps:
+        est_laps = max_laps
     return est_laps
 
 
-def wear_lifespan_in_mins(remaining: float, wear_last_lap: float, laptime: float) -> float:
+def wear_lifespan_in_mins(remaining: float, wear_last_lap: float, laptime: float, max_mins: float = 999) -> float:
     """Wear lifespan in minutes = remaining / last lap wear * laptime / 60"""
     if laptime <= 0:
-        return 999
+        return max_mins
     if wear_last_lap > 0:
         est_mins = remaining / wear_last_lap * laptime / 60
     else:
-        est_mins = 999
-    if est_mins > 999:
-        est_mins = 999
+        est_mins = max_mins
+    if est_mins > max_mins:
+        est_mins = max_mins
     return est_mins
 
 

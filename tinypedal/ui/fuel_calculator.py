@@ -300,7 +300,7 @@ class HistoryPanel(QWidget):
         self.symbol_fuel = units.set_symbol_fuel(cfg.units["fuel_unit"])
 
         flag_selectable = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-        flag_unselectable = Qt.NoItemFlags
+        flag_unselectable = Qt.ItemIsEnabled
         self.columns = (
             {
                 "name": "lap",
@@ -388,7 +388,7 @@ class HistoryPanel(QWidget):
                 "header": "Tyre(%)",
                 "width": 5,
                 "config": "show_column_tyre_wear",
-                "process": (lambda data: f"{data.tyre_wear_average():.3f}"),
+                "process": (lambda data: f"{data.tyre_wear_max():.3f}"),
                 "flags": flag_selectable,
                 "highlight": False,
             },
@@ -540,6 +540,7 @@ class CalculatorPanel(QWidget):
         layout_panel.addWidget(self.pit_preview)
         layout_panel.addLayout(layout_calculator)
         self.setLayout(layout_panel)
+        self.setFixedWidth(self.sizeHint().width() * 0.85)
 
     def fill_in_data(self, dataset: deque[ConsumptionData]):
         """Fill in history data to edit"""
@@ -663,7 +664,9 @@ class CalculatorPanel(QWidget):
         # Recalculate and find nearest minimum pit counts on previous loop
         while loop_counts:
             minimum_pit_counts = calc.ceil(estimate_pit_counts)
-            if total_race_seconds:  # time-type race
+            if consumption <= 0:  # unavailable
+                total_race_laps = 0
+            elif total_race_seconds:  # time-type race
                 total_pit_seconds = minimum_pit_counts * average_pit_seconds
                 total_race_laps = total_formation_laps + calc.time_type_full_laps_remain(
                     laptime, total_race_seconds - total_pit_seconds)
@@ -698,19 +701,19 @@ class CalculatorPanel(QWidget):
             if minimum_pit_counts == calc.ceil(estimate_pit_counts):
                 break
 
-        total_runlaps = calc.end_stint_laps(total_need_full, consumption)
+        total_runlaps = total_race_laps  # calc.end_stint_laps(total_need_full, consumption)
 
         total_runmins = calc.end_stint_minutes(total_runlaps, laptime)
 
         used_one_less = calc.one_less_pit_stop_consumption(
-            estimate_pit_counts, tank_capacity, amount_curr, total_race_laps)
+            estimate_pit_counts, tank_capacity, amount_curr, total_runlaps)
 
         if minimum_pit_counts:
             average_refuel = (
-                total_need_full - fuel_start + minimum_pit_counts * end_stint_fuel
+                amount_refuel + minimum_pit_counts * end_stint_fuel
                 ) / minimum_pit_counts
         elif fuel_start < total_need_full <= tank_capacity:
-            average_refuel = total_need_full - fuel_start
+            average_refuel = amount_refuel
         else:
             average_refuel = 0
 
@@ -729,25 +732,36 @@ class CalculatorPanel(QWidget):
             output_usage = self.usage_energy
             output_refill = self.refill_energy
 
+        estimate_pit_counts = max(estimate_pit_counts, 0)
+        minimum_pit_counts = max(calc.ceil(minimum_pit_counts), 0)
+        final_stint_laps = max(total_runlaps - int(start_runlaps) - int(stint_runlaps) * max(minimum_pit_counts - 1, 0), 0)
+
         output_usage.total_needed.setText(
-            f"{total_need_frac:.3f} ≈ {total_need_full}")
-        output_usage.end_stint.setText(
-            f"{end_stint_fuel:.3f}")
+            f"{f'{total_need_frac:.3f}':.6} ≈ {total_need_full}")
         output_usage.pit_stops.setText(
-            f"{max(estimate_pit_counts, 0):.3f} ≈ {max(calc.ceil(minimum_pit_counts), 0)}")
-        output_usage.one_less_stint.setText(
-            f"{max(used_one_less, 0):.3f}")
+            f"{estimate_pit_counts:.3f} ≈ {minimum_pit_counts}")
+
         output_usage.total_laps.setText(
             f"{total_runlaps:.3f}")
         output_usage.total_minutes.setText(
             f"{total_runmins:.3f}")
+
         output_usage.stint_laps.setText(
             f"{stint_runlaps:.3f}")
         output_usage.stint_minutes.setText(
             f"{stint_runmins:.3f}")
 
+        output_usage.final_laps.setText(
+            f"{final_stint_laps:.3f}")
+
+        output_usage.end_stint.setText(
+            f"{end_stint_fuel:.3f}")
+        output_usage.one_less_stint.setText(
+            f"{max(used_one_less, 0):.3f}")
+
         output_refill.average_refill.setText(
             f"{average_refuel:.3f}")
+
         # Set warning color if exceeded tank capacity
         _highlight_invalid(output_refill.average_refill, average_refuel > tank_capacity)
         return total_runlaps, stint_runlaps, start_runlaps
@@ -764,8 +778,8 @@ class CalculatorPanel(QWidget):
         tyre_wear_lap = self.input_tyre.wear_lap.value()
         tyre_wear_stint = tyre_wear_lap * stint_runlaps
 
-        tyre_lifespan_laps = calc.wear_lifespan_in_laps(tyre_start_tread, tyre_wear_lap)
-        tyre_lifespan_mins = calc.wear_lifespan_in_mins(tyre_start_tread, tyre_wear_lap, laptime)
+        tyre_lifespan_laps = calc.wear_lifespan_in_laps(tyre_start_tread, tyre_wear_lap, 9999)
+        tyre_lifespan_mins = calc.wear_lifespan_in_mins(tyre_start_tread, tyre_wear_lap, laptime, 9999)
         tyre_lifespan_stints = tyre_lifespan_laps / stint_runlaps if stint_runlaps else 0
 
         self.input_tyre.lifespan_laps.setText(f"{tyre_lifespan_laps:.3f}")
@@ -865,7 +879,7 @@ class InputFuel(QFrame):
 
         self.capacity = QDoubleSpinBox()
         self.capacity.setRange(0, 9999)
-        self.capacity.setDecimals(2)
+        self.capacity.setDecimals(3)
         self.capacity.setAlignment(Qt.AlignRight)
         self.capacity.valueChanged.connect(parent.update_input)
 
@@ -889,7 +903,7 @@ class InputFuel(QFrame):
 
         _add_output(0, 0, layout, self.capacity, "Tank Capacity:", parent.symbol_fuel)
         _add_output(0, 2, layout, self.fuel_used, "Fuel Consumption:", parent.symbol_fuel)
-        _add_output(2, 0, layout, self.fuel_ratio, "Fuel Ratio:", "")
+        _add_output(2, 0, layout, self.fuel_ratio, "Fuel/Energy Ratio:", "")
         _add_output(2, 2, layout, self.energy_used, "Energy Consumption:", "%")
 
 
@@ -991,6 +1005,10 @@ class OutputUsage(QFrame):
         self.stint_minutes.setAlignment(Qt.AlignRight)
         self.stint_minutes.setReadOnly(True)
 
+        self.final_laps = QLineEdit("0.000")
+        self.final_laps.setAlignment(Qt.AlignRight)
+        self.final_laps.setReadOnly(True)
+
         self.end_stint = QLineEdit("0.000")
         self.end_stint.setAlignment(Qt.AlignRight)
         self.end_stint.setReadOnly(True)
@@ -1001,12 +1019,13 @@ class OutputUsage(QFrame):
 
         _add_output(0, 0, layout, self.total_needed, f"Total Race {type_name}:", unit_text)
         _add_output(2, 0, layout, self.pit_stops, "Total Pit Stops:", "pit")
-        _add_output(4, 0, layout, self.total_laps, "Total Laps:", "lap")
-        _add_output(6, 0, layout, self.total_minutes, "Total Minutes:", "min")
-        _add_output(8, 0, layout, self.stint_laps, "Maximum Stint Laps:", "lap")
-        _add_output(10, 0, layout, self.stint_minutes, "Maximum Stint Minutes:", "min")
-        _add_output(12, 0, layout, self.end_stint, f"End Stint {type_name}:", unit_text)
-        _add_output(14, 0, layout, self.one_less_stint, "One Less Pit Stop:", unit_text)
+        _add_output(4, 0, layout, self.total_laps, "Total Race Laps:", "lap")
+        _add_output(6, 0, layout, self.total_minutes, "Total Race Minutes:", "min")
+        _add_output(8, 0, layout, self.stint_laps, "Max Stint Laps:", "lap")
+        _add_output(10, 0, layout, self.stint_minutes, "Max Stint Minutes:", "min")
+        _add_output(12, 0, layout, self.final_laps, "Final Stint Laps:", "lap")
+        _add_output(14, 0, layout, self.end_stint, f"End Stint {type_name}:", unit_text)
+        _add_output(16, 0, layout, self.one_less_stint, "One Less Pit Stop:", unit_text)
 
 
 class InputRefill(QFrame):

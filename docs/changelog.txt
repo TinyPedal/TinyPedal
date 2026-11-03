@@ -14,7 +14,9 @@ WIP
 
 * Fuel Calculator
   - Added "Stint laps" column under "Stint" header, which shows stint lap number for each lap entry. Column can be toggled hidden via right-click menu on column header.
+  - Added "Final stint laps" reading, which shows number of laps to complete on the final stint.
   - Show line separator between each new stint (grey color) or session (red color) lap data for improved readability.
+  - "Tyre Wear" column now shows the highest tread wear of all tyres.
 
 * Stint Module
   - Added stint lap number logging to Consumption History data.

@@ -408,6 +408,10 @@ def set_style_window(base_font_pt: int) -> str:
             background: {color_inactive_highlight};
             font-weight:bold;
         }}
+        FuelCalculator QLineEdit, QDoubleSpinBox, QSpinBox {{
+            font-size: {font_pt_item_button}pt;
+            font-weight:bold;
+        }}
 
         /* About dialog */
         About QLabel {{
