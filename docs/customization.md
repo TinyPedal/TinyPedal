@@ -2451,10 +2451,10 @@ Show temperature net change per lap.
 2 layouts are available: `0` = vertical layout, `1` = horizontal layout.
 
     show_pit_timer
-Show pit timer, and total amount time spent in pit after exit pit.
+Show pit timer, and total amount time spent in pit after exiting pit.
 
     pit_time_highlight_duration
-Set highlight duration for total amount time spent in pit after exit pit.
+Set highlight duration for total amount time spent in pit after exiting pit.
 
     pit_in_text, pit_out_text, pit_closed_text
 Set custom text for pit in, out, closed.
@@ -2547,6 +2547,17 @@ Show scheduled repairs notification and estimated repair time when damage repair
 
     scheduled_repairs_text
 Set custom text for scheduled repairs.
+
+    show_speeding_in_pit
+Show warning indication when speeding in pit lane. First value shows maximum speed exceeded above pit lane speed limit. Second value shows total speeding time in seconds.
+
+    speeding_highlight_duration
+Set highlight duration for displaying speeding indication after exiting pit.
+
+    pit_lane_speed_limit
+Set pit lane speed limit (in KPH) for detecting speeding. Default value is `60` KPH.
+
+Note, since game API does not provide speed limit info, this option must be set manually to detect speeding correctly. Different games or tracks may have different speed limit.
 
 [**`Back to Top`**](#)
 

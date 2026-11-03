@@ -243,6 +243,22 @@ class Realtime(Overlay):
                 column=self.wcfg["display_order_scheduled_repairs"],
             )
 
+        # Speeding in pit
+        if self.wcfg["show_speeding_in_pit"]:
+            self.bar_speeding = self.set_rawtext(
+                text="SPEEDIN",
+                padding=bar_padx,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.wcfg["font_color_speeding_in_pit"],
+                bg_color=self.wcfg["background_color_speeding_in_pit"],
+            )
+            self.set_primary_orient(
+                target=self.bar_speeding,
+                column=self.wcfg["display_order_speeding_in_pit"],
+            )
+
         # Last data
         self.pit_timer = PitTimer(self.wcfg["pit_time_highlight_duration"])
         self.green_timer = GreenFlagTimer(self.wcfg["green_flag_duration"])
@@ -253,12 +269,17 @@ class Realtime(Overlay):
             self.wcfg["traffic_low_speed_threshold"],
             self.wcfg["show_traffic_while_off_track"],
         )
+        self.speeding_timer = SpeedingTimer(
+            self.wcfg["pit_lane_speed_limit"],
+            self.wcfg["speeding_highlight_duration"],
+        )
 
     def post_update(self):
         self.pit_timer.reset()
         self.blue_timer.reset()
         self.traffic_timer.reset()
         self.green_timer.reset()
+        self.speeding_timer.reset()
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
@@ -322,6 +343,11 @@ class Realtime(Overlay):
         if self.wcfg["show_scheduled_repairs"]:
             repair_time = api.read.vehicle.repair_time()
             self.update_repair_time(self.bar_repairs, repair_time)
+
+        # Speeding in pit
+        if self.wcfg["show_speeding_in_pit"]:
+            speeding = self.speeding_timer.update(in_pits, elapsed_time)
+            self.update_speeding(self.bar_speeding, speeding)
 
     # GUI update methods
     def update_pit_timer(self, target, data):
@@ -542,6 +568,24 @@ class Realtime(Overlay):
                 target.state = hidden
                 target.setHidden(hidden)
 
+    def update_speeding(self, target, data):
+        """Speeding in pit"""
+        if target.last != data:
+            target.last = data
+            timer = data[0]
+            if timer > 0:
+                speeding_time = f"{timer:.1f}"
+                max_speeding = f"{self.unit_speed(data[1]):02.0f}"
+                target.text = f"{max_speeding}/{speeding_time:.3}s"
+                target.update()
+                hidden = False
+            else:
+                hidden = True
+
+            if target.state != hidden:
+                target.state = hidden
+                target.setHidden(hidden)
+
     # Additional methods
     def is_lowfuel(self, in_race):
         """Is low fuel"""
@@ -749,3 +793,54 @@ class PitTimer:
         self._timer_start = 0
         self._last_in_pits = 0
         self._last_pit_time = 0
+
+
+class SpeedingTimer:
+    """Speeding timer"""
+
+    __slots__ = (
+        "_timer_start",
+        "_elapsed_time",
+        "_speeding_time",
+        "_max_speeding",
+        "_pit_speed",
+        "_highlight_duration",
+    )
+
+    def __init__(self, pit_speed: float, highlight_duration: float):
+        self._timer_start = 0.0
+        self._elapsed_time = 0.0
+        self._speeding_time = 0.0
+        self._max_speeding = 0.0
+        self._pit_speed = pit_speed / 3.6
+        self._highlight_duration = highlight_duration
+
+    def update(self, in_pits: bool, elapsed_time: float):
+        """Check pit speeding"""
+        delta_time = elapsed_time - self._elapsed_time
+        self._elapsed_time = elapsed_time
+
+        if in_pits:
+            speed = api.read.vehicle.speed()
+            if speed > self._pit_speed:
+                self._speeding_time += delta_time
+            exceeded_speed = speed - self._pit_speed
+            if self._max_speeding < exceeded_speed:
+                self._max_speeding = exceeded_speed
+            self._timer_start = elapsed_time
+        elif self._speeding_time:
+            if (
+                self._timer_start > elapsed_time
+                or elapsed_time - self._timer_start > self._highlight_duration
+            ):
+                self._speeding_time = 0.0
+                self._max_speeding = 0.0
+
+        return self._speeding_time, self._max_speeding
+
+    def reset(self):
+        """Reset"""
+        self._timer_start = 0.0
+        self._elapsed_time = 0.0
+        self._speeding_time = 0.0
+        self._max_speeding = 0.0

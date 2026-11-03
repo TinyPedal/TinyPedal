@@ -34,6 +34,12 @@ WIP
 * Damage Widget
   - Added "global_scale" option (requested by user "cnc3937-eng"), which allows to scale display size without adjusting size of individual parts. Default scale is "1.0". Minimum scale is limited to "0.1".
 
+* Flag Widget
+  - Added "show_speeding_in_pit" option (requested by user "KyanH06"), which shows warning indication when speeding in pit lane. First value shows maximum speed exceeded above pit lane speed limit. Second value shows total speeding time in seconds.
+  - Added "pit_lane_speed_limit" option, which sets pit lane speed limit (in KPH) for detecting speeding. Default value is "60" KPH.
+    Note, since game API does not provide speed limit info, this option must be set manually to detect speeding correctly. Different games or tracks may have different speed limit.
+  - Added "speeding_highlight_duration" option, which sets highlight duration for displaying speeding indication after exiting pit.
+
 * Lap time history Widget
   - Added "show_stint_laps" option (requested by user "lucamilan87"), which shows stint lap number.
   - Added "laps_width", "stint_laps_width" options, which set max display width for lap number.
