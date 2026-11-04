@@ -107,7 +107,7 @@ class Brake(ABC):
 
     @abstractmethod
     def wear(self, index: int | None = None) -> tuple[float, ...]:
-        """Brake remaining thickness (meters)"""
+        """Brake remaining thickness (millimeters)"""
 
 
 class ElectricMotor(ABC):

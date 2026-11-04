@@ -159,13 +159,13 @@ class Brake(_reader.Brake, DataAdapter):
         )
 
     def wear(self, index: int | None = None) -> tuple[float, ...]:
-        """Brake remaining thickness (meters)"""
+        """Brake remaining thickness (millimeters)"""
         data = self.shmm.accPhysicsInfo.padLife
         return (
-            rmnan(data[0]) * 0.001,
-            rmnan(data[1]) * 0.001,
-            rmnan(data[2]) * 0.001,
-            rmnan(data[3]) * 0.001,
+            rmnan(data[0]),
+            rmnan(data[1]),
+            rmnan(data[2]),
+            rmnan(data[3]),
         )
 
 

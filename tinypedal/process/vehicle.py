@@ -27,6 +27,15 @@ from ..decorator import generator_init
 from ..regex_pattern import rex_number_extract
 
 
+def export_brakes(data: list, default: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+    """Export brake data (convert meter to millimeter)"""
+    try:
+        return data[0] * 1000, data[1] * 1000, data[2] * 1000, data[3] * 1000
+    except (IndexError, TypeError, ValueError):
+        pass
+    return default
+
+
 def export_wheels(data: list, default: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
     """Export wheel data"""
     try:

@@ -17,6 +17,8 @@ WIP
   - Added "Final stint laps" reading, which shows number of laps to complete on the final stint.
   - Show line separator between each new stint (grey color) or session (red color) lap data for improved readability.
   - "Tyre Wear" column now shows the highest tread wear of all tyres.
+  - Added separate tabs for "Fuel usage" and "Wear rate" calculations.
+  - Added "Brake wear" calculation under "Wear rate".
 
 * Stint Module
   - Added stint lap number logging to Consumption History data.

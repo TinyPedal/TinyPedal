@@ -1127,8 +1127,12 @@ Select one or more `Time`, `Fuel`, `NRG`, `Tyre`, `Tank` values from history tab
 
 Select multiple values from history table and click `Add selected data` button to calculate average reading of selected values and send to calculator.
 
+### Lap time setting
+
     Lap time
 Set lap time in `minutes` : `seconds` : `milliseconds` format. Values are automatically carried over between spin boxes when exceeded minimum or maximum value range. This value can be retrieved from `Time` column.
+
+### Fuel setting
 
     Tank capacity
 Set vehicle fuel tank capacity. This value can be retrieved from `Tank` column.
@@ -1142,6 +1146,11 @@ Set virtual energy consumption per lap. This value can be retrieved from `NRG` c
     Fuel/Energy ratio
 Show fuel ratio between fuel and virtual energy consumption.
 
+    Starting fuel, Starting energy
+Set amount fuel or energy to carry at the starting of race (first stint). This value affects `Total race fuel (or energy)` and `Total pit stops` calculation, and is used for calculating `Average refueling` or `Average replenishing` per pit stop. Maximum value cannot exceed `Tank capacity` for fuel (or `100%` for energy). If value is set to `0` (default), `Tank capacity` value will be used as starting fuel (or `100%` for starting energy) for `Average refueling` calculation.
+
+### Race setting
+
     Race minutes
 Set race length in minutes for time-based race. Note, option is disabled if `Race laps` is set.
 
@@ -1153,6 +1162,8 @@ Set number of formation or rolling start laps.
 
     Average pit seconds
 Set average pit stop time in seconds.
+
+### Fuel usage tab
 
     Total race fuel, Total race energy
 Show total required fuel or energy to finish race. First value is raw reading with decimal places, second value behind `≈` sign is rounded up integer reading.
@@ -1177,26 +1188,25 @@ Show remaining fuel or energy at the end of stint.
     One less pit stop
 Show theoretical fuel or energy consumption in order to make one less pit stop.
 
-    Starting fuel, Starting energy
-Set amount fuel or energy to carry at the starting of race (first stint). This value affects `Total race fuel (or energy)` and `Total pit stops` calculation, and is used for calculating `Average refueling` or `Average replenishing` per pit stop. Maximum value cannot exceed `Tank capacity` for fuel (or `100%` for energy). If value is set to `0` (default), `Tank capacity` value will be used as starting fuel (or `100%` for starting energy) for `Average refueling` calculation.
-
     Average refueling, Average replenishing
 Show average refueling or replenishing per pit stop, and display warning color if value exceeds `Tank capacity` (fuel) or `100%` (energy).
 
-    Starting tyre tread
-Set starting tyre tread (percent). For example, 100% for new tyres, and less for worn tyres.
+### Wear rate tab
 
-    Tread wear per lap
-Set tyre tread wear (percent) per lap. This value can be retrieved from `Tyre` column.
+    Starting tyre tread, Starting brake pad
+Set starting tyre tread or brake pad (percent). For example, 100% for new tyres, and less for worn tyres.
+
+    Wear per lap
+Set wear (percent) per lap. For tyre wear, this value can be retrieved from `Tyre` column.
 
     Tread wear per stint
-Show total tyre tread wear (percent) per stint. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
+Show total wear (percent) per stint. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
 
     Lifespan laps, Lifespan minutes
-Show total tyre lifespan in laps and minutes based on `tread wear per lap` and `lap time`.
+Show total lifespan in laps and minutes based on `wear per lap` and `lap time`.
 
     Lifespan stints
-Show estimated tyre lifespan in number of stints. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
+Show estimated lifespan in number of stints. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
 
 [**`Back to Top`**](#)
 

@@ -452,8 +452,6 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float):
 
         # Calculate wear difference & accumulated wear
         for idx, brake_curr in enumerate(brake_curr_set):
-            brake_curr *= 1000  # meter to millimeter
-
             # Log brake failure
             if brake_curr > 0:
                 failure_record[idx] = brake_curr

@@ -136,7 +136,7 @@ class Brake(_reader.Brake, DataAdapter):
         )
 
     def wear(self, index: int | None = None) -> tuple[float, ...]:
-        """Brake remaining thickness (meters)"""
+        """Brake remaining thickness (millimeters)"""
         return self.rest.brakeWear
 
 

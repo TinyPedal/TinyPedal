@@ -27,7 +27,12 @@ import logging
 from ..constant import DATA
 from ..decorator import slotclass
 from ..process.garage import export_lmu_car_setup
-from ..process.vehicle import absolute_refilling, export_wheels, steerlock_to_number
+from ..process.vehicle import (
+    absolute_refilling,
+    export_brakes,
+    export_wheels,
+    steerlock_to_number,
+)
 from ..process.weather import FORECAST_RF2_DEFAULT, forecast_rf2
 from ..validator import valid_value_type
 from ._restapi import ResOutput, RestAPITask
@@ -70,7 +75,7 @@ def lmu_restapi_tasks() -> tuple[RestAPITask, ...]:
     )
     res_currentstint = (
         ResOutput("aeroDamage", -1.0, valid_value_type, ("wearables", "body", "aero")),
-        ResOutput("brakeWear", DATA.WHEELS_NA, export_wheels, ("wearables", "brakes")),
+        ResOutput("brakeWear", DATA.WHEELS_NA, export_brakes, ("wearables", "brakes")),
         ResOutput("suspensionDamage", DATA.WHEELS_NA, export_wheels, ("wearables", "suspension")),
         ResOutput("absoluteRefill", 0.0, absolute_refilling, ("pitMenu", "pitMenu")),
         ResOutput("maxVirtualEnergy", 0.0, valid_value_type, ("fuelInfo", "maxVirtualEnergy")),
