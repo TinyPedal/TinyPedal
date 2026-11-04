@@ -1115,7 +1115,7 @@ This panel also includes a vertical `pit stop preview` bar on the left, which vi
 Note, when `Energy consumption` value is higher than zero, pit stops and stint laps from preview bar will be calculated based on energy usage. Stint lap mark may not be displayed if there is not enough space to draw.
 
     Consumption history table
-On the right side is consumption history table, which lists `lap number`, `lap time`, `fuel consumption`, `virtual energy consumption`, `fuel ratio`, `battery drain`, `battery regen`, `battery net change`, `tyre tread wear`, `tank capacity` columns from [Consumption History](#consumption-history) data. Invalid lap time or consumption data is highlighted in red. Nonessential column can be hidden (or shown) by right-click on table header and select corresponding column name.
+On the right side is consumption history table, which lists `lap number`, `lap time`, `fuel consumption`, `virtual energy consumption`, `fuel ratio`, `battery drain`, `battery regen`, `battery net change`, `tyre wear`, `tank capacity` columns from [Consumption History](#consumption-history) data. Invalid lap time or consumption data is highlighted in red. Nonessential column can be hidden (or shown) by right-click on table header and select corresponding column name.
 
 Click `Load Live` button to load or update consumption history from live session to history table and automatically fill in latest data to calculator.
 
@@ -1193,13 +1193,13 @@ Show average refueling or replenishing per pit stop, and display warning color i
 
 ### Wear rate tab
 
-    Starting tyre tread, Starting brake pad
-Set starting tyre tread or brake pad (percent). For example, 100% for new tyres, and less for worn tyres.
+    Starting tyre life, Starting pad life
+Set starting tyre or brake pad life (percent). For example, 100% for new tyres, and less for worn tyres.
 
-    Wear per lap
+    Percent wear per lap
 Set wear (percent) per lap. For tyre wear, this value can be retrieved from `Tyre` column.
 
-    Tread wear per stint
+    Percent wear per stint
 Show total wear (percent) per stint. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
 
     Lifespan laps, Lifespan minutes
@@ -1207,6 +1207,13 @@ Show total lifespan in laps and minutes based on `wear per lap` and `lap time`.
 
     Lifespan stints
 Show estimated lifespan in number of stints. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
+
+    Brake pad thickness, Millimeter wear per lap
+Set effective brake pad thickness and wear per lap (millimeters) for calculating `Percent wear per lap`.
+
+For LMU, `effective effective` = `brake thickness` - `failure thickness`.
+
+See Wiki Appendix for common vehicle's brake thickness reference table.
 
 [**`Back to Top`**](#)
 
@@ -2032,7 +2039,7 @@ For example, if `brake thickness` is `40`mm, and `failure thickness` is `25`mm, 
 
 Since brake failure thickness threshold data is not available from game API, it requires testing to find out, and may vary from vehicle to vehicle. Front brake failure thickness threshold can be different from rear brake. Thickness threshold value should not exceed brake maximum thickness, otherwise brake wear readings will not be displayed correctly.
 
-See Wiki Appendix for common vehicle's brake failure reference table.
+See Wiki Appendix for common vehicle's brake thickness reference table.
 
     show_remaining
 Show total remaining brake in percentage that changes color according to wear. A `FAIL` text will be shown on failed brakes.

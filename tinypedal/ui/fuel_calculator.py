@@ -523,8 +523,8 @@ class CalculatorPanel(QWidget):
         self.usage_fuel = OutputUsage(self, "Fuel")
         self.usage_energy = OutputUsage(self, "Energy")
 
-        self.input_tyre = InputWear(self, "Tyre Tread")
-        self.input_brake = InputWear(self, "Brake Pad")
+        self.input_tyre = InputWear(self, "Tyre")
+        self.input_brake = InputWear(self, "Pad")
 
         # Fuel usage tab
         panel_result = QFrame()
@@ -924,9 +924,9 @@ class InputFuel(QFrame):
         _add_output(4, 0, layout, self.fuel_start, "Starting Fuel:", parent.symbol_fuel)
         _add_output(4, 2, layout, self.energy_start, "Starting Energy:", "%")
 
-    def validate_starting_fuel(self):
+    def validate_starting_fuel(self, value: float):
         """Validate starting fuel"""
-        if self.fuel_start.value() > self.capacity.value():
+        if value > self.capacity.value():
             self.fuel_start.setValue(self.capacity.value())
 
 
@@ -970,18 +970,18 @@ class InputRace(QFrame):
         _add_output(2, 0, layout, self.formation, "Formation/Rolling:", "lap")
         _add_output(2, 2, layout, self.pit_seconds, "Average Pit Seconds:", "sec")
 
-    def disable_race_lap(self):
+    def disable_race_lap(self, value: int):
         """Disable race laps if race minutes is set"""
-        if self.minutes.value() > 0:
+        if value > 0:
             if self.laps.isEnabled():
                 self.laps.setValue(0)
                 self.laps.setDisabled(True)
         else:
             self.laps.setDisabled(False)
 
-    def disable_race_minute(self):
+    def disable_race_minute(self, value: int):
         """Disable race minutes if race laps is set"""
-        if self.laps.value() > 0:
+        if value > 0:
             if self.minutes.isEnabled():
                 self.minutes.setValue(0)
                 self.minutes.setDisabled(True)
@@ -1064,13 +1064,28 @@ class InputWear(QFrame):
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(2, 1)
 
-        self.start_wear = QDoubleSpinBox()
-        self.start_wear.setRange(0, 100)
-        self.start_wear.setDecimals(3)
-        self.start_wear.setSingleStep(0.01)
-        self.start_wear.setAlignment(Qt.AlignRight)
-        self.start_wear.setValue(100.0)
-        self.start_wear.valueChanged.connect(parent.update_input)
+        if type_name == "Pad":
+            self.effective = QDoubleSpinBox()
+            self.effective.setRange(0, 99999)
+            self.effective.setDecimals(6)
+            self.effective.setSingleStep(1.0)
+            self.effective.setAlignment(Qt.AlignRight)
+            self.effective.valueChanged.connect(self.update_thickness)
+
+            self.wear_millimeter = QDoubleSpinBox()
+            self.wear_millimeter.setRange(0, 99999)
+            self.wear_millimeter.setDecimals(6)
+            self.wear_millimeter.setSingleStep(0.0001)
+            self.wear_millimeter.setAlignment(Qt.AlignRight)
+            self.wear_millimeter.valueChanged.connect(self.update_thickness)
+
+        self.wear_start = QDoubleSpinBox()
+        self.wear_start.setRange(0, 100)
+        self.wear_start.setDecimals(3)
+        self.wear_start.setSingleStep(0.01)
+        self.wear_start.setAlignment(Qt.AlignRight)
+        self.wear_start.setValue(100.0)
+        self.wear_start.valueChanged.connect(parent.update_input)
 
         self.wear_lap = QDoubleSpinBox()
         self.wear_lap.setRange(0, 100)
@@ -1095,16 +1110,29 @@ class InputWear(QFrame):
         self.lifespan_stints.setAlignment(Qt.AlignRight)
         self.lifespan_stints.setReadOnly(True)
 
-        _add_output(0, 0, layout, self.start_wear, f"Starting {type_name}:", "%")
-        _add_output(0, 2, layout, self.lifespan_laps, "Lifespan Laps:", "lap")
-        _add_output(2, 0, layout, self.wear_lap, "Wear Per Lap:", "%")
-        _add_output(2, 2, layout, self.lifespan_minutes, "Lifespan Minutes:", "min")
-        _add_output(4, 0, layout, self.wear_stint, "Wear Per Stint:", "%")
-        _add_output(4, 2, layout, self.lifespan_stints, "Lifespan Stints:", "x")
+        if type_name == "Pad":
+            _add_output(0, 0, layout, self.effective, "Brake Pad Thickness:", "mm")
+            _add_output(0, 2, layout, self.wear_millimeter, "Millimeter Wear Per Lap:", "mm")
+        _add_output(2, 0, layout, self.wear_start, f"Starting {type_name} Life:", "%")
+        _add_output(2, 2, layout, self.lifespan_laps, "Lifespan Laps:", "lap")
+        _add_output(4, 0, layout, self.wear_lap, "Percent Wear Per Lap:", "%")
+        _add_output(4, 2, layout, self.lifespan_minutes, "Lifespan Minutes:", "min")
+        _add_output(6, 0, layout, self.wear_stint, "Percent Wear Per Stint:", "%")
+        _add_output(6, 2, layout, self.lifespan_stints, "Lifespan Stints:", "x")
+
+    def update_thickness(self, value: float):
+        """Convert thickness to percent"""
+        if value > 0:
+            effective_thickness = self.effective.value()
+            if effective_thickness > 0:
+                wear_lap = self.wear_millimeter.value() * 100 / effective_thickness
+            else:
+                wear_lap = 0
+            self.wear_lap.setValue(wear_lap)
 
     def update(self, stint_runlaps: float, laptime: float):
         """Calculate wear"""
-        wear_start = self.start_wear.value()
+        wear_start = self.wear_start.value()
         wear_lap = self.wear_lap.value()
         wear_stint = wear_lap * stint_runlaps
 
