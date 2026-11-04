@@ -523,7 +523,8 @@ class CalculatorPanel(QWidget):
         self.usage_fuel = OutputUsage(self, "Fuel")
         self.usage_energy = OutputUsage(self, "Energy")
 
-        self.input_tyre = InputTyreWear(self)
+        self.input_tyre = InputWear(self, "Tyre Tread")
+        self.input_brake = InputWear(self, "Brake Pad")
 
         # Fuel usage tab
         panel_result = QFrame()
@@ -535,8 +536,9 @@ class CalculatorPanel(QWidget):
 
         # Wear rate tab
         panel_wear = QFrame()
-        layout_wear = _set_layout(QVBoxLayout())
+        layout_wear = _set_layout(QVBoxLayout(), 4)
         layout_wear.addWidget(self.input_tyre)
+        layout_wear.addWidget(self.input_brake)
         layout_wear.setAlignment(Qt.AlignTop)
         panel_wear.setLayout(layout_wear)
 
@@ -660,17 +662,33 @@ class CalculatorPanel(QWidget):
             "energy", 100, energy_used, energy_start, total_race_seconds,
             absolute_race_laps, total_formation_laps, average_pit_seconds, laptime)
 
-        # Calc tyre
-        self._calc_tyre_consumption(fuel_stint_runlaps, energy_stint_runlaps, laptime)
-
         # Update pit preview
         if energy_used > 0:
             self.pit_preview.sync(energy_total_runlaps, energy_stint_runlaps, energy_start_runlaps)
         else:
             self.pit_preview.sync(fuel_total_runlaps, fuel_stint_runlaps, fuel_start_runlaps)
 
-    def _calc_consumption(self, output_type, tank_capacity, consumption, fuel_start,
-        total_race_seconds, absolute_race_laps, total_formation_laps, average_pit_seconds, laptime):
+        # Calc wear
+        # Pick the least runnable laps if both energy & fuel available
+        if energy_stint_runlaps > 0 < fuel_stint_runlaps:
+            min_stint_runlaps = min(fuel_stint_runlaps, energy_stint_runlaps)
+        else:
+            min_stint_runlaps = fuel_stint_runlaps
+        self.input_tyre.update(min_stint_runlaps, laptime)
+        self.input_brake.update(min_stint_runlaps, laptime)
+
+    def _calc_consumption(
+        self,
+        output_type: str,
+        tank_capacity: float,
+        consumption: float,
+        fuel_start: float,
+        total_race_seconds: float,
+        absolute_race_laps: int,
+        total_formation_laps: float,
+        average_pit_seconds: float,
+        laptime: float,
+    ):
         """Calculate and output results"""
         estimate_pit_counts = 0
         minimum_pit_counts = 0  # minimum pit stop required to finish race
@@ -782,36 +800,11 @@ class CalculatorPanel(QWidget):
         _highlight_invalid(output_usage.average_refill, average_refuel > tank_capacity)
         return total_runlaps, stint_runlaps, start_runlaps
 
-    def _calc_tyre_consumption(self, fuel_stint_runlaps, energy_stint_runlaps, laptime):
-        """Calculate tyre consumption"""
-        # Pick the least runnable laps if both energy & fuel available
-        if energy_stint_runlaps > 0 < fuel_stint_runlaps:
-            stint_runlaps = min(fuel_stint_runlaps, energy_stint_runlaps)
-        else:
-            stint_runlaps = fuel_stint_runlaps
-
-        tyre_start_tread = self.input_tyre.start_tread.value()
-        tyre_wear_lap = self.input_tyre.wear_lap.value()
-        tyre_wear_stint = tyre_wear_lap * stint_runlaps
-
-        tyre_lifespan_laps = calc.wear_lifespan_in_laps(tyre_start_tread, tyre_wear_lap, 99999)
-        tyre_lifespan_mins = calc.wear_lifespan_in_mins(tyre_start_tread, tyre_wear_lap, laptime, 99999)
-        tyre_lifespan_stints = tyre_lifespan_laps / stint_runlaps if stint_runlaps else 0
-
-        self.input_tyre.lifespan_laps.setText(f"{tyre_lifespan_laps:.3f}")
-        self.input_tyre.lifespan_minutes.setText(f"{tyre_lifespan_mins:.3f}")
-        self.input_tyre.lifespan_stints.setText(f"{tyre_lifespan_stints:.3f}")
-
-        self.input_tyre.wear_stint.setText(f"{tyre_wear_stint:.3f}")
-        _highlight_invalid(self.input_tyre.lifespan_stints, 0 < tyre_lifespan_stints < 1)
-        _highlight_invalid(self.input_tyre.wear_stint, tyre_wear_stint >= tyre_start_tread)
-
 
 class InputLapTime(QFrame):
     """Input lap time setup"""
 
     def __init__(self, parent) -> None:
-        """Set input lap time"""
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
         layout = _set_layout(QGridLayout(self))
@@ -881,7 +874,6 @@ class InputFuel(QFrame):
     """Input fuel setup"""
 
     def __init__(self, parent) -> None:
-        """Set input fuel"""
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
         layout = _set_layout(QGridLayout(self))
@@ -942,7 +934,6 @@ class InputRace(QFrame):
     """Input race setup"""
 
     def __init__(self, parent) -> None:
-        """Set input race"""
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
         layout = _set_layout(QGridLayout(self))
@@ -1001,8 +992,7 @@ class InputRace(QFrame):
 class OutputUsage(QFrame):
     """Output usage display"""
 
-    def __init__(self, parent, type_name) -> None:
-        """Set output display"""
+    def __init__(self, parent, type_name: str) -> None:
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
         layout = _set_layout(QGridLayout(self))
@@ -1064,24 +1054,23 @@ class OutputUsage(QFrame):
         _add_output(18, 0, layout, self.average_refill, "Average Refilling:", unit_text)
 
 
-class InputTyreWear(QFrame):
-    """Input tyre wear"""
+class InputWear(QFrame):
+    """Input wear"""
 
-    def __init__(self, parent) -> None:
-        """Set input race"""
+    def __init__(self, parent, type_name: str) -> None:
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
         layout = _set_layout(QGridLayout(self))
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(2, 1)
 
-        self.start_tread = QDoubleSpinBox()
-        self.start_tread.setRange(0, 100)
-        self.start_tread.setDecimals(3)
-        self.start_tread.setSingleStep(0.01)
-        self.start_tread.setAlignment(Qt.AlignRight)
-        self.start_tread.setValue(100.0)
-        self.start_tread.valueChanged.connect(parent.update_input)
+        self.start_wear = QDoubleSpinBox()
+        self.start_wear.setRange(0, 100)
+        self.start_wear.setDecimals(3)
+        self.start_wear.setSingleStep(0.01)
+        self.start_wear.setAlignment(Qt.AlignRight)
+        self.start_wear.setValue(100.0)
+        self.start_wear.valueChanged.connect(parent.update_input)
 
         self.wear_lap = QDoubleSpinBox()
         self.wear_lap.setRange(0, 100)
@@ -1106,9 +1095,27 @@ class InputTyreWear(QFrame):
         self.lifespan_stints.setAlignment(Qt.AlignRight)
         self.lifespan_stints.setReadOnly(True)
 
-        _add_output(0, 0, layout, self.start_tread, "Starting Tyre Tread:", "%")
+        _add_output(0, 0, layout, self.start_wear, f"Starting {type_name}:", "%")
         _add_output(0, 2, layout, self.lifespan_laps, "Lifespan Laps:", "lap")
-        _add_output(2, 0, layout, self.wear_lap, "Tread Wear Per Lap:", "%")
+        _add_output(2, 0, layout, self.wear_lap, "Wear Per Lap:", "%")
         _add_output(2, 2, layout, self.lifespan_minutes, "Lifespan Minutes:", "min")
-        _add_output(4, 0, layout, self.wear_stint, "Tread Wear Per Stint:", "%")
+        _add_output(4, 0, layout, self.wear_stint, "Wear Per Stint:", "%")
         _add_output(4, 2, layout, self.lifespan_stints, "Lifespan Stints:", "x")
+
+    def update(self, stint_runlaps: float, laptime: float):
+        """Calculate wear"""
+        wear_start = self.start_wear.value()
+        wear_lap = self.wear_lap.value()
+        wear_stint = wear_lap * stint_runlaps
+
+        lifespan_laps = calc.wear_lifespan_in_laps(wear_start, wear_lap, 99999)
+        lifespan_mins = calc.wear_lifespan_in_mins(wear_start, wear_lap, laptime, 99999)
+        lifespan_stints = lifespan_laps / stint_runlaps if stint_runlaps else 0
+
+        self.lifespan_laps.setText(f"{lifespan_laps:.3f}")
+        self.lifespan_minutes.setText(f"{lifespan_mins:.3f}")
+        self.lifespan_stints.setText(f"{lifespan_stints:.3f}")
+
+        self.wear_stint.setText(f"{wear_stint:.3f}")
+        _highlight_invalid(self.lifespan_stints, 0 < lifespan_stints < 1)
+        _highlight_invalid(self.wear_stint, wear_stint >= wear_start)
