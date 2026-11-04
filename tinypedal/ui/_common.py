@@ -74,12 +74,19 @@ def singleton_dialog(dialog_type: str, show_error: bool = True):
     """Singleton dialog decorator"""
 
     def decorator(dialog_class: BaseDialog):
+        _instance_type: ClassVar[set[str]] = set()
+
+        def remove(dialog_type: str):
+            """Remove dialog type"""
+            _instance_type.remove(dialog_type)
 
         def unset_dialog_state(pointer):
-            DialogSingleton.remove(dialog_type)
+            remove(dialog_type)
 
         def wrapper(*args, **kwargs):
-            if DialogSingleton.new(dialog_type):
+            if dialog_type not in _instance_type:
+                # Append new dialog type if not exist
+                _instance_type.add(dialog_type)
                 instance = dialog_class(*args, **kwargs)
                 instance.destroyed.connect(unset_dialog_state)
                 return instance
@@ -88,33 +95,6 @@ def singleton_dialog(dialog_type: str, show_error: bool = True):
         return wrapper
 
     return decorator
-
-
-class DialogSingleton:
-    """Singleton dialog"""
-
-    _instance_type: ClassVar[set[str]] = set()
-
-    def __init__(self):
-        raise TypeError("not for instantiate")
-
-    @classmethod
-    def is_opened(cls, dialog_type: str) -> bool:
-        """Is dialog open"""
-        return dialog_type in cls._instance_type
-
-    @classmethod
-    def new(cls, dialog_type: str) -> bool:
-        """Append new dialog type if not exist"""
-        if dialog_type not in cls._instance_type:
-            cls._instance_type.add(dialog_type)
-            return True
-        return False
-
-    @classmethod
-    def remove(cls, dialog_type: str):
-        """Remove dialog type"""
-        cls._instance_type.remove(dialog_type)
 
 
 class DialogSingletonError:
@@ -161,7 +141,6 @@ class CompactButton(QPushButton):
 class BaseDialog(QDialog):
     """Base dialog class"""
     MARGIN = UIScaler.pixel(6)
-    TYPE = None
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -188,6 +167,9 @@ class BaseDialog(QDialog):
             defaultButton=QMessageBox.No,
         )
         return confirm == QMessageBox.Yes
+
+    def interrupt(self):
+        """Interrupt when reloading preset"""
 
 
 class BaseEditor(BaseDialog):

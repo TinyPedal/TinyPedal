@@ -87,8 +87,6 @@ def get_font_list() -> list[str]:
 class FontConfig(BaseDialog):
     """Config global font setting"""
 
-    TYPE = CONFIG.TYPE_CONFIG
-
     def __init__(self, parent, user_setting: dict, reload_func: Callable):
         super().__init__(parent)
         self.set_config_title("Global Font Override", cfg.filename.setting)
@@ -152,6 +150,10 @@ class FontConfig(BaseDialog):
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(layout_main)
 
+    def interrupt(self):
+        """Interrupt when reloading preset"""
+        self.close()
+
     def applying(self):
         """Save & apply"""
         self.save_setting(self.user_setting)
@@ -210,8 +212,6 @@ class FontConfig(BaseDialog):
 @singleton_dialog(CONFIG.TYPE_CONFIG)
 class UserConfig(BaseDialog):
     """User configuration"""
-
-    TYPE = CONFIG.TYPE_CONFIG
 
     def __init__(
         self,
@@ -319,6 +319,10 @@ class UserConfig(BaseDialog):
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, self.MARGIN)
         self.setLayout(layout_main)
         self.setMinimumWidth(self.sizeHint().width() + UIScaler.size(2))
+
+    def interrupt(self):
+        """Interrupt when reloading preset"""
+        self.close()
 
     def has_display_order(self) -> bool:
         """Check whether has display order option"""

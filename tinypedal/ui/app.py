@@ -399,8 +399,7 @@ class AppWindow(QMainWindow):
         """Reload current preset"""
         # Close any config dialog first
         for _widget in self.findChildren(BaseDialog):
-            if _widget.TYPE == CONFIG.TYPE_CONFIG:
-                _widget.close()
+            _widget.interrupt()
         tinypedal.reload(reload_preset)
         app_signal.refresh.emit(True)
 
