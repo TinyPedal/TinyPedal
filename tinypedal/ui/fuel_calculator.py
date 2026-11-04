@@ -35,6 +35,7 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QHeaderView,
     QLabel,
+    QLayout,
     QLineEdit,
     QMenu,
     QMessageBox,
@@ -43,6 +44,7 @@ from PySide2.QtWidgets import (
     QStatusBar,
     QTableWidget,
     QTableWidgetItem,
+    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -56,11 +58,10 @@ from ..userfile.consumption_history import load_consumption_history_file
 from ._common import BaseDialog, UIScaler
 
 
-def set_grid_layout(parent, spacing: int = 2, margin: int = 4):
-    """Set grid layout"""
+def _set_layout(layout: QLayout, spacing: int = 2, margin: int = 4):
+    """Set layout"""
     spacing = UIScaler.pixel(spacing)
     margin = UIScaler.pixel(margin)
-    layout = QGridLayout(parent)
     layout.setSpacing(spacing)
     layout.setContentsMargins(margin, margin, margin, margin)
     return layout
@@ -136,10 +137,10 @@ class FuelCalculator(BaseDialog):
         layout_panel.addLayout(layout_calculator)
         layout_panel.addLayout(layout_history)
         layout_main.setContentsMargins(self.MARGIN, self.MARGIN, self.MARGIN, 0)
-        layout_main.setSizeConstraint(QHBoxLayout.SetFixedSize)
         layout_main.addLayout(layout_panel, stretch=1)
         layout_main.addWidget(self.status_bar)
 
+        self.toggle_history_panel(cfg.user.config["fuel_calculator"]["show_consumption_history"])
         self.load_live_data()
 
     def load_file_data(self):
@@ -182,6 +183,13 @@ class FuelCalculator(BaseDialog):
         self.panel_history.setHidden(not checked)
         self.button_adddata.setHidden(not checked)
         self.button_toggle.setText("Hide History" if checked else "Show History")
+
+        margin = self.layout().contentsMargins()
+        width = self.panel_calculator.width() + margin.left() + margin.right()
+
+        if checked:
+            width += self.panel_history.sizeHint().width() + self.layout().spacing()
+        self.setFixedWidth(width)
 
         config = cfg.user.config["fuel_calculator"]
         if config["show_consumption_history"] != checked:
@@ -407,6 +415,7 @@ class HistoryPanel(QWidget):
         self.table_history.setColumnCount(len(self.columns))
         self.table_history.setHorizontalHeaderLabels([col["header"] for col in self.columns])
         self.table_history.verticalHeader().setVisible(False)
+        self.table_history.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         table_hori_header = self.table_history.horizontalHeader()
         table_hori_header.setSectionResizeMode(QHeaderView.Fixed)
@@ -429,7 +438,7 @@ class HistoryPanel(QWidget):
         config = cfg.user.config["fuel_calculator"]
         table = self.table_history
 
-        width = 20
+        width = self.table_history.verticalScrollBar().sizeHint().width() + 3
         for idx, col in enumerate(self.columns):
             if col["config"]:
                 table.setColumnHidden(idx, not config[col["config"]])
@@ -510,37 +519,46 @@ class CalculatorPanel(QWidget):
         self.input_laptime = InputLapTime(self)
         self.input_fuel = InputFuel(self)
         self.input_race = InputRace(self)
-        self.input_tyre = InputTyreWear(self)
 
         self.usage_fuel = OutputUsage(self, "Fuel")
         self.usage_energy = OutputUsage(self, "Energy")
 
-        self.refill_fuel = InputRefill(self, "Fuel")
-        self.refill_energy = InputRefill(self, "Energy")
+        self.input_tyre = InputTyreWear(self)
 
-        layout_usage = QHBoxLayout()
-        layout_usage.addWidget(self.usage_fuel)
-        layout_usage.addWidget(self.usage_energy)
+        # Fuel usage tab
+        panel_result = QFrame()
+        layout_result = _set_layout(QHBoxLayout(), 4)
+        layout_result.addWidget(self.usage_fuel)
+        layout_result.addWidget(self.usage_energy)
+        layout_result.setAlignment(Qt.AlignTop)
+        panel_result.setLayout(layout_result)
 
-        layout_refill = QHBoxLayout()
-        layout_refill.addWidget(self.refill_fuel)
-        layout_refill.addWidget(self.refill_energy)
+        # Wear rate tab
+        panel_wear = QFrame()
+        layout_wear = _set_layout(QVBoxLayout())
+        layout_wear.addWidget(self.input_tyre)
+        layout_wear.setAlignment(Qt.AlignTop)
+        panel_wear.setLayout(layout_wear)
 
+        # Result tabs
+        result_tabs = QTabWidget(self)
+        result_tabs.addTab(panel_result, "Fuel Usage")  # 0
+        result_tabs.addTab(panel_wear, "Wear Rate")  # 1
+
+        # Calculator panel
         layout_calculator = QVBoxLayout()
         layout_calculator.setAlignment(Qt.AlignTop)
         layout_calculator.addWidget(self.input_laptime)
         layout_calculator.addWidget(self.input_fuel)
         layout_calculator.addWidget(self.input_race)
-        layout_calculator.addLayout(layout_usage)
-        layout_calculator.addLayout(layout_refill)
-        layout_calculator.addWidget(self.input_tyre)
+        layout_calculator.addWidget(result_tabs)
 
         layout_panel = QHBoxLayout()
         layout_panel.setContentsMargins(0, 0, 0, 0)
         layout_panel.addWidget(self.pit_preview)
         layout_panel.addLayout(layout_calculator)
         self.setLayout(layout_panel)
-        self.setFixedWidth(self.sizeHint().width() * 0.85)
+        self.setFixedWidth(self.sizeHint().width() * 0.9)
 
     def fill_in_data(self, dataset: deque[ConsumptionData]):
         """Fill in history data to edit"""
@@ -619,11 +637,11 @@ class CalculatorPanel(QWidget):
         # Get fuel setup
         tank_capacity = self.input_fuel.capacity.value()
         fuel_used = self.input_fuel.fuel_used.value()
-        fuel_start = self.refill_fuel.amount_start.value(
-            ) if self.refill_fuel.amount_start.value() else tank_capacity
+        fuel_start = self.input_fuel.fuel_start.value(
+            ) if self.input_fuel.fuel_start.value() else tank_capacity
         energy_used = self.input_fuel.energy_used.value()
-        energy_start = self.refill_energy.amount_start.value(
-            ) if self.refill_energy.amount_start.value() else 100
+        energy_start = self.input_fuel.energy_start.value(
+            ) if self.input_fuel.energy_start.value() else 100
 
         # Calc fuel ratio
         if self.is_gallon:
@@ -727,10 +745,8 @@ class CalculatorPanel(QWidget):
         # Output
         if output_type == "fuel":
             output_usage = self.usage_fuel
-            output_refill = self.refill_fuel
         else:
             output_usage = self.usage_energy
-            output_refill = self.refill_energy
 
         estimate_pit_counts = max(estimate_pit_counts, 0)
         minimum_pit_counts = max(calc.ceil(minimum_pit_counts), 0)
@@ -759,11 +775,11 @@ class CalculatorPanel(QWidget):
         output_usage.one_less_stint.setText(
             f"{max(used_one_less, 0):.3f}")
 
-        output_refill.average_refill.setText(
+        output_usage.average_refill.setText(
             f"{average_refuel:.3f}")
 
         # Set warning color if exceeded tank capacity
-        _highlight_invalid(output_refill.average_refill, average_refuel > tank_capacity)
+        _highlight_invalid(output_usage.average_refill, average_refuel > tank_capacity)
         return total_runlaps, stint_runlaps, start_runlaps
 
     def _calc_tyre_consumption(self, fuel_stint_runlaps, energy_stint_runlaps, laptime):
@@ -778,8 +794,8 @@ class CalculatorPanel(QWidget):
         tyre_wear_lap = self.input_tyre.wear_lap.value()
         tyre_wear_stint = tyre_wear_lap * stint_runlaps
 
-        tyre_lifespan_laps = calc.wear_lifespan_in_laps(tyre_start_tread, tyre_wear_lap, 9999)
-        tyre_lifespan_mins = calc.wear_lifespan_in_mins(tyre_start_tread, tyre_wear_lap, laptime, 9999)
+        tyre_lifespan_laps = calc.wear_lifespan_in_laps(tyre_start_tread, tyre_wear_lap, 99999)
+        tyre_lifespan_mins = calc.wear_lifespan_in_mins(tyre_start_tread, tyre_wear_lap, laptime, 99999)
         tyre_lifespan_stints = tyre_lifespan_laps / stint_runlaps if stint_runlaps else 0
 
         self.input_tyre.lifespan_laps.setText(f"{tyre_lifespan_laps:.3f}")
@@ -790,11 +806,6 @@ class CalculatorPanel(QWidget):
         _highlight_invalid(self.input_tyre.lifespan_stints, 0 < tyre_lifespan_stints < 1)
         _highlight_invalid(self.input_tyre.wear_stint, tyre_wear_stint >= tyre_start_tread)
 
-    def validate_starting_fuel(self):
-        """Validate starting fuel"""
-        if self.refill_fuel.amount_start.value() > self.input_fuel.capacity.value():
-            self.refill_fuel.amount_start.setValue(self.input_fuel.capacity.value())
-
 
 class InputLapTime(QFrame):
     """Input lap time setup"""
@@ -803,7 +814,7 @@ class InputLapTime(QFrame):
         """Set input lap time"""
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
-        layout = set_grid_layout(self)
+        layout = _set_layout(QGridLayout(self))
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(2, 1)
         layout.setColumnStretch(4, 1)
@@ -873,7 +884,7 @@ class InputFuel(QFrame):
         """Set input fuel"""
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
-        layout = set_grid_layout(self)
+        layout = _set_layout(QGridLayout(self))
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(2, 1)
 
@@ -901,10 +912,30 @@ class InputFuel(QFrame):
         self.energy_used.setAlignment(Qt.AlignRight)
         self.energy_used.valueChanged.connect(parent.update_input)
 
+        self.fuel_start = QDoubleSpinBox()
+        self.fuel_start.setDecimals(2)
+        self.fuel_start.setAlignment(Qt.AlignRight)
+        self.fuel_start.setRange(0, 9999)
+        self.fuel_start.valueChanged.connect(parent.update_input)
+        self.fuel_start.valueChanged.connect(self.validate_starting_fuel)
+
+        self.energy_start = QDoubleSpinBox()
+        self.energy_start.setDecimals(2)
+        self.energy_start.setAlignment(Qt.AlignRight)
+        self.energy_start.setRange(0, 100)
+        self.energy_start.valueChanged.connect(parent.update_input)
+
         _add_output(0, 0, layout, self.capacity, "Tank Capacity:", parent.symbol_fuel)
         _add_output(0, 2, layout, self.fuel_used, "Fuel Consumption:", parent.symbol_fuel)
         _add_output(2, 0, layout, self.fuel_ratio, "Fuel/Energy Ratio:", "")
         _add_output(2, 2, layout, self.energy_used, "Energy Consumption:", "%")
+        _add_output(4, 0, layout, self.fuel_start, "Starting Fuel:", parent.symbol_fuel)
+        _add_output(4, 2, layout, self.energy_start, "Starting Energy:", "%")
+
+    def validate_starting_fuel(self):
+        """Validate starting fuel"""
+        if self.fuel_start.value() > self.capacity.value():
+            self.fuel_start.setValue(self.capacity.value())
 
 
 class InputRace(QFrame):
@@ -914,7 +945,7 @@ class InputRace(QFrame):
         """Set input race"""
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
-        layout = set_grid_layout(self)
+        layout = _set_layout(QGridLayout(self))
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(2, 1)
 
@@ -974,7 +1005,7 @@ class OutputUsage(QFrame):
         """Set output display"""
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
-        layout = set_grid_layout(self)
+        layout = _set_layout(QGridLayout(self))
 
         if type_name == "Fuel":
             unit_text = parent.symbol_fuel
@@ -1017,6 +1048,10 @@ class OutputUsage(QFrame):
         self.one_less_stint.setAlignment(Qt.AlignRight)
         self.one_less_stint.setReadOnly(True)
 
+        self.average_refill = QLineEdit("0.000")
+        self.average_refill.setAlignment(Qt.AlignRight)
+        self.average_refill.setReadOnly(True)
+
         _add_output(0, 0, layout, self.total_needed, f"Total Race {type_name}:", unit_text)
         _add_output(2, 0, layout, self.pit_stops, "Total Pit Stops:", "pit")
         _add_output(4, 0, layout, self.total_laps, "Total Race Laps:", "lap")
@@ -1026,37 +1061,7 @@ class OutputUsage(QFrame):
         _add_output(12, 0, layout, self.final_laps, "Final Stint Laps:", "lap")
         _add_output(14, 0, layout, self.end_stint, f"End Stint {type_name}:", unit_text)
         _add_output(16, 0, layout, self.one_less_stint, "One Less Pit Stop:", unit_text)
-
-
-class InputRefill(QFrame):
-    """Input refill display"""
-
-    def __init__(self, parent, type_name: str) -> None:
-        """Set output display"""
-        super().__init__(parent)
-        self.setFrameShape(QFrame.StyledPanel)
-        layout = set_grid_layout(self)
-
-        self.amount_start = QDoubleSpinBox()
-        self.amount_start.setDecimals(2)
-        self.amount_start.setAlignment(Qt.AlignRight)
-
-        if type_name == "Fuel":
-            start_range = 9999
-            unit_text = parent.symbol_fuel
-            self.amount_start.valueChanged.connect(parent.validate_starting_fuel)
-        else:
-            start_range = 100
-            unit_text = "%"
-        self.amount_start.setRange(0, start_range)
-        self.amount_start.valueChanged.connect(parent.update_input)
-
-        self.average_refill = QLineEdit("0.000")
-        self.average_refill.setAlignment(Qt.AlignRight)
-        self.average_refill.setReadOnly(True)
-
-        _add_output(0, 0, layout, self.amount_start, f"Starting {type_name}:", unit_text)
-        _add_output(2, 0, layout, self.average_refill, "Average Refilling:", unit_text)
+        _add_output(18, 0, layout, self.average_refill, "Average Refilling:", unit_text)
 
 
 class InputTyreWear(QFrame):
@@ -1066,7 +1071,7 @@ class InputTyreWear(QFrame):
         """Set input race"""
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
-        layout = set_grid_layout(self)
+        layout = _set_layout(QGridLayout(self))
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(2, 1)
 
@@ -1089,11 +1094,11 @@ class InputTyreWear(QFrame):
         self.wear_stint.setAlignment(Qt.AlignRight)
         self.wear_stint.setReadOnly(True)
 
-        self.lifespan_laps = QLineEdit("0.000")
+        self.lifespan_laps = QLineEdit("99999.000")
         self.lifespan_laps.setAlignment(Qt.AlignRight)
         self.lifespan_laps.setReadOnly(True)
 
-        self.lifespan_minutes = QLineEdit("0.000")
+        self.lifespan_minutes = QLineEdit("99999.000")
         self.lifespan_minutes.setAlignment(Qt.AlignRight)
         self.lifespan_minutes.setReadOnly(True)
 
