@@ -1107,15 +1107,17 @@ Enable or disable module.
 
 Fuel value and unit symbol depend on `Fuel Unit` setting from [Units](#units) config dialog, `L` = liter, `gal` = gallon. Virtual energy unit is `%` = percentage. Note, after changed `Fuel Unit` setting, it is required to close and reopen `Fuel calculator` in order to update units info for calculation.
 
-    Calculation panel
+### Calculation panel
+
 On the left side is calculation panel, which handles `fuel` and `virtual energy` usage calculation and results display.
 
 This panel also includes a vertical `pit stop preview` bar on the left, which visualizes pit stops as blue marks and stint laps as grey marks. Each pit stop mark shows a reference lap completion number. Total estimated number of race laps is displayed at bottom of the bar.
 
 Note, when `Energy consumption` value is higher than zero, pit stops and stint laps from preview bar will be calculated based on energy usage. Stint lap mark may not be displayed if there is not enough space to draw.
 
-    Consumption history table
-On the right side is consumption history table, which lists `lap number`, `lap time`, `fuel consumption`, `virtual energy consumption`, `fuel ratio`, `battery drain`, `battery regen`, `battery net change`, `tyre wear`, `tank capacity` columns from [Consumption History](#consumption-history) data. Invalid lap time or consumption data is highlighted in red. Nonessential column can be hidden (or shown) by right-click on table header and select corresponding column name.
+### Consumption history table
+
+On the right side is consumption history table, which lists lap data from [Consumption History](#consumption-history) data. Invalid lap time or consumption data is highlighted in red. Nonessential column can be hidden (or shown) by right-click on table header and select corresponding column name.
 
 Click `Load Live` button to load or update consumption history from live session to history table and automatically fill in latest data to calculator.
 
@@ -1123,9 +1125,45 @@ Click `Load File` button to load data from specific consumption history file to 
 
 Loaded data source and track and class name will be displayed on status bar.
 
-Select one or more `Time`, `Fuel`, `NRG`, `Tyre`, `Tank` values from history table and click `Add selected data` button to send value to calculator.
+Select one or more values from history table and click `Add selected data` button to send value to calculator.
 
 Select multiple values from history table and click `Add selected data` button to calculate average reading of selected values and send to calculator.
+
+    Lap
+Lap number column.
+
+    Stint
+Stint lap number column.
+
+    Time
+Lap time column.
+
+    Fuel
+Fuel consumption column.
+
+    NRG
+Virtual energy consumption (percent) column.
+
+    F/Ratio
+Fuel and virtual energy ratio column.
+
+    Drain
+Battery drain (percent) column.
+
+    Regen
+Battery regen (percent) column.
+
+    B/NET
+Battery net change (percent) column.
+
+    Tyre F, Tyre R
+Highest front and rear tyre tread wear (percent) column.
+
+    Pad F, Pad R
+Highest front and rear brake pad wear (millimeters) column.
+
+    Tank
+Fuel tank capacity column.
 
 ### Lap time setting
 
@@ -1209,7 +1247,7 @@ Show total lifespan in laps and minutes based on `wear per lap` and `lap time`.
 Show estimated lifespan in number of stints. Note, while virtual energy is available, this value will be calculated based on the least `maximum stint laps` between fuel and virtual energy.
 
     Brake pad thickness, Millimeter wear per lap
-Set effective brake pad thickness and wear per lap (millimeters) for calculating `Percent wear per lap`.
+Set effective brake pad thickness and wear per lap (millimeters) for calculating `Percent wear per lap`. Millimeter wear per lap value can be retrieved from `Pad` column.
 
 For LMU, `effective effective` = `brake thickness` - `failure thickness`.
 

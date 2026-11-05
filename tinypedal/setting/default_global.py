@@ -102,7 +102,10 @@ GLOBAL_DEFAULT = {
         "show_column_battery_drain": True,
         "show_column_battery_regen": True,
         "show_column_battery_net_change": True,
-        "show_column_tyre_wear": True,
+        "show_column_tyre_wear_front": True,
+        "show_column_tyre_wear_rear": True,
+        "show_column_brake_wear_front": True,
+        "show_column_brake_wear_rear": True,
         "show_column_tank_capacity": True,
     },
     "tyre_strategy_planner": {

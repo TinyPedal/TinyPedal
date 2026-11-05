@@ -16,12 +16,13 @@ WIP
   - Added "Stint laps" column under "Stint" header, which shows stint lap number for each lap entry. Column can be toggled hidden via right-click menu on column header.
   - Added "Final stint laps" reading, which shows number of laps to complete on the final stint.
   - Show line separator between each new stint (grey color) or session (red color) lap data for improved readability.
-  - "Tyre Wear" column now shows the highest tread wear of all tyres.
   - Added separate tabs for "Fuel usage" and "Wear rate" calculations.
   - Added "Brake wear" calculation under "Wear rate".
+  - Added "Pad F" (front) and "Pad R" (rear) brake wear columns, each shows the highest pad (millimeters) wear of front or rear brakes per lap.
+  - Separated "Tyre" column into "Tyre F" (front) and "Tyre R" (rear) tyre wear columns, each shows the highest tread (percentage) wear of front or rear tyres per lap.
 
 * Stint Module
-  - Added stint lap number logging to Consumption History data.
+  - Added stint lap number and brake wear logging to Consumption History data.
   - Increased maximum Consumption History data logging from "100" to "300" most recent laps per vehicle class.
 
 * Pace notes playback

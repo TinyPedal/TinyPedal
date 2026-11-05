@@ -81,6 +81,27 @@ def _add_output(row: int, column: int, layout: QGridLayout, editor: QWidget, tit
     return editor
 
 
+def _add_data_column(
+    key: str,
+    name: str,
+    width: float,
+    process: object,
+    flags: Qt.ItemFlag,
+    config: str = "",
+    highlight: bool = False,
+):
+    """Add lap data column"""
+    return {
+        "key": key,
+        "name": name,
+        "width": width,
+        "process": process,
+        "flags": flags,
+        "config": config,
+        "highlight": highlight,
+    }
+
+
 class FuelCalculator(BaseDialog):
     """Fuel calculator"""
 
@@ -310,110 +331,122 @@ class HistoryPanel(QWidget):
         flag_selectable = Qt.ItemIsSelectable | Qt.ItemIsEnabled
         flag_unselectable = Qt.ItemIsEnabled
         self.columns = (
-            {
-                "name": "lap",
-                "header": "Lap",
-                "width": 3,
-                "config": "",
-                "process": (lambda data: f"{data.lapNumber}" if data.lapNumber > 0 else DATA.TEXT_PLACEHOLDER),
-                "flags": flag_unselectable,
-                "highlight": False,
-            },
-            {
-                "name": "stint",
-                "header": "Stint",
-                "width": 3,
-                "config": "show_column_stint_laps",
-                "process": (lambda data: f"{data.stintLapNumber}" if data.stintLapNumber > 0 else DATA.TEXT_PLACEHOLDER),
-                "flags": flag_unselectable,
-                "highlight": False,
-            },
-            {
-                "name": "time",
-                "header": "Time",
-                "width": 6,
-                "config": "",
-                "process": (lambda data: calc.sec2laptime_full(data.lapTimeLast)),
-                "flags": flag_selectable,
-                "highlight": True,
-            },
-            {
-                "name": "fuel",
-                "header": f"Fuel({self.symbol_fuel})",
-                "width": 5,
-                "config": "",
-                "process": (lambda data: f"{self.unit_fuel(data.lastLapUsedFuel):.3f}"),
-                "flags": flag_selectable,
-                "highlight": True,
-            },
-            {
-                "name": "energy",
-                "header": "NRG(%)",
-                "width": 5,
-                "config": "",
-                "process": (lambda data: f"{data.lastLapUsedEnergy:.3f}"),
-                "flags": flag_selectable,
-                "highlight": True,
-            },
-            {
-                "name": "ratio",
-                "header": "F/Ratio",
-                "width": 5,
-                "config": "show_column_fuel_ratio",
-                "process": (lambda data: f"{calc.fuel_to_energy_ratio(data.lastLapUsedFuel, data.lastLapUsedEnergy):.3f}"),
-                "flags": flag_unselectable,
-                "highlight": False,
-            },
-            {
-                "name": "drain",
-                "header": "Drain(%)",
-                "width": 5,
-                "config": "show_column_battery_drain",
-                "process": (lambda data: f"{data.batteryDrainLast:.3f}"),
-                "flags": flag_unselectable,
-                "highlight": False,
-            },
-            {
-                "name": "regen",
-                "header": "Regen(%)",
-                "width": 5,
-                "config": "show_column_battery_regen",
-                "process": (lambda data: f"{data.batteryRegenLast:.3f}"),
-                "flags": flag_unselectable,
-                "highlight": False,
-            },
-            {
-                "name": "net",
-                "header": "B/Net(%)",
-                "width": 5,
-                "config": "show_column_battery_net_change",
-                "process": (lambda data: f"{data.batteryRegenLast - data.batteryDrainLast:+.3f}"),
-                "flags": flag_unselectable,
-                "highlight": False,
-            },
-            {
-                "name": "tyre",
-                "header": "Tyre(%)",
-                "width": 5,
-                "config": "show_column_tyre_wear",
-                "process": (lambda data: f"{data.tyre_wear_max():.3f}"),
-                "flags": flag_selectable,
-                "highlight": False,
-            },
-            {
-                "name": "tank",
-                "header": f"Tank({self.symbol_fuel})",
-                "width": 5,
-                "config": "show_column_tank_capacity",
-                "process": (lambda data: f"{self.unit_fuel(data.capacityFuel):.3f}"),
-                "flags": flag_selectable,
-                "highlight": False,
-            },
+            _add_data_column(
+                key="lap",
+                name="Lap",
+                width=3,
+                process=(lambda data: f"{data.lapNumber}" if data.lapNumber > 0 else DATA.TEXT_PLACEHOLDER),
+                flags=flag_unselectable,
+            ),
+            _add_data_column(
+                key="stint",
+                name="Stint",
+                width=3,
+                process=(lambda data: f"{data.stintLapNumber}" if data.stintLapNumber > 0 else DATA.TEXT_PLACEHOLDER),
+                flags=flag_unselectable,
+                config="show_column_stint_laps",
+            ),
+            _add_data_column(
+                key="time",
+                name="Time",
+                width=6,
+                process=(lambda data: calc.sec2laptime_full(data.lapTimeLast)),
+                flags=flag_selectable,
+                highlight=True,
+            ),
+            _add_data_column(
+                key="fuel",
+                name=f"Fuel({self.symbol_fuel})",
+                width=5,
+                process=(lambda data: f"{self.unit_fuel(data.lastLapUsedFuel):.3f}"),
+                flags=flag_selectable,
+                highlight=True,
+            ),
+            _add_data_column(
+                key="energy",
+                name="NRG(%)",
+                width=5,
+                process=(lambda data: f"{data.lastLapUsedEnergy:.3f}"),
+                flags=flag_selectable,
+                highlight=True,
+            ),
+            _add_data_column(
+                key="ratio",
+                name="F/Ratio",
+                width=5,
+                process=(lambda data: f"{calc.fuel_to_energy_ratio(data.lastLapUsedFuel, data.lastLapUsedEnergy):.3f}"),
+                flags=flag_unselectable,
+                config="show_column_fuel_ratio",
+            ),
+            _add_data_column(
+                key="drain",
+                name="Drain(%)",
+                width=5,
+                process=(lambda data: f"{data.batteryDrainLast:.3f}"),
+                flags=flag_unselectable,
+                config="show_column_battery_drain",
+            ),
+            _add_data_column(
+                key="regen",
+                name="Regen(%)",
+                width=5,
+                process=(lambda data: f"{data.batteryRegenLast:.3f}"),
+                flags=flag_unselectable,
+                config="show_column_battery_regen",
+            ),
+            _add_data_column(
+                key="net",
+                name="B/Net(%)",
+                width=5,
+                process=(lambda data: f"{data.batteryRegenLast - data.batteryDrainLast:+.3f}"),
+                flags=flag_unselectable,
+                config="show_column_battery_net_change",
+            ),
+            _add_data_column(
+                key="tyre_wear",
+                name="Tyre F(%)",
+                width=5,
+                process=(lambda data: f"{max(data.tyreWearFL, data.tyreWearFR):.3f}"),
+                flags=flag_selectable,
+                config="show_column_tyre_wear_front",
+            ),
+            _add_data_column(
+                key="tyre_wear",
+                name="Tyre R(%)",
+                width=5,
+                process=(lambda data: f"{max(data.tyreWearRL, data.tyreWearRR):.3f}"),
+                flags=flag_selectable,
+                config="show_column_tyre_wear_rear",
+            ),
+            _add_data_column(
+                key="brake_wear",
+                name="Pad F(mm)",
+                width=6,
+                process=(lambda data: f"{max(data.brakeWearFL, data.brakeWearFR):.6f}"),
+                flags=flag_selectable,
+                config="show_column_brake_wear_front",
+            ),
+            _add_data_column(
+                key="brake_wear",
+                name="Pad R(mm)",
+                width=6,
+                process=(lambda data: f"{max(data.brakeWearRL, data.brakeWearRR):.6f}"),
+                flags=flag_selectable,
+                config="show_column_brake_wear_rear",
+            ),
+            _add_data_column(
+                key="tank",
+                name=f"Tank({self.symbol_fuel})",
+                width=5,
+                process=(lambda data: f"{self.unit_fuel(data.capacityFuel):.3f}"),
+                flags=flag_selectable,
+                config="show_column_tank_capacity",
+            ),
         )
 
         self.table_history = QTableWidget(self)
         self.table_history.setColumnCount(len(self.columns))
-        self.table_history.setHorizontalHeaderLabels([col["header"] for col in self.columns])
+        self.table_history.setHorizontalHeaderLabels([col["name"] for col in self.columns])
         self.table_history.verticalHeader().setVisible(False)
         self.table_history.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
@@ -468,7 +501,7 @@ class HistoryPanel(QWidget):
             table.insertRow(row_index)
             for column_index, col in enumerate(self.columns):
                 item = self._add_table_item(
-                    header=col["name"],
+                    key=col["key"],
                     text=col["process"](lap_data),
                     flags=col["flags"],
                     highlight=highlight_color if col["highlight"] else None,
@@ -489,10 +522,10 @@ class HistoryPanel(QWidget):
             else:
                 separator_color = None
 
-    def _add_table_item(self, header: str, text: str, flags: Qt.ItemFlags, highlight=None, background=None):
+    def _add_table_item(self, key: str, text: str, flags: Qt.ItemFlags, highlight=None, background=None):
         """Add table item"""
         item = QTableWidgetItem()
-        item.header = header
+        item.column_key = key
         item.setText(text)
         item.setTextAlignment(Qt.AlignCenter)
         item.setFlags(flags)
@@ -577,12 +610,18 @@ class CalculatorPanel(QWidget):
             self.input_fuel.capacity.setValue(self.unit_fuel(capacity))
         # Load consumption from last valid lap
         if latest_history.isValidLap:
+            # Fuel
             fuel_used = latest_history.lastLapUsedFuel
             self.input_fuel.fuel_used.setValue(self.unit_fuel(fuel_used))
+            # Energy
             energy_used = latest_history.lastLapUsedEnergy
             self.input_fuel.energy_used.setValue(energy_used)
-            tyre_wear = latest_history.tyre_wear_average()
+            # Tyre wear
+            tyre_wear = max(latest_history.tyre_wear())
             self.input_tyre.wear_lap.setValue(tyre_wear)
+            # Brake wear
+            brake_wear = max(latest_history.brake_wear())
+            self.input_brake.wear_millimeter.setValue(brake_wear)
 
     def add_table_data(self, selected_data: list[QTableWidgetItem]):
         """Add selected history data"""
@@ -590,19 +629,22 @@ class CalculatorPanel(QWidget):
         data_fuel = []
         data_energy = []
         data_tyrewear = []
+        data_brakewear = []
         data_capacity = []
 
         for data in selected_data:
-            header = data.header
-            if header == "time":
+            column_key = data.column_key
+            if column_key == "time":
                 data_laptime.append(laptime_string_to_seconds(data.text()))
-            elif header == "fuel":
+            elif column_key == "fuel":
                 data_fuel.append(float(data.text()))
-            elif header == "energy":
+            elif column_key == "energy":
                 data_energy.append(float(data.text()))
-            elif header == "tyre":
+            elif column_key == "tyre_wear":
                 data_tyrewear.append(float(data.text()))
-            elif header == "tank":
+            elif column_key == "brake_wear":
+                data_brakewear.append(float(data.text()))
+            elif column_key == "tank":
                 data_capacity.append(data)
 
         # Send data to calculator
@@ -620,6 +662,9 @@ class CalculatorPanel(QWidget):
         if data_tyrewear:
             output_value = calc.dataset_mean(data_tyrewear)
             self.input_tyre.wear_lap.setValue(output_value)
+        if data_brakewear:
+            output_value = calc.dataset_mean(data_brakewear)
+            self.input_brake.wear_millimeter.setValue(output_value)
         if data_capacity:
             output_value = float(data_capacity[0].text())
             self.input_fuel.capacity.setValue(output_value)

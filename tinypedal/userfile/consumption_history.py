@@ -39,7 +39,7 @@ def parse_consumption(data_reader, default_data):
         # Update deprecated tyre wear data
         if not data.get("tyreWearFL"):
             tyre_wear_avg = data.get("tyreAvgWearLast")
-            if tyre_wear_avg:
+            if tyre_wear_avg:  # replace with individual wear
                 data["tyreWearFL"] = tyre_wear_avg
                 data["tyreWearFR"] = tyre_wear_avg
                 data["tyreWearRL"] = tyre_wear_avg

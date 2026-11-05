@@ -128,6 +128,7 @@ def record_consumption_history(output: HistoryInfo, filepath: str):
             or output.consumptionDataSet[0].lapNumber != lap_number
         ):
             tyre_wear = minfo.wheels.lastLapTreadWear
+            brake_wear = minfo.wheels.lastLapBrakeWear
             output.consumptionDataSet.appendleft(
                 ConsumptionData(
                     lapNumber=lap_number,
@@ -143,6 +144,10 @@ def record_consumption_history(output: HistoryInfo, filepath: str):
                     tyreWearFR=tyre_wear[1],
                     tyreWearRL=tyre_wear[2],
                     tyreWearRR=tyre_wear[3],
+                    brakeWearFL=brake_wear[0],
+                    brakeWearFR=brake_wear[1],
+                    brakeWearRL=brake_wear[2],
+                    brakeWearRR=brake_wear[3],
                 )
             )
             output.consumptionDataVersion += 1

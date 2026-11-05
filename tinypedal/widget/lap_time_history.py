@@ -418,8 +418,8 @@ class Realtime(Overlay):
 
             if self.wcfg["show_wear"]:
                 if self.wcfg["show_highest_wear"]:
-                    wear = data.tyre_wear_max()
+                    wear = max(data.tyre_wear())
                 else:
-                    wear = data.tyre_wear_average()
+                    wear = calc.fmean(data.tyre_wear())
                 self.update_wear(self.bars_wear[index], wear)
                 self.bars_wear[index].setHidden(hidden)
