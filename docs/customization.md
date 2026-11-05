@@ -904,15 +904,18 @@ Note, you will still need a third party program (such as `OpenKneeboard`) to pro
     combined_mode
 Enable overlay combined mode for displaying widgets. This option is disabled by default.
 
-While `Combined Mode` disabled, each Widget will be displayed in separate window. This is the default setting.
+While `Combined Mode` disabled, each Widget will be displayed in separate window. This is the default and recommended setting for normal use.
 
 While `Combined Mode` enabled, all Widgets will be combined and drawn in one single maximized window. This may improve performance and compatibility when using `OpenKneeboard` (or similar tool) for displaying overlay in `VR`, and easier to project overlay window.
 
+Generally, it is only recommended to enable this option for `VR`, or there is noticeable performance gain while enabled.
+
 **Known issues when enabled Combined Mode:**
 
-* Some widgets may show visual artifacts when moved and displayed on top of other widgets, such as Navigation and Radar Widget (try not to overlap widgets).
-* With multi-screen, all widgets will only be displayed on one of the screens.
-* Individual widget's "opacity" option doesn't work. To workaround this issue, a new "overlay_combined_mode_opacity" option is added to "Compatibility" config dialog, which allows to set overall overlay opacity.
+* Some widgets may show visual artifacts when displayed on top of other widgets, such as Navigation and Radar Widget.
+* On multi-screen, all widgets will only be displayed on one of the screens. Thus it is not recommended to enable this option for multi-screen.
+* Individual widget's `opacity` option doesn't work. To workaround this issue, a new `overlay_combined_mode_opacity` option is added to `Compatibility` config dialog, which allows to set overall overlay opacity. Note, opacity may not work on Linux.
+* Slightly increase (roughly 10%) in memory and CPU usage due to extra drawing overheads.
 
 [**`Back to Top`**](#)
 
@@ -1872,7 +1875,10 @@ Set maximum rotation difference between left or right wheel rotation and same ax
 Set percentage threshold for counting wheel lock duration under braking. `0.3` means 30% of tyre slip ratio.
 
     minimum_delta_distance
-Set minimum recording distance (in meters) between each tyre wear sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
+Set minimum recording distance (in meters) between each tyre or brake wear sample. Default value is `5` meters. Lower value may result more samples recorded and bigger file size; higher value may result less samples recorded and inaccuracy. Recommended value range in `5` to `10` meters.
+
+    minimum_brake_failure_detection_time
+Set minimum detection time (seconds) for detecting brake failure while under braking. Default is `3` seconds. Minimum detection time is limited to `1` second.
 
     enable_suspension_measurement_while_offroad
 Enable suspension travel measurement while vehicle is offroad. This option should be disabled for road racing for more accurate suspension measurement. This option is disabled by default.

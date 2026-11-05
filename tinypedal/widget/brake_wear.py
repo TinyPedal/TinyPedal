@@ -248,7 +248,7 @@ class Realtime(Overlay):
         data = minfo.wheels
         for idx in range(4):
             brake_curr = data.currentBrakeThickness[idx]
-            is_failed = brake_curr <= 0
+            is_failed = data.isBrakeFailed[idx]
 
             # Calculate effective thickness in millimeters
             failure_thickness = data.failureBrakeThickness[idx]
@@ -276,7 +276,7 @@ class Realtime(Overlay):
                     threshold_remaining = self.threshold_remaining * max_thickness
                 else:
                     threshold_remaining = self.threshold_remaining * 100
-                self.update_remain(self.bars_remain[idx], brake_curr, threshold_remaining, is_failed)
+                self.update_remain(self.bars_remain[idx], 0 if is_failed else brake_curr, threshold_remaining)
 
             # Wear differences
             if self.wcfg["show_wear_difference"]:
@@ -297,11 +297,11 @@ class Realtime(Overlay):
                 self.update_mins(self.bars_mins[idx], wear_mins)
 
     # GUI update methods
-    def update_remain(self, target, data, threshold_remaining, is_failed):
+    def update_remain(self, target, data, threshold_remaining):
         """Remaining brake thickness"""
         if target.last != data:
             target.last = data
-            if is_failed:
+            if data == 0:
                 text = "FAIL"
             else:
                 text = f"{data:.2f}"[:4].strip(".")

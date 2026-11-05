@@ -801,6 +801,7 @@ class WheelsInfo:
     lastLapBrakeWear: list[float] = df_list(0.0, 4)
     estimatedBrakeWear: list[float] = df_list(0.0, 4)
     estimatedValidBrakeWear: list[float] = df_list(0.0, 4)
+    isBrakeFailed: list[bool] = df_list(False, 4)
     # Suspension
     currentSuspensionPosition: list[float] = df_list(0.0, 4)
     staticSuspensionPosition: list[float] = df_list(0.0, 4)

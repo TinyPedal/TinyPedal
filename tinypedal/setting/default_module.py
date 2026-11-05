@@ -111,6 +111,7 @@ MODULE_DEFAULT = {
         "maximum_rotation_difference_rear": 0.002,
         "wheel_lock_threshold": 0.3,
         "minimum_delta_distance": 5,
+        "minimum_brake_failure_detection_time": 3,
         "average_suspension_position_samples": 20,
         "average_suspension_position_margin": 1,
         "enable_suspension_measurement_while_offroad": False,

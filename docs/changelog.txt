@@ -2,12 +2,13 @@ WIP
 -----------------------------
 * Overlay
   - Added "Combined Mode" option in "Overlay" menu, which sets overlay combined mode for displaying widgets. This option is disabled by default.
-    While "Combined Mode" disabled, each Widget will be displayed in separate window. This is the default setting.
     While "Combined Mode" enabled, all Widgets will be combined and drawn in one single maximized window, which may improve performance and compatibility when using "OpenKneeboard" (or similar tool) for displaying overlay in "VR", and easier to project overlay window.
+    Generally, it is only recommended to enable this option for "VR", or there is noticeable performance gain while enabled.
   - Known issues when enabled "Combined Mode":
-    - Some widgets may show visual artifacts when moved and displayed on top of other widgets, such as Navigation and Radar Widget (try not to overlap widgets).
-    - With multi-screen, all widgets will only be displayed on one of the screens.
-    - Individual widget's "opacity" option doesn't work. To workaround this issue, a new "overlay_combined_mode_opacity" option is added to "Compatibility" config dialog, which allows to set overall overlay opacity.
+    - Some widgets may show visual artifacts when displayed on top of other widgets, such as Navigation and Radar Widget.
+    - On multi-screen, all widgets will only be displayed on one of the screens. Thus it is not recommended to enable this option for multi-screen.
+    - Individual widget's "opacity" option doesn't work. To workaround this issue, a new "overlay_combined_mode_opacity" option is added to "Compatibility" config dialog, which allows to set overall overlay opacity. Note, opacity may not work on Linux.
+    - Slightly increase (roughly 10%) in memory and CPU usage due to extra drawing overheads.
 
 * Hotkey Tab
   - Added "Overlay Combined Mode" keybinding for toggling overlay combined mode.
@@ -24,6 +25,10 @@ WIP
 * Stint Module
   - Added stint lap number and brake wear logging to Consumption History data.
   - Increased maximum Consumption History data logging from "100" to "300" most recent laps per vehicle class.
+
+* Wheels Module
+  - Added "minimum_brake_failure_detection_time" option, which sets minimum detection time (seconds) for detecting brake failure while under braking. Default is "3" seconds. Minimum detection time is limited to "1" second.
+  - Improved brake failure detection and logging methods.
 
 * Pace notes playback
   - Added "Enable Playback While Spectating" check box, which allows to enable or disable pace notes playback while "Spectate" mode enabled. This option is disabled by default.
