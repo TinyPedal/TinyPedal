@@ -906,7 +906,7 @@ Enable overlay combined mode for displaying widgets. This option is disabled by 
 
 While `Combined Mode` disabled, each Widget will be displayed in separate window. This is the default and recommended setting for normal use.
 
-While `Combined Mode` enabled, all Widgets will be combined and drawn in one single maximized window. This may improve performance and compatibility when using `OpenKneeboard` (or similar tool) for displaying overlay in `VR`, and easier to project overlay window.
+While `Combined Mode` enabled, all Widgets will be combined and drawn in one single maximized window. This may improve performance and compatibility when using `OpenKneeboard` (or similar tool) for displaying overlay in `VR`, and making it easier to project overlay window.
 
 Generally, it is only recommended to enable this option for `VR`, or there is noticeable performance gain while enabled.
 
@@ -2071,7 +2071,7 @@ Set duration (seconds) for continuously updating average brake temperature for a
 2 layouts are available: `0` = vertical layout, `1` = horizontal layout.
 
     show_thickness
-Show brake thickness (millimeter) instead of percentage, which also affects wear difference readings.
+Show remaining brake thickness (millimeter).
 
 Note, brake maximum thickness (for percentage wear calculation) is retrieved at the moment when car leaves garage or has brake repaired or changed. Reloading a preset or restarting APP in the middle of a running stint could result wrong maximum thickness and percentage wear calculation, which should be avoided.
 
@@ -2086,7 +2086,7 @@ Since brake failure thickness threshold data is not available from game API, it 
 See Wiki Appendix for common vehicle's brake thickness reference table.
 
     show_remaining
-Show total remaining brake in percentage that changes color according to wear. A `FAIL` text will be shown on failed brakes.
+Show remaining brake thickness in percentage that changes color according to wear. A `FAIL` text will be shown on failed brakes.
 
     show_wear_difference
 Show estimated brake wear difference per lap (at least one valid lap is required).

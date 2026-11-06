@@ -2,13 +2,9 @@ WIP
 -----------------------------
 * Overlay
   - Added "Combined Mode" option in "Overlay" menu, which sets overlay combined mode for displaying widgets. This option is disabled by default.
-    While "Combined Mode" enabled, all Widgets will be combined and drawn in one single maximized window, which may improve performance and compatibility when using "OpenKneeboard" (or similar tool) for displaying overlay in "VR", and easier to project overlay window.
+    While "Combined Mode" enabled, all Widgets will be combined and drawn in one single maximized window, which may improve performance and compatibility when using "OpenKneeboard" (or similar tool) for displaying overlay in "VR", and making it easier to project overlay window.
     Generally, it is only recommended to enable this option for "VR", or there is noticeable performance gain while enabled.
-  - Known issues when enabled "Combined Mode":
-    - Some widgets may show visual artifacts when displayed on top of other widgets, such as Navigation and Radar Widget.
-    - On multi-screen, all widgets will only be displayed on one of the screens. Thus it is not recommended to enable this option for multi-screen.
-    - Individual widget's "opacity" option doesn't work. To workaround this issue, a new "overlay_combined_mode_opacity" option is added to "Compatibility" config dialog, which allows to set overall overlay opacity. Note, opacity may not work on Linux.
-    - Slightly increase (roughly 10%) in memory and CPU usage due to extra drawing overheads.
+  - See User Guide "Overlay" section for details about "Combined Mode".
 
 * Hotkey Tab
   - Added "Overlay Combined Mode" keybinding for toggling overlay combined mode.
@@ -38,6 +34,9 @@ WIP
     This option is provided for compatibility purpose, which may be used with alternative RF2 SharedMemory Plugin, such as [RF2.3.8.SharedMemoryMapPlugin.dll](https://github.com/TonyWhitley/rF2SharedMemoryMapPlugin/releases) that used by CrewChief.
     Note, to use with "RF2.3.8.SharedMemoryMapPlugin.dll", set prefix value to "rF2.3.8.". Remember to update prefix value (with matching version value) if a new version of the plugin DLL file installed in game.
   - Fixed an issue that caused RF2 API not working on Linux.
+
+* Brake wear
+  - "show_thickness" option now shows remaining brake thickness separately from "show_remaining" option.
 
 * Damage Widget
   - Added "global_scale" option (requested by user "cnc3937-eng"), which allows to scale display size without adjusting size of individual parts. Default scale is "1.0". Minimum scale is limited to "0.1".

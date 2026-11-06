@@ -58,6 +58,44 @@ class Realtime(Overlay):
         self.threshold_remaining = min(max(self.wcfg["warning_threshold_remaining"], 0), 100) * 0.01
 
         # Remaining brake thickness
+        if self.wcfg["show_thickness"]:
+            layout_thick = self.set_grid_layout()
+            self.bar_style_thick = (
+                self.wcfg["font_color_thickness"],
+                self.wcfg["font_color_warning"],
+            )
+            self.bars_thick = self.set_rawtext(
+                text=DATA.TEXT_NA,
+                padding=bar_padx,
+                width=bar_width,
+                fixed_height=font_m.height,
+                offset_y=font_m.voffset,
+                fg_color=self.bar_style_thick[0],
+                bg_color=self.wcfg["background_color_thickness"],
+                count=4,
+                last=0,
+            )
+            self.set_grid_layout_quad(
+                layout=layout_thick,
+                targets=self.bars_thick,
+            )
+            self.set_primary_orient(
+                target=layout_thick,
+                column=self.wcfg["display_order_thickness"],
+            )
+
+            if self.wcfg["show_caption"]:
+                cap_thick = self.set_rawtext(
+                    font=font_cap,
+                    text=self.wcfg["caption_text_thickness"],
+                    fixed_height=font_cap_m.height,
+                    offset_y=font_cap_m.voffset,
+                    fg_color=self.wcfg["font_color_caption"],
+                    bg_color=self.wcfg["background_color_caption"],
+                )
+                layout_thick.addWidget(cap_thick, 0, 0, 1, 0)
+
+        # Remaining brake percent
         if self.wcfg["show_remaining"]:
             layout_remain = self.set_grid_layout()
             self.bar_style_remain = (
@@ -261,22 +299,21 @@ class Realtime(Overlay):
             if max_thickness <= 0:  # bypass invalid value
                 max_thickness = 99999999
 
+            # Brake thickness
+            if self.wcfg["show_thickness"]:
+                self.update_thick(self.bars_thick[idx], 0 if is_failed else brake_curr, self.threshold_remaining * max_thickness)
+
             # Convert to percent
             live_wear_percent = live_wear * 100 / max_thickness
             est_wear_percent = est_wear * 100 / max_thickness
-            if not self.wcfg["show_thickness"]:
-                brake_curr *= 100 / max_thickness
-                live_wear *= 100 / max_thickness
-                est_wear *= 100 / max_thickness
-                est_valid_wear *= 100 / max_thickness
+            brake_curr *= 100 / max_thickness
+            live_wear *= 100 / max_thickness
+            est_wear *= 100 / max_thickness
+            est_valid_wear *= 100 / max_thickness
 
             # Remaining brake thickness
             if self.wcfg["show_remaining"]:
-                if self.wcfg["show_thickness"]:
-                    threshold_remaining = self.threshold_remaining * max_thickness
-                else:
-                    threshold_remaining = self.threshold_remaining * 100
-                self.update_remain(self.bars_remain[idx], 0 if is_failed else brake_curr, threshold_remaining)
+                self.update_remain(self.bars_remain[idx], 0 if is_failed else brake_curr, self.threshold_remaining * 100)
 
             # Wear differences
             if self.wcfg["show_wear_difference"]:
@@ -297,8 +334,20 @@ class Realtime(Overlay):
                 self.update_mins(self.bars_mins[idx], wear_mins)
 
     # GUI update methods
-    def update_remain(self, target, data, threshold_remaining):
+    def update_thick(self, target, data, threshold_remaining):
         """Remaining brake thickness"""
+        if target.last != data:
+            target.last = data
+            if data == 0:
+                text = "FAIL"
+            else:
+                text = f"{data:.2f}"[:4].strip(".")
+            target.text = text
+            target.fg = self.bar_style_thick[data <= threshold_remaining]
+            target.update()
+
+    def update_remain(self, target, data, threshold_remaining):
+        """Remaining brake percent"""
         if target.last != data:
             target.last = data
             if data == 0:
