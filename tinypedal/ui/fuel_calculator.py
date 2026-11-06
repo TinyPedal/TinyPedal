@@ -449,14 +449,12 @@ class HistoryPanel(QWidget):
         self.table_history.setHorizontalHeaderLabels([col["name"] for col in self.columns])
         self.table_history.verticalHeader().setVisible(False)
         self.table_history.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        for idx, col in enumerate(self.columns):
+            self.table_history.setColumnWidth(idx, UIScaler.size(col["width"]))
 
         table_hori_header = self.table_history.horizontalHeader()
         table_hori_header.setSectionResizeMode(QHeaderView.Fixed)
         table_hori_header.setStretchLastSection(True)
-
-        for idx, col in enumerate(self.columns):
-            self.table_history.setColumnWidth(idx, UIScaler.size(col["width"]))
-
         table_hori_header.setContextMenuPolicy(Qt.CustomContextMenu)
         table_hori_header.customContextMenuRequested.connect(parent.table_header_menu)
         self.toggle_column()

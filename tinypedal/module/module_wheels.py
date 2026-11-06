@@ -301,7 +301,7 @@ def calc_tyre_wear(output: WheelsInfo, min_delta_distance: float, lock_threshold
                 pos_last = pos_curr
 
         # Find delta data index
-        if is_valid_delta and api.read.timing.current_laptime() > 0.3:
+        if is_valid_delta:
             index_higher = calc.binary_search_higher_column(
                 delta_array_last, pos_curr, 0, len(delta_array_last) - 1)
         else:
@@ -415,6 +415,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float, min_failure_t
         if max(brake_curr_set) < 0:
             continue
 
+        brake_input = api.read.inputs.brake()
         elapsed_time = api.read.timing.elapsed()
         delta_time = elapsed_time - last_elapsed_time
         last_elapsed_time = elapsed_time
@@ -454,7 +455,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float, min_failure_t
                 pos_last = pos_curr
 
         # Find delta data index
-        if is_valid_delta and api.read.timing.current_laptime() > 0.3:
+        if is_valid_delta:
             index_higher = calc.binary_search_higher_column(
                 delta_array_last, pos_curr, 0, len(delta_array_last) - 1)
         else:
@@ -467,9 +468,9 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float, min_failure_t
                 failure_record[idx] = brake_curr
                 failure_timer[idx] = 0.0
             elif (
-                failure_timer[idx] < min_failure_time
+                brake_input > 0.2  # min 20% brake input
+                and failure_timer[idx] < min_failure_time
                 and abs(wheel_rot[idx]) > 4  # min 4 rotation per second
-                and api.read.inputs.brake() > 0.2  # min 20% brake input
             ):
                 failure_timer[idx] += delta_time
                 if failure_timer[idx] >= min_failure_time:

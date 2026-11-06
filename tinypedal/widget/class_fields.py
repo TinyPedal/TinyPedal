@@ -139,15 +139,17 @@ class Realtime(Overlay):
         for data in islice(veh_info.dataSet, veh_info.totalVehicles):
             class_name = data.vehicleClass
             position_overall = data.positionOverall
-            is_active = data.inPit != 2  # not in garage (DNF or DQ will end up in garage)
             field = class_data.get(class_name)
+            # Add new field
             if field is None:
-                class_data[class_name] = [position_overall, is_active, 1]
-            else:
-                if field[0] > position_overall:
-                    field[0] = position_overall
-                field[1] += is_active
-                field[2] += 1
+                class_data[class_name] = [position_overall, 0, 0]
+                field = class_data[class_name]
+            # Update field
+            if field[0] > position_overall:
+                field[0] = position_overall
+            if data.inPit != 2:  # not in garage (DNF or DQ will end up in garage)
+                field[1] += 1
+            field[2] += 1
 
         return tuple(
             (class_name, active, total)
