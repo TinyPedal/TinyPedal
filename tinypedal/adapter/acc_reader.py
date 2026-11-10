@@ -547,10 +547,14 @@ class Session(_reader.Session, DataAdapter):
         return acc_sky_type(self.shmm.accGraphicsInfo.rainIntensity)
 
     def grip_level(self) -> float:
-        """Track base grip level, convert to fraction 0.0 to 1.0"""
+        """Track base grip level, convert to fraction 0.0 to 1.0
+
+        Grip level in percent:
+            0=green, 70=fast, 100 = optium
+        """
         grip = self.shmm.accGraphicsInfo.trackGripStatus
         if grip == 1:
-            return 0.6
+            return 0.7
         if grip == 2:
             return 1.0
         return 0.0

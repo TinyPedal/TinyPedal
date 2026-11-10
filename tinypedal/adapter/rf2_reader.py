@@ -459,7 +459,7 @@ class Session(_reader.Session, DataAdapter):
         """Rain severity (fraction), range 0.0 - 1.0
 
         Rain in percent:
-            1-10 drizzle, 11-20 light rain, 21-40 rain, 41-60 heavy rain, 61-100 storm
+            1-10=drizzle, 11-20=light rain, 21-40=rain, 41-60=heavy rain, 61-100=storm
 
         Notes:
             - Game API only reports those data with limited accuracy,

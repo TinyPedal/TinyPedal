@@ -461,7 +461,7 @@ class Session(_reader.Session, DataAdapter):
         """Rain severity (fraction), range 0.0 - 1.0
 
         Rain in percent:
-            1-10 drizzle, 11-20 light rain, 21-40 rain, 41-60 heavy rain, 61-100 storm
+            1-10=drizzle, 11-20=light rain, 21-40=rain, 41-60=heavy rain, 61-100=storm
 
         Notes:
             - Game API only reports those data with limited accuracy,
@@ -538,12 +538,16 @@ class Session(_reader.Session, DataAdapter):
         return 10
 
     def grip_level(self) -> float:
-        """Track base grip level, convert to fraction 0.0 to 1.0"""
+        """Track base grip level, convert to fraction 0.0 to 1.0
+
+        Grip level in percent:
+            0=green, 50=low, 70=medium, 90=heavy, 100=saturated
+        """
         grip = self.shmm.lmuScorInfo.mTrackGripLevel
         if grip == 1:
-            return 0.3
+            return 0.5
         if grip == 2:
-            return 0.6
+            return 0.7
         if grip == 3:
             return 0.9
         if grip == 4:
