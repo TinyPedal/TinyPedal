@@ -541,7 +541,7 @@ class Session(_reader.Session, DataAdapter):
         """Track base grip level, convert to fraction 0.0 to 1.0
 
         Grip level in percent:
-            0=green, 50=low, 70=medium, 90=heavy, 100=saturated
+            0=green, 50=low, 70=medium, 80=heavy, 100=saturated
         """
         grip = self.shmm.lmuScorInfo.mTrackGripLevel
         if grip == 1:
@@ -549,7 +549,7 @@ class Session(_reader.Session, DataAdapter):
         if grip == 2:
             return 0.7
         if grip == 3:
-            return 0.9
+            return 0.8
         if grip == 4:
             return 1.0
         return 0.0
