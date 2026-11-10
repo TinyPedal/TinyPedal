@@ -210,7 +210,7 @@ pip3 install py2exe
 
 To build executable file, run command:
 ```sh
-python freeze_py2exe.py
+python freeze_pyside2.py
 ```
 
 After building completed, executable file can be found in `dist\TinyPedal` folder.

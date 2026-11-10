@@ -1,5 +1,5 @@
 """
-py2exe build script
+py2exe build script for PySide2 & Python 3.8-3.10 only
 """
 
 from __future__ import annotations
