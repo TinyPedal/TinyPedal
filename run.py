@@ -147,8 +147,11 @@ def override_pyside_version(version: int = 6):
     """Override PySide version 2 to 6"""
     if version != 6:
         return
+    # Import PySide6 directly so it works with build script
+    from PySide6 import QtCore, QtGui, QtMultimedia, QtWidgets
+
     original = "PySide2"
-    override = f"PySide{version}"
+    override = "PySide6"
     override_module(original, override)
     override_module(f"{original}.QtCore", f"{override}.QtCore")
     override_module(f"{original}.QtGui", f"{override}.QtGui")
@@ -158,7 +161,7 @@ def override_pyside_version(version: int = 6):
 
 def override_module(original: str, override: str):
     """Manual import & override module"""
-    sys.modules[original] = __import__(override, fromlist=[override])
+    sys.modules[original] = sys.modules[override]
 
 
 # General function
