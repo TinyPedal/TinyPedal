@@ -1,5 +1,9 @@
 """
-py2exe build script for PySide2 & Python 3.8-3.10 only
+py2exe build script for PySide2
+
+Requires:
+- Python 3.8, 3.9, 3.10
+- py2exe <=0.13.0.2, >=0.12.0.0 (>=0.14 doesn't work with Python 3.8, 3.9)
 """
 
 from __future__ import annotations
@@ -10,7 +14,7 @@ import shutil
 import sys
 from glob import glob
 
-from py2exe import freeze
+import py2exe
 
 from run import add_argument, parse_argument
 from tinypedal import version_check
@@ -103,6 +107,23 @@ def delete_old_build(dist_path: str) -> bool:
         return False
 
 
+def check_build_info(dist_path: str) -> None:
+    """Check build info"""
+    print("INFO:py2exe:", py2exe.__version__)
+    print("INFO:Build path:", os.path.abspath(dist_path))
+    print("INFO:Platform:", PLATFORM.SYSTEM)
+    print("INFO:TinyPedal:", APP.VERSION)
+    print("INFO:Python:", version_check.python())
+    print("INFO:Qt:", version_check.qt())
+    print("INFO:PySide:", version_check.pyside())
+    print("INFO:psutil:", version_check.psutil())
+
+    if not PLATFORM.WINDOWS:
+        print("ERROR:Build script does not support none Windows platform")
+        print("INFO:Building canceled")
+        sys.exit()
+
+
 def build_exe(dist_path: str) -> None:
     """Building executable file"""
     PYTHON_PATH = sys.exec_prefix
@@ -124,6 +145,7 @@ def build_exe(dist_path: str) -> None:
     ]
     # ---------------------------------------------------
     EXCLUDE_MODULES = [
+        "PySide6",  # in case both PySide2 & PySide6 installed
         "difflib",
         "pdb",
         "venv",
@@ -155,7 +177,7 @@ def build_exe(dist_path: str) -> None:
     ]
     if sys.version_info < (3, 10):
         EXCLUDE_MODULES += [
-            # Required by pyside2 on python 3.10+
+            # Not required on python 3.8, 3.9
             "urllib",
             "pathlib",
         ]
@@ -201,7 +223,7 @@ def build_exe(dist_path: str) -> None:
         ("mediaservice", QT_MEDIASERVICE),
     ]
     # ---------------------------------------------------
-    freeze(
+    py2exe.freeze(
         version_info=BUILD_VERSION,
         windows=EXECUTABLE_SETTING,
         options=BUILD_OPTIONS,
@@ -212,27 +234,13 @@ def build_exe(dist_path: str) -> None:
 
 def build_start() -> None:
     """Start building"""
-    # Add search path for third party modules
-    sys.path.append("thirdparty")
-
     cli_args = get_cli_argument()
     dist_path = check_dist(cli_args.get("output", "dist"))
     if not dist_path:
         print("INFO:Building canceled")
         return
 
-    print("INFO:Build path:", os.path.abspath(dist_path))
-    print("INFO:Platform:", PLATFORM.SYSTEM)
-    print("INFO:TinyPedal:", APP.VERSION)
-    print("INFO:Python:", version_check.python())
-    print("INFO:Qt:", version_check.qt())
-    print("INFO:PySide:", version_check.pyside())
-    print("INFO:psutil:", version_check.psutil())
-
-    if not PLATFORM.WINDOWS:
-        print("ERROR:Build script does not support none Windows platform")
-        print("INFO:Building canceled")
-        return
+    check_build_info(dist_path)
 
     if check_old_build(cli_args.get("clean", False), dist_path):
         build_exe(dist_path)
@@ -241,4 +249,8 @@ def build_start() -> None:
         print("INFO:Building canceled")
 
 
-build_start()
+if __name__ == "__main__":
+    # Add search path for third party modules
+    sys.path.append("thirdparty")
+
+    build_start()

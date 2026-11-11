@@ -136,7 +136,7 @@ Note, if game cannot generate `rFactor2SharedMemoryMapPlugin64.dll` entry in `Cu
 > [!IMPORTANT]
 > Make sure to check Python version before installing additional dependencies.
 >
-> PySide2 may not be available for Python version higher than 3.10; or requires PySide6 instead for running with newer Python version. PySide6 is currently supported only via command line argument, see [Command Line Arguments](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide#command-line-arguments) in User Guide for details.
+> PySide2 may not be available for Python version higher than 3.10; or requires PySide6 instead for running with newer Python version. PySide6 is supported via command line argument, see [Command Line Arguments](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide#command-line-arguments) in User Guide for details.
 
 ### Download source code
 
@@ -203,20 +203,31 @@ python run.py
 
 Executable file can be built with [py2exe](http://www.py2exe.org).
 
+> [!NOTE]
+> For building with `PySide2`, `py2exe` version `0.12.0.0` or higher is required (but no higher than `0.13.0.2`).\
+> For building with `PySide6`, `py2exe` version `0.13.0.2` or higher is required.
+
 To install py2exe, run command:
 ```sh
 pip3 install py2exe
 ```
 
-To build executable file, run command:
+To build executable file with `PySide2`, run command:
 ```sh
 python freeze_pyside2.py
 ```
 
+Alternatively, to build with `PySide6`, run command instead:
+```sh
+python freeze_pyside6.py
+```
+
 After building completed, executable file can be found in `dist\TinyPedal` folder.
 
-> [!NOTE]
-> The build script only supports py2exe `v0.12.0.0` or higher. The build script does not support `PySide6`.
+The build script also supports command line arguments, type following command to check for available arguments:
+```sh
+python freeze_pyside2.py --help
+```
 
 ## Running on Linux
 

@@ -240,7 +240,16 @@ def main():
     )
     opt_log_level = cli_args.get("log_level", arg_log_level["default"])
     opt_single_instance = cli_args.get("single_instance", arg_single_instance["default"]) != 0
-    opt_pyside_override = cli_args.get("pyside", arg_pyside["default"])
+
+    if os.getenv("RUN_FROM_SOURCE"):
+        opt_pyside_override = cli_args.get("pyside", arg_pyside["default"])
+    else:  # ignore pyside argument if not run from source
+        opt_pyside_override = 2
+        try:  # check whether built with PySide6
+            import PySide2
+        except ImportError:
+            import PySide6
+            opt_pyside_override = 6
 
     # Check whether to override PySide version
     override_pyside_version(opt_pyside_override)

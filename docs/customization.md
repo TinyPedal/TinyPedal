@@ -383,7 +383,7 @@ To run multiple copies of TinyPedal at same time: `python .\run.py -s 0` or `.\t
 Single instance mode saves `pid.log` file in the same folder as `tinypedal.log`, which is used for instance identification.
 
     -p, --pyside
-Set PySide (Qt for Python) module version. Set `2` for PySide2 (default). Set `6` for PySide6. Currently, this option is only available while `running from source`, and mainly for testing purpose or used on platform where PySide2 is no longer available.
+Set PySide (Qt for Python) module version. Set `2` for PySide2 (default). Set `6` for PySide6. Note, currently PySide2 is the primary supported version.
 
 [**`Back to Top`**](#)
 
