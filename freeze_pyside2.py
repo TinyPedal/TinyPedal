@@ -4,7 +4,6 @@ py2exe build script for PySide2 & Python 3.8-3.10 only
 
 from __future__ import annotations
 
-import argparse
 import os
 import re
 import shutil
@@ -13,29 +12,34 @@ from glob import glob
 
 from py2exe import freeze
 
+from run import add_argument, parse_argument
 from tinypedal import version_check
 from tinypedal.constant import APP, FILE, PLATFORM
 
 
 def get_cli_argument():
     """Get command line argument"""
-    parse = argparse.ArgumentParser(
-        description="TinyPedal windows excutable build command line arguments"
+    arg_clean = add_argument(
+        name="clean",
+        arguments=("-c", "--clean"),
+        help="force clean build; remove old build folder before building",
     )
-    parse.add_argument(
-        "-c",
-        "--clean",
-        action="store_true",
-        help="force remove old build folder before building",
-    )
-    parse.add_argument(
-        "-p",
-        "--path",
-        type=str,
+    arg_output = add_argument(
+        name="output",
+        arguments=("-o", "--output"),
         default="dist",
-        help="set build folder for distribution files, default to './dist'",
+        help="set output build folder for distribution files, default to './dist'",
     )
-    return parse.parse_args()
+    cli_args = parse_argument(
+        headline="TinyPedal windows excutable build command line arguments",
+        exe_name=__file__,
+        user_arguments=sys.argv,
+        app_arguments=(
+            arg_clean,
+            arg_output,
+        ),
+    )
+    return cli_args
 
 
 def check_dist(dist_path: str) -> str:
@@ -212,7 +216,7 @@ def build_start() -> None:
     sys.path.append("thirdparty")
 
     cli_args = get_cli_argument()
-    dist_path = check_dist(cli_args.path)
+    dist_path = check_dist(cli_args.get("output", "dist"))
     if not dist_path:
         print("INFO:Building canceled")
         return
@@ -230,7 +234,7 @@ def build_start() -> None:
         print("INFO:Building canceled")
         return
 
-    if check_old_build(cli_args.clean, dist_path):
+    if check_old_build(cli_args.get("clean", False), dist_path):
         build_exe(dist_path)
         print("INFO:Building finished")
     else:

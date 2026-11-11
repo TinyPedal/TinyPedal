@@ -29,8 +29,22 @@ import sys
 
 
 # Argument function
-def add_argument(name: str, arguments: tuple[str, ...], choices: tuple[int, ...], default: int | None, help: str) -> dict:
-    """Add argument"""
+def add_argument(
+    name: str,
+    arguments: tuple[str, ...],
+    choices: tuple[int, ...] = (),
+    default: int | None = None,
+    help: str = "",
+) -> dict:
+    """Add argument
+
+    Args:
+        name: argument key name.
+        arguments: short and/or long argument name, for example ("-o", "--output").
+        choices: optional argument value choice (tuple), for example (0, 1, 2).
+        default: optional argument default value.
+        help: help text.
+    """
     return {
         "name": name,
         "arguments": arguments,
@@ -64,10 +78,10 @@ def print_help(desc: str, exe_name: str, help_arg: dict, app_args: tuple[dict, .
     for arg_info in app_args:
         file.write(format_argument(arg_info))
         arguments = arg_info["arguments"]
-        choices = arg_info["choices"]
-        if choices:
-            long_ver += f"{arguments[-1]} {choices[-1]} "
-            short_ver += f"{arguments[0]} {choices[0]} "
+        default = arg_info["default"]
+        if default is not None:
+            long_ver += f"{arguments[-1]} {default} "
+            short_ver += f"{arguments[0]} {default} "
         else:
             long_ver += f"{arguments[-1]} "
             short_ver += f"{arguments[0]} "
@@ -80,8 +94,15 @@ def print_help(desc: str, exe_name: str, help_arg: dict, app_args: tuple[dict, .
         file.write(f"\nError: invaild arguments: '{error_arg}'")
 
 
-def parse_argument(desc: str, exe_name: str, user_arguments: list[str], app_arguments: tuple[dict, ...]) -> dict:
-    """Parse command line argument"""
+def parse_argument(headline: str, exe_name: str, user_arguments: list[str], app_arguments: tuple[dict, ...]) -> dict:
+    """Parse command line argument
+
+    Args:
+        headline: headline description.
+        exe_name: executable file name.
+        user_arguments: user arguments.
+        app_arguments: app available arguments.
+    """
     args_output = {}
     if len(user_arguments) < 2:
         return args_output
@@ -93,8 +114,6 @@ def parse_argument(desc: str, exe_name: str, user_arguments: list[str], app_argu
     help_arg = add_argument(
         name="help",
         arguments=("-h", "--help"),
-        choices=(),
-        default=None,
         help="show this help message and exit",
     )
     # Check optional arguments
@@ -121,22 +140,22 @@ def parse_argument(desc: str, exe_name: str, user_arguments: list[str], app_argu
 
             default = arg_info["default"]
 
-            # Without choices
+            # Without default (boolean)
             if default is None:
                 args_output[arg_info["name"]] = True
                 continue
 
-            # With choices
+            # With choices or default
             skip_next = True
             temp_arg = user_args[index + 1]
             temp_value = type(default)(temp_arg)
-            if temp_value in arg_info["choices"]:
+            if temp_value in arg_info["choices"] or not arg_info["choices"]:
                 args_output[arg_info["name"]] = temp_value
             else:
                 raise ValueError
 
     except (TypeError, IndexError, KeyError, ValueError):
-        print_help(desc, exe_name, help_arg, app_arguments, temp_arg)
+        print_help(headline, exe_name, help_arg, app_arguments, temp_arg)
         sys.exit()
 
     return args_output
@@ -210,7 +229,7 @@ def main():
 
     # Load command line arguments
     cli_args = parse_argument(
-        desc="TinyPedal command line arguments",
+        headline="TinyPedal command line arguments",
         exe_name=exe_name,
         user_arguments=sys.argv,
         app_arguments=(
