@@ -352,11 +352,7 @@ def _update_environment():
             os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2:fontengine=freetype"
             os.environ["QT_MEDIA_BACKEND"] = "windows"
         else:
-            if cfg.compatibility["multimedia_plugin_on_windows"] == "WMF":
-                multimedia_plugin = "windowsmediafoundation"
-            else:
-                multimedia_plugin = "directshow"
-            os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = multimedia_plugin
+            os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = "windowsmediafoundation"
 
     # Linux only
     else:

@@ -185,7 +185,7 @@ def build_exe(dist_path: str) -> None:
         f"{PYTHON_PATH}/Lib/site-packages/PySide2/plugins/platforms/qwindows.dll",
     ]
     QT_MEDIASERVICE = [
-        f"{PYTHON_PATH}/Lib/site-packages/PySide2/plugins/mediaservice/dsengine.dll",
+        #f"{PYTHON_PATH}/Lib/site-packages/PySide2/plugins/mediaservice/dsengine.dll",
         f"{PYTHON_PATH}/Lib/site-packages/PySide2/plugins/mediaservice/wmfengine.dll",
     ]
     BUILD_DATA_FILES = [

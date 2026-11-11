@@ -58,7 +58,6 @@ GLOBAL_DEFAULT = {
         "enable_x11_platform_plugin_override": (not PLATFORM.WINDOWS),
         "overlay_combined_mode_opacity": 0.9,
         "background_color_global": "#000000",
-        "multimedia_plugin_on_windows": "WMF",
     },
     "telemetry": {
         "api_name": API.NAME_LMU,

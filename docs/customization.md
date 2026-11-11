@@ -814,11 +814,6 @@ Sets global background color for all widgets.
 
 Note, global background color will only be visible when `enable_translucent_background` option is disabled or translucent background is not supported. Some widgets with own background setting may override this option.
 
-    multimedia_plugin_on_windows
-Set multimedia plugin for playing sound file on windows. Default is using `WMF` plugin.
-
-Note, if the option is set on `DirectShow`, additional audio decoder software may be required to play certain sound formats, such as `MP3`. This option requires restarting TinyPedal to take effect.
-
 [**`Back to Top`**](#)
 
 
