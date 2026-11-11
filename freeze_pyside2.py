@@ -16,26 +16,25 @@ from glob import glob
 
 import py2exe
 
-from run import add_argument, parse_argument
-from tinypedal import version_check
+from tinypedal import argument, version_check
 from tinypedal.constant import APP, FILE, PLATFORM
 
 
 def get_cli_argument():
     """Get command line argument"""
-    arg_clean = add_argument(
+    arg_clean = argument.add_argument(
         name="clean",
         arguments=("-c", "--clean"),
         help="force clean build; remove old build folder before building",
     )
-    arg_output = add_argument(
+    arg_output = argument.add_argument(
         name="output",
         arguments=("-o", "--output"),
         default="dist",
         help="set output build folder for distribution files, default to './dist'",
     )
-    cli_args = parse_argument(
-        headline="TinyPedal windows excutable build command line arguments",
+    cli_args = argument.parse_argument(
+        headline="TinyPedal windows executable build command line arguments",
         exe_name=__file__,
         user_arguments=sys.argv,
         app_arguments=(

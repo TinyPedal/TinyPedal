@@ -19,7 +19,7 @@ from freeze_pyside2 import (
     check_old_build,
     get_cli_argument,
 )
-from run import override_pyside_version
+from tinypedal import override_pyside_version
 from tinypedal.constant import APP, FILE
 
 

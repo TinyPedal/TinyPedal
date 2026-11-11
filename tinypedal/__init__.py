@@ -65,8 +65,74 @@ app_signal: ApplicationSignal
 
 
 # Public function
-def start(log_level: int, single_instance: bool):
+def start():
     """Launch check & start app"""
+    # Check whether running from source
+    exe_name = "tinypedal.exe"
+    if exe_name not in sys.executable:
+        exe_name = "python run.py"
+        os.environ["RUN_FROM_SOURCE"] = "TRUE"
+
+        # Add keyboard interrupt signal
+        import signal
+        signal.signal(signal.SIGINT, _int_signal_handler)
+
+        # Add search path for third party modules
+        sys.path.append("thirdparty")
+
+    # Config arguments
+    from . import argument
+    arg_log_level = argument.add_argument(
+        name="log_level",
+        arguments=("-l", "--log-level"),
+        choices=(0, 1, 2),
+        default=1,
+        help="set logging output level; '0' error only; '1' all (default); '2' to file",
+    )
+    arg_single_instance = argument.add_argument(
+        name="single_instance",
+        arguments=("-s", "--single-instance"),
+        choices=(0, 1),
+        default=1,
+        help="set running mode:; '0' allow multiple instances; '1' single instance (default)",
+    )
+    arg_pyside = argument.add_argument(
+        name="pyside",
+        arguments=("-p", "--pyside"),
+        choices=(2, 6),
+        default=2,
+        help="set PySide version; '2' PySide2 (default); '6' PySide6 (source only)",
+    )
+
+    # Load command line arguments
+    cli_args = argument.parse_argument(
+        headline="TinyPedal command line arguments",
+        exe_name=exe_name,
+        user_arguments=sys.argv,
+        app_arguments=(
+            arg_log_level,
+            arg_single_instance,
+            arg_pyside,
+        ),
+    )
+
+    log_level = cli_args.get("log_level", arg_log_level["default"])
+    single_instance = cli_args.get("single_instance", arg_single_instance["default"]) != 0
+
+    # Check PySide version override
+    if os.getenv("RUN_FROM_SOURCE"):
+        opt_pyside_override = cli_args.get("pyside", arg_pyside["default"])
+    else:  # ignore pyside argument if not run from source
+        opt_pyside_override = 2
+        try:  # check whether built with PySide6
+            import PySide2
+        except ImportError:
+            import PySide6
+            opt_pyside_override = 6
+
+    override_pyside_version(opt_pyside_override)
+    os.environ["PYSIDE_OVERRIDE"] = str(opt_pyside_override)
+
     # Set logger
     global logger
     if logger:  # one time init only
@@ -161,6 +227,28 @@ def reload(reload_preset: bool = False):
     api.restart()
     # Load modules
     _load_modules()
+
+
+# Module override function
+def override_pyside_version(version: int = 6):
+    """Override PySide version 2 to 6"""
+    if version != 6:
+        return
+    # Import PySide6 directly so it works with build script
+    from PySide6 import QtCore, QtGui, QtMultimedia, QtWidgets
+
+    original = "PySide2"
+    override = "PySide6"
+    override_module(original, override)
+    override_module(f"{original}.QtCore", f"{override}.QtCore")
+    override_module(f"{original}.QtGui", f"{override}.QtGui")
+    override_module(f"{original}.QtWidgets", f"{override}.QtWidgets")
+    override_module(f"{original}.QtMultimedia", f"{override}.QtMultimedia")
+
+
+def override_module(original: str, override: str):
+    """Manual import & override module"""
+    sys.modules[original] = sys.modules[override]
 
 
 # Private function
@@ -362,3 +450,8 @@ def _update_environment():
     # Common
     if not cfg.application["enable_high_dpi_scaling"]:
         os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"  # force disable (qt6 only)
+
+
+def _int_signal_handler(sign, frame):
+    """Quit by keyboard interrupt"""
+    sys.exit()
