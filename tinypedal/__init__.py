@@ -432,6 +432,10 @@ def _clear_environment():
 def _update_environment():
     """Update environment before starting GUI"""
     from .constant import PLATFORM
+
+    # Uncomment following line to enable "WS_EX_NOREDIRECTIONBITMAP" exstyle flag (PySide6 only)
+    # os.environ["QT_QPA_DISABLE_REDIRECTION_SURFACE"] = "1"
+
     # Windows only
     if PLATFORM.WINDOWS:
         if os.getenv("PYSIDE_OVERRIDE") == "6":
