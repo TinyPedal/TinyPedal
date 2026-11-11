@@ -207,9 +207,14 @@ Executable file can be built with [py2exe](http://www.py2exe.org).
 > For building with `PySide2`, `py2exe` version `0.12.0.0` or higher is required (but no higher than `0.13.0.2`).\
 > For building with `PySide6`, `py2exe` version `0.13.0.2` or higher is required.
 
-To install py2exe, run command:
+To install `py2exe`, run command:
 ```sh
 pip3 install py2exe
+```
+
+To install a specific `py2exe` version, such as `0.13.0.2`, run command:
+```sh
+pip3 install py2exe==0.13.0.2
 ```
 
 To build executable file with `PySide2`, run command:

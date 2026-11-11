@@ -46,7 +46,7 @@ def get_cli_argument():
     )
     cli_args = argument.parse_argument(
         headline="TinyPedal windows executable build command line arguments",
-        exe_name=__file__,
+        exe_name=os.path.basename(__file__),
         user_arguments=sys.argv,
         app_arguments=(
             arg_pyside,
