@@ -101,7 +101,7 @@ def start():
         arguments=("-p", "--pyside"),
         choices=(2, 6),
         default=2,
-        help="set PySide version; '2' PySide2 (default); '6' PySide6 (source only)",
+        help="set PySide version; '2' PySide2 (default); '6' PySide6",
     )
 
     # Load command line arguments

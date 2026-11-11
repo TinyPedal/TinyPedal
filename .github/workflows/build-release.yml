@@ -89,7 +89,7 @@ jobs:
 
     - name: Build Windows executable
       run: |
-        python freeze_pyside2.py -c
+        python build_win.py -c
 
     - name: ZIP Windows file
       shell: pwsh

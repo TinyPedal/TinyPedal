@@ -214,19 +214,19 @@ pip3 install py2exe
 
 To build executable file with `PySide2`, run command:
 ```sh
-python freeze_pyside2.py
+python build_win.py
 ```
 
-Alternatively, to build with `PySide6`, run command instead:
+Alternatively, to build with `PySide6` instead, run command:
 ```sh
-python freeze_pyside6.py
+python build_win.py --pyside 6
 ```
 
 After building completed, executable file can be found in `dist\TinyPedal` folder.
 
 The build script also supports command line arguments, type following command to check for available arguments:
 ```sh
-python freeze_pyside2.py --help
+python build_win.py --help
 ```
 
 ## Running on Linux
