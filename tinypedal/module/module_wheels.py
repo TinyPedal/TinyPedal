@@ -469,6 +469,7 @@ def calc_brake_wear(output: WheelsInfo, min_delta_distance: float, min_failure_t
                 failure_timer[idx] = 0.0
             elif (
                 brake_input > 0.2  # min 20% brake input
+                and not realtime_state.spectating
                 and failure_timer[idx] < min_failure_time
                 and abs(wheel_rot[idx]) > 4  # min 4 rotation per second
             ):
