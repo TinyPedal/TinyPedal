@@ -23,8 +23,6 @@ Relative module
 from __future__ import annotations
 
 from functools import lru_cache
-from itertools import chain
-from operator import itemgetter
 
 from .. import api, minfo, realtime_state
 from ..calculation import asym_max
@@ -97,17 +95,36 @@ class Realtime(DataModule):
 
                 # Create standings index list
                 if is_exclusive_mode:  # single class exclusive list
-                    standings_index_list = standings_index_from_same_class(
-                        min_top_veh, classes_list, plr_class_name, plr_class_place,
-                        veh_limit_exclusive)
+                    standings_index_list = list(
+                        standings_index_from_same_class(
+                            min_top_veh,
+                            classes_list,
+                            plr_class_name,
+                            plr_class_place,
+                            veh_limit_exclusive,
+                        )
+                    )
                 elif is_split_mode and is_multi_class:  # multi-class split list
-                    standings_index_list = list(chain(*list(standings_index_from_all_classes(
-                        min_top_veh, classes_list, plr_class_name, plr_class_place,
-                        veh_limit_other, veh_limit_player))))
+                    standings_index_list = list(
+                        standings_index_from_all_classes(
+                            min_top_veh,
+                            classes_list,
+                            plr_class_name,
+                            plr_class_place,
+                            veh_limit_other,
+                            veh_limit_player,
+                        )
+                    )
                 else:  # mixed class list
-                    classes_list.sort(key=itemgetter(1))  # sort by overall position
-                    standings_index_list = calc_standings_index(
-                        min_top_veh, veh_limit_combined, plr_place, classes_list)
+                    classes_list.sort(key=sort_class_mixed)
+                    standings_index_list = list(
+                        calc_standings_index(
+                            min_top_veh,
+                            veh_limit_combined,
+                            plr_place,
+                            classes_list,
+                        )
+                    )
 
                 # Output data
                 output.relativeAhead = relative_ahead
@@ -285,7 +302,7 @@ def standings_index_from_all_classes(
     min_top_veh: int, class_pos_list: list, plr_class_name: str, plr_class_place: int,
     veh_limit_other: int, veh_limit_player: int):
     """Generate class standings index list from all classes"""
-    class_collection = sorted(split_class_list(class_pos_list), key=sort_class_collection)
+    class_collection = sorted(split_class_list(class_pos_list), key=sort_class_grouped)
     for class_list in class_collection:
         if plr_class_name == class_list[0][0]:  # match class name
             veh_limit = veh_limit_player
@@ -293,27 +310,33 @@ def standings_index_from_all_classes(
         else:
             veh_limit = veh_limit_other
             plr_place = 0
-        yield calc_standings_index(min_top_veh, veh_limit, plr_place, class_list)
+        yield from calc_standings_index(min_top_veh, veh_limit, plr_place, class_list)
 
 
 def standings_index_from_same_class(
     min_top_veh: int, class_pos_list: list, plr_class_name: str, plr_class_place: int, veh_limit_player: int
-) -> list[int]:
+):
     """Generate class standings index list from same class only"""
     class_list = [class_data for class_data in class_pos_list if plr_class_name == class_data[0]]
-    if not class_list:
-        return [-1]
-    return calc_standings_index(min_top_veh, veh_limit_player, plr_class_place, class_list)
+    if class_list:
+        yield from calc_standings_index(min_top_veh, veh_limit_player, plr_class_place, class_list)
+    else:
+        yield -1
 
 
 def calc_standings_index(
     min_top_veh: int, veh_limit: int, plr_place: int, class_index_list: list
-) -> list[int]:
+):
     """Calculate vehicle standings index list"""
     veh_total = len(class_index_list)
     ref_place_list = create_reference_place(min_top_veh, veh_total, plr_place, veh_limit)
-    # Create final standing index list
-    return list(standings_index_from_place_reference(ref_place_list, class_index_list, veh_total))
+    # Match place from reference list to generate standings player index list
+    for ref_index in ref_place_list:
+        if 0 < ref_index <= veh_total:  # prevent out of range
+            yield class_index_list[ref_index - 1][2]  # 2 - player index
+        else:
+            break
+    yield -1  # append an empty index as gap between classes
 
 
 @lru_cache(maxsize=DATA.MAX_CLASSES)
@@ -340,18 +363,6 @@ def create_reference_place(
         rear_cut_max = veh_total
     front_cut_max = rear_cut_max - max_cut_range
     return REF_PLACES[:min_top_veh] + REF_PLACES[front_cut_max:rear_cut_max]
-
-
-def standings_index_from_place_reference(
-    ref_place_list: tuple, class_index_list: list, veh_total: int
-):
-    """Match place from reference list to generate standings player index list"""
-    for ref_index in ref_place_list:
-        if 0 < ref_index <= veh_total:  # prevent out of range
-            yield class_index_list[ref_index - 1][2]  # 2 - player index
-        else:
-            break
-    yield -1  # append an empty index as gap between classes
 
 
 def split_class_list(class_list: list):
@@ -389,6 +400,11 @@ def max_vehicles_in_class(max_cls_veh: int, min_top_veh: int, min_add_veh: int =
     return max(int(max_cls_veh), min_top_veh + min_add_veh)
 
 
-def sort_class_collection(collection: list) -> float:
+def sort_class_grouped(collection: list[tuple]) -> int:
     """Sort class collection by overall position"""
     return collection[0][1]  # 1 overall position
+
+
+def sort_class_mixed(_class: tuple) -> int:
+    """Sort mixed class collection by overall position"""
+    return _class[1]  # 1 overall position
