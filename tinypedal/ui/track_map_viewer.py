@@ -129,12 +129,40 @@ class MapView(QWidget):
         self.marked_coords = []
         self.highlighted_coords = None
 
+        # View control
+        self.view_offset_x = 0
+        self.view_offset_y = 0
+        self.mouse_pos = None
+
         # Set layout
         self.set_controls()
         layout_inner_control = QHBoxLayout()
         layout_inner_control.setAlignment(Qt.AlignBottom)
         layout_inner_control.addWidget(self.slider_pos_dist)
         self.setLayout(layout_inner_control)
+
+    def resizeEvent(self, event):
+        """Recalculate view center on resize"""
+        self.center_x = self.size().width() / 2
+        self.center_y = self.size().height() / 2
+
+    def mouseMoveEvent(self, event):
+        """Update view offset position"""
+        if self.mouse_pos is not None:
+            pos = event.pos() - self.mouse_pos
+            self.view_offset_x = pos.x()
+            self.view_offset_y = pos.y()
+            self.update()
+
+    def mousePressEvent(self, event):
+        """Set mouse position & press state"""
+        if event.buttons() == Qt.LeftButton:
+            self.mouse_pos = event.pos()
+            self.mouse_pos -= QPoint(self.view_offset_x, self.view_offset_y)
+
+    def mouseReleaseEvent(self, event):
+        """Reset mouse position on release"""
+        self.mouse_pos = None
 
     def load_config(self, is_reload: bool = True):
         """Load config"""
@@ -266,6 +294,11 @@ class MapView(QWidget):
         self.marked_coords.clear()
         self.highlighted_coords = None
 
+    def reset_map_view(self):
+        """Reset map view"""
+        self.view_offset_x = 0
+        self.view_offset_y = 0
+
     def update_highlighted_coords(self):
         """Update highlighted coordinates"""
         if not self.raw_coords:
@@ -274,6 +307,7 @@ class MapView(QWidget):
         index = calc.binary_search_higher_column(
             self.raw_dists, pos_dist, 0, self.map_nodes - 1)
         self.highlighted_coords = self.raw_coords[index]
+        self.reset_map_view()
         self.update()
 
     def update_marked_coords(self, temp_dists: set):
@@ -295,7 +329,10 @@ class MapView(QWidget):
     def set_context_menu(self):
         """Set context menu"""
         menu = QMenu()  # temp menu, no parent
+        menu.addAction("Reset Map View")
+        menu.addAction("Reset Map Zoom")
         menu_items = (
+            None,
             "show_dark_background",
             None,
             "show_map_info",
@@ -324,10 +361,17 @@ class MapView(QWidget):
         menu = self.set_context_menu()
         action = menu.exec_(self.mapToGlobal(position))
         if action:
-            name = "show_" + action.text().replace(" ", "_").lower()
-            self.ecfg[name] = not self.ecfg[name]
-            cfg.save(config_type=CONFIG.TYPE_CONFIG)
-            self.update()
+            action_text = action.text()
+            if action_text == "Reset Map View":
+                self.reset_map_view()
+                self.update()
+            elif action_text == "Reset Map Zoom":
+                self.spinbox_map_scale.setValue(1)
+            else:
+                name = "show_" + action_text.replace(" ", "_").lower()
+                self.ecfg[name] = not self.ecfg[name]
+                cfg.save(config_type=CONFIG.TYPE_CONFIG)
+                self.update()
 
     def open_config_dialog(self):
         """Open config"""
@@ -467,10 +511,8 @@ class MapView(QWidget):
         pos_dist, pos_z = self.raw_dists[self.map_seek_index]
 
         # Transform coordinates
-        self.center_x = self.size().width() / 2
-        self.center_y = self.size().height() / 2
-        center_offset_x = self.center_x - pos_x * self.map_scale
-        center_offset_y = self.center_y - pos_y * self.map_scale
+        center_offset_x = self.center_x + self.view_offset_x - pos_x * self.map_scale
+        center_offset_y = self.center_y + self.view_offset_y - pos_y * self.map_scale
 
         # Calculation
         curve_section = list(gen_section_path(
@@ -603,13 +645,17 @@ class MapView(QWidget):
             self.pen.setWidth(self.ecfg["distance_circle_width"])
             self.pen.setColor(self.ecfg["distance_circle_color"])
             painter.setPen(self.pen)
+            center_offset_x = self.center_x + self.view_offset_x
+            center_offset_y = self.center_y + self.view_offset_y
             for circle_radius in self.distance_circle_radius:
                 if circle_radius > 0:
                     circle_radius *= self.map_scale
                     painter.drawEllipse(
-                        self.center_x - circle_radius,
-                        self.center_y - circle_radius,
-                        circle_radius * 2, circle_radius * 2)
+                        center_offset_x - circle_radius,
+                        center_offset_y - circle_radius,
+                        circle_radius * 2,
+                        circle_radius * 2,
+                    )
 
     def draw_center_mark(self, painter, yaw_radians):
         """Draw center mark"""
@@ -617,9 +663,10 @@ class MapView(QWidget):
             self.pen.setWidth(self.ecfg["center_mark_width"])
             self.pen.setColor(self.ecfg["center_mark_color"])
             painter.setPen(self.pen)
-
-            center_mark_radius = self.ecfg["center_mark_radius"]
-            painter.translate(self.center_x, self.center_y)
+            center_offset_x = self.center_x + self.view_offset_x
+            center_offset_y = self.center_y + self.view_offset_y
+            center_mark_radius = self.ecfg["center_mark_radius"] * self.map_scale
+            painter.translate(center_offset_x, center_offset_y)
             painter.rotate(calc.degrees(yaw_radians))
             painter.drawLine(-center_mark_radius, 0, center_mark_radius, 0)
             painter.drawLine(0, -center_mark_radius, 0, center_mark_radius)

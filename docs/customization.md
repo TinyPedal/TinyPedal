@@ -1490,13 +1490,17 @@ To load a track map, click `Load Map` button. Map file name will be displayed al
 
 To customize map display, click `Config` button. Note, some display options may require reload track map file to be updated.
 
+To move map view, click and drag the map in map display area.
+
 To zoom map in or out, scroll mouse wheel in map display area; or adjust `Zoom` spin box value.
 
 To move current position on map, use position slider at bottom of map display; or adjust `Position` spin box value.
 
 To increase or decrease current nodes selection, adjust `Nodes` spin box value. Note, minimum nodes selection is limited to `3` nodes, maximum nodes selection cannot exceed total map nodes.
 
-To toggle on or off specific map display, `Right-Click` on map display area to open context menu, includes:
+To reset map view, or toggle specific map display, `Right-Click` on map display area to open context menu:
+* Reset map view - Reset map view to center of display.
+* Reset map zoom - Reset map zoom to `1.0`.
 * Map info - Show map length, total map nodes.
 * Position info - Show current node position and global XYZ coordinates (Z is elevation).
 * Curve info - Show curve section length, grade, radius, angle, curvature.

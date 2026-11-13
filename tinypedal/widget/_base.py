@@ -181,7 +181,7 @@ class Base(QWidget):
 
     def mouseMoveEvent(self, event):
         """Update widget position"""
-        if mousepos.valid() and event.buttons() == Qt.LeftButton:
+        if mousepos.valid():
             # Snapping to reference grid if Ctrl is pressed
             if (event.modifiers() & Qt.ControlModifier):
                 self.move(mousepos.snapping(self, event.globalPos()))

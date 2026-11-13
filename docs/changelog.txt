@@ -1,3 +1,9 @@
+WIP
+-----------------------------
+* Track Map Viewer
+  - Now supports click and drag for moving map view.
+  - Added "Reset Map View" and "Reset Map Zoom" options to right-click context menu.
+
 2.53.0 (2026-11-06)
 -----------------------------
 * Overlay
