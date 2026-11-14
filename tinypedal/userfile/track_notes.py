@@ -25,7 +25,6 @@ from __future__ import annotations
 import csv
 import logging
 import os
-from operator import itemgetter
 from typing import Any, Callable, Iterable
 
 from ..constant import DATA, FILE
@@ -47,6 +46,11 @@ HEADER_TRACK_NOTES = COLUMN_DISTANCE, COLUMN_TRACKNOTE, COLUMN_COMMENT, COLUMN_T
 METADATA_FIELDNAMES = "TITLE", "AUTHOR", "DATE", "DESCRIPTION"
 
 logger = logging.getLogger(__name__)
+
+
+def sort_by_column(column_key: str):
+    """Sort by column key (dict)"""
+    return lambda data: data[column_key]
 
 
 def set_notes_filter(notes_type: str) -> str:
@@ -131,7 +135,7 @@ def parse_csv_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
     # Load notes
     notes_reader = csv.DictReader(notes_file, fieldnames=notes_header, restval="", restkey="unknown")
     notes_temp = (note_line for note_line in notes_reader if verify_notes(note_line, column_key))
-    return sorted(notes_temp, key=itemgetter(column_key)), meta_info
+    return sorted(notes_temp, key=sort_by_column(column_key)), meta_info
 
 
 def parse_gpl_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
@@ -169,7 +173,7 @@ def parse_gpl_notes(notes_file: Iterable[str], table_header: tuple[str, ...]):
                     table_header[2]: comment,
                 }
             )
-    return sorted(notes_temp, key=itemgetter(column_key)), meta_info
+    return sorted(notes_temp, key=sort_by_column(column_key)), meta_info
 
 
 def parse_csv_notes_only(notes_file: Iterable[str], table_header: tuple[str, ...]):
@@ -185,7 +189,7 @@ def parse_csv_notes_only(notes_file: Iterable[str], table_header: tuple[str, ...
         raise ValueError
     notes_reader = csv.DictReader(notes_file, fieldnames=notes_header, restval="", restkey="unknown")
     notes_temp = (note_line for note_line in notes_reader if verify_notes(note_line, column_key))
-    return sorted(notes_temp, key=itemgetter(column_key))
+    return sorted(notes_temp, key=sort_by_column(column_key))
 
 
 def load_notes_file(

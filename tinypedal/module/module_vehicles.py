@@ -255,7 +255,6 @@ def update_vehicle_data(
 
             data.positionOverall = api.read.vehicle.place(index)
             data.bestLapTime = api.read.timing.best_laptime(index)
-            data.numPitStops = api.read.vehicle.number_pitstops(index, api.read.vehicle.number_penalties(index))
             data.pitRequested = api.read.vehicle.pit_request(index)
             data.driverName = api.read.vehicle.driver_name(index)
             data.vehicleName = api.read.vehicle.vehicle_model(index)
@@ -266,6 +265,10 @@ def update_vehicle_data(
             data.isFinished = api.read.vehicle.finish_state(index) == 1
             data.incidents = api.read.vehicle.incidents(index)
             data.trackLimitsPoints = api.read.session.cut_points(index)
+
+            penalties = api.read.vehicle.number_penalties(index)
+            data.numPitStops = -penalties if penalties else api.read.vehicle.number_pitstops(index)
+            data.penaltyType = api.read.vehicle.penalty_type(index)
 
             last_laptime = api.read.timing.last_laptime(index)
             data.isValidLap = last_laptime > 0

@@ -1003,13 +1003,29 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         state = self.shmm.lmuScorVeh(index)
         return 2 if state.mInGarageStall else state.mInPits
 
-    def number_pitstops(self, index: int | None = None, penalty: int = 0) -> int:
+    def number_pitstops(self, index: int | None = None) -> int:
         """Number of pit stops"""
-        return -penalty if penalty else self.shmm.lmuScorVeh(index).mNumPitstops
+        return self.shmm.lmuScorVeh(index).mNumPitstops
 
     def number_penalties(self, index: int | None = None) -> int:
         """Number of penalties"""
         return self.shmm.lmuScorVeh(index).mNumPenalties
+
+    def penalty_type(self, index: int | None = None) -> int:
+        """Most outstanding penalty type, 0 = no penalty, 1 = drive through, 2 = stop go"""
+        data = self.shmm.lmuResults(index)
+        penalty = data["penalty"]
+        if not penalty:
+            return 0
+        # Reset if data not synced
+        if self.shmm.lmuScorVeh(index).mNumPenalties <= 0:
+            data["penalty"] = ""
+            return 0
+        # Stop go
+        if "S" in penalty:
+            return 2
+        # Drive through
+        return 1
 
     def pit_request(self, index: int | None = None) -> bool:
         """Is requested pit, 0 = none, 1 = request, 2 = entering, 3 = stopped, 4 = exiting"""

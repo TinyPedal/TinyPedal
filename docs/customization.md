@@ -3724,6 +3724,13 @@ Set custom yellow flag status text which shows when driver causes (or likely to)
     finish_status_text
 Set custom finish (checkered flag) status text which shows when driver finished race.
 
+    drive_through_status_text, stop_go_status_text
+Set drive through and stop go penalty status text which shows when driver receives penalty.
+
+Note, penalty type only works for `LMU`. Only one of the most outstanding penalty types is displayed at a time. For example, stop go penalty will be displayed over drive through penalty while having both penalties.
+
+Due to some limitations in game API, penalty type data will not be preserved after restarted or reloaded overlay during a session.
+
     show_tyre_compound
 Show tyre compound symbol for tyre that matches specific tyre compounds defined in `compounds.json` preset.
 

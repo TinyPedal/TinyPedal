@@ -945,13 +945,17 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         state = self.shmm.rf2ScorVeh(index)
         return 2 if state.mInGarageStall else state.mInPits
 
-    def number_pitstops(self, index: int | None = None, penalty: int = 0) -> int:
+    def number_pitstops(self, index: int | None = None) -> int:
         """Number of pit stops"""
-        return -penalty if penalty else self.shmm.rf2ScorVeh(index).mNumPitstops
+        return self.shmm.rf2ScorVeh(index).mNumPitstops
 
     def number_penalties(self, index: int | None = None) -> int:
         """Number of penalties"""
         return self.shmm.rf2ScorVeh(index).mNumPenalties
+
+    def penalty_type(self, index: int | None = None) -> int:
+        """Most outstanding penalty type, 0 = no penalty, 1 = drive through, 2 = stop go"""
+        return 0
 
     def pit_request(self, index: int | None = None) -> bool:
         """Is requested pit, 0 = none, 1 = request, 2 = entering, 3 = stopped, 4 = exiting"""

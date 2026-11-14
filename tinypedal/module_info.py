@@ -517,6 +517,7 @@ class VehicleDataSet:
     inPit: int = 0
     isClassFastestLastLap: bool = False
     numPitStops: int = 0
+    penaltyType: int = 0
     pitRequested: bool = False
     tireCompoundName: tuple[str, ...] = ("", "", "", "")
     relativeOrientationRadians: float = 0.0

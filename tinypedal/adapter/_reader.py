@@ -666,12 +666,16 @@ class Vehicle(ABC):
         """Is in paddock (either pit lane or garage), 0 = on track, 1 = pit lane, 2 = garage"""
 
     @abstractmethod
-    def number_pitstops(self, index: int | None = None, penalty: int = 0) -> int:
+    def number_pitstops(self, index: int | None = None) -> int:
         """Number of pit stops"""
 
     @abstractmethod
     def number_penalties(self, index: int | None = None) -> int:
         """Number of penalties"""
+
+    @abstractmethod
+    def penalty_type(self, index: int | None = None) -> int:
+        """Most outstanding penalty type, 0 = no penalty, 1 = drive through, 2 = stop go"""
 
     @abstractmethod
     def pit_request(self, index: int | None = None) -> bool:

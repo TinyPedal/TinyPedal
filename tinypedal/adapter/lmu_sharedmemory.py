@@ -26,7 +26,7 @@ import ctypes
 import logging
 import threading
 from time import monotonic
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 if TYPE_CHECKING:  # for type checker only
     from thirdparty.pyLMUSharedMemory import lmu_data, lmu_enum
@@ -430,7 +430,7 @@ class LMUInfo:
             index = self._sync.player_scor_index
         return self._laptime_last[index].update(self.lmuTeleVeh(index).mLapStartET)
 
-    def lmuResults(self, index: int | None = INVALID_INDEX) -> dict[str, float]:
+    def lmuResults(self, index: int | None = INVALID_INDEX) -> dict[str, Any]:
         """LMU results data"""
         if index is None:
             data = self._sync.player_scor

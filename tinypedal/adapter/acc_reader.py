@@ -957,14 +957,18 @@ class Vehicle(_reader.Vehicle, DataAdapter):
         in_pit = data.inPitLane
         return 2 if in_pit and data.inGarage else in_pit
 
-    def number_pitstops(self, index: int | None = None, penalty: int = 0) -> int:
+    def number_pitstops(self, index: int | None = None) -> int:
         """Number of pit stops"""
-        return -penalty if penalty else self.udp_carinfo(index).pitStops
+        return self.udp_carinfo(index).pitStops
 
     def number_penalties(self, index: int | None = None) -> int:
         """Number of penalties"""
         if self.udp_carinfo(index).eventType == 3:
             return 1
+        return 0
+
+    def penalty_type(self, index: int | None = None) -> int:
+        """Most outstanding penalty type, 0 = no penalty, 1 = drive through, 2 = stop go"""
         return 0
 
     def pit_request(self, index: int | None = None) -> bool:

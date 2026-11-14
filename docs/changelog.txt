@@ -4,6 +4,12 @@ WIP
   - Now supports click and drag for moving map view.
   - Added "Reset Map View" and "Reset Map Zoom" options to right-click context menu.
 
+* Relative, Rivals, Standings Widget
+  - Added "drive through" and "stop go" penalty type display to "pit status" column (requested by users from issues #157 #345).
+    Note, penalty type only works for "LMU". Only one of the most outstanding penalty types is displayed at a time. For example, stop go penalty will be displayed over drive through penalty while having both penalties.
+    Due to some limitations in game API, penalty type data will not be preserved after restarted or reloaded overlay during a session.
+  - Added "pit_status_text_alignment", "drive_through_status_text", "stop_go_status_text" and color options. Default status text "D" for drive through, and "S" for stop go.
+
 2.53.0 (2026-11-06)
 -----------------------------
 * Overlay

@@ -326,11 +326,13 @@ class Realtime(Overlay):
         # Vehicle in pit
         if self.wcfg["show_pit_status"]:
             self.pit_status_text = (
-                self.wcfg["none_status_text"],
-                self.wcfg["pit_status_text"],
-                self.wcfg["garage_status_text"],
-                self.wcfg["yellow_flag_status_text"],
-                self.wcfg["finish_status_text"],
+                self.wcfg["none_status_text"],  # 0
+                self.wcfg["pit_status_text"],  # 1
+                self.wcfg["garage_status_text"],  # 2
+                self.wcfg["yellow_flag_status_text"],  # 3
+                self.wcfg["finish_status_text"],  # 4
+                self.wcfg["drive_through_status_text"],  # 5
+                self.wcfg["stop_go_status_text"],  # 6
             )
             self.bar_style_pit = (
                 (
@@ -353,6 +355,14 @@ class Realtime(Overlay):
                     self.wcfg["font_color_finish"],
                     self.wcfg["background_color_finish"],
                 ),
+                (
+                    self.wcfg["font_color_drive_through"],
+                    self.wcfg["background_color_drive_through"],
+                ),
+                (
+                    self.wcfg["font_color_stop_go"],
+                    self.wcfg["background_color_stop_go"],
+                ),
             )
             self.bars_pit = self.set_rawtext(
                 padding=bar_padx,
@@ -361,6 +371,7 @@ class Realtime(Overlay):
                 offset_y=font_m.voffset,
                 fg_color=self.bar_style_pit[0][0],
                 bg_color=self.bar_style_pit[0][1],
+                alignment=self.wcfg["pit_status_text_alignment"],
                 count=self.veh_range,
             )
             self.set_grid_layout_table_column(
@@ -729,7 +740,17 @@ class Realtime(Overlay):
                 self.update_cls(self.bars_cls[idx], veh_info.vehicleClass, state)
             # Vehicle in pit
             if _option["show_pit_status"]:
-                self.update_pit(self.bars_pit[idx], veh_info.inPit, veh_info.isYellow, veh_info.isFinished, state)
+                if veh_info.isFinished:  # finished
+                    status_index = 4
+                elif veh_info.penaltyType > 0:  # penalty
+                    status_index = 4 + veh_info.penaltyType
+                elif veh_info.inPit > 0:  # pit & garage
+                    status_index = veh_info.inPit
+                elif veh_info.isYellow:  # yellow flag
+                    status_index = 3
+                else:  # none
+                    status_index = 0
+                self.update_pit(self.bars_pit[idx], status_index, state)
             # Tyre compound
             if _option["show_tyre_compound"]:
                 self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundName, state)
@@ -890,12 +911,7 @@ class Realtime(Overlay):
         """Vehicle in pit"""
         if target.last != data:
             target.last = data
-            if data[2]:  # finish flag
-                index = 4
-            else:
-                index = data[0]
-                if data[1] and index == 0:  # show yellow flag outside pits
-                    index = 3
+            index = data[0]
             target.text = self.pit_status_text[index]
             target.fg, target.bg = self.bar_style_pit[index]
             self.toggle_visibility(target, data[-1])

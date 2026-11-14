@@ -38,6 +38,7 @@ class LMUResults:
         "contact_vehicle": 0,
         "contact_immovable": 0,
         "track_cut": 0,
+        "penalty": "",
     })
 
     __slots__ = (
@@ -51,10 +52,63 @@ class LMUResults:
         self.data = {}
         self.timestamp = 0
 
-    def check_missing(self, driver: bytes):
-        """Check & add missing driver"""
+    def _get_driver(self, driver: bytes) -> dict:
+        """Get driver data, add new if missing"""
         if driver not in self.data:
             self.data[driver] = self.DEFAULT.copy()
+        return self.data[driver]
+
+    def _incidents(self, line: str):
+        """Log incidents"""
+        pos_beg = line.find(b">")
+        if pos_beg > 8:
+            pos_beg += 1
+            pos_end = line.find(b"(", pos_beg)
+            if pos_end > pos_beg:
+                driver_data = self._get_driver(line[pos_beg:pos_end])
+                if b"with another vehicle" in line:
+                    driver_data["contact_vehicle"] += 1
+                else:
+                    driver_data["contact_immovable"] += 1
+
+    def _track_limits(self, line: str):
+        """Log track limits"""
+        if b"No Further Action" not in line:
+            pos_beg = line.find(b"Driver=")
+            if pos_beg > 11:
+                pos_beg += 8
+                pos_end = line.find(b'"', pos_beg)
+                if pos_end > pos_beg:
+                    driver_data = self._get_driver(line[pos_beg:pos_end])
+                    driver_data["track_cut"] += 1
+
+    def _penalty_scored(self, line: str):
+        """Log penalty - scored"""
+        pos_beg = line.find(b"Driver=")
+        if pos_beg > 8:
+            pos_beg += 8
+            pos_end = line.find(b'"', pos_beg)
+            if pos_end > pos_beg:
+                driver_data = self._get_driver(line[pos_beg:pos_end])
+                if b"Stop/Go" in line:  # stop go
+                    penalty_symbol = "S"
+                else:  # driver through
+                    penalty_symbol = "D"
+                driver_data["penalty"] += penalty_symbol
+
+    def _penalty_served(self, line: str):
+        """Log penalty - served"""
+        pos_beg = line.find(b">")
+        if pos_beg > 8:
+            pos_beg += 1
+            pos_end = line.find(b" served", pos_beg)
+            if pos_end > pos_beg:
+                driver_data = self._get_driver(line[pos_beg:pos_end])
+                if b"Stop/Go" in line:  # stop go
+                    penalty_symbol = "S"
+                else:  # driver through
+                    penalty_symbol = "D"
+                driver_data["penalty"] = driver_data["penalty"].replace(penalty_symbol, "", 1)
 
     def update(self, stream: bytes):
         """Update results data"""
@@ -65,30 +119,21 @@ class LMUResults:
         if not stream:
             return
         # Parse stream
-        results_data = self.data
         for line in stream.split(b"\n"):
             if not line:
                 continue
             # Log incidents
             if line.startswith(b"<Incident"):
-                pos_beg = line.find(b">")
-                if pos_beg > 8:
-                    pos_beg += 1
-                    pos_end = line.find(b"(", pos_beg)
-                    driver = line[pos_beg:pos_end]
-                    self.check_missing(driver)
-                    if b"with another vehicle" in line:
-                        results_data[driver]["contact_vehicle"] += 1
-                    else:
-                        results_data[driver]["contact_immovable"] += 1
+                self._incidents(line)
                 continue
-            # Log track cuts
+            # Log track limits
             if line.startswith(b"<TrackLimits"):
-                if b"No Further Action" not in line:
-                    pos_beg = line.find(b"Driver=")
-                    if pos_beg > 11:
-                        pos_beg += 8
-                        pos_end = line.find(b'"', pos_beg)
-                        driver = line[pos_beg:pos_end]
-                        self.check_missing(driver)
-                        results_data[driver]["track_cut"] += 1
+                self._track_limits(line)
+                continue
+            # Log penalty
+            if line.startswith(b"<Penalty"):
+                if b"Penalty=" in line:
+                    self._penalty_scored(line)
+                else:
+                    self._penalty_served(line)
+                continue
