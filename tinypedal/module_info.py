@@ -513,7 +513,7 @@ class VehicleDataSet:
     isLapped: float = 0.0
     isYellow: bool = False
     isValidLap: bool = False
-    isFinished: bool = False
+    finishState: int = 0
     inPit: int = 0
     isClassFastestLastLap: bool = False
     numPitStops: int = 0

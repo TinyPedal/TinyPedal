@@ -262,13 +262,13 @@ def update_vehicle_data(
             data.vehicleClass = api.read.vehicle.class_name(index)
             data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.tireCompoundName = api.read.tyre.compound_class(index)
-            data.isFinished = api.read.vehicle.finish_state(index) == 1
             data.incidents = api.read.vehicle.incidents(index)
             data.trackLimitsPoints = api.read.session.cut_points(index)
 
             penalties = api.read.vehicle.number_penalties(index)
             data.numPitStops = -penalties if penalties else api.read.vehicle.number_pitstops(index)
             data.penaltyType = api.read.vehicle.penalty_type(index)
+            data.finishState = api.read.vehicle.finish_state(index)
 
             last_laptime = api.read.timing.last_laptime(index)
             data.isValidLap = last_laptime > 0
@@ -360,7 +360,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
             final_pit_time = 0.0
 
         # Leader time
-        if leader_index == player_index or output.leaderData.isFinished:
+        if leader_index == player_index or output.leaderData.finishState:
             leader_finish_offset = 0.0
             player_lap_offset = 0.0
         else:

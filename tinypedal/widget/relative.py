@@ -377,6 +377,7 @@ class Realtime(Overlay):
                 self.wcfg["finish_status_text"],  # 4
                 self.wcfg["drive_through_status_text"],  # 5
                 self.wcfg["stop_go_status_text"],  # 6
+                self.wcfg["disqualify_status_text"],  # 7
             )
             self.bar_style_pit = (
                 (
@@ -406,6 +407,10 @@ class Realtime(Overlay):
                 (
                     self.wcfg["font_color_stop_go"],
                     self.wcfg["background_color_stop_go"],
+                ),
+                (
+                    self.wcfg["font_color_disqualify"],
+                    self.wcfg["background_color_disqualify"],
                 ),
             )
             self.bars_pit = self.set_rawtext(
@@ -847,8 +852,11 @@ class Realtime(Overlay):
                 self.update_cls(self.bars_cls[idx], veh_info.vehicleClass, state)
             # Vehicle in pit
             if _option["show_pit_status"]:
-                if veh_info.isFinished:  # finished
-                    status_index = 4
+                if veh_info.finishState > 0:
+                    if veh_info.finishState == 3:  # disqualify
+                        status_index = -1
+                    else:  # finished
+                        status_index = 4
                 elif veh_info.penaltyType > 0:  # penalty
                     status_index = 4 + veh_info.penaltyType
                 elif veh_info.inPit > 0:  # pit & garage

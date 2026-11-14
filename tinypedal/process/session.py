@@ -90,10 +90,12 @@ class LMUResults:
             pos_end = line.find(b'"', pos_beg)
             if pos_end > pos_beg:
                 driver_data = self._get_driver(line[pos_beg:pos_end])
-                if b"Stop/Go" in line:  # stop go
-                    penalty_symbol = "S"
-                else:  # driver through
+                if b"Drive Thru" in line:  # driver through
                     penalty_symbol = "D"
+                elif b"Stop/Go" in line:  # stop go
+                    penalty_symbol = "S"
+                else:  # ignore disqualify (available in sharedmemory API)
+                    return
                 driver_data["penalty"] += penalty_symbol
 
     def _penalty_served(self, line: str):
@@ -104,10 +106,12 @@ class LMUResults:
             pos_end = line.find(b" served", pos_beg)
             if pos_end > pos_beg:
                 driver_data = self._get_driver(line[pos_beg:pos_end])
-                if b"Stop/Go" in line:  # stop go
-                    penalty_symbol = "S"
-                else:  # driver through
+                if b"Drive Thru" in line:  # driver through
                     penalty_symbol = "D"
+                elif b"Stop/Go" in line:  # stop go
+                    penalty_symbol = "S"
+                else:  # ignore disqualify (available in sharedmemory API)
+                    return
                 driver_data["penalty"] = driver_data["penalty"].replace(penalty_symbol, "", 1)
 
     def update(self, stream: bytes):

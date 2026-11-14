@@ -3724,8 +3724,8 @@ Set custom yellow flag status text which shows when driver causes (or likely to)
     finish_status_text
 Set custom finish (checkered flag) status text which shows when driver finished race.
 
-    drive_through_status_text, stop_go_status_text
-Set drive through and stop go penalty status text which shows when driver receives penalty.
+    drive_through_status_text, stop_go_status_text, disqualify_status_text
+Set drive through, stop go, disqualify penalty status text which shows when driver receives penalty.
 
 Note, penalty type only works for `LMU`. Only one of the most outstanding penalty types is displayed at a time. For example, stop go penalty will be displayed over drive through penalty while having both penalties.
 
