@@ -33,7 +33,7 @@ from ._base import DataModule
 REF_PLACES = tuple(range(1, DATA.MAX_VEHICLES + 1))
 TEMP_RELATIVE_AHEAD = [(0.0, -1)] * DATA.MAX_VEHICLES
 TEMP_RELATIVE_BEHIND = [(0.0, -1)] * DATA.MAX_VEHICLES
-TEMP_CLASSES = [("", -1, -1, -1.0, -1.0)] * DATA.MAX_VEHICLES
+TEMP_CLASSES = [("", -1, -1, -1.0)] * DATA.MAX_VEHICLES
 TEMP_DRAW_ORDER = list(range(DATA.MAX_VEHICLES))
 
 
@@ -186,7 +186,6 @@ def get_vehicles_info(
         # Update classes list
         class_name = api.read.vehicle.class_name(index)
         place_overall = api.read.vehicle.place(index)
-        laptime_best = api.read.timing.best_laptime(index)
         laptime_last = api.read.timing.last_laptime(index)
 
         if laptime_last > 0 and not in_pitlane:
@@ -194,17 +193,11 @@ def get_vehicles_info(
         else:
             laptime_personal_last = DATA.MAX_SECONDS
 
-        if laptime_best > 0:
-            laptime_personal_best = laptime_best
-        else:
-            laptime_personal_best = DATA.MAX_SECONDS
-
         TEMP_CLASSES[index] = (
             class_name,  # 0 vehicle class name
             place_overall,  # 1 overall position
             index,  # 2 player index
-            laptime_personal_best,  # 3 best lap time
-            laptime_personal_last,  # 4 last lap time (for fastest last lap check)
+            laptime_personal_last,  # 3 last lap time (for fastest last lap check)
         )
 
         # Update draw order list
@@ -252,14 +245,13 @@ def update_position_in_class(sorted_veh_class: list, plr_index: int):
     place_in_class = 0
     opt_index_ahead = -1
     opt_index_leader = -1
-    laptime_class_best = DATA.MAX_SECONDS
     last_fastest_laptime = DATA.MAX_SECONDS
     last_fastest_index = -1
     plr_class_name = ""
     plr_class_place = 0
     veh_data = minfo.vehicles.dataSet
 
-    for class_name, _, opt_index, laptime_best, laptime_last in sorted_veh_class:
+    for class_name, _, opt_index, laptime_last in sorted_veh_class:
         output_data = veh_data[opt_index]
 
         if last_class_name == class_name:
@@ -270,7 +262,6 @@ def update_position_in_class(sorted_veh_class: list, plr_index: int):
             place_in_class = 1  # reset position counter
             opt_index_ahead = -1  # no opponent ahead of class leader
             opt_index_leader = opt_index
-            laptime_class_best = laptime_best
             last_fastest_laptime = DATA.MAX_SECONDS  # reset last fastest
             if last_fastest_index != -1:  # mark fastest last lap
                 veh_data[last_fastest_index].isClassFastestLastLap = True
@@ -288,7 +279,6 @@ def update_position_in_class(sorted_veh_class: list, plr_index: int):
         output_data.classBehindIndex = -1
         output_data.classLeaderIndex = opt_index_leader
         output_data.positionInClass = place_in_class
-        output_data.classBestLapTime = laptime_class_best
         output_data.isClassFastestLastLap = False
         opt_index_ahead = opt_index  # store opponent index for next
 

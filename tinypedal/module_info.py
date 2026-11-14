@@ -233,7 +233,7 @@ class DeltaLapTimeHistory:
     laps: int = 0
     best: float = 0.0
     last: float = 0.0
-    average: float = 0.0
+    average: float = DATA.MAX_SECONDS
 
     def update(self, laptime_last: float, lap_number: int, best_valid: float):
         """Update delta lap time history"""
@@ -501,7 +501,6 @@ class VehicleDataSet:
     classAheadIndex: int = -1
     classBehindIndex: int = -1
     classLeaderIndex: int = -1
-    classBestLapTime: float = DATA.MAX_SECONDS
     bestLapTime: float = DATA.MAX_SECONDS
     lastLapTime: float = DATA.MAX_SECONDS
     currentLapProgress: float = 0.0

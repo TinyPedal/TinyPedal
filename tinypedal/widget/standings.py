@@ -853,6 +853,7 @@ class Realtime(Overlay):
         total_std_idx = len(standings_list) - 1  # skip final -1 index
         plr_veh_info = minfo.vehicles.playerData
         in_race = api.read.session.in_race()
+        class_leader_laptime_best = DATA.MAX_SECONDS
 
         # Standings update
         for idx in range(self.veh_range):
@@ -908,7 +909,9 @@ class Realtime(Overlay):
                         time_gap = self.gap_to_leader_race(veh_info.gapBehindLeader, veh_info.positionOverall)
                 else:
                     if self.show_class_timegap:
-                        time_gap = self.gap_to_leader_best(veh_info.positionInClass, veh_info.bestLapTime, veh_info.classBestLapTime)
+                        if veh_info.positionInClass == 1:
+                            class_leader_laptime_best = veh_info.bestLapTime
+                        time_gap = self.gap_to_leader_best(veh_info.positionInClass, veh_info.bestLapTime, class_leader_laptime_best)
                     else:
                         time_gap = self.gap_to_leader_best(veh_info.positionOverall, veh_info.bestLapTime, minfo.vehicles.leaderData.bestLapTime)
                 self.update_gap(self.bars_gap[idx], time_gap, hi_player, state)
