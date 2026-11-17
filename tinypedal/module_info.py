@@ -486,6 +486,8 @@ class PitTimer:
 class VehicleDataSet:
     """Vehicle data set"""
 
+    index: int = -1
+    classOrder: int = 0
     isPlayer: bool = False
     elapsedTime: float = 0.0
     speed: float = 0.0
@@ -701,7 +703,7 @@ class RelativeInfo:
 
     relativeAhead: list[tuple[float, int]] = df_list(DATA.RELATIVE_NA)
     relativeBehind: list[tuple[float, int]] = df_list(DATA.RELATIVE_NA)
-    standings: list[int] = df_list(-1)
+    standings: tuple[int, ...] = DATA.STANDINGS_DEFAULT
     drawOrder: list[int] = df_list(0)
     relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, DATA.MAX_VEHICLES)
     relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, DATA.MAX_VEHICLES)
@@ -769,6 +771,11 @@ class VehiclesInfo:
     finishTimeOffset: float = 0.0
     finishAsLap: bool = True
     finishLapOffset: float = 0.0
+
+    def update_index(self):
+        """Update player index"""
+        for index, data in enumerate(self.dataSet):
+            data.index = index
 
 
 @slotclass

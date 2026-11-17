@@ -1882,7 +1882,6 @@ WIDGET_DEFAULT = {
         "bar_gap": 1,
         "additional_players_front": 0,
         "additional_players_behind": 0,
-        "show_vehicle_in_garage": False,
         "show_player_highlighted": True,
         "show_lap_difference": True,
         "font_color_same_lap": "#FFFFFF",

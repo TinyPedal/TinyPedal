@@ -139,7 +139,7 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        veh_data = minfo.vehicles.dataSet
+        veh_dataset = minfo.vehicles.dataSet
         player_index = minfo.vehicles.playerIndex
         player_laptime = api.read.timing.estimated_laptime()
 
@@ -163,7 +163,7 @@ class Realtime(Overlay):
 
             # Ahead
             for ahead_timegap, ahead_index in relative_ahead:
-                if veh_data[ahead_index].inPit:
+                if veh_dataset[ahead_index].inPit:
                     continue
 
                 avg_delta_timegap = delta_time_interval_ahead[ahead_index].long
@@ -183,7 +183,7 @@ class Realtime(Overlay):
 
             # Behind
             for behind_timegap, behind_index in relative_behind:
-                if veh_data[behind_index].inPit:
+                if veh_dataset[behind_index].inPit:
                     continue
 
                 avg_delta_timegap = delta_time_interval_behind[behind_index].long
@@ -207,18 +207,18 @@ class Realtime(Overlay):
 
         if self.wcfg["show_class"]:
             if self.show_slower_ahead:
-                veh_info = veh_data[ahead_overtake_index]
+                veh_info = veh_dataset[ahead_overtake_index]
                 self.update_class(self.bar_classes[0], veh_info.vehicleClass, veh_info.driverName)
             if self.show_race_leader:
-                veh_info = veh_data[leader_overtake_index]
+                veh_info = veh_dataset[leader_overtake_index]
                 self.update_class(self.bar_classes[1], veh_info.vehicleClass, veh_info.driverName)
             if self.show_faster_behind:
-                veh_info = veh_data[behind_overtake_index]
+                veh_info = veh_dataset[behind_overtake_index]
                 self.update_class(self.bar_classes[2], veh_info.vehicleClass, veh_info.driverName)
 
         if self.wcfg["show_estimated_laps"]:
-            plr_lap_progress = 1 - veh_data[player_index].currentLapProgress
-            opt_lap_progress = 1 - veh_data[ahead_overtake_index].currentLapProgress
+            plr_lap_progress = 1 - veh_dataset[player_index].currentLapProgress
+            opt_lap_progress = 1 - veh_dataset[ahead_overtake_index].currentLapProgress
             if self.show_slower_ahead:
                 self.update_laps(self.bar_laps[0], ahead_overtake_laps, opt_lap_progress)
             if self.show_race_leader:

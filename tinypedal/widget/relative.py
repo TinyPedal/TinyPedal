@@ -768,6 +768,7 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         _option = self.wcfg  # reduce lookup in loop
 
+        veh_dataset = minfo.vehicles.dataSet
         relative_list = relative_data(
             minfo.relative.relativeAhead,
             minfo.relative.relativeBehind,
@@ -791,7 +792,7 @@ class Realtime(Overlay):
                 state = 0
 
             # Get vehicle dataset
-            veh_info = minfo.vehicles.dataSet[rel_idx]
+            veh_info = veh_dataset[rel_idx]
             # Highlighted player
             hi_player = _option["show_player_highlighted"] and veh_info.isPlayer
             # Check whether is lapped

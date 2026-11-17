@@ -36,6 +36,7 @@ from PySide2.QtGui import (
 
 from .. import api, minfo
 from .. import calculation as calc
+from ..module_info import VehicleDataSet
 from ._base import Overlay
 
 
@@ -382,7 +383,7 @@ class Realtime(Overlay):
             else:
                 self.draw_warning_rect(painter, nearest_left, nearest_right, indicator)
 
-    def draw_collision_course(self, painter, veh_info):
+    def draw_collision_course(self, painter, veh_info: VehicleDataSet):
         """Draw collision course"""
         intercept_x, intercept_y = calc.rotate_coordinate(
             veh_info.relativeOrientationRadians,
@@ -405,7 +406,7 @@ class Realtime(Overlay):
             painter.fillRect(self.coll_shape, coll_color)
 
     # Additional methods
-    def color_lap_diff(self, veh_info):
+    def color_lap_diff(self, veh_info: VehicleDataSet):
         """Compare lap differences & set color"""
         if veh_info.positionOverall == 1:
             return self.brush_veh["leader"]

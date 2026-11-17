@@ -25,6 +25,7 @@ from itertools import islice
 from .. import minfo
 from ..constant import DATA
 from ..formatter import random_color_class
+from ..module_info import VehiclesInfo
 from ._base import Overlay
 
 
@@ -115,7 +116,7 @@ class Realtime(Overlay):
             if idx >= total_fields:
                 target.setHidden(True)
                 continue
-            class_name, active, total = fields[idx]
+            _, class_name, active, total = fields[idx]
             text_class, target.bg = self.set_class_style(class_name)
             text_field = f"{text_class:<{self.class_width}.{self.class_width}}"
             if self.wcfg["show_active_count"]:
@@ -129,34 +130,31 @@ class Realtime(Overlay):
             target.setHidden(False)
 
     # Additional methods
-    def count_class_fields(self, veh_info):
-        """Count active and total vehicles per class, sorted by class leader position
+    def count_class_fields(self, veh_info: VehiclesInfo):
+        """Count active and total vehicles per class, sorted by class order
 
         Returns:
             Tuple of (class name, active vehicles, total vehicles).
         """
-        class_data = {}  # class name: [best position, active, total]
+        class_data = {}
         for data in islice(veh_info.dataSet, veh_info.totalVehicles):
             class_name = data.vehicleClass
-            position_overall = data.positionOverall
             field = class_data.get(class_name)
             # Add new field
             if field is None:
-                class_data[class_name] = [position_overall, 0, 0]
+                class_data[class_name] = [
+                    data.classOrder,  # 0 - class order
+                    class_name,  # 1 - class name
+                    0,  # 2 - active cars
+                    0,  # 3 - total cars
+                ]
                 field = class_data[class_name]
             # Update field
-            if field[0] > position_overall:
-                field[0] = position_overall
             if data.inPit != 2:  # not in garage (DNF or DQ will end up in garage)
-                field[1] += 1
-            field[2] += 1
+                field[2] += 1
+            field[3] += 1
 
-        return tuple(
-            (class_name, active, total)
-            for class_name, (_, active, total) in sorted(
-                class_data.items(), key=lambda item: item[1][0]
-            )
-        )
+        return tuple(sorted(data for data in class_data.values()))
 
     def set_class_style(self, class_name: str):
         """Compare vehicle class name with user defined dictionary"""

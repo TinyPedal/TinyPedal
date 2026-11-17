@@ -43,6 +43,7 @@ class Realtime(DataModule):
         update_interval = self.idle_interval
 
         output = minfo.vehicles
+        output.update_index()
         max_lap_diff_ahead = self.mcfg["lap_difference_ahead_threshold"]
         max_lap_diff_behind = self.mcfg["lap_difference_behind_threshold"]
         max_finish_time_diff = max(self.mcfg["finish_time_difference_threshold"], 0)

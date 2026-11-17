@@ -25,6 +25,7 @@ from PySide2.QtGui import QBrush, QPainter, QPainterPath, QPen, QPixmap, QRadial
 
 from .. import api, minfo
 from .. import calculation as calc
+from ..module_info import VehicleDataSet
 from ._base import Overlay
 
 
@@ -144,7 +145,7 @@ class Realtime(Overlay):
         # Draw map
         self.draw_map_image(painter)
         # Draw vehicles
-        self.draw_vehicle(painter, minfo.vehicles.dataSet, minfo.relative.drawOrder)
+        self.draw_vehicle(painter)
         # Apply mask
         if self.wcfg["show_fade_out"]:
             painter.setCompositionMode(QPainter.CompositionMode_DestinationOut)
@@ -259,8 +260,11 @@ class Realtime(Overlay):
 
         painter.resetTransform()
 
-    def draw_vehicle(self, painter, veh_info, veh_draw_order):
+    def draw_vehicle(self, painter):
         """Draw vehicles"""
+        veh_dataset = minfo.vehicles.dataSet
+        veh_draw_order = minfo.relative.drawOrder
+
         if self.wcfg["show_circle_vehicle_shape"]:
             draw_shape = painter.drawEllipse
         else:
@@ -268,7 +272,7 @@ class Realtime(Overlay):
 
         # Draw vehicle within view range
         for index in veh_draw_order:
-            data = veh_info[index]
+            data = veh_dataset[index]
             # Draw player vehicle
             if data.isPlayer:
                 painter.setPen(self.pen_outline["player"])
@@ -318,7 +322,7 @@ class Realtime(Overlay):
         painter.drawEllipse(0, 0, self.area_size, self.area_size)
 
     # Additional methods
-    def color_vehicle(self, veh_info):
+    def color_vehicle(self, veh_info: VehicleDataSet):
         """Compare lap differences & set color"""
         if veh_info.isYellow and not veh_info.inPit:
             return self.brush_overall["yellow"]

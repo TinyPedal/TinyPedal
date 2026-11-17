@@ -865,10 +865,11 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         _option = self.wcfg  # reduce lookup in loop
 
+        in_race = api.read.session.in_race()
         standings_list = minfo.relative.standings
         total_std_idx = len(standings_list) - 1  # skip final -1 index
+        veh_dataset = minfo.vehicles.dataSet
         plr_veh_info = minfo.vehicles.playerData
-        in_race = api.read.session.in_race()
         class_leader_laptime_best = DATA.MAX_SECONDS
 
         # Standings update
@@ -890,7 +891,7 @@ class Realtime(Overlay):
                 state = 2
 
             # Get vehicle dataset
-            veh_info = minfo.vehicles.dataSet[std_idx]
+            veh_info = veh_dataset[std_idx]
             # Highlighted player
             hi_player = _option["show_player_highlighted"] and veh_info.isPlayer
             # Driver position

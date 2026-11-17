@@ -26,6 +26,7 @@ from PySide2.QtGui import QBrush, QPainter, QPainterPath, QPen, QPixmap
 from .. import api, minfo
 from .. import calculation as calc
 from ..formatter import random_color_class
+from ..module_info import VehicleDataSet
 from ..process.vehicle import vehicle_position_interp
 from ._base import Overlay
 
@@ -162,15 +163,11 @@ class Realtime(Overlay):
         painter.setRenderHint(QPainter.Antialiasing, True)
 
         if self.map_scaled:
-            self.draw_vehicle_on_map(
-                painter, minfo.vehicles.dataSet, minfo.relative.drawOrder
-            )
+            self.draw_vehicle_on_map(painter)
             if self.wcfg["show_safety_car"] and api.read.lap.safety_car_active():
                 self.draw_safetycar_on_map(painter, self.map_scaled)
         else:
-            self.draw_vehicle_on_circle(
-                painter, minfo.vehicles.dataSet, minfo.relative.drawOrder
-            )
+            self.draw_vehicle_on_circle(painter)
         if self.wcfg["show_pitout_prediction"]:
             self.draw_pitout_prediction(
                 painter,
@@ -338,12 +335,15 @@ class Realtime(Overlay):
                     self.area_size * 0.5
                 )
 
-    def draw_vehicle_on_circle(self, painter, veh_info, veh_draw_order):
+    def draw_vehicle_on_circle(self, painter):
         """Draw vehicles on temporary circle map"""
+        veh_dataset = minfo.vehicles.dataSet
+        veh_draw_order = minfo.relative.drawOrder
+
         offset = self.area_size * 0.5
 
         for index in veh_draw_order:
-            data = veh_info[index]
+            data = veh_dataset[index]
 
             inpit_offset = self.wcfg["font_size"] * data.inPit
             pos_x, pos_y = calc.rotate_coordinate(
@@ -374,14 +374,17 @@ class Realtime(Overlay):
                 painter.drawText(self.veh_text_shape, Qt.AlignCenter, f"{place_veh}")
             painter.resetTransform()
 
-    def draw_vehicle_on_map(self, painter, veh_info, veh_draw_order):
+    def draw_vehicle_on_map(self, painter):
         """Draw vehicles on track map"""
+        veh_dataset = minfo.vehicles.dataSet
+        veh_draw_order = minfo.relative.drawOrder
+
         # Position = coords * scale - (min_range * scale - offset)
         x_offset = self.map_range[0] * self.map_scale - self.map_offset[0]  # min range x, offset x
         y_offset = self.map_range[2] * self.map_scale - self.map_offset[1]  # min range y, offset y
 
         for index in veh_draw_order:
-            data = veh_info[index]
+            data = veh_dataset[index]
 
             if self.map_orient:
                 rot_x, rot_y = calc.rotate_coordinate(self.map_orient, data.worldPositionX, data.worldPositionY)
@@ -453,7 +456,7 @@ class Realtime(Overlay):
         painter.drawText(self.veh_text_shape, Qt.AlignCenter, self.wcfg["safety_car_text"])
         painter.resetTransform()
 
-    def draw_pitout_prediction(self, painter, map_data, plr_veh_info):
+    def draw_pitout_prediction(self, painter, map_data, plr_veh_info: VehicleDataSet):
         """Draw pitout prediction circles"""
         # Skip drawing
         if not plr_veh_info.inPit:
@@ -583,7 +586,7 @@ class Realtime(Overlay):
         self.rect_proximity.setRect(proxi_x, proxi_x, proxi_y, proxi_y)
 
     # Additional methods
-    def outline_vehicle(self, veh_info):
+    def outline_vehicle(self, veh_info: VehicleDataSet):
         """Set vehicle outline"""
         if veh_info.isPlayer:
             return self.pen_outline["player"]
@@ -594,7 +597,7 @@ class Realtime(Overlay):
                 return self.pen_outline["laps_behind"]
         return self.pen_outline["opponent"]
 
-    def color_vehicle(self, veh_info):
+    def color_vehicle(self, veh_info: VehicleDataSet):
         """Set vehicle color"""
         if veh_info.isYellow and not veh_info.inPit:
             return self.brush_overall["yellow"]

@@ -666,6 +666,7 @@ class Realtime(Overlay):
         _option = self.wcfg  # reduce lookup in loop
 
         in_race = api.read.session.in_race()
+        veh_dataset = minfo.vehicles.dataSet
         plr_veh_info = minfo.vehicles.playerData
         rivals_list = plr_veh_info.classAheadIndex, plr_veh_info.classBehindIndex
 
@@ -683,7 +684,7 @@ class Realtime(Overlay):
                 state = 0
 
             # Get vehicle dataset
-            veh_info = minfo.vehicles.dataSet[rvl_idx]
+            veh_info = veh_dataset[rvl_idx]
             # Driver position
             if _option["show_position"]:
                 self.update_pos(self.bars_pos[idx], veh_info.positionOverall, state)
