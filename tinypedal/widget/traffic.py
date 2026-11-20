@@ -141,7 +141,10 @@ class Realtime(Overlay):
         """Update when vehicle on track"""
         veh_dataset = minfo.vehicles.dataSet
         player_index = minfo.vehicles.playerIndex
-        player_laptime = api.read.timing.estimated_laptime()
+        player_laptime = minfo.vehicles.playerData.estimatedLapTime
+
+        relative_ahead = minfo.relative.relativeAhead
+        relative_behind = minfo.relative.relativeBehind
 
         ahead_overtake_laps = DATA.MAX_SECONDS
         ahead_overtake_timegap = 0.0
@@ -155,21 +158,15 @@ class Realtime(Overlay):
         leader_overtake_timegap = 0.0
         leader_overtake_index = minfo.vehicles.leaderIndex
 
-        if player_laptime > 0:
-            relative_ahead = minfo.relative.relativeAhead
-            relative_behind = minfo.relative.relativeBehind
-            delta_time_interval_ahead = minfo.relative.relativeDeltaAhead
-            delta_time_interval_behind = minfo.relative.relativeDeltaBehind
-
+        for ahead_data, behind_data in zip(relative_ahead, relative_behind):
             # Ahead
-            for ahead_timegap, ahead_index in relative_ahead:
-                if veh_dataset[ahead_index].inPit:
-                    continue
+            if not ahead_data.inPit:
+                ahead_timegap = ahead_data.relativeGapAhead
+                ahead_index = ahead_data.index
+                ahead_delta_timegap = ahead_data.relativeDeltaAhead.long
 
-                avg_delta_timegap = delta_time_interval_ahead[ahead_index].long
-
-                if avg_delta_timegap > 0:
-                    ahead_laps = ahead_timegap / avg_delta_timegap / player_laptime
+                if ahead_delta_timegap > 0:
+                    ahead_laps = -ahead_timegap / ahead_delta_timegap / player_laptime
                 else:
                     ahead_laps = 0
 
@@ -177,19 +174,14 @@ class Realtime(Overlay):
                     ahead_overtake_laps = ahead_laps
                     ahead_overtake_timegap = ahead_timegap
                     ahead_overtake_index = ahead_index
-
-            if ahead_overtake_laps >= DATA.MAX_SECONDS:
-                ahead_overtake_laps = 0.0
-
             # Behind
-            for behind_timegap, behind_index in relative_behind:
-                if veh_dataset[behind_index].inPit:
-                    continue
+            if not behind_data.inPit:
+                behind_timegap = behind_data.relativeGapBehind
+                behind_index = behind_data.index
+                behind_delta_timegap = behind_data.relativeDeltaBehind.long
 
-                avg_delta_timegap = delta_time_interval_behind[behind_index].long
-
-                if avg_delta_timegap > 0:
-                    behind_laps = -behind_timegap / avg_delta_timegap / player_laptime
+                if behind_delta_timegap > 0:
+                    behind_laps = behind_timegap / behind_delta_timegap / player_laptime
                 else:
                     behind_laps = 0
 
@@ -202,8 +194,11 @@ class Realtime(Overlay):
                     leader_overtake_laps = behind_laps
                     leader_overtake_timegap = behind_timegap
 
-            if behind_overtake_laps >= DATA.MAX_SECONDS:
-                behind_overtake_laps = 0.0
+        if ahead_overtake_laps >= DATA.MAX_SECONDS:
+            ahead_overtake_laps = 0.0
+
+        if behind_overtake_laps >= DATA.MAX_SECONDS:
+            behind_overtake_laps = 0.0
 
         if self.wcfg["show_class"]:
             if self.show_slower_ahead:

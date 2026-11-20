@@ -20,7 +20,6 @@
 Radar Widget
 """
 
-from itertools import islice
 from typing import NamedTuple
 
 from PySide2.QtCore import QRectF, Qt
@@ -341,7 +340,7 @@ class Realtime(Overlay):
         nearest_right = indicator.max_range_x
 
         # Draw opponent vehicle within radar range
-        for veh_info in islice(minfo.vehicles.dataSet, minfo.vehicles.totalVehicles):
+        for veh_info in minfo.vehicles.activeDataSet:
             if veh_info.isPlayer:
                 continue
             # -x = left, +x = right, -y = ahead, +y = behind
@@ -454,7 +453,7 @@ class Realtime(Overlay):
         # Quick check straight range vehicles
         if minfo.vehicles.nearestLine > self.straight_range:
             return False
-        for veh_info in islice(minfo.vehicles.dataSet, minfo.vehicles.totalVehicles):
+        for veh_info in minfo.vehicles.activeDataSet:
             # -x = left, +x = right, -y = ahead, +y = behind
             if (not veh_info.isPlayer and
                 hide_range.behind > veh_info.relativeRotatedPositionY > -hide_range.ahead and

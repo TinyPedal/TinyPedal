@@ -337,14 +337,9 @@ class Realtime(Overlay):
 
     def draw_vehicle_on_circle(self, painter):
         """Draw vehicles on temporary circle map"""
-        veh_dataset = minfo.vehicles.dataSet
-        veh_draw_order = minfo.relative.drawOrder
-
         offset = self.area_size * 0.5
 
-        for index in veh_draw_order:
-            data = veh_dataset[index]
-
+        for data in minfo.vehicles.drawOrder:
             inpit_offset = self.wcfg["font_size"] * data.inPit
             pos_x, pos_y = calc.rotate_coordinate(
                 6.2831853 * data.currentLapProgress,
@@ -376,16 +371,11 @@ class Realtime(Overlay):
 
     def draw_vehicle_on_map(self, painter):
         """Draw vehicles on track map"""
-        veh_dataset = minfo.vehicles.dataSet
-        veh_draw_order = minfo.relative.drawOrder
-
         # Position = coords * scale - (min_range * scale - offset)
         x_offset = self.map_range[0] * self.map_scale - self.map_offset[0]  # min range x, offset x
         y_offset = self.map_range[2] * self.map_scale - self.map_offset[1]  # min range y, offset y
 
-        for index in veh_draw_order:
-            data = veh_dataset[index]
-
+        for data in minfo.vehicles.drawOrder:
             if self.map_orient:
                 rot_x, rot_y = calc.rotate_coordinate(self.map_orient, data.worldPositionX, data.worldPositionY)
                 pos_x = rot_x * self.map_scale - x_offset

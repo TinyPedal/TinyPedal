@@ -488,6 +488,7 @@ class VehicleDataSet:
 
     index: int = -1
     classOrder: int = 0
+    drawPriority: int = 0
     isPlayer: bool = False
     elapsedTime: float = 0.0
     speed: float = 0.0
@@ -505,9 +506,13 @@ class VehicleDataSet:
     classLeaderIndex: int = -1
     bestLapTime: float = DATA.MAX_SECONDS
     lastLapTime: float = DATA.MAX_SECONDS
+    estimatedLapTime: float = DATA.MAX_SECONDS
+    estimatedTimeIntoLap: float = 0.0
     currentLapProgress: float = 0.0
     totalLapProgress: float = 0.0
     totalLapCompleted: int = 0
+    relativeGapAhead: float = 0.0
+    relativeGapBehind: float = 0.0
     gapBehindNext: float = 0.0
     gapBehindNextInClass: float = 0.0
     gapBehindLeader: float = 0.0
@@ -540,6 +545,8 @@ class VehicleDataSet:
     fuelHistory: DeltaFuelHistory = df_wrap(DeltaFuelHistory)
     energyHistory: DeltaFuelHistory = df_wrap(DeltaFuelHistory)
     lapTimeHistory: DeltaLapTimeHistory = df_wrap(DeltaLapTimeHistory)
+    relativeDeltaAhead: DeltaTimeInterval = df_wrap(DeltaTimeInterval)
+    relativeDeltaBehind: DeltaTimeInterval = df_wrap(DeltaTimeInterval)
 
 
 @slotclass
@@ -701,12 +708,8 @@ class NotesInfo:
 class RelativeInfo:
     """Relative output data"""
 
-    relativeAhead: list[tuple[float, int]] = df_list(DATA.RELATIVE_NA)
-    relativeBehind: list[tuple[float, int]] = df_list(DATA.RELATIVE_NA)
-    standings: tuple[int, ...] = DATA.STANDINGS_DEFAULT
-    drawOrder: list[int] = df_list(0)
-    relativeDeltaAhead: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, DATA.MAX_VEHICLES)
-    relativeDeltaBehind: tuple[DeltaTimeInterval, ...] = df_tuple(DeltaTimeInterval, DATA.MAX_VEHICLES)
+    relativeAhead: list[VehicleDataSet] = df_list(None)
+    relativeBehind: list[VehicleDataSet] = df_list(None)
 
 
 @slotclass
@@ -745,7 +748,17 @@ class StatsInfo:
 class VehiclesInfo:
     """Vehicles output data"""
 
+    # Data set update state
+    updateDrawOrder: bool = True
+    updateClassField: bool = True
+    updateClassOrder: bool = True
+    updateQualifyOrder: bool = True
+    updateAheadIndex: bool = True
+    updateStandingsIndex: bool = True
+    # Data set
     dataSet: tuple[VehicleDataSet, ...] = df_tuple(VehicleDataSet, DATA.MAX_VEHICLES)
+    activeDataSet: tuple[VehicleDataSet, ...] = ()
+    drawOrder: tuple[VehicleDataSet, ...] = ()
     dataSetVersion: int = -1
     # Leader reference
     leaderIndex: int = 0
@@ -776,6 +789,21 @@ class VehiclesInfo:
         """Update player index"""
         for index, data in enumerate(self.dataSet):
             data.index = index
+
+    def update_dataset(self):
+        """Update all data set"""
+        self.updateDrawOrder = True
+        self.updateClassField = True
+        self.updateClassOrder = True
+        self.updateQualifyOrder = True
+        self.updateAheadIndex = True
+        self.updateStandingsIndex = True
+
+    def reset_finish_offset(self):
+        """Reset finish offset"""
+        self.finishTimeOffset = 0.0
+        self.finishAsLap = True
+        self.finishLapOffset = 0.0
 
 
 @slotclass

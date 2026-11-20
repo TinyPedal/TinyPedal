@@ -20,12 +20,9 @@
 Class fields Widget
 """
 
-from itertools import islice
-
 from .. import minfo
 from ..constant import DATA
 from ..formatter import random_color_class
-from ..module_info import VehiclesInfo
 from ._base import Overlay
 
 
@@ -83,34 +80,16 @@ class Realtime(Overlay):
             if idx > 0:
                 target.hide()  # keep first field visible as placeholder
 
-        # Last data
-        self.post_update()
-
-    def post_update(self):
-        self.last_totals = None
-        self.last_fields = ()
-
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        veh_info = minfo.vehicles
-        totals = (
-            # Force refresh when leader completes a lap
-            # in case any class overall position changed
-            veh_info.leaderData.totalLapCompleted,
-            veh_info.totalVehicles,
-            veh_info.totalInGarage,
-        )
-        # Only recount if vehicle total changes
-        if self.last_totals != totals:
-            self.last_totals = totals
-            fields = self.count_class_fields(veh_info)
-            if self.last_fields != fields:
-                self.last_fields = fields
-                self.update_fields(fields)
+        if minfo.vehicles.updateClassField:
+            minfo.vehicles.updateClassField = False
+            self.update_fields()
 
     # GUI update methods
-    def update_fields(self, fields):
+    def update_fields(self):
         """Class fields"""
+        fields = self.count_class_fields()
         total_fields = len(fields)
         for idx, target in enumerate(self.bars_field):
             if idx >= total_fields:
@@ -130,14 +109,14 @@ class Realtime(Overlay):
             target.setHidden(False)
 
     # Additional methods
-    def count_class_fields(self, veh_info: VehiclesInfo):
+    def count_class_fields(self):
         """Count active and total vehicles per class, sorted by class order
 
         Returns:
             Tuple of (class name, active vehicles, total vehicles).
         """
         class_data = {}
-        for data in islice(veh_info.dataSet, veh_info.totalVehicles):
+        for data in minfo.vehicles.activeDataSet:
             class_name = data.vehicleClass
             field = class_data.get(class_name)
             # Add new field

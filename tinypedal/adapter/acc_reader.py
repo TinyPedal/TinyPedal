@@ -724,19 +724,24 @@ class Timing(_reader.Timing, DataAdapter):
         ))
 
     def estimated_laptime(self, index: int | None = None) -> float:
-        """Estimated lap time (seconds)"""
+        """Estimated lap time (seconds), default to 120.0 if zero"""
         length = ACC_TRACK_LENGTH(self.shmm.accStaticInfo.trackName)
         if length <= 0:
             length = self.udp.trackData.trackMeters
-        return length / 40
+        laptime = length / 40
+        if laptime > 0:
+            return laptime
+        return 120.0
 
     def estimated_time_into(self, index: int | None = None) -> float:
         """Estimated time into lap (seconds)"""
         length = ACC_TRACK_LENGTH(self.shmm.accStaticInfo.trackName)
         if length <= 0:
             length = self.udp.trackData.trackMeters
-        estimated_laptime = length / 40
-        return rmnan(estimated_laptime * self.udp_carinfo(index).splinePosition)
+        laptime = length / 40
+        if laptime <= 0:
+            laptime = 120.0
+        return rmnan(laptime * self.udp_carinfo(index).splinePosition)
 
     def last_sector(self, index: int | None = None) -> float:
         """Last sector time (seconds)"""
@@ -954,8 +959,11 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def in_paddock(self, index: int | None = None) -> int:
         """Is in paddock (either pit lane or garage), 0 = on track, 1 = pit lane, 2 = garage"""
         data = self.udp_carinfo(index)
-        in_pit = data.inPitLane
-        return 2 if in_pit and data.inGarage else in_pit
+        if data.inPitLane:
+            if data.inGarage:
+                return 2
+            return 1
+        return 0
 
     def number_pitstops(self, index: int | None = None) -> int:
         """Number of pit stops"""

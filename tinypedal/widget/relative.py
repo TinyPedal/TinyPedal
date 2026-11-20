@@ -20,10 +20,13 @@
 Relative Widget
 """
 
+from __future__ import annotations
+
 from .. import api, minfo, units
 from .. import calculation as calc
 from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
+from ..module_info import VehicleDataSet
 from ..userfile.custom_image import load_brand_logo_image
 from ..userfile.heatmap import select_compound_color, select_compound_symbol
 from ..validator import is_transparent_color
@@ -215,8 +218,8 @@ class Realtime(Overlay):
                 ),
             )
             self.nearest_time_gap = (
-                -max(self.wcfg["nearest_time_gap_threshold_behind"], 0),
-                max(self.wcfg["nearest_time_gap_threshold_front"], 0),
+                -max(self.wcfg["nearest_time_gap_threshold_front"], 0),
+                max(self.wcfg["nearest_time_gap_threshold_behind"], 0),
             )
             self.bars_gap = self.set_rawtext(
                 padding=bar_padx,
@@ -1015,7 +1018,7 @@ class Realtime(Overlay):
                 color_index = 0
             if data[-1]:
                 if self.wcfg["show_time_gap_sign"] and data[0] != 0:
-                    text = f"{-data[0]:+.{self.gap_decimals}f}"[:self.gap_width].strip(".")
+                    text = f"{data[0]:+.{self.gap_decimals}f}"[:self.gap_width].strip(".")
                 else:
                     text = f"{abs(data[0]):.{self.gap_decimals}f}"[:self.gap_width].strip(".")
             else:
@@ -1384,26 +1387,32 @@ def lap_difference_index(is_lapped, offset=2):
     return (is_lapped < 0) + (is_lapped > 0) * 2 + offset
 
 
-def relative_data(ahead_list: list, behind_list: list, player_index: int, max_ahead: int, max_behind: int):
+def relative_data(
+    dataset_ahead: list[VehicleDataSet],
+    dataset_behind: list[VehicleDataSet],
+    player_index: int,
+    max_ahead: int,
+    max_behind: int,
+):
     """Generate relative time & index data"""
     # Yield ahead data
-    ahead_count = len(ahead_list)
+    ahead_count = len(dataset_ahead)
     while ahead_count < max_ahead:
         ahead_count += 1
         yield DATA.RELATIVE_NA
-    for ahead_data in ahead_list:
+    for ahead_data in dataset_ahead:
         if ahead_count > max_ahead:
             ahead_count -= 1
         else:
-            yield ahead_data
+            yield (ahead_data.relativeGapAhead, ahead_data.index)
     # Yield player data
     yield (0.0, player_index)
     # Yield behind data
     behind_count = 0
-    for behind_data in behind_list:
+    for behind_data in dataset_behind:
         if behind_count < max_behind:
             behind_count += 1
-            yield behind_data
+            yield (behind_data.relativeGapBehind, behind_data.index)
         else:
             break
     while behind_count < max_behind:

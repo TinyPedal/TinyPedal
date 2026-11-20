@@ -24,6 +24,7 @@ from .. import api, minfo, units
 from .. import calculation as calc
 from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
+from ..process.standings import standings_index_list
 from ..userfile.custom_image import load_brand_logo_image
 from ..userfile.heatmap import select_compound_color, select_compound_symbol
 from ..validator import is_transparent_color
@@ -861,12 +862,24 @@ class Realtime(Overlay):
                 transparent_columns=transparent_columns,
             )
 
+        # Last data
+        self.gen_standings = standings_index_list(
+            veh_info=minfo.vehicles,
+            is_exclusive_mode=self.wcfg["enable_single_class_exclusive_mode"],
+            is_split_mode=self.wcfg["enable_multi_class_split_mode"],
+            min_top_veh=self.wcfg["minimum_top_vehicles"],
+            veh_limit_exclusive=self.wcfg["maximum_vehicles_exclusive_mode"],
+            veh_limit_combined=self.wcfg["maximum_vehicles_combined_mode"],
+            veh_limit_other=self.wcfg["maximum_vehicles_per_split_others"],
+            veh_limit_player=self.wcfg["maximum_vehicles_per_split_player"],
+        )
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
         _option = self.wcfg  # reduce lookup in loop
 
+        standings_list = next(self.gen_standings)
         in_race = api.read.session.in_race()
-        standings_list = minfo.relative.standings
         total_std_idx = len(standings_list) - 1  # skip final -1 index
         veh_dataset = minfo.vehicles.dataSet
         plr_veh_info = minfo.vehicles.playerData

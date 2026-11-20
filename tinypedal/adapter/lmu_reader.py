@@ -745,8 +745,11 @@ class Timing(_reader.Timing, DataAdapter):
         ))
 
     def estimated_laptime(self, index: int | None = None) -> float:
-        """Estimated lap time (seconds)"""
-        return rmnan(self.shmm.lmuScorVeh(index).mEstimatedLapTime)
+        """Estimated lap time (seconds), default to 120.0 if zero"""
+        laptime = self.shmm.lmuScorVeh(index).mEstimatedLapTime
+        if laptime > 0:
+            return laptime
+        return 120.0
 
     def estimated_time_into(self, index: int | None = None) -> float:
         """Estimated time into lap (seconds)"""
@@ -1001,7 +1004,11 @@ class Vehicle(_reader.Vehicle, DataAdapter):
     def in_paddock(self, index: int | None = None) -> int:
         """Is in paddock (either pit lane or garage), 0 = on track, 1 = pit lane, 2 = garage"""
         state = self.shmm.lmuScorVeh(index)
-        return 2 if state.mInGarageStall else state.mInPits
+        if state.mInGarageStall:
+            return 2
+        if state.mInPits:
+            return 1
+        return 0
 
     def number_pitstops(self, index: int | None = None) -> int:
         """Number of pit stops"""

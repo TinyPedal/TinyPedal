@@ -262,17 +262,13 @@ class Realtime(Overlay):
 
     def draw_vehicle(self, painter):
         """Draw vehicles"""
-        veh_dataset = minfo.vehicles.dataSet
-        veh_draw_order = minfo.relative.drawOrder
-
         if self.wcfg["show_circle_vehicle_shape"]:
             draw_shape = painter.drawEllipse
         else:
             draw_shape = painter.drawPolygon
 
         # Draw vehicle within view range
-        for index in veh_draw_order:
-            data = veh_dataset[index]
+        for data in minfo.vehicles.drawOrder:
             # Draw player vehicle
             if data.isPlayer:
                 painter.setPen(self.pen_outline["player"])

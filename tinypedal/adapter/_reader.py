@@ -527,7 +527,7 @@ class Timing(ABC):
 
     @abstractmethod
     def estimated_laptime(self, index: int | None = None) -> float:
-        """Estimated lap time (seconds)"""
+        """Estimated lap time (seconds), default to 120.0 if zero"""
 
     @abstractmethod
     def estimated_time_into(self, index: int | None = None) -> float:
