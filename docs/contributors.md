@@ -5,7 +5,7 @@
 
 ## Cross-platform
 * Potajito - Cross-platform (Linux) implementation, bug fixes
-* Lawrence Stalder (Bykow) - Cross-platform (Linux) features, widget enhancements
+* Lawrence Stalder (Bykow) - Cross-platform (Linux) features, widget implementation
 * Bernat (berarma) - Cross-platform (Linux) implementation, bug fixes
 * SynthetikzZ - Cross-platform (Linux) assistance, features
 * Sergio Rafael Lemke (srlemke) - Cross-platform (Linux) assistance, features, bug fixes
