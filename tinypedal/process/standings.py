@@ -54,15 +54,16 @@ def standings_index_list(
     while True:
         yield standings_index_list
 
-        # Update vehicle dataset
-        veh_total = veh_info.totalVehicles
-        if last_veh_total != veh_total:
-            last_veh_total = veh_total
-            dataset_temp[:] = veh_info.dataSet[:veh_total]
-            veh_info.updateStandingsIndex = True
-
         if veh_info.updateStandingsIndex:
             veh_info.updateStandingsIndex = False
+
+            # Update vehicle dataset
+            active_dataset = veh_info.activeDataSet
+            veh_total = len(active_dataset)
+            if last_veh_total != veh_total:
+                last_veh_total = veh_total
+                dataset_temp[:] = active_dataset
+
             plr_data = veh_info.playerData
             # Optimize for one car
             if veh_total <= 1:

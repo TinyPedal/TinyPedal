@@ -113,9 +113,15 @@ class Realtime(DataModule):
                             output.updateAheadIndex = False
                             update_overall_ahead_index(dataset_temp)
 
+                        elif output.updateClassStats:
+                            output.updateClassStats = False
+                            update_class_stats(dataset_temp)
+
                         elif output.updateClassOrder:
                             output.updateClassOrder = False
                             update_position_in_class(dataset_temp)
+                            # Make sure to update standings after updated class order
+                            output.updateStandingsIndex = True
 
                         elif output.updateDrawOrder:
                             output.updateDrawOrder = False
@@ -144,33 +150,32 @@ def update_vehicle_data(
     in_race: bool,
 ) -> None:
     """Update vehicle data"""
-    nearest_line = DATA.MAX_METERS
-    nearest_time_behind = DATA.MAX_SECONDS
-    nearest_yellow_ahead = DATA.MAX_METERS
-    nearest_yellow_behind = -DATA.MAX_METERS
-    nearest_blue_class = ""
-
-    # Counter
+    # Low priority
     if update_low_priority:
+        nearest_time_behind = DATA.MAX_SECONDS
+        nearest_yellow_ahead = DATA.MAX_METERS
+        nearest_yellow_behind = -DATA.MAX_METERS
+        nearest_blue_class = ""
+
+        under_blue = api.read.session.blue_flag()
+        plr_lap_distance = api.read.lap.distance()
+
         total_completed_laps = 0
         total_out_pits = 0
         total_in_pits = 0
-        total_in_garage = 0
         total_stopped_pits = 0
         total_pit_requests = 0
 
         _update_draw_order = False
         _update_class_order = False
+        _update_class_stats = False
         _update_ahead_index = False
-        _update_standings_index = False
 
-    # General data
+    # High priority
+    nearest_line = DATA.MAX_METERS
     track_length = api.read.lap.track_length()
-    under_blue = api.read.session.blue_flag()
     speedtrap_distance = minfo.mapping.speedTrapPosition
 
-    # Local player data
-    plr_lap_distance = api.read.lap.distance()
     plr_pos_x = api.read.vehicle.position_longitudinal()
     plr_pos_y = api.read.vehicle.position_lateral()
     plr_ori_yaw = api.read.vehicle.orientation_yaw()
@@ -178,15 +183,14 @@ def update_vehicle_data(
     # Update dataset from all vehicles in current session
     for index, data in enumerate(output.activeDataSet):
         # Temp & quick reference
-        laps_completed = api.read.lap.completed(index)
         lap_distance = api.read.lap.distance(index)
         data.speed = speed = api.read.vehicle.speed(index)
         data.inPit = in_pit = api.read.vehicle.in_paddock(index)
+        data.isPlayer = is_player = api.read.vehicle.is_player(index)
 
         # Update high priority info
-        data.isPlayer = api.read.vehicle.is_player(index)
         data.isYellow = speed < 8 and in_pit != 2
-        data.pitTimer.update(in_pit, elapsed_time, laps_completed, speed)
+        data.pitTimer.update(in_pit, elapsed_time, data.totalLapCompleted, speed)
 
         if in_pit:
             data.licoTimer.elapsed = 0.0
@@ -195,15 +199,12 @@ def update_vehicle_data(
             data.licoTimer.update(elapsed_time, api.read.inputs.throttle_raw(index), api.read.inputs.brake_raw(index))
             data.speedTrap.update(speed, lap_distance, speedtrap_distance, track_length)
 
-        if data.isPlayer:
+        if is_player:
             output.playerData = data  # save player info
             output.playerIndex = index
             data.elapsedTime = elapsed_time
             data.worldPositionX = plr_pos_x
             data.worldPositionY = plr_pos_y
-            if data.isYellow:
-                nearest_yellow_ahead = 0.0
-                nearest_yellow_behind = 0.0
         else:
             # Relative position & orientation
             opt_elapsed_time = api.read.timing.elapsed(index)
@@ -244,11 +245,14 @@ def update_vehicle_data(
 
         # Update low priority info
         if update_low_priority:
+
+            # Lap progress, time gap
+            laps_completed = api.read.lap.completed(index)
             data.currentLapProgress = calc.lap_progress_distance(lap_distance, track_length)
 
             if data.totalLapCompleted != laps_completed:
                 data.totalLapCompleted = laps_completed
-                _update_class_order = True  # update when completed new lap
+                _update_class_stats = True  # update when completed new lap
             elif 0 < data.currentLapProgress < 1:  # helps avoid desync
                 data.totalLapProgress = data.totalLapCompleted + data.currentLapProgress
                 data.isLapped = calc.lap_difference(
@@ -257,33 +261,60 @@ def update_vehicle_data(
                 ) if in_race else 0
                 update_time_gap_behind(data, output.dataSet, output.leaderIndex)
 
-            data.bestLapTime = api.read.timing.best_laptime(index)
-            data.pitRequested = api.read.vehicle.pit_request(index)
+            # Name
             data.driverName = api.read.vehicle.driver_name(index)
             data.vehicleName = api.read.vehicle.vehicle_model(index)
             data.brandName = select_brand_name(data.vehicleName)
-            data.vehicleClass = api.read.vehicle.class_name(index)
-            data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.tireCompoundName = api.read.tyre.compound_class(index)
+
+            class_name = api.read.vehicle.class_name(index)
+            if data.vehicleClass != class_name:
+                data.vehicleClass = class_name
+                _update_class_order = True
+
+            # Damage, incidents, track limits
+            data.vehicleIntegrity = api.read.vehicle.integrity(index)
             data.incidents = api.read.vehicle.incidents(index)
             data.trackLimitsPoints = api.read.session.cut_points(index)
 
+            # Pit stop, penalty, finish state
             penalties = api.read.vehicle.number_penalties(index)
             data.numPitStops = -penalties if penalties else api.read.vehicle.number_pitstops(index)
             data.penaltyType = api.read.vehicle.penalty_type(index)
             data.finishState = api.read.vehicle.finish_state(index)
+            data.pitRequested = api.read.vehicle.pit_request(index)
 
+            # Lap time, validation
+            data.bestLapTime = api.read.timing.best_laptime(index)
             last_laptime = api.read.timing.last_laptime(index)
             data.isValidLap = last_laptime > 0
             data.lastLapTime = abs(last_laptime)
             if 1 < api.read.timing.current_laptime(index) < 8:
                 data.lapTimeHistory.update(last_laptime, laps_completed, data.bestLapTime)
 
+            # Fuel, energy, stint usage
             fuel_remaining = api.read.engine.fuel_fraction(index)
             energy_remaining = api.read.engine.virtual_energy(index)
             data.fuelHistory.update(laps_completed, fuel_remaining)
             data.energyHistory.update(laps_completed, energy_remaining)
             update_stint_usage(data, fuel_remaining, energy_remaining)
+
+            # Overall position
+            position_overall = api.read.vehicle.place(index)
+            if data.positionOverall != position_overall:
+                data.positionOverall = position_overall
+                _update_class_order = True
+                _update_ahead_index = True
+
+            if position_overall == 1:
+                output.leaderData = data  # save leader info
+                output.leaderIndex = index
+
+            # Draw priority, 0 = top priority, 0 > low priority
+            draw_priority = 0 if is_player else in_pit * -1000 - position_overall
+            if data.drawPriority != draw_priority:
+                data.drawPriority = draw_priority
+                _update_draw_order = True
 
             # Update counter
             total_completed_laps += laps_completed
@@ -296,39 +327,23 @@ def update_vehicle_data(
                 if 0 < opt_time_behind < nearest_time_behind:
                     nearest_time_behind = opt_time_behind
                     if under_blue and (not in_race or data.isLapped > 0):
-                        nearest_blue_class = data.vehicleClass
+                        nearest_blue_class = class_name
             elif in_pit == 1:  # in pit (exclude garage)
                 total_in_pits += 1
                 total_stopped_pits += (speed < 0.1)
-            else:  # in garage (or retired)
-                total_in_garage += 1
 
             # Nearest yellow flag distance
             if data.isYellow:
-                opt_rel_distance = calc.circular_position_relative(
-                    track_length, plr_lap_distance, lap_distance)
-                if nearest_yellow_ahead > opt_rel_distance >= 0:
-                    nearest_yellow_ahead = opt_rel_distance
-                if nearest_yellow_behind < opt_rel_distance <= 0:
-                    nearest_yellow_behind = opt_rel_distance
-
-            # Overall position
-            position_overall = api.read.vehicle.place(index)
-            if data.positionOverall != position_overall:
-                data.positionOverall = position_overall
-                _update_class_order = True
-                _update_ahead_index = True
-                _update_standings_index = True
-
-            if position_overall == 1:
-                output.leaderData = data  # save leader info
-                output.leaderIndex = index
-
-            # Draw priority, 0 = top priority, 0 > low priority
-            draw_priority = 0 if data.isPlayer else in_pit * -1000 - position_overall
-            if data.drawPriority != draw_priority:
-                data.drawPriority = draw_priority
-                _update_draw_order = True
+                if is_player:
+                    nearest_yellow_ahead = 0.0
+                    nearest_yellow_behind = 0.0
+                else:
+                    opt_rel_distance = calc.circular_position_relative(
+                        track_length, plr_lap_distance, lap_distance)
+                    if nearest_yellow_ahead > opt_rel_distance >= 0:
+                        nearest_yellow_ahead = opt_rel_distance
+                    if nearest_yellow_behind < opt_rel_distance <= 0:
+                        nearest_yellow_behind = opt_rel_distance
 
     # Output extra info
     if update_low_priority:
@@ -339,7 +354,6 @@ def update_vehicle_data(
 
         output.totalOutPits = total_out_pits
         output.totalInPits = total_in_pits
-        output.totalInGarage = total_in_garage
         output.totalStoppedPits = total_stopped_pits
         output.totalPitRequests = total_pit_requests
         output.totalCompletedLaps = total_completed_laps
@@ -348,11 +362,41 @@ def update_vehicle_data(
         output.updateDrawOrder |= _update_draw_order
         output.updateClassField |= _update_draw_order
         output.updateClassOrder |= _update_class_order
+        output.updateClassStats |= _update_class_stats
         output.updateAheadIndex |= _update_ahead_index
-        output.updateStandingsIndex |= _update_standings_index
 
     output.nearestLine = nearest_line
     output.dataSetVersion += 1
+
+
+def update_class_stats(veh_dataset: list[VehicleDataSet]) -> None:
+    """Update vehicle class stats"""
+    veh_dataset.sort(key=standings.sort_by_class)
+    last_class_name = None
+    data_fastest = None
+    laptime_last_fastest = DATA.MAX_SECONDS
+
+    for data in veh_dataset:
+        class_name = data.vehicleClass
+
+        if last_class_name != class_name:
+            last_class_name = class_name  # reset class name
+            laptime_last_fastest = DATA.MAX_SECONDS  # reset last fastest
+            if data_fastest:  # mark fastest last lap
+                data_fastest.isClassFastestLastLap = True
+                data_fastest = None  # reset
+
+        # Check fastest last lap in class
+        if data.isValidLap:
+            laptime_last = data.lastLapTime
+            if laptime_last_fastest > laptime_last:
+                laptime_last_fastest = laptime_last
+                data_fastest = data
+
+        data.isClassFastestLastLap = False
+
+    if data_fastest:  # mark for last class
+        data_fastest.isClassFastestLastLap = True
 
 
 def update_position_in_class(veh_dataset: list[VehicleDataSet]) -> None:
@@ -363,9 +407,7 @@ def update_position_in_class(veh_dataset: list[VehicleDataSet]) -> None:
     place_in_class = 0
     index_ahead = -1
     index_leader = -1
-    laptime_last_fastest = DATA.MAX_SECONDS
     data_ahead = None
-    data_fastest = None
 
     for data in veh_dataset:
         index = data.index
@@ -381,30 +423,16 @@ def update_position_in_class(veh_dataset: list[VehicleDataSet]) -> None:
             place_in_class = 1  # reset position counter
             index_ahead = -1  # no opponent ahead of class leader
             index_leader = index
-            laptime_last_fastest = DATA.MAX_SECONDS  # reset last fastest
-            if data_fastest:  # mark fastest last lap
-                data_fastest.isClassFastestLastLap = True
-                data_fastest = None  # reset
-
-        # Check fastest last lap in class
-        if data.isValidLap:
-            laptime_last = data.lastLapTime
-            if laptime_last_fastest > laptime_last:
-                laptime_last_fastest = laptime_last
-                data_fastest = data
 
         data.classOrder = class_order + place_in_class
         data.classAheadIndex = index_ahead
         data.classBehindIndex = -1
         data.classLeaderIndex = index_leader
         data.positionInClass = place_in_class
-        data.isClassFastestLastLap = False
+
         # Store ahead
         index_ahead = index
         data_ahead = data
-
-    if data_fastest:  # mark for last class
-        data_fastest.isClassFastestLastLap = True
 
 
 def update_qualify_position(veh_dataset: list[VehicleDataSet]) -> None:

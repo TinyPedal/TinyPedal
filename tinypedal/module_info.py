@@ -511,8 +511,8 @@ class VehicleDataSet:
     currentLapProgress: float = 0.0
     totalLapProgress: float = 0.0
     totalLapCompleted: int = 0
-    relativeGapAhead: float = 0.0
-    relativeGapBehind: float = 0.0
+    relativeGapAhead: float = -DATA.MAX_SECONDS
+    relativeGapBehind: float = DATA.MAX_SECONDS
     gapBehindNext: float = 0.0
     gapBehindNextInClass: float = 0.0
     gapBehindLeader: float = 0.0
@@ -752,6 +752,7 @@ class VehiclesInfo:
     updateDrawOrder: bool = True
     updateClassField: bool = True
     updateClassOrder: bool = True
+    updateClassStats: bool = True
     updateQualifyOrder: bool = True
     updateAheadIndex: bool = True
     updateStandingsIndex: bool = True
@@ -769,7 +770,6 @@ class VehiclesInfo:
     # Counter
     totalOutPits: int = 0
     totalInPits: int = 0
-    totalInGarage: int = 0
     totalStoppedPits: int = 0
     totalPitRequests: int = 0
     totalCompletedLaps: int = 0
@@ -795,6 +795,7 @@ class VehiclesInfo:
         self.updateDrawOrder = True
         self.updateClassField = True
         self.updateClassOrder = True
+        self.updateClassStats = True
         self.updateQualifyOrder = True
         self.updateAheadIndex = True
         self.updateStandingsIndex = True
