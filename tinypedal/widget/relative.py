@@ -1393,28 +1393,29 @@ def relative_data(
     player_index: int,
     max_ahead: int,
     max_behind: int,
+    max_time: float = DATA.MAX_SECONDS,
+    data_none: tuple[float, int] = DATA.RELATIVE_NA,
 ):
     """Generate relative time & index data"""
     # Yield ahead data
-    ahead_count = len(dataset_ahead)
-    while ahead_count < max_ahead:
-        ahead_count += 1
-        yield DATA.RELATIVE_NA
-    for ahead_data in dataset_ahead:
-        if ahead_count > max_ahead:
-            ahead_count -= 1
-        else:
-            yield (ahead_data.relativeGapAhead, ahead_data.index)
+    ahead_count = len(dataset_ahead) - max_ahead
+    for idx in range(ahead_count, ahead_count + max_ahead):
+        if idx >= 0:
+            ahead_data = dataset_ahead[idx]
+            ahead_gap = ahead_data.relativeGapAhead
+            if ahead_gap > -max_time:  # check if gap time is valid
+                yield (ahead_gap, ahead_data.index)
+                continue
+        yield data_none
     # Yield player data
     yield (0.0, player_index)
     # Yield behind data
-    behind_count = 0
-    for behind_data in dataset_behind:
-        if behind_count < max_behind:
-            behind_count += 1
-            yield (behind_data.relativeGapBehind, behind_data.index)
-        else:
-            break
-    while behind_count < max_behind:
-        behind_count += 1
-        yield DATA.RELATIVE_NA
+    behind_count = len(dataset_behind)
+    for idx in range(max_behind):
+        if idx < behind_count:
+            behind_data = dataset_behind[idx]
+            behind_gap = behind_data.relativeGapBehind
+            if behind_gap < max_time:  # check if gap time is valid
+                yield (behind_gap, behind_data.index)
+                continue
+        yield data_none

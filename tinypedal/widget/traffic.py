@@ -20,7 +20,7 @@
 Traffic Widget
 """
 
-from .. import api, minfo, units
+from .. import minfo, units
 from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
 from ._base import Overlay
