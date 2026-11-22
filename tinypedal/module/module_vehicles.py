@@ -125,7 +125,7 @@ class Realtime(DataModule):
 
                         elif output.updateDrawOrder:
                             output.updateDrawOrder = False
-                            dataset_temp.sort(key=standings.sort_by_priority)
+                            dataset_temp.sort(key=standings.sort_by_draw_priority)
                             output.drawOrder = tuple(dataset_temp)
 
                         elif output.updateQualifyOrder:
@@ -166,7 +166,7 @@ def update_vehicle_data(
         total_stopped_pits = 0
         total_pit_requests = 0
 
-        _diff_draw_priority = False
+        _diff_in_pit = False
         _diff_position_overall = False
         _diff_class_name = False
         _diff_laps_completed = False
@@ -184,8 +184,8 @@ def update_vehicle_data(
     for index, data in enumerate(output.activeDataSet):
         # Temp & quick reference
         lap_distance = api.read.lap.distance(index)
+        in_pit = api.read.vehicle.in_paddock(index)
         data.speed = speed = api.read.vehicle.speed(index)
-        data.inPit = in_pit = api.read.vehicle.in_paddock(index)
         data.isPlayer = is_player = api.read.vehicle.is_player(index)
 
         # Update high priority info
@@ -236,7 +236,7 @@ def update_vehicle_data(
                 # Relative distance & time gap
                 data.relativeStraightDistance = calc.dist(
                     (plr_pos_x, plr_pos_y),
-                    (est_pos_x, est_pos_y)
+                    (est_pos_x, est_pos_y),
                 )
 
             # Nearest straight line distance (non local players)
@@ -284,6 +284,10 @@ def update_vehicle_data(
             data.finishState = api.read.vehicle.finish_state(index)
             data.pitRequested = api.read.vehicle.pit_request(index)
 
+            if data.inPit != in_pit:
+                data.inPit = in_pit
+                _diff_in_pit = True
+
             # Lap time, validation
             data.bestLapTime = api.read.timing.best_laptime(index)
             last_laptime = api.read.timing.last_laptime(index)
@@ -308,12 +312,6 @@ def update_vehicle_data(
             if position_overall == 1:
                 output.leaderData = data  # save leader info
                 output.leaderIndex = index
-
-            # Draw priority, 0 = top priority, 0 > low priority
-            draw_priority = 0 if is_player else in_pit * -1000 - position_overall
-            if data.drawPriority != draw_priority:
-                data.drawPriority = draw_priority
-                _diff_draw_priority = True
 
             # Update counter
             total_completed_laps += laps_completed
@@ -358,8 +356,8 @@ def update_vehicle_data(
         output.totalCompletedLaps = total_completed_laps
 
         # Update state
-        output.updateDrawOrder |= _diff_draw_priority
-        output.updateClassField |= _diff_draw_priority | _diff_class_name
+        output.updateDrawOrder |= _diff_position_overall | _diff_in_pit
+        output.updateClassField |= _diff_position_overall | _diff_in_pit | _diff_class_name
         output.updateClassOrder |= _diff_position_overall | _diff_class_name
         output.updateClassStats |= _diff_laps_completed
         output.updateAheadIndex |= _diff_position_overall

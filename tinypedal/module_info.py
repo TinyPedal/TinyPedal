@@ -488,7 +488,6 @@ class VehicleData:
 
     index: int = -1
     classOrder: int = 0
-    drawPriority: int = 0
     isPlayer: bool = False
     elapsedTime: float = 0.0
     speed: float = 0.0

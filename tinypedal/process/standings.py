@@ -239,9 +239,11 @@ def sort_by_overall(data: VehicleData) -> int:
     return data.positionOverall
 
 
-def sort_by_priority(data: VehicleData) -> int:
+def sort_by_draw_priority(data: VehicleData) -> int:
     """Sort by draw priority"""
-    return data.drawPriority
+    if data.isPlayer:
+        return 0
+    return data.inPit * -1000 - data.positionOverall
 
 
 def sort_by_qualification(data: VehicleData) -> tuple[str, int]:
