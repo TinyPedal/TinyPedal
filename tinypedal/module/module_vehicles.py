@@ -25,7 +25,7 @@ from __future__ import annotations
 from .. import api, minfo, realtime_state
 from .. import calculation as calc
 from ..constant import DATA
-from ..module_info import VehicleDataSet, VehiclesInfo
+from ..module_info import VehicleData, VehiclesInfo
 from ..process import standings
 from ..userfile.brands import select_brand_name
 from ..validator import state_timer
@@ -368,7 +368,7 @@ def update_vehicle_data(
     output.dataSetVersion += 1
 
 
-def update_class_stats(veh_dataset: list[VehicleDataSet]) -> None:
+def update_class_stats(veh_dataset: list[VehicleData]) -> None:
     """Update vehicle class stats"""
     veh_dataset.sort(key=standings.sort_by_class)
     last_class_name = None
@@ -397,7 +397,7 @@ def update_class_stats(veh_dataset: list[VehicleDataSet]) -> None:
         data_fastest.isClassFastestLastLap = True
 
 
-def update_position_in_class(veh_dataset: list[VehicleDataSet]) -> None:
+def update_position_in_class(veh_dataset: list[VehicleData]) -> None:
     """Update vehicle position in class"""
     veh_dataset.sort(key=standings.sort_by_class)
     class_order = 0
@@ -433,7 +433,7 @@ def update_position_in_class(veh_dataset: list[VehicleDataSet]) -> None:
         data_ahead = data
 
 
-def update_qualify_position(veh_dataset: list[VehicleDataSet]) -> None:
+def update_qualify_position(veh_dataset: list[VehicleData]) -> None:
     """Update vehicle qualify position"""
     # Update qualify position overall
     for data in veh_dataset:
@@ -452,7 +452,7 @@ def update_qualify_position(veh_dataset: list[VehicleDataSet]) -> None:
         data.qualifyInClass = qualify_in_class
 
 
-def update_overall_ahead_index(veh_dataset: list[VehicleDataSet]) -> None:
+def update_overall_ahead_index(veh_dataset: list[VehicleData]) -> None:
     """Update vehicle ahead index by overall position"""
     veh_dataset.sort(key=standings.sort_by_overall)
     ahead_index = -1
@@ -556,7 +556,7 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
         return
 
 
-def update_time_gap_behind(data: VehicleDataSet, veh_dataset: tuple[VehicleDataSet, ...], overall_index_leader: int) -> None:
+def update_time_gap_behind(data: VehicleData, veh_dataset: tuple[VehicleData, ...], overall_index_leader: int) -> None:
     """Update time gap behind"""
     class_index_ahead = data.classAheadIndex
     if class_index_ahead < 0:
@@ -586,7 +586,7 @@ def update_time_gap_behind(data: VehicleDataSet, veh_dataset: tuple[VehicleDataS
         data.gapBehindLeader = time_interval_behind(veh_dataset[overall_index_leader], data)
 
 
-def time_interval_behind(data_ahead: VehicleDataSet, data_behind: VehicleDataSet) -> float:
+def time_interval_behind(data_ahead: VehicleData, data_behind: VehicleData) -> float:
     """Calculate time interval behind next"""
     lap_diff = data_ahead.totalLapProgress - data_behind.totalLapProgress
     if lap_diff < 0:  # desync check during double-file formation lap
@@ -601,7 +601,7 @@ def time_interval_behind(data_ahead: VehicleDataSet, data_behind: VehicleDataSet
 
 
 def update_stint_usage(
-    data: VehicleDataSet,
+    data: VehicleData,
     fuel_remaining: float,
     energy_remaining: float,
 ) -> None:

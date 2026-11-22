@@ -25,7 +25,7 @@ from PySide2.QtGui import QBrush, QPainter, QPainterPath, QPen, QPixmap, QRadial
 
 from .. import api, minfo
 from .. import calculation as calc
-from ..module_info import VehicleDataSet
+from ..module_info import VehicleData
 from ._base import Overlay
 
 
@@ -318,7 +318,7 @@ class Realtime(Overlay):
         painter.drawEllipse(0, 0, self.area_size, self.area_size)
 
     # Additional methods
-    def color_vehicle(self, veh_info: VehicleDataSet):
+    def color_vehicle(self, veh_info: VehicleData):
         """Compare lap differences & set color"""
         if veh_info.isYellow and not veh_info.inPit:
             return self.brush_overall["yellow"]

@@ -26,7 +26,7 @@ from .. import api, minfo, units
 from .. import calculation as calc
 from ..constant import DATA
 from ..formatter import random_color_class, shorten_driver_name
-from ..module_info import VehicleDataSet
+from ..module_info import VehicleData
 from ..userfile.custom_image import load_brand_logo_image
 from ..userfile.heatmap import select_compound_color, select_compound_symbol
 from ..validator import is_transparent_color
@@ -1388,8 +1388,8 @@ def lap_difference_index(is_lapped, offset=2):
 
 
 def relative_data(
-    dataset_ahead: list[VehicleDataSet],
-    dataset_behind: list[VehicleDataSet],
+    dataset_ahead: list[VehicleData],
+    dataset_behind: list[VehicleData],
     player_index: int,
     max_ahead: int,
     max_behind: int,

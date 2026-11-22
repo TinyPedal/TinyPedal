@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from .. import api, minfo, realtime_state
 from ..constant import DATA
-from ..module_info import RelativeInfo, VehicleDataSet
+from ..module_info import RelativeInfo, VehicleData
 from ..validator import state_timer
 from ._base import DataModule
 
@@ -75,8 +75,8 @@ class Realtime(DataModule):
 
 def update_relative_data(
     output: RelativeInfo,
-    active_dataset: tuple[VehicleDataSet, ...],
-    dataset_temp: list[VehicleDataSet],
+    active_dataset: tuple[VehicleData, ...],
+    dataset_temp: list[VehicleData],
     update_relative_delta: bool,
 ) -> None:
     """Update relative time"""
@@ -117,11 +117,11 @@ def update_relative_data(
     output.relativeBehind = relative_behind
 
 
-def sort_by_relative_ahead(data: VehicleDataSet) -> float:
+def sort_by_relative_ahead(data: VehicleData) -> float:
     """Sort by relative ahead"""
     return data.relativeGapAhead
 
 
-def sort_by_relative_behind(data: VehicleDataSet) -> float:
+def sort_by_relative_behind(data: VehicleData) -> float:
     """Sort by relative behind"""
     return data.relativeGapBehind

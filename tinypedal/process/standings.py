@@ -26,7 +26,7 @@ from functools import lru_cache
 
 from ..constant import DATA
 from ..decorator import generator_init
-from ..module_info import VehicleDataSet, VehiclesInfo
+from ..module_info import VehicleData, VehiclesInfo
 
 
 @generator_init
@@ -106,7 +106,7 @@ def standings_index_list(
 
 
 def standings_index_from_all_classes(
-    veh_dataset: list[VehicleDataSet],
+    veh_dataset: list[VehicleData],
     min_top_veh: int,
     veh_limit_other: int,
     veh_limit_player: int,
@@ -126,7 +126,7 @@ def standings_index_from_all_classes(
 
 
 def standings_index_from_same_class(
-    veh_dataset: list[VehicleDataSet],
+    veh_dataset: list[VehicleData],
     min_top_veh: int,
     veh_limit_player: int,
     plr_class_name: str,
@@ -142,7 +142,7 @@ def standings_index_from_same_class(
 
 
 def calc_standings_index(
-    veh_dataset: list[VehicleDataSet],
+    veh_dataset: list[VehicleData],
     min_top_veh: int,
     veh_limit: int,
     plr_place: int,
@@ -185,7 +185,7 @@ def create_reference_place(
     )
 
 
-def split_class_list(veh_dataset: list[VehicleDataSet]):
+def split_class_list(veh_dataset: list[VehicleData]):
     """Split class list into class collection"""
     class_name = veh_dataset[0].vehicleClass
     index_start = 0
@@ -224,26 +224,26 @@ def max_vehicles_in_class(max_cls_veh: int, min_top_veh: int, min_add_veh: int =
 
 
 # Sorting function
-def sort_by_class(data: VehicleDataSet) -> tuple[str, int]:
+def sort_by_class(data: VehicleData) -> tuple[str, int]:
     """Sort by class"""
     return data.vehicleClass, data.positionOverall
 
 
-def sort_by_class_group(data: VehicleDataSet) -> int:
+def sort_by_class_group(data: VehicleData) -> int:
     """Sort by class group"""
     return data.classOrder
 
 
-def sort_by_overall(data: VehicleDataSet) -> int:
+def sort_by_overall(data: VehicleData) -> int:
     """Sort by overall position"""
     return data.positionOverall
 
 
-def sort_by_priority(data: VehicleDataSet) -> int:
+def sort_by_priority(data: VehicleData) -> int:
     """Sort by draw priority"""
     return data.drawPriority
 
 
-def sort_by_qualification(data: VehicleDataSet) -> tuple[str, int]:
+def sort_by_qualification(data: VehicleData) -> tuple[str, int]:
     """Sort by class & qualification"""
     return data.vehicleClass, data.qualifyOverall

@@ -26,7 +26,7 @@ from PySide2.QtGui import QBrush, QPainter, QPainterPath, QPen, QPixmap
 from .. import api, minfo
 from .. import calculation as calc
 from ..formatter import random_color_class
-from ..module_info import VehicleDataSet
+from ..module_info import VehicleData
 from ..process.vehicle import vehicle_position_interp
 from ._base import Overlay
 
@@ -446,7 +446,7 @@ class Realtime(Overlay):
         painter.drawText(self.veh_text_shape, Qt.AlignCenter, self.wcfg["safety_car_text"])
         painter.resetTransform()
 
-    def draw_pitout_prediction(self, painter, map_data, plr_veh_info: VehicleDataSet):
+    def draw_pitout_prediction(self, painter, map_data, plr_veh_info: VehicleData):
         """Draw pitout prediction circles"""
         # Skip drawing
         if not plr_veh_info.inPit:
@@ -576,7 +576,7 @@ class Realtime(Overlay):
         self.rect_proximity.setRect(proxi_x, proxi_x, proxi_y, proxi_y)
 
     # Additional methods
-    def outline_vehicle(self, veh_info: VehicleDataSet):
+    def outline_vehicle(self, veh_info: VehicleData):
         """Set vehicle outline"""
         if veh_info.isPlayer:
             return self.pen_outline["player"]
@@ -587,7 +587,7 @@ class Realtime(Overlay):
                 return self.pen_outline["laps_behind"]
         return self.pen_outline["opponent"]
 
-    def color_vehicle(self, veh_info: VehicleDataSet):
+    def color_vehicle(self, veh_info: VehicleData):
         """Set vehicle color"""
         if veh_info.isYellow and not veh_info.inPit:
             return self.brush_overall["yellow"]

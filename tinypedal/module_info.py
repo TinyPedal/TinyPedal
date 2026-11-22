@@ -483,8 +483,8 @@ class PitTimer:
 
 
 @slotclass
-class VehicleDataSet:
-    """Vehicle data set"""
+class VehicleData:
+    """Vehicle data"""
 
     index: int = -1
     classOrder: int = 0
@@ -708,8 +708,8 @@ class NotesInfo:
 class RelativeInfo:
     """Relative output data"""
 
-    relativeAhead: list[VehicleDataSet] = df_list(None)
-    relativeBehind: list[VehicleDataSet] = df_list(None)
+    relativeAhead: list[VehicleData] = df_list(None)
+    relativeBehind: list[VehicleData] = df_list(None)
 
 
 @slotclass
@@ -757,16 +757,16 @@ class VehiclesInfo:
     updateAheadIndex: bool = True
     updateStandingsIndex: bool = True
     # Data set
-    dataSet: tuple[VehicleDataSet, ...] = df_tuple(VehicleDataSet, DATA.MAX_VEHICLES)
-    activeDataSet: tuple[VehicleDataSet, ...] = ()
-    drawOrder: tuple[VehicleDataSet, ...] = ()
+    dataSet: tuple[VehicleData, ...] = df_tuple(VehicleData, DATA.MAX_VEHICLES)
+    activeDataSet: tuple[VehicleData, ...] = ()
+    drawOrder: tuple[VehicleData, ...] = ()
     dataSetVersion: int = -1
     # Leader reference
     leaderIndex: int = 0
-    leaderData: VehicleDataSet = df_wrap(VehicleDataSet)
+    leaderData: VehicleData = df_wrap(VehicleData)
     # Player reference
     playerIndex: int = -1
-    playerData: VehicleDataSet = df_wrap(VehicleDataSet)
+    playerData: VehicleData = df_wrap(VehicleData)
     # Counter
     totalOutPits: int = 0
     totalInPits: int = 0
