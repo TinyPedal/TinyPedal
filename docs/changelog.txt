@@ -11,6 +11,12 @@ WIP
   - Added "pit_status_text_alignment", "drive_through_status_text", "stop_go_status_text", "disqualify_status_text" and color options. Default status text "D" for drive through (red), "S" for stop go (red), "D" for disqualify (black).
   - Removed "show_vehicle_in_garage" option from Relative Widget.
 
+* Relative, Vehicles Module
+  - Further optimized vehicles data processing methods for more efficiency.
+
+* Wheels Module
+  - Disabled brake failure detection while spectating to avoid incorrect data.
+
 2.53.0 (2026-11-06)
 -----------------------------
 * Overlay

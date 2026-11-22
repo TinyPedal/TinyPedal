@@ -166,10 +166,10 @@ def update_vehicle_data(
         total_stopped_pits = 0
         total_pit_requests = 0
 
-        _update_draw_order = False
-        _update_class_order = False
-        _update_class_stats = False
-        _update_ahead_index = False
+        _diff_draw_priority = False
+        _diff_position_overall = False
+        _diff_class_name = False
+        _diff_laps_completed = False
 
     # High priority
     nearest_line = DATA.MAX_METERS
@@ -252,7 +252,7 @@ def update_vehicle_data(
 
             if data.totalLapCompleted != laps_completed:
                 data.totalLapCompleted = laps_completed
-                _update_class_stats = True  # update when completed new lap
+                _diff_laps_completed = True
             elif 0 < data.currentLapProgress < 1:  # helps avoid desync
                 data.totalLapProgress = data.totalLapCompleted + data.currentLapProgress
                 data.isLapped = calc.lap_difference(
@@ -270,7 +270,7 @@ def update_vehicle_data(
             class_name = api.read.vehicle.class_name(index)
             if data.vehicleClass != class_name:
                 data.vehicleClass = class_name
-                _update_class_order = True
+                _diff_class_name = True
 
             # Damage, incidents, track limits
             data.vehicleIntegrity = api.read.vehicle.integrity(index)
@@ -303,8 +303,7 @@ def update_vehicle_data(
             position_overall = api.read.vehicle.place(index)
             if data.positionOverall != position_overall:
                 data.positionOverall = position_overall
-                _update_class_order = True
-                _update_ahead_index = True
+                _diff_position_overall = True
 
             if position_overall == 1:
                 output.leaderData = data  # save leader info
@@ -314,7 +313,7 @@ def update_vehicle_data(
             draw_priority = 0 if is_player else in_pit * -1000 - position_overall
             if data.drawPriority != draw_priority:
                 data.drawPriority = draw_priority
-                _update_draw_order = True
+                _diff_draw_priority = True
 
             # Update counter
             total_completed_laps += laps_completed
@@ -359,11 +358,11 @@ def update_vehicle_data(
         output.totalCompletedLaps = total_completed_laps
 
         # Update state
-        output.updateDrawOrder |= _update_draw_order
-        output.updateClassField |= _update_draw_order
-        output.updateClassOrder |= _update_class_order
-        output.updateClassStats |= _update_class_stats
-        output.updateAheadIndex |= _update_ahead_index
+        output.updateDrawOrder |= _diff_draw_priority
+        output.updateClassField |= _diff_draw_priority | _diff_class_name
+        output.updateClassOrder |= _diff_position_overall | _diff_class_name
+        output.updateClassStats |= _diff_laps_completed
+        output.updateAheadIndex |= _diff_position_overall
 
     output.nearestLine = nearest_line
     output.dataSetVersion += 1
@@ -387,13 +386,12 @@ def update_class_stats(veh_dataset: list[VehicleDataSet]) -> None:
                 data_fastest = None  # reset
 
         # Check fastest last lap in class
+        data.isClassFastestLastLap = False
         if data.isValidLap:
             laptime_last = data.lastLapTime
             if laptime_last_fastest > laptime_last:
                 laptime_last_fastest = laptime_last
                 data_fastest = data
-
-        data.isClassFastestLastLap = False
 
     if data_fastest:  # mark for last class
         data_fastest.isClassFastestLastLap = True

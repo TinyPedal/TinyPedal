@@ -1146,6 +1146,7 @@ class Realtime(Overlay):
 
     def int_to_next(self, gap_behind_class, is_ahead):
         """Interval to next"""
+        sign = "-" if is_ahead else "+"
         if isinstance(gap_behind_class, int):
-            return f"{'+-'[is_ahead]}{gap_behind_class:.0f}L"
-        return f"{'+-'[is_ahead]}{gap_behind_class:.{self.int_decimals}f}"
+            return f"{sign}{gap_behind_class:.0f}L"
+        return f"{sign}{gap_behind_class:.{self.int_decimals}f}"
