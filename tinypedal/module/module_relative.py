@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from .. import api, minfo, realtime_state
 from ..constant import DATA
-from ..module_info import RelativeInfo, VehicleData
+from ..module_info import VehicleData
 from ..validator import state_timer
 from ._base import DataModule
 
@@ -40,9 +40,6 @@ class Realtime(DataModule):
         reset = False
         update_interval = self.idle_interval
 
-        output = minfo.relative
-        dataset_temp = []  # reused for sorting & processing
-
         gen_one_second_timer = state_timer(1.0)
 
         while not _event_wait(update_interval):
@@ -51,19 +48,10 @@ class Realtime(DataModule):
                 if not reset:
                     reset = True
                     update_interval = self.active_interval
-                    last_active_total = -1
-
-                active_dataset = minfo.vehicles.activeDataSet
-                veh_total = len(active_dataset)
-                if last_active_total != veh_total:
-                    last_active_total = veh_total
-                    dataset_temp[:] = active_dataset
 
                 # Update vehicle relative
                 update_relative_data(
-                    output,
-                    active_dataset,
-                    dataset_temp,
+                    minfo.vehicles.activeDataSet,
                     next(gen_one_second_timer),
                 )
 
@@ -74,15 +62,12 @@ class Realtime(DataModule):
 
 
 def update_relative_data(
-    output: RelativeInfo,
     active_dataset: tuple[VehicleData, ...],
-    dataset_temp: list[VehicleData],
     update_relative_delta: bool,
 ) -> None:
     """Update relative time"""
     plt_laptime_est = api.read.timing.estimated_laptime()
     plr_time_into = api.read.timing.estimated_time_into()
-    count_valid = 0
 
     for index, data in enumerate(active_dataset):
         data.estimatedTimeIntoLap = api.read.timing.estimated_time_into(index)
@@ -97,7 +82,6 @@ def update_relative_data(
 
             data.relativeGapAhead = diff_time_ahead
             data.relativeGapBehind = diff_time_behind
-            count_valid += 1
 
             if update_relative_delta:  # update at 1 sec interval
                 data.relativeDeltaAhead.update(-diff_time_ahead)
@@ -105,23 +89,3 @@ def update_relative_data(
         else:
             data.relativeGapAhead = -DATA.MAX_SECONDS
             data.relativeGapBehind = DATA.MAX_SECONDS
-
-    dataset_temp.sort(key=sort_by_relative_ahead)
-    relative_ahead = dataset_temp[len(dataset_temp) - count_valid :]
-
-    dataset_temp.sort(key=sort_by_relative_behind)
-    relative_behind = dataset_temp[:count_valid]
-
-    # Output data
-    output.relativeAhead = relative_ahead
-    output.relativeBehind = relative_behind
-
-
-def sort_by_relative_ahead(data: VehicleData) -> float:
-    """Sort by relative ahead"""
-    return data.relativeGapAhead
-
-
-def sort_by_relative_behind(data: VehicleData) -> float:
-    """Sort by relative behind"""
-    return data.relativeGapBehind

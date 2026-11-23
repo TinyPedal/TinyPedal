@@ -50,6 +50,8 @@ def standings_index_list(
     dataset_temp = []
     standings_index_list = DATA.STANDINGS_DEFAULT
     last_veh_total = -1
+    # Init list
+    veh_info.updateStandingsIndex = True
 
     while True:
         yield standings_index_list

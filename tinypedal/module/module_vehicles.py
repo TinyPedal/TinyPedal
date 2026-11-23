@@ -184,15 +184,12 @@ def update_vehicle_data(
 
     # Update dataset from all vehicles in current session
     for index, data in enumerate(output.activeDataSet):
-        # Temp & quick reference
+        # Update high priority info
         lap_distance = api.read.lap.distance(index)
         in_pit = api.read.vehicle.in_paddock(index)
         data.speed = speed = api.read.vehicle.speed(index)
         data.isPlayer = is_player = api.read.vehicle.is_player(index)
-
-        # Update high priority info
         data.isYellow = speed < 8 and in_pit != 2
-        data.pitTimer.update(in_pit, elapsed_time, data.totalLapCompleted, speed)
 
         if in_pit:
             data.licoTimer.elapsed = 0.0
@@ -280,22 +277,23 @@ def update_vehicle_data(
             data.trackLimitsPoints = api.read.session.cut_points(index)
 
             # Pit stop, penalty, finish state
+            if data.inPit != in_pit:
+                data.inPit = in_pit
+                _diff_in_pit = True
+
             penalties = api.read.vehicle.number_penalties(index)
             data.numPitStops = -penalties if penalties else api.read.vehicle.number_pitstops(index)
             data.penaltyType = api.read.vehicle.penalty_type(index)
             data.finishState = api.read.vehicle.finish_state(index)
             data.pitRequested = api.read.vehicle.pit_request(index)
-
-            if data.inPit != in_pit:
-                data.inPit = in_pit
-                _diff_in_pit = True
+            data.pitTimer.update(in_pit, elapsed_time, laps_completed, speed)
 
             # Lap time, validation
             data.bestLapTime = api.read.timing.best_laptime(index)
             last_laptime = api.read.timing.last_laptime(index)
             data.isValidLap = last_laptime > 0
             data.lastLapTime = abs(last_laptime)
-            if 1 < api.read.timing.current_laptime(index) < 8:
+            if 100 > lap_distance > 20:  # check only at start of lap
                 data.lapTimeHistory.update(last_laptime, laps_completed, data.bestLapTime)
 
             # Fuel, energy, stint usage
@@ -479,8 +477,8 @@ def update_finish_time(output: VehiclesInfo, max_finish_time_diff: float) -> Non
             leader_finish_offset = 0.0
             player_lap_offset = 0.0
         else:
-            leader_lap_into = api.read.lap.progress(leader_index)
-            player_lap_into = api.read.lap.progress(player_index)
+            leader_lap_into = output.leaderData.currentLapProgress
+            player_lap_into = output.playerData.currentLapProgress
 
             # Final pit stop time offset
             if minfo.energy.available:

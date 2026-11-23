@@ -704,14 +704,6 @@ class NotesInfo:
 
 
 @slotclass
-class RelativeInfo:
-    """Relative output data"""
-
-    relativeAhead: list[VehicleData] = df_list(None)
-    relativeBehind: list[VehicleData] = df_list(None)
-
-
-@slotclass
 class SectorData:
     """Sector data set"""
 
@@ -881,7 +873,6 @@ class ModuleInfo:
     history: HistoryInfo = df_wrap(HistoryInfo)
     hybrid: HybridInfo = df_wrap(HybridInfo)
     mapping: MappingInfo = df_wrap(MappingInfo)
-    relative: RelativeInfo = df_wrap(RelativeInfo)
     sectors: SectorsInfo = df_wrap(SectorsInfo)
     stats: StatsInfo = df_wrap(StatsInfo)
     pacenotes: NotesInfo = df_wrap(NotesInfo)

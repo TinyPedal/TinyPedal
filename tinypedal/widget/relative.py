@@ -767,14 +767,29 @@ class Realtime(Overlay):
                 transparent_columns=transparent_columns,
             )
 
+        # Last data
+        self.last_veh_total = -1
+        self.dataset_ahead = []
+        self.dataset_behind = []
+
     def timerEvent(self, event):
         """Update when vehicle on track"""
         _option = self.wcfg  # reduce lookup in loop
 
+        veh_total = minfo.vehicles.totalVehicles
+        if self.last_veh_total != veh_total:
+            self.last_veh_total = veh_total
+            active_dataset = minfo.vehicles.activeDataSet
+            self.dataset_ahead[:] = active_dataset
+            self.dataset_behind[:] = active_dataset
+
+        self.dataset_ahead.sort(key=sort_by_relative_ahead)
+        self.dataset_behind.sort(key=sort_by_relative_behind)
+
         veh_dataset = minfo.vehicles.dataSet
         relative_list = relative_data(
-            minfo.relative.relativeAhead,
-            minfo.relative.relativeBehind,
+            self.dataset_ahead,
+            self.dataset_behind,
             minfo.vehicles.playerIndex,
             self.max_veh_front,
             self.max_veh_behind,
@@ -1419,3 +1434,13 @@ def relative_data(
                 yield (behind_gap, behind_data.index)
                 continue
         yield data_none
+
+
+def sort_by_relative_ahead(data: VehicleData) -> float:
+    """Sort by relative ahead"""
+    return data.relativeGapAhead
+
+
+def sort_by_relative_behind(data: VehicleData) -> float:
+    """Sort by relative behind"""
+    return data.relativeGapBehind
