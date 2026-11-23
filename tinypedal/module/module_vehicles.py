@@ -66,11 +66,12 @@ class Realtime(DataModule):
                     last_in_race = -1
                     last_player_index = -1
 
-                veh_total = output.totalVehicles = api.read.vehicle.total_vehicles()
+                veh_total = api.read.vehicle.total_vehicles()
 
                 if last_active_total != veh_total:
                     last_active_total = veh_total
                     output.activeDataSet = output.dataSet[:max(veh_total, 1)]
+                    output.totalVehicles = veh_total
                     dataset_temp[:] = output.activeDataSet
 
                 if veh_total > 0:
@@ -122,6 +123,7 @@ class Realtime(DataModule):
                             update_position_in_class(dataset_temp)
                             # Make sure to update standings after updated class order
                             output.updateStandingsIndex = True
+                            output.updateClassField = True
 
                         elif output.updateDrawOrder:
                             output.updateDrawOrder = False
@@ -357,7 +359,7 @@ def update_vehicle_data(
 
         # Update state
         output.updateDrawOrder |= _diff_position_overall | _diff_in_pit
-        output.updateClassField |= _diff_position_overall | _diff_in_pit | _diff_class_name
+        output.updateClassField |= _diff_in_pit
         output.updateClassOrder |= _diff_position_overall | _diff_class_name
         output.updateClassStats |= _diff_laps_completed
         output.updateAheadIndex |= _diff_position_overall

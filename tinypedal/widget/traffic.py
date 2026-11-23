@@ -139,12 +139,10 @@ class Realtime(Overlay):
 
     def timerEvent(self, event):
         """Update when vehicle on track"""
-        veh_dataset = minfo.vehicles.dataSet
-        player_index = minfo.vehicles.playerIndex
-        player_laptime = minfo.vehicles.playerData.estimatedLapTime
-
-        relative_ahead = minfo.relative.relativeAhead
-        relative_behind = minfo.relative.relativeBehind
+        veh_info = minfo.vehicles
+        veh_dataset = veh_info.dataSet
+        player_index = veh_info.playerIndex
+        player_laptime = veh_info.playerData.estimatedLapTime
 
         ahead_overtake_laps = DATA.MAX_SECONDS
         ahead_overtake_timegap = 0.0
@@ -156,43 +154,42 @@ class Realtime(Overlay):
 
         leader_overtake_laps = 0.0
         leader_overtake_timegap = 0.0
-        leader_overtake_index = minfo.vehicles.leaderIndex
+        leader_overtake_index = veh_info.leaderIndex
 
-        for ahead_data, behind_data in zip(relative_ahead, relative_behind):
+        for data in veh_info.activeDataSet:
+            if data.inPit:
+                continue
+            opt_index = data.index
             # Ahead
-            if not ahead_data.inPit:
-                ahead_timegap = ahead_data.relativeGapAhead
-                ahead_index = ahead_data.index
-                ahead_delta_timegap = ahead_data.relativeDeltaAhead.long
+            ahead_timegap = data.relativeGapAhead
+            ahead_delta_timegap = data.relativeDeltaAhead.long
 
-                if ahead_delta_timegap > 0:
-                    ahead_laps = -ahead_timegap / ahead_delta_timegap / player_laptime
-                else:
-                    ahead_laps = 0
+            if ahead_delta_timegap > 0:
+                ahead_laps = -ahead_timegap / ahead_delta_timegap / player_laptime
+            else:
+                ahead_laps = 0
 
-                if 0 < ahead_laps < ahead_overtake_laps:
-                    ahead_overtake_laps = ahead_laps
-                    ahead_overtake_timegap = ahead_timegap
-                    ahead_overtake_index = ahead_index
+            if 0 < ahead_laps < ahead_overtake_laps:
+                ahead_overtake_laps = ahead_laps
+                ahead_overtake_timegap = ahead_timegap
+                ahead_overtake_index = opt_index
             # Behind
-            if not behind_data.inPit:
-                behind_timegap = behind_data.relativeGapBehind
-                behind_index = behind_data.index
-                behind_delta_timegap = behind_data.relativeDeltaBehind.long
+            behind_timegap = data.relativeGapBehind
+            behind_delta_timegap = data.relativeDeltaBehind.long
 
-                if behind_delta_timegap > 0:
-                    behind_laps = behind_timegap / behind_delta_timegap / player_laptime
-                else:
-                    behind_laps = 0
+            if behind_delta_timegap > 0:
+                behind_laps = behind_timegap / behind_delta_timegap / player_laptime
+            else:
+                behind_laps = 0
 
-                if 0 < behind_laps < behind_overtake_laps:
-                    behind_overtake_laps = behind_laps
-                    behind_overtake_timegap = behind_timegap
-                    behind_overtake_index = behind_index
+            if 0 < behind_laps < behind_overtake_laps:
+                behind_overtake_laps = behind_laps
+                behind_overtake_timegap = behind_timegap
+                behind_overtake_index = opt_index
 
-                if behind_index == leader_overtake_index:
-                    leader_overtake_laps = behind_laps
-                    leader_overtake_timegap = behind_timegap
+            if opt_index == leader_overtake_index:
+                leader_overtake_laps = behind_laps
+                leader_overtake_timegap = behind_timegap
 
         if ahead_overtake_laps >= DATA.MAX_SECONDS:
             ahead_overtake_laps = 0.0
@@ -202,14 +199,14 @@ class Realtime(Overlay):
 
         if self.wcfg["show_class"]:
             if self.show_slower_ahead:
-                veh_info = veh_dataset[ahead_overtake_index]
-                self.update_class(self.bar_classes[0], veh_info.vehicleClass, veh_info.driverName)
+                opt_data = veh_dataset[ahead_overtake_index]
+                self.update_class(self.bar_classes[0], opt_data.vehicleClass, opt_data.driverName)
             if self.show_race_leader:
-                veh_info = veh_dataset[leader_overtake_index]
-                self.update_class(self.bar_classes[1], veh_info.vehicleClass, veh_info.driverName)
+                opt_data = veh_dataset[leader_overtake_index]
+                self.update_class(self.bar_classes[1], opt_data.vehicleClass, opt_data.driverName)
             if self.show_faster_behind:
-                veh_info = veh_dataset[behind_overtake_index]
-                self.update_class(self.bar_classes[2], veh_info.vehicleClass, veh_info.driverName)
+                opt_data = veh_dataset[behind_overtake_index]
+                self.update_class(self.bar_classes[2], opt_data.vehicleClass, opt_data.driverName)
 
         if self.wcfg["show_estimated_laps"]:
             plr_lap_progress = 1 - veh_dataset[player_index].currentLapProgress
