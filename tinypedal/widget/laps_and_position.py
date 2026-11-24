@@ -224,11 +224,11 @@ class Realtime(Overlay):
 
         # Position change
         if self.wcfg["show_position_change"]:
-            veh_info = minfo.vehicles.playerData
+            plr_data = minfo.vehicles.playerData
             if self.wcfg["show_position_change_in_class"]:
-                pos_diff = veh_info.qualifyInClass - veh_info.positionInClass
+                pos_diff = plr_data.qualifyInClass - plr_data.positionInClass
             else:
-                pos_diff = veh_info.qualifyOverall - veh_info.positionOverall
+                pos_diff = plr_data.qualifyOverall - plr_data.positionOverall
             self.update_position_change(self.bar_pos_change, pos_diff)
 
     # GUI update methods

@@ -446,13 +446,13 @@ class Realtime(Overlay):
         painter.drawText(self.veh_text_shape, Qt.AlignCenter, self.wcfg["safety_car_text"])
         painter.resetTransform()
 
-    def draw_pitout_prediction(self, painter, map_data, plr_veh_info: VehicleData):
+    def draw_pitout_prediction(self, painter, map_data, plr_data: VehicleData):
         """Draw pitout prediction circles"""
         # Skip drawing
-        if not plr_veh_info.inPit:
+        if not plr_data.inPit:
             if not self.show_while_requested:  # if not in pit
                 return
-            if not plr_veh_info.pitRequested:  # not requested pit
+            if not plr_data.pitRequested:  # not requested pit
                 return
 
         # Verify data set
@@ -474,13 +474,13 @@ class Realtime(Overlay):
         dist_end_index = min(len(dist_data), len(map_data)) - 1
 
         # Calculate pit timer & target time
-        if plr_veh_info.pitRequested and not plr_veh_info.inPit:  # out pit lane
+        if plr_data.pitRequested and not plr_data.inPit:  # out pit lane
             pitin_time = target_node_time(minfo.mapping.pitEntryPosition, deltabest_data, deltabest_max_index, laptime_scale)
-            pos_curr_time = target_node_time(api.read.lap.distance(), deltabest_data, deltabest_max_index, laptime_scale)
+            pos_curr_time = target_node_time(plr_data.distanceIntoLap, deltabest_data, deltabest_max_index, laptime_scale)
             pit_timer = pos_curr_time - pitin_time
             target_pit_time = self.min_pit_time
         else:  # in pit lane
-            pit_timer = plr_veh_info.pitTimer.elapsed
+            pit_timer = plr_data.pitTimer.elapsed
             target_pit_time = target_pitstop_duration(pit_timer, self.min_pit_time, self.pit_time_increment)
 
         # Find time_into from deltabest_data, scale to match laptime_pace
@@ -489,7 +489,7 @@ class Realtime(Overlay):
 
         painter.setBrush(Qt.NoBrush)
 
-        for pit_time, auto_prediction in self.get_target_pit_time(target_pit_time, pit_timer, plr_veh_info.inPit):
+        for pit_time, auto_prediction in self.get_target_pit_time(target_pit_time, pit_timer, plr_data.inPit):
             # Calc estimated pitout_time_into based on laptime_pace
             offset_time_into = pitout_time_extend - pit_time
             pitout_time_into = (offset_time_into - offset_time_into // laptime_pace * laptime_pace) * laptime_scale
@@ -576,34 +576,34 @@ class Realtime(Overlay):
         self.rect_proximity.setRect(proxi_x, proxi_x, proxi_y, proxi_y)
 
     # Additional methods
-    def outline_vehicle(self, veh_info: VehicleData):
+    def outline_vehicle(self, data: VehicleData):
         """Set vehicle outline"""
-        if veh_info.isPlayer:
+        if data.isPlayer:
             return self.pen_outline["player"]
         if self.wcfg["show_lap_difference_outline"]:
-            if veh_info.isLapped > 0:
+            if data.isLapped > 0:
                 return self.pen_outline["laps_ahead"]
-            if veh_info.isLapped < 0:
+            if data.isLapped < 0:
                 return self.pen_outline["laps_behind"]
         return self.pen_outline["opponent"]
 
-    def color_vehicle(self, veh_info: VehicleData):
+    def color_vehicle(self, data: VehicleData):
         """Set vehicle color"""
-        if veh_info.isYellow and not veh_info.inPit:
+        if data.isYellow and not data.inPit:
             return self.brush_overall["yellow"]
-        if veh_info.inPit and not veh_info.isPlayer:
+        if data.inPit and not data.isPlayer:
             return self.brush_overall["in_pit"]
         if self.wcfg["enable_multi_class_styling"]:
-            if self.wcfg["show_custom_player_color_in_multi_class"] and veh_info.isPlayer:
+            if self.wcfg["show_custom_player_color_in_multi_class"] and data.isPlayer:
                 return self.brush_overall["player"]
-            return self.classes_style(veh_info.vehicleClass)
-        if veh_info.isPlayer:
+            return self.classes_style(data.vehicleClass)
+        if data.isPlayer:
             return self.brush_overall["player"]
-        if veh_info.positionOverall == 1:
+        if data.positionOverall == 1:
             return self.brush_overall["leader"]
-        if veh_info.isLapped > 0:
+        if data.isLapped > 0:
             return self.brush_overall["laps_ahead"]
-        if veh_info.isLapped < 0:
+        if data.isLapped < 0:
             return self.brush_overall["laps_behind"]
         return self.brush_overall["same_lap"]
 

@@ -52,6 +52,7 @@ class Realtime(DataModule):
         max_finish_time_diff = max(self.mcfg["finish_time_difference_threshold"], 0)
 
         gen_low_priority_timer = state_timer(0.2)
+        in_race = False
 
         while not _event_wait(update_interval):
             if not realtime_state.paused:
@@ -77,7 +78,6 @@ class Realtime(DataModule):
                 if veh_total > 0:
                     update_low_priority = next(gen_low_priority_timer)
                     session_elapsed = api.read.timing.elapsed()
-                    in_race = api.read.session.in_race()
 
                     update_vehicle_data(
                         output,
@@ -87,9 +87,10 @@ class Realtime(DataModule):
                         session_elapsed,
                         in_race,
                     )
-                    player_index = output.playerIndex
 
                     if update_low_priority:
+                        in_race = api.read.session.in_race()
+                        player_index = output.playerIndex
 
                         if (
                             last_veh_total != veh_total

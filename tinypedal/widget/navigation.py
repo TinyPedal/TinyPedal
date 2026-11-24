@@ -318,19 +318,19 @@ class Realtime(Overlay):
         painter.drawEllipse(0, 0, self.area_size, self.area_size)
 
     # Additional methods
-    def color_vehicle(self, veh_info: VehicleData):
+    def color_vehicle(self, data: VehicleData):
         """Compare lap differences & set color"""
-        if veh_info.isYellow and not veh_info.inPit:
+        if data.isYellow and not data.inPit:
             return self.brush_overall["yellow"]
-        if veh_info.inPit and not veh_info.isPlayer:
+        if data.inPit and not data.isPlayer:
             return self.brush_overall["in_pit"]
-        if veh_info.isPlayer:
+        if data.isPlayer:
             return self.brush_overall["player"]
-        if veh_info.positionOverall == 1:
+        if data.positionOverall == 1:
             return self.brush_overall["leader"]
-        if veh_info.isLapped > 0:
+        if data.isLapped > 0:
             return self.brush_overall["laps_ahead"]
-        if veh_info.isLapped < 0:
+        if data.isLapped < 0:
             return self.brush_overall["laps_behind"]
         return self.brush_overall["same_lap"]
 

@@ -667,8 +667,8 @@ class Realtime(Overlay):
 
         in_race = api.read.session.in_race()
         veh_dataset = minfo.vehicles.dataSet
-        plr_veh_info = minfo.vehicles.playerData
-        rivals_list = plr_veh_info.classAheadIndex, plr_veh_info.classBehindIndex
+        plr_data = minfo.vehicles.playerData
+        rivals_list = plr_data.classAheadIndex, plr_data.classBehindIndex
 
         # Standings update
         for idx, rvl_idx in enumerate(rivals_list):
@@ -684,121 +684,121 @@ class Realtime(Overlay):
                 state = 0
 
             # Get vehicle dataset
-            veh_info = veh_dataset[rvl_idx]
+            data = veh_dataset[rvl_idx]
             # Driver position
             if _option["show_position"]:
-                self.update_pos(self.bars_pos[idx], veh_info.positionOverall, state)
+                self.update_pos(self.bars_pos[idx], data.positionOverall, state)
             # Driver position change
             if _option["show_position_change"]:
                 if _option["show_position_change_in_class"]:
-                    pos_diff = veh_info.qualifyInClass - veh_info.positionInClass
+                    pos_diff = data.qualifyInClass - data.positionInClass
                 else:
-                    pos_diff = veh_info.qualifyOverall - veh_info.positionOverall
+                    pos_diff = data.qualifyOverall - data.positionOverall
                 self.update_pgl(self.bars_pgl[idx], pos_diff, state)
             # Driver name
             if _option["show_driver_name"]:
-                self.update_drv(self.bars_drv[idx], veh_info.driverName, state)
+                self.update_drv(self.bars_drv[idx], data.driverName, state)
             # Vehicle name
             if _option["show_vehicle_name"]:
                 if _option["show_vehicle_brand_as_name"]:
-                    vehicle_name = veh_info.brandName
+                    vehicle_name = data.brandName
                 else:
-                    vehicle_name = veh_info.vehicleName
+                    vehicle_name = data.vehicleName
                 self.update_veh(self.bars_veh[idx], vehicle_name, state)
             # Brand logo
             if _option["show_brand_logo"]:
-                self.update_brd(self.bars_brd[idx], veh_info.brandName, state)
+                self.update_brd(self.bars_brd[idx], data.brandName, state)
             # Time interval
             if _option["show_time_interval"]:
-                is_ahead = veh_info.positionOverall < plr_veh_info.positionOverall
+                is_ahead = data.positionOverall < plr_data.positionOverall
                 if is_ahead:
-                    time_int = plr_veh_info.gapBehindNextInClass
+                    time_int = plr_data.gapBehindNextInClass
                 else:
-                    time_int = veh_info.gapBehindNextInClass
+                    time_int = data.gapBehindNextInClass
                 self.update_int(self.bars_int[idx], time_int, is_ahead, state)
             # Vehicle laptime
             if _option["show_laptime"]:
-                if _option["show_pitstop_duration_while_requested_pitstop"] and plr_veh_info.pitRequested:
-                    laptime = self.set_pittime(veh_info.inPit, veh_info.pitTimer.elapsed)
+                if _option["show_pitstop_duration_while_requested_pitstop"] and plr_data.pitRequested:
+                    laptime = self.set_pittime(data.inPit, data.pitTimer.elapsed)
                 elif in_race or _option["show_best_laptime"]:
-                    if veh_info.pitTimer.pitting:
-                        laptime = self.set_pittime(veh_info.inPit, veh_info.pitTimer.elapsed)
+                    if data.pitTimer.pitting:
+                        laptime = self.set_pittime(data.inPit, data.pitTimer.elapsed)
                     else:
-                        laptime = self.set_laptime(veh_info.lastLapTime, veh_info.isValidLap)
+                        laptime = self.set_laptime(data.lastLapTime, data.isValidLap)
                 else:
-                    laptime = self.set_laptime(veh_info.bestLapTime)
+                    laptime = self.set_laptime(data.bestLapTime)
                 self.update_lpt(self.bars_lpt[idx], laptime, state)
             # Vehicle best laptime
             if _option["show_best_laptime"]:
                 if in_race and _option["show_best_laptime_from_recent_laps_in_race"]:
-                    laptime = veh_info.lapTimeHistory.best
+                    laptime = data.lapTimeHistory.best
                 else:
-                    laptime = veh_info.bestLapTime
+                    laptime = data.bestLapTime
                 self.update_blp(self.bars_blp[idx], laptime, state)
             # Vehicle average laptime
             if _option["show_average_laptime"]:
-                self.update_alp(self.bars_alp[idx], veh_info.lapTimeHistory.average, state)
+                self.update_alp(self.bars_alp[idx], data.lapTimeHistory.average, state)
             # Position in class
             if _option["show_position_in_class"]:
-                self.update_pic(self.bars_pic[idx], veh_info.positionInClass, veh_info.vehicleClass, state)
+                self.update_pic(self.bars_pic[idx], data.positionInClass, data.vehicleClass, state)
             # Vehicle class
             if _option["show_class"]:
-                self.update_cls(self.bars_cls[idx], veh_info.vehicleClass, state)
+                self.update_cls(self.bars_cls[idx], data.vehicleClass, state)
             # Vehicle in pit
             if _option["show_pit_status"]:
-                if veh_info.finishState > 0:
-                    if veh_info.finishState == 3:  # disqualify
+                if data.finishState > 0:
+                    if data.finishState == 3:  # disqualify
                         status_index = -1
                     else:  # finished
                         status_index = 4
-                elif veh_info.penaltyType > 0:  # penalty
-                    status_index = 4 + veh_info.penaltyType
-                elif veh_info.inPit > 0:  # pit & garage
-                    status_index = veh_info.inPit
-                elif veh_info.isYellow:  # yellow flag
+                elif data.penaltyType > 0:  # penalty
+                    status_index = 4 + data.penaltyType
+                elif data.inPit > 0:  # pit & garage
+                    status_index = data.inPit
+                elif data.isYellow:  # yellow flag
                     status_index = 3
                 else:  # none
                     status_index = 0
                 self.update_pit(self.bars_pit[idx], status_index, state)
             # Tyre compound
             if _option["show_tyre_compound"]:
-                self.update_tcp(self.bars_tcp[idx], veh_info.tireCompoundName, state)
+                self.update_tcp(self.bars_tcp[idx], data.tireCompoundName, state)
             # Pitstop count
             if _option["show_pitstop_count"]:
-                self.update_psc(self.bars_psc[idx], veh_info.numPitStops, veh_info.pitRequested, state)
+                self.update_psc(self.bars_psc[idx], data.numPitStops, data.pitRequested, state)
             # Delta laptime
             if _option["show_delta_laptime"]:
-                delta_lap = calc.delta_laptime(veh_info.lapTimeHistory.data, plr_veh_info.lapTimeHistory.data, self.max_delta)
+                delta_lap = calc.delta_laptime(data.lapTimeHistory.data, plr_data.lapTimeHistory.data, self.max_delta)
                 self.update_dlt(self.bars_dlt[idx], delta_lap, state)
             # Remaining energy
             if _option["show_energy_remaining"]:
-                self.update_nrg(self.bars_nrg[idx], veh_info.energyRemaining, state)
+                self.update_nrg(self.bars_nrg[idx], data.energyRemaining, state)
             # Energy usage
             if _option["show_energy_usage"]:
-                nrg_usage = veh_info.energyHistory.used
-                nrg_average = veh_info.energyHistory.average
+                nrg_usage = data.energyHistory.used
+                nrg_average = data.energyHistory.average
                 if nrg_usage <= 0:
-                    nrg_usage = veh_info.fuelHistory.used
-                    nrg_average = veh_info.fuelHistory.average
+                    nrg_usage = data.fuelHistory.used
+                    nrg_average = data.fuelHistory.average
                 self.update_use(self.bars_use[idx], nrg_usage, nrg_average, state)
             # Vehicle integrity
             if _option["show_vehicle_integrity"]:
-                self.update_dmg(self.bars_dmg[idx], veh_info.vehicleIntegrity, state)
+                self.update_dmg(self.bars_dmg[idx], data.vehicleIntegrity, state)
             # Incidents
             if _option["show_incidents"]:
-                self.update_icd(self.bars_icd[idx], veh_info.incidents, state)
+                self.update_icd(self.bars_icd[idx], data.incidents, state)
             # Track limits points
             if _option["show_track_limits_points"]:
-                self.update_tlp(self.bars_tlp[idx], veh_info.trackLimitsPoints, state)
+                self.update_tlp(self.bars_tlp[idx], data.trackLimitsPoints, state)
             # Stint laps
             if _option["show_stint_laps"]:
-                self.update_stl(self.bars_stl[idx], veh_info.currentStintLaps, veh_info.estimatedStintLaps, state)
+                self.update_stl(self.bars_stl[idx], data.currentStintLaps, data.estimatedStintLaps, state)
             # Speed trap
             if _option["show_speed_trap"]:
-                self.update_spd(self.bars_spd[idx], veh_info.speedTrap.speed, state)
+                self.update_spd(self.bars_spd[idx], data.speedTrap.speed, state)
             # Lift and coast time
             if _option["show_lift_and_coast_time"]:
-                self.update_lic(self.bars_lic[idx], veh_info.licoTimer.elapsed, veh_info.licoTimer.idling, state)
+                self.update_lic(self.bars_lic[idx], data.licoTimer.elapsed, data.licoTimer.idling, state)
 
     # GUI update methods
     def update_pos(self, target, *data):
