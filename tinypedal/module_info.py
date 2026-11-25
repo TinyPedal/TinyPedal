@@ -507,6 +507,7 @@ class VehicleData:
     lastLapTime: float = DATA.MAX_SECONDS
     estimatedLapTime: float = DATA.MAX_SECONDS
     estimatedTimeIntoLap: float = 0.0
+    distanceIntoLap: float = 0.0
     currentLapProgress: float = 0.0
     totalLapProgress: float = 0.0
     totalLapCompleted: int = 0
@@ -520,7 +521,7 @@ class VehicleData:
     isYellow: bool = False
     isValidLap: bool = False
     finishState: int = 0
-    inPit: int = 0
+    inPit: int = -1
     isClassFastestLastLap: bool = False
     numPitStops: int = 0
     penaltyType: int = 0

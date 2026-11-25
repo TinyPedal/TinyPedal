@@ -52,6 +52,8 @@ class Realtime(DataModule):
         vehicle_resets = None
         update_interval = self.idle_interval
 
+        setting_telemetry = self.cfg.telemetry
+
         gen_auto_backup_car_setup = auto_backup_car_setup(
             filepath=self.cfg.path.car_setups,
         )
@@ -81,7 +83,7 @@ class Realtime(DataModule):
 
                 gen_record_driver_stats.send(vehicle_resets)
 
-                if self.cfg.telemetry["enable_auto_backup_car_setup"]:
+                if setting_telemetry["enable_auto_backup_car_setup"]:
                     gen_auto_backup_car_setup.send(vehicle_resets)
 
             else:

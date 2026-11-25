@@ -48,7 +48,7 @@ def rf2_restapi_tasks() -> tuple[RestAPITask, ...]:
         ResOutput("privateQualifying", 0, valid_value_type, ("currentValue",)),
     )
     res_garagesetup = (
-        ResOutput("lastCarSetup", (), ExportCarSetupRF2()),
+        ResOutput("lastCarSetup", (), ExportCarSetupRF2().export),
     )
     # Define task set
     return (

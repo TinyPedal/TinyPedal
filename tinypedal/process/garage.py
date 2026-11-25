@@ -277,7 +277,7 @@ class ExportCarSetupRF2:
     def __init__(self):
         self._shared_data = {}
 
-    def __call__(self, source: dict, default: tuple) -> tuple[str, ...]:
+    def export(self, source: dict, default: tuple) -> tuple[str, ...]:
         """Export rf2 car setup"""
         temp_data = self._shared_data
         if not isinstance(source, dict) or not source:
