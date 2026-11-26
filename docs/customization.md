@@ -1765,7 +1765,7 @@ Enable notes module.
 
 
 ## Relative module
-**This module provides vehicle relative and standings data.**
+**This module provides vehicle relative standings data.**
 
     module_relative
 Enable relative module.

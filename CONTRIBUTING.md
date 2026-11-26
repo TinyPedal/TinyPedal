@@ -4,6 +4,7 @@ Thank you for your interests on **TinyPedal** project.
 
 Before posting new feature requests or issues, make sure to:
 
+- Read this guideline thoroughly to avoid miscommunication or wasting your time.
 - Read [Frequently Asked Questions](https://github.com/TinyPedal/TinyPedal/wiki/Frequently-Asked-Questions) and [User Guide](https://github.com/TinyPedal/TinyPedal/wiki/User-Guide) for existing issues to avoid duplicates.
 - Use [github search](https://github.com/search?q=repo%3ATinyPedal%2FTinyPedal&type=issues) to quickly search for related issue.
 - Check out [Pinned issues](https://github.com/TinyPedal/TinyPedal/issues) at top of issues page for common issues.
@@ -31,9 +32,12 @@ There are often bug reports which turned out to be issues caused by other third 
 
 For implementing features or fixing bugs, please open [Pull Requests](https://github.com/TinyPedal/TinyPedal/pulls).
 
-Please note that, the primary focus of TinyPedal project is simplicity and efficiency. Every feature should be carefully thought out before implementation. Not every Pull Requests may be accepted, as we will see what fits the best for the project.
-
 It is recommended to open [Issues](https://github.com/TinyPedal/TinyPedal/issues) to discuss about the feature beforehand, to avoid wasting time on feature that will not be considered.
+
+> [!IMPORTANT]
+> The primary focus of TinyPedal project is simplicity and efficiency. Every feature should be carefully thought out before implementation. Quality is valued over quantity.
+>
+> **Not every Pull Requests may be accepted.** Feature Implementation or Pull Request may be rejected if it is determined not fitting for the project. Please do not waste time on implementation if you would have a hard feeling about this.
 
 ### AI code and usage
 
