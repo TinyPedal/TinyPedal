@@ -1764,15 +1764,6 @@ Enable notes module.
 [**`Back to Top`**](#)
 
 
-## Relative module
-**This module provides vehicle relative standings data.**
-
-    module_relative
-Enable relative module.
-
-[**`Back to Top`**](#)
-
-
 ## Sectors module
 **This module provides sectors timing data.**
 

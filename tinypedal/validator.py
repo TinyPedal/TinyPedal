@@ -205,3 +205,31 @@ def state_timer(interval: float, last: float = 0):
             yield True
         else:
             yield False
+
+
+def timeout_timer(interval: float, last: float = 0):
+    """Timeout timer
+
+    Args:
+        interval: time interval in seconds.
+        last: last time stamp in seconds.
+    Yields:
+        timeout: seconds per timeout, 0 while not timeout.
+    """
+    def _timer(_interval: float, _last: float):
+        timeout = 0.0
+        while True:
+            seconds = yield timeout
+
+            if _last > seconds:
+                _last = seconds
+
+            timeout = seconds - _last
+            if timeout >= _interval:
+                _last = seconds
+            else:
+                timeout = 0.0
+
+    t = _timer(interval, last)
+    next(t)
+    return t.send

@@ -68,11 +68,6 @@ MODULE_DEFAULT = {
         "update_interval": 10,
         "idle_update_interval": 400,
     },
-    "module_relative": {
-        "enable": True,
-        "update_interval": 100,
-        "idle_update_interval": 400,
-    },
     "module_sectors": {
         "enable": True,
         "update_interval": 10,

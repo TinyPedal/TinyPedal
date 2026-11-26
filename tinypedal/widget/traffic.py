@@ -157,7 +157,7 @@ class Realtime(Overlay):
         leader_overtake_index = veh_info.leaderIndex
 
         for data in veh_info.activeDataSet:
-            if data.inPit:
+            if data.isPlayer or data.inPit:
                 continue
             opt_index = data.index
             # Ahead

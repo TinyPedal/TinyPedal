@@ -28,7 +28,7 @@ from ..constant import DATA
 from ..module_info import VehicleData, VehiclesInfo
 from ..process import standings
 from ..userfile.brands import select_brand_name
-from ..validator import state_timer
+from ..validator import timeout_timer
 from ._base import DataModule
 
 
@@ -51,7 +51,8 @@ class Realtime(DataModule):
         max_lap_diff_behind = self.mcfg["lap_difference_behind_threshold"]
         max_finish_time_diff = max(self.mcfg["finish_time_difference_threshold"], 0)
 
-        gen_priority_timer_low = state_timer(0.2)
+        timeout_timer_200 = timeout_timer(0.19)
+        timeout_timer_1000 = timeout_timer(0.99)
         track_length = 0.0
         in_race = False
 
@@ -85,7 +86,8 @@ class Realtime(DataModule):
                         track_length,
                     )
 
-                    if next(gen_priority_timer_low):
+                    if timeout_timer_200(session_elapsed):
+                        timeout_1000 = timeout_timer_1000(session_elapsed)
                         session_type = api.read.session.session_type()
                         in_race = session_type == 4
                         track_length = api.read.lap.track_length()
@@ -98,6 +100,7 @@ class Realtime(DataModule):
                             session_elapsed,
                             track_length,
                             in_race,
+                            timeout_1000,
                         )
 
                         # Conditional updates
@@ -158,6 +161,8 @@ def update_priority_high(output: VehiclesInfo, elapsed_time: float, track_length
     nearest_line = DATA.MAX_METERS
     speedtrap_distance = minfo.mapping.speedTrapPosition
 
+    plt_laptime_est = output.playerData.estimatedLapTime
+    plr_time_into = api.read.timing.estimated_time_into()
     plr_pos_x = api.read.vehicle.position_longitudinal()
     plr_pos_y = api.read.vehicle.position_lateral()
     plr_ori_yaw = api.read.vehicle.orientation_yaw()
@@ -182,6 +187,7 @@ def update_priority_high(output: VehiclesInfo, elapsed_time: float, track_length
             output.playerData = data  # save player info
             output.playerIndex = index
             data.elapsedTime = elapsed_time
+            data.estimatedTimeIntoLap = plr_time_into
             data.worldPositionX = plr_pos_x
             data.worldPositionY = plr_pos_y
         else:
@@ -219,6 +225,22 @@ def update_priority_high(output: VehiclesInfo, elapsed_time: float, track_length
             if nearest_line > data.relativeStraightDistance:
                 nearest_line = data.relativeStraightDistance
 
+            # Relative time
+            data.estimatedTimeIntoLap = api.read.timing.estimated_time_into(index)
+            if data.inPit != 2:
+                diff_time = plr_time_into - data.estimatedTimeIntoLap
+                diff_time_ahead = diff_time_behind = diff_time - diff_time // plt_laptime_est * plt_laptime_est
+                if diff_time_ahead > 0:  # negative=ahead
+                    diff_time_ahead -= plt_laptime_est
+                if diff_time_behind < 0:  # positive=behind
+                    diff_time_behind += plt_laptime_est
+
+                data.relativeGapAhead = diff_time_ahead
+                data.relativeGapBehind = diff_time_behind
+            else:
+                data.relativeGapAhead = -DATA.MAX_SECONDS
+                data.relativeGapBehind = DATA.MAX_SECONDS
+
     # Output extra info
     output.nearestLine = nearest_line
     output.dataSetVersion += 1
@@ -231,6 +253,7 @@ def update_priority_low(
     elapsed_time: float,
     track_length: float,
     in_race: bool,
+    timeout_1000: float,
 ) -> None:
     """Update vehicle info - low priority data"""
     nearest_time_behind = DATA.MAX_SECONDS
@@ -353,6 +376,11 @@ def update_priority_low(
                     nearest_yellow_ahead = opt_rel_distance
                 if nearest_yellow_behind < opt_rel_distance <= 0:
                     nearest_yellow_behind = opt_rel_distance
+
+        # Relative time
+        if timeout_1000:
+            data.relativeDeltaAhead.update(-data.relativeGapAhead)
+            data.relativeDeltaBehind.update(data.relativeGapBehind)
 
     # Output extra info
     output.nearestTraffic = nearest_time_behind
