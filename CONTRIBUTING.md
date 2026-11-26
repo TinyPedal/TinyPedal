@@ -37,7 +37,9 @@ It is recommended to open [Issues](https://github.com/TinyPedal/TinyPedal/issues
 > [!IMPORTANT]
 > The primary focus of TinyPedal project is simplicity and efficiency. Every feature should be carefully thought out before implementation. Quality is valued over quantity.
 >
-> **Not every Pull Requests may be accepted.** Feature Implementation or Pull Request may be rejected if it is determined not fitting for the project. Please do not waste time on implementation if you would have a hard feeling about this.
+> **Not every Pull Requests may be accepted.** Feature Implementation or Pull Request may be rejected if it is determined not fitting for the project; or it does not meet the requirements outlined below.
+>
+> Please do not waste time on implementation if above notice is not acceptable to you.
 
 ### AI code and usage
 
@@ -69,5 +71,3 @@ Different games may have very different API accessing methods and data structure
 - Game API accessing must be restricted to READ-ONLY. **Modifying game API data or controlling game behavior will not be accepted.**
 
 - Implementation must be thoroughly tested and proved to be working via **Pull Requests**, before the code will be accepted into this project. This may take as long as the time required.
-
-Please do not waste time on implementation if above notice is not acceptable.
