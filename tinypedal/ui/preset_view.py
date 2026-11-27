@@ -40,7 +40,12 @@ from .. import app_signal, cfg
 from ..constant import APP, CONFIG, FILE
 from ..userfile.json_setting import create_backup_file, set_backup_timestamp
 from ._common import UIScaler
-from .preset_management import CreatePreset, PresetTransfer, RestoreBackup
+from .preset_management import (
+    CreatePreset,
+    PresetTagItem,
+    PresetTransfer,
+    RestoreBackup,
+)
 
 
 class PresetList(QWidget):
@@ -106,7 +111,9 @@ class PresetList(QWidget):
             item.setText(preset_name)
             self.listbox_preset.addItem(item)
             # Add primary preset tag
-            label_item = PresetTagItem(None, preset_name)
+            label_item = PresetTagItem()
+            label_item.add_class_name(preset_name)
+            label_item.add_file_lock(preset_name)
             self.listbox_preset.setItemWidget(item, label_item)
 
         loaded_preset = cfg.filename.setting
@@ -250,30 +257,3 @@ class PresetList(QWidget):
             defaultButton=QMessageBox.No,
         )
         return confirm == QMessageBox.Yes
-
-
-class PresetTagItem(QWidget):
-    """Preset tag item"""
-
-    def __init__(self, parent, preset_name: str):
-        super().__init__(parent)
-        layout_item = QHBoxLayout()
-        layout_item.setContentsMargins(0, 0, 0, 0)
-        layout_item.setSpacing(0)
-        layout_item.addStretch(1)
-
-        # Class name tag
-        for class_name, class_data in cfg.user.classes.items():
-            if preset_name == class_data["preset"]:
-                label_class_name = QLabel(class_name)
-                label_class_name.setStyleSheet(f"background: {class_data['color']};")
-                layout_item.addWidget(label_class_name)
-
-        # File lock tag
-        preset_filename = f"{preset_name}{FILE.EXT_JSON}"
-        if preset_filename in cfg.user.filelock:
-            label_locked = QLabel(f"{cfg.user.filelock[preset_filename]['version']}")
-            label_locked.setStyleSheet("background: #777;")
-            layout_item.addWidget(label_locked)
-
-        self.setLayout(layout_item)

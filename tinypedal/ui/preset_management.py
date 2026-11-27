@@ -42,6 +42,7 @@ from PySide2.QtWidgets import (
     QListWidgetItem,
     QMessageBox,
     QVBoxLayout,
+    QWidget,
 )
 
 from .. import app_signal, cfg
@@ -53,12 +54,50 @@ from ..setting.validator import PresetValidator
 from ..userfile.json_setting import (
     load_setting_json_file,
     save_and_verify_json_file,
-    verify_json_file,
+    verify_json_version,
 )
 from ..validator import is_allowed_filename
 from ._common import QVAL_FILENAME, BaseDialog, BaseEditor, CompactButton, UIScaler
 
 logger = logging.getLogger(__name__)
+
+
+class PresetTagItem(QWidget):
+    """Preset tag item"""
+
+    def __init__(self, parent=None, align_right: bool = True):
+        super().__init__(parent)
+        layout_item = QHBoxLayout(self)
+        layout_item.setContentsMargins(0, 0, 0, 0)
+        layout_item.setSpacing(0)
+        layout_item.addStretch(1)
+        if not align_right:
+            layout_item.setDirection(QHBoxLayout.RightToLeft)
+
+    def add_version(self, version: str):
+        """Add version tag"""
+        layout_item = self.layout()
+        label_tag = QLabel(version)
+        label_tag.setStyleSheet("background: #555;")
+        layout_item.addWidget(label_tag)
+
+    def add_class_name(self, preset_name: str):
+        """Add class name tag"""
+        layout_item = self.layout()
+        for class_name, class_data in cfg.user.classes.items():
+            if preset_name == class_data["preset"]:
+                label_class_name = QLabel(class_name)
+                label_class_name.setStyleSheet(f"background: {class_data['color']};")
+                layout_item.addWidget(label_class_name)
+
+    def add_file_lock(self, preset_name: str):
+        """Add file lock tag"""
+        layout_item = self.layout()
+        preset_filename = f"{preset_name}{FILE.EXT_JSON}"
+        if preset_filename in cfg.user.filelock:
+            label_locked = QLabel(f"{cfg.user.filelock[preset_filename]['version']}")
+            label_locked.setStyleSheet("background: #777;")
+            layout_item.addWidget(label_locked)
 
 
 class CreatePreset(BaseDialog):
@@ -204,13 +243,18 @@ class RestoreBackup(BaseEditor):
                 continue
             item = QListWidgetItem()
             item.setText(backup_name)
-            item.is_valid = verify_json_file(None, backup_name, cfg.path.settings)
+            self.listbox_backup.addItem(item)
+            version = verify_json_version(backup_name, cfg.path.settings)
+            item.is_valid = version is not None
             item.is_style = not is_allowed_filename(basename)
             if not item.is_valid:
                 item.setForeground(invalid_color)
             elif item.is_style:
                 item.setForeground(style_color)
-            self.listbox_backup.addItem(item)
+            if version:  # add preset tag
+                label_item = PresetTagItem()
+                label_item.add_version(version)
+                self.listbox_backup.setItemWidget(item, label_item)
 
     def is_selected(self) -> bool:
         """Is file selected"""

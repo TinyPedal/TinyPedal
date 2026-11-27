@@ -143,17 +143,11 @@ def save_json_file(
             json.dump(dict_user, jsonfile, indent=4)
 
 
-def verify_json_file(
-    dict_user: dict | None, filename: str, filepath: str, extension: str = ""
-) -> bool:
+def verify_json_file(dict_user: dict, filename: str, filepath: str, extension: str = "") -> bool:
     """Verify saved json file"""
     filename_source = f"{filepath}{filename}{extension}"
     try:
         with open(filename_source, "r", encoding="utf-8") as jsonfile:
-            # Check load only
-            if dict_user is None:
-                json.load(jsonfile)
-                return True
             # Compare saved data with loaded
             saved = json.dumps(json.load(jsonfile))
             loaded = json.dumps(dict_user)
@@ -163,6 +157,25 @@ def verify_json_file(
     except (AttributeError, TypeError, ValueError, OSError):
         logger.error("USERDATA: unable to verify %s", filename_source)
     return False
+
+
+def verify_json_version(filename: str, filepath: str, extension: str = "") -> str | None:
+    """Verify and check json file version"""
+    filename_source = f"{filepath}{filename}{extension}"
+    try:
+        with open(filename_source, "r", encoding="utf-8") as jsonfile:
+            dict_user = json.load(jsonfile)
+            preset_info = dict_user.get("preset")
+            if isinstance(preset_info, dict):
+                version = preset_info.get("version")
+                if isinstance(version, str):
+                    return version
+            return ""
+    except FileNotFoundError:
+        logger.error("USERDATA: not found %s", filename_source)
+    except (AttributeError, TypeError, ValueError, OSError):
+        logger.error("USERDATA: unable to verify %s", filename_source)
+    return None
 
 
 def copy_and_verify_file(filename_source: str, filename_copied: str) -> bool:
