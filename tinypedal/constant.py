@@ -21,6 +21,7 @@ Constants
 """
 
 import sys
+import time
 from types import MappingProxyType
 
 from .decorator import constantclass
@@ -314,7 +315,7 @@ class FILE:
     STATS_DRIVER = f"driver{EXT_STATS}"
 
     # Log file
-    LOG_APP = f"tinypedal{EXT_LOG}"
+    LOG_APP = f"tinypedal-{time.strftime('%Y-%m-%d-%H-%M-%S')}{EXT_LOG}"
     LOG_PID = f"pid{EXT_LOG}"
 
     # Document file

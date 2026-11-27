@@ -27,7 +27,7 @@ import json
 import logging
 import os
 import shutil
-from time import localtime, monotonic, sleep, strftime, time
+from time import monotonic, sleep, strftime, time
 from typing import Callable
 
 from ..constant import FILE
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 def set_backup_timestamp(prefix: str = FILE.EXT_BACKUP, timestamp: bool = True) -> str:
     """Set backup timestamp"""
     if timestamp:
-        time_local = strftime("%Y-%m-%d-%H-%M-%S", localtime())
+        time_local = strftime("%Y-%m-%d-%H-%M-%S")
         time_millisecond = str(time() % 1)[2:8]  # keep 6 decimals
         time_stamp = f"-{time_local}-{time_millisecond}"
     else:

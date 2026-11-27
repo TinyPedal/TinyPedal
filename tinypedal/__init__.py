@@ -150,7 +150,15 @@ def start():
     # Config logger
     from .constant import APP, FILE
     from .log_handler import set_logging_level
-    set_logging_level(logger, path_global, FILE.LOG_APP, log_stream, log_level)
+
+    set_logging_level(
+        logger,
+        path_global,
+        FILE.LOG_APP,
+        os.getenv("RUN_FROM_SOURCE"),
+        log_stream,
+        log_level,
+    )
 
     # Check single instance
     _check_single_instance(single_instance, path_global, FILE.LOG_PID)

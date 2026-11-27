@@ -34,7 +34,8 @@ def new_stream_handler(_logger: logging.Logger, stream) -> logging.StreamHandler
         Stream handler.
     """
     format_console = logging.Formatter(
-        "%(asctime)s.%(msecs)03d %(levelname)s: %(message)s", datefmt="%H:%M:%S"
+        "%(asctime)s.%(msecs)03d %(levelname)s: %(message)s",
+        datefmt="%H:%M:%S",
     )
     _handler = logging.StreamHandler(stream)
     _handler.setFormatter(format_console)
@@ -61,7 +62,14 @@ def new_file_handler(_logger: logging.Logger, filepath: str, filename: str) -> l
     return _handler
 
 
-def set_logging_level(_logger: logging.Logger, filepath: str, filename: str, log_stream=None, log_level=1) -> None:
+def set_logging_level(
+    _logger: logging.Logger,
+    filepath: str,
+    filename: str,
+    has_console: bool,
+    log_stream=None,
+    log_level=1,
+) -> None:
     """Set logging level
 
     Args:
@@ -74,11 +82,11 @@ def set_logging_level(_logger: logging.Logger, filepath: str, filename: str, log
             2 = output all log to both console & file.
     """
     _logger.setLevel(logging.INFO)
-    if log_stream is not None:
+    if log_stream is not None:  # always log to stream
         new_stream_handler(_logger, log_stream)
-    if log_level >= 1:
+    if has_console and log_level >= 1:  # log to console
         new_stream_handler(_logger, sys.stdout)
         _logger.info("LOGGING: output to console")
-    if log_level == 2:
+    if log_level == 2:  # log to file
         new_file_handler(_logger, filepath, filename)
-        _logger.info("LOGGING: output to %s", filename)
+        _logger.info("LOGGING: output to file: %s", filename)

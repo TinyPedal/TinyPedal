@@ -22,7 +22,7 @@ Stats module
 
 from __future__ import annotations
 
-from time import localtime, strftime
+from time import strftime
 
 from .. import api, minfo, realtime_state
 from .. import calculation as calc
@@ -315,7 +315,7 @@ def auto_backup_car_setup(filepath: str):
                     if last_data_hash != data_hash:
                         temp_filename = set_car_setup_filename(
                             api.alias,
-                            strftime("%Y-%m-%d %H-%M-%S", localtime()),
+                            strftime("%Y-%m-%d %H-%M-%S"),
                             api.read.session.track_name(),
                             api.read.vehicle.class_name(),
                             api.read.vehicle.vehicle_model(),
