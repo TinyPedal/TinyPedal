@@ -272,34 +272,38 @@ class PresetValidator:
         cls.sort_key_order(dict_user, dict_def)
 
     @classmethod
-    def global_preset(cls, dict_user: dict, dict_def: dict) -> dict:
+    def global_preset(cls, dict_user: dict, dict_def: dict) -> bool:
         """Validate global preset"""
         # Pre update global preset, run before validation
         preset_version = _get_preset_version(dict_user, version.__version__)
         build_version = parse_version_string(version.__version__)
-        if preset_version == DATA.VERSION_NA or preset_version < build_version:
+        is_old_preset = (preset_version == DATA.VERSION_NA or preset_version < build_version)
+        if is_old_preset:
             preupdate_global_setting(preset_version, dict_user)
         # Validate preset
-        return cls._validate(dict_user, dict_def)
+        cls._validate(dict_user, dict_def)
+        return is_old_preset
 
     @classmethod
-    def user_preset(cls, dict_user: dict, dict_def: dict) -> dict:
+    def user_preset(cls, dict_user: dict, dict_def: dict) -> bool:
         """Validate user preset"""
         # Pre update user preset, run before validation
         preset_version = _get_preset_version(dict_user, version.__version__)
         build_version = parse_version_string(version.__version__)
-        if preset_version == DATA.VERSION_NA or preset_version < build_version:
+        is_old_preset = (preset_version == DATA.VERSION_NA or preset_version < build_version)
+        if is_old_preset:
             preupdate_user_setting(preset_version, dict_user)
         # Validate preset
-        return cls._validate(dict_user, dict_def)
+        cls._validate(dict_user, dict_def)
+        return is_old_preset
 
     @classmethod
-    def shortcuts_preset(cls, dict_user: dict, dict_def: dict) -> dict:
+    def shortcuts_preset(cls, dict_user: dict, dict_def: dict) -> bool:
         """Validate global keyboard shortcuts preset"""
         dict_user = cls._validate(dict_user, dict_def)
         for options in dict_user.values():
             options["bind"] = validate_hotkey(options["bind"])
-        return dict_user
+        return False
 
     @classmethod
     def _validate(cls, dict_user: dict, dict_def: dict) -> dict:

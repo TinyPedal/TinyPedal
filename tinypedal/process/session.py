@@ -87,11 +87,12 @@ class LMUResults:
                     if pos_beg > 11:
                         pos_beg += 15
                         pos_end = line.find(b'"', pos_beg)
-                        try:
-                            points = float(line[pos_beg:pos_end])
-                            driver_data["cut_points"] = points
-                        except ValueError:
-                            return
+                        if pos_end > pos_beg:
+                            try:
+                                points = float(line[pos_beg:pos_end])
+                                driver_data["cut_points"] = points
+                            except ValueError:
+                                return
 
     def _penalty_scored(self, line: str):
         """Log penalty - scored"""

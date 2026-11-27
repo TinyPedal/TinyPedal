@@ -57,11 +57,11 @@ def copy_setting(dict_user: dict) -> dict:
 
 def load_setting_json_file(
     filename: str, filepath: str, dict_def: dict, file_info: str = "user preset",
-    validator: Callable[[dict, dict], dict] | None = None, max_attempts: int = 5,
+    validator: Callable[[dict, dict], bool] | None = None, max_attempts: int = 5,
 ) -> dict:
     """Load setting json file & verify"""
     filename_source = f"{filepath}{filename}"
-    # Start loading attempts
+    is_old_file = False
     attempts = max_attempts
     while attempts > 0:
         try:
@@ -69,7 +69,7 @@ def load_setting_json_file(
                 setting_user = json.load(jsonfile)
             # Verify & assign setting
             if callable(validator):
-                setting_user = validator(setting_user, dict_def)
+                is_old_file = validator(setting_user, dict_def)
             break
         except FileNotFoundError:
             logger.info("USERDATA: %s not found, fall back to default", filename)
@@ -81,8 +81,11 @@ def load_setting_json_file(
         sleep(0.05)
     else:
         logger.error("USERDATA: %s failed loading, fall back to default", filename)
-        create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
+        is_old_file = True
         setting_user = copy_setting(dict_def)
+
+    if is_old_file:
+        create_backup_file(filename, filepath, set_backup_timestamp(), show_log=True)
 
     logger.info("USERDATA: %s loaded (%s)", filename, file_info)
     return setting_user

@@ -1,5 +1,8 @@
 WIP
 -----------------------------
+* Preset management
+  - Now automatically creates backup file when loading a preset that used by previous TinyPedal version. Backup preset can be restored via "Restore" button under "Preset" Tab.
+
 * Track Map Viewer
   - Now supports click and drag for moving map view.
   - Added "Reset Map View" and "Reset Map Zoom" options to right-click context menu.

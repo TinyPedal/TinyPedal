@@ -86,7 +86,11 @@ TinyPedal automatically saves setting when user makes changes to widget position
 
 
 ## Backup JSON file
-TinyPedal will automatically create backup file with time stamp suffix if old setting file fails to load, and new default `JSON` with same filename will be generated.
+TinyPedal will automatically create backup file when:
+- Loading a preset that created or used by previous TinyPedal version.
+- Failed to load a preset.
+
+Backup file will be created with time stamp suffix, and new default preset file with same filename will be generated.
 
 A newer released version will auto-update old setting and add new setting after loading. It may still be a good idea to manually backup files before upgrading to newer version.
 
