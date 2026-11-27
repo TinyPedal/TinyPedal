@@ -167,6 +167,8 @@ def update_priority_high(output: VehiclesInfo, elapsed_time: float, track_length
     plr_pos_y = api.read.vehicle.position_lateral()
     plr_ori_yaw = api.read.vehicle.orientation_yaw()
     plr_ori_yaw_offset = plr_ori_yaw - 3.14159265
+    plr_ori_sin = calc.sin(plr_ori_yaw_offset)
+    plr_ori_cos = calc.cos(plr_ori_yaw_offset)
 
     # Update dataset from all vehicles in current session
     for index, data in enumerate(output.activeDataSet):
@@ -217,9 +219,8 @@ def update_priority_high(output: VehiclesInfo, elapsed_time: float, track_length
 
                 data.relativeStraightDistance = calc.hypot(pos_rel_x, pos_rel_y)
                 data.relativeOrientationRadians = opt_ori_yaw - plr_ori_yaw
-                data.relativeRotatedPositionX, data.relativeRotatedPositionY = (
-                    calc.rotate_coordinate(plr_ori_yaw_offset, pos_rel_x, pos_rel_y)
-                )
+                data.relativeRotatedPositionX = plr_ori_cos * pos_rel_x - plr_ori_sin * pos_rel_y
+                data.relativeRotatedPositionY = plr_ori_cos * pos_rel_y + plr_ori_sin * pos_rel_x
 
             # Nearest straight line distance (non local players)
             if nearest_line > data.relativeStraightDistance:

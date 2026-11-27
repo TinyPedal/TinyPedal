@@ -158,8 +158,10 @@ def rotate_coordinate(ori_rad: float, pos_x: float, pos_y: float) -> tuple[float
     """Rotate x y coordinates"""
     sin_rad = sin(ori_rad)
     cos_rad = cos(ori_rad)
-    return (cos_rad * pos_x - sin_rad * pos_y,
-            cos_rad * pos_y + sin_rad * pos_x)
+    return (
+        cos_rad * pos_x - sin_rad * pos_y,
+        cos_rad * pos_y + sin_rad * pos_x,
+    )
 
 
 def time_interp_coordinate(
@@ -592,18 +594,13 @@ def zoom_map(coords: Sequence[tuple[float, float]], map_scale: float, margin: in
     return tuple(zip(x_range_scaled, y_range_scaled)), map_size, map_offset
 
 
-def rotate_map(coords: Sequence[tuple[float, float]], angle: int):
-    """Rotate map coordinates"""
-    rot_rad = radians(angle)
-    for x, y in coords:
-        yield rotate_coordinate(rot_rad, x, y)
-
-
 def scale_map(coords: Sequence[tuple[float, float]], area_size: int, margin: int = 0, angle: int = 0):
     """Scale map data"""
     # Rotate & separate X & Y coordinates
     if angle != 0:
-        x_range, y_range = tuple(zip(*rotate_map(coords, angle)))
+        angle_rad = radians(angle)
+        rotated_coords = (rotate_coordinate(angle_rad, x, y) for x, y in coords)
+        x_range, y_range = tuple(zip(*rotated_coords))
     else:
         x_range, y_range = tuple(zip(*coords))
     # Map size: x=width, y=height
@@ -667,24 +664,15 @@ def line_intersect_coords(
     rad: amount rotation (radians) to apply
     length: length between coordinates
     """
-    yaw_rad = atan2(
-        coord_b[1] - coord_a[1],
-        coord_b[0] - coord_a[0]
+    yaw_rad = atan2(coord_b[1] - coord_a[1], coord_b[0] - coord_a[0])
+    pos_x1, pos_y1 = rotate_coordinate(yaw_rad + rad, length, 0)
+    pos_x2, pos_y2 = rotate_coordinate(yaw_rad - rad, length, 0)
+    return (
+        pos_x1 + coord_a[0],
+        pos_y1 + coord_a[1],
+        pos_x2 + coord_a[0],
+        pos_y2 + coord_a[1],
     )
-    pos_x1, pos_y1 = rotate_coordinate(
-        yaw_rad + rad,
-        length,  # x pos
-        0  # y pos
-    )
-    pos_x2, pos_y2 = rotate_coordinate(
-        yaw_rad - rad,
-        length,  # x pos
-        0  # y pos
-    )
-    return (pos_x1 + coord_a[0],
-            pos_y1 + coord_a[1],
-            pos_x2 + coord_a[0],
-            pos_y2 + coord_a[1])
 
 
 # Fuel

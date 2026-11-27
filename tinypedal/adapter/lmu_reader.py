@@ -572,10 +572,12 @@ class Session(_reader.Session, DataAdapter):
 
     def cut_points(self, index: int | None = None) -> float:
         """Current track limits cut points per penalty"""
-        points = self.shmm.lmuScorInfo.mTrackLimitsStepsPerPoint
-        if points:
-            return self.shmm.lmuTeleVeh(index).mTrackLimitsSteps / points
-        return 0.0
+        max_points = self.shmm.lmuScorInfo.mTrackLimitsStepsPerPoint
+        if max_points:
+            points = self.shmm.lmuTeleVeh(index).mTrackLimitsSteps / max_points
+            if points > 0:
+                return points
+        return self.shmm.lmuResults(index)["cut_points"]
 
     def wind_direction(self) -> float:
         """Wind direction (degrees)"""

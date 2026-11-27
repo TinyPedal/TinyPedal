@@ -393,15 +393,14 @@ class SpeedTrap:
 
         # Center distance to speed trap position
         distance_into = circular_position_relative(track_length, speedtrap_distance, distance_into)
-
-        if self._record_next:
-            # Distance before speed trap
-            if 0 > distance_into:
-                self._distance_before = distance_into
-                self._speed_before = speed
-            else:
-                # Distance after speed trap
-                if distance_into - self._distance_before < 200:
+        if -200 < distance_into < 200:
+            if self._record_next:
+                # Distance before speed trap
+                if 0 > distance_into:
+                    self._distance_before = distance_into
+                    self._speed_before = speed
+                else:
+                    # Distance after speed trap
                     self.speed = linear_interp(
                         0,
                         self._distance_before,
@@ -409,10 +408,10 @@ class SpeedTrap:
                         distance_into,
                         speed,
                     )
-                # Turn off record until distance circles back
-                self._record_next = False
-        elif 0 > distance_into:
-            self._record_next = True
+                    # Turn off record until distance circles back
+                    self._record_next = False
+            elif 0 > distance_into:
+                self._record_next = True
 
 
 @slotclass

@@ -38,6 +38,7 @@ class LMUResults:
         "contact_vehicle": 0,
         "contact_immovable": 0,
         "track_cut": 0,
+        "cut_points": 0.0,
         "penalty": "",
     })
 
@@ -81,6 +82,16 @@ class LMUResults:
                 if pos_end > pos_beg:
                     driver_data = self._get_driver(line[pos_beg:pos_end])
                     driver_data["track_cut"] += 1
+                    # Get points
+                    pos_beg = line.find(b"CurrentPoints=")
+                    if pos_beg > 11:
+                        pos_beg += 15
+                        pos_end = line.find(b'"', pos_beg)
+                        try:
+                            points = float(line[pos_beg:pos_end])
+                            driver_data["cut_points"] = points
+                        except ValueError:
+                            return
 
     def _penalty_scored(self, line: str):
         """Log penalty - scored"""
